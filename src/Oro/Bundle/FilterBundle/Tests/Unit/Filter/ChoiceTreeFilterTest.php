@@ -25,6 +25,7 @@ class ChoiceTreeFilterTest extends OrmTestCase
     /** @var ChoiceTreeFilter */
     private $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);

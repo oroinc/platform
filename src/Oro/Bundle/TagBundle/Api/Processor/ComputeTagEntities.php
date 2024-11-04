@@ -24,9 +24,7 @@ class ComputeTagEntities implements ProcessorInterface
         $this->dataLoader = $dataLoader;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeLoadedDataContext $context */

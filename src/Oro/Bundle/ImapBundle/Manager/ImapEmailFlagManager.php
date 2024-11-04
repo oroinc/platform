@@ -32,9 +32,7 @@ class ImapEmailFlagManager implements EmailFlagManagerInterface
         $this->em = $em;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setFlags(EmailFolder $folder, Email $email, $flags)
     {
         $repoImapEmail = $this->em->getRepository(ImapEmail::class);
@@ -43,17 +41,13 @@ class ImapEmailFlagManager implements EmailFlagManagerInterface
         $this->connector->setFlags($uid, $flags);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setUnseen(EmailFolder $folder, Email $email)
     {
         $this->setFlags($folder, $email, [self::FLAG_UNSEEN]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setSeen(EmailFolder $folder, Email $email)
     {
         $this->setFlags($folder, $email, [self::FLAG_SEEN]);

@@ -16,6 +16,7 @@ class RequestListenerTest extends \PHPUnit\Framework\TestCase
     /** @var RequestListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->featureChecker = $this->createMock(FeatureChecker::class);

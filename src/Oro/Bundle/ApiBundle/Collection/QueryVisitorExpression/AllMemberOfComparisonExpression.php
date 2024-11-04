@@ -22,9 +22,7 @@ class AllMemberOfComparisonExpression implements ComparisonExpressionInterface
         $this->notExpression = $notExpression;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkComparisonExpression(
         QueryExpressionVisitor $visitor,
         string $field,
@@ -41,7 +39,7 @@ class AllMemberOfComparisonExpression implements ComparisonExpressionInterface
         $visitor->addParameter($parameterName, $value);
         $visitor->addParameter($expectedNumberOfRecordsParameterName, $this->getExpectedNumberOfRecords($value));
 
-        $subquery = $visitor->createSubquery($field, true);
+        $subquery = $visitor->createSubquery($field, true, $expression !== $field ? $expression : null);
         $subquery->andWhere(
             $subquery->expr()->in(
                 QueryBuilderUtil::getSelectExpr($subquery),

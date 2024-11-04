@@ -20,6 +20,7 @@ class OAuthSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var OAuthSubscriber */
     private $subscriber;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);

@@ -24,17 +24,13 @@ class MutableEntityOverrideProvider implements EntityOverrideProviderInterface
         $this->substitutions[$entityClass] = $substituteEntityClass;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getSubstituteEntityClass(string $entityClass): ?string
     {
         return $this->substitutions[$entityClass] ?? null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEntityClass(string $substituteClass): ?string
     {
         $entityClass = array_search($substituteClass, $this->substitutions, true);

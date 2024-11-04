@@ -20,6 +20,7 @@ class WebpAwareImagineUrlProviderTest extends \PHPUnit\Framework\TestCase
 
     private WebpAwareImagineUrlProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->innerImagineUrlProvider = $this->createMock(ImagineUrlProvider::class);

@@ -10,11 +10,13 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class ViewFieldConfiguration implements FieldConfigInterface
 {
+    #[\Override]
     public function getSectionName(): string
     {
         return 'view';
     }
 
+    #[\Override]
     public function configure(NodeBuilder $nodeBuilder): void
     {
         $nodeBuilder

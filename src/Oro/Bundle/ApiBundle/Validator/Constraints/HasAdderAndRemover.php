@@ -20,25 +20,19 @@ class HasAdderAndRemover extends Constraint implements ConstraintWithStatusCodeI
     public $class;
     public $property;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getStatusCode(): int
     {
         return Response::HTTP_NOT_IMPLEMENTED;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRequiredOptions(): array
     {
         return ['class', 'property'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::PROPERTY_CONSTRAINT;

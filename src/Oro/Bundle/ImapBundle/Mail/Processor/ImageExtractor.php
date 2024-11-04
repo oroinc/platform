@@ -14,6 +14,7 @@ class ImageExtractor implements ContentIdExtractorInterface
      *
      * @return array
      */
+    #[\Override]
     public function extract(PartInterface $multipart)
     {
         $contents = [];

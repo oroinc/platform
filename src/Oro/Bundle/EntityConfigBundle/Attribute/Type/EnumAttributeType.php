@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityConfigBundle\Attribute\Type;
 
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 /**
@@ -11,33 +11,25 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
  */
 class EnumAttributeType implements AttributeTypeInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isSearchable(FieldConfigModel $attribute)
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isFilterable(FieldConfigModel $attribute)
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isSortable(FieldConfigModel $attribute)
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSearchableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
         if ($originalValue === null) {
@@ -46,32 +38,30 @@ class EnumAttributeType implements AttributeTypeInterface
 
         $this->ensureSupportedType($originalValue);
 
-        /** @var AbstractEnumValue $originalValue */
+        /** @var EnumOptionInterface $originalValue */
         return $originalValue->getName();
     }
 
     /**
      * Enum is uses array representation as in general it may combine multiple values
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function getFilterableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
         if ($originalValue === null) {
             return [];
         }
 
-        /** @var AbstractEnumValue $originalValue */
+        /** @var EnumOptionInterface $originalValue */
         $this->ensureSupportedType($originalValue);
 
-        $key = sprintf('%s_enum.%s', $attribute->getFieldName(), $originalValue->getId());
+        $key = sprintf('%s_enum.%s', $attribute->getFieldName(), $originalValue->getInternalId());
 
         return [$key => 1];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSortableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
         if ($originalValue === null) {
@@ -80,7 +70,7 @@ class EnumAttributeType implements AttributeTypeInterface
 
         $this->ensureSupportedType($originalValue);
 
-        /** @var AbstractEnumValue $originalValue */
+        /** @var EnumOptionInterface $originalValue */
         return $originalValue->getPriority();
     }
 
@@ -90,11 +80,11 @@ class EnumAttributeType implements AttributeTypeInterface
      */
     protected function ensureSupportedType($originalValue)
     {
-        if (!$originalValue instanceof AbstractEnumValue) {
+        if (!$originalValue instanceof EnumOptionInterface) {
             throw new \InvalidArgumentException(
                 sprintf(
                     'Value must be instance of "%s", "%s" given',
-                    AbstractEnumValue::class,
+                    EnumOptionInterface::class,
                     is_object($originalValue) ? get_class($originalValue) : gettype($originalValue)
                 )
             );

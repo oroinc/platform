@@ -66,9 +66,6 @@ abstract class AbstractOutputAstWalker implements OutputAstWalkerInterface
      */
     protected $quoteStrategy;
 
-    /**
-     * {@inheritDoc}
-     */
     public function __construct($query, $parserResult, array $queryComponents)
     {
         $this->query = $query;
@@ -86,6 +83,7 @@ abstract class AbstractOutputAstWalker implements OutputAstWalkerInterface
      *
      * @return AbstractQuery.
      */
+    #[\Override]
     public function getQuery()
     {
         return $this->query;
@@ -96,6 +94,7 @@ abstract class AbstractOutputAstWalker implements OutputAstWalkerInterface
      *
      * @return \Doctrine\DBAL\Connection
      */
+    #[\Override]
     public function getConnection()
     {
         return $this->conn;
@@ -106,30 +105,25 @@ abstract class AbstractOutputAstWalker implements OutputAstWalkerInterface
      *
      * @return \Doctrine\ORM\EntityManager
      */
+    #[\Override]
     public function getEntityManager()
     {
         return $this->em;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getQueryComponent($dqlAlias)
     {
         return $this->queryComponents[$dqlAlias];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getQueryComponents()
     {
         return $this->queryComponents;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setQueryComponent($dqlAlias, array $queryComponent)
     {
         $requiredKeys = ['metadata', 'parent', 'relation', 'map', 'nestingLevel', 'token'];
@@ -141,331 +135,237 @@ abstract class AbstractOutputAstWalker implements OutputAstWalkerInterface
         $this->queryComponents[$dqlAlias] = $queryComponent;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkSelectStatement(AST\SelectStatement $AST)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkSelectClause($selectClause)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkFromClause($fromClause)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkFunction($function)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkOrderByClause($orderByClause)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkOrderByItem($orderByItem)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkHavingClause($havingClause)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkJoin($join)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkSelectExpression($selectExpression)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkQuantifiedExpression($qExpr)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkSubselect($subselect)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkSubselectFromClause($subselectFromClause)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkSimpleSelectClause($simpleSelectClause)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkSimpleSelectExpression($simpleSelectExpression)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkAggregateExpression($aggExpression)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkGroupByClause($groupByClause)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkGroupByItem($groupByItem)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkUpdateStatement(AST\UpdateStatement $AST)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkDeleteStatement(AST\DeleteStatement $AST)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkDeleteClause(AST\DeleteClause $deleteClause)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkUpdateClause($updateClause)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkUpdateItem($updateItem)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkWhereClause($whereClause)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkConditionalExpression($condExpr)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkConditionalTerm($condTerm)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkConditionalFactor($factor)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkConditionalPrimary($primary)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkExistsExpression($existsExpr)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkCollectionMemberExpression($collMemberExpr)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkEmptyCollectionComparisonExpression($emptyCollCompExpr)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkNullComparisonExpression($nullCompExpr)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkInExpression($inExpr)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkInstanceOfExpression($instanceOfExpr)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkLiteral($literal)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkBetweenExpression($betweenExpr)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkLikeExpression($likeExpr)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkStateFieldPathExpression($stateFieldPathExpression)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkComparisonExpression($compExpr)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkInputParameter($inputParam)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkArithmeticExpression($arithmeticExpr)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkArithmeticTerm($term)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkStringPrimary($stringPrimary)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkArithmeticFactor($factor)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkSimpleArithmeticExpression($simpleArithmeticExpr)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkPathExpression($pathExpr)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkResultVariable($resultVariable)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getExecutor($AST)
     {
     }

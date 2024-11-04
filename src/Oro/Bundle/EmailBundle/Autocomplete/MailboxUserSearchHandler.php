@@ -20,9 +20,7 @@ class MailboxUserSearchHandler extends OrganizationUsersHandler
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getBasicQueryBuilder()
     {
         $queryBuilder = $this->entityRepository->createQueryBuilder('u');

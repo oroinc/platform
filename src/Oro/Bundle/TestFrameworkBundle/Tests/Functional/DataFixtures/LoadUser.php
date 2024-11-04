@@ -15,9 +15,7 @@ class LoadUser extends AbstractFixture implements InitialFixtureInterface
 {
     public const USER = 'user';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $user = $manager->getRepository(User::class)

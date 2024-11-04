@@ -16,9 +16,7 @@ class LoadPermissionData extends AbstractFixture implements ContainerAwareInterf
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         /* @var PermissionConfigurationBuilder $builder */

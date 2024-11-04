@@ -16,6 +16,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class ReportRepositoryTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());

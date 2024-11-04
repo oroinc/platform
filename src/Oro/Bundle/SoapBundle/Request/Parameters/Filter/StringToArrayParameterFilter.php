@@ -15,9 +15,7 @@ class StringToArrayParameterFilter implements ParameterFilterInterface
         $this->separator = $separator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function filter($rawValue, $operator)
     {
         if ($rawValue) {

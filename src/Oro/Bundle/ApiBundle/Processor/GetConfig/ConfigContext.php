@@ -46,9 +46,7 @@ class ConfigContext extends ApiContext
     /** @var string[]|null */
     private ?array $explicitlyConfiguredFieldNames = null;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function initialize(): void
     {
         parent::initialize();

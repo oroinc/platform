@@ -9,18 +9,14 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class DropTemporaryUniqueIndex implements Migration, OrderedMigrationInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_audit');
         $table->dropIndex('idx_oro_audit_version');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOrder()
     {
         return 0;

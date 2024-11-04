@@ -19,6 +19,7 @@ class WorkflowTranslationHelperTest extends WebTestCase
     /** @var WorkflowTranslationHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

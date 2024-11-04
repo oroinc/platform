@@ -24,17 +24,13 @@ class ConsumptionExtension extends AbstractExtension
         $this->messageProcessorClassProvider = $messageProcessorClassProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onBeforeReceive(Context $context): void
     {
         $this->consumerState->clear();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPreReceived(Context $context): void
     {
         $messageProcessorName = $context->getMessageProcessorName();
@@ -46,9 +42,7 @@ class ConsumptionExtension extends AbstractExtension
         $this->consumerState->setMessage($context->getMessage());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPostReceived(Context $context): void
     {
         $this->consumerState->setMessageProcessorName();

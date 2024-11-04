@@ -14,9 +14,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
  */
 class NormalizeSorters extends NormalizeSection
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */

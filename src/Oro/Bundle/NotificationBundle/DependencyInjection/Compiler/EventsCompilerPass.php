@@ -10,9 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class EventsCompilerPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $notificationManager = $container->findDefinition('oro_notification.manager');

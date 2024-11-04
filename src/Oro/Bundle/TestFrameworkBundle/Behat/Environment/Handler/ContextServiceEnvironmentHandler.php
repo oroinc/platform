@@ -36,11 +36,13 @@ final class ContextServiceEnvironmentHandler implements EnvironmentHandler
         $this->contextInitializers[] = $contextInitializer;
     }
 
+    #[\Override]
     public function supportsSuite(Suite $suite): bool
     {
         return $suite->hasSetting('contexts');
     }
 
+    #[\Override]
     public function buildEnvironment(Suite $suite): Environment
     {
         $this->container->reset();
@@ -100,6 +102,7 @@ final class ContextServiceEnvironmentHandler implements EnvironmentHandler
         return $context;
     }
 
+    #[\Override]
     public function supportsEnvironmentAndSubject(Environment $environment, $testSubject = null): bool
     {
         return $environment instanceof InitializedSymfonyExtensionEnvironment;
@@ -108,6 +111,7 @@ final class ContextServiceEnvironmentHandler implements EnvironmentHandler
     /**
      * We don't do anything because we have isolation for every feature instead of scenario
      */
+    #[\Override]
     public function isolateEnvironment(Environment $environment, $testSubject = null): Environment
     {
         return $environment;

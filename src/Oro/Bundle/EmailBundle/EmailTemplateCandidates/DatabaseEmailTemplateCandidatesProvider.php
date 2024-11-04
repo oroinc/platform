@@ -23,6 +23,7 @@ class DatabaseEmailTemplateCandidatesProvider implements EmailTemplateCandidates
         $this->doctrineHelper = $doctrineHelper;
     }
 
+    #[\Override]
     public function getCandidatesNames(EmailTemplateCriteria $emailTemplateCriteria, array $templateContext = []): array
     {
         if (str_starts_with($emailTemplateCriteria->getName(), '@')) {

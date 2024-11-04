@@ -7,12 +7,13 @@ use Oro\Bundle\DashboardBundle\EventListener\DashboardTypeDatagridListener;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
-use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
+use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumOptionRepository;
+use Oro\Bundle\EntityExtendBundle\Provider\EnumOptionsProvider;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DashboardTypeDatagridListenerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var EnumValueRepository|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EnumOptionRepository|\PHPUnit\Framework\MockObject\MockObject */
     private $repository;
 
     /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
@@ -21,17 +22,19 @@ class DashboardTypeDatagridListenerTest extends \PHPUnit\Framework\TestCase
     /** @var DashboardTypeDatagridListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
-        $this->repository = $this->createMock(EnumValueRepository::class);
+        $this->repository = $this->createMock(EnumOptionRepository::class);
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects(self::any())
             ->method('getRepository')
             ->willReturn($this->repository);
 
         $this->translator = $this->createMock(TranslatorInterface::class);
+        $enumOptinoProvider = $this->createMock(EnumOptionsProvider::class);
 
-        $this->listener = new DashboardTypeDatagridListener($doctrine, $this->translator);
+        $this->listener = new DashboardTypeDatagridListener($doctrine, $this->translator, $enumOptinoProvider);
     }
 
     public function testWhenMoreThenOneWidgetTypeInDb(): void
@@ -50,25 +53,23 @@ class DashboardTypeDatagridListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->listener->onBuildBefore($event);
         self::assertEquals(
-            ['dashboardType' => [
+            ['dashboard_type' => [
                 'label' => 'translated_label',
                 'editable' => false,
-                'inline_editing' => ['enable' => false]
-            ]],
+                'inline_editing' => ['enable' => false],
+                'frontend_type' => 'select',
+                'data_name' => 'dashboard_type',
+                'choices' => [],
+                'translatable_options' => false
+            ]
+            ],
             $config->offsetGet('columns')
         );
         self::assertEquals(
-            ['query' => [
-                'select' => ['dt.name as dashboardType'],
-                'join' => ['left' => [['join' => 'dashboard.dashboard_type', 'alias' => 'dt']]]
-            ]],
-            $config->offsetGet('source')
-        );
-        self::assertEquals(
             ['columns' => [
-                'dashboardType' => [
+                'dashboard_type' => [
                     'type' => 'enum',
-                    'data_name' => 'dt.id',
+                    'data_name' => 'dashboard_type',
                     'enum_code' => 'dashboard_type'
                 ]
             ]],

@@ -18,6 +18,7 @@ services:
     Oro\Bundle\EntityConfigBundle\Controller\AttributeController:
         calls:
             - [setContainer, ['@Psr\Container\ContainerInterface']]
+            - [setNameGenerator, ['@oro_migration.db_id_name_generator']]
         tags:
             - { name: container.service_subscriber }
 

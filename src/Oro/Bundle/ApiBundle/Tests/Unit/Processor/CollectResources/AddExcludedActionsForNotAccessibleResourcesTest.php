@@ -16,6 +16,7 @@ class AddExcludedActionsForNotAccessibleResourcesTest extends \PHPUnit\Framework
     /** @var AddExcludedActionsForNotAccessibleResources */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->actionProcessorBag = $this->createMock(ActionProcessorBagInterface::class);

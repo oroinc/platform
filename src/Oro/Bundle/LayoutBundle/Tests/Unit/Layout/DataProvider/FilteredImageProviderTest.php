@@ -18,6 +18,7 @@ class FilteredImageProviderTest extends \PHPUnit\Framework\TestCase
     /** @var FilteredImageProvider */
     private $placeholderDataProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->attachmentManager = $this->createMock(AttachmentManager::class);

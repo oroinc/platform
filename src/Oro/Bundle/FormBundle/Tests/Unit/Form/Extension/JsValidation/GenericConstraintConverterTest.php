@@ -20,6 +20,7 @@ class GenericConstraintConverterTest extends TestCase
 
     private GenericConstraintConverter $converter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->constraintFactory = $this->createMock(ConstraintFactory::class);

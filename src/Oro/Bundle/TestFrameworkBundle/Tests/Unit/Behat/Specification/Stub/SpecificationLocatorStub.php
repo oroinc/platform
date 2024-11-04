@@ -22,17 +22,13 @@ class SpecificationLocatorStub implements SpecificationLocator
         $this->featureCount = $featureCount;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLocatorExamples()
     {
         return 'Return iterators with count of features specified in constructor. For unit tests only';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function locateSpecifications(Suite $suite, $locator = null)
     {
         $features = [];

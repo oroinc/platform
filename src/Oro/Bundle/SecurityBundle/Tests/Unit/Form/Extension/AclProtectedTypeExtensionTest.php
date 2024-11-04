@@ -20,6 +20,7 @@ class AclProtectedTypeExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var AclProtectedTypeExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $fieldAclHelper = $this->createMock(AclHelper::class);

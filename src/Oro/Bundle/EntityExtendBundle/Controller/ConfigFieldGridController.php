@@ -178,9 +178,7 @@ class ConfigFieldGridController extends AbstractController
         return $this->container->get(RemoveRestoreConfigFieldHandler::class);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

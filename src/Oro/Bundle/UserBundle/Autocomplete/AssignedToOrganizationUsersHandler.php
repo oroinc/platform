@@ -19,9 +19,7 @@ class AssignedToOrganizationUsersHandler extends UserSearchHandler
         $this->tokenAccessor = $tokenAccessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function searchIds($search, $firstResult, $maxResults)
     {
         $searchQuery = $this->indexer->getSimpleSearchQuery(

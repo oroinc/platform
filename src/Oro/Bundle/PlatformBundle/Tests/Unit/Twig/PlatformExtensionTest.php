@@ -16,6 +16,7 @@ class PlatformExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var PlatformExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->versionHelper = $this->createMock(VersionHelper::class);

@@ -21,6 +21,7 @@ class ExportProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var ExportProcessor */
     protected $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = $this->createMock(ContextInterface::class);

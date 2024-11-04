@@ -45,9 +45,7 @@ class ExecuteJobAction extends AbstractAction
         $this->jobExecutor = $jobExecutor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $jobType = $this->getJobType($context);
@@ -63,9 +61,7 @@ class ExecuteJobAction extends AbstractAction
         $this->contextAccessor->setValue($context, $this->attribute, $jobResult);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (empty($options['jobType'])) {

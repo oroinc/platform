@@ -72,17 +72,13 @@ abstract class AbstractBufferedQueryResultIterator implements BufferedQueryResul
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getSource()
     {
         return $this->source;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setBufferSize($bufferSize)
     {
         $this->assertQueryWasNotExecuted('buffer size');
@@ -93,9 +89,7 @@ abstract class AbstractBufferedQueryResultIterator implements BufferedQueryResul
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setPageCallback(callable $callback = null)
     {
         $this->pageCallback = $callback;
@@ -103,9 +97,7 @@ abstract class AbstractBufferedQueryResultIterator implements BufferedQueryResul
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setPageLoadedCallback(callable $callback = null)
     {
         $this->pageLoadedCallback = $callback;
@@ -113,9 +105,7 @@ abstract class AbstractBufferedQueryResultIterator implements BufferedQueryResul
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setHydrationMode($hydrationMode)
     {
         $this->assertQueryWasNotExecuted('hydration mode');
@@ -125,17 +115,13 @@ abstract class AbstractBufferedQueryResultIterator implements BufferedQueryResul
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function current(): mixed
     {
         return $this->current;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function valid(): bool
     {
         return null !== $this->current;

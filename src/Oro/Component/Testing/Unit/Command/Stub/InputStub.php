@@ -31,82 +31,60 @@ class InputStub implements InputInterface
         $this->options = $options;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFirstArgument(): ?string
     {
         return current($this->arguments);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasParameterOption($values, $onlyParams = false): bool
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParameterOption($values, $default = false, $onlyParams = false)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function bind(InputDefinition $definition)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate()
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getArguments(): array
     {
         return $this->arguments;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getArgument($name)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setArgument($name, $value)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasArgument($name): bool
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOptions(): array
     {
         return $this->options;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOption($name)
     {
         if (isset($this->options[$name])) {
@@ -116,31 +94,23 @@ class InputStub implements InputInterface
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setOption($name, $value)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasOption($name): bool
     {
         return array_key_exists($name, $this->options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isInteractive(): bool
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setInteractive($interactive)
     {
     }
@@ -148,6 +118,7 @@ class InputStub implements InputInterface
     /**
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return (string)$this->command;

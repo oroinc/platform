@@ -52,6 +52,7 @@ class TranslationMessageSanitizationError
         return $this->sanitizedMessage;
     }
 
+    #[\Override]
     public function __toString()
     {
         return (string)json_encode([

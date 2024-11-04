@@ -14,6 +14,7 @@ class ActivityOwnerTest extends \PHPUnit\Framework\TestCase
     /** @var ActivityOwner */
     private $entity;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entity = new ActivityOwner();

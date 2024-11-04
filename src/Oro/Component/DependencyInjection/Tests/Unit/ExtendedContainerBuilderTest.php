@@ -19,6 +19,7 @@ class ExtendedContainerBuilderTest extends \PHPUnit\Framework\TestCase
 
     private ExtendedContainerBuilder $builder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $extension = $this->createMock(ExtensionInterface::class);

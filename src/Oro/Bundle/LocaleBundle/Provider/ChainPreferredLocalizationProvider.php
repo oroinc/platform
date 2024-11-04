@@ -24,9 +24,7 @@ class ChainPreferredLocalizationProvider implements PreferredLocalizationProvide
         $this->providers = $providers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($entity): bool
     {
         foreach ($this->providers as $provider) {
@@ -38,9 +36,7 @@ class ChainPreferredLocalizationProvider implements PreferredLocalizationProvide
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPreferredLocalization($entity): ?Localization
     {
         foreach ($this->providers as $provider) {

@@ -36,6 +36,7 @@ class EmailAssociationsDemoDataFixturesListenerTest extends OrmTestCase
     /** @var EmailAssociationsDemoDataFixturesListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->listenerManager = $this->createMock(OptionalListenerManager::class);

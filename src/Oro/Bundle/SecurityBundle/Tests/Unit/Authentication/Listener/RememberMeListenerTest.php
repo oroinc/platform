@@ -20,6 +20,7 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
     private CsrfProtectedRequestHelper $csrfProtectedRequestHelper;
     private RememberMeListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->innerRememberMeAuthenticator = $this->createMock(RememberMeAuthenticator::class);

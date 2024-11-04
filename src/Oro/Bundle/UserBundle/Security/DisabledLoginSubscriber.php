@@ -28,9 +28,7 @@ class DisabledLoginSubscriber implements EventSubscriberInterface
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [
@@ -51,7 +49,9 @@ class DisabledLoginSubscriber implements EventSubscriberInterface
         }
 
         // allow `null` or statues that are not included in `self::$disallowed`
-        $isAllowed = $user->getAuthStatus() ? !in_array($user->getAuthStatus()->getId(), self::$disallowed) : true;
+        $isAllowed = $user->getAuthStatus()
+            ? !in_array($user->getAuthStatus()->getInternalId(), self::$disallowed)
+            : true;
 
         if ($isAllowed) {
             return;

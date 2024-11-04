@@ -13,6 +13,7 @@ class LimitResultsListenerTest extends \PHPUnit\Framework\TestCase
      */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->listener = new LimitResultsListener();

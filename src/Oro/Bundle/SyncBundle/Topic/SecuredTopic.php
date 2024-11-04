@@ -21,9 +21,7 @@ class SecuredTopic extends BroadcastTopic
         $this->clientManipulator = $clientManipulator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onSubscribe(ConnectionInterface $connection, Topic $topic, WampRequest $request)
     {
         if (!$this->isApplicable($connection, $this->getUserId($request))) {

@@ -18,9 +18,7 @@ class FixRestAnnotationsPass implements CompilerPassInterface
     const ANNOTATION_READER_SERVICE_SUFFIX = '.annotation_reader';
     const ANNOTATION_READER_CLASS = 'Oro\Bundle\SoapBundle\Routing\RestAnnotationReader';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if ($container->has(self::ROUTING_LOADER_SERVICE) && $container->has(self::REST_ROUTING_LOADER_SERVICE)) {

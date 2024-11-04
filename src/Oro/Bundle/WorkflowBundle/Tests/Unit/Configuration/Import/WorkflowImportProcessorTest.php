@@ -24,6 +24,7 @@ class WorkflowImportProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowImportProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->reader = $this->createMock(ConfigFileReaderInterface::class);

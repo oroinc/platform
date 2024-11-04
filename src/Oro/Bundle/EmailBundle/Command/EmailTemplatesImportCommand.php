@@ -41,9 +41,7 @@ class EmailTemplatesImportCommand extends Command
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function configure(): void
     {
         $this
@@ -51,9 +49,7 @@ class EmailTemplatesImportCommand extends Command
             ->addOption('force', null, InputOption::VALUE_NONE, 'Force update');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $source = $input->getArgument('source');

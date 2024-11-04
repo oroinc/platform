@@ -129,6 +129,7 @@ class ActivityOwner
     /**
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return (string)$this->getId();

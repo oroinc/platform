@@ -20,6 +20,7 @@ class MimeTypeValidatorTest extends ConstraintValidatorTestCase
         'image/png'
     ];
 
+    #[\Override]
     protected function createValidator(): MimeTypeValidator
     {
         return new MimeTypeValidator(self::ALLOWED_FILE_MIME_TYPES, self::ALLOWED_IMAGE_MIME_TYPES);

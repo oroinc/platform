@@ -12,9 +12,7 @@ class RefreshGrid extends AbstractAction
      */
     protected $gridNames;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $property = new PropertyPath('refreshGrid');
@@ -30,9 +28,7 @@ class RefreshGrid extends AbstractAction
         $this->contextAccessor->setValue($context, $property, array_unique($gridNames));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (empty($options)) {

@@ -39,6 +39,7 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
     /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
     private $attributeManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $repositoryLocalization = $this->createMock(ObjectRepository::class);
@@ -71,9 +72,7 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $attributeMultiSelectType = new AttributeMultiSelectType($this->attributeManager, $this->getTranslator());

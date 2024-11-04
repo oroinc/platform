@@ -21,6 +21,7 @@ class EmailThreadManagerTest extends \PHPUnit\Framework\TestCase
     /** @var EmailThreadManager */
     private $emailThreadManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->emailThreadProvider = $this->createMock(EmailThreadProvider::class);

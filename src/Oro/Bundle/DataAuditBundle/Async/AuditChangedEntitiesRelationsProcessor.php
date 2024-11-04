@@ -22,9 +22,7 @@ class AuditChangedEntitiesRelationsProcessor extends AbstractAuditProcessor impl
         $this->entityChangesToAuditEntryConverter = $entityChangesToAuditEntryConverter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $body = $message->getBody();
@@ -52,9 +50,7 @@ class AuditChangedEntitiesRelationsProcessor extends AbstractAuditProcessor impl
         return self::ACK;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [AuditChangedEntitiesRelationsTopic::getName()];

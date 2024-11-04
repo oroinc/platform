@@ -21,9 +21,6 @@ trait PageObjectDictionary
      */
     protected $pageFactory;
 
-    /**
-     * {@inheritdoc}
-     */
     public function setElementFactory(OroElementFactory $elementFactory)
     {
         $this->elementFactory = $elementFactory;

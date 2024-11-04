@@ -8,6 +8,7 @@ class FilenameExtensionHelperTest extends \PHPUnit\Framework\TestCase
 {
     private FilenameExtensionHelper $filenameExtensionHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->filenameExtensionHelper = new FilenameExtensionHelper(['image/svg']);

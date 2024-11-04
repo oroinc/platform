@@ -15,6 +15,7 @@ class BusinessUnitTreeTransformerTest extends \PHPUnit\Framework\TestCase
 
     private $buManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->buManager = $this->createMock(BusinessUnitManager::class);

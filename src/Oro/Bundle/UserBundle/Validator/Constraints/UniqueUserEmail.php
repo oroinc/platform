@@ -11,9 +11,7 @@ class UniqueUserEmail extends Constraint
 {
     public string $message = 'oro.user.message.user_email_exists';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;

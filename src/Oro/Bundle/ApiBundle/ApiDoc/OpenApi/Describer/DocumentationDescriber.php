@@ -36,9 +36,7 @@ class DocumentationDescriber implements DescriberInterface
         $this->documentationProvider = $documentationProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function describe(OA\OpenApi $api, array $options): void
     {
         $api->info = Util::createChildItem(OA\Info::class, $api);

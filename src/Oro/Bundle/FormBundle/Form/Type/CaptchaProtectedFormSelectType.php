@@ -20,11 +20,13 @@ class CaptchaProtectedFormSelectType extends AbstractType
     ) {
     }
 
+    #[\Override]
     public function getParent()
     {
         return ChoiceType::class;
     }
 
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefault('choice_loader', new CallbackChoiceLoader(function () {
@@ -39,6 +41,7 @@ class CaptchaProtectedFormSelectType extends AbstractType
         $resolver->setDefault('expanded', true);
     }
 
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_captcha_protected_form_select';

@@ -27,6 +27,7 @@ abstract class AbstractStateProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject */
     protected $datagridParameters;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->gridViewManager = $this->createMock(GridViewManager::class);

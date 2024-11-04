@@ -20,35 +20,27 @@ class NameStrategy implements NameStrategyInterface
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDelimiter()
     {
         return self::DELIMITER;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function parseGridName($fullName)
     {
         $parts = $this->parseGridNameAndScope($fullName);
         return $parts[0];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function parseGridScope($fullName)
     {
         $parts = $this->parseGridNameAndScope($fullName);
         return $parts[1];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildGridFullName($name, $scope)
     {
         $result = $name;
@@ -62,9 +54,7 @@ class NameStrategy implements NameStrategyInterface
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getGridUniqueName($name)
     {
         $request = $this->requestStack->getCurrentRequest();

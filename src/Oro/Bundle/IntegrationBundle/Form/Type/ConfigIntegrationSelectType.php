@@ -23,17 +23,13 @@ class ConfigIntegrationSelectType extends AbstractType
         $this->registry = $registry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addModelTransformer(new IdToEntityTransformer($this->registry, Channel::class));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): string
     {
         return IntegrationSelectType::class;

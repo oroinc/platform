@@ -39,9 +39,7 @@ class PreviewMetadataProvider implements PreviewMetadataProviderInterface
         $this->fileTitleProvider = $fileTitleProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMetadata(File $file): array
     {
         $previewUrl = '';

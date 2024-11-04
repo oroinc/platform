@@ -33,6 +33,7 @@ class RelationMetadataBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var RelationMetadataBuilder */
     private $builder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

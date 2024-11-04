@@ -46,9 +46,7 @@ class AutoResponseTemplateType extends AbstractType
         $this->htmlTagHelper = $htmlTagHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $localizations = $this->localizationManager->getLocalizations();
@@ -115,9 +113,7 @@ class AutoResponseTemplateType extends AbstractType
         $builder->setDataMapper(new LocalizationAwareEmailTemplateDataMapper($builder->getDataMapper()));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -125,17 +121,12 @@ class AutoResponseTemplateType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_email_autoresponse_template';

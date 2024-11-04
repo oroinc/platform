@@ -13,6 +13,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  */
 class ChangeTokenFieldType implements Migration
 {
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $this->changeEmailAccessTokenFieldType($schema);

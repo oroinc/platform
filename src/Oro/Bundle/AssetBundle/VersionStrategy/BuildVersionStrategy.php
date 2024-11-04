@@ -20,9 +20,7 @@ class BuildVersionStrategy implements VersionStrategyInterface
         $this->buildVersionFilePath = $buildVersionFilePath;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVersion(string $path): string
     {
         if ($this->version === null) {
@@ -38,9 +36,7 @@ class BuildVersionStrategy implements VersionStrategyInterface
         return $this->version;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function applyVersion(string $path): string
     {
         $version = $this->getVersion($path);

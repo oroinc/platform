@@ -17,9 +17,7 @@ class WorkflowItemSerializer implements WorkflowItemSerializerInterface
         $this->workflowResultObjectSerializer = $workflowResultObjectSerializer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function serialize(WorkflowItem $workflowItem): array
     {
         return [

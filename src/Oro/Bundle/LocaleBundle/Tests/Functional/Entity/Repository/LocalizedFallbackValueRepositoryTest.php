@@ -14,6 +14,7 @@ class LocalizedFallbackValueRepositoryTest extends WebTestCase
     private EntityManager $entityManager;
     private LocalizedFallbackValueRepository $repository;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

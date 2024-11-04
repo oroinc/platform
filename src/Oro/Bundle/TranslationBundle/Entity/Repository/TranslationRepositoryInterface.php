@@ -11,6 +11,4 @@ interface TranslationRepositoryInterface
     public function updateDefaultTranslations(array $data): void;
 
     public function updateTranslations(array $data, string $locale): void;
-
-    public function getAllIdentities(): array;
 }

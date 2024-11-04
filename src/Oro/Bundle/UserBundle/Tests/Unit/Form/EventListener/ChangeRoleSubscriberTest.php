@@ -14,6 +14,7 @@ class ChangeRoleSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var ChangeRoleSubscriber */
     private $changeRoleSubscriber;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->changeRoleSubscriber = new ChangeRoleSubscriber();

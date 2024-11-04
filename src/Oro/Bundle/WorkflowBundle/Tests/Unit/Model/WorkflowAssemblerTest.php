@@ -67,6 +67,7 @@ class WorkflowAssemblerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowAssembler */
     private $workflowAssembler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflow = $this->createWorkflow();

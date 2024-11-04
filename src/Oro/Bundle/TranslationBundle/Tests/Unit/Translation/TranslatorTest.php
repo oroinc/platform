@@ -75,6 +75,7 @@ class TranslatorTest extends \PHPUnit\Framework\TestCase
     /** @var MessageCatalogueSanitizer|MockObject */
     private $messageCatalogueSanitizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->sanitizationErrorCollection = new TranslationMessageSanitizationErrorCollection();

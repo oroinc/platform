@@ -10,6 +10,7 @@ class ActionContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     /** @var ActionContextConfigurator */
     private $contextConfigurator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->contextConfigurator = new ActionContextConfigurator();

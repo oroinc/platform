@@ -95,9 +95,7 @@ class Manager implements FunctionProviderInterface
         return $this->getFilterObject($name, $config);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunction($name, $groupName, $groupType)
     {
         $result = null;

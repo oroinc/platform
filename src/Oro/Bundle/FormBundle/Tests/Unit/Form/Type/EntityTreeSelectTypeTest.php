@@ -13,6 +13,7 @@ class EntityTreeSelectTypeTest extends FormIntegrationTestCase
 {
     private EntityTreeSelectType $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -20,9 +21,7 @@ class EntityTreeSelectTypeTest extends FormIntegrationTestCase
         $this->formType = new EntityTreeSelectType();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

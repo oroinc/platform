@@ -32,6 +32,7 @@ class WidgetAttributesTest extends \PHPUnit\Framework\TestCase
     /** @var WidgetConfigs */
     private $target;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);

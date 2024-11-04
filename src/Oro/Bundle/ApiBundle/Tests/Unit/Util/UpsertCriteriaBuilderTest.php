@@ -23,6 +23,7 @@ class UpsertCriteriaBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var UpsertCriteriaBuilder */
     private $upsertCriteriaBuilder;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

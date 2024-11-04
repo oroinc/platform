@@ -29,9 +29,7 @@ class UserSearchHandler extends FullNameSearchHandler
         parent::__construct($userEntityName, $properties);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function convertItem($user)
     {
         $result = parent::convertItem($user);

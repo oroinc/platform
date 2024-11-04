@@ -22,9 +22,7 @@ class TestEntityNameResolverClassesProvider implements TestEntityNameResolverCla
         $this->searchMappingProvider = $searchMappingProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEntityClasses(): array
     {
         $entityClasses = $this->innerProvider->getEntityClasses();

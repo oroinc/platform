@@ -20,9 +20,7 @@ class ChainRouteOptionsResolver implements RouteOptionsResolverInterface
         $this->resolvers = $resolvers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function resolve(Route $route, RouteCollectionAccessor $routes)
     {
         foreach ($this->resolvers as $resolver) {

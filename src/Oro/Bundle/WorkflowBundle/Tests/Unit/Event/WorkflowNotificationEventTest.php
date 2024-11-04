@@ -18,6 +18,7 @@ class WorkflowNotificationEventTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowNotificationEvent */
     private $event;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->transitionRecord = $this->createMock(WorkflowTransitionRecord::class);

@@ -15,9 +15,7 @@ class FileItemType extends AbstractType
 {
     const TYPE = 'oro_attachment_file_item';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -32,9 +30,7 @@ class FileItemType extends AbstractType
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -46,9 +42,7 @@ class FileItemType extends AbstractType
         $resolver->setAllowedTypes('file_options', 'array');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::TYPE;

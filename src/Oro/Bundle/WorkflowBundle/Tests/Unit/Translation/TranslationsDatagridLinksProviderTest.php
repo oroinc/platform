@@ -21,6 +21,7 @@ class TranslationsDatagridLinksProviderTest extends \PHPUnit\Framework\TestCase
     /** @var TranslationsDatagridLinksProvider */
     private $linksProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->routeHelper = $this->createMock(TranslationsDatagridRouteHelper::class);

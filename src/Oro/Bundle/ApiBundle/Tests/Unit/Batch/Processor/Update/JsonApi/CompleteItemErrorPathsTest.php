@@ -23,6 +23,7 @@ class CompleteItemErrorPathsTest extends BatchUpdateProcessorTestCase
     /** @var CompleteItemErrorPaths */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

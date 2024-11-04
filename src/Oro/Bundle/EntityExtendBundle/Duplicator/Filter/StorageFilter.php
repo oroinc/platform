@@ -14,9 +14,7 @@ use Oro\Bundle\EntityExtendBundle\Model\ExtendEntityStorage;
  */
 class StorageFilter implements Filter
 {
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function apply($object, $property, $objectCopier): void
     {
         if (!$object instanceof ExtendEntityInterface) {

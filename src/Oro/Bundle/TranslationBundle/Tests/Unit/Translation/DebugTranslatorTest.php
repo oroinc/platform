@@ -51,6 +51,7 @@ class DebugTranslatorTest extends TestCase
 
     private ContainerInterface|MockObject $container;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->cacheDir = $this->getTempDir('debug_translator');

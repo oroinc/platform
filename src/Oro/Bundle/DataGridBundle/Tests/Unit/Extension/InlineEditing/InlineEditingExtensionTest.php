@@ -18,6 +18,7 @@ class InlineEditingExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var InlineEditingExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configurator = $this->createMock(InlineEditingConfigurator::class);

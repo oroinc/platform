@@ -37,9 +37,7 @@ class ProcessorBagConfigBuilder implements ProcessorBagConfigProviderInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getActions(): array
     {
         $this->ensureInitialized();
@@ -47,9 +45,7 @@ class ProcessorBagConfigBuilder implements ProcessorBagConfigProviderInterface
         return array_keys($this->processors);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getGroups(string $action): array
     {
         $this->ensureInitialized();
@@ -57,9 +53,7 @@ class ProcessorBagConfigBuilder implements ProcessorBagConfigProviderInterface
         return $this->groups[$action] ?? [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getProcessors(string $action): array
     {
         $this->ensureInitialized();

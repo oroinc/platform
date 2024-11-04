@@ -8,11 +8,13 @@ use Oro\Bundle\DataAuditBundle\Tests\Unit\Stub\AuditField;
 
 class AuditFieldTest extends \PHPUnit\Framework\TestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         AuditFieldTypeRegistry::addType('testingtype', 'testingtype');
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         AuditFieldTypeRegistry::removeType('testingtype');

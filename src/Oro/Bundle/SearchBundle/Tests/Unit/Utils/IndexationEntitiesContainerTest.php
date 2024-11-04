@@ -9,6 +9,7 @@ class IndexationEntitiesContainerTest extends \PHPUnit\Framework\TestCase
     /** @var IndexationEntitiesContainer */
     private $container;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = new IndexationEntitiesContainer();

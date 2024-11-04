@@ -22,9 +22,7 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
         $this->localizedFallbackValueClass = $localizedFallbackValueClass;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function processEntity(
         $entity,
         $isFullData = false,
@@ -45,12 +43,7 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
         return is_a($entity, $this->localizedFallbackValueClass, true);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * Adds extra functionality to the base method:
-     * - loads existing collection or LocalizedFallbackValue entities if any
-     */
+    #[\Override]
     protected function generateSearchContextForRelationsUpdate($entity, $entityName, $fieldName, $isPersistRelation)
     {
         $fields = $this->fieldHelper->getRelations($entityName);
@@ -70,9 +63,7 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
         return parent::generateSearchContextForRelationsUpdate($entity, $entityName, $fieldName, $isPersistRelation);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function findExistingEntity($entity, array $searchContext = [])
     {
         if ($this->isLocalizedFallbackValueEntity($entity)) {
@@ -95,11 +86,7 @@ class LocalizedFallbackValueAwareStrategy extends ConfigurableAddOrReplaceStrate
             is_a($field['related_entity_name'], $this->localizedFallbackValueClass, true);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * No need to search LocalizedFallbackValue by identity fields in new entities storage
-     */
+    #[\Override]
     protected function combineIdentityValues($entity, $entityClass, array $searchContext)
     {
         if (is_a($entityClass, $this->localizedFallbackValueClass, true)) {

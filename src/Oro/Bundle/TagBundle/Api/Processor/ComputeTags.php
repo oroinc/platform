@@ -37,9 +37,7 @@ class ComputeTags implements ProcessorInterface
         $this->aclHelper = $aclHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeLoadedDataContext $context */

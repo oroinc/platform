@@ -12,9 +12,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetNormalizedEntityConfigExtras implements ProcessorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var FormContext $context */

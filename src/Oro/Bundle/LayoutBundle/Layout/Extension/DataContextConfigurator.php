@@ -10,9 +10,7 @@ use Oro\Component\Layout\ContextInterface;
  */
 class DataContextConfigurator implements ContextConfiguratorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureContext(ContextInterface $context)
     {
         if (!$context->has('data')) {

@@ -18,6 +18,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class AllValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator(): AllValidator
     {
         return new AllValidator();

@@ -26,6 +26,7 @@ class HandleFieldsFilterTest extends GetProcessorTestCase
     /** @var HandleFieldsFilter */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

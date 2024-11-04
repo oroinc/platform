@@ -11,6 +11,7 @@ class DateTimeTypeCastTest extends \PHPUnit\Framework\TestCase
     /** @var DateTimeTypeCast */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->handler = new DateTimeTypeCast();

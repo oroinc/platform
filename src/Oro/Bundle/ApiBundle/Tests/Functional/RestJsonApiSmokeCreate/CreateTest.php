@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Tests\Functional\CheckSkippedEntityTrait;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @group regression
@@ -37,14 +38,14 @@ class CreateTest extends RestJsonApiTestCase
                 [],
                 false
             );
-            self::assertResponseStatusCodeNotEquals($response, 500);
+            self::assertResponseStatusCodeNotEquals($response, Response::HTTP_INTERNAL_SERVER_ERROR);
 
             // test create with NULL value for read-only timestampable fields
             $this->createWithNullValueForReadOnlyTimestampableFields($entityClass, $entityType);
         });
     }
 
-    public function createWithNullValueForReadOnlyTimestampableFields(string $entityClass, string $entityType): void
+    private function createWithNullValueForReadOnlyTimestampableFields(string $entityClass, string $entityType): void
     {
         $entityConfig = $this->getApiConfig($entityClass, ApiAction::CREATE);
         if (null === $entityConfig) {
@@ -67,7 +68,7 @@ class CreateTest extends RestJsonApiTestCase
             [],
             false
         );
-        self::assertResponseStatusCodeNotEquals($response, 500);
+        self::assertResponseStatusCodeNotEquals($response, Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 
     private function getReadOnlyTimestampableFields(EntityDefinitionConfig $config): array

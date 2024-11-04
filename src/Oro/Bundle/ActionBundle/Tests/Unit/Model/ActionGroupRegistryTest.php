@@ -21,6 +21,7 @@ class ActionGroupRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var ActionGroupRegistry */
     private $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configurationProvider = $this->createMock(ConfigurationProviderInterface::class);

@@ -25,9 +25,7 @@ class ConfigDumpReferenceCommand extends Command
         $this->configuration = $configuration;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function configure(): void
     {
         $this
@@ -44,9 +42,7 @@ HELP
         ;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output = new SymfonyStyle($input, $output);

@@ -138,6 +138,7 @@ class NoteController extends RestController
      *
      * @return ApiEntityManager
      */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_note.manager.api');
@@ -146,6 +147,7 @@ class NoteController extends RestController
     /**
      * @return FormInterface
      */
+    #[\Override]
     public function getForm()
     {
         return $this->container->get('oro_note.form.note.api');
@@ -154,14 +156,13 @@ class NoteController extends RestController
     /**
      * @return ApiFormHandler
      */
+    #[\Override]
     public function getFormHandler()
     {
         return $this->container->get('oro_note.form.handler.note_api');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function transformEntityField($field, &$value)
     {
         switch ($field) {

@@ -15,6 +15,7 @@ class RolePrivilegeCategoryProviderTest extends \PHPUnit\Framework\TestCase
     /** @var RolePrivilegeCategoryProvider */
     private $categoryProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configurationProvider = $this->createMock(PrivilegeCategoryConfigurationProvider::class);

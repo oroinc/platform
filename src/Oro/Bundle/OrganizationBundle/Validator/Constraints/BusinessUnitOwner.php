@@ -8,9 +8,7 @@ class BusinessUnitOwner extends Constraint
 {
     public $message = "Business Unit can't set self as Parent.";
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;

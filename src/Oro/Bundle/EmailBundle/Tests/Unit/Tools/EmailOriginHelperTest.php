@@ -35,6 +35,7 @@ class EmailOriginHelperTest extends TestCase
     /** @var EmailOriginHelper */
     private $emailOriginHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);

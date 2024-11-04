@@ -32,17 +32,13 @@ class LoadOriginData extends AbstractFixture implements DependentFixtureInterfac
         ],
     ];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadUserData::class, LoadOrganization::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         foreach ($this->data as $reference => $data) {

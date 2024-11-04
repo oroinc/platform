@@ -17,9 +17,7 @@ class OwnersWidgetProviderFilter implements WidgetProviderFilterInterface
         $this->ownerHelper = $ownerHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function filter(QueryBuilder $queryBuilder, WidgetOptionBag $widgetOptions)
     {
         $owners = $this->ownerHelper->getOwnerIds($widgetOptions);

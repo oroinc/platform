@@ -17,6 +17,7 @@ class FilterTypeTest extends \PHPUnit\Framework\TestCase
 {
     private FormFactoryInterface $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -54,9 +55,6 @@ class FilterTypeTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($form->isSynchronized());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     protected function getExtensions(): array
     {
         return [

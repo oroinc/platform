@@ -14,6 +14,7 @@ class MakeAnnotationReaderServicesPersistentPass extends RegisterPersistentServi
      *
      * @return string[]
      */
+    #[\Override]
     protected function getPersistentServices(ContainerBuilder $container)
     {
         $result = [];

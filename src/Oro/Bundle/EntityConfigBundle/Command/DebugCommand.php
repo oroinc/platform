@@ -46,6 +46,7 @@ class DebugCommand extends Command
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     public function configure()
     {
         $this
@@ -129,6 +130,7 @@ HELP
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @noinspection PhpMissingParentCallCommonInspection
      */
+    #[\Override]
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);

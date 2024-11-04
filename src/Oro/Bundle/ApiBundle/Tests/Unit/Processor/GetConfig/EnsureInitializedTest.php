@@ -12,6 +12,7 @@ class EnsureInitializedTest extends ConfigProcessorTestCase
 {
     private EnsureInitialized $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

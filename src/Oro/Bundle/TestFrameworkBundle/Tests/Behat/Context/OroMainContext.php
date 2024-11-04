@@ -85,9 +85,7 @@ class OroMainContext extends MinkContext implements
         $this->getSession()->resizeWindow(1920, 1080, 'current');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSession($name = null)
     {
         $session = parent::getSession($name);
@@ -505,10 +503,10 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * {@inheritdoc}
      *
      * @Then /^(?:|I )should see the following lines/
      */
+    #[\Override]
     public function assertPageContainsText($text)
     {
         if ($text instanceof PyStringNode) {
@@ -528,9 +526,7 @@ class OroMainContext extends MinkContext implements
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function assertPageNotContainsText($text)
     {
         $result = $this->spin(function (OroMainContext $context) use ($text) {
@@ -1100,6 +1096,18 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
+     * Example: And I should see "Schedule Now" element with the url matches "/folder/" in top window
+     *
+     * @Then /^(?:|I )should see "(?P<elementName>[^"]+)" element with the url matches (?P<url>"[^"]+") in top window$/
+     */
+    public function iShouldSeeElementWithUrl($elementName, $url)
+    {
+        $elements = $this->findAllElements($elementName);
+        $element = reset($elements);
+        self::assertMatchesRegularExpression($url, $element->getAttribute('href'));
+    }
+
+    /**
      * Example: And I should see "file.jpg" file link with the url matches "/admin/"
      *
      * @Then /^(?:|I )should not see "(?P<text>[^"]+)" link with the url matches (?P<url>"[^"]+")$/
@@ -1163,6 +1171,7 @@ class OroMainContext extends MinkContext implements
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function pressButton($button)
     {
         if ($button === 'Change History') {
@@ -1246,9 +1255,7 @@ class OroMainContext extends MinkContext implements
         $this->getSession()->wait($timeout * 1000);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function assertElementContainsText($element, $text)
     {
         $elementObject = $this->createElement($element);
@@ -1264,9 +1271,7 @@ class OroMainContext extends MinkContext implements
         self::assertTrue((bool)preg_match($regex, $actual), $message, $element);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function assertElementNotContainsText($element, $text)
     {
         $elementObject = $this->createElement($element);
@@ -1636,9 +1641,7 @@ JS;
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function selectOption($select, $option)
     {
         $select = $this->fixStepArgument($select);
@@ -1715,9 +1718,7 @@ JS;
         $this->assertTrue($optionElement->isSelected(), sprintf('Option %s is not selected', $option));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function fillField($field, $value)
     {
         $field = $this->fixStepArgument($field);
@@ -1733,9 +1734,7 @@ JS;
         $this->createOroForm()->fillField($field, $value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function assertElementOnPage($element)
     {
         $isVisible = $this->spin(function (OroMainContext $context) use ($element) {
@@ -1748,9 +1747,7 @@ JS;
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function assertElementNotOnPage($element)
     {
         $elementOnPage = $this->createElement($element);
@@ -2931,9 +2928,7 @@ JS;
         self::assertEquals($color, $element->getColor());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function assertPageAddress($page)
     {
         $this->spin(function () use ($page) {
@@ -3043,6 +3038,7 @@ JS;
      *
      * @return string
      */
+    #[\Override]
     protected function fixStepArgument($argument)
     {
         return str_replace(['\\"', '\\#'], ['"', '#'], $argument);
@@ -3260,6 +3256,7 @@ JS;
      *
      * @Then /^the "(?P<field>(?:[^"]|\\")*)" field should contain:$/
      */
+    #[\Override]
     public function assertFieldContains($field, $value)
     {
         parent::assertFieldContains($field, $value);

@@ -13,6 +13,7 @@ class AbstractCompositeTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractComposite */
     private $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->condition = new class() extends AbstractComposite {

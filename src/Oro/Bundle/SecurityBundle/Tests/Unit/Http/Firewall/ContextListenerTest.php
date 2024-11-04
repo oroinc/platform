@@ -30,6 +30,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
 
     private ContextListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);

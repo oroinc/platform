@@ -9,6 +9,7 @@ use Symfony\Component\Form\FormTypeExtensionInterface;
 
 class EmailTypeTemplateAccessibilityCheckerExtensionTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

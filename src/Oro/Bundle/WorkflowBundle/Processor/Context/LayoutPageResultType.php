@@ -14,16 +14,19 @@ class LayoutPageResultType implements LayoutResultTypeInterface
         $this->formRouteName = $formRouteName;
     }
 
+    #[\Override]
     public function getName(): string
     {
         return self::NAME;
     }
 
+    #[\Override]
     public function supportsCustomForm(): bool
     {
         return true;
     }
 
+    #[\Override]
     public function getFormRouteName(): string
     {
         return $this->formRouteName;

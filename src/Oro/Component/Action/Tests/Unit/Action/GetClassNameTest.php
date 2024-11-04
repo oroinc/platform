@@ -14,6 +14,7 @@ class GetClassNameTest extends \PHPUnit\Framework\TestCase
     /** @var GetClassName */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->action = new GetClassName(new ContextAccessor());

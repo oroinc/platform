@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\EntityDescript
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\FieldsDescriptionHelper;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\FiltersDescriptionHelper;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
@@ -39,9 +40,7 @@ class CompleteDescriptions implements ProcessorInterface
         $this->filtersDescriptionHelper = $filtersDescriptionHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */
@@ -56,8 +55,7 @@ class CompleteDescriptions implements ProcessorInterface
         $entityClass = $context->getClassName();
         $definition = $context->getResult();
         $isInherit = false;
-        $parentClass = (new \ReflectionClass($entityClass))->getParentClass();
-        if ($parentClass
+        if (ExtendHelper::getParentClassName($entityClass)
             && $this->resourcesProvider->isResourceKnown($entityClass, $context->getVersion(), $requestType)
         ) {
             $isInherit = true;

@@ -26,9 +26,7 @@ class AssignActiveUser extends AbstractAction
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $activeUser = null;
@@ -45,9 +43,7 @@ class AssignActiveUser extends AbstractAction
         $this->contextAccessor->setValue($context, $this->options['attribute'], $activeUser);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (!in_array(count($options), [1, 2])) {

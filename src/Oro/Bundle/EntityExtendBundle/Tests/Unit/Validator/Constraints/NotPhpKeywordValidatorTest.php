@@ -8,6 +8,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class NotPhpKeywordValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator()
     {
         return new NotPhpKeywordValidator();

@@ -6,9 +6,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class PlatformControllerTest extends WebTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient(

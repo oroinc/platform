@@ -14,6 +14,7 @@ class NormalizeIdFilterKeyTest extends GetListProcessorOrmRelatedTestCase
     /** @var NormalizeIdFilterKey */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

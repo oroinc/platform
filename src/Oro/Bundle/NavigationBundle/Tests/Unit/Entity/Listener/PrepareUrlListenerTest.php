@@ -16,6 +16,7 @@ class PrepareUrlListenerTest extends \PHPUnit\Framework\TestCase
     /** @var PrepareUrlListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManager::class);

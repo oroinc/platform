@@ -29,9 +29,7 @@ class InitializeEntityMapper implements ProcessorInterface
         $this->entityOverrideProviderRegistry = $entityOverrideProviderRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ChangeRelationshipContext $context */

@@ -18,6 +18,7 @@ class DatagridPreExportTopicTest extends AbstractTopicTestCase
     private const VALID_GRID_NAME = 'grid-name';
     private const INVALID_GRID_NAME = 'invalid-grid-name';
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->chainConfigurationProvider = $this->createMock(ConfigurationProviderInterface::class);
@@ -33,6 +34,7 @@ class DatagridPreExportTopicTest extends AbstractTopicTestCase
     }
 
 
+    #[\Override]
     protected function getTopic(): TopicInterface
     {
         return new DatagridPreExportTopic(
@@ -42,6 +44,7 @@ class DatagridPreExportTopicTest extends AbstractTopicTestCase
         );
     }
 
+    #[\Override]
     public function validBodyDataProvider(): array
     {
         $format = 'csv';
@@ -107,6 +110,7 @@ class DatagridPreExportTopicTest extends AbstractTopicTestCase
         ];
     }
 
+    #[\Override]
     public function invalidBodyDataProvider(): array
     {
         $format = 'csv';

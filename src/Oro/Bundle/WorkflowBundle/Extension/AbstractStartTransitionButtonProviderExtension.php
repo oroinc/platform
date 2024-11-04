@@ -10,17 +10,13 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
 abstract class AbstractStartTransitionButtonProviderExtension extends AbstractButtonProviderExtension
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports(ButtonInterface $button)
     {
         return $button instanceof StartTransitionButton && $button->getTransition()->isStart();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function createTransitionButton(
         Transition $transition,
         Workflow $workflow,
@@ -29,9 +25,7 @@ abstract class AbstractStartTransitionButtonProviderExtension extends AbstractBu
         return new StartTransitionButton($transition, $workflow, $buttonContext);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getActiveWorkflows()
     {
         $exclusiveGroups = [];

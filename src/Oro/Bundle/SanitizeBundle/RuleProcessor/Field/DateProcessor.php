@@ -18,11 +18,13 @@ class DateProcessor implements ProcessorInterface
     ) {
     }
 
+    #[\Override]
     public static function getProcessorName(): string
     {
         return 'date';
     }
 
+    #[\Override]
     public function getIncompatibilityMessages(
         string $fieldName,
         ClassMetadata $metadata,
@@ -40,9 +42,7 @@ class DateProcessor implements ProcessorInterface
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSqls(
         string $fieldName,
         ClassMetadata $metadata,

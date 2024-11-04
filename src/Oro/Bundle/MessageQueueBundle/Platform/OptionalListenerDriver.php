@@ -29,6 +29,7 @@ class OptionalListenerDriver implements DriverInterface
         $this->optionalListenerManager = $optionalListenerManager;
     }
 
+    #[\Override]
     public function send(QueueInterface $queue, Message $message): void
     {
         $disabledListeners = $this->optionalListenerManager->getDisabledListeners();
@@ -42,16 +43,19 @@ class OptionalListenerDriver implements DriverInterface
         $this->driver->send($queue, $message);
     }
 
+    #[\Override]
     public function createTransportMessage(): MessageInterface
     {
         return $this->driver->createTransportMessage();
     }
 
+    #[\Override]
     public function createQueue($queueName): QueueInterface
     {
         return $this->driver->createQueue($queueName);
     }
 
+    #[\Override]
     public function getConfig(): Config
     {
         return $this->driver->getConfig();

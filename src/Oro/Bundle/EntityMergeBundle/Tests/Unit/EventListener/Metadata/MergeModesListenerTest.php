@@ -18,6 +18,7 @@ class MergeModesListenerTest extends \PHPUnit\Framework\TestCase
     /** @var MergeModesListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityMetadata = $this->createMock(EntityMetadata::class);

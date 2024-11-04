@@ -17,6 +17,7 @@ class CaptchaExtensionTest extends TestCase
     private CaptchaSettingsProviderInterface|MockObject $captchaSettingsProvider;
     private CaptchaExtension $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->captchaSettingsProvider = $this->createMock(CaptchaSettingsProviderInterface::class);

@@ -14,17 +14,13 @@ class SimpleGeneratorStub implements TagGeneratorInterface
         $this->suffix = $suffix;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($data)
     {
         return \is_string($data) && str_contains($data, 'test');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function generate($data, $includeCollectionTag = false, $processNestedData = false)
     {
         $tags = [$data . '_' . $this->suffix];

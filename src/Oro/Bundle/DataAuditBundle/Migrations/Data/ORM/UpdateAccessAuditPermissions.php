@@ -39,17 +39,13 @@ class UpdateAccessAuditPermissions extends AbstractFixture implements ContainerA
      */
     private $container;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         if (!$this->container->get(ApplicationState::class)->isInstalled()) {

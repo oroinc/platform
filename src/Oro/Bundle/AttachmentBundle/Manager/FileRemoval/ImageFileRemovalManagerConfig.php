@@ -7,9 +7,7 @@ namespace Oro\Bundle\AttachmentBundle\Manager\FileRemoval;
  */
 final class ImageFileRemovalManagerConfig implements FileRemovalManagerConfigInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfiguration(): array
     {
         return [

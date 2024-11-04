@@ -19,7 +19,7 @@ class SuiteAwareSubscriber implements EventSubscriberInterface
         $this->services = $services;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

@@ -8,32 +8,24 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 class ConfigurationExtensionStub implements ConfigurationExtensionInterface, ProcessConfigurationExtensionInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function extendConfigurationTree(NodeBuilder $node): void
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function processConfiguration(array $configuration): array
     {
         return $configuration;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function completeConfiguration(array $configuration): array
     {
         return $configuration;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function clearConfigurationCache(): void
     {
     }

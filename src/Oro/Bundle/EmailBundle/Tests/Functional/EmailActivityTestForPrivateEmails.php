@@ -10,6 +10,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class EmailActivityTestForPrivateEmails extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());

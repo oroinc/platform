@@ -66,9 +66,7 @@ class ProcessSynchronousOperation implements ProcessorInterface
         $this->filterNamesRegistry = $filterNamesRegistry;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var UpdateListContext $context */
@@ -235,7 +233,7 @@ class ProcessSynchronousOperation implements ProcessorInterface
 
         $filterNames = $this->filterNamesRegistry->getFilterNames($context->getRequestType());
         $filterGroupName = $filterNames->getDataFilterGroupName();
-        $idFilterName = $filterGroupName ? sprintf('%s[id]', $filterGroupName) : 'id';
+        $idFilterName = $filterGroupName ? $filterGroupName . '[id]' : 'id';
         $targetContext->getFilterValues()->set($idFilterName, new FilterValue($idFilterName, $entityIds));
         $pageSizeFilterName = $filterNames->getPageSizeFilterName();
         $targetContext->getFilterValues()->set($pageSizeFilterName, new FilterValue($pageSizeFilterName, -1));
@@ -325,7 +323,8 @@ class ProcessSynchronousOperation implements ProcessorInterface
     private function getErrorTitle(BatchError $batchError): string
     {
         $title = $batchError->getTitle();
-        if (str_starts_with($batchError->getDetail(), self::CHUNK_LIMIT_EXCEEDED_ERROR_MESSAGE)) {
+        $detail = $batchError->getDetail();
+        if ($detail && str_starts_with($detail, self::CHUNK_LIMIT_EXCEEDED_ERROR_MESSAGE)) {
             $title = Constraint::REQUEST_DATA;
         } elseif ('async operation exception' === $title) {
             $title = 'operation exception';
@@ -334,10 +333,10 @@ class ProcessSynchronousOperation implements ProcessorInterface
         return $title;
     }
 
-    private function getErrorDetail(BatchError $batchError, string $entityClass): string
+    private function getErrorDetail(BatchError $batchError, string $entityClass): ?string
     {
         $detail = $batchError->getDetail();
-        if (str_starts_with($detail, self::CHUNK_LIMIT_EXCEEDED_ERROR_MESSAGE)) {
+        if ($detail && str_starts_with($detail, self::CHUNK_LIMIT_EXCEEDED_ERROR_MESSAGE)) {
             $prefix = substr($detail, strlen(self::CHUNK_LIMIT_EXCEEDED_ERROR_MESSAGE));
             $detail = 'The data limit for the synchronous operation exceeded' . $prefix;
             if ('.' === $prefix) {

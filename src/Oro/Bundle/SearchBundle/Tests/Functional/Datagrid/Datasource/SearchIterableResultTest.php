@@ -28,6 +28,7 @@ class SearchIterableResultTest extends SearchBundleWebTestCase
         'item9@mail.com 0123-456900'
     ];
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

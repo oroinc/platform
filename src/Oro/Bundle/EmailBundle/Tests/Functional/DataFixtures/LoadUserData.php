@@ -18,17 +18,13 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface, D
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadBusinessUnit::class, LoadOrganization::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $userManager = $this->getUserManager();

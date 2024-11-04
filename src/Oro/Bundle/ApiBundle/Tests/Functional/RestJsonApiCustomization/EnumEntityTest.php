@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 
 class EnumEntityTest extends RestJsonApiTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -24,7 +25,7 @@ class EnumEntityTest extends RestJsonApiTestCase
                 'data' => [
                     [
                         'type'       => 'testapienum1',
-                        'id'         => '<toString(@enum1_0->id)>',
+                        'id'         => '<toString(@enum1_0->internalId)>',
                         'attributes' => [
                             'name'     => 'Item 0',
                             'priority' => -1,
@@ -33,7 +34,7 @@ class EnumEntityTest extends RestJsonApiTestCase
                     ],
                     [
                         'type'       => 'testapienum1',
-                        'id'         => '<toString(@enum1_1->id)>',
+                        'id'         => '<toString(@enum1_1->internalId)>',
                         'attributes' => [
                             'name'     => 'Item 1',
                             'priority' => 0,
@@ -42,7 +43,7 @@ class EnumEntityTest extends RestJsonApiTestCase
                     ],
                     [
                         'type'       => 'testapienum1',
-                        'id'         => '<toString(@enum1_2->id)>',
+                        'id'         => '<toString(@enum1_2->internalId)>',
                         'attributes' => [
                             'name'     => 'Item 2',
                             'priority' => 1,
@@ -51,7 +52,7 @@ class EnumEntityTest extends RestJsonApiTestCase
                     ],
                     [
                         'type'       => 'testapienum1',
-                        'id'         => '<toString(@enum1_3->id)>',
+                        'id'         => '<toString(@enum1_3->internalId)>',
                         'attributes' => [
                             'name'     => 'Item 3',
                             'priority' => 2,
@@ -60,7 +61,7 @@ class EnumEntityTest extends RestJsonApiTestCase
                     ],
                     [
                         'type'       => 'testapienum1',
-                        'id'         => '<toString(@enum1_4->id)>',
+                        'id'         => '<toString(@enum1_4->internalId)>',
                         'attributes' => [
                             'name'     => 'Item 4',
                             'priority' => 3,
@@ -84,7 +85,7 @@ class EnumEntityTest extends RestJsonApiTestCase
                 'data' => [
                     [
                         'type'       => 'testapienum1',
-                        'id'         => '<toString(@enum1_4->id)>',
+                        'id'         => '<toString(@enum1_4->internalId)>',
                         'attributes' => [
                             'name'     => 'Item 4',
                             'priority' => 3,
@@ -93,7 +94,7 @@ class EnumEntityTest extends RestJsonApiTestCase
                     ],
                     [
                         'type'       => 'testapienum1',
-                        'id'         => '<toString(@enum1_3->id)>',
+                        'id'         => '<toString(@enum1_3->internalId)>',
                         'attributes' => [
                             'name'     => 'Item 3',
                             'priority' => 2,
@@ -102,7 +103,7 @@ class EnumEntityTest extends RestJsonApiTestCase
                     ],
                     [
                         'type'       => 'testapienum1',
-                        'id'         => '<toString(@enum1_2->id)>',
+                        'id'         => '<toString(@enum1_2->internalId)>',
                         'attributes' => [
                             'name'     => 'Item 2',
                             'priority' => 1,
@@ -117,12 +118,12 @@ class EnumEntityTest extends RestJsonApiTestCase
 
     public function testGet(): void
     {
-        $response = $this->get(['entity' => 'testapienum1', 'id' => '<toString(@enum1_1->id)>']);
+        $response = $this->get(['entity' => 'testapienum1', 'id' => '<toString(@enum1_1->internalId)>']);
         $this->assertResponseContains(
             [
                 'data' => [
                     'type'       => 'testapienum1',
-                    'id'         => '<toString(@enum1_1->id)>',
+                    'id'         => '<toString(@enum1_1->internalId)>',
                     'attributes' => [
                         'name'     => 'Item 1',
                         'priority' => 0,
@@ -161,7 +162,7 @@ class EnumEntityTest extends RestJsonApiTestCase
     public function testTryToDelete(): void
     {
         $response = $this->delete(
-            ['entity' => 'testapienum1', 'id' => '<toString(@enum1_1->id)>'],
+            ['entity' => 'testapienum1', 'id' => '<toString(@enum1_1->internalId)>'],
             [],
             [],
             false
@@ -173,7 +174,7 @@ class EnumEntityTest extends RestJsonApiTestCase
     {
         $response = $this->cdelete(
             ['entity' => 'testapienum1'],
-            ['filter[id]' => '<toString(@enum1_1->id)>'],
+            ['filter[id]' => '<toString(@enum1_1->internalId)>'],
             [],
             false
         );
@@ -193,7 +194,7 @@ class EnumEntityTest extends RestJsonApiTestCase
     {
         $response = $this->options(
             $this->getItemRouteName(),
-            ['entity' => 'testapienum1', 'id' => '<toString(@enum1_1->id)>']
+            ['entity' => 'testapienum1', 'id' => '<toString(@enum1_1->internalId)>']
         );
         self::assertAllowResponseHeader($response, 'OPTIONS, GET');
     }

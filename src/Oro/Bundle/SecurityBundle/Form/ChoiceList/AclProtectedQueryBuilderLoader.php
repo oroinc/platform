@@ -65,9 +65,7 @@ class AclProtectedQueryBuilderLoader implements EntityLoaderInterface
         $this->options = $options;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntities(): array
     {
         $query = $this->queryBuilder->getQuery();
@@ -75,9 +73,7 @@ class AclProtectedQueryBuilderLoader implements EntityLoaderInterface
         return $this->aclHelper->apply($query, $this->permission, $this->options)->execute();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntitiesByIds($identifier, array $values): array
     {
         QueryBuilderUtil::checkIdentifier($identifier);

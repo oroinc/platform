@@ -52,9 +52,7 @@ class OrganizationExtension extends AbstractExtension implements ServiceSubscrib
         return $this->container->get('oro_organization.business_unit_manager');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -117,9 +115,7 @@ class OrganizationExtension extends AbstractExtension implements ServiceSubscrib
         return $this->getBusinessUnitManager()->getBusinessUnitRepo()->getBusinessUnitsCount();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

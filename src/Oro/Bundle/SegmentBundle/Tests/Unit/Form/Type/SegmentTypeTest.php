@@ -20,6 +20,7 @@ class SegmentTypeTest extends TestCase
     /** @var SegmentType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new SegmentType();

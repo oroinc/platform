@@ -24,9 +24,7 @@ class DbalSession implements DbalSessionInterface
         $this->connection = $connection;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function createMessage(
         mixed $body = '',
         array $properties = [],
@@ -40,17 +38,13 @@ class DbalSession implements DbalSessionInterface
         return $message;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function createQueue(string $name): QueueInterface
     {
         return new Queue($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function createConsumer(QueueInterface $queue): MessageConsumerInterface
     {
         $consumer = new DbalMessageConsumer($this, $queue);
@@ -63,21 +57,18 @@ class DbalSession implements DbalSessionInterface
         return $consumer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function createProducer(): MessageProducerInterface
     {
         return new DbalMessageProducer($this->connection);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function close(): void
     {
     }
 
+    #[\Override]
     public function getConnection(): ConnectionInterface
     {
         return $this->connection;

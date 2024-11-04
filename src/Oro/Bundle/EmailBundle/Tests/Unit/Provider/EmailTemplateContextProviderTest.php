@@ -19,6 +19,7 @@ class EmailTemplateContextProviderTest extends TestCase
 
     private EmailTemplateContextProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);

@@ -28,9 +28,7 @@ class AttributeGroupRestType extends AbstractContainerType
         $this->attributeRenderRegistry = $attributeRenderRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildBlock(BlockBuilderInterface $builder, Options $options)
     {
         /** @var AttributeFamily $attributeFamily */
@@ -66,9 +64,7 @@ class AttributeGroupRestType extends AbstractContainerType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         BlockUtils::setViewVarsFromOptions($view, $options, ['options']);
@@ -86,9 +82,7 @@ class AttributeGroupRestType extends AbstractContainerType
         return sprintf('%s_%s_%s', $blockId, $blockType, $group->getCode());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(
@@ -104,9 +98,7 @@ class AttributeGroupRestType extends AbstractContainerType
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getName()
     {
         return self::NAME;

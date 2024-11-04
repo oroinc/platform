@@ -19,6 +19,7 @@ class TargetMetadataProviderTest extends \PHPUnit\Framework\TestCase
     /** @var TargetMetadataProvider */
     private $targetMetadataProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->objectAccessor = $this->createMock(ObjectAccessorInterface::class);

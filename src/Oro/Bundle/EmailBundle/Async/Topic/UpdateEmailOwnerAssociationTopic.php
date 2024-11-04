@@ -10,16 +10,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class UpdateEmailOwnerAssociationTopic extends AbstractTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.email.update_email_owner_association';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Update single email for email owner';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver

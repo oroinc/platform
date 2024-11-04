@@ -8,18 +8,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class BusinessUnitApiType extends BusinessUnitType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         parent::buildForm($builder, $options);
         $builder->addEventSubscriber(new PatchSubscriber());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
@@ -33,17 +29,12 @@ class BusinessUnitApiType extends BusinessUnitType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'business_unit';

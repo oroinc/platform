@@ -19,14 +19,13 @@ class WorkflowTransitionTypeTest extends AbstractWorkflowAttributesTypeTestCase
 {
     private WorkflowTransitionType $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new WorkflowTransitionType();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

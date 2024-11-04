@@ -52,6 +52,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
     /** @var FormFactoryInterface */
     private $formFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $constraintFactory = new ConstraintFactory();

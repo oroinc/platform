@@ -16,9 +16,7 @@ use Symfony\Component\Form\ChoiceList\View\ChoiceView;
  */
 class JsonArrayChoiceFilter extends AbstractFilter
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMetadata()
     {
         $formView = $this->getFormView();
@@ -37,17 +35,13 @@ class JsonArrayChoiceFilter extends AbstractFilter
         return $metadata;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function prepareData(array $data): array
     {
         return $data;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         $isPostgres = $ds->getDatabasePlatform() instanceof PostgreSQL94Platform;
@@ -69,17 +63,13 @@ class JsonArrayChoiceFilter extends AbstractFilter
         return $ds->expr()->orX(...$expr);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFormType(): string
     {
         return ChoiceFilterType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function parseData($data)
     {
         $data = parent::parseData($data);

@@ -49,6 +49,7 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
 
     private OptionsResolver $optionsResolver;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configurationProvider = $this->createMock(ConfigurationProviderInterface::class);

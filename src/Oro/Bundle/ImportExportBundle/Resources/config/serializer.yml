@@ -24,6 +24,8 @@ services:
         calls:
             - [setDispatcher, ['@event_dispatcher']]
             - [setScalarFieldDenormalizer, ['@oro_importexport.serializer.scalar_field_denormalizer']]
+            - [setEnumOptionProvider, ['@oro_entity_extend.enum_options_provider']]
+            - [setDoctrineHelper, ['@oro_entity.doctrine_helper']]
         tags:
             - { name: oro_importexport.normalizer, priority: -10 }
 

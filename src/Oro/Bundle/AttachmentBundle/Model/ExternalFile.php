@@ -49,11 +49,13 @@ class ExternalFile extends \SplFileInfo
         return $this->mimeType;
     }
 
+    #[\Override]
     public function getSize(): int
     {
         return $this->size;
     }
 
+    #[\Override]
     public function __toString(): string
     {
         return $this->url;

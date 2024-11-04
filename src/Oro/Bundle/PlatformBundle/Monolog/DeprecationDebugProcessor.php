@@ -17,6 +17,7 @@ class DeprecationDebugProcessor extends DebugProcessor
         $this->collectDeprecations = $collectDeprecations;
     }
 
+    #[\Override]
     public function __invoke(array $record): array
     {
         if (!$this->collectDeprecations && $this->isDeprecationErrorLogRecord($record)) {

@@ -23,9 +23,7 @@ class RenameActivityAssociations implements
     use ConnectionAwareTrait;
     use ExtendNameGeneratorAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $helper = new RenameActivityAssociations20(

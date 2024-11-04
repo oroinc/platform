@@ -37,6 +37,7 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
     /** @var RestDocContextProvider */
     private $contextProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->requestType = new RequestType([RequestType::REST]);

@@ -16,6 +16,7 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $container;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);

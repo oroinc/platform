@@ -30,9 +30,7 @@ class AddAssociationValidators implements ProcessorInterface
         $this->associationAccessExclusionProviderRegistry = $associationAccessExclusionProviderRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */

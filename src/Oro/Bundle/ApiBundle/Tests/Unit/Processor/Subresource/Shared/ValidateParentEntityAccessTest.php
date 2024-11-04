@@ -3,31 +3,38 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
 use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityAccess;
-use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorOrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Bundle\ApiBundle\Util\QueryAclHelper;
+use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
+class ValidateParentEntityAccessTest extends GetSubresourceProcessorOrmRelatedTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    private $doctrineHelper;
+    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
+    protected $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdHelper */
+    /** @var EntityIdHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $entityIdHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|QueryAclHelper */
+    /** @var QueryAclHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $queryAclHelper;
+
+    /** @var QueryHintResolverInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $queryHintResolver;
 
     /** @var ValidateParentEntityAccess */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -35,11 +42,13 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->entityIdHelper = $this->createMock(EntityIdHelper::class);
         $this->queryAclHelper = $this->createMock(QueryAclHelper::class);
+        $this->queryHintResolver = $this->createMock(QueryHintResolverInterface::class);
 
         $this->processor = new ValidateParentEntityAccess(
             $this->doctrineHelper,
             $this->entityIdHelper,
-            $this->queryAclHelper
+            $this->queryAclHelper,
+            $this->queryHintResolver
         );
     }
 
@@ -84,7 +93,7 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
         $associationName = 'association';
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName);
-        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentMetadata = new EntityMetadata($parentClass);
 
         $this->doctrineHelper->expects(self::once())
             ->method('getManageableEntityClass')
@@ -128,12 +137,13 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
         $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('The parent entity does not exist.');
 
-        $parentClass = 'Test\Class';
+        $parentClass = Group::class;
         $parentId = 123;
         $associationName = 'association';
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName);
-        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentConfig->addHint('HINT_TEST');
+        $parentMetadata = new EntityMetadata($parentClass);
 
         $this->doctrineHelper->expects(self::once())
             ->method('getManageableEntityClass')
@@ -164,14 +174,20 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
             ->with(AbstractQuery::HYDRATE_ARRAY)
             ->willReturn(null);
 
-        $notAclProtectedQuery = $this->createMock(AbstractQuery::class);
+        $notAclProtectedQuery = new Query($this->em);
+        $notAclProtectedQuery->setDQL(sprintf('SELECT e.id FROM %s AS e', $parentClass));
         $qb->expects(self::once())
             ->method('getQuery')
             ->willReturn($notAclProtectedQuery);
-        $notAclProtectedQuery->expects(self::once())
-            ->method('getOneOrNullResult')
-            ->with(AbstractQuery::HYDRATE_ARRAY)
-            ->willReturn(null);
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            $notAclProtectedQuery->getSQL(),
+            []
+        );
+
+        $this->queryHintResolver->expects(self::once())
+            ->method('resolveHints')
+            ->with(self::identicalTo($notAclProtectedQuery), ['HINT_TEST']);
 
         $this->context->setParentClassName($parentClass);
         $this->context->setParentId($parentId);
@@ -186,12 +202,13 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
         $this->expectException(AccessDeniedException::class);
         $this->expectExceptionMessage('No access to the parent entity.');
 
-        $parentClass = 'Test\Class';
+        $parentClass = Group::class;
         $parentId = 123;
         $associationName = 'association';
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName);
-        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentConfig->addHint('HINT_TEST');
+        $parentMetadata = new EntityMetadata($parentClass);
 
         $this->doctrineHelper->expects(self::once())
             ->method('getManageableEntityClass')
@@ -222,14 +239,20 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
             ->with(AbstractQuery::HYDRATE_ARRAY)
             ->willReturn(null);
 
-        $notAclProtectedQuery = $this->createMock(AbstractQuery::class);
+        $notAclProtectedQuery = new Query($this->em);
+        $notAclProtectedQuery->setDQL(sprintf('SELECT e.id FROM %s AS e', $parentClass));
         $qb->expects(self::once())
             ->method('getQuery')
             ->willReturn($notAclProtectedQuery);
-        $notAclProtectedQuery->expects(self::once())
-            ->method('getOneOrNullResult')
-            ->with(AbstractQuery::HYDRATE_ARRAY)
-            ->willReturn(['id' => $parentId]);
+        $this->setQueryExpectation(
+            $this->getDriverConnectionMock($this->em),
+            $notAclProtectedQuery->getSQL(),
+            [['id_0' => $parentId]]
+        );
+
+        $this->queryHintResolver->expects(self::once())
+            ->method('resolveHints')
+            ->with(self::identicalTo($notAclProtectedQuery), ['HINT_TEST']);
 
         $this->context->setParentClassName($parentClass);
         $this->context->setParentId($parentId);
@@ -247,7 +270,7 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorTestCase
         $associationName = 'association';
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->addField($associationName);
-        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentMetadata = new EntityMetadata($parentClass);
 
         $this->doctrineHelper->expects(self::once())
             ->method('getManageableEntityClass')

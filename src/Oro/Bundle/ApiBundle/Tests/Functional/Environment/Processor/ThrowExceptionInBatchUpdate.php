@@ -23,9 +23,9 @@ class ThrowExceptionInBatchUpdate implements ProcessorInterface
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var BatchUpdateContext $context */

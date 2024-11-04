@@ -14,6 +14,7 @@ class ConsumeMessagesCommandTest extends \PHPUnit\Framework\TestCase
 
     private ConsumeMessagesCommand $command;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->consumer = $this->createMock(QueueConsumer::class);

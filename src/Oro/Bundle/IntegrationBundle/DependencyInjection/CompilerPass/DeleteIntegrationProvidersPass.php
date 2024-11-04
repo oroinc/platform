@@ -11,9 +11,7 @@ class DeleteIntegrationProvidersPass implements CompilerPassInterface
     const DELETE_PROVIDER_TAG = 'oro_integration.delete_provider';
     const DELETE_MANAGER      = 'oro_integration.delete_manager';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $providers = $container->findTaggedServiceIds(self::DELETE_PROVIDER_TAG);

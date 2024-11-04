@@ -14,9 +14,7 @@ class ExtensionsPass implements CompilerPassInterface
 {
     use PriorityTaggedServiceTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $container->getDefinition('oro_datagrid.datagrid.builder')

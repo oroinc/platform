@@ -13,6 +13,7 @@ class MultipleFileConstraintFromEntityFieldConfigTest extends \PHPUnit\Framework
     /** @var FileConstraintFromEntityFieldConfig */
     private $constraint;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->constraint = new MultipleFileConstraintFromEntityFieldConfig(

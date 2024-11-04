@@ -36,9 +36,7 @@ class SecurityAwareDriver implements DriverInterface
         $this->tokenSerializer = $tokenSerializer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function send(QueueInterface $queue, Message $message): void
     {
         // add the current security token to the message
@@ -81,25 +79,19 @@ class SecurityAwareDriver implements DriverInterface
         $this->driver->send($queue, $message);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function createTransportMessage(): MessageInterface
     {
         return $this->driver->createTransportMessage();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function createQueue(string $queueName): QueueInterface
     {
         return $this->driver->createQueue($queueName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfig(): Config
     {
         return $this->driver->getConfig();

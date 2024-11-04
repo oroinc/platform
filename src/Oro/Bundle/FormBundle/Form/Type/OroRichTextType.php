@@ -80,9 +80,7 @@ class OroRichTextType extends AbstractType
         $this->assetHelper = $assetHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (null !== $options['wysiwyg_options']['valid_elements']) {
@@ -90,9 +88,7 @@ class OroRichTextType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $assetsBaseUrl = ltrim($this->context->getBasePath() . '/', '/');
@@ -180,25 +176,18 @@ class OroRichTextType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return TextareaType::class;

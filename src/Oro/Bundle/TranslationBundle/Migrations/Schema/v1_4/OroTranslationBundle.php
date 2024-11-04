@@ -13,9 +13,7 @@ class OroTranslationBundle implements Migration, DatabasePlatformAwareInterface
 {
     use DatabasePlatformAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $queries->addQuery(new MigrateTranslationKeyPrefixQuery());

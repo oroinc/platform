@@ -70,9 +70,7 @@ class AutocompleteController extends AbstractController
         ));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

@@ -22,6 +22,7 @@ class RenderedEmailTemplateProviderTest extends TestCase
 
     private RenderedEmailTemplateProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->emailTemplateProvider = $this->createMock(EmailTemplateProvider::class);

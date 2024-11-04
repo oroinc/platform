@@ -28,6 +28,7 @@ class EntityPaginationListenerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityPaginationListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

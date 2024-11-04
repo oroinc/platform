@@ -8,6 +8,7 @@ class ExtendFieldFormTypeProviderTest extends \PHPUnit\Framework\TestCase
 {
     private ExtendFieldFormTypeProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider = new ExtendFieldFormTypeProvider();

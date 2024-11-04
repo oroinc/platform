@@ -9,6 +9,7 @@ class ScheduleTest extends \PHPUnit\Framework\TestCase
 {
     private Schedule $object;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->object = new Schedule();

@@ -56,6 +56,7 @@ class ActivityManagerTest extends OrmTestCase
     /** @var ActivityManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();

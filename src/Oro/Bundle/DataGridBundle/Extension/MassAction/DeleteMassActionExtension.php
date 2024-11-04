@@ -38,9 +38,7 @@ class DeleteMassActionExtension extends AbstractExtension
         $this->entityClassResolver = $entityClassResolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         if (!$config->isOrmDatasource() || !parent::isApplicable($config)) {
@@ -97,9 +95,7 @@ class DeleteMassActionExtension extends AbstractExtension
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function processConfigs(DatagridConfiguration $config)
     {
         $actions = $config->offsetGetOr(static::MASS_ACTION_KEY, []);
@@ -156,9 +152,7 @@ class DeleteMassActionExtension extends AbstractExtension
         return sprintf('%s.%s', $rootAlias, $identifier);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPriority()
     {
         // should be applied before mass action extension

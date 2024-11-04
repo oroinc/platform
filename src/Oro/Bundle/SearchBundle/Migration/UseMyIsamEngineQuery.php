@@ -21,17 +21,13 @@ class UseMyIsamEngineQuery implements MigrationQuery, ConnectionAwareInterface
         $this->tableName = $tableName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return 'Use MyIsam for specified MySQL table';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $query = sprintf('ALTER TABLE `%s` ENGINE = MYISAM;', $this->tableName);

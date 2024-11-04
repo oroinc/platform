@@ -19,9 +19,7 @@ class DownloadLinksType extends AbstractType
         $this->assetHelper = $assetHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
@@ -31,26 +29,19 @@ class DownloadLinksType extends AbstractType
             ->setAllowedTypes('source', 'array');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['files'] = $this->getFiles($options['source']);
         $view->vars['class'] = $options['class'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_download_links_type';

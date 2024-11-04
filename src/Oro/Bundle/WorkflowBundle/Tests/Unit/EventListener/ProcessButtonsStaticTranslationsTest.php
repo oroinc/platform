@@ -28,6 +28,7 @@ class ProcessButtonsStaticTranslationsTest extends \PHPUnit\Framework\TestCase
     /** @var ProcessButtonsStaticTranslations */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translationHelper = $this->createMock(TransitionTranslationHelper::class);

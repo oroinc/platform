@@ -17,6 +17,7 @@ class YamlDriverTest extends \PHPUnit\Framework\TestCase
 
     private string $cacheDir;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -18,6 +18,7 @@ class ItemStepTest extends \PHPUnit\Framework\TestCase
 
     private ItemStep $itemStep;
 
+    #[\Override]
     protected function setUp(): void
     {
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);

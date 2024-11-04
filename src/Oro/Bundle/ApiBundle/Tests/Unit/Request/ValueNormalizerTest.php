@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
 use Doctrine\Common\Collections\Criteria;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
+use Oro\Bundle\ApiBundle\Model\NormalizedDateTime;
 use Oro\Bundle\ApiBundle\Model\Range;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue as Processor;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeValueContext;
@@ -45,6 +46,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
+    #[\Override]
     protected function setUp(): void
     {
         $processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
@@ -157,6 +159,21 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
         $processorRegistry->expects(self::any())
             ->method('getProcessor')
             ->willReturnMap($processorMap);
+    }
+
+    private function getDateTime(string $datetime): \DateTime
+    {
+        return new \DateTime($datetime, new \DateTimeZone('UTC'));
+    }
+
+    private function getNormalizedDateTime(
+        string $datetime,
+        int $precision = NormalizedDateTime::PRECISION_SECOND
+    ): NormalizedDateTime {
+        $result = new NormalizedDateTime($datetime, new \DateTimeZone('UTC'));
+        $result->setPrecision($precision);
+
+        return $result;
     }
 
     /**
@@ -783,82 +800,151 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
             [-123.4, '-1.234', DataType::PERCENT_100, [RequestType::REST], false],
             [[123.4, -456.0], '1.234,-4.56', DataType::PERCENT_100, [RequestType::REST], true],
             [
-                new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
-                new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
-                DataType::DATETIME,
-                [RequestType::REST],
-                true
-            ],
-            [
-                new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
-                new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
-                DataType::DATETIME,
-                [RequestType::REST],
-                false
-            ],
-            [
-                [
-                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC'))
-                ],
-                [
-                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC'))
-                ],
+                $this->getDateTime('2010-01-28T15:00:00'),
+                $this->getDateTime('2010-01-28T15:00:00'),
                 DataType::DATETIME,
                 [RequestType::REST],
                 true
             ],
             [
                 [
-                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC'))
+                    $this->getDateTime('2010-01-28T15:00:00'),
+                    $this->getDateTime('2010-01-28T15:00:00')
                 ],
                 [
-                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC'))
+                    $this->getDateTime('2010-01-28T15:00:00'),
+                    $this->getDateTime('2010-01-28T15:00:00')
+                ],
+                DataType::DATETIME,
+                [RequestType::REST],
+                true
+            ],
+            [
+                $this->getNormalizedDateTime('2010-01-28T15:00:00'),
+                $this->getNormalizedDateTime('2010-01-28T15:00:00'),
+                DataType::DATETIME,
+                [RequestType::REST],
+                true
+            ],
+            [
+                $this->getNormalizedDateTime('2010-01-28T15:00:00'),
+                $this->getNormalizedDateTime('2010-01-28T15:00:00'),
+                DataType::DATETIME,
+                [RequestType::REST],
+                false
+            ],
+            [
+                [
+                    $this->getNormalizedDateTime('2010-01-28T15:00:00'),
+                    $this->getNormalizedDateTime('2010-01-28T15:00:00')
+                ],
+                [
+                    $this->getNormalizedDateTime('2010-01-28T15:00:00'),
+                    $this->getNormalizedDateTime('2010-01-28T15:00:00')
+                ],
+                DataType::DATETIME,
+                [RequestType::REST],
+                true
+            ],
+            [
+                [
+                    $this->getNormalizedDateTime('2010-01-28T15:00:00'),
+                    $this->getNormalizedDateTime('2010-01-28T15:00:00')
+                ],
+                [
+                    $this->getNormalizedDateTime('2010-01-28T15:00:00'),
+                    $this->getNormalizedDateTime('2010-01-28T15:00:00')
                 ],
                 DataType::DATETIME,
                 [RequestType::REST],
                 false
             ],
             [
-                new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
+                $this->getNormalizedDateTime('2010-01-28T00:00:00', NormalizedDateTime::PRECISION_DAY),
                 '2010-01-28',
                 DataType::DATETIME,
                 [RequestType::REST],
                 true
             ],
             [
-                new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
+                $this->getNormalizedDateTime('2010-01-28T00:00:00', NormalizedDateTime::PRECISION_DAY),
                 '2010-01-28',
                 DataType::DATETIME,
                 [RequestType::REST],
                 false
             ],
             [
-                new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
-                '2010-01-28T15:00:00+00:00',
+                $this->getNormalizedDateTime('2010-02-01T00:00:00', NormalizedDateTime::PRECISION_MONTH),
+                '2010-02',
                 DataType::DATETIME,
                 [RequestType::REST],
                 true
             ],
             [
-                new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
+                $this->getNormalizedDateTime('2010-02-01T00:00:00', NormalizedDateTime::PRECISION_MONTH),
+                '2010-02',
+                DataType::DATETIME,
+                [RequestType::REST],
+                false
+            ],
+            [
+                $this->getNormalizedDateTime('2010-01-01T00:00:00', NormalizedDateTime::PRECISION_YEAR),
+                '2010',
+                DataType::DATETIME,
+                [RequestType::REST],
+                true
+            ],
+            [
+                $this->getNormalizedDateTime('2010-01-01T00:00:00', NormalizedDateTime::PRECISION_YEAR),
+                '2010',
+                DataType::DATETIME,
+                [RequestType::REST],
+                false
+            ],
+            [
+                $this->getNormalizedDateTime('2010-01-28T15:01:00', NormalizedDateTime::PRECISION_MINUTE),
+                '2010-01-28T15:01',
+                DataType::DATETIME,
+                [RequestType::REST],
+                true
+            ],
+            [
+                $this->getNormalizedDateTime('2010-01-28T15:00:00', NormalizedDateTime::PRECISION_HOUR),
+                '2010-01-28T15',
+                DataType::DATETIME,
+                [RequestType::REST],
+                true
+            ],
+            [
+                $this->getNormalizedDateTime('2010-01-28T15:01:02'),
+                '2010-01-28T15:01:02Z',
+                DataType::DATETIME,
+                [RequestType::REST],
+                true
+            ],
+            [
+                $this->getNormalizedDateTime('2010-01-28T15:01:02'),
+                '2010-01-28T15:01:02+00:00',
+                DataType::DATETIME,
+                [RequestType::REST],
+                true
+            ],
+            [
+                $this->getNormalizedDateTime('2010-01-28T15:00:00'),
                 '2010-01-28T15:00:00+00:00',
                 DataType::DATETIME,
                 [RequestType::REST],
                 false
             ],
             [
-                new \DateTime('2010-01-28T15:00:00+0200', new \DateTimeZone('UTC')),
+                $this->getNormalizedDateTime('2010-01-28T15:00:00+0200'),
                 '2010-01-28T15:00:00+02:00',
                 DataType::DATETIME,
                 [RequestType::REST],
                 true
             ],
             [
-                new \DateTime('2010-01-28T15:00:00+0200', new \DateTimeZone('UTC')),
+                $this->getNormalizedDateTime('2010-01-28T15:00:00+0200'),
                 '2010-01-28T15:00:00+02:00',
                 DataType::DATETIME,
                 [RequestType::REST],
@@ -866,8 +952,8 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
             ],
             [
                 [
-                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('2010-01-28T15:00:00+0200', new \DateTimeZone('UTC'))
+                    $this->getNormalizedDateTime('2010-01-28T15:00:00'),
+                    $this->getNormalizedDateTime('2010-01-28T15:00:00+0200')
                 ],
                 '2010-01-28T15:00:00+00:00,2010-01-28T15:00:00+02:00',
                 DataType::DATETIME,
@@ -875,63 +961,111 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 true
             ],
             [
-                new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
-                new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
-                DataType::DATE,
-                [RequestType::REST],
-                true
-            ],
-            [
-                new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
-                new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
-                DataType::DATE,
-                [RequestType::REST],
-                false
-            ],
-            [
-                [
-                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC'))
-                ],
-                [
-                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC'))
-                ],
+                $this->getDateTime('2010-01-28T00:00:00'),
+                $this->getDateTime('2010-01-28T00:00:00'),
                 DataType::DATE,
                 [RequestType::REST],
                 true
             ],
             [
                 [
-                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC'))
+                    $this->getDateTime('2010-01-28T00:00:00'),
+                    $this->getDateTime('2010-01-28T00:00:00')
                 ],
                 [
-                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC'))
+                    $this->getDateTime('2010-01-28T00:00:00'),
+                    $this->getDateTime('2010-01-28T00:00:00')
+                ],
+                DataType::DATE,
+                [RequestType::REST],
+                true
+            ],
+            [
+                $this->getNormalizedDateTime('2010-01-28T00:00:00'),
+                $this->getNormalizedDateTime('2010-01-28T00:00:00'),
+                DataType::DATE,
+                [RequestType::REST],
+                true
+            ],
+            [
+                $this->getNormalizedDateTime('2010-01-28T00:00:00'),
+                $this->getNormalizedDateTime('2010-01-28T00:00:00'),
+                DataType::DATE,
+                [RequestType::REST],
+                false
+            ],
+            [
+                [
+                    $this->getNormalizedDateTime('2010-01-28T00:00:00'),
+                    $this->getNormalizedDateTime('2010-01-28T00:00:00')
+                ],
+                [
+                    $this->getNormalizedDateTime('2010-01-28T00:00:00'),
+                    $this->getNormalizedDateTime('2010-01-28T00:00:00')
+                ],
+                DataType::DATE,
+                [RequestType::REST],
+                true
+            ],
+            [
+                [
+                    $this->getNormalizedDateTime('2010-01-28T00:00:00'),
+                    $this->getNormalizedDateTime('2010-01-28T00:00:00')
+                ],
+                [
+                    $this->getNormalizedDateTime('2010-01-28T00:00:00'),
+                    $this->getNormalizedDateTime('2010-01-28T00:00:00')
                 ],
                 DataType::DATE,
                 [RequestType::REST],
                 false
             ],
             [
-                new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
+                $this->getNormalizedDateTime('2010-01-28T00:00:00', NormalizedDateTime::PRECISION_DAY),
                 '2010-01-28',
                 DataType::DATE,
                 [RequestType::REST],
                 true
             ],
             [
-                new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
+                $this->getNormalizedDateTime('2010-01-28T00:00:00', NormalizedDateTime::PRECISION_DAY),
                 '2010-01-28',
                 DataType::DATE,
                 [RequestType::REST],
                 false
             ],
             [
+                $this->getNormalizedDateTime('2010-02-01T00:00:00', NormalizedDateTime::PRECISION_MONTH),
+                '2010-02',
+                DataType::DATE,
+                [RequestType::REST],
+                true
+            ],
+            [
+                $this->getNormalizedDateTime('2010-02-01T00:00:00', NormalizedDateTime::PRECISION_MONTH),
+                '2010-02',
+                DataType::DATE,
+                [RequestType::REST],
+                false
+            ],
+            [
+                $this->getNormalizedDateTime('2010-01-01T00:00:00', NormalizedDateTime::PRECISION_YEAR),
+                '2010',
+                DataType::DATE,
+                [RequestType::REST],
+                true
+            ],
+            [
+                $this->getNormalizedDateTime('2010-01-01T00:00:00', NormalizedDateTime::PRECISION_YEAR),
+                '2010',
+                DataType::DATE,
+                [RequestType::REST],
+                false
+            ],
+            [
                 [
-                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('2010-01-29T00:00:00', new \DateTimeZone('UTC'))
+                    $this->getNormalizedDateTime('2010-01-28T00:00:00', NormalizedDateTime::PRECISION_DAY),
+                    $this->getNormalizedDateTime('2010-01-29T00:00:00', NormalizedDateTime::PRECISION_DAY)
                 ],
                 '2010-01-28,2010-01-29',
                 DataType::DATE,
@@ -939,63 +1073,111 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 true
             ],
             [
-                new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
-                new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
-                DataType::TIME,
-                [RequestType::REST],
-                true
-            ],
-            [
-                new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
-                new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
-                DataType::TIME,
-                [RequestType::REST],
-                false
-            ],
-            [
-                [
-                    new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC'))
-                ],
-                [
-                    new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC'))
-                ],
+                $this->getDateTime('1970-01-01T15:00:00'),
+                $this->getDateTime('1970-01-01T15:00:00'),
                 DataType::TIME,
                 [RequestType::REST],
                 true
             ],
             [
                 [
-                    new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC'))
+                    $this->getDateTime('1970-01-01T15:00:00'),
+                    $this->getDateTime('1970-01-01T15:00:00')
                 ],
                 [
-                    new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('1970-01-01T15:00:00', new \DateTimeZone('UTC'))
+                    $this->getDateTime('1970-01-01T15:00:00'),
+                    $this->getDateTime('1970-01-01T15:00:00')
+                ],
+                DataType::TIME,
+                [RequestType::REST],
+                true
+            ],
+            [
+                $this->getNormalizedDateTime('1970-01-01T15:00:00'),
+                $this->getNormalizedDateTime('1970-01-01T15:00:00'),
+                DataType::TIME,
+                [RequestType::REST],
+                true
+            ],
+            [
+                $this->getNormalizedDateTime('1970-01-01T15:00:00'),
+                $this->getNormalizedDateTime('1970-01-01T15:00:00'),
+                DataType::TIME,
+                [RequestType::REST],
+                false
+            ],
+            [
+                [
+                    $this->getNormalizedDateTime('1970-01-01T15:00:00'),
+                    $this->getNormalizedDateTime('1970-01-01T15:00:00')
+                ],
+                [
+                    $this->getNormalizedDateTime('1970-01-01T15:00:00'),
+                    $this->getNormalizedDateTime('1970-01-01T15:00:00')
+                ],
+                DataType::TIME,
+                [RequestType::REST],
+                true
+            ],
+            [
+                [
+                    $this->getNormalizedDateTime('1970-01-01T15:00:00'),
+                    $this->getNormalizedDateTime('1970-01-01T15:00:00')
+                ],
+                [
+                    $this->getNormalizedDateTime('1970-01-01T15:00:00'),
+                    $this->getNormalizedDateTime('1970-01-01T15:00:00')
                 ],
                 DataType::TIME,
                 [RequestType::REST],
                 false
             ],
             [
-                new \DateTime('1970-01-01T10:30:59', new \DateTimeZone('UTC')),
+                $this->getNormalizedDateTime('1970-01-01T10:30:59'),
                 '10:30:59',
                 DataType::TIME,
                 [RequestType::REST],
                 true
             ],
             [
-                new \DateTime('1970-01-01T10:30:59', new \DateTimeZone('UTC')),
+                $this->getNormalizedDateTime('1970-01-01T10:30:59'),
                 '10:30:59',
                 DataType::TIME,
                 [RequestType::REST],
                 false
             ],
             [
+                $this->getNormalizedDateTime('1970-01-01T10:30:00', NormalizedDateTime::PRECISION_MINUTE),
+                '10:30',
+                DataType::TIME,
+                [RequestType::REST],
+                true
+            ],
+            [
+                $this->getNormalizedDateTime('1970-01-01T10:30:00', NormalizedDateTime::PRECISION_MINUTE),
+                '10:30',
+                DataType::TIME,
+                [RequestType::REST],
+                false
+            ],
+            [
+                $this->getNormalizedDateTime('1970-01-01T10:00:00', NormalizedDateTime::PRECISION_HOUR),
+                '10',
+                DataType::TIME,
+                [RequestType::REST],
+                true
+            ],
+            [
+                $this->getNormalizedDateTime('1970-01-01T10:00:00', NormalizedDateTime::PRECISION_HOUR),
+                '10',
+                DataType::TIME,
+                [RequestType::REST],
+                false
+            ],
+            [
                 [
-                    new \DateTime('1970-01-01T10:30:59', new \DateTimeZone('UTC')),
-                    new \DateTime('1970-01-01T11:45:00', new \DateTimeZone('UTC'))
+                    $this->getNormalizedDateTime('1970-01-01T10:30:59'),
+                    $this->getNormalizedDateTime('1970-01-01T11:45:00')
                 ],
                 '10:30:59,11:45:00',
                 DataType::TIME,
@@ -1130,65 +1312,98 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
             [new Range(-45.6, -12.3), '-.456..-.123', DataType::PERCENT_100],
             [
                 new Range(
-                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('2010-01-28T15:00:01', new \DateTimeZone('UTC'))
+                    $this->getDateTime('2010-01-28T15:00:00'),
+                    $this->getDateTime('2010-01-28T15:00:01')
                 ),
                 new Range(
-                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('2010-01-28T15:00:01', new \DateTimeZone('UTC'))
+                    $this->getDateTime('2010-01-28T15:00:00'),
+                    $this->getDateTime('2010-01-28T15:00:01')
                 ),
                 DataType::DATETIME
             ],
             [
                 new Range(
-                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('2010-01-28T15:00:01', new \DateTimeZone('UTC'))
+                    $this->getNormalizedDateTime('2010-01-28T15:00:00'),
+                    $this->getNormalizedDateTime('2010-01-28T15:00:01')
+                ),
+                new Range(
+                    $this->getNormalizedDateTime('2010-01-28T15:00:00'),
+                    $this->getNormalizedDateTime('2010-01-28T15:00:01')
+                ),
+                DataType::DATETIME
+            ],
+            [
+                new Range(
+                    $this->getNormalizedDateTime('2010-01-28T15:00:00'),
+                    $this->getNormalizedDateTime('2010-01-28T15:00:01')
                 ),
                 '2010-01-28T15:00:00..2010-01-28T15:00:01',
                 DataType::DATETIME
             ],
             [
                 new Range(
-                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('2010-01-29T00:00:00', new \DateTimeZone('UTC'))
+                    $this->getNormalizedDateTime('2010-01-28T00:00:00', NormalizedDateTime::PRECISION_DAY),
+                    $this->getNormalizedDateTime('2010-01-29T00:00:00', NormalizedDateTime::PRECISION_DAY)
                 ),
                 '2010-01-28..2010-01-29',
                 DataType::DATETIME
             ],
             [
                 new Range(
-                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('2010-01-28T15:00:01', new \DateTimeZone('UTC'))
+                    $this->getDateTime('2010-01-28T15:00:00'),
+                    $this->getDateTime('2010-01-28T15:00:01')
                 ),
                 new Range(
-                    new \DateTime('2010-01-28T15:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('2010-01-28T15:00:01', new \DateTimeZone('UTC'))
+                    $this->getDateTime('2010-01-28T15:00:00'),
+                    $this->getDateTime('2010-01-28T15:00:01')
                 ),
                 DataType::DATE
             ],
             [
                 new Range(
-                    new \DateTime('2010-01-28T00:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('2010-01-29T00:00:00', new \DateTimeZone('UTC'))
+                    $this->getNormalizedDateTime('2010-01-28T15:00:00'),
+                    $this->getNormalizedDateTime('2010-01-28T15:00:01')
+                ),
+                new Range(
+                    $this->getNormalizedDateTime('2010-01-28T15:00:00'),
+                    $this->getNormalizedDateTime('2010-01-28T15:00:01')
+                ),
+                DataType::DATE
+            ],
+            [
+                new Range(
+                    $this->getNormalizedDateTime('2010-01-28T00:00:00', NormalizedDateTime::PRECISION_DAY),
+                    $this->getNormalizedDateTime('2010-01-29T00:00:00', NormalizedDateTime::PRECISION_DAY)
                 ),
                 '2010-01-28..2010-01-29',
                 DataType::DATE
             ],
             [
                 new Range(
-                    new \DateTime('1970-01-01T00:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('1970-01-01T00:00:01', new \DateTimeZone('UTC'))
+                    $this->getDateTime('1970-01-01T00:00:00'),
+                    $this->getDateTime('1970-01-01T00:00:01')
                 ),
                 new Range(
-                    new \DateTime('1970-01-01T00:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('1970-01-01T00:00:01', new \DateTimeZone('UTC'))
+                    $this->getDateTime('1970-01-01T00:00:00'),
+                    $this->getDateTime('1970-01-01T00:00:01')
                 ),
                 DataType::TIME
             ],
             [
                 new Range(
-                    new \DateTime('1970-01-01T00:00:00', new \DateTimeZone('UTC')),
-                    new \DateTime('1970-01-01T00:00:01', new \DateTimeZone('UTC'))
+                    $this->getNormalizedDateTime('1970-01-01T00:00:00'),
+                    $this->getNormalizedDateTime('1970-01-01T00:00:01')
+                ),
+                new Range(
+                    $this->getNormalizedDateTime('1970-01-01T00:00:00'),
+                    $this->getNormalizedDateTime('1970-01-01T00:00:01')
+                ),
+                DataType::TIME
+            ],
+            [
+                new Range(
+                    $this->getNormalizedDateTime('1970-01-01T00:00:00'),
+                    $this->getNormalizedDateTime('1970-01-01T00:00:01')
                 ),
                 '00:00:00..00:00:01',
                 DataType::TIME
@@ -2016,6 +2231,13 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
             if ($expected instanceof Range) {
                 self::assertNormalizedValue($expected->getFromValue(), $actual->getFromValue(), 'Range.fromValue');
                 self::assertNormalizedValue($expected->getToValue(), $actual->getToValue(), 'Range.toValue');
+            } elseif ($expected instanceof NormalizedDateTime) {
+                self::assertEquals($expected, $actual, $message);
+                self::assertEquals(
+                    $expected->getPrecision(),
+                    $actual->getPrecision(),
+                    ($message ? $message . '. ' : '') . 'NormalizedDateTime::precision'
+                );
             } else {
                 self::assertEquals($expected, $actual, $message);
             }

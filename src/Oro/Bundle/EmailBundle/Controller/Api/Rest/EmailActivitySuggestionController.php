@@ -56,9 +56,7 @@ class EmailActivitySuggestionController extends RestGetController
         return $this->buildResponse($data['result'], self::ACTION_LIST, $data);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_email.manager.email_activity_suggestion.api');

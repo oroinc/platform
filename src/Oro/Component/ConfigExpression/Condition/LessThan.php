@@ -7,17 +7,13 @@ namespace Oro\Component\ConfigExpression\Condition;
  */
 class LessThan extends AbstractComparison
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'lt';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doCompare($left, $right)
     {
         return $left < $right;

@@ -27,6 +27,7 @@ class ValidateOwnerListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ValidateOwnerListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);

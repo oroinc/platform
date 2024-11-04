@@ -40,9 +40,7 @@ class SearchResultsExtension extends AbstractExtension
         $this->dispatcher      = $dispatcher;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return
@@ -50,9 +48,7 @@ class SearchResultsExtension extends AbstractExtension
             && $config->offsetGetByPath(self::TYPE_PATH) === self::TYPE_VALUE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
         $rows = $result->getData();
@@ -103,9 +99,7 @@ class SearchResultsExtension extends AbstractExtension
         $result->setData($resultRows);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPriority()
     {
         return 10;

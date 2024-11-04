@@ -32,6 +32,7 @@ class ParentLocalizationSearchHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var ParentLocalizationSearchHandler */
     private $searchHandler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->indexer = $this->createMock(Indexer::class);

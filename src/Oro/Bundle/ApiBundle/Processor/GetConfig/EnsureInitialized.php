@@ -21,9 +21,7 @@ class EnsureInitialized implements ProcessorInterface
         $this->configLoaderFactory = $configLoaderFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */

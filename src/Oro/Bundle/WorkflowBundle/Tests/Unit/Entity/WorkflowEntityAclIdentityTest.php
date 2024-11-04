@@ -15,6 +15,7 @@ class WorkflowEntityAclIdentityTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowEntityAclIdentity */
     private $aclIdentity;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->aclIdentity = new WorkflowEntityAclIdentity();

@@ -22,6 +22,7 @@ class FormatterExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var FormatterExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->propertyContainer = $this->createMock(ContainerInterface::class);

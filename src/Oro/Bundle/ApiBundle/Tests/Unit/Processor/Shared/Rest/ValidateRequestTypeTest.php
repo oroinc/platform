@@ -10,6 +10,7 @@ class ValidateRequestTypeTest extends GetProcessorTestCase
 {
     private ValidateRequestType $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

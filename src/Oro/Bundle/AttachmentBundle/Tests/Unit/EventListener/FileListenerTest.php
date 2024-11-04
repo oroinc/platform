@@ -29,6 +29,7 @@ class FileListenerTest extends \PHPUnit\Framework\TestCase
     /** @var FileListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fileManager = $this->createMock(FileManager::class);

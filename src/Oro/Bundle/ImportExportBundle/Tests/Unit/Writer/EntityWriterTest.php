@@ -28,6 +28,7 @@ class EntityWriterTest extends \PHPUnit\Framework\TestCase
     /** @var EntityWriter */
     protected $writer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManager::class);

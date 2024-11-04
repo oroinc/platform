@@ -15,6 +15,7 @@ class FixMessageFlattenExceptionNormalizerTest extends \PHPUnit\Framework\TestCa
     /** @var FixMessageFlattenExceptionNormalizer */
     private $normalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->innerNormalizer = $this->createMock(NormalizerInterface::class);

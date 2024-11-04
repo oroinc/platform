@@ -10,6 +10,7 @@ class CalendarDateCommandTest extends WebTestCase
 {
     private const DATE_FORMAT = 'Y-m-d';
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());

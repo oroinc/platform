@@ -8,6 +8,7 @@ use Oro\Bundle\TranslationBundle\Translation\TranslationMessageSanitizationError
 
 class UnsafeTranslationMessagesTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());

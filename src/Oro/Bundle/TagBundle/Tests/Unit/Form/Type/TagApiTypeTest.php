@@ -12,6 +12,7 @@ class TagApiTypeTest extends \PHPUnit\Framework\TestCase
     /** @var TagApiType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new TagApiType();

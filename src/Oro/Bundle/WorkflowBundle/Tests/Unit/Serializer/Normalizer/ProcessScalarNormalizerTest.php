@@ -9,6 +9,7 @@ class ProcessScalarNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var ProcessScalarNormalizer */
     private $normalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->normalizer = new ProcessScalarNormalizer();

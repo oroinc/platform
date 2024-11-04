@@ -13,9 +13,7 @@ class GetClassName extends AbstractAction
      */
     protected $options;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $object = $this->contextAccessor->getValue($context, $this->options['object']);
@@ -23,9 +21,7 @@ class GetClassName extends AbstractAction
         $this->contextAccessor->setValue($context, $this->options['attribute'], $class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (empty($options['object'])) {

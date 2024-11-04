@@ -16,9 +16,7 @@ class ChangeJsonArrayToJsonType implements Migration, DatabasePlatformAwareInter
 {
     use DatabasePlatformAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         if ($this->platform instanceof PostgreSQL94Platform) {

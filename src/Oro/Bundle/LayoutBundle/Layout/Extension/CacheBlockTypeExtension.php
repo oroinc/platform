@@ -14,25 +14,19 @@ use Oro\Component\Layout\BlockView;
  */
 class CacheBlockTypeExtension extends AbstractBlockTypeExtension
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getExtendedType()
     {
         return BaseType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         $view->vars['cache'] = $options->get('cache');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefault('cache', null);

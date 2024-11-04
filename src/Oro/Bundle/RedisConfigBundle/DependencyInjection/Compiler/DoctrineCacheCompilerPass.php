@@ -22,6 +22,7 @@ class DoctrineCacheCompilerPass implements CompilerPassInterface
     private const DOCTRINE_CACHE_SERVICE           = 'oro.doctrine.abstract';
     private const DOCTRINE_CACHE_NO_MEMORY_SERVICE = 'oro.doctrine.abstract.without_memory_cache';
 
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         if ($this->isRedisEnabledForDoctrine($container)) {

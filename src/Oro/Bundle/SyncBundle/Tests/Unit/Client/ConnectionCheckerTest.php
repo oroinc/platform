@@ -22,6 +22,7 @@ class ConnectionCheckerTest extends TestCase
 
     private ConnectionChecker $checker;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->client = $this->createMock(WebsocketClientInterface::class);

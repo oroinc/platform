@@ -8,9 +8,7 @@ use Oro\Bundle\EntityMergeBundle\Datasource\Orm\MergeIterableResult;
 
 class MergeIterableResultFactory extends IterableResultFactory
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getIterableResult($qb): IterableResult
     {
         return new MergeIterableResult($qb);

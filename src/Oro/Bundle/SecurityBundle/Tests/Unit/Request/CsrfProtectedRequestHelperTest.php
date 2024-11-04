@@ -15,6 +15,7 @@ class CsrfProtectedRequestHelperTest extends \PHPUnit\Framework\TestCase
     /** @var CsrfProtectedRequestHelper */
     private $csrfProtectedRequestHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->csrfRequestManager = $this->createMock(CsrfRequestManager::class);

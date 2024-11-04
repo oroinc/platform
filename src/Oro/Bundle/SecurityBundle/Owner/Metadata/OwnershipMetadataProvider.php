@@ -38,17 +38,13 @@ class OwnershipMetadataProvider extends AbstractOwnershipMetadataProvider
         $this->cache = $cache;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function supports(): bool
     {
         return $this->tokenAccessor->getUser() instanceof User;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getUserClass(): string
     {
         $this->ensureOwningEntityClassesInitialized();
@@ -56,9 +52,7 @@ class OwnershipMetadataProvider extends AbstractOwnershipMetadataProvider
         return $this->userClass;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getBusinessUnitClass(): string
     {
         $this->ensureOwningEntityClassesInitialized();
@@ -66,9 +60,7 @@ class OwnershipMetadataProvider extends AbstractOwnershipMetadataProvider
         return $this->businessUnitClass;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getOrganizationClass(): ?string
     {
         $this->ensureOwningEntityClassesInitialized();
@@ -76,9 +68,7 @@ class OwnershipMetadataProvider extends AbstractOwnershipMetadataProvider
         return $this->organizationClass;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMaxAccessLevel(int $accessLevel, string $className = null): int
     {
         // Fix Access Level for given object. Change it from SYSTEM_LEVEL to GLOBAL_LEVEL
@@ -99,16 +89,19 @@ class OwnershipMetadataProvider extends AbstractOwnershipMetadataProvider
         return $accessLevel;
     }
 
+    #[\Override]
     protected function getCache(): CacheInterface
     {
         return $this->cache;
     }
 
+    #[\Override]
     protected function createNoOwnershipMetadata(): OwnershipMetadataInterface
     {
         return new OwnershipMetadata();
     }
 
+    #[\Override]
     protected function getOwnershipMetadata(ConfigInterface $config): OwnershipMetadataInterface
     {
         return new OwnershipMetadata(

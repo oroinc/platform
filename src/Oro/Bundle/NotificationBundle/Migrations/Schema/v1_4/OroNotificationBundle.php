@@ -9,9 +9,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroNotificationBundle implements Migration
 {
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $this->addEntityEmailsField($schema);

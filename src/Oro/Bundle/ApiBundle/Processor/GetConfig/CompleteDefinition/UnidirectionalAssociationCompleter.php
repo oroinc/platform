@@ -36,9 +36,7 @@ class UnidirectionalAssociationCompleter implements CustomDataTypeCompleterInter
         $this->entityOverrideProviderRegistry = $entityOverrideProviderRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function completeCustomDataType(
         ClassMetadata $metadata,
         EntityDefinitionConfig $definition,

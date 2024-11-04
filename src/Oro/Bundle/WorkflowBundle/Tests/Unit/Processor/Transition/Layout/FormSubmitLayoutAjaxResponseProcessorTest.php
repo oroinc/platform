@@ -16,6 +16,7 @@ class FormSubmitLayoutAjaxResponseProcessorTest extends \PHPUnit\Framework\TestC
     /** @var FormSubmitLayoutAjaxResponseProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processor = new FormSubmitLayoutAjaxResponseProcessor();

@@ -13,6 +13,7 @@ use Symfony\Component\Console\Tester\CommandTester;
  */
 class CommandOutputIsEmpty extends Constraint
 {
+    #[\Override]
     protected function matches($commandTester): bool
     {
         /** @var CommandTester $commandTester */
@@ -21,12 +22,14 @@ class CommandOutputIsEmpty extends Constraint
         return '' === $output;
     }
 
+    #[\Override]
     public function toString(): string
     {
         return 'command output is empty';
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function failureDescription($commandTester): string
     {
         /** @var CommandTester $commandTester */

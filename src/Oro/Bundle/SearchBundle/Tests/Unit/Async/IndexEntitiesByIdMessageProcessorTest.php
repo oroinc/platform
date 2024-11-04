@@ -23,6 +23,7 @@ class IndexEntitiesByIdMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     private IndexEntitiesByIdMessageProcessor $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);

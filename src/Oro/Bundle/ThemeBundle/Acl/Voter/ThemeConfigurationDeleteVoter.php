@@ -12,12 +12,9 @@ use Oro\Bundle\ThemeBundle\DependencyInjection\Configuration;
  */
 class ThemeConfigurationDeleteVoter extends AbstractEntityVoter
 {
-    /** {@inheritDoc} */
     protected $supportedAttributes = [BasicPermission::DELETE];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getPermissionForAttribute($class, $identifier, $attribute): int
     {
         if ($this->isSelectedInSystemConfiguration($identifier)) {

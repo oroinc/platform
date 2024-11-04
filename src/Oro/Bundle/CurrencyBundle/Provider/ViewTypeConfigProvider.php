@@ -22,9 +22,7 @@ class ViewTypeConfigProvider implements ViewTypeProviderInterface
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getViewType()
     {
         if (!$this->viewType) {

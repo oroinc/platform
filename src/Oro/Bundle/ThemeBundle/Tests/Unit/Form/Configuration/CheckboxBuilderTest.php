@@ -18,6 +18,7 @@ final class CheckboxBuilderTest extends TestCase
     private Packages|MockObject $packages;
     private FormBuilderInterface|MockObject $formBuilder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formBuilder = $this->createMock(FormBuilderInterface::class);

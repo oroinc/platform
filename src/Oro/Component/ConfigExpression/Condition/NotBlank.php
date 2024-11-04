@@ -7,17 +7,13 @@ namespace Oro\Component\ConfigExpression\Condition;
  */
 class NotBlank extends Blank
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'not_empty';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isConditionAllowed($context)
     {
         return !parent::isConditionAllowed($context);

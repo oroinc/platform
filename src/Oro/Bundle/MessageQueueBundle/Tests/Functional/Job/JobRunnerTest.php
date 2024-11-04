@@ -14,6 +14,7 @@ class JobRunnerTest extends WebTestCase
     use JobsAwareTestTrait;
     use MessageQueueExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -21,6 +22,7 @@ class JobRunnerTest extends WebTestCase
         self::purgeMessageQueue();
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         self::purgeMessageQueue();

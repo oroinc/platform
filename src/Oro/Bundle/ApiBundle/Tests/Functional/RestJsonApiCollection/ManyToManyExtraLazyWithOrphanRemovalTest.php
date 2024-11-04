@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\Collection;
  */
 class ManyToManyExtraLazyWithOrphanRemovalTest extends AbstractManyToManyCollectionTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -18,25 +19,19 @@ class ManyToManyExtraLazyWithOrphanRemovalTest extends AbstractManyToManyCollect
         ]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function isOrphanRemoval(): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getAssociationName(): string
     {
         return 'manyToManyExtraLazyWithOrphanRemovalItems';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getItems($entity): Collection
     {
         return $entity->getManyToManyExtraLazyWithOrphanRemovalItems();

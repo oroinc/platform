@@ -17,6 +17,7 @@ class FeatureResourceDecisionManagerTest extends \PHPUnit\Framework\TestCase
     /** @var FeatureResourceDecisionManager */
     private $featureResourceDecisionManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->featureDecisionManager = $this->createMock(FeatureDecisionManagerInterface::class);

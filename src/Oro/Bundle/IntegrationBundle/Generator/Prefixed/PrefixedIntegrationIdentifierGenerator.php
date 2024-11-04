@@ -17,9 +17,7 @@ class PrefixedIntegrationIdentifierGenerator implements IntegrationIdentifierGen
         $this->prefix = $prefix;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function generateIdentifier(Channel $channel): string
     {
         return sprintf('%s_%s', $this->prefix, $channel->getId());

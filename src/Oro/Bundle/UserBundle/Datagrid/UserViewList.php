@@ -45,9 +45,9 @@ class UserViewList extends AbstractViewsList
                 'enabled' => [
                     'value' => BooleanFilterType::TYPE_YES,
                 ],
-                'authStatus' => [
+                'auth_status' => [
                     'type' => EnumFilterType::TYPE_IN,
-                    'value' => ['reset'],
+                    'value' => ['auth_status.reset'],
                 ],
             ],
             'sorters' => [],
@@ -64,7 +64,7 @@ class UserViewList extends AbstractViewsList
                 'enabled' => [
                     'value' => BooleanFilterType::TYPE_NO,
                 ],
-                'authStatus' =>  null,
+                'auth_status' =>  null,
             ],
             'sorters' => [],
             'columns' => [
@@ -75,17 +75,13 @@ class UserViewList extends AbstractViewsList
         ],
     ];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getViewsList()
     {
         return $this->getSystemViewsList();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSystemViewsList()
     {
         $views = parent::getSystemViewsList();

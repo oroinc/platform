@@ -7,9 +7,7 @@ use Doctrine\Persistence\ObjectManager;
 
 class LoadExtendedRelationsData extends AbstractFixture
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $owningEntity  = new \Extend\Entity\TestEntity1();

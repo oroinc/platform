@@ -9,6 +9,7 @@ class ResetIdentifierGeneratorTest extends MetadataProcessorTestCase
 {
     private ResetIdentifierGenerator $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

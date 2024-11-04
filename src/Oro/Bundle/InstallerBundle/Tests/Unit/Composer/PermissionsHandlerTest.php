@@ -19,6 +19,7 @@ class PermissionsHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var PermissionsHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->process = $this->createMock(Process::class);

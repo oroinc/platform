@@ -27,11 +27,13 @@ class WebpAwareFileNameProvider implements FileNameProviderInterface
         $this->filterConfiguration = $filterConfiguration;
     }
 
+    #[\Override]
     public function getFileName(File $file): string
     {
         return $this->innerFileNameProvider->getFileName($file);
     }
 
+    #[\Override]
     public function getFilteredImageName(File $file, string $filterName, string $format = ''): string
     {
         if (!$format && $this->webpConfiguration->isEnabledForAll()) {
@@ -44,6 +46,7 @@ class WebpAwareFileNameProvider implements FileNameProviderInterface
         return $this->innerFileNameProvider->getFilteredImageName($file, $filterName, $format);
     }
 
+    #[\Override]
     public function getResizedImageName(File $file, int $width, int $height, string $format = ''): string
     {
         if (!$format && $this->webpConfiguration->isEnabledForAll()) {

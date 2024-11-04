@@ -30,6 +30,7 @@ class ScheduleSendEmailTemplateTest extends \PHPUnit\Framework\TestCase
 
     private ScheduleSendEmailTemplate $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $contextAccessor = $this->createMock(ContextAccessor::class);

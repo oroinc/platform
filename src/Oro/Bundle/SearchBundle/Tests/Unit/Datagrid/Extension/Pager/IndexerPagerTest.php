@@ -12,6 +12,7 @@ class IndexerPagerTest extends \PHPUnit\Framework\TestCase
     /** @var IndexerPager */
     private $pager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->pager = new IndexerPager();

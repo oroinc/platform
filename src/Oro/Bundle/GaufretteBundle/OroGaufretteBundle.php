@@ -13,9 +13,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class OroGaufretteBundle extends Bundle
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function boot(): void
     {
         parent::boot();
@@ -23,9 +21,7 @@ class OroGaufretteBundle extends Bundle
         $this->registerReadonlyStreamWrapper();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);

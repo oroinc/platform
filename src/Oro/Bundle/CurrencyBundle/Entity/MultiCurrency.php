@@ -72,9 +72,7 @@ class MultiCurrency implements EmptyItem
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isEmpty()
     {
         return $this->value === null;

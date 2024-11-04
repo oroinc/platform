@@ -79,25 +79,19 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
         $this->fieldAclExtension = $fieldAclExtension;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getExtensionKey()
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFieldExtension()
     {
         return $this->fieldAclExtension;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($type, $id)
     {
         if (ObjectIdentityFactory::ROOT_IDENTITY_TYPE === $type) {
@@ -114,9 +108,7 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
         return $this->entityMetadataProvider->isProtectedEntity($type);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMasks($permission)
     {
         $this->buildPermissionsMap();
@@ -124,9 +116,7 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
         return parent::getMasks($permission);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasMasks($permission)
     {
         $this->buildPermissionsMap();
@@ -134,9 +124,7 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
         return parent::hasMasks($permission);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPermissionGroupMask($mask)
     {
         if (\array_key_exists($mask, $this->permissionGroupMasks)) {
@@ -157,9 +145,7 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validateMask($mask, $object, $permission = null)
     {
         if (0 === $this->removeServiceBits($mask)) {
@@ -188,9 +174,7 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
         throw $this->createInvalidAclMaskException($mask, $object);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getObjectIdentity($val)
     {
         if (\is_string($val)) {
@@ -206,9 +190,7 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
         return $this->fromDomainObject($val);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMaskBuilder($permission)
     {
         if (!$permission) {
@@ -218,9 +200,7 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
         return clone $this->getEntityMaskBuilder($this->getIdentityForPermission($permission));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAllMaskBuilders()
     {
         $result = [];
@@ -232,19 +212,17 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMaskPattern($mask)
     {
         return EntityMaskBuilder::getPatternFor($mask);
     }
 
     /**
-     * {@inheritdoc}
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function adaptRootMask($rootMask, $object)
     {
         $permissions = $this->getPermissions($rootMask, true);
@@ -278,25 +256,19 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
         return $rootMask;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getServiceBits($mask)
     {
         return $mask & EntityMaskBuilder::SERVICE_BITS;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function removeServiceBits($mask)
     {
         return $mask & EntityMaskBuilder::REMOVE_SERVICE_BITS;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAccessLevel($mask, $permission = null, $object = null)
     {
         if (0 === $this->removeServiceBits($mask)) {
@@ -319,9 +291,7 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPermissions($mask = null, $setOnly = false, $byCurrentGroup = false)
     {
         if (null === $mask) {
@@ -358,9 +328,7 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null, $aclGroup = null)
     {
         if ($oid->getType() === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
@@ -416,17 +384,13 @@ class EntityAclExtension extends AbstractAccessLevelAclExtension
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getClasses()
     {
         return $this->entityMetadataProvider->getEntities();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function decideIsGranting($triggeredMask, $object, TokenInterface $securityToken)
     {
         if (!$this->isSupportedObject($object) || null === $this->getObjectId($object)) {

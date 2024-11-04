@@ -21,6 +21,7 @@ class DefaultFormProcessor implements ProcessorInterface
     /**
      * @param ContextInterface|TransitionContext $context
      */
+    #[\Override]
     public function process(ContextInterface $context)
     {
         $request = $context->getRequest();

@@ -40,9 +40,7 @@ class MenuUpdateProvider implements MenuUpdateProviderInterface
         $this->menuUpdateManager = $menuUpdateManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMenuUpdatesForMenuItem(ItemInterface $menuItem, array $options = [])
     {
         $scopeType = $menuItem->getExtra('scope_type', ConfigurationBuilder::DEFAULT_SCOPE_TYPE);

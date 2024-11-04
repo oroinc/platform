@@ -44,9 +44,7 @@ class ConfigProvider extends PhpArrayConfigProvider
         return $config[$chartName];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
         $configs = [];

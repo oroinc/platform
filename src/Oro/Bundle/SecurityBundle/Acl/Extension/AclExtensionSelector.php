@@ -36,9 +36,7 @@ class AclExtensionSelector implements ResetInterface
         $this->objectIdAccessor = $objectIdAccessor;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset()
     {
         $this->localCache = [];

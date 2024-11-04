@@ -22,6 +22,7 @@ class EntityAliasResolverRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
     private $container;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->defaultResolver = $this->createMock(EntityAliasResolver::class);

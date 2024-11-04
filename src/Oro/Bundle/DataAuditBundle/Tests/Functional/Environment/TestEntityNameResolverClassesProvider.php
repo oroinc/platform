@@ -29,10 +29,10 @@ class TestEntityNameResolverClassesProvider implements TestEntityNameResolverCla
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
+    #[\Override]
     public function getEntityClasses(): array
     {
         $foundEntityClasses = [];

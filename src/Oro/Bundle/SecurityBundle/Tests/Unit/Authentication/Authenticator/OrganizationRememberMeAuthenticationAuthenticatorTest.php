@@ -27,6 +27,7 @@ class OrganizationRememberMeAuthenticationAuthenticatorTest extends \PHPUnit\Fra
     private MockObject&OrganizationGuesserInterface $organizationGuesser;
     private MockObject&OrganizationRememberMeTokenFactoryInterface $tokenFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->rememberMeHandler = $this->createMock(RememberMeHandlerInterface::class);

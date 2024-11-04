@@ -19,9 +19,7 @@ class AppKernelInitializer implements ContextInitializer
         $this->appKernel = $appKernel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initializeContext(Context $context): void
     {
         if ($context instanceof AppKernelAwareInterface) {

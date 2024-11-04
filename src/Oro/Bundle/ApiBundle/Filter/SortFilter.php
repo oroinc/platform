@@ -10,9 +10,7 @@ use Doctrine\Common\Collections\Criteria;
  */
 class SortFilter extends StandaloneFilterWithDefaultValue
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function apply(Criteria $criteria, FilterValue $value = null): void
     {
         $val = null !== $value

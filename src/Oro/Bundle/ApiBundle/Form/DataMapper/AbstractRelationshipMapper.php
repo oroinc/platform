@@ -27,9 +27,7 @@ abstract class AbstractRelationshipMapper implements DataMapperInterface
         $this->entityMapper = $entityMapper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function mapDataToForms(mixed $viewData, \Traversable $forms): void
     {
         $empty = null === $viewData;
@@ -50,9 +48,7 @@ abstract class AbstractRelationshipMapper implements DataMapperInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function mapFormsToData(\Traversable $forms, mixed &$viewData): void
     {
         if (null === $viewData) {

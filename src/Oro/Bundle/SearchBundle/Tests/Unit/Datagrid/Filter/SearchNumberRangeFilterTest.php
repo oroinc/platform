@@ -20,6 +20,7 @@ class SearchNumberRangeFilterTest extends \PHPUnit\Framework\TestCase
     /** @var SearchNumberRangeFilter */
     private $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $formFactory = $this->createMock(FormFactoryInterface::class);

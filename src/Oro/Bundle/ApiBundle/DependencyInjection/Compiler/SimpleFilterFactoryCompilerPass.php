@@ -14,9 +14,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class SimpleFilterFactoryCompilerPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $filters = [];

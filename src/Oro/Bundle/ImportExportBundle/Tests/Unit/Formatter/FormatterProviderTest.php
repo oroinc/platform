@@ -17,6 +17,7 @@ class FormatterProviderTest extends \PHPUnit\Framework\TestCase
     /** @var FormatterProvider */
     private $formatter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);

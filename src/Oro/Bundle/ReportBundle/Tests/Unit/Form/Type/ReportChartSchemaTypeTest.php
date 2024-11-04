@@ -14,6 +14,7 @@ class ReportChartSchemaTypeTest extends FormIntegrationTestCase
     /** @var ReportChartSchemaType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $manager = $this->createMock(Manager::class);
@@ -47,9 +48,7 @@ class ReportChartSchemaTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

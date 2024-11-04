@@ -36,6 +36,7 @@ abstract class AbstractEventTriggerExtensionTestCase extends \PHPUnit\Framework\
     /** @var array */
     protected $triggers;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManager::class);

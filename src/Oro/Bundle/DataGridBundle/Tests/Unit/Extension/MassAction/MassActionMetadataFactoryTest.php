@@ -14,6 +14,7 @@ class MassActionMetadataFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var MassActionMetadataFactory */
     private $massActionMetadataFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->actionMetadataFactory = $this->createMock(ActionMetadataFactory::class);

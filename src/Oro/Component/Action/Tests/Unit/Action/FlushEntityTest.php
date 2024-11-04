@@ -19,6 +19,7 @@ class FlushEntityTest extends \PHPUnit\Framework\TestCase
     /** @var FlushEntity */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);

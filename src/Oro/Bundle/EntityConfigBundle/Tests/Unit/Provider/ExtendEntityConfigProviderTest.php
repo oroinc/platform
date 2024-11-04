@@ -25,6 +25,7 @@ class ExtendEntityConfigProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $extendProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

@@ -27,6 +27,7 @@ class FormSubmitTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCas
     /** @var FormSubmitTemplateResponseProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflowItemSerializer = $this->createMock(WorkflowItemSerializerInterface::class);

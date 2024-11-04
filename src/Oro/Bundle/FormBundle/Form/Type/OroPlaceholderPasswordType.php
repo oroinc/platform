@@ -22,9 +22,7 @@ class OroPlaceholderPasswordType extends AbstractType
 
     private const DEFAULT_PLACEHOLDER = '*';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->setAttribute(self::PLACEHOLDER_OPTIONS, new \ArrayObject());
@@ -60,9 +58,7 @@ class OroPlaceholderPasswordType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $oroOptions = $form->getConfig()->getAttribute(self::PLACEHOLDER_OPTIONS);
@@ -87,9 +83,7 @@ class OroPlaceholderPasswordType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -102,17 +96,13 @@ class OroPlaceholderPasswordType extends AbstractType
         $resolver->setAllowedValues('always_empty', true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return PasswordType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_placeholder_password';

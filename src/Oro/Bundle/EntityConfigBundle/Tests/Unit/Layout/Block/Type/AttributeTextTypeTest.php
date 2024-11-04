@@ -19,6 +19,7 @@ class AttributeTextTypeTest extends BlockTypeTestCase
     /** @var AttributeTextType */
     private $attributeTextType;
 
+    #[\Override]
     protected function initializeLayoutFactoryBuilder(LayoutFactoryBuilderInterface $layoutFactoryBuilder)
     {
         $this->attributeConfigurationProvider = $this->createMock(AttributeConfigurationProvider::class);

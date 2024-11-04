@@ -9,9 +9,7 @@ class UnauthenticatedTest extends RestJsonApiTestCase
 {
     private const WWW_AUTHENTICATE_HEADER_VALUE = 'WSSE realm="Secured API", profile="UsernameToken"';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getWsseAuthHeader(): array
     {
         return self::generateWsseAuthHeader('NotExistingUser');

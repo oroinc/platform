@@ -11,9 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ThemeConfigurationSelectType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -29,17 +27,13 @@ class ThemeConfigurationSelectType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_theme_configuration_select';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return OroEntitySelectOrCreateInlineType::class;

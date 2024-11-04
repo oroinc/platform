@@ -35,9 +35,7 @@ class LoadEmailThreadContextItem implements ProcessorInterface
         $this->authorizationChecker = $authorizationChecker;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var SingleItemContext $context */

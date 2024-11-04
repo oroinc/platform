@@ -13,6 +13,7 @@ class ChainAssociationAccessExclusionProviderTest extends \PHPUnit\Framework\Tes
     /** @var ChainAssociationAccessExclusionProvider */
     private $chainProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $highPriorityProvider = $this->createMock(AssociationAccessExclusionProviderInterface::class);

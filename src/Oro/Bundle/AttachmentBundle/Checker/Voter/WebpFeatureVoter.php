@@ -17,9 +17,7 @@ class WebpFeatureVoter implements VoterInterface
         $this->webpStrategy = $webpStrategy;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function vote($feature, $scopeIdentifier = null): int
     {
         if ($feature !== 'attachment_webp') {

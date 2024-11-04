@@ -38,6 +38,7 @@ class DebugDataProviderSignatureCommand extends Command
         parent::__construct();
     }
 
+    #[\Override]
     public function configure()
     {
         $this
@@ -55,6 +56,7 @@ HELP
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @noinspection PhpMissingParentCallCommonInspection
      */
+    #[\Override]
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $this->layoutRegistry = $this->layoutManager->getLayoutFactory()->getRegistry();

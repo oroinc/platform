@@ -53,9 +53,7 @@ class AuditChangedEntitiesInverseCollectionsProcessor extends AbstractAuditProce
         $this->batchSize = $batchSize;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         try {
@@ -156,9 +154,7 @@ class AuditChangedEntitiesInverseCollectionsProcessor extends AbstractAuditProce
         return $collectionsData;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics(): array
     {
         return [AuditChangedEntitiesInverseCollectionsTopic::getName()];

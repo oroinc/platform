@@ -6,9 +6,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 
 class AttributeHandler extends AbstractHandler
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function handle(array $configuration)
     {
         $rawAttributes = array();

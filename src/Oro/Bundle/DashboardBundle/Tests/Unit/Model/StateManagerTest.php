@@ -25,6 +25,7 @@ class StateManagerTest extends \PHPUnit\Framework\TestCase
     /** @var StateManager */
     private $stateManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);

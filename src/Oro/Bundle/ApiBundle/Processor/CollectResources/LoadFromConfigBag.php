@@ -19,9 +19,7 @@ class LoadFromConfigBag implements ProcessorInterface
         $this->configBagRegistry = $configBagRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CollectResourcesContext $context */

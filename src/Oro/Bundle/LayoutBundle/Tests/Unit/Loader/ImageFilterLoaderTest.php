@@ -26,6 +26,7 @@ class ImageFilterLoaderTest extends \PHPUnit\Framework\TestCase
 
     private FilterConfiguration|\PHPUnit\Framework\MockObject\MockObject $filterConfig;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->imageTypeProvider = $this->createMock(ImageTypeProvider::class);

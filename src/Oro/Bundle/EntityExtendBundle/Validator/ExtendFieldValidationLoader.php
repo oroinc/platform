@@ -30,9 +30,7 @@ class ExtendFieldValidationLoader extends AbstractFieldConfigBasedValidationLoad
         $this->fieldConfigConstraintsFactory = $fieldConfigConstraintsFactory;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function processFieldConfig(ClassMetadata $metadata, ConfigInterface $fieldConfig): void
     {
         if (!$fieldConfig->is('is_enabled')) {

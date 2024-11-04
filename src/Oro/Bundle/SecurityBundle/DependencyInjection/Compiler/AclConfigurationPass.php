@@ -19,9 +19,7 @@ class AclConfigurationPass implements CompilerPassInterface
 {
     use TaggedServiceTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $this->substituteSecurityIdentityStrategy($container);

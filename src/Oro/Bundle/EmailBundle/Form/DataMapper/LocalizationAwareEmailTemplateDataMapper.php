@@ -23,9 +23,7 @@ class LocalizationAwareEmailTemplateDataMapper implements DataMapperInterface
         $this->inner = $inner;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function mapDataToForms($viewData, $forms): void
     {
         if ($viewData === null) {
@@ -62,9 +60,7 @@ class LocalizationAwareEmailTemplateDataMapper implements DataMapperInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function mapFormsToData($forms, &$viewData): void
     {
         if ($viewData === null) {

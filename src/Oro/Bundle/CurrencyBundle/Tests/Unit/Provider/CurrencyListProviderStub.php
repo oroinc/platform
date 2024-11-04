@@ -11,9 +11,7 @@ class CurrencyListProviderStub implements CurrencyListProviderInterface
      */
     private $currencyList = ['USD', 'EUR'];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCurrencyList()
     {
         return $this->currencyList;

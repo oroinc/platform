@@ -15,6 +15,7 @@ class SaveAndReturnActionFormTemplateDataProviderTest extends \PHPUnit\Framework
 
     private SaveAndReturnActionFormTemplateDataProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->form = $this->createMock(FormInterface::class);

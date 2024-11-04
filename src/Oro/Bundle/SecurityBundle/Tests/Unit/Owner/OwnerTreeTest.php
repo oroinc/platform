@@ -15,6 +15,7 @@ class OwnerTreeTest extends \PHPUnit\Framework\TestCase
 
     private OwnerTree $tree;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tree = new OwnerTree();

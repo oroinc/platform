@@ -42,9 +42,7 @@ class UniqueEntityExtension extends AbstractTypeExtension
         $this->doctrineHelper       = $doctrineHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (empty($options['data_class'])) {

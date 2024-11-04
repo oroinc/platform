@@ -13,6 +13,7 @@ class ThemeConfigurationProviderTest extends TestCase
 
     private ThemeConfigurationProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->generalThemeConfigurationProvider = $this->createMock(GeneralThemeConfigurationProvider::class);

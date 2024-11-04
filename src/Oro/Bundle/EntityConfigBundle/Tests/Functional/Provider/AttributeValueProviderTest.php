@@ -15,6 +15,7 @@ class AttributeValueProviderTest extends WebTestCase
     /** @var AttributeValueProviderInterface */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());

@@ -12,9 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class ExtendDuplicatorPass implements CompilerPassInterface
 {
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $container->getDefinition('oro_action.factory.duplicator_factory')

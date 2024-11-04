@@ -66,6 +66,7 @@ class EntityCacheWarmer extends CacheWarmer
     /**
      * {inheritdoc}
      */
+    #[\Override]
     public function warmUp($cacheDir): array
     {
         $fs   = $this->createFilesystem();
@@ -78,6 +79,7 @@ class EntityCacheWarmer extends CacheWarmer
     /**
      * {inheritdoc}
      */
+    #[\Override]
     public function isOptional(): bool
     {
         return false;

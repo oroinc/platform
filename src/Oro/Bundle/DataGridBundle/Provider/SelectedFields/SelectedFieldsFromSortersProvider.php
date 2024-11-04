@@ -11,9 +11,7 @@ use Oro\Bundle\DataGridBundle\Extension\Sorter\Configuration as SorterConfigurat
  */
 class SelectedFieldsFromSortersProvider extends AbstractSelectedFieldsProvider
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getConfiguration(DatagridConfiguration $datagridConfiguration): array
     {
         return $datagridConfiguration->offsetGetByPath(SorterConfiguration::COLUMNS_PATH, []);

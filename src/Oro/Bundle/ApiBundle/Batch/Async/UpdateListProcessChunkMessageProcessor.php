@@ -68,17 +68,13 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics(): array
     {
         return [UpdateListProcessChunkTopic::getName()];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         $startTimestamp = microtime(true);

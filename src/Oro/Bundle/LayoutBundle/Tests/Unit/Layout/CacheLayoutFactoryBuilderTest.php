@@ -17,6 +17,7 @@ class CacheLayoutFactoryBuilderTest extends \PHPUnit\Framework\TestCase
 
     private CacheLayoutFactoryBuilder $cacheLayoutFactoryBuilder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $layoutContextStack = new LayoutContextStack();

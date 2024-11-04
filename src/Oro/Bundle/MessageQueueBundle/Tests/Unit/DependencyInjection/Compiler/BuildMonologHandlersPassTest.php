@@ -15,6 +15,7 @@ class BuildMonologHandlersPassTest extends \PHPUnit\Framework\TestCase
 {
     private BuildMonologHandlersPass $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new BuildMonologHandlersPass();

@@ -22,9 +22,7 @@ class NumberTypeFormatter implements TypeFormatterInterface
         $this->numberFormatter = $numberFormatter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function formatType($value, $type)
     {
         switch ($type) {

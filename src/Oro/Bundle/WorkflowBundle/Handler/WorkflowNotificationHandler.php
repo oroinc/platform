@@ -12,9 +12,7 @@ use Oro\Bundle\WorkflowBundle\Event\WorkflowNotificationEvent;
  */
 class WorkflowNotificationHandler extends EmailNotificationHandler
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handle(NotificationEvent $event, array $matchedNotifications)
     {
         if (!$event instanceof WorkflowNotificationEvent) {

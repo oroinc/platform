@@ -30,9 +30,7 @@ class EventDispatchableRestClientFactory implements FactoryInterface
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getClientInstance(RestTransportSettingsInterface $transportEntity)
     {
         $client = $this->legacyClientFactory->createRestClient(

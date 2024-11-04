@@ -10,6 +10,7 @@ class WorkflowDeactivateAction extends AjaxAction
     /**
      * @return ActionConfiguration
      */
+    #[\Override]
     public function getOptions()
     {
         $options = parent::getOptions();

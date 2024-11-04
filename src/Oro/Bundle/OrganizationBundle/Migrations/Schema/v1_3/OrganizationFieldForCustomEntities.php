@@ -19,9 +19,7 @@ class OrganizationFieldForCustomEntities implements Migration, ContainerAwareInt
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         /** @var ConfigManager $configManager */

@@ -33,6 +33,7 @@ class EmailAttributeProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EmailAttributeProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);

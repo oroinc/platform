@@ -22,9 +22,9 @@ class ConfigurationType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
      * @throws ConfigurationBuilderNotFoundException
      */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $configuration = $this->getThemeConfiguration($options);
@@ -35,9 +35,7 @@ class ConfigurationType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -49,9 +47,9 @@ class ConfigurationType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
      * @throws ConfigurationBuilderNotFoundException
      */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         $configuration = $this->getThemeConfiguration($options);
@@ -69,9 +67,7 @@ class ConfigurationType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_theme_configuration_list';

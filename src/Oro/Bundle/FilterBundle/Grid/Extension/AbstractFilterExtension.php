@@ -53,9 +53,7 @@ abstract class AbstractFilterExtension extends AbstractExtension
         $this->filterExecutionContext = $filterExecutionContext;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function processConfigs(DatagridConfiguration $config)
     {
         $filters = $config->offsetGetByPath(Configuration::FILTERS_PATH);
@@ -70,9 +68,7 @@ abstract class AbstractFilterExtension extends AbstractExtension
         $config->offsetSetByPath(Configuration::FILTERS_PATH, array_replace_recursive($filters, $filtersNormalized));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $metadata)
     {
         $filters = $this->filtersProvider->getDatagridFilters($config);
@@ -146,7 +142,7 @@ abstract class AbstractFilterExtension extends AbstractExtension
      */
     protected function updateState(array $filters, DatagridConfiguration $config, MetadataObject $metadata): void
     {
-        $filtersState = $this->filtersStateProvider->getState($config, $this->getParameters());
+        $filtersState = $this->filtersStateProvider->getStateFromParameters($config, $this->getParameters());
         $initialFiltersState = $this->filtersStateProvider->getDefaultState($config);
 
         foreach ($filters as $filterName => $filter) {

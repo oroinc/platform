@@ -15,6 +15,7 @@ class SetTargetProcessorTest extends BatchUpdateItemProcessorTestCase
     /** @var SetTargetProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

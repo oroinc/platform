@@ -17,6 +17,7 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
     /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
     protected $metadata;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -24,9 +25,7 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
         $this->metadata = $this->createMock(ClassMetadata::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getAttributeType(): AttributeTypeInterface
     {
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
@@ -38,9 +37,7 @@ class ManyToManyAttributeTypeTest extends AttributeTypeTestCase
         return new ManyToManyAttributeType($this->entityNameResolver, $doctrineHelper);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configurationMethodsDataProvider(): array
     {
         return [

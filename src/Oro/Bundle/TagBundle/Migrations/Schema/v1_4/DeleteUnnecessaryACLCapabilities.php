@@ -12,9 +12,7 @@ class DeleteUnnecessaryACLCapabilities implements Migration, ContainerAwareInter
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $aclManager = $this->container->get('oro_security.acl.manager');

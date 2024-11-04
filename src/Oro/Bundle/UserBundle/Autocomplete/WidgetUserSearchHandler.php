@@ -52,9 +52,7 @@ class WidgetUserSearchHandler extends UserSearchHandler
         $this->searchUserCriteria = $searchCriteria;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function search($query, $page, $perPage, $searchById = false)
     {
         $page = (int)$page > 0 ? (int)$page : 1;
@@ -65,9 +63,7 @@ class WidgetUserSearchHandler extends UserSearchHandler
         return parent::search($query, $page, $perPage, $searchById);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function convertItems(array $items)
     {
         $result = parent::convertItems($items);
@@ -89,9 +85,7 @@ class WidgetUserSearchHandler extends UserSearchHandler
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function convertItem($item)
     {
         if ($this->idFieldName) {
@@ -110,9 +104,7 @@ class WidgetUserSearchHandler extends UserSearchHandler
         return parent::convertItem($item);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function searchEntities($search, $firstResult, $maxResults)
     {
         $queryBuilder = $this->getBasicQueryBuilder();
@@ -126,9 +118,6 @@ class WidgetUserSearchHandler extends UserSearchHandler
         return $queryBuilder->getQuery()->getResult();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function getBasicQueryBuilder()
     {
         $queryBuilder = $this->entityRepository->createQueryBuilder('u');

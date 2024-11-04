@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\Collection;
  */
 class ManyToManyWithOrphanRemovalTest extends AbstractManyToManyCollectionTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -18,25 +19,19 @@ class ManyToManyWithOrphanRemovalTest extends AbstractManyToManyCollectionTestCa
         ]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function isOrphanRemoval(): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getAssociationName(): string
     {
         return 'manyToManyWithOrphanRemovalItems';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getItems($entity): Collection
     {
         return $entity->getManyToManyWithOrphanRemovalItems();

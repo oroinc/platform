@@ -21,6 +21,7 @@ class BlockViewCacheTest extends \PHPUnit\Framework\TestCase
     /** @var BlockViewCache */
     private $blockViewCache;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->cache = $this->createMock(AbstractAdapter::class);

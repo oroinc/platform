@@ -12,6 +12,7 @@ class ProcessTriggerConfigurationTest extends \PHPUnit\Framework\TestCase
     /** @var ProcessTriggerConfiguration */
     private $configuration;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configuration = new ProcessTriggerConfiguration();

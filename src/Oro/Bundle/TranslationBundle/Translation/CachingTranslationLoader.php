@@ -21,6 +21,7 @@ class CachingTranslationLoader implements LoaderInterface
         $this->cache = $cache;
     }
 
+    #[\Override]
     public function load(mixed $resource, string $locale, string $domain = 'messages'): MessageCatalogue
     {
         $resourceKey = $this->getResourceKey($resource);

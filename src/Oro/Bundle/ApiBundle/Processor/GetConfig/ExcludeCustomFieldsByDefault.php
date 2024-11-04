@@ -11,9 +11,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class ExcludeCustomFieldsByDefault implements ProcessorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */

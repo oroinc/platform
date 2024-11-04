@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest;
 
+use Oro\Bundle\ApiBundle\Model\NormalizedDateTime;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue\AbstractProcessor;
 
 /**
@@ -12,35 +13,40 @@ class NormalizeDate extends AbstractProcessor
 {
     public const REQUIREMENT = '\d{4}(-\d{2}(-\d{2}?)?)?';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getDataTypeString(): string
     {
         return 'date';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getDataTypePluralString(): string
     {
         return 'dates';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getRequirement(): string
     {
         return self::REQUIREMENT;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function normalizeValue(mixed $value): mixed
     {
-        return new \DateTime($value, new \DateTimeZone('UTC'));
+        $precision = NormalizedDateTime::PRECISION_DAY;
+        $delimiterCount = substr_count($value, '-');
+        if (0 === $delimiterCount) {
+            $value .= '-01-01';
+            $precision = NormalizedDateTime::PRECISION_YEAR;
+        } elseif (1 === $delimiterCount) {
+            $value .= '-01';
+            $precision = NormalizedDateTime::PRECISION_MONTH;
+        }
+
+        $result = new NormalizedDateTime($value, new \DateTimeZone('UTC'));
+        $result->setPrecision($precision);
+
+        return $result;
     }
 }

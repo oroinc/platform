@@ -13,10 +13,10 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class NameOrOrganizationValidator extends ConstraintValidator
 {
     /**
-     * {@inheritdoc}
      * @param AbstractAddress    $entity
      * @param NameOrOrganization $constraint
      */
+    #[\Override]
     public function validate($entity, Constraint $constraint)
     {
         if (null === $entity) {

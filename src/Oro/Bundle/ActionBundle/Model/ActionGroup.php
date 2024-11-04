@@ -40,6 +40,7 @@ class ActionGroup implements ActionGroupInterface
         $this->parametersResolver = $parametersResolver;
     }
 
+    #[\Override]
     public function execute(ActionData $data, Collection $errors = null): ActionData
     {
         $this->parametersResolver->resolve($data, $this, $errors);
@@ -54,11 +55,13 @@ class ActionGroup implements ActionGroupInterface
         return $data;
     }
 
+    #[\Override]
     public function getDefinition(): ActionGroupDefinition
     {
         return $this->definition;
     }
 
+    #[\Override]
     public function isAllowed(ActionData $data, Collection $errors = null): bool
     {
         if ($config = $this->definition->getConditions()) {
@@ -84,6 +87,7 @@ class ActionGroup implements ActionGroupInterface
     /**
      * @return array<string,Parameter>
      */
+    #[\Override]
     public function getParameters(): array
     {
         if ($this->parameters === null) {

@@ -16,6 +16,7 @@ class MessageBufferManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrine;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->bufferedProducer = $this->createMock(BufferedMessageProducer::class);

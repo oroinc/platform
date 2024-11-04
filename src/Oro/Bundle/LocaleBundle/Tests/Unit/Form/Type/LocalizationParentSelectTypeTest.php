@@ -17,6 +17,7 @@ class LocalizationParentSelectTypeTest extends \PHPUnit\Framework\TestCase
     /** @var LocalizationParentSelectType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formType = new LocalizationParentSelectType();

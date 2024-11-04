@@ -11,9 +11,7 @@ class SmtpConnectionConfiguration extends Constraint
 {
     public string $message = 'oro.email.validator.configuration.connection.smtp';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string
     {
         return self::CLASS_CONSTRAINT;

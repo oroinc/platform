@@ -18,9 +18,7 @@ class SelfIdentifiableFilterStub extends ComparisonFilter implements SelfIdentif
         $this->foundFilterKeys = $filterKeys;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function searchFilterKeys(array $filterValues): array
     {
         if ($this->foundFilterKeys instanceof \Exception) {

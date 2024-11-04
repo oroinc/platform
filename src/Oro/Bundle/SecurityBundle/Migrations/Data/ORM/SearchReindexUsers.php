@@ -15,9 +15,7 @@ class SearchReindexUsers extends AbstractFixture implements ContainerAwareInterf
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $user = $manager->getRepository(User::class)

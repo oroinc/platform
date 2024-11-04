@@ -11,9 +11,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class OroFormBundle extends Bundle
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function boot(): void
     {
         parent::boot();
@@ -21,9 +19,7 @@ class OroFormBundle extends Bundle
         \HTMLPurifier_URISchemeRegistry::instance()->register('tel', new HtmlPurifierTelValidator());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);

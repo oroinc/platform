@@ -15,33 +15,24 @@ class ChoiceOriginFolderFilterType extends AbstractChoiceType
     const TYPE_NOT_CONTAINS = 2;
     const NAME              = 'oro_type_originfolder_filter';
 
-    /**
-     * {@inheritDoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return FilterType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $choices = [
@@ -61,9 +52,7 @@ class ChoiceOriginFolderFilterType extends AbstractChoiceType
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         if (isset($options['populate_default'])) {

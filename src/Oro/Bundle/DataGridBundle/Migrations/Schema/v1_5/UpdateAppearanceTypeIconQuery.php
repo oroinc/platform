@@ -158,9 +158,7 @@ class UpdateAppearanceTypeIconQuery extends ParametrizedMigrationQuery
         'zoom-out' => 'search-minus',
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -169,9 +167,7 @@ class UpdateAppearanceTypeIconQuery extends ParametrizedMigrationQuery
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->migrateConfigs($logger);

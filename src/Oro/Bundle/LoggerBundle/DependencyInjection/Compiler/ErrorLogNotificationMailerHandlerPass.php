@@ -13,6 +13,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ErrorLogNotificationMailerHandlerPass implements CompilerPassInterface
 {
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $configuration = $container->getExtension('monolog')->getConfiguration([], $container);

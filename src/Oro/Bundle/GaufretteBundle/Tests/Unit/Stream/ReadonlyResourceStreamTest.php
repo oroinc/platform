@@ -10,6 +10,7 @@ class ReadonlyResourceStreamTest extends \PHPUnit\Framework\TestCase
     /** @var ReadonlyResourceStream */
     private $stream;
 
+    #[\Override]
     protected function setUp(): void
     {
         $resource = fopen(__DIR__ . '/../Fixtures/test.txt', 'rb');

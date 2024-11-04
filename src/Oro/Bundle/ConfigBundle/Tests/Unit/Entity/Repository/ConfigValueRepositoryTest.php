@@ -18,6 +18,7 @@ class ConfigValueRepositoryTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigValueRepository */
     private $repository;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManagerInterface::class);

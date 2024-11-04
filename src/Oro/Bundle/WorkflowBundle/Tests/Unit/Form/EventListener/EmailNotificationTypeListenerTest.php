@@ -32,6 +32,7 @@ class EmailNotificationTypeListenerTest extends TestCase
     /** @var EmailNotificationTypeListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);

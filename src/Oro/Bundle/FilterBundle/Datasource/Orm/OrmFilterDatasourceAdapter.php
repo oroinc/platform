@@ -34,9 +34,7 @@ class OrmFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
         $this->qbTools = new QueryBuilderTools($this->qb->getDQLPart('select'));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDatabasePlatform()
     {
         return $this->qb->getEntityManager()->getConnection()->getDatabasePlatform();
@@ -50,6 +48,7 @@ class OrmFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
      *                            Can be FilterUtility::CONDITION_OR or FilterUtility::CONDITION_AND.
      * @param bool   $isComputed  Specifies whether the restriction should be added to the HAVING part of a query.
      */
+    #[\Override]
     public function addRestriction($restriction, $condition, $isComputed = false)
     {
         if (!($isComputed && $this->getDatabasePlatform() instanceof MySqlPlatform)) {
@@ -71,25 +70,19 @@ class OrmFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function groupBy($_)
     {
         return call_user_func_array([$this->qb, 'groupBy'], func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addGroupBy($_)
     {
         return call_user_func_array([$this->qb, 'addGroupBy'], func_get_args());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function expr()
     {
         if (null === $this->expressionBuilder) {
@@ -99,17 +92,13 @@ class OrmFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
         return $this->expressionBuilder;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setParameter($key, $value, $type = null)
     {
         $this->qb->setParameter($key, $value, $type);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function generateParameterName($filterName)
     {
         if (!array_key_exists($filterName, $this->parameterNames)) {
@@ -145,9 +134,7 @@ class OrmFilterDatasourceAdapter implements FilterDatasourceAdapterInterface
         return $parameterName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFieldByAlias($fieldName)
     {
         return $this->qbTools->getFieldByAlias($fieldName);

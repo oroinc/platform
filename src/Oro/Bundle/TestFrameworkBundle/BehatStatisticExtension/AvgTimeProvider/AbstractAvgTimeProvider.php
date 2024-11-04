@@ -36,9 +36,7 @@ abstract class AbstractAvgTimeProvider implements StatisticRepositoryAwareInterf
         $this->criteria = $criteria;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setRepository(StatisticRepository $repository)
     {
         $this->repository = $repository;
@@ -53,9 +51,7 @@ abstract class AbstractAvgTimeProvider implements StatisticRepositoryAwareInterf
         $this->averageTime = round(array_sum($this->averageTimeTable) / count($this->averageTimeTable));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAverageTime()
     {
         if (!$this->isCalculated) {
@@ -65,9 +61,7 @@ abstract class AbstractAvgTimeProvider implements StatisticRepositoryAwareInterf
         return $this->averageTime;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAverageTimeById($id)
     {
         if (!$this->isCalculated) {

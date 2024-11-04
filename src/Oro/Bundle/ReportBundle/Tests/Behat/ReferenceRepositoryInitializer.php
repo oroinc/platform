@@ -9,9 +9,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Collection;
 
 class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function init(ManagerRegistry $doctrine, Collection $referenceRepository): void
     {
         $reportTypeRepo = $doctrine->getManager()->getRepository(ReportType::class);

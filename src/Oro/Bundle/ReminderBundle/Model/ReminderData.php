@@ -38,6 +38,7 @@ class ReminderData implements ReminderDataInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getSubject()
     {
         return $this->subject;
@@ -57,6 +58,7 @@ class ReminderData implements ReminderDataInterface
     /**
      * @return \DateTime
      */
+    #[\Override]
     public function getExpireAt()
     {
         return $this->expireAt;
@@ -76,6 +78,7 @@ class ReminderData implements ReminderDataInterface
     /**
      * @return User
      */
+    #[\Override]
     public function getRecipient()
     {
         return $this->recipient;

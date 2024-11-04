@@ -27,9 +27,7 @@ class TransitionLabel extends Label
         $this->fromLabel = $fromStepLabel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function trans(TranslatorInterface $translator)
     {
         $transition = $this->label;
@@ -50,11 +48,13 @@ class TransitionLabel extends Label
         return sprintf(self::TRANSITION_LABEL_TEMPLATE, $transition, $fromStep, $toStep);
     }
 
+    #[\Override]
     public function __serialize(): array
     {
         return [$this->label, $this->toLabel, $this->fromLabel];
     }
 
+    #[\Override]
     public function __unserialize(array $serialized): void
     {
         [$this->label, $this->toLabel, $this->fromLabel] = $serialized;
@@ -68,6 +68,7 @@ class TransitionLabel extends Label
      * @return TransitionLabel A new instance of a TransitionLabel object
      */
     // @codingStandardsIgnoreStart
+    #[\Override]
     public static function __set_state($data)
     {
         return new TransitionLabel($data['label'], $data['toLabel'], $data['fromLabel']);

@@ -21,17 +21,13 @@ class ScopeUserCriteriaProvider implements ScopeCriteriaProviderInterface
         $this->tokenStorage = $tokenStorage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCriteriaField()
     {
         return self::USER;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCriteriaValue()
     {
         $token = $this->tokenStorage->getToken();
@@ -45,9 +41,7 @@ class ScopeUserCriteriaProvider implements ScopeCriteriaProviderInterface
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCriteriaValueType()
     {
         return User::class;

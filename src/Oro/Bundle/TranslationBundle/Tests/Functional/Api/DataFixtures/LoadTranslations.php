@@ -12,17 +12,13 @@ use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 
 class LoadTranslations extends AbstractFixture implements DependentFixtureInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadOrganization::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $this->addReference(

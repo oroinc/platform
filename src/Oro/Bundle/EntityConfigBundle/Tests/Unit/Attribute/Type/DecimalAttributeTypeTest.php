@@ -7,17 +7,13 @@ use Oro\Bundle\EntityConfigBundle\Attribute\Type\DecimalAttributeType;
 
 class DecimalAttributeTypeTest extends AttributeTypeTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getAttributeType(): AttributeTypeInterface
     {
         return new DecimalAttributeType();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configurationMethodsDataProvider(): array
     {
         return [

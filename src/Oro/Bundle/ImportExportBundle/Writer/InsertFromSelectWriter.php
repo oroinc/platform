@@ -29,9 +29,7 @@ class InsertFromSelectWriter extends AbstractNativeQueryWriter
         return $this->fields;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function write(array $items)
     {
         foreach ($items as $item) {

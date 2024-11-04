@@ -26,9 +26,7 @@ abstract class AbstractFieldsChangesAction extends AbstractAction
         $this->fieldsChangesManager = $fieldsChangesManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (empty($options[self::OPTION_KEY_ENTITY])) {

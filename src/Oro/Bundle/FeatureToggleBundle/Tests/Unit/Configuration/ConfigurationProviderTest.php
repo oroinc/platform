@@ -87,6 +87,7 @@ class ConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 
     private string $cacheFile;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->cacheFile = $this->getTempFile('FeatureToggleConfigurationProvider');

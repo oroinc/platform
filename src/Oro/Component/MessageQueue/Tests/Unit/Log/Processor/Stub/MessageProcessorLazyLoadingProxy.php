@@ -18,30 +18,29 @@ class MessageProcessorLazyLoadingProxy extends MessageProcessorProxy implements 
         $this->isProxyInitialized = $isProxyInitialized;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getWrappedValueHolderValue(): ?object
     {
         return $this->isProxyInitialized ? parent::getWrappedValueHolderValue() : null;
     }
 
+    #[\Override]
     public function setProxyInitializer(?\Closure $initializer = null): void
     {
     }
 
+    #[\Override]
     public function getProxyInitializer(): ?\Closure
     {
         return null;
     }
 
+    #[\Override]
     public function initializeProxy(): bool
     {
         $this->isProxyInitialized = true;
@@ -49,6 +48,7 @@ class MessageProcessorLazyLoadingProxy extends MessageProcessorProxy implements 
         return $this->isProxyInitialized;
     }
 
+    #[\Override]
     public function isProxyInitialized(): bool
     {
         return $this->isProxyInitialized;

@@ -15,6 +15,7 @@ class PostProcessingVoterTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     private $configManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

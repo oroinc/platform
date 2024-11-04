@@ -9,6 +9,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class BusinessUnitOwnerValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator()
     {
         return new BusinessUnitOwnerValidator();

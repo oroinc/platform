@@ -18,6 +18,7 @@ class ExtendableConditionEventErrorsProcessorTest extends TestCase
 
     private ExtendableConditionEventErrorsProcessor $errorsProcessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);

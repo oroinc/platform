@@ -9,9 +9,7 @@ class TagsInformationPass implements CompilerPassInterface
 {
     const INFORMATION_PROVIDER_SERVICE = 'oro_test.provider.container_tags_documentation_information';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if ($container->hasDefinition(self::INFORMATION_PROVIDER_SERVICE)) {

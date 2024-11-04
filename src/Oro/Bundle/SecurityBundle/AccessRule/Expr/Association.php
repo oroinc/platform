@@ -22,9 +22,7 @@ class Association implements ExpressionInterface
         return $this->associationName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visit(Visitor $visitor)
     {
         return $visitor->walkAssociation($this);

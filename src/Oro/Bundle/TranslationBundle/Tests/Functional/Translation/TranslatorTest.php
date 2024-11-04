@@ -18,6 +18,7 @@ class TranslatorTest extends WebTestCase
 {
     private Translator $translator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

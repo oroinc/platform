@@ -22,6 +22,7 @@ class ExtendedAssociationFilterFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendedAssociationFilterFactory */
     private $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);

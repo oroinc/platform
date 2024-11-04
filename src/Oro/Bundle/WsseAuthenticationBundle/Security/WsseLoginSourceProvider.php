@@ -11,9 +11,7 @@ use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
  */
 class WsseLoginSourceProvider implements LoginSourceProviderForFailedRequestInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getLoginSourceForFailedRequest(
         AuthenticatorInterface $authenticator,
         \Exception $exception

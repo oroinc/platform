@@ -20,6 +20,7 @@ class TemplateRendererConfigProviderTest extends \PHPUnit\Framework\TestCase
     /** @var TemplateRendererConfigProvider */
     private $configProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->variablesProvider = $this->createMock(VariablesProvider::class);

@@ -14,9 +14,7 @@ class SetResponseContentType implements ProcessorInterface
 {
     private const JSON_API_MEDIA_TYPE = 'application/vnd.api+json';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

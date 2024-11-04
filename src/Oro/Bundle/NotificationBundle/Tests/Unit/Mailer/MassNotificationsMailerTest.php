@@ -29,6 +29,7 @@ class MassNotificationsMailerTest extends \PHPUnit\Framework\TestCase
 
     private MassNotificationsMailer $mailer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->transport = $this->createMock(TransportInterface::class);

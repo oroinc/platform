@@ -14,9 +14,7 @@ class NormalizeGuid implements ProcessorInterface
 {
     public const REQUIREMENT = '[a-f0-9]{8}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{4}\-[a-f0-9]{12}';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var NormalizeValueContext $context */

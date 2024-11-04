@@ -10,6 +10,7 @@ class GroupingOrmQueryConverterContextTest extends \PHPUnit\Framework\TestCase
     /** @var GroupingOrmQueryConverterContext */
     private $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new GroupingOrmQueryConverterContext();

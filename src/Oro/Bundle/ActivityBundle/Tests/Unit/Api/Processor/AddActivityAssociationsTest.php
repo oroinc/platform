@@ -14,6 +14,7 @@ class AddActivityAssociationsTest extends ConfigProcessorTestCase
     /** @var AddActivityAssociations */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

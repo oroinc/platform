@@ -21,6 +21,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
     /** @var SetDataCustomizationHandler */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class FiltersByFieldsTest extends RestJsonApiTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -65,32 +66,46 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $this->assertResponseContains(['data' => $expectedRows], $response);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function equalFilterDataProvider(): array
     {
         $expectedRows = [['id' => '<toString(@TestItem2->id)>']];
+        $expectedRowsByYear = [
+            ['id' => '<toString(@TestItem1->id)>'],
+            ['id' => '<toString(@TestItem2->id)>'],
+            ['id' => '<toString(@TestItem3->id)>'],
+            ['id' => '<toString(@AnotherItem->id)>']
+        ];
+        $expectedRowsByTimeHour = [
+            ['id' => '<toString(@TestItem1->id)>'],
+            ['id' => '<toString(@TestItem2->id)>'],
+            ['id' => '<toString(@AnotherItem->id)>']
+        ];
 
         return [
-            'by string field'          => [
+            'by string field' => [
                 ['fieldString' => 'Test String 2 Value'],
                 $expectedRows
             ],
-            'by integer field'         => [
+            'by integer field' => [
                 ['fieldInt' => '2'],
                 $expectedRows
             ],
-            'by smallint field'        => [
+            'by smallint field' => [
                 ['fieldSmallInt' => '2'],
                 $expectedRows
             ],
-            'by bigint field'          => [
+            'by bigint field' => [
                 ['fieldBigInt' => '234567890123456'],
                 $expectedRows
             ],
-            'by boolean field'         => [
+            'by boolean field' => [
                 ['fieldBoolean' => 'true'],
                 $expectedRows
             ],
-            'by decimal field'         => [
+            'by decimal field' => [
                 ['fieldDecimal' => '2.34567891'],
                 $expectedRows
             ],
@@ -98,47 +113,83 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
                 ['fieldDecimalDefault' => '234'],
                 $expectedRows
             ],
-            'by float field'           => [
+            'by float field' => [
                 ['fieldFloat' => '2.2'],
                 $expectedRows
             ],
-            'by datetime field'        => [
-                ['fieldDateTime' => '2010-11-01T10:12:13+00:00'],
+            'by datetime field' => [
+                ['fieldDateTime' => '2010-11-02T10:12:13+00:00'],
                 $expectedRows
             ],
-            'by date field'            => [
-                ['fieldDate' => '2010-11-01'],
+            'by datetime field, minute' => [
+                ['fieldDateTime' => '2010-11-02T10:12'],
                 $expectedRows
             ],
-            'by time field'            => [
+            'by datetime field, hour' => [
+                ['fieldDateTime' => '2010-11-02T10'],
+                $expectedRows
+            ],
+            'by datetime field, day' => [
+                ['fieldDateTime' => '2010-11-02'],
+                $expectedRows
+            ],
+            'by datetime field, month' => [
+                ['fieldDateTime' => '2010-11'],
+                $expectedRows
+            ],
+            'by datetime field, year' => [
+                ['fieldDateTime' => '2010'],
+                $expectedRowsByYear
+            ],
+            'by date field' => [
+                ['fieldDate' => '2010-11-02'],
+                $expectedRows
+            ],
+            'by date field, month' => [
+                ['fieldDate' => '2010-11'],
+                $expectedRows
+            ],
+            'by date field, year' => [
+                ['fieldDate' => '2010'],
+                $expectedRowsByYear
+            ],
+            'by time field' => [
                 ['fieldTime' => '10:12:13'],
                 $expectedRows
             ],
-            'by guid field'            => [
+            'by time field, minute' => [
+                ['fieldTime' => '10:12'],
+                $expectedRows
+            ],
+            'by time field, hour' => [
+                ['fieldTime' => '10'],
+                $expectedRowsByTimeHour
+            ],
+            'by guid field' => [
                 ['fieldGuid' => '12c9746c-f44d-4a84-a72c-bdf750c70568'],
                 $expectedRows
             ],
-            'by percent field'         => [
+            'by percent field' => [
                 ['fieldPercent' => '0.2'],
                 $expectedRows
             ],
-            'by percent_100 field'     => [
+            'by percent_100 field' => [
                 ['fieldPercent100' => '0.2'],
                 $expectedRows
             ],
-            'by money field'           => [
+            'by money field' => [
                 ['fieldMoney' => '2.3456'],
                 $expectedRows
             ],
-            'by duration field'        => [
+            'by duration field' => [
                 ['fieldDuration' => '22'],
                 $expectedRows
             ],
-            'by money_value field'     => [
+            'by money_value field' => [
                 ['fieldMoneyValue' => '2.3456'],
                 $expectedRows
             ],
-            'by currency field'        => [
+            'by currency field' => [
                 ['fieldCurrency' => 'UAH'],
                 $expectedRows
             ],
@@ -189,6 +240,9 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $this->assertResponseContains(['data' => $expectedRows], $response);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function notEqualFilterDataProvider(): array
     {
         $expectedRows = [
@@ -197,29 +251,36 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
             ['id' => '<toString(@AnotherItem->id)>'],
             ['id' => '<toString(@EmptyItem->id)>']
         ];
+        $expectedRowsByYear = [
+            ['id' => '<toString(@EmptyItem->id)>']
+        ];
+        $expectedRowsByTimeHour = [
+            ['id' => '<toString(@TestItem3->id)>'],
+            ['id' => '<toString(@EmptyItem->id)>']
+        ];
 
         return [
-            'by string field'          => [
+            'by string field' => [
                 ['fieldString' => 'Test String 2 Value'],
                 $expectedRows
             ],
-            'by integer field'         => [
+            'by integer field' => [
                 ['fieldInt' => '2'],
                 $expectedRows
             ],
-            'by smallint field'        => [
+            'by smallint field' => [
                 ['fieldSmallInt' => '2'],
                 $expectedRows
             ],
-            'by bigint field'          => [
+            'by bigint field' => [
                 ['fieldBigInt' => '234567890123456'],
                 $expectedRows
             ],
-            'by boolean field'         => [
+            'by boolean field' => [
                 ['fieldBoolean' => 'true'],
                 $expectedRows
             ],
-            'by decimal field'         => [
+            'by decimal field' => [
                 ['fieldDecimal' => '2.34567891'],
                 $expectedRows
             ],
@@ -227,47 +288,83 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
                 ['fieldDecimalDefault' => '234'],
                 $expectedRows
             ],
-            'by float field'           => [
+            'by float field' => [
                 ['fieldFloat' => '2.2'],
                 $expectedRows
             ],
-            'by datetime field'        => [
-                ['fieldDateTime' => '2010-11-01T10:12:13+00:00'],
+            'by datetime field' => [
+                ['fieldDateTime' => '2010-11-02T10:12:13+00:00'],
                 $expectedRows
             ],
-            'by date field'            => [
-                ['fieldDate' => '2010-11-01'],
+            'by datetime field, minute' => [
+                ['fieldDateTime' => '2010-11-02T10:12'],
                 $expectedRows
             ],
-            'by time field'            => [
+            'by datetime field, hour' => [
+                ['fieldDateTime' => '2010-11-02T10'],
+                $expectedRows
+            ],
+            'by datetime field, day' => [
+                ['fieldDateTime' => '2010-11-02'],
+                $expectedRows
+            ],
+            'by datetime field, month' => [
+                ['fieldDateTime' => '2010-11'],
+                $expectedRows
+            ],
+            'by datetime field, year' => [
+                ['fieldDateTime' => '2010'],
+                $expectedRowsByYear
+            ],
+            'by date field' => [
+                ['fieldDate' => '2010-11-02'],
+                $expectedRows
+            ],
+            'by date field, month' => [
+                ['fieldDate' => '2010-11'],
+                $expectedRows
+            ],
+            'by date field, year' => [
+                ['fieldDate' => '2010'],
+                $expectedRowsByYear
+            ],
+            'by time field' => [
                 ['fieldTime' => '10:12:13'],
                 $expectedRows
             ],
-            'by guid field'            => [
+            'by time field, minute' => [
+                ['fieldTime' => '10:12'],
+                $expectedRows
+            ],
+            'by time field, hour' => [
+                ['fieldTime' => '10'],
+                $expectedRowsByTimeHour
+            ],
+            'by guid field' => [
                 ['fieldGuid' => '12c9746c-f44d-4a84-a72c-bdf750c70568'],
                 $expectedRows
             ],
-            'by percent field'         => [
+            'by percent field' => [
                 ['fieldPercent' => '0.2'],
                 $expectedRows
             ],
-            'by percent_100 field'     => [
+            'by percent_100 field' => [
                 ['fieldPercent100' => '0.2'],
                 $expectedRows
             ],
-            'by money field'           => [
+            'by money field' => [
                 ['fieldMoney' => '2.3456'],
                 $expectedRows
             ],
-            'by duration field'        => [
+            'by duration field' => [
                 ['fieldDuration' => '22'],
                 $expectedRows
             ],
-            'by money_value field'     => [
+            'by money_value field' => [
                 ['fieldMoneyValue' => '2.3456'],
                 $expectedRows
             ],
-            'by currency field'        => [
+            'by currency field' => [
                 ['fieldCurrency' => 'UAH'],
                 $expectedRows
             ],
@@ -293,21 +390,26 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
             ['id' => '<toString(@TestItem1->id)>'],
             ['id' => '<toString(@TestItem3->id)>']
         ];
+        $expectedRowsByMonth = [
+            ['id' => '<toString(@TestItem1->id)>'],
+            ['id' => '<toString(@TestItem3->id)>'],
+            ['id' => '<toString(@AnotherItem->id)>']
+        ];
 
         return [
-            'by integer field'         => [
+            'by integer field' => [
                 ['fieldInt' => '1,3'],
                 $expectedRows
             ],
-            'by smallint field'        => [
+            'by smallint field' => [
                 ['fieldSmallInt' => '1,3'],
                 $expectedRows
             ],
-            'by bigint field'          => [
+            'by bigint field' => [
                 ['fieldBigInt' => '123456789012345,345678901234567'],
                 $expectedRows
             ],
-            'by decimal field'         => [
+            'by decimal field' => [
                 ['fieldDecimal' => '1.234567,3.45678912'],
                 $expectedRows
             ],
@@ -315,35 +417,173 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
                 ['fieldDecimalDefault' => '123,345'],
                 $expectedRows
             ],
-            'by float field'           => [
+            'by float field' => [
                 ['fieldFloat' => '1.1,3.3'],
                 $expectedRows
             ],
-            'by guid field'            => [
+            'by datetime field' => [
+                ['fieldDateTime' => '2010-10-01T10:11:12+00:00,2010-12-01T11:13:14+00:00'],
+                $expectedRows
+            ],
+            'by datetime field, month' => [
+                ['fieldDateTime' => '2010-10,2010-12'],
+                $expectedRowsByMonth
+            ],
+            'by date field' => [
+                ['fieldDate' => '2010-10-01,2010-12-01'],
+                $expectedRows
+            ],
+            'by date field, month' => [
+                ['fieldDate' => '2010-10,2010-12'],
+                $expectedRowsByMonth
+            ],
+            'by time field' => [
+                ['fieldTime' => '10:11:12,11:13:14'],
+                $expectedRows
+            ],
+            'by time field, minute' => [
+                ['fieldTime' => '10:11,11:13'],
+                $expectedRows
+            ],
+            'by guid field' => [
                 ['fieldGuid' => 'ae404bc5-c9bb-4677-9bad-21144c704734,311e3b02-3cd2-4228-aff3-bafe9b0826de'],
                 $expectedRows
             ],
-            'by percent field'         => [
+            'by percent field' => [
                 ['fieldPercent' => '0.1,0.3'],
                 $expectedRows
             ],
-            'by percent_100 field'     => [
+            'by percent_100 field' => [
                 ['fieldPercent100' => '0.1,0.3'],
                 $expectedRows
             ],
-            'by money field'           => [
+            'by money field' => [
                 ['fieldMoney' => '1.234,3.4567'],
                 $expectedRows
             ],
-            'by duration field'        => [
+            'by duration field' => [
                 ['fieldDuration' => '11,33'],
                 $expectedRows
             ],
-            'by money_value field'     => [
+            'by money_value field' => [
                 ['fieldMoneyValue' => '1.2345,3.4567'],
                 $expectedRows
             ],
-            'by currency field'        => [
+            'by currency field' => [
+                ['fieldCurrency' => 'USD,EUR'],
+                $expectedRows
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider notEqualArrayFilterDataProvider
+     */
+    public function testNotEqualArrayFilter(array $filter, array $expectedRows)
+    {
+        $key = key($filter);
+        $filter = [sprintf('filter[%s][neq]', $key) => $filter[$key]];
+
+        // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
+        // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
+        if ('fieldBoolean' === $key && $this->isPostgreSql()) {
+            $expectedRows = array_merge($expectedRows, [['id' => '<toString(@NullItem->id)>']]);
+        }
+
+        $entityType = $this->getEntityType(TestAllDataTypes::class);
+        $this->prepareExpectedRows($expectedRows, $entityType);
+
+        $response = $this->cget(['entity' => $entityType], $filter);
+
+        $this->assertResponseContains(['data' => $expectedRows], $response);
+    }
+
+    public function notEqualArrayFilterDataProvider(): array
+    {
+        $expectedRows = [
+            ['id' => '<toString(@TestItem2->id)>'],
+            ['id' => '<toString(@AnotherItem->id)>'],
+            ['id' => '<toString(@EmptyItem->id)>']
+        ];
+        $expectedRowsByMonth = [
+            ['id' => '<toString(@TestItem2->id)>'],
+            ['id' => '<toString(@EmptyItem->id)>']
+        ];
+
+        return [
+            'by integer field' => [
+                ['fieldInt' => '1,3'],
+                $expectedRows
+            ],
+            'by smallint field' => [
+                ['fieldSmallInt' => '1,3'],
+                $expectedRows
+            ],
+            'by bigint field' => [
+                ['fieldBigInt' => '123456789012345,345678901234567'],
+                $expectedRows
+            ],
+            'by decimal field' => [
+                ['fieldDecimal' => '1.234567,3.45678912'],
+                $expectedRows
+            ],
+            'by default decimal field' => [
+                ['fieldDecimalDefault' => '123,345'],
+                $expectedRows
+            ],
+            'by float field' => [
+                ['fieldFloat' => '1.1,3.3'],
+                $expectedRows
+            ],
+            'by datetime field' => [
+                ['fieldDateTime' => '2010-10-01T10:11:12+00:00,2010-12-01T11:13:14+00:00'],
+                $expectedRows
+            ],
+            'by datetime field, month' => [
+                ['fieldDateTime' => '2010-10,2010-12'],
+                $expectedRowsByMonth
+            ],
+            'by date field' => [
+                ['fieldDate' => '2010-10-01,2010-12-01'],
+                $expectedRows
+            ],
+            'by date field, month' => [
+                ['fieldDate' => '2010-10,2010-12'],
+                $expectedRowsByMonth
+            ],
+            'by time field' => [
+                ['fieldTime' => '10:11:12,11:13:14'],
+                $expectedRows
+            ],
+            'by time field, minute' => [
+                ['fieldTime' => '10:11,11:13'],
+                $expectedRows
+            ],
+            'by guid field' => [
+                ['fieldGuid' => 'ae404bc5-c9bb-4677-9bad-21144c704734,311e3b02-3cd2-4228-aff3-bafe9b0826de'],
+                $expectedRows
+            ],
+            'by percent field' => [
+                ['fieldPercent' => '0.1,0.3'],
+                $expectedRows
+            ],
+            'by percent_100 field' => [
+                ['fieldPercent100' => '0.1,0.3'],
+                $expectedRows
+            ],
+            'by money field' => [
+                ['fieldMoney' => '1.234,3.4567'],
+                $expectedRows
+            ],
+            'by duration field' => [
+                ['fieldDuration' => '11,33'],
+                $expectedRows
+            ],
+            'by money_value field' => [
+                ['fieldMoneyValue' => '1.2345,3.4567'],
+                $expectedRows
+            ],
+            'by currency field' => [
                 ['fieldCurrency' => 'USD,EUR'],
                 $expectedRows
             ],
@@ -390,19 +630,19 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         ];
 
         return [
-            'by integer field'         => [
+            'by integer field' => [
                 ['fieldInt' => '2..3'],
                 $expectedRows
             ],
-            'by smallint field'        => [
+            'by smallint field' => [
                 ['fieldSmallInt' => '2..3'],
                 $expectedRows
             ],
-            'by bigint field'          => [
+            'by bigint field' => [
                 ['fieldBigInt' => '234567890123456..345678901234567'],
                 $expectedRows
             ],
-            'by decimal field'         => [
+            'by decimal field' => [
                 ['fieldDecimal' => '2.2..3.5'],
                 $expectedRows
             ],
@@ -410,39 +650,39 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
                 ['fieldDecimalDefault' => '233..346'],
                 $expectedRows
             ],
-            'by float field'           => [
+            'by float field' => [
                 ['fieldFloat' => '2.2..3.5'],
                 $expectedRows
             ],
-            'by datetime field'        => [
-                ['fieldDateTime' => '2010-11-01T10:12:13..2010-12-01T10:13:14'],
+            'by datetime field' => [
+                ['fieldDateTime' => '2010-11-02T10:12:13..2010-12-01T11:13:14'],
                 $expectedRows
             ],
-            'by date field'            => [
-                ['fieldDate' => '2010-11-01..2010-12-01'],
+            'by date field' => [
+                ['fieldDate' => '2010-11-02..2010-12-01'],
                 $expectedRows
             ],
-            'by time field'            => [
-                ['fieldTime' => '10:12:13..10:13:14'],
+            'by time field' => [
+                ['fieldTime' => '10:12:13..11:13:14'],
                 $expectedRows
             ],
-            'by percent field'         => [
+            'by percent field' => [
                 ['fieldPercent' => '0.2..0.3'],
                 $expectedRows
             ],
-            'by percent_100 field'     => [
+            'by percent_100 field' => [
                 ['fieldPercent' => '0.2..0.3'],
                 $expectedRows
             ],
-            'by money field'           => [
+            'by money field' => [
                 ['fieldMoney' => '2.3456..3.4567'],
                 $expectedRows
             ],
-            'by duration field'        => [
+            'by duration field' => [
                 ['fieldDuration' => '22..33'],
                 $expectedRows
             ],
-            'by money_value field'     => [
+            'by money_value field' => [
                 ['fieldMoneyValue' => '2.3456..3.4567'],
                 $expectedRows
             ],
@@ -481,21 +721,26 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
             ['id' => '<toString(@AnotherItem->id)>'],
             ['id' => '<toString(@EmptyItem->id)>']
         ];
+        $expectedRowsByDate = [
+            ['id' => '<toString(@TestItem1->id)>'],
+            ['id' => '<toString(@TestItem3->id)>'],
+            ['id' => '<toString(@EmptyItem->id)>']
+        ];
 
         return [
-            'by integer field'         => [
+            'by integer field' => [
                 ['fieldInt' => '2..3'],
                 $expectedRows1
             ],
-            'by smallint field'        => [
+            'by smallint field' => [
                 ['fieldSmallInt' => '2..3'],
                 $expectedRows1
             ],
-            'by bigint field'          => [
+            'by bigint field' => [
                 ['fieldBigInt' => '123456789012346..345678901234566'],
                 $expectedRows2
             ],
-            'by decimal field'         => [
+            'by decimal field' => [
                 ['fieldDecimal' => '1.2345671..3.45678911'],
                 $expectedRows2
             ],
@@ -503,43 +748,39 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
                 ['fieldDecimalDefault' => '124..344'],
                 $expectedRows2
             ],
-            'by float field'           => [
+            'by float field' => [
                 ['fieldFloat' => '1.1001..3.2999'],
                 $expectedRows2
             ],
-            'by datetime field'        => [
-                ['fieldDateTime' => '2010-10-01T10:11:13..2010-12-01T10:13:13'],
-                $expectedRows2
+            'by datetime field' => [
+                ['fieldDateTime' => '2010-10-01T10:11:13..2010-12-01T11:13:13'],
+                $expectedRowsByDate
             ],
-            'by date field'            => [
+            'by date field' => [
                 ['fieldDate' => '2010-10-02..2010-11-30'],
-                [
-                    ['id' => '<toString(@TestItem1->id)>'],
-                    ['id' => '<toString(@TestItem3->id)>'],
-                    ['id' => '<toString(@EmptyItem->id)>']
-                ]
+                $expectedRowsByDate
             ],
-            'by time field'            => [
+            'by time field' => [
                 ['fieldTime' => '10:11:13..10:13:13'],
                 $expectedRows2
             ],
-            'by percent field'         => [
+            'by percent field' => [
                 ['fieldPercent' => '0.101..0.299'],
                 $expectedRows2
             ],
-            'by percent_100 field'     => [
+            'by percent_100 field' => [
                 ['fieldPercent100' => '0.101..0.299'],
                 $expectedRows2
             ],
-            'by money field'           => [
+            'by money field' => [
                 ['fieldMoney' => '1.2341..3.4566'],
                 $expectedRows2
             ],
-            'by duration field'        => [
+            'by duration field' => [
                 ['fieldDuration' => '12..32'],
                 $expectedRows2
             ],
-            'by money_value field'     => [
+            'by money_value field' => [
                 ['fieldMoneyValue' => '1.2346..3.4566'],
                 $expectedRows2
             ],
@@ -553,7 +794,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
-                'title'  => 'filter constraint',
+                'title' => 'filter constraint',
                 'detail' => 'The operator "eq" is not supported.',
                 'source' => ['parameter' => 'filter[fieldText]']
             ],
@@ -742,31 +983,31 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         ];
 
         return [
-            'by string field'          => [
+            'by string field' => [
                 'fieldString',
                 $expectedRows
             ],
-            'by text field'            => [
+            'by text field' => [
                 'fieldText',
                 $expectedRows
             ],
-            'by integer field'         => [
+            'by integer field' => [
                 'fieldInt',
                 $expectedRows
             ],
-            'by smallint field'        => [
+            'by smallint field' => [
                 'fieldSmallInt',
                 $expectedRows
             ],
-            'by bigint field'          => [
+            'by bigint field' => [
                 'fieldBigInt',
                 $expectedRows
             ],
-            'by boolean field'         => [
+            'by boolean field' => [
                 'fieldBoolean',
                 $expectedRows
             ],
-            'by decimal field'         => [
+            'by decimal field' => [
                 'fieldDecimal',
                 $expectedRows
             ],
@@ -774,47 +1015,47 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
                 'fieldDecimalDefault',
                 $expectedRows
             ],
-            'by float field'           => [
+            'by float field' => [
                 'fieldFloat',
                 $expectedRows
             ],
-            'by datetime field'        => [
+            'by datetime field' => [
                 'fieldDateTime',
                 $expectedRows
             ],
-            'by date field'            => [
+            'by date field' => [
                 'fieldDate',
                 $expectedRows
             ],
-            'by time field'            => [
+            'by time field' => [
                 'fieldTime',
                 $expectedRows
             ],
-            'by guid field'            => [
+            'by guid field' => [
                 'fieldGuid',
                 $expectedRows
             ],
-            'by percent field'         => [
+            'by percent field' => [
                 'fieldPercent',
                 $expectedRows
             ],
-            'by percent_100 field'     => [
+            'by percent_100 field' => [
                 'fieldPercent100',
                 $expectedRows
             ],
-            'by money field'           => [
+            'by money field' => [
                 'fieldMoney',
                 $expectedRows
             ],
-            'by duration field'        => [
+            'by duration field' => [
                 'fieldDuration',
                 $expectedRows
             ],
-            'by money_value field'     => [
+            'by money_value field' => [
                 'fieldMoneyValue',
                 $expectedRows
             ],
-            'by currency field'        => [
+            'by currency field' => [
                 'fieldCurrency',
                 $expectedRows
             ],
@@ -928,31 +1169,31 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $expectedRows = [['id' => '<toString(@NullItem->id)>']];
 
         return [
-            'by string field'          => [
+            'by string field' => [
                 'fieldString',
                 $expectedRows
             ],
-            'by text field'            => [
+            'by text field' => [
                 'fieldText',
                 $expectedRows
             ],
-            'by integer field'         => [
+            'by integer field' => [
                 'fieldInt',
                 $expectedRows
             ],
-            'by smallint field'        => [
+            'by smallint field' => [
                 'fieldSmallInt',
                 $expectedRows
             ],
-            'by bigint field'          => [
+            'by bigint field' => [
                 'fieldBigInt',
                 $expectedRows
             ],
-            'by boolean field'         => [
+            'by boolean field' => [
                 'fieldBoolean',
                 $expectedRows
             ],
-            'by decimal field'         => [
+            'by decimal field' => [
                 'fieldDecimal',
                 $expectedRows
             ],
@@ -960,47 +1201,47 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
                 'fieldDecimalDefault',
                 $expectedRows
             ],
-            'by float field'           => [
+            'by float field' => [
                 'fieldFloat',
                 $expectedRows
             ],
-            'by datetime field'        => [
+            'by datetime field' => [
                 'fieldDateTime',
                 $expectedRows
             ],
-            'by date field'            => [
+            'by date field' => [
                 'fieldDate',
                 $expectedRows
             ],
-            'by time field'            => [
+            'by time field' => [
                 'fieldTime',
                 $expectedRows
             ],
-            'by guid field'            => [
+            'by guid field' => [
                 'fieldGuid',
                 $expectedRows
             ],
-            'by percent field'         => [
+            'by percent field' => [
                 'fieldPercent',
                 $expectedRows
             ],
-            'by percent_100 field'     => [
+            'by percent_100 field' => [
                 'fieldPercent100',
                 $expectedRows
             ],
-            'by money field'           => [
+            'by money field' => [
                 'fieldMoney',
                 $expectedRows
             ],
-            'by duration field'        => [
+            'by duration field' => [
                 'fieldDuration',
                 $expectedRows
             ],
-            'by money_value field'     => [
+            'by money_value field' => [
                 'fieldMoneyValue',
                 $expectedRows
             ],
-            'by currency field'        => [
+            'by currency field' => [
                 'fieldCurrency',
                 $expectedRows
             ],
@@ -1050,27 +1291,27 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         ];
 
         return [
-            'by string field'          => [
+            'by string field' => [
                 ['fieldString' => 'Test String 2 Value'],
                 $expectedRows
             ],
-            'by integer field'         => [
+            'by integer field' => [
                 ['fieldInt' => '2'],
                 $expectedRows
             ],
-            'by smallint field'        => [
+            'by smallint field' => [
                 ['fieldSmallInt' => '2'],
                 $expectedRows
             ],
-            'by bigint field'          => [
+            'by bigint field' => [
                 ['fieldBigInt' => '234567890123456'],
                 $expectedRows
             ],
-            'by boolean field'         => [
+            'by boolean field' => [
                 ['fieldBoolean' => 'true'],
                 $expectedRows
             ],
-            'by decimal field'         => [
+            'by decimal field' => [
                 ['fieldDecimal' => '2.34567891'],
                 $expectedRows
             ],
@@ -1078,47 +1319,47 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
                 ['fieldDecimalDefault' => '234'],
                 $expectedRows
             ],
-            'by float field'           => [
+            'by float field' => [
                 ['fieldFloat' => '2.2'],
                 $expectedRows
             ],
-            'by datetime field'        => [
-                ['fieldDateTime' => '2010-11-01T10:12:13+00:00'],
+            'by datetime field' => [
+                ['fieldDateTime' => '2010-11-02T10:12:13+00:00'],
                 $expectedRows
             ],
-            'by date field'            => [
-                ['fieldDate' => '2010-11-01'],
+            'by date field' => [
+                ['fieldDate' => '2010-11-02'],
                 $expectedRows
             ],
-            'by time field'            => [
+            'by time field' => [
                 ['fieldTime' => '10:12:13'],
                 $expectedRows
             ],
-            'by guid field'            => [
+            'by guid field' => [
                 ['fieldGuid' => '12c9746c-f44d-4a84-a72c-bdf750c70568'],
                 $expectedRows
             ],
-            'by percent field'         => [
+            'by percent field' => [
                 ['fieldPercent' => '0.2'],
                 $expectedRows
             ],
-            'by percent_100 field'     => [
+            'by percent_100 field' => [
                 ['fieldPercent100' => '0.2'],
                 $expectedRows
             ],
-            'by money field'           => [
+            'by money field' => [
                 ['fieldMoney' => '2.3456'],
                 $expectedRows
             ],
-            'by duration field'        => [
+            'by duration field' => [
                 ['fieldDuration' => '22'],
                 $expectedRows
             ],
-            'by money_value field'     => [
+            'by money_value field' => [
                 ['fieldMoneyValue' => '2.3456'],
                 $expectedRows
             ],
-            'by currency field'        => [
+            'by currency field' => [
                 ['fieldCurrency' => 'UAH'],
                 $expectedRows
             ],
@@ -1132,7 +1373,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
-                'title'  => 'filter constraint',
+                'title' => 'filter constraint',
                 'detail' => 'The operator "contains" is not supported.',
                 'source' => ['parameter' => 'filter[fieldString][contains]']
             ],
@@ -1147,7 +1388,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
-                'title'  => 'filter constraint',
+                'title' => 'filter constraint',
                 'detail' => 'The operator "not_contains" is not supported.',
                 'source' => ['parameter' => 'filter[fieldString][not_contains]']
             ],
@@ -1162,7 +1403,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
-                'title'  => 'filter constraint',
+                'title' => 'filter constraint',
                 'detail' => 'The operator "starts_with" is not supported.',
                 'source' => ['parameter' => 'filter[fieldString][starts_with]']
             ],
@@ -1182,7 +1423,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
-                'title'  => 'filter constraint',
+                'title' => 'filter constraint',
                 'detail' => 'The operator "not_starts_with" is not supported.',
                 'source' => ['parameter' => 'filter[fieldString][not_starts_with]']
             ],
@@ -1197,7 +1438,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
-                'title'  => 'filter constraint',
+                'title' => 'filter constraint',
                 'detail' => 'The operator "ends_with" is not supported.',
                 'source' => ['parameter' => 'filter[fieldString][ends_with]']
             ],
@@ -1212,7 +1453,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
-                'title'  => 'filter constraint',
+                'title' => 'filter constraint',
                 'detail' => 'The operator "not_ends_with" is not supported.',
                 'source' => ['parameter' => 'filter[fieldString][not_ends_with]']
             ],
@@ -1227,7 +1468,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
-                'title'  => 'filter constraint',
+                'title' => 'filter constraint',
                 'detail' => 'The operator "empty" is not supported.',
                 'source' => ['parameter' => 'filter[fieldString][empty]']
             ],
@@ -1242,7 +1483,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
-                'title'  => 'filter constraint',
+                'title' => 'filter constraint',
                 'detail' => 'The operator "empty" is not supported.',
                 'source' => ['parameter' => 'filter[fieldString][empty]']
             ],
@@ -1305,7 +1546,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
                 ['fieldString' => 'String'],
                 $expectedRows
             ],
-            'by text field'   => [
+            'by text field' => [
                 ['fieldText' => 'Text'],
                 $expectedRows
             ]
@@ -1366,7 +1607,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
                 ['fieldString' => 'String'],
                 $expectedRows
             ],
-            'by text field'   => [
+            'by text field' => [
                 ['fieldText' => 'Text'],
                 $expectedRows
             ]
@@ -1428,7 +1669,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
                 ['fieldString' => 'Test'],
                 $expectedRows
             ],
-            'by text field'   => [
+            'by text field' => [
                 ['fieldText' => 'Test'],
                 $expectedRows
             ]
@@ -1489,7 +1730,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
                 ['fieldString' => 'Test'],
                 $expectedRows
             ],
-            'by text field'   => [
+            'by text field' => [
                 ['fieldText' => 'Test'],
                 $expectedRows
             ]
@@ -1551,7 +1792,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
                 ['fieldString' => 'Value'],
                 $expectedRows
             ],
-            'by text field'   => [
+            'by text field' => [
                 ['fieldText' => 'Value'],
                 $expectedRows
             ]
@@ -1612,7 +1853,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
                 ['fieldString' => 'Value'],
                 $expectedRows
             ],
-            'by text field'   => [
+            'by text field' => [
                 ['fieldText' => 'Value'],
                 $expectedRows
             ]
@@ -1654,7 +1895,7 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         ];
 
         return [
-            'empty, by string field'     => [
+            'empty, by string field' => [
                 ['fieldString' => 'yes'],
                 $emptyValueExpectedRows
             ],
@@ -1662,43 +1903,43 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
                 ['fieldString' => 'no'],
                 $notEmptyValueExpectedRows
             ],
-            'empty, by text field'       => [
+            'empty, by text field' => [
                 ['fieldText' => 'yes'],
                 $emptyValueExpectedRows
             ],
-            'not empty, by text field'   => [
+            'not empty, by text field' => [
                 ['fieldText' => 'no'],
                 $notEmptyValueExpectedRows
             ],
-            'empty, by array field'       => [
+            'empty, by array field' => [
                 ['fieldArray' => 'yes'],
                 $emptyValueExpectedRows
             ],
-            'not empty, by array field'   => [
+            'not empty, by array field' => [
                 ['fieldArray' => 'no'],
                 $notEmptyValueExpectedRows
             ],
-            'empty, by simple array field'       => [
+            'empty, by simple array field' => [
                 ['fieldSimpleArray' => 'yes'],
                 $emptyValueExpectedRows
             ],
-            'not empty, by simple array field'   => [
+            'not empty, by simple array field' => [
                 ['fieldSimpleArray' => 'no'],
                 $notEmptyValueExpectedRows
             ],
-            'empty, by json array field'       => [
+            'empty, by json array field' => [
                 ['fieldJsonArray' => 'yes'],
                 $emptyValueExpectedRows
             ],
-            'not empty, by json array field'   => [
+            'not empty, by json array field' => [
                 ['fieldJsonArray' => 'no'],
                 $notEmptyValueExpectedRows
             ],
-            'empty, by json field'       => [
+            'empty, by json field' => [
                 ['fieldJson' => 'yes'],
                 $emptyValueExpectedRows
             ],
-            'not empty, by json field'   => [
+            'not empty, by json field' => [
                 ['fieldJson' => 'no'],
                 $notEmptyValueExpectedRows
             ],

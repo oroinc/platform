@@ -23,9 +23,7 @@ class GetAvailableWorkflowByRecordGroup extends AbstractAction
         $this->manager = $manager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (empty($options['group_name'])) {
@@ -49,9 +47,7 @@ class GetAvailableWorkflowByRecordGroup extends AbstractAction
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $entityClass = $this->contextAccessor->getValue($context, $this->options['entity_class']);

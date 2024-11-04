@@ -36,6 +36,7 @@ class WorkflowDataHelperTest extends \PHPUnit\Framework\TestCase
     /** @var AclGroupProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $aclGroupProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);

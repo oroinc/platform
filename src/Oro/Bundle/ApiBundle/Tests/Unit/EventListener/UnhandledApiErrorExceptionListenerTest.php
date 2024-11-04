@@ -22,6 +22,7 @@ class UnhandledApiErrorExceptionListenerTest extends \PHPUnit\Framework\TestCase
     /** @var UnhandledApiErrorExceptionListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->handler = $this->createMock(RequestActionHandler::class);

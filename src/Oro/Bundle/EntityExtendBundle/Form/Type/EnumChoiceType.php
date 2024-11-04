@@ -11,9 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class EnumChoiceType extends AbstractEnumType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
@@ -35,25 +33,18 @@ class EnumChoiceType extends AbstractEnumType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return TranslatableEntityType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_enum_choice';

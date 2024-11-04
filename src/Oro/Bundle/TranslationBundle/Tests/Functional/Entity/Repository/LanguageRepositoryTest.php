@@ -15,6 +15,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class LanguageRepositoryTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

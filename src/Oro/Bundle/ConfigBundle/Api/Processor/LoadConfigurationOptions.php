@@ -19,9 +19,7 @@ class LoadConfigurationOptions implements ProcessorInterface
         $this->configRepository = $configRepository;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ListContext $context */

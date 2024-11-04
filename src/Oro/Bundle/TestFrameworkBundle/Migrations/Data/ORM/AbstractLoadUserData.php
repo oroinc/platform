@@ -21,9 +21,7 @@ abstract class AbstractLoadUserData extends AbstractFixture implements Container
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         /** @var UserManager $userManager */

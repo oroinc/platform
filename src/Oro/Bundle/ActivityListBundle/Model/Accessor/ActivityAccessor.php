@@ -21,17 +21,13 @@ class ActivityAccessor extends DefaultAccessor
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'activity';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getValue($entity, FieldMetadata $metadata)
     {
         if ($metadata->has('activity') && $metadata->has('type') && $metadata->get('activity') === true) {

@@ -22,9 +22,7 @@ class AclProtectedQueryResolver extends QueryResolver
         $this->aclHelper = $aclHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function resolveQuery(Query $query, EntityConfig $config): void
     {
         $this->aclHelper->apply($query);

@@ -11,6 +11,7 @@ class SetHttpResponseStatusCodeForFormActionTest extends UpdateProcessorTestCase
 {
     private SetHttpResponseStatusCodeForFormAction $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

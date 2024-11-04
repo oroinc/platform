@@ -31,6 +31,7 @@ class ChainMetadataProvider implements MetadataProviderInterface
      *
      * @return array
      */
+    #[\Override]
     public function getMetadataFor($object)
     {
         $metadata = [];

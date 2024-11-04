@@ -20,9 +20,7 @@ class DraftableFilterExtension extends AbstractExtension
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPreReceived(Context $context)
     {
         if ($this->filterState->isDisabled()) {

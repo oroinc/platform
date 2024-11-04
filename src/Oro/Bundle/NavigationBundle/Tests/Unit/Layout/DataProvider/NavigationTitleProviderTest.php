@@ -17,6 +17,7 @@ class NavigationTitleProviderTest extends \PHPUnit\Framework\TestCase
     /** @var NavigationTitleProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->titleService = $this->createMock(TitleService::class);

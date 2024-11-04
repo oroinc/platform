@@ -65,9 +65,7 @@ class MomentDateTimeFormatConverter extends AbstractDateTimeFormatConverter
         'Z'      => 'ZZ',
     );
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function convertFormat($format)
     {
         return preg_replace('~[\'"](.*?)[\'"]~', '[$1]', parent::convertFormat($format));

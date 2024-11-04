@@ -14,6 +14,7 @@ class FullNameSearchHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var FullNameSearchHandler */
     private $searchHandler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityNameResolver = $this->createMock(EntityNameResolver::class);

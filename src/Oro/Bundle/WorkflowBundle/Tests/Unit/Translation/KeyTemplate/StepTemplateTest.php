@@ -6,7 +6,7 @@ use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\StepTemplate;
 
 class StepTemplateTest extends TemplateTestCase
 {
-    /** {@inheritdoc} */
+    #[\Override]
     public function getTemplateInstance()
     {
         return new StepTemplate();
@@ -17,11 +17,13 @@ class StepTemplateTest extends TemplateTestCase
         $this->assertName(StepTemplate::NAME);
     }
 
+    #[\Override]
     public function testGetTemplate()
     {
         $this->assertTemplate('oro.workflow.{{ workflow_name }}.step.{{ step_name }}');
     }
 
+    #[\Override]
     public function testGetRequiredKeys()
     {
         $this->assertRequiredKeys(['workflow_name', 'step_name']);

@@ -30,6 +30,7 @@ class AppendRelationshipMapperTest extends \PHPUnit\Framework\TestCase
     /** @var AppendRelationshipMapper */
     private $mapper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->dispatcher = $this->createMock(EventDispatcherInterface::class);

@@ -16,9 +16,7 @@ class CheckUserEmailCaseInsensitiveOption extends AbstractFixture implements Con
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $repository = $manager->getRepository(User::class);

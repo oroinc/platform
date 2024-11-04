@@ -17,6 +17,7 @@ class DependencyVoterTest extends \PHPUnit\Framework\TestCase
     /** @var DependencyVoter */
     private $dependencyVoter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->featureChecker = $this->createMock(FeatureChecker::class);

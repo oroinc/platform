@@ -19,9 +19,7 @@ class DateTimeNormalizer implements ObjectNormalizerInterface
         $this->dataTransformerRegistry = $dataTransformerRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function normalize(object $object, RequestType $requestType): mixed
     {
         $dataTransformer = $this->dataTransformerRegistry->getDataTransformer(DataType::DATETIME, $requestType);

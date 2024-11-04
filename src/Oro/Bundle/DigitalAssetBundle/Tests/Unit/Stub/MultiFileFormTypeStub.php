@@ -10,17 +10,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class MultiFileFormTypeStub extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('multiFileField', MultiFileType::class, []);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([

@@ -37,6 +37,7 @@ class WindowsStateManagerTest extends \PHPUnit\Framework\TestCase
     /** @var WindowsStateManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);

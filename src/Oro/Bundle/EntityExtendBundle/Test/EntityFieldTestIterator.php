@@ -13,9 +13,7 @@ class EntityFieldTestIterator implements EntityFieldIteratorInterface
 {
     private array $extensions = [];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getExtensions(): iterable
     {
         return array_values($this->extensions);

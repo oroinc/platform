@@ -319,7 +319,7 @@ action_groups:
                     'username': $.data.username
             - '@tree':
                 conditions:
-                    '@equal': [$.data.auth_status.id, 'expired']
+                    '@equal': [$.data.auth_status.internalId, 'expired']
                 actions:
                     - '@run_action_group':
                         action_group: resetPassword

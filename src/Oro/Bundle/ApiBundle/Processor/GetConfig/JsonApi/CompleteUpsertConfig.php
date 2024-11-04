@@ -28,9 +28,7 @@ class CompleteUpsertConfig extends AbstractAddStatusCodes
         $this->entityIdHelper = $entityIdHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */

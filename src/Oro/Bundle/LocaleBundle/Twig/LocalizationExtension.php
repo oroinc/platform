@@ -32,9 +32,7 @@ class LocalizationExtension extends AbstractExtension implements ServiceSubscrib
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFilters()
     {
         return [
@@ -80,9 +78,7 @@ class LocalizationExtension extends AbstractExtension implements ServiceSubscrib
         return (string)$this->getLocalizationHelper()->getLocalizedValue($values, $localization);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

@@ -11,9 +11,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SubmitForm implements ProcessorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var FormContext $context */

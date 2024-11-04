@@ -24,9 +24,7 @@ class PageStateData extends AbstractFixture implements DependentFixtureInterface
         ],
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [
@@ -34,9 +32,7 @@ class PageStateData extends AbstractFixture implements DependentFixtureInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         foreach (self::$pageStates as $key => $data) {

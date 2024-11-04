@@ -28,6 +28,7 @@ class WebsocketClientTest extends \PHPUnit\Framework\TestCase
     /** @var WebsocketClient */
     private $websocketClient;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->wampClientFactory = $this->createMock(WampClientFactoryInterface::class);

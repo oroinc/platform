@@ -131,6 +131,7 @@ class EmailActivityController extends RestGetController
      *
      * @return EmailActivityApiEntityManager
      */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_email.manager.email_activity.api');

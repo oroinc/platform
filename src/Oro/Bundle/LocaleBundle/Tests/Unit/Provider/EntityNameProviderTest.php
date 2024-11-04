@@ -22,6 +22,7 @@ class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EntityNameProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->nameFormatter = $this->createMock(NameFormatter::class);

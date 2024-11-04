@@ -28,6 +28,7 @@ class SidebarExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var SidebarExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->widgetDefinitionProvider = $this->createMock(WidgetDefinitionProvider::class);

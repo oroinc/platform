@@ -22,6 +22,7 @@ class ActionExecutorTest extends TestCase
 
     private ActionExecutor $actionExecutor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->actionFactory = $this->createMock(ActionFactoryInterface::class);

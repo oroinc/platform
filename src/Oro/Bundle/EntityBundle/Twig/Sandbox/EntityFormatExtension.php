@@ -29,9 +29,7 @@ class EntityFormatExtension extends AbstractExtension
         $this->formatters = $formatters;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [

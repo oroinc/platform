@@ -24,6 +24,7 @@ class DateFilterSubscriberTest extends \PHPUnit\Framework\TestCase
 
     private DateFilterSubscriber $subscriber;
 
+    #[\Override]
     protected function setUp(): void
     {
         $localeSettings = $this->createMock(LocaleSettings::class);

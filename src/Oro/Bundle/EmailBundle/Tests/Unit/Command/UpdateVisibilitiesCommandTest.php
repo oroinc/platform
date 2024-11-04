@@ -15,6 +15,7 @@ class UpdateVisibilitiesCommandTest extends \PHPUnit\Framework\TestCase
     /** @var UpdateVisibilitiesCommand */
     private $command;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->command = new UpdateVisibilitiesCommand(self::getMessageProducer());

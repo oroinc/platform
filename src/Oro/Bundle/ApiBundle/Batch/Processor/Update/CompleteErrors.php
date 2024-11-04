@@ -27,9 +27,7 @@ class CompleteErrors implements ProcessorInterface
         $this->errorCompleterRegistry = $errorCompleterRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var BatchUpdateContext $context */

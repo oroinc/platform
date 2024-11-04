@@ -14,6 +14,7 @@ class PrimaryItemCollectionNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var PrimaryItemCollectionNormalizer */
     private $normalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->serializer = $this->createMock(Serializer::class);

@@ -71,25 +71,19 @@ class EntitySecurityMetadata implements ClassSecurityMetadata
         return $this->securityType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getClassName()
     {
         return $this->className;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getGroup()
     {
         return $this->group;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLabel()
     {
         return $this->label;
@@ -105,25 +99,19 @@ class EntitySecurityMetadata implements ClassSecurityMetadata
         return $this->permissions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return $this->description;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCategory()
     {
         return $this->category;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFields()
     {
         return $this->fields;

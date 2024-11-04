@@ -23,6 +23,7 @@ class EmailAddressValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var EmailAddressHelper */
     private $emailAddressHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->constraint = new EmailAddress();

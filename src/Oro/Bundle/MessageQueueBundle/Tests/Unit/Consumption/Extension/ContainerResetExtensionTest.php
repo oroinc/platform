@@ -27,6 +27,7 @@ class ContainerResetExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ContainerResetExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->clearer1 = $this->getMockBuilder(ClearerInterface::class)

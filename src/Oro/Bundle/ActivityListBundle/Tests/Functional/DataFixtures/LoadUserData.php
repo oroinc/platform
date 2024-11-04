@@ -16,9 +16,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
     use ContainerAwareTrait;
     use SetRolePermissionsTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         /** @var AclManager $aclManager */

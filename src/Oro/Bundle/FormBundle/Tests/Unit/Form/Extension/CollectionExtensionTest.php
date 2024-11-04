@@ -12,6 +12,7 @@ class CollectionExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var CollectionExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extension = new CollectionExtension();

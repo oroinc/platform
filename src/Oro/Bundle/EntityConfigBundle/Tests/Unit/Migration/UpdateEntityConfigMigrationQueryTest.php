@@ -12,6 +12,7 @@ class UpdateEntityConfigMigrationQueryTest extends \PHPUnit\Framework\TestCase
     /** @var CommandExecutor|\PHPUnit\Framework\MockObject\MockObject */
     private $commandExecutor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->commandExecutor = $this->createMock(CommandExecutor::class);

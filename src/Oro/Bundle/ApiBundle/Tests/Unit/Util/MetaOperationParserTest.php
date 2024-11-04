@@ -7,12 +7,13 @@ use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Util\MetaOperationParser;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class MetaOperationParserTest extends \PHPUnit\Framework\TestCase
+class MetaOperationParserTest extends TestCase
 {
     public function testEmptyMeta(): void
     {
@@ -22,11 +23,11 @@ class MetaOperationParserTest extends \PHPUnit\Framework\TestCase
         $context->expects(self::never())
             ->method('addError');
 
-        $flags = MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', '/meta', $context);
+        $flags = MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate', '/meta', $context);
 
-        self::assertSame([null, null], $flags);
+        self::assertSame([null, null, null], $flags);
 
-        self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert'));
+        self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate'));
     }
 
     public function testUpdateMetaOptionEqualsToTrue(): void
@@ -39,11 +40,11 @@ class MetaOperationParserTest extends \PHPUnit\Framework\TestCase
         $context->expects(self::never())
             ->method('addError');
 
-        $flags = MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', '/meta', $context);
+        $flags = MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate', '/meta', $context);
 
-        self::assertSame([true, null], $flags);
+        self::assertSame([true, null, null], $flags);
 
-        self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert'));
+        self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate'));
     }
 
     public function testUpdateMetaOptionEqualsToFalse(): void
@@ -56,11 +57,11 @@ class MetaOperationParserTest extends \PHPUnit\Framework\TestCase
         $context->expects(self::never())
             ->method('addError');
 
-        $flags = MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', '/meta', $context);
+        $flags = MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate', '/meta', $context);
 
-        self::assertSame([false, null], $flags);
+        self::assertSame([false, null, null], $flags);
 
-        self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert'));
+        self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate'));
     }
 
     /**
@@ -81,11 +82,11 @@ class MetaOperationParserTest extends \PHPUnit\Framework\TestCase
             ->method('addError')
             ->with($error);
 
-        $flags = MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', '/meta', $context);
+        $flags = MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate', '/meta', $context);
 
         self::assertNull($flags);
 
-        self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert'));
+        self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate'));
     }
 
     public function invalidUpdateOptionDataProvider(): array
@@ -106,11 +107,11 @@ class MetaOperationParserTest extends \PHPUnit\Framework\TestCase
         $context->expects(self::never())
             ->method('addError');
 
-        $flags = MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', '/meta', $context);
+        $flags = MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate', '/meta', $context);
 
-        self::assertSame([null, true], $flags);
+        self::assertSame([null, true, null], $flags);
 
-        self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert'));
+        self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate'));
     }
 
     public function testUpsertMetaOptionEqualsToFalse(): void
@@ -123,11 +124,11 @@ class MetaOperationParserTest extends \PHPUnit\Framework\TestCase
         $context->expects(self::never())
             ->method('addError');
 
-        $flags = MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', '/meta', $context);
+        $flags = MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate', '/meta', $context);
 
-        self::assertSame([null, false], $flags);
+        self::assertSame([null, false, null], $flags);
 
-        self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert'));
+        self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate'));
     }
 
     public function testUpsertMetaOptionEqualsToIdArray(): void
@@ -140,11 +141,11 @@ class MetaOperationParserTest extends \PHPUnit\Framework\TestCase
         $context->expects(self::never())
             ->method('addError');
 
-        $flags = MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', '/meta', $context);
+        $flags = MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate', '/meta', $context);
 
-        self::assertSame([null, true], $flags);
+        self::assertSame([null, true, null], $flags);
 
-        self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert'));
+        self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate'));
     }
 
     public function testUpsertMetaOptionEqualsToArrayOfFields(): void
@@ -157,11 +158,11 @@ class MetaOperationParserTest extends \PHPUnit\Framework\TestCase
         $context->expects(self::never())
             ->method('addError');
 
-        $flags = MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', '/meta', $context);
+        $flags = MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate', '/meta', $context);
 
-        self::assertSame([null, ['field1', 'field2']], $flags);
+        self::assertSame([null, ['field1', 'field2'], null], $flags);
 
-        self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert'));
+        self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate'));
     }
 
     /**
@@ -182,11 +183,11 @@ class MetaOperationParserTest extends \PHPUnit\Framework\TestCase
             ->method('addError')
             ->with($error);
 
-        $flags = MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', '/meta', $context);
+        $flags = MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate', '/meta', $context);
 
         self::assertNull($flags);
 
-        self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert'));
+        self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate'));
     }
 
     public function invalidUpsertOptionDataProvider(): array
@@ -202,6 +203,65 @@ class MetaOperationParserTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
+    public function testValidateMetaOptionEqualsToTrue(): void
+    {
+        $meta = [
+            'validate' => true
+        ];
+
+        $context = $this->createMock(FormContext::class);
+        $context->expects(self::never())
+            ->method('addError');
+
+        $flags = MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate', '/meta', $context);
+
+        self::assertSame([null, null, true], $flags);
+
+        self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate'));
+    }
+
+    public function testValidateMetaOptionEqualsToFalse(): void
+    {
+        $meta = [
+            'validate' => false
+        ];
+
+        $context = $this->createMock(FormContext::class);
+        $context->expects(self::never())
+            ->method('addError');
+
+        $flags = MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate', '/meta', $context);
+
+        self::assertSame([null, null, false], $flags);
+
+        self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate'));
+    }
+
+    /**
+     * @dataProvider invalidUpdateOptionDataProvider
+     */
+    public function testInvalidValidateMetaOption(mixed $validateOptionValue): void
+    {
+        $meta = [
+            'validate' => $validateOptionValue
+        ];
+        $error = Error::createValidationError(
+            Constraint::VALUE,
+            'This value should be a boolean.'
+        )->setSource(ErrorSource::createByPointer('/meta/validate'));
+
+        $context = $this->createMock(FormContext::class);
+        $context->expects(self::once())
+            ->method('addError')
+            ->with($error);
+
+        $flags = MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate', '/meta', $context);
+
+        self::assertNull($flags);
+
+        self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate'));
+    }
+
     public function testBothUpdateAndUpsertMetaOptionsEqualsToTrue(): void
     {
         $meta = [
@@ -210,7 +270,7 @@ class MetaOperationParserTest extends \PHPUnit\Framework\TestCase
         ];
         $error = Error::createValidationError(
             Constraint::REQUEST_DATA,
-            'Both "update" and "upsert" options cannot be set.'
+            'Only one meta option can be used.'
         )->setSource(ErrorSource::createByPointer('/meta'));
 
         $context = $this->createMock(FormContext::class);
@@ -218,11 +278,11 @@ class MetaOperationParserTest extends \PHPUnit\Framework\TestCase
             ->method('addError')
             ->with($error);
 
-        $flags = MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', '/meta', $context);
+        $flags = MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate', '/meta', $context);
 
         self::assertNull($flags);
 
-        self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert'));
+        self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate'));
     }
 
     public function testBothUpdateAndUpsertMetaOptionsEqualsToFalse(): void
@@ -236,10 +296,53 @@ class MetaOperationParserTest extends \PHPUnit\Framework\TestCase
         $context->expects(self::never())
             ->method('addError');
 
-        $flags = MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', '/meta', $context);
+        $flags = MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate', '/meta', $context);
 
-        self::assertSame([false, false], $flags);
+        self::assertSame([false, false, null], $flags);
 
-        self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert'));
+        self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate'));
+    }
+
+    public function testAllMetaOptionsEqualsToTrue(): void
+    {
+        $meta = [
+            'update' => true,
+            'upsert' => true,
+            'validate' => true
+        ];
+        $error = Error::createValidationError(
+            Constraint::REQUEST_DATA,
+            'Only one meta option can be used.'
+        )->setSource(ErrorSource::createByPointer('/meta'));
+
+        $context = $this->createMock(FormContext::class);
+        $context->expects(self::once())
+            ->method('addError')
+            ->with($error);
+
+        $flags = MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate', '/meta', $context);
+
+        self::assertNull($flags);
+
+        self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate'));
+    }
+
+    public function testValidateMetaOptionsEqualsToTrueWithFalseOptions(): void
+    {
+        $meta = [
+            'update' => false,
+            'upsert' => false,
+            'validate' => true
+        ];
+
+        $context = $this->createMock(FormContext::class);
+        $context->expects(self::never())
+            ->method('addError');
+
+        $flags = MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate', '/meta', $context);
+
+        self::assertSame([false, false, true], $flags);
+
+        self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate'));
     }
 }

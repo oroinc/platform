@@ -20,9 +20,7 @@ class ChainExtension implements ExtensionInterface
         $this->extensions = $extensions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPreRunUnique(Job $job)
     {
         foreach ($this->extensions as $extension) {
@@ -30,9 +28,7 @@ class ChainExtension implements ExtensionInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPostRunUnique(Job $job, $jobResult)
     {
         foreach ($this->extensions as $extension) {
@@ -40,9 +36,7 @@ class ChainExtension implements ExtensionInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPreCreateDelayed(Job $job)
     {
         foreach ($this->extensions as $extension) {
@@ -50,9 +44,7 @@ class ChainExtension implements ExtensionInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPostCreateDelayed(Job $job, $createResult)
     {
         foreach ($this->extensions as $extension) {
@@ -60,9 +52,7 @@ class ChainExtension implements ExtensionInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPreRunDelayed(Job $job)
     {
         foreach ($this->extensions as $extension) {
@@ -70,9 +60,7 @@ class ChainExtension implements ExtensionInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPostRunDelayed(Job $job, $jobResult)
     {
         foreach ($this->extensions as $extension) {
@@ -80,9 +68,7 @@ class ChainExtension implements ExtensionInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onCancel(Job $job)
     {
         foreach ($this->extensions as $extension) {
@@ -90,9 +76,7 @@ class ChainExtension implements ExtensionInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onError(Job $job)
     {
         foreach ($this->extensions as $extension) {

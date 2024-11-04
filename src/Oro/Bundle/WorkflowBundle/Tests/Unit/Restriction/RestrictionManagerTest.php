@@ -25,6 +25,7 @@ class RestrictionManagerTest extends TestCase
     /** @var WorkflowRestrictionRepository|MockObject */
     private $repository;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);

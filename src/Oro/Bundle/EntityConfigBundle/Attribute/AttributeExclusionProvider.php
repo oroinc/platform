@@ -23,9 +23,7 @@ class AttributeExclusionProvider extends AbstractExclusionProvider
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isIgnoredRelation(ClassMetadata $metadata, $associationName)
     {
         if (!$metadata->hasAssociation($associationName)) {

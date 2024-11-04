@@ -18,9 +18,7 @@ class MessageFilter implements MessageFilterInterface
         $this->featureChecker = $featureChecker;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function apply(MessageBuffer $buffer): void
     {
         foreach ($buffer->getTopics() as $topic) {

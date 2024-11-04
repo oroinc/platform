@@ -10,6 +10,7 @@ class PhoneCollectionTypeTest extends \PHPUnit\Framework\TestCase
     /** @var PhoneCollectionType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new PhoneCollectionType();

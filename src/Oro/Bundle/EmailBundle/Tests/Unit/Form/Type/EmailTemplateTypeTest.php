@@ -39,6 +39,7 @@ class EmailTemplateTypeTest extends FormIntegrationTestCase
     /** @var EmailTemplateType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
@@ -49,9 +50,7 @@ class EmailTemplateTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $entityProvider = $this->createMock(EntityProvider::class);

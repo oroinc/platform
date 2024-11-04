@@ -22,9 +22,7 @@ class LayoutUpdateFileMatcher extends ByFileNameMatcher
         $this->excludeFilePathPatterns = $excludeFilePathPatterns;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isMatched(\SplFileInfo $file): bool
     {
         return
@@ -32,11 +30,13 @@ class LayoutUpdateFileMatcher extends ByFileNameMatcher
             && !$this->isFileExcluded($file);
     }
 
+    #[\Override]
     public function __serialize(): array
     {
         return [parent::__serialize(), $this->excludeFilePathPatterns];
     }
 
+    #[\Override]
     public function __unserialize(array $serialized): void
     {
         [$serializedParent, $this->excludeFilePathPatterns] = $serialized;

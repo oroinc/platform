@@ -28,6 +28,7 @@ class UpdateCommand extends Command
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     public function configure()
     {
         $this
@@ -44,6 +45,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('Update configuration data for entities');

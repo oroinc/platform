@@ -39,9 +39,7 @@ class ChainOwnershipMetadataProvider implements OwnershipMetadataProviderInterfa
         $this->emulatedProvider = null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function supports(): bool
     {
         if ($this->defaultProvider) {
@@ -57,49 +55,37 @@ class ChainOwnershipMetadataProvider implements OwnershipMetadataProviderInterfa
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMetadata(?string $className): OwnershipMetadataInterface
     {
         return $this->getSupportedProvider()->getMetadata($className);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getUserClass(): string
     {
         return $this->getSupportedProvider()->getUserClass();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getBusinessUnitClass(): string
     {
         return $this->getSupportedProvider()->getBusinessUnitClass();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getOrganizationClass(): ?string
     {
         return $this->getSupportedProvider()->getOrganizationClass();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMaxAccessLevel(int $accessLevel, string $className = null): int
     {
         return $this->getSupportedProvider()->getMaxAccessLevel($accessLevel, $className);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function clearCache(?string $className = null): void
     {
         foreach ($this->providers as $provider) {
@@ -109,9 +95,7 @@ class ChainOwnershipMetadataProvider implements OwnershipMetadataProviderInterfa
         $this->defaultProvider?->clearCache($className);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function warmUpCache(?string $className = null): void
     {
         foreach ($this->providers as $provider) {

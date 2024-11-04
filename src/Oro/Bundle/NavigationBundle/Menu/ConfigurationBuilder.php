@@ -50,6 +50,7 @@ class ConfigurationBuilder implements BuilderInterface
      * @param array         $options
      * @param string|null   $alias
      */
+    #[\Override]
     public function build(ItemInterface $menu, array $options = [], $alias = null)
     {
         $tree = $this->configurationProvider->getMenuTree();

@@ -29,16 +29,12 @@ abstract class AbstractEntityDeleteHandlerExtension implements EntityDeleteHandl
         $this->accessDeniedExceptionFactory = $factory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function assertDeleteGranted($entity): void
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function postFlush($entity, array $options): void
     {
     }

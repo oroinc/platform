@@ -26,9 +26,7 @@ class CallbackLayoutUpdate implements LayoutUpdateInterface
         $this->callback = $callback;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function updateLayout(LayoutManipulatorInterface $layoutManipulator, LayoutItemInterface $item)
     {
         call_user_func($this->callback, $layoutManipulator, $item);

@@ -11,6 +11,7 @@ class RestDocStatusCodesHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var RestDocStatusCodesHandler */
     private $statusCodesHandler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->statusCodesHandler = new RestDocStatusCodesHandler();

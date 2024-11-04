@@ -36,9 +36,7 @@ class AvailableOwnerAccessRule implements AccessRuleInterface
         $this->ownershipMetadataProvider = $ownershipMetadataProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(Criteria $criteria): bool
     {
         return
@@ -46,9 +44,7 @@ class AvailableOwnerAccessRule implements AccessRuleInterface
             && $criteria->hasOption(self::TARGET_ENTITY_CLASS);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(Criteria $criteria): void
     {
         $alias = $criteria->getAlias();

@@ -17,6 +17,7 @@ class TranslationNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var TranslationNormalizer */
     private $normalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translationManager = $this->createMock(TranslationManager::class);

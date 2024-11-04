@@ -20,6 +20,7 @@ class FormFactoryProcessor implements ProcessorInterface
     /**
      * @param ContextInterface|TransitionContext $context
      */
+    #[\Override]
     public function process(ContextInterface $context)
     {
         $formData = $context->getFormData();

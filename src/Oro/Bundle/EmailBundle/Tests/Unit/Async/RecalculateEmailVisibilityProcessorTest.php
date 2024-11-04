@@ -34,6 +34,7 @@ class RecalculateEmailVisibilityProcessorTest extends OrmTestCase
     /** @var RecalculateEmailVisibilityProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->jobRunner = $this->createMock(JobRunner::class);

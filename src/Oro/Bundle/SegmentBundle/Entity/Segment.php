@@ -101,9 +101,7 @@ class Segment extends AbstractQueryDesigner implements GridQueryDesignerInterfac
         $this->cloneExtendEntityStorage();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getGridPrefix(): string
     {
         return self::GRID_PREFIX;
@@ -204,6 +202,7 @@ class Segment extends AbstractQueryDesigner implements GridQueryDesignerInterfac
      *
      * @return string
      */
+    #[\Override]
     public function getEntity()
     {
         return $this->entity;
@@ -215,6 +214,7 @@ class Segment extends AbstractQueryDesigner implements GridQueryDesignerInterfac
      * @param string $entity
      * @return Segment
      */
+    #[\Override]
     public function setEntity($entity)
     {
         $this->entity = $entity;
@@ -250,6 +250,7 @@ class Segment extends AbstractQueryDesigner implements GridQueryDesignerInterfac
      *
      * @return string
      */
+    #[\Override]
     public function getDefinition()
     {
         return $this->definition;
@@ -261,6 +262,7 @@ class Segment extends AbstractQueryDesigner implements GridQueryDesignerInterfac
      * @param string $definition
      * @return Segment
      */
+    #[\Override]
     public function setDefinition($definition)
     {
         $this->definition = $definition;

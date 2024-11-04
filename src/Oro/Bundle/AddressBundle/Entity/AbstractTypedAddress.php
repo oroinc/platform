@@ -137,6 +137,7 @@ abstract class AbstractTypedAddress extends AbstractAddress implements PrimaryIt
      * @param bool $primary
      * @return AbstractTypedAddress
      */
+    #[\Override]
     public function setPrimary($primary)
     {
         $this->primary = (bool)$primary;
@@ -147,14 +148,13 @@ abstract class AbstractTypedAddress extends AbstractAddress implements PrimaryIt
     /**
      * @return bool
      */
+    #[\Override]
     public function isPrimary()
     {
         return (bool)$this->primary;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isEmpty()
     {
         return parent::isEmpty()

@@ -10,6 +10,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class AttributeFamilyGroupsValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator(): AttributeFamilyGroupsValidator
     {
         return new AttributeFamilyGroupsValidator();

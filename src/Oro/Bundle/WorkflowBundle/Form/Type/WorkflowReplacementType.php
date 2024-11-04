@@ -23,9 +23,7 @@ class WorkflowReplacementType extends AbstractType
         $this->helper = $helper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -43,18 +41,14 @@ class WorkflowReplacementType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefault('workflow', null);
         $resolver->setAllowedTypes('workflow', [WorkflowDefinition::class]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         /** @var WorkflowDefinition $workflow */
@@ -63,17 +57,12 @@ class WorkflowReplacementType extends AbstractType
         $view->vars['workflowsToDeactivation'] = $this->helper->getWorkflowsToDeactivation($workflow)->getValues();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;

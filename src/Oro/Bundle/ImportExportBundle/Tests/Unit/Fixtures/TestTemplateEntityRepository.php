@@ -12,20 +12,24 @@ class TestTemplateEntityRepository implements
 {
     protected $entityRegistry;
 
+    #[\Override]
     public function getEntityClass()
     {
         return 'Test\Entity';
     }
 
+    #[\Override]
     public function getEntity($key)
     {
         return null;
     }
 
+    #[\Override]
     public function fillEntityData($key, $entity)
     {
     }
 
+    #[\Override]
     public function setTemplateManager(TemplateManager $entityRegistry)
     {
         $this->entityRegistry = $entityRegistry;

@@ -32,6 +32,7 @@ class LayoutRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var LayoutRegistry */
     private $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extension = $this->createMock(ExtensionInterface::class);

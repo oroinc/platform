@@ -16,6 +16,7 @@ class NameFormatterTest extends \PHPUnit\Framework\TestCase
     /** @var NameFormatter */
     private $formatter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->localeSettings = $this->createMock(LocaleSettings::class);

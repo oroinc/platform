@@ -37,9 +37,7 @@ class NamedValidationConstraint extends Constraint implements ConstraintWithStat
         return $this->constraintType;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getStatusCode(): int
     {
         return $this->statusCode ?? Response::HTTP_BAD_REQUEST;

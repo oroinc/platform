@@ -19,6 +19,7 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var ActionProcessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $customizationProcessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->customizationProcessor = $this->createMock(ActionProcessorInterface::class);

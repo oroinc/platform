@@ -12,6 +12,7 @@ class HasElementsTest extends \PHPUnit\Framework\TestCase
 {
     private HasElements $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->condition = new HasElements();

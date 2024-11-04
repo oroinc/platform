@@ -18,6 +18,7 @@ class StepExecutionAwareImportProcessorTest extends ImportProcessorTest
     /** @var StepExecutionAwareImportProcessor */
     protected $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

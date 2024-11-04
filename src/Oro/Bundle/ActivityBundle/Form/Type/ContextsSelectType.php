@@ -60,9 +60,7 @@ class ContextsSelectType extends AbstractType
         $this->featureChecker = $featureChecker;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->resetViewTransformers();
@@ -74,9 +72,7 @@ class ContextsSelectType extends AbstractType
         $builder->addViewTransformer($contextsToViewTransformer);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['attr']['data-selected-data'] = $this->getSelectedData($form, $options['configs']['separator']);
@@ -158,9 +154,7 @@ class ContextsSelectType extends AbstractType
         return $this->translator->trans($label);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $defaultConfigs = [
@@ -186,25 +180,18 @@ class ContextsSelectType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return Select2HiddenType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;

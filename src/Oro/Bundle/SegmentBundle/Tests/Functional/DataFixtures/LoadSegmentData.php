@@ -298,18 +298,14 @@ class LoadSegmentData extends AbstractLoadSegmentData
         ]
     ];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         parent::load($manager);
         $this->applySegmentFilterToDefinition($manager);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getSegmentsData(): array
     {
         return self::$segments;

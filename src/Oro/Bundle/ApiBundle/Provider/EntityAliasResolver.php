@@ -35,33 +35,25 @@ class EntityAliasResolver extends BaseEntityAliasResolver
         $this->configFiles = $configFiles;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function hasAlias($entityClass)
     {
         return parent::hasAlias($this->resolveEntityClass($entityClass));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getAlias($entityClass)
     {
         return parent::getAlias($this->resolveEntityClass($entityClass));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getPluralAlias($entityClass)
     {
         return parent::getPluralAlias($this->resolveEntityClass($entityClass));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createStorage()
     {
         return new EntityAliasStorage($this->configFiles);

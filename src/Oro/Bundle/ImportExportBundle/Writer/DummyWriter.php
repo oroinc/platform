@@ -9,9 +9,7 @@ use Oro\Bundle\BatchBundle\Item\ItemWriterInterface;
  */
 class DummyWriter implements ItemWriterInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function write(array $items)
     {
     }

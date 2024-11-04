@@ -17,6 +17,7 @@ class FakeRestClientTest extends \PHPUnit\Framework\TestCase
     /** @var FakeRestClient */
     private $client;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->client = new FakeRestClient();

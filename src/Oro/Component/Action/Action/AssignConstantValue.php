@@ -29,9 +29,7 @@ class AssignConstantValue extends AbstractAction
      */
     protected $value;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $value = $this->contextAccessor->getValue($context, $this->value);
@@ -52,9 +50,7 @@ class AssignConstantValue extends AbstractAction
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (count($options) != 2) {

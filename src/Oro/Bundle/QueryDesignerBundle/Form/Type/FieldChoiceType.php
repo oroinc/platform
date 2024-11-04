@@ -24,9 +24,7 @@ class FieldChoiceType extends AbstractType
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $componentOptions = $options['page_component_options'];
@@ -49,9 +47,7 @@ class FieldChoiceType extends AbstractType
         $view->vars['page_component_options'] = $componentOptions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefined('page_component_name');
@@ -74,9 +70,7 @@ class FieldChoiceType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         if (isset($options['page_component_name'])) {
@@ -86,25 +80,18 @@ class FieldChoiceType extends AbstractType
         $view->vars['attr']['data-page-component-options'] = json_encode($view->vars['page_component_options']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return HiddenType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;

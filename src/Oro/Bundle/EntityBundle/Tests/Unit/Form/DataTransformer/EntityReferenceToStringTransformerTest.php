@@ -13,6 +13,7 @@ class EntityReferenceToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityReferenceToStringTransformer */
     private $transformer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $doctrineHelper = $this->createMock(DoctrineHelper::class);

@@ -17,9 +17,7 @@ use Oro\Bundle\SecurityBundle\AccessRule\Expr\Value;
  */
 abstract class ModifyExpressionVisitor extends Visitor
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function walkComparison(Comparison $comparison): mixed
     {
         return new Comparison(
@@ -29,17 +27,13 @@ abstract class ModifyExpressionVisitor extends Visitor
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function walkValue(Value $value): mixed
     {
         return $value;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function walkCompositeExpression(CompositeExpression $expr): mixed
     {
         $modifiedExpressions = [];
@@ -60,33 +54,25 @@ abstract class ModifyExpressionVisitor extends Visitor
         return new CompositeExpression($expr->getType(), $modifiedExpressions);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function walkAccessDenied(AccessDenied $accessDenied): mixed
     {
         return $accessDenied;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function walkPath(Path $path): mixed
     {
         return $path;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function walkSubquery(Subquery $subquery): mixed
     {
         return $subquery;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function walkExists(Exists $existsExpr): mixed
     {
         return new Exists(
@@ -95,9 +81,7 @@ abstract class ModifyExpressionVisitor extends Visitor
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function walkNullComparison(NullComparison $comparison): mixed
     {
         return new NullComparison(
@@ -106,9 +90,7 @@ abstract class ModifyExpressionVisitor extends Visitor
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function walkAssociation(Association $association): mixed
     {
         return $association;

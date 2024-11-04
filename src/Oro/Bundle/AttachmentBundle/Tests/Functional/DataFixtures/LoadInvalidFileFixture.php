@@ -13,9 +13,7 @@ class LoadInvalidFileFixture extends AbstractFixture implements DependentFixture
 {
     public const INVALID_FILE_1 = 'invalid_file';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [
@@ -24,9 +22,7 @@ class LoadInvalidFileFixture extends AbstractFixture implements DependentFixture
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $invalidFile = (new File())

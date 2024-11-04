@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Entity\Repository;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -15,7 +17,7 @@ class RoleRepository extends EntityRepository
     /**
      * Returns a query builder which can be used to get a list of users assigned to the given role
      *
-     * @param  Role $role
+     * @param Role $role
      * @return QueryBuilder
      */
     public function getUserQueryBuilder(Role $role)
@@ -57,5 +59,27 @@ class RoleRepository extends EntityRepository
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    public function getFirstMatchedUserByRoleName(string $role, ?Organization $organization = null): ?User
+    {
+        $role = $this->findOneBy(['role' => $role]);
+        if (!$role) {
+            return null;
+        }
+
+        $queryBuilder = $this
+            ->getUserQueryBuilder($role)
+            ->orderBy('u.id', 'ASC')
+            ->setMaxResults(1);
+
+        if ($organization) {
+            $queryBuilder
+                ->innerJoin('u.organizations', 'organization')
+                ->andWhere($queryBuilder->expr()->eq('organization.id', ':organizationId'))
+                ->setParameter('organizationId', $organization->getId(), Types::INTEGER);
+        }
+
+        return $queryBuilder->getQuery()->getOneOrNullResult();
     }
 }

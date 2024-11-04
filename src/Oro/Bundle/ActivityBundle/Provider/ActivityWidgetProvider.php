@@ -45,17 +45,13 @@ class ActivityWidgetProvider implements WidgetProviderInterface
         $this->entityRoutingHelper = $entityRoutingHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($object)
     {
         return $this->activityManager->hasActivityAssociations(ClassUtils::getClass($object));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getWidgets($object)
     {
         $result = [];

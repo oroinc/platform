@@ -30,14 +30,13 @@ class GuzzleRestResponse implements RestResponseInterface
     /**
      * @return null|string
      */
+    #[\Override]
     public function getRequestUrl()
     {
         return $this->requestUrl;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBodyAsString()
     {
         try {
@@ -49,97 +48,73 @@ class GuzzleRestResponse implements RestResponseInterface
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getStatusCode()
     {
         return $this->response->getStatusCode();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getHeader($header)
     {
         return $this->response->getHeader($header);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getHeaders()
     {
         return $this->response->getHeaders();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasHeader($header)
     {
         return $this->response->hasHeader($header);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getReasonPhrase()
     {
         return $this->response->getReasonPhrase();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isClientError()
     {
         return $this->getStatusCode() >= 400 && $this->getStatusCode() < 500;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isError()
     {
         return $this->isClientError() || $this->isServerError();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isInformational()
     {
         return $this->getStatusCode() < 200;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isRedirect()
     {
         return $this->getStatusCode() >= 300 && $this->getStatusCode() < 400;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isServerError()
     {
         return $this->getStatusCode() >= 500 && $this->getStatusCode() < 600;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isSuccessful()
     {
         return ($this->getStatusCode() >= 200 && $this->getStatusCode() < 300) || $this->getStatusCode() == 304;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function json()
     {
         return Utils::jsonDecode($this->getBodyAsString(), true);

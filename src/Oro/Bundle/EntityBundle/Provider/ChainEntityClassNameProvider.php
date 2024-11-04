@@ -18,9 +18,7 @@ class ChainEntityClassNameProvider implements EntityClassNameProviderInterface
         $this->providers = $providers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityClassName(string $entityClass): ?string
     {
         foreach ($this->providers as $provider) {
@@ -33,9 +31,7 @@ class ChainEntityClassNameProvider implements EntityClassNameProviderInterface
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityClassPluralName(string $entityClass): ?string
     {
         foreach ($this->providers as $provider) {

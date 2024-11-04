@@ -17,6 +17,7 @@ class AppearanceExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var AppearanceExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);

@@ -96,4 +96,22 @@ class ConfigValueRepository extends EntityRepository
 
         return array_unique(array_column($rows, 'recordId'));
     }
+
+    public function getConfigValueByRecordId(int $recordId, string $section, string $name): ?ConfigValue
+    {
+        $qb = $this->createQueryBuilder('cv');
+
+        return $qb
+            ->join('cv.config', 'c')
+            ->where(
+                $qb->expr()->eq('c.recordId', ':recordId'),
+                $qb->expr()->eq('cv.section', ':section'),
+                $qb->expr()->eq('cv.name', ':name')
+            )
+            ->setParameter('recordId', $recordId)
+            ->setParameter('section', $section)
+            ->setParameter('name', $name)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

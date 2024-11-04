@@ -13,6 +13,7 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
 {
     private EnumChoiceType $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -92,18 +93,6 @@ class EnumChoiceTypeTest extends AbstractEnumTypeTestCase
         $resolver->resolve([
             'enum_code' => null,
             'class' => null,
-        ]);
-    }
-
-    public function testClassNormalizerUnexpectedEnumException(): void
-    {
-        $this->expectException(InvalidOptionsException::class);
-        $this->expectExceptionMessage('must be a child of "Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue"');
-
-        $resolver = $this->getOptionsResolver();
-        $this->type->configureOptions($resolver);
-        $resolver->resolve([
-            'enum_code' => 'unknown',
         ]);
     }
 

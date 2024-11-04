@@ -28,9 +28,7 @@ class DbalDriver implements DriverInterface
         $this->config = $config;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function send(QueueInterface $queue, Message $message): void
     {
         $headers = $message->getHeaders();
@@ -60,25 +58,19 @@ class DbalDriver implements DriverInterface
         $this->session->createProducer()->send($queue, $transportMessage);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function createTransportMessage(): MessageInterface
     {
         return $this->session->createMessage();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function createQueue(string $queueName): QueueInterface
     {
         return $this->session->createQueue($queueName);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfig(): Config
     {
         return $this->config;

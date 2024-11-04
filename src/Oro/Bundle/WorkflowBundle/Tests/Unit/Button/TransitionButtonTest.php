@@ -29,6 +29,7 @@ class TransitionButtonTest extends \PHPUnit\Framework\TestCase
     /** @var TransitionButton */
     private $button;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->transition = $this->createMock(Transition::class);

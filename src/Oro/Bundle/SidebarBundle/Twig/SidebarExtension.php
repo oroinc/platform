@@ -52,9 +52,7 @@ class SidebarExtension extends AbstractExtension implements FeatureToggleableInt
         return $this->container->get(AssetHelper::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -93,9 +91,7 @@ class SidebarExtension extends AbstractExtension implements FeatureToggleableInt
         return $definitions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

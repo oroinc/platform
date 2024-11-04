@@ -9,6 +9,7 @@ use Oro\Bundle\UserBundle\Entity\AbstractUser;
  */
 class WsseTokenFactory implements WsseTokenFactoryInterface
 {
+    #[\Override]
     public function create(AbstractUser $user, $firewallName, array $roles = []): WsseToken
     {
         return new WsseToken($user, $firewallName, $roles);

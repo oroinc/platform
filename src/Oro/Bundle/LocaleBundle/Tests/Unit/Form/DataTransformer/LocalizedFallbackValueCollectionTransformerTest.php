@@ -25,6 +25,7 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
     /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrine;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

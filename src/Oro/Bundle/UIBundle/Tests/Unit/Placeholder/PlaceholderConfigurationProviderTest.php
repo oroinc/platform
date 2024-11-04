@@ -15,6 +15,7 @@ class PlaceholderConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 
     private PlaceholderConfigurationProvider $configurationProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $cacheFile = $this->getTempFile('PlaceholderConfigurationProvider');

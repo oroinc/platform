@@ -7,9 +7,7 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 class ParentLocalizationSearchHandler extends AbstractParentEntitySearchHandler
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getChildrenIds($localization)
     {
         return $localization instanceof Localization ? $localization->getChildrenIds() : [];

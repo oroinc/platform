@@ -12,6 +12,7 @@ class EqualToTest extends \PHPUnit\Framework\TestCase
     /** @var Condition\EqualTo */
     protected $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->condition = new Condition\EqualTo();

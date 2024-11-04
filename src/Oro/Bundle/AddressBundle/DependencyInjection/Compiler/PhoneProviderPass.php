@@ -15,9 +15,7 @@ class PhoneProviderPass implements CompilerPassInterface
 {
     use TaggedServiceTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $tagName = 'oro_address.phone_provider';

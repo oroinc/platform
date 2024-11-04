@@ -13,9 +13,7 @@ class EntityFieldIterator implements EntityFieldIteratorInterface
     {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getExtensions(): iterable
     {
         return $this->extensions;

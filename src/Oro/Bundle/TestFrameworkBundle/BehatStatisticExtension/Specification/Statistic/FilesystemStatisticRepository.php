@@ -41,9 +41,7 @@ class FilesystemStatisticRepository implements StatisticRepositoryInterface, Obj
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFeatureDuration($path)
     {
         foreach ($this->featureDuration as $feature => $duration) {
@@ -55,9 +53,7 @@ class FilesystemStatisticRepository implements StatisticRepositoryInterface, Obj
         return $this->averageFeatureTime;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function find($id)
     {
         $model = new FeatureStatistic();
@@ -69,33 +65,25 @@ class FilesystemStatisticRepository implements StatisticRepositoryInterface, Obj
         return $model->setDuration($this->averageFeatureTime);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function findAll()
     {
         throw new \RuntimeException('Not supported');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
     {
         throw new \RuntimeException('Not supported');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function findOneBy(array $criteria)
     {
         throw new \RuntimeException('Not supported');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getClassName()
     {
         throw new \RuntimeException('Not supported');

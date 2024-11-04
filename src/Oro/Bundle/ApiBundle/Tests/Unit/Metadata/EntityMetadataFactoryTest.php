@@ -18,6 +18,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
     /** @var EntityMetadataFactory */
     private $metadataFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

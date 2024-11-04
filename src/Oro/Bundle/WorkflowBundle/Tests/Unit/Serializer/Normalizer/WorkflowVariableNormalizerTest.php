@@ -39,6 +39,7 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowVariableNormalizer */
     private $normalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->attributeNormalizer = $this->createMock(AttributeNormalizer::class);

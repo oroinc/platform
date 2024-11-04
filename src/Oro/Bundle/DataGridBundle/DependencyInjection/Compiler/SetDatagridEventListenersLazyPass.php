@@ -14,9 +14,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 class SetDatagridEventListenersLazyPass implements CompilerPassInterface
 {
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition('profiler')) {

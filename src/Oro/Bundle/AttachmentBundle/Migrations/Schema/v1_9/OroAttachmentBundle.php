@@ -13,9 +13,7 @@ class OroAttachmentBundle implements Migration, ConnectionAwareInterface
 {
     use ConnectionAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $sql = 'select field_name, class_name'

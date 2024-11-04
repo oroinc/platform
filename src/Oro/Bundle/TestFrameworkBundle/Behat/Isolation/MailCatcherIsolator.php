@@ -22,7 +22,7 @@ class MailCatcherIsolator implements IsolatorInterface
     {
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function start(BeforeStartTestsEvent $event)
     {
         $event->writeln('<info>Purge MailCatcher storage</info>');
@@ -36,43 +36,45 @@ class MailCatcherIsolator implements IsolatorInterface
         }
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function beforeTest(BeforeIsolatedTestEvent $event)
     {
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function afterTest(AfterIsolatedTestEvent $event)
     {
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function terminate(AfterFinishTestsEvent $event)
     {
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function isApplicable(ContainerInterface $container)
     {
         return true;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function restoreState(RestoreStateEvent $event)
     {
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function isOutdatedState()
     {
         return false;
     }
 
+    #[\Override]
     public function getName()
     {
         return 'MailCatcher';
     }
 
+    #[\Override]
     public function getTag()
     {
         return 'mail';

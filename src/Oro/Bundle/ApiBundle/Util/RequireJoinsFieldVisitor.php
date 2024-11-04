@@ -38,12 +38,13 @@ class RequireJoinsFieldVisitor extends ExpressionVisitor
         return $fields;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkComparison(Comparison $comparison)
     {
         $field = $comparison->getField();
+        if (!$field) {
+            return;
+        }
         if (!isset($this->fields[$field])) {
             $this->fields[$field] = $this->isJoinRequired($comparison);
         } elseif (!$this->fields[$field] && $this->isJoinRequired($comparison)) {
@@ -51,17 +52,13 @@ class RequireJoinsFieldVisitor extends ExpressionVisitor
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkValue(Value $value)
     {
         return $value->getValue();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkCompositeExpression(CompositeExpression $expr)
     {
         $expressionList = $expr->getExpressionList();

@@ -9,9 +9,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 class AssertSharedDataExistInCustomizeDataContext implements ProcessorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeDataContext $context */

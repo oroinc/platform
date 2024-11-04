@@ -22,9 +22,7 @@ class TraceableProcessorApplicableCheckerFactory implements ProcessorApplicableC
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function createApplicableChecker(): ChainApplicableChecker
     {
         $traceableChecker = new TraceableChainApplicableChecker($this->logger);

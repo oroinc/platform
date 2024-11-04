@@ -39,9 +39,7 @@ class Select2Type extends AbstractType
         $this->blockPrefix = $blockPrefix;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if ($this->parentForm === self::HIDDEN_TYPE) {
@@ -49,9 +47,7 @@ class Select2Type extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['configs'] = $options['configs'];
@@ -59,9 +55,7 @@ class Select2Type extends AbstractType
         $this->addSelect2BlockPrefix($view);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -70,25 +64,18 @@ class Select2Type extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return $this->parentForm;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return $this->blockPrefix;

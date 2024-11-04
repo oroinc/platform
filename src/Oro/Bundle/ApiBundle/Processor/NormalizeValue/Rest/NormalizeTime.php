@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest;
 
+use Oro\Bundle\ApiBundle\Model\NormalizedDateTime;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue\AbstractProcessor;
 
 /**
@@ -10,37 +11,42 @@ use Oro\Bundle\ApiBundle\Processor\NormalizeValue\AbstractProcessor;
  */
 class NormalizeTime extends AbstractProcessor
 {
-    public const REQUIREMENT = '\d{2}:\d{2}(:\d{2}(\.\d+)?)?';
+    public const REQUIREMENT = '\d{2}(:\d{2}(:\d{2}(\.\d+)?)?)?';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getDataTypeString(): string
     {
         return 'time';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getDataTypePluralString(): string
     {
         return 'times';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getRequirement(): string
     {
         return self::REQUIREMENT;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function normalizeValue(mixed $value): mixed
     {
-        return new \DateTime('1970-01-01T' . $value, new \DateTimeZone('UTC'));
+        $precision = NormalizedDateTime::PRECISION_SECOND;
+        $delimiterCount = substr_count($value, ':');
+        if (0 === $delimiterCount) {
+            $value .= ':00:00';
+            $precision = NormalizedDateTime::PRECISION_HOUR;
+        } elseif (1 === $delimiterCount) {
+            $value .= ':00';
+            $precision = NormalizedDateTime::PRECISION_MINUTE;
+        }
+
+        $result = new NormalizedDateTime('1970-01-01T' . $value, new \DateTimeZone('UTC'));
+        $result->setPrecision($precision);
+
+        return $result;
     }
 }

@@ -211,9 +211,7 @@ class ConfigEntityGridController extends AbstractController
         return new JsonResponse(['message' => 'Item was restored', 'successful' => true], Response::HTTP_OK);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

@@ -22,48 +22,36 @@ class LayoutContextStub implements ContextInterface
         $this->resolved = $resolved;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getResolver()
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function resolve()
     {
         $this->resolved = true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isResolved()
     {
         return $this->resolved;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function has($name)
     {
         return array_key_exists($name, $this->items);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function get($name)
     {
         return $this->getOr($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOr($name, $default = null)
     {
         if ($this->has($name)) {
@@ -73,17 +61,13 @@ class LayoutContextStub implements ContextInterface
         return $default;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function set($name, $value)
     {
         $this->items[$name] = $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function remove($name)
     {
         if ($this->has($name)) {
@@ -91,49 +75,37 @@ class LayoutContextStub implements ContextInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function data()
     {
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetExists($name): bool
     {
         return $this->has($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetGet($name): mixed
     {
         return $this->getOr($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetSet($name, $value): void
     {
         $this->set($name, $value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetUnset($name): void
     {
         $this->remove($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getHash()
     {
         return md5(serialize($this->items));

@@ -35,6 +35,7 @@ class EmailTemplateRenderingSubscriberTest extends TestCase
 
     private EmailTemplateRenderingSubscriber $subscriber;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->emailModelBuilderHelper = $this->createMock(EmailModelBuilderHelper::class);

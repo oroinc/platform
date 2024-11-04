@@ -7,17 +7,13 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 class TestConfigExtension extends AbstractConfigExtension
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityConfigurationSections(): array
     {
         return ['test_section' => new TestConfiguration()];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigureCallbacks(): array
     {
         return [
@@ -42,9 +38,7 @@ class TestConfigExtension extends AbstractConfigExtension
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPostProcessCallbacks(): array
     {
         return [
@@ -93,9 +87,7 @@ class TestConfigExtension extends AbstractConfigExtension
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityConfigurationLoaders(): array
     {
         return ['test_section' => new TestConfigLoader()];

@@ -96,9 +96,7 @@ class DbalMessageConsumer implements MessageConsumerInterface
         return $this->pollingInterval / 1000;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function receive($timeout = 0): ?MessageInterface
     {
         $startAt = microtime(true);
@@ -124,9 +122,7 @@ class DbalMessageConsumer implements MessageConsumerInterface
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function acknowledge(MessageInterface $message): void
     {
         if (!$message instanceof DbalMessageInterface) {
@@ -138,9 +134,7 @@ class DbalMessageConsumer implements MessageConsumerInterface
         $this->deleteMessageWithRetry($message);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reject(MessageInterface $message, $requeue = false): void
     {
         if (!$message instanceof DbalMessageInterface) {

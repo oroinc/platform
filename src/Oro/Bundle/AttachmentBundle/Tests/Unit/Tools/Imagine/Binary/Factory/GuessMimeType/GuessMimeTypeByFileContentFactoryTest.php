@@ -18,6 +18,7 @@ class GuessMimeTypeByFileContentFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var GuessMimeTypeByFileContentFactory */
     private $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->mimeTypeGuesser = $this->createMock(MimeTypeGuesserInterface::class);

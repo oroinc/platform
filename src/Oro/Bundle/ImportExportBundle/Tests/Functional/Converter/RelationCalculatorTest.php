@@ -13,6 +13,7 @@ class RelationCalculatorTest extends WebTestCase
     /** @var RelationCalculator */
     private $relationCalculator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

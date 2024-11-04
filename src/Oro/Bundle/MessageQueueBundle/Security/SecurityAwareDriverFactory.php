@@ -32,9 +32,7 @@ class SecurityAwareDriverFactory implements DriverFactoryInterface
         $this->tokenSerializer = $tokenSerializer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function create(ConnectionInterface $connection, Config $config)
     {
         return new SecurityAwareDriver(

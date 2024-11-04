@@ -4,7 +4,12 @@ namespace Oro\Bundle\ImportExportBundle\Serializer\Normalizer;
 
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface;
+use Oro\Bundle\EntityExtendBundle\Provider\EnumOptionsProvider;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\ImportExportBundle\Event\DenormalizeEntityEvent;
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent;
@@ -35,6 +40,10 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     /** @var ContextAwareDenormalizerInterface */
     protected $scalarFieldDenormalizer;
 
+    protected EnumOptionsProvider $enumOptionsProvider;
+
+    protected DoctrineHelper $doctrineHelper;
+
     /** @var EventDispatcherInterface */
     protected $dispatcher;
 
@@ -50,14 +59,22 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
         $this->scalarFieldDenormalizer = $scalarFieldDenormalizer;
     }
 
+    public function setEnumOptionProvider(EnumOptionsProvider $enumOptionsProvider): void
+    {
+        $this->enumOptionsProvider = $enumOptionsProvider;
+    }
+
+    public function setDoctrineHelper(DoctrineHelper $doctrineHelper): void
+    {
+        $this->doctrineHelper = $doctrineHelper;
+    }
+
     public function setDispatcher(EventDispatcherInterface $dispatcher): void
     {
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         $event = $this->dispatchDenormalize($data, $this->createObject($type), Events::BEFORE_DENORMALIZE_ENTITY);
@@ -65,74 +82,21 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
         $fields = $this->fieldHelper->getEntityFields($type, EntityFieldProvider::OPTION_WITH_RELATIONS);
 
         foreach ($fields as $field) {
-            $fieldName = $field['name'];
-            if (!\array_key_exists($fieldName, $data) || $event->isFieldSkipped($fieldName)) {
+            if ($this->shouldSkipDenormalization($data, $field, $event)) {
                 continue;
             }
 
+            $fieldName = $field['name'];
             $value = $data[$fieldName];
-            $fieldContext = $context;
-            if ($value !== null) {
-                $fieldContext['originalFieldName'] = $fieldContext['fieldName'] ?? $fieldName;
-                $fieldContext['fieldName'] = $fieldName;
-                if ($this->isObjectField($field)) {
-                    if ($this->fieldHelper->isMultipleRelation($field)) {
-                        $entityClass = sprintf('ArrayCollection<%s>', $field['related_entity_name']);
-                    } elseif ($this->fieldHelper->isSingleRelation($field)) {
-                        // if data for object value is empty array we should not create empty object
-                        if ([] === $value) {
-                            continue;
-                        }
-                        $entityClass = $field['related_entity_name'];
-                    } else {
-                        $entityClass = 'DateTime';
-                        $fieldContext['type'] = $field['type'];
-                    }
-                    $value = $this->serializer->denormalize($value, $entityClass, $format, $fieldContext);
-                } else {
-                    $fieldContext['className'] = $type;
-                    $value = $this->tryDenormalizesValueAsScalar($field, $fieldContext, $value, $format);
-                }
-            }
 
+            if ($data[$fieldName] !== null) {
+                $fieldContext = $this->prepareFieldContextForDenormalization($context, $fieldName, $type, $field);
+                $value = $this->processFieldValueForDenormalization($value, $field, $fieldContext, $format);
+            }
             $this->setObjectValue($result, $fieldName, $value);
         }
 
         return $this->dispatchDenormalize($data, $result, Events::AFTER_DENORMALIZE_ENTITY)->getObject();
-    }
-
-    protected function isObjectField(array $field): bool
-    {
-        return $this->fieldHelper->isRelation($field) || $this->fieldHelper->isDateTimeField($field);
-    }
-
-    /**
-     * Try denormalizes data back into internal representation of datatype in php
-     *
-     * @param array $fieldConfig Field configuration
-     * @param array $context Options available to the denormalizer
-     * @param mixed $value Value to convert
-     * @param string $format Format the given data was extracted from
-     *
-     * @return mixed
-     */
-    protected function tryDenormalizesValueAsScalar(array $fieldConfig, array $context, $value, $format)
-    {
-        $fieldType = $fieldConfig['type'] ?? false;
-        if (false === $fieldType) {
-            return $value;
-        }
-
-        $fieldContext = \array_merge(
-            $context,
-            [ScalarFieldDenormalizer::CONTEXT_OPTION_SKIP_INVALID_VALUE => true]
-        );
-
-        if (!$this->scalarFieldDenormalizer->supportsDenormalization($value, $fieldType, $format, $fieldContext)) {
-            return $value;
-        }
-
-        return $this->scalarFieldDenormalizer->denormalize($value, $fieldType, $format, $fieldContext);
     }
 
     /**
@@ -154,9 +118,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
         return $reflection->newInstance();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
         return is_array($data) && class_exists($type) && $this->fieldHelper->hasConfig($type);
@@ -165,54 +127,31 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function normalize($object, string $format = null, array $context = [])
     {
         $entityName = ClassUtils::getClass($object);
         $fields = $this->fieldHelper->getEntityFields($entityName, EntityFieldProvider::OPTION_WITH_RELATIONS);
 
-        $result = $this->dispatchNormalize($object, [], $context, Events::BEFORE_NORMALIZE_ENTITY);
+        $result = [];
+
+        $result = $this->dispatchNormalize($object, $result, $context, Events::BEFORE_NORMALIZE_ENTITY);
         foreach ($fields as $field) {
             $fieldName = $field['name'];
-
-            if ($this->isFieldSkippedForNormalization($entityName, $fieldName, $context)) {
+            if ($this->shouldSkipNormalization($entityName, $fieldName, $field, $context)) {
                 continue;
             }
 
             $fieldValue = $this->getObjectValue($object, $fieldName);
+            $fieldContext = $this->prepareFieldContextForNormalization($context, $fieldName, $entityName, $field);
+
             if (is_object($fieldValue)) {
-                $fieldContext = $context;
-
-                $fieldContext['fieldName'] = $fieldName;
-                if (method_exists($object, 'getId')) {
-                    $fieldContext['entityId'] = $object->getId();
-                }
-
-                $isFullMode = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'full');
-
-                // Do not export relation in short mode if it does not contain identity fields
-                if (!$isFullMode
-                    && isset($field['related_entity_name'])
-                    && $this->fieldHelper->hasConfig($field['related_entity_name'])
-                    && !$this->hasIdentityFields($field['related_entity_name'])
-                ) {
-                    continue;
-                }
-
-                if ($this->fieldHelper->isRelation($field)) {
-                    if ($isFullMode) {
-                        $fieldContext['mode'] = self::FULL_MODE;
-                    } else {
-                        $fieldContext['mode'] = self::SHORT_MODE;
-                    }
-                }
-
-                if ($this->fieldHelper->isDateTimeField($field)) {
-                    $fieldContext['type'] = $field['type'];
-                }
-
                 $fieldValue = $this->serializer->normalize($fieldValue, $format, $fieldContext);
+            } elseif (isset($field['type']) && ExtendHelper::isMultiEnumType($field['type']) && is_array($fieldValue)) {
+                foreach ($fieldValue as &$item) {
+                    $item = $this->serializer->normalize($item, $format, $fieldContext);
+                }
             }
 
             $result[$fieldName] = $fieldValue;
@@ -240,9 +179,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
         return $isExcluded || $isNotIdentity;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supportsNormalization($data, string $format = null, array $context = []): bool
     {
         if (is_object($data)) {
@@ -254,9 +191,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setSerializer(SerializerInterface $serializer)
     {
         if (!$serializer instanceof ContextAwareNormalizerInterface ||
@@ -337,5 +272,154 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     protected function setObjectValue($object, $fieldName, $value)
     {
         $this->fieldHelper->setObjectValue($object, $fieldName, $value);
+    }
+
+    private function shouldSkipNormalization($entityName, $fieldName, $field, $context): bool
+    {
+        return $this->isFieldSkippedForNormalization($entityName, $fieldName, $context)
+            || $this->shouldSkipRelationField($entityName, $field);
+    }
+
+    private function shouldSkipDenormalization($data, $field, $event): bool
+    {
+        $fieldName = $field['name'];
+        return !array_key_exists($fieldName, $data)
+            || $event->isFieldSkipped($fieldName)
+            // if data for object value is empty array we should not create empty object
+            || ($this->fieldHelper->isSingleRelation($field) && [] === $data[$fieldName])
+            || (ExtendHelper::isSingleEnumType($field['type']) && [] === $data[$fieldName]);
+    }
+
+    private function shouldSkipRelationField($entityName, $field): bool
+    {
+        $isFullMode = $this->fieldHelper->getConfigValue($entityName, $field['name'], 'full');
+
+        // Do not export relation in short mode if it does not contain identity fields
+        return !$isFullMode
+            && isset($field['related_entity_name'])
+            && $this->fieldHelper->hasConfig($field['related_entity_name'])
+            && !$this->hasIdentityFields($field['related_entity_name']);
+    }
+
+    private function prepareFieldContextForNormalization($context, $fieldName, $entityName, $field): array
+    {
+        $fieldContext = $context;
+        $fieldContext['fieldName'] = $fieldName;
+        $fieldType = $field['type'] ?? '';
+
+        if ($this->fieldHelper->isRelation($field) || ExtendHelper::isEnumerableType($fieldType)) {
+            $fieldContext['mode'] = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'full')
+                ? self::FULL_MODE
+                : self::SHORT_MODE;
+        }
+
+        if ($this->fieldHelper->isDateTimeField($field)) {
+            $fieldContext['type'] = $fieldType;
+        }
+
+        return $fieldContext;
+    }
+
+    public function prepareFieldContextForDenormalization($context, $fieldName, $type, $field): array
+    {
+        $fieldContext = $context;
+        $fieldContext['originalFieldName'] = $fieldContext['fieldName'] ?? $fieldName;
+        $fieldContext['fieldName'] = $fieldName;
+        $fieldContext['className'] = $type;
+
+        if ($this->fieldHelper->isDateTimeField($field)) {
+            $fieldContext['type'] = $field['type'];
+        }
+
+        return $fieldContext;
+    }
+
+    private function processFieldValueForDenormalization($value, $field, $fieldContext, $format): mixed
+    {
+        if ($this->fieldHelper->isRelation($field)) {
+            return $this->processRelationField($value, $field, $fieldContext, $format);
+        }
+
+        if ($this->fieldHelper->isDateTimeField($field)) {
+            return $this->processDateTimeField($value, $format, $fieldContext);
+        }
+
+        if (ExtendHelper::isEnumerableType($field['type'] ?? '')) {
+            return $this->processEnumField($value, $field, $fieldContext);
+        }
+
+        return $value;
+    }
+
+    private function processRelationField($value, $field, $fieldContext, $format): mixed
+    {
+        $entityClass = $field['related_entity_name'];
+        if ($this->fieldHelper->isMultipleRelation($field)) {
+            $entityClass = 'ArrayCollection<' . $entityClass . '>';
+        } else {
+            if ([] === $value) {
+                return null;
+            }
+        }
+
+        return $this->serializer->denormalize($value, $entityClass, $format, $fieldContext);
+    }
+
+    private function processDateTimeField($value, $format, $fieldContext): mixed
+    {
+        return $this->serializer->denormalize($value, \DateTime::class, $format, $fieldContext);
+    }
+
+    private function processEnumField($value, array $field, array $fieldContext): mixed
+    {
+        $enumCode = $this->fieldHelper->getFieldConfig(
+            'enum',
+            $fieldContext['entityName'],
+            $field['name']
+        )->get('enum_code');
+        if (ExtendHelper::isSingleEnumType($field['type'])) {
+            $value = $this->mapEnumOption($enumCode, reset($value));
+        } elseif (ExtendHelper::isMultiEnumType($field['type'])) {
+            $value = array_map(fn ($item) =>  $this->mapEnumOption($enumCode, reset($item)), $value);
+        }
+
+        return $value;
+    }
+
+    private function mapEnumOption(string $enumCode, string $value): ?EnumOptionInterface
+    {
+        $enumOptions = $this->enumOptionsProvider->getEnumChoicesByCode($enumCode);
+        if (empty($enumOptions)) {
+            return null;
+        }
+        $optionClass = EnumOption::class;
+        if (isset($enumOptions[$value])) {
+            return $this->doctrineHelper->getEntityManager($optionClass)?->getReference(
+                $optionClass,
+                $enumOptions[$value]
+            );
+        }
+        $enumOptionIdByValue = ExtendHelper::buildEnumOptionId($enumCode, $value);
+        if (in_array($enumOptionIdByValue, $enumOptions, true)) {
+            return $this->doctrineHelper->getEntityManager($optionClass)?->getReference(
+                $optionClass,
+                $enumOptionIdByValue
+            );
+        }
+        try {
+            if (ExtendHelper::extractEnumCode($value) === $enumCode) {
+                return $this->doctrineHelper->getEntityManager($optionClass)?->getReference(
+                    $optionClass,
+                    $value
+                );
+            }
+        } catch (\LogicException $exception) {
+            // $value is not valid enum option id
+        }
+
+        return $this->doctrineHelper->getEntityManager($optionClass)?->getReference(
+            $optionClass,
+            ExtendHelper::buildEnumOptionId($enumCode, ExtendHelper::buildEnumInternalId($value))
+        );
     }
 }

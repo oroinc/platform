@@ -38,9 +38,7 @@ class DateFilterSubscriber implements EventSubscriberInterface
         $this->dateFilterModifier = $modifier;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

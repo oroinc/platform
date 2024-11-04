@@ -15,6 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DebugWorkflowDefinitionsCommandTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

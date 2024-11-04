@@ -22,81 +22,61 @@ class ArrayPager implements PagerInterface
      */
     protected $nbResults = 0;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setMaxPerPage($maxPerPage)
     {
         $this->maxPerPage = $maxPerPage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMaxPerPage()
     {
         return $this->maxPerPage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setPage($page)
     {
         $this->page = $page;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPage()
     {
         return $this->page;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPreviousPage()
     {
         return max($this->page - 1, $this->getFirstPage());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getNextPage()
     {
         return min($this->page + 1, $this->getLastPage());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLastPage()
     {
         return ceil($this->nbResults / $this->getMaxPerPage());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFirstPage()
     {
         return 1;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function haveToPaginate()
     {
         return $this->maxPerPage && $this->nbResults > $this->getMaxPerPage();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getNbResults()
     {
         return $this->nbResults;

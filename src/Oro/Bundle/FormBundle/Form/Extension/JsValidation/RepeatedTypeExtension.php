@@ -16,9 +16,7 @@ use Symfony\Component\Form\FormView;
  */
 class RepeatedTypeExtension extends AbstractTypeExtension
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $first = $view->children[$options['first_name']];
@@ -50,9 +48,7 @@ class RepeatedTypeExtension extends AbstractTypeExtension
         $second->vars['attr']['data-validation'] = json_encode($secondValue);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getExtendedTypes(): iterable
     {
         return [RepeatedType::class];

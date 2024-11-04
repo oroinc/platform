@@ -30,6 +30,7 @@ class DeletedAttributeRelationProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var DeletedAttributeRelationProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

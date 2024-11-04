@@ -55,9 +55,7 @@ class UpdateAclEntriesMigrationQuery extends ParametrizedSqlMigrationQuery
         $this->aclClassesTableName = $aclClassesTableName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $messages = parent::getDescription();
@@ -67,9 +65,7 @@ class UpdateAclEntriesMigrationQuery extends ParametrizedSqlMigrationQuery
         return $messages;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function processQueries(LoggerInterface $logger, $dryRun = false)
     {
         $rootClassId = $this->getRootClassId($logger);

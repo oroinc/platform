@@ -21,6 +21,7 @@ class MenuUpdateManagerTest extends WebTestCase
 
     private MenuUpdateManager $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());

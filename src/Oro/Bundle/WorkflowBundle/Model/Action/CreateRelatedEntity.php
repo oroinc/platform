@@ -38,9 +38,7 @@ class CreateRelatedEntity extends ComponentAbstractAction
         $this->registry = $registry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         if (!$context instanceof WorkflowItem) {
@@ -90,9 +88,7 @@ class CreateRelatedEntity extends ComponentAbstractAction
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (!empty($options[ComponentCreateObject::OPTION_KEY_DATA]) &&

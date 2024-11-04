@@ -33,6 +33,7 @@ class EmbeddedFormTypeProperty extends AbstractProperty
      *
      * @return mixed
      */
+    #[\Override]
     protected function getRawValue(ResultRecordInterface $record)
     {
         $label = (string) $this->manager->getLabelByType($record->getValue('formType'));

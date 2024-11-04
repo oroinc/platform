@@ -20,6 +20,7 @@ class ChainVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject */
     private $configProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $highPriorityProvider = $this->createMock(VirtualRelationProviderInterface::class);

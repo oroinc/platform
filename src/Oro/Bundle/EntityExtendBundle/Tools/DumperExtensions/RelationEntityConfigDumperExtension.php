@@ -28,17 +28,13 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
         $this->fieldTypeHelper = $fieldTypeHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($actionType)
     {
         return ExtendConfigDumper::ACTION_PRE_UPDATE === $actionType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function preUpdate()
     {
         $entityConfigs = $this->configManager->getConfigs('extend');
@@ -251,7 +247,7 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
         $relationKey = ExtendHelper::buildRelationKey(
             $fieldConfigId->getClassName(),
             $fieldConfigId->getFieldName(),
-            $this->fieldTypeHelper->getUnderlyingType($fieldConfigId->getFieldType()),
+            $this->fieldTypeHelper->getUnderlyingType($fieldConfigId->getFieldType(), $fieldConfig),
             $fieldConfig->get('target_entity')
         );
 
@@ -318,7 +314,7 @@ class RelationEntityConfigDumperExtension extends AbstractEntityConfigDumperExte
             'extend',
             $fieldConfigId->getClassName(),
             $fieldConfigId->getFieldName(),
-            $this->fieldTypeHelper->getUnderlyingType($fieldConfigId->getFieldType())
+            $this->fieldTypeHelper->getUnderlyingType($fieldConfigId->getFieldType(), $fieldConfig)
         );
     }
 

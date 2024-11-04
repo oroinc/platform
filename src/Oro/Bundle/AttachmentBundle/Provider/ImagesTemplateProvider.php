@@ -14,6 +14,7 @@ class ImagesTemplateProvider implements ImagesTemplateProviderInterface
         $this->imagesTemplate = $imagesTemplate;
     }
 
+    #[\Override]
     public function getTemplate(): string
     {
         return $this->imagesTemplate;

@@ -12,6 +12,7 @@ class ThemeListenerTest extends \PHPUnit\Framework\TestCase
 {
     private ThemeListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->listener = new ThemeListener('defaultTheme');

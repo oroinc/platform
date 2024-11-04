@@ -27,6 +27,7 @@ class EntityFieldNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityFieldNormalizer */
     private $normalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);

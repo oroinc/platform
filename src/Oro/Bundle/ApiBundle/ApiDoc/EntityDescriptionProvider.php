@@ -287,7 +287,7 @@ class EntityDescriptionProvider
             return $this->cache[$entityClass][self::MANAGEABLE];
         }
 
-        $result = $this->doctrineHelper->isManageableEntity($entityClass);
+        $result = $this->doctrineHelper->isManageableEntityClass($entityClass);
         $this->cache[$entityClass][self::MANAGEABLE] = $result;
 
         return $result;

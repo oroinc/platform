@@ -21,6 +21,7 @@ class NormalizeEntityClassTest extends BatchUpdateItemProcessorTestCase
     /** @var NormalizeEntityClass */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

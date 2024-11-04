@@ -24,9 +24,7 @@ class Configuration implements ConfigurationInterface
     const DISABLE_DEFAULT_SORTING_PATH      = '[sorters][disable_default_sorting]';
     const DISABLE_NOT_SELECTED_OPTION_PATH  = '[sorters][disable_not_selected_option]';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $builder = new TreeBuilder(static::SORTERS_KEY);

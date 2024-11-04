@@ -36,25 +36,18 @@ class WorkflowVariablesType extends AbstractType
         $this->managerRegistry = $managerRegistry;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $this->addVariables($builder, $options);
@@ -99,8 +92,8 @@ class WorkflowVariablesType extends AbstractType
      * Custom options:
      * - "workflow" - required, instance of Workflow
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefined(['workflow'])

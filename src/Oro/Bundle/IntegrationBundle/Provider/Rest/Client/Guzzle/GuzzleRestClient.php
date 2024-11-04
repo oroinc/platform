@@ -60,17 +60,13 @@ class GuzzleRestClient implements RestClientInterface
         return $this->guzzleClient;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function get($resource, array $params = [], array $headers = [], array $options = [])
     {
         return $this->performRequest('get', $resource, $params, null, $headers, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getJSON($resource, array $params = [], array $headers = [], array $options = [])
     {
         $response = $this->get($resource, $params, $headers, $options);
@@ -83,25 +79,19 @@ class GuzzleRestClient implements RestClientInterface
         return $response->json();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function post($resource, $data, array $headers = [], array $options = [])
     {
         return $this->performRequest('post', $resource, [], $data, $headers, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function put($resource, $data, array $headers = [], array $options = [])
     {
         return $this->performRequest('put', $resource, [], $data, $headers, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function delete($resource, array $headers = [], array $options = [])
     {
         return $this->performRequest('delete', $resource, [], null, $headers, $options);
@@ -176,9 +166,7 @@ class GuzzleRestClient implements RestClientInterface
         return $this->lastResponse;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLastResponse()
     {
         return $this->lastResponse;

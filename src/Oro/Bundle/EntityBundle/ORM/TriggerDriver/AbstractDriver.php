@@ -35,27 +35,21 @@ abstract class AbstractDriver implements DatabaseDriverInterface, EntityTriggerD
     {
         $this->doctrineHelper = $doctrineHelper;
     }
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function disable()
     {
         $this->init();
         $this->connection->executeStatement(sprintf($this->getSqlDisable(), $this->tableName));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function enable()
     {
         $this->init();
         $this->connection->executeStatement(sprintf($this->getSqlEnable(), $this->tableName));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setEntityClass($entityClass)
     {
         $this->entityClass = $entityClass;

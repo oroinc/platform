@@ -13,6 +13,7 @@ class ExtendClassMetadataFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendClassMetadataFactory */
     private $cmf;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

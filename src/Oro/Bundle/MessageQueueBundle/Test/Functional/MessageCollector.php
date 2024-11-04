@@ -21,11 +21,13 @@ class MessageCollector extends BaseMessageCollector
         $this->driverMessageCollector = $driverMessageCollector;
     }
 
+    #[\Override]
     public function getSentMessages(): array
     {
         return array_values($this->driverMessageCollector->getSentMessages());
     }
 
+    #[\Override]
     public function clearTopicMessages($topic): self
     {
         $this->driverMessageCollector->clearTopicMessages($topic);
@@ -33,6 +35,7 @@ class MessageCollector extends BaseMessageCollector
         return $this;
     }
 
+    #[\Override]
     public function clear(): self
     {
         $this->driverMessageCollector->clear();

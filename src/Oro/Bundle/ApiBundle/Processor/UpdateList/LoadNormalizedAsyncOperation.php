@@ -22,9 +22,7 @@ class LoadNormalizedAsyncOperation implements ProcessorInterface
         $this->processorBag = $processorBag;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var UpdateListContext $context */

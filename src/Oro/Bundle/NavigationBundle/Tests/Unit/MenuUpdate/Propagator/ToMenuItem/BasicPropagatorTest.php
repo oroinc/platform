@@ -18,6 +18,7 @@ class BasicPropagatorTest extends \PHPUnit\Framework\TestCase
 
     private BasicPropagator $propagator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $localizationHelper = $this->createMock(LocalizationHelper::class);

@@ -34,9 +34,7 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVariableDefinitions(): array
     {
         $result = [];
@@ -52,9 +50,7 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVariableGetters(): array
     {
         $result = [];
@@ -70,9 +66,7 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVariableProcessors(string $entityClass): array
     {
         return [];

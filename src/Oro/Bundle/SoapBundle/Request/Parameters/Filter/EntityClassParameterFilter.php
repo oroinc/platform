@@ -14,9 +14,7 @@ class EntityClassParameterFilter implements ParameterFilterInterface
         $this->helper = $helper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function filter($rawValue, $operator)
     {
         if (is_array($rawValue)) {

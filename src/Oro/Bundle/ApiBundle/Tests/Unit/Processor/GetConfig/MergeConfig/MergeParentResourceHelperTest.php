@@ -28,6 +28,7 @@ class MergeParentResourceHelperTest extends \PHPUnit\Framework\TestCase
     /** @var MergeParentResourceHelper */
     private $mergeParentResourceHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);

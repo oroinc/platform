@@ -16,6 +16,7 @@ class UniqueJobsProcessedExtensionTest extends \PHPUnit\Framework\TestCase
 
     private Context $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->jobManager = $this->createMock(JobManager::class);

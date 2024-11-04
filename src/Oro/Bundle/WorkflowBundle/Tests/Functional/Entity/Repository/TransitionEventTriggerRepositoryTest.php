@@ -9,6 +9,7 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadTransitionTrigge
 
 class TransitionEventTriggerRepositoryTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

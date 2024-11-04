@@ -34,6 +34,7 @@ class EmailModelFromEmailTemplateFactoryTest extends TestCase
 
     private From $from;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->emailTemplateContextProvider = $this->createMock(EmailTemplateContextProvider::class);

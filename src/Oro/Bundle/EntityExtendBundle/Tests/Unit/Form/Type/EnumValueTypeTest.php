@@ -28,15 +28,14 @@ class EnumValueTypeTest extends FormIntegrationTestCase
     /** @var EnumValueType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new EnumValueType($this->getConfigProvider());
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $validator = new RecursiveValidator(
@@ -327,7 +326,11 @@ class EnumValueTypeTest extends FormIntegrationTestCase
                     ['enum_code', false, null, $enumCode],
                     ['immutable_codes', false, [], $immutableCodes],
                 ]);
-
+            $config->expects($this->any())
+                ->method('has')
+                ->willReturnMap([
+                    ['immutable_codes', true],
+                ]);
             $configProvider->expects($this->any())
                 ->method('getConfigById')
                 ->willReturn($config);

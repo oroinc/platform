@@ -45,6 +45,7 @@ class AttachmentApiEntityManager extends ApiEntityManager
      *
      * @throws AccessDeniedException
      */
+    #[\Override]
     protected function checkFoundEntity($entity)
     {
         parent::checkFoundEntity($entity);
@@ -55,9 +56,7 @@ class AttachmentApiEntityManager extends ApiEntityManager
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getSerializationConfig()
     {
         $config = [

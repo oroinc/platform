@@ -45,25 +45,18 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
         $this->searchRegistry = $searchRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_entity_create_or_select_inline';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return OroJquerySelect2HiddenType::class;
@@ -81,8 +74,8 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
      * - create_form_route - route name for creation form
      * - create_form_route_parameters - route parameters for create_form_route_parameters
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -225,9 +218,7 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['grid_widget_route'] = $options['grid_widget_route'];

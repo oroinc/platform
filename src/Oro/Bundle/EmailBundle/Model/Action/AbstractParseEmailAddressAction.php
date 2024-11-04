@@ -25,10 +25,10 @@ abstract class AbstractParseEmailAddressAction extends AbstractAction
     }
 
     /**
-     * {@inheritdoc}
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
+    #[\Override]
     public function initialize(array $options)
     {
         if (!isset($options['attribute']) && !isset($options[0])) {

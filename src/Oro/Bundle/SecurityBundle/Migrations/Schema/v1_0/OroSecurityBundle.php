@@ -12,9 +12,7 @@ class OroSecurityBundle implements Migration, ContainerAwareInterface
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         //create symfony acl tables

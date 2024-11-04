@@ -30,6 +30,7 @@ class DeletedAttributeProvider implements DeletedAttributeProviderInterface
      * @param array $ids
      * @return FieldConfigModel[]
      */
+    #[\Override]
     public function getAttributesByIds(array $ids)
     {
         if (!$this->configModelManager->checkDatabase()) {
@@ -41,6 +42,7 @@ class DeletedAttributeProvider implements DeletedAttributeProviderInterface
         return $repository->getAttributesByIds($ids);
     }
 
+    #[\Override]
     public function removeAttributeValues(AttributeFamily $attributeFamily, array $names)
     {
         if (!$names) {

@@ -41,9 +41,7 @@ class DeletedAttributeRelationProcessor implements MessageProcessorInterface
         $this->deletedAttributeProvider = $deletedAttributeProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $messageBody = $message->getBody();

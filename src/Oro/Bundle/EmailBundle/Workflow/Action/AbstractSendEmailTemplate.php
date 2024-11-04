@@ -12,9 +12,7 @@ abstract class AbstractSendEmailTemplate extends AbstractSendEmail
 {
     protected array $options = [];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options): self
     {
         $this->assertFrom($options);
@@ -39,6 +37,7 @@ abstract class AbstractSendEmailTemplate extends AbstractSendEmail
         return $this;
     }
 
+    #[\Override]
     protected function getRecipients(object|array $context, array $options): array
     {
         $recipients = parent::getRecipients($context, $options);

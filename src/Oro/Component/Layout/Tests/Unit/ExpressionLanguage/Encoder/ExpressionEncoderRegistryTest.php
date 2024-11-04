@@ -13,6 +13,7 @@ class ExpressionEncoderRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var ExpressionEncoderRegistry */
     private $encoderRegistry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->encoder = $this->createMock(ExpressionEncoderInterface::class);

@@ -13,16 +13,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class SampleNormalizableBodyTopic extends AbstractTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.message_queue.test.normalizable_body';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Test topic with body that is normalized by option resolver.';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver

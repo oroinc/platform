@@ -18,6 +18,7 @@ class AbstractDataFixturesListenerTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractDataFixturesListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->listenerManager = $this->createMock(OptionalListenerManager::class);

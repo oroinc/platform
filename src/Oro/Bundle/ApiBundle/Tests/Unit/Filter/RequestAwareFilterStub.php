@@ -16,9 +16,7 @@ class RequestAwareFilterStub extends ComparisonFilter implements RequestAwareFil
         return $this->requestType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setRequestType(RequestType $requestType): void
     {
         $this->requestType = $requestType;

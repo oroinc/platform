@@ -28,9 +28,7 @@ class FormTemplateDataProviderComposite implements FormTemplateDataProviderInter
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getData($entity, FormInterface $form, Request $request)
     {
         $data = [[]];

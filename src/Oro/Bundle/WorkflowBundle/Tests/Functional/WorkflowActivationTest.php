@@ -14,6 +14,7 @@ class WorkflowActivationTest extends WebTestCase
     /** @var WorkflowManager */
     private $workflowManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());

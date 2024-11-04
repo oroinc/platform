@@ -19,6 +19,7 @@ class CommentDocumentationTest extends RestJsonApiTestCase
 
     private static bool $isDocumentationCacheWarmedUp = false;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

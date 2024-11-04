@@ -28,9 +28,6 @@ class OroSelenium2Driver extends Selenium2Driver
      */
     private $xpathEscaper;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct($browserName, $desiredCapabilities, $wdHost)
     {
         $this->xpathManipulator = new Manipulator();
@@ -40,9 +37,9 @@ class OroSelenium2Driver extends Selenium2Driver
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function setValue($xpath, $value)
     {
         $element = $this->findElement($xpath);
@@ -97,6 +94,7 @@ class OroSelenium2Driver extends Selenium2Driver
      * @throws \Behat\Mink\Exception\DriverException
      * @throws \Behat\Mink\Exception\UnsupportedDriverActionException
      */
+    #[\Override]
     public function getValue($xpath)
     {
         $element = $this->findElement($xpath);
@@ -321,9 +319,7 @@ JS;
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function wait($timeout, $condition)
     {
         $script = "return $condition;";
@@ -339,9 +335,7 @@ JS;
         return (bool) $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function doubleClick($xpath)
     {
         // Original method doesn't work properly with chromedriver,
@@ -351,9 +345,7 @@ JS;
         $this->withSyn()->executeJsOnXpath($xpath, $script);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function keyDown($xpath, $char, $modifier = null)
     {
         $charToKeyMap = [
@@ -399,17 +391,12 @@ JS;
         return $this->getWebDriverSession()->element('xpath', $xpath);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function executeJsOnXpath($xpath, $script, $sync = true)
     {
         return $this->executeJsOnElement($this->findElement($xpath), $script, $sync);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function executeJsOnElement(Element $element, $script, $sync = true)
     {
         $script = str_replace('{{ELEMENT}}', 'arguments[0]', $script);

@@ -12,6 +12,7 @@ class RedeliveryMessageExtensionTest extends WebTestCase
 {
     use MessageQueueExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -19,6 +20,7 @@ class RedeliveryMessageExtensionTest extends WebTestCase
         self::purgeMessageQueue();
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         self::purgeMessageQueue();

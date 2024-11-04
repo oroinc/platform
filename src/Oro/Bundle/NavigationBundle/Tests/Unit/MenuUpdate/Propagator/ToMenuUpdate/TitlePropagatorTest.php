@@ -21,6 +21,7 @@ class TitlePropagatorTest extends \PHPUnit\Framework\TestCase
 
     private TitlePropagator $propagator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->menuUpdateHelper = $this->createMock(MenuUpdateHelper::class);

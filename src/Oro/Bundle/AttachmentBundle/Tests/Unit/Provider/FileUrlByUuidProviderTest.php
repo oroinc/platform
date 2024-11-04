@@ -19,6 +19,7 @@ class FileUrlByUuidProviderTest extends \PHPUnit\Framework\TestCase
 
     private FileUrlByUuidProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);

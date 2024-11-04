@@ -18,14 +18,13 @@ class UpdateAclAdministratorRole extends AbstractFixture implements DependentFix
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [LoadRolesData::class];
     }
 
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         /** @var AclManager $aclManager */

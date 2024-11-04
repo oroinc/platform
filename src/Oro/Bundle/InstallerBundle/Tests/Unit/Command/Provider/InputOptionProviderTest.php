@@ -22,6 +22,7 @@ class InputOptionProviderTest extends \PHPUnit\Framework\TestCase
     private OutputInterface|MockObject $output;
     private InputOptionProvider $inputOptionProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->questionHelper = $this->createMock(QuestionHelper::class);

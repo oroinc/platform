@@ -57,6 +57,12 @@ services:
             - '@oro_config.manager'
             - '@doctrine'
 
+    oro_theme.provider.theme_configuration_type:
+        class: Oro\Bundle\ThemeBundle\Provider\ThemeConfigurationTypeProvider
+        public: true
+        arguments:
+            - !tagged_iterator oro_theme.theme_configuration_type_provider
+
     # Voter
     oro_theme.acl.voter.theme_configuration_delete:
         class: Oro\Bundle\ThemeBundle\Acl\Voter\ThemeConfigurationDeleteVoter

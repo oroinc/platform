@@ -22,9 +22,7 @@ class UserAgentProvider implements UserAgentProviderInterface
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getUserAgent()
     {
         $userAgentName = self::UNKNOWN_USER_AGENT;

@@ -45,6 +45,7 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
     /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject */
     protected $datagridParameters;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->filterBag = new FilterBagStub();
@@ -151,7 +152,7 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
     {
         $this->filtersStateProvider
             ->expects(self::once())
-            ->method('getState')
+            ->method('getStateFromParameters')
             ->with(self::isInstanceOf(DatagridConfiguration::class), $this->datagridParameters)
             ->willReturn($filtersState);
 

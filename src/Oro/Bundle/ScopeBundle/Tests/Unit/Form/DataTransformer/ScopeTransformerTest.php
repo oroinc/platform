@@ -19,6 +19,7 @@ class ScopeTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var ScopeTransformer */
     private $transformer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->scopeManager = $this->createMock(ScopeManager::class);

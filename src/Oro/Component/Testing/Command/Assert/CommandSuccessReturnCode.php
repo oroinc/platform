@@ -9,18 +9,14 @@ use PHPUnit\Framework\Constraint\Constraint;
  */
 class CommandSuccessReturnCode extends Constraint
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function matches($other): bool
     {
         /** @var \Symfony\Component\Console\Tester\CommandTester $other */
         return 0 === $other->getStatusCode();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function failureDescription($other): string
     {
         /** @var \Symfony\Component\Console\Tester\CommandTester $other */
@@ -30,9 +26,7 @@ class CommandSuccessReturnCode extends Constraint
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function toString(): string
     {
         return 'command returned success return code';

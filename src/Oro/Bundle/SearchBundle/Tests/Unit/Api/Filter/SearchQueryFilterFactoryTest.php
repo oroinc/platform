@@ -19,6 +19,7 @@ class SearchQueryFilterFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject|ExpressionVisitor */
     private $searchQueryCriteriaVisitor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->searchMappingProvider = $this->createMock(AbstractSearchMappingProvider::class);

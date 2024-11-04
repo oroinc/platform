@@ -28,6 +28,7 @@ class ControllerListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ControllerListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->classAuthorizationChecker = $this->createMock(ClassAuthorizationChecker::class);

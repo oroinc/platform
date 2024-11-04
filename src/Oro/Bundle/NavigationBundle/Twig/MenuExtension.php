@@ -63,9 +63,7 @@ class MenuExtension extends AbstractExtension implements ServiceSubscriberInterf
         return $this->container->get(ConfigurationProvider::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -204,9 +202,7 @@ class MenuExtension extends AbstractExtension implements ServiceSubscriberInterf
         return $menu;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

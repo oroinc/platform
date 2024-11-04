@@ -12,6 +12,7 @@ class CountryTypeTest extends FormIntegrationTestCase
     /** @var CountryType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -20,6 +20,7 @@ class EmailTemplateRepositoryTest extends WebTestCase
     private const SYSTEM_TEMPLATE_EMAIL_WITH_ENTITY = 'user_reset_password';
     private const USER_ENTITY_TEMPLATE_NAME = 'user_reset_password';
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

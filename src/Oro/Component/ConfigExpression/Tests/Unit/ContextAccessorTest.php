@@ -14,6 +14,7 @@ class ContextAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var ContextAccessor */
     private $contextAccessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->contextAccessor = new ContextAccessor();

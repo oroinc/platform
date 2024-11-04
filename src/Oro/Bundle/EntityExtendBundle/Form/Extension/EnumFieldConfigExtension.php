@@ -16,17 +16,13 @@ class EnumFieldConfigExtension extends AbstractTypeExtension
         $this->eventSubscriber = $eventSubscriber;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber($this->eventSubscriber);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getExtendedTypes(): iterable
     {
         return [ConfigType::class];

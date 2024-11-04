@@ -20,10 +20,10 @@ class MessageBodyResolver implements MessageBodyResolverInterface
     }
 
     /**
-     * {@inheritdoc}
      *
      * @throws InvalidMessageBodyException
      */
+    #[\Override]
     public function resolveBody(string $topicName, array|string|float|int|bool|null $body): array|string
     {
         $optionsResolver = new OptionsResolver();

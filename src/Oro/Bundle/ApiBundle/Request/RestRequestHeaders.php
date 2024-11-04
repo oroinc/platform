@@ -26,9 +26,7 @@ class RestRequestHeaders extends AbstractParameterBag
         $this->request = $request;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function has(string $key): bool
     {
         if (null === $this->parameters) {
@@ -40,9 +38,7 @@ class RestRequestHeaders extends AbstractParameterBag
         return isset($this->parameters[$key]) && false !== $this->parameters[$key];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function get(string $key): mixed
     {
         if (null === $this->parameters) {
@@ -63,9 +59,7 @@ class RestRequestHeaders extends AbstractParameterBag
             : $val['v'];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function set(string $key, mixed $value): void
     {
         $this->ensureInternalStorageInitialized();
@@ -73,9 +67,7 @@ class RestRequestHeaders extends AbstractParameterBag
         $this->parameters[$this->normalizeKey($key)] = ['v' => $value];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function remove(string $key): void
     {
         $this->ensureInternalStorageInitialized();
@@ -83,9 +75,7 @@ class RestRequestHeaders extends AbstractParameterBag
         $this->parameters[$this->normalizeKey($key)] = false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function toArray(): array
     {
         $result = [];
@@ -105,9 +95,7 @@ class RestRequestHeaders extends AbstractParameterBag
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function clear(): void
     {
         $this->ensureInternalStorageInitialized();
@@ -118,9 +106,7 @@ class RestRequestHeaders extends AbstractParameterBag
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function count(): int
     {
         if (null === $this->parameters) {

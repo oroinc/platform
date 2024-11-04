@@ -28,6 +28,7 @@ class AjaxControllerTest extends WebTestCase
     /** @var PhpArrayConfigCacheModifier */
     private $configModifier;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
@@ -40,6 +41,7 @@ class AjaxControllerTest extends WebTestCase
             ->setMessage(self::MESSAGE_DEFAULT);
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $this->configModifier->resetCache();

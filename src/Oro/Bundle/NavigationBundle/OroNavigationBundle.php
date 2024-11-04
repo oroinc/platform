@@ -12,9 +12,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class OroNavigationBundle extends Bundle
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);

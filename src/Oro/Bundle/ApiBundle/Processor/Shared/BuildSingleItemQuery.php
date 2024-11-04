@@ -22,9 +22,7 @@ class BuildSingleItemQuery implements ProcessorInterface
         $this->entityIdHelper = $entityIdHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var SingleItemContext $context */

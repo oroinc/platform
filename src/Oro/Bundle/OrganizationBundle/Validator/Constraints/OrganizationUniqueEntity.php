@@ -14,9 +14,6 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[Attribute(Attribute::TARGET_CLASS)]
 class OrganizationUniqueEntity extends UniqueEntity
 {
-    /**
-     * {@inheritdoc}
-     */
     public function __construct($options = null)
     {
         $this->service = 'organization_unique';

@@ -13,6 +13,7 @@ class IifTest extends \PHPUnit\Framework\TestCase
     /** @var Func\Iif */
     protected $function;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->function = new Func\Iif();

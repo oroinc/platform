@@ -31,6 +31,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
     /** @var EntityDescriptionProvider */
     private $entityDescriptionProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

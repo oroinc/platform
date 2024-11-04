@@ -28,9 +28,7 @@ class DatagridColumnsFromContextProvider implements DatagridColumnsFromContextPr
         $this->columnsStateProvider = $columnsStateProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getColumnsFromContext(ContextInterface $context): array
     {
         if (!$context->hasOption('gridName')) {

@@ -22,6 +22,7 @@ class ConnectorRegistryTest extends \PHPUnit\Framework\TestCase
 
     private ConnectorRegistry $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->jobFactory = $this->createMock(JobFactory::class);

@@ -54,9 +54,7 @@ class IndexEntitiesByTypeMessageProcessor implements MessageProcessorInterface, 
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $payload = $message->getBody();
@@ -99,9 +97,7 @@ class IndexEntitiesByTypeMessageProcessor implements MessageProcessorInterface, 
         return $result ? self::ACK : self::REJECT;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [IndexEntitiesByTypeTopic::getName()];

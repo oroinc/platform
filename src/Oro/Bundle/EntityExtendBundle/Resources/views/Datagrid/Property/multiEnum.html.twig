@@ -1,7 +1,10 @@
 {% if value is not empty %}
-<ul class="list-unstyled options">
-    {% for id in value|sort_enum(entity_class) %}
-    <li>{{ id|trans_enum(entity_class) }}</li>
-    {% endfor %}
-</ul>
+    {% set sortedValues = value|sort_enum %}
+    {% if sortedValues is not empty %}
+        <ul class="list-unstyled options">
+            {% for id in sortedValues %}
+                <li>{{ id|trans_enum }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 {% endif %}

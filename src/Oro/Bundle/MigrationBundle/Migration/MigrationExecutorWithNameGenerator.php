@@ -23,9 +23,7 @@ class MigrationExecutorWithNameGenerator extends MigrationExecutor
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setExtensionManager(MigrationExtensionManager $extensionManager): void
     {
         parent::setExtensionManager($extensionManager);
@@ -34,9 +32,7 @@ class MigrationExecutorWithNameGenerator extends MigrationExecutor
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createSchemaObject(
         array $tables = [],
         array $sequences = [],
@@ -54,9 +50,7 @@ class MigrationExecutorWithNameGenerator extends MigrationExecutor
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function checkTableName(string $tableName, Migration $migration): void
     {
         parent::checkTableName($tableName, $migration);
@@ -72,9 +66,7 @@ class MigrationExecutorWithNameGenerator extends MigrationExecutor
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function checkColumnName(string $tableName, string $columnName, Migration $migration): void
     {
         parent::checkColumnName($tableName, $columnName, $migration);

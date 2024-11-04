@@ -12,9 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class ConsoleCommandListenerPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $container->getDefinition('oro_featuretoggle.event_listener.console_command')

@@ -14,6 +14,7 @@ class ApplicationContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     /** @var ApplicationContextConfigurator */
     private $contextConfigurator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->kernel = $this->createMock(KernelInterface::class);

@@ -17,6 +17,7 @@ class MultiCurrencyGuesserTest extends \PHPUnit\Framework\TestCase
     /** @var CurrencyToString */
     private $currencyToStringConverter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->currencyHelper = $this->createMock(CurrencyNameHelper::class);

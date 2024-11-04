@@ -13,6 +13,7 @@ class EmailTemplateChainLoaderTest extends TestCase
 {
     private ChainLoader $chainLoader;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->chainLoader = new ChainLoader();

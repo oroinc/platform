@@ -10,6 +10,7 @@ class DurationToStringTransformerTest extends \PHPUnit\Framework\TestCase
 {
     private DurationToStringTransformer $transformer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->transformer = new DurationToStringTransformer();

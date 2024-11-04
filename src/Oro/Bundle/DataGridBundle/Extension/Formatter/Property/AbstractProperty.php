@@ -29,9 +29,7 @@ abstract class AbstractProperty implements PropertyInterface
     /** @var array */
     protected $excludeParams = [];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     final public function init(PropertyConfiguration $params)
     {
         $this->params = $params;
@@ -54,9 +52,7 @@ abstract class AbstractProperty implements PropertyInterface
      */
     abstract protected function getRawValue(ResultRecordInterface $record);
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getValue(ResultRecordInterface $record)
     {
         return $this->format($this->getRawValue($record));
@@ -138,9 +134,7 @@ abstract class AbstractProperty implements PropertyInterface
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMetadata()
     {
         $defaultMetadata = [

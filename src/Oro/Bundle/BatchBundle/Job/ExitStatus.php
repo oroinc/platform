@@ -178,6 +178,7 @@ class ExitStatus
     /**
      * Return the string representation of the current status
      */
+    #[\Override]
     public function __toString(): string
     {
         return sprintf('[%s] %s', $this->exitCode, $this->exitDescription);

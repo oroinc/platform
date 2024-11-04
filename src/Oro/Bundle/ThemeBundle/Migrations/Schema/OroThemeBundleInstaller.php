@@ -12,17 +12,13 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  */
 class OroThemeBundleInstaller implements Installation
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMigrationVersion(): string
     {
-        return 'v1_0';
+        return 'v1_1';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $this->createOroThemeConfigurationTable($schema);
@@ -38,19 +34,11 @@ class OroThemeBundleInstaller implements Installation
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('business_unit_owner_id', 'integer', ['notnull' => false]);
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
-        $table->addColumn(
-            'type',
-            'string',
-            ['default' => 'Storefront', 'length' => 255]
-        );
+        $table->addColumn('type', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->addColumn('description', 'text', ['notnull' => false]);
         $table->addColumn('theme', 'string', ['length' => 255]);
-        $table->addColumn(
-            'configuration',
-            'array',
-            ['notnull' => false, 'comment' => '(DC2Type:array)']
-        );
+        $table->addColumn('configuration', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
         $table->addColumn('created_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('updated_at', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addIndex(['organization_id'], 'idx_3ca89d3632c8a3de', []);

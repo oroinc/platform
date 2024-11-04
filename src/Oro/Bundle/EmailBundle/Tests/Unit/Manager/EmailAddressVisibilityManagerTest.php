@@ -41,6 +41,7 @@ class EmailAddressVisibilityManagerTest extends \PHPUnit\Framework\TestCase
     /** @var EmailAddressVisibilityManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);

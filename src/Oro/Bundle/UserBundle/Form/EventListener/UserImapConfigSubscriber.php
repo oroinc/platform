@@ -36,9 +36,7 @@ class UserImapConfigSubscriber implements EventSubscriberInterface
         $this->tokenAccessor = $tokenAccessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

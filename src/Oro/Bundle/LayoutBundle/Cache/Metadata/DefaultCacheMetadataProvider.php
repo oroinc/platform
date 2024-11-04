@@ -11,9 +11,7 @@ use Oro\Component\Layout\ContextInterface;
  */
 class DefaultCacheMetadataProvider implements CacheMetadataProviderInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getCacheMetadata(BlockView $blockView, ContextInterface $context): ?LayoutCacheMetadata
     {
         $metadata = $blockView->vars['cache'];

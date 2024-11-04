@@ -14,9 +14,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class EmailFoldersValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof EmailFolders) {

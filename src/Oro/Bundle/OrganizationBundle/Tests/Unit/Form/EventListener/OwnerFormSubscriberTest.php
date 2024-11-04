@@ -31,6 +31,7 @@ class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var OwnerFormSubscriber */
     private $subscriber;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

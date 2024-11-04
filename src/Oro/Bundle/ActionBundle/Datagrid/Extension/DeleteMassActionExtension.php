@@ -36,9 +36,7 @@ class DeleteMassActionExtension extends BaseDeleteMassActionExtension
         $this->contextHelper = $contextHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isDeleteActionExists(DatagridConfiguration $config, $key)
     {
         if ($key !== static::ACTION_KEY) {

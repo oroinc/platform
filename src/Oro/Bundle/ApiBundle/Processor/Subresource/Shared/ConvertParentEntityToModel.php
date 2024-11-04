@@ -11,9 +11,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class ConvertParentEntityToModel implements ProcessorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ChangeRelationshipContext $context */

@@ -60,6 +60,7 @@ class CacheLayoutBuilder extends LayoutBuilder
         $this->eventDispatcher = $eventDispatcher;
     }
 
+    #[\Override]
     public function getLayout(ContextInterface $context, $rootId = null): Layout
     {
         $layout = parent::getLayout($context, $rootId);
@@ -69,9 +70,7 @@ class CacheLayoutBuilder extends LayoutBuilder
         return $layout;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function processBlockViewData(
         BlockView $blockView,
         ContextInterface $context,
@@ -136,6 +135,7 @@ class CacheLayoutBuilder extends LayoutBuilder
         return $cached;
     }
 
+    #[\Override]
     protected function buildValueBags(BlockView $view)
     {
         array_walk_recursive(

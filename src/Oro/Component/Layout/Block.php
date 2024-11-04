@@ -45,17 +45,13 @@ final class Block implements BlockInterface
         $this->parent = false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTypeName()
     {
         $blockType = $this->rawLayout->getProperty($this->id, RawLayout::BLOCK_TYPE, true);
@@ -65,17 +61,13 @@ final class Block implements BlockInterface
             : $blockType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAliases()
     {
         return $this->rawLayout->getAliases($this->id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent()
     {
         if ($this->parent === false) {
@@ -91,33 +83,25 @@ final class Block implements BlockInterface
         return $this->parent;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOptions()
     {
         return $this->rawLayout->getProperty($this->id, RawLayout::RESOLVED_OPTIONS, true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTypeHelper()
     {
         return $this->typeHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getContext()
     {
         return $this->context;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getData()
     {
         return $this->data;

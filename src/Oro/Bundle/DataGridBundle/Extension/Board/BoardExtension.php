@@ -56,7 +56,6 @@ class BoardExtension extends AbstractExtension
     /** @var EntityClassResolver */
     protected $entityClassResolver;
 
-    /** {@inheritdoc} */
     protected $excludedModes = [
         DatagridModeProvider::DATAGRID_IMPORTEXPORT_MODE
     ];
@@ -87,9 +86,7 @@ class BoardExtension extends AbstractExtension
         $this->entityClassResolver = $entityClassResolver;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         if (!parent::isApplicable($config)) {
@@ -112,9 +109,7 @@ class BoardExtension extends AbstractExtension
         return !empty($this->boards);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
         $boardOptions = [];
@@ -149,9 +144,7 @@ class BoardExtension extends AbstractExtension
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
         if ($this->isBoardEnabled()) {
@@ -180,9 +173,7 @@ class BoardExtension extends AbstractExtension
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getPriority()
     {
         // Should be processed after pager and sorting

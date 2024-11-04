@@ -13,6 +13,7 @@ class TransitionEventTriggerExpressionVerifierTest extends \PHPUnit\Framework\Te
     /** @var TransitionEventTriggerExpressionVerifier */
     private $verifier;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->verifier = new TransitionEventTriggerExpressionVerifier();

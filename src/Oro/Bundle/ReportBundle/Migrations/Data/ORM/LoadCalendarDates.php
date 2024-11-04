@@ -14,9 +14,7 @@ class LoadCalendarDates extends AbstractFixture implements ContainerAwareInterfa
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $calendarDateManager = $this->container->get('oro_report.calendar_date_manager');

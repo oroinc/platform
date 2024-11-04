@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * The helper class to complete the configuration of API resource based on not ORM entity.
@@ -28,6 +29,7 @@ class CompleteObjectDefinitionHelper
         } else {
             $this->completeObjectAssociations($definition, $context->getVersion(), $context->getRequestType());
         }
+        $this->completeEnumOptionHint($context->getClassName(), $definition);
     }
 
     private function removeObjectNonIdentifierFields(EntityDefinitionConfig $definition): void
@@ -70,6 +72,23 @@ class CompleteObjectDefinitionHelper
             $targetClass = $field->getTargetClass();
             if ($targetClass) {
                 $this->associationHelper->completeAssociation($field, $targetClass, $version, $requestType);
+            }
+        }
+    }
+
+    private function completeEnumOptionHint(string $entityClass, EntityDefinitionConfig $definition): void
+    {
+        if (ExtendHelper::isOutdatedEnumOptionEntity($entityClass)) {
+            $hasTranslatableHint = false;
+            $hints = $definition->getHints();
+            foreach ($hints as $hint) {
+                if (\is_array($hint) && 'HINT_ENUM_OPTION' === $hint['name']) {
+                    $hasTranslatableHint = true;
+                    break;
+                }
+            }
+            if (!$hasTranslatableHint) {
+                $definition->addHint('HINT_ENUM_OPTION', ExtendHelper::getEnumCode($entityClass));
             }
         }
     }

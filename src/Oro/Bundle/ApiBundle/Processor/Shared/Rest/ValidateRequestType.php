@@ -14,9 +14,7 @@ use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
  */
 class ValidateRequestType implements ProcessorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

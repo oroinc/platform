@@ -9,9 +9,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class OroEntityExtendExtension extends Extension
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(array $configs, ContainerBuilder $container): void
     {
         $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
@@ -22,6 +20,7 @@ class OroEntityExtendExtension extends Extension
         $loader->load('form_type.yml');
         $loader->load('commands.yml');
         $loader->load('controllers.yml');
+        $loader->load('mq_topics.yml');
 
         if ('test' === $container->getParameter('kernel.environment')) {
             $loader->load('services_test.yml');

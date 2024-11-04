@@ -19,9 +19,7 @@ class UpdateEmbeddedFormsTypes extends AbstractFixture implements
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getPreviousClassNames(): array
     {
         return [
@@ -29,9 +27,7 @@ class UpdateEmbeddedFormsTypes extends AbstractFixture implements
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $this->updateFormType(

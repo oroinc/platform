@@ -10,6 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class FullApplicationSanitizeSqlDumpTest extends WebTestCase
 {
+    #[\Override]
     protected function setup(): void
     {
         $this->initClient();

@@ -39,9 +39,7 @@ class RedeliveryMessageExtension extends AbstractExtension
         $this->delay = $delay;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPreReceived(Context $context)
     {
         $message = $context->getMessage();

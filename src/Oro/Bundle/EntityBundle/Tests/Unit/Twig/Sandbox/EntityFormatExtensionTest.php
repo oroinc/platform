@@ -31,6 +31,7 @@ class EntityFormatExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var EntityFormatExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->environment = $this->createMock(Environment::class);

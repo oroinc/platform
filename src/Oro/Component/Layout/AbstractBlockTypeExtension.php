@@ -7,30 +7,22 @@ use Oro\Component\Layout\Block\Type\Options;
 
 abstract class AbstractBlockTypeExtension implements BlockTypeExtensionInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildBlock(BlockBuilderInterface $builder, Options $options)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(BlockView $view, BlockInterface $block)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
     }

@@ -16,6 +16,7 @@ class AsyncOperationErrorsTest extends RestJsonApiTestCase
 {
     use RolePermissionExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -101,10 +102,10 @@ class AsyncOperationErrorsTest extends RestJsonApiTestCase
         );
         $url = sprintf('{baseUrl}/asyncoperations/%d/errors', $operationId);
         $expectedContent = $this->updateIds('get_async_operation_errors_first_page.yml', $operationId);
-        $expectedContent['links'] = $this->getExpectedContentWithPaginationLinks([
+        $expectedContent['links'] = [
             'self' => $url,
             'next' => $url . '?page%5Bnumber%5D=2&page%5Bsize%5D=2',
-        ]);
+        ];
         $this->assertResponseContains($expectedContent, $response);
     }
 
@@ -118,12 +119,12 @@ class AsyncOperationErrorsTest extends RestJsonApiTestCase
         );
         $url = sprintf('{baseUrl}/asyncoperations/%d/errors', $operationId);
         $expectedContent = $this->updateIds('get_async_operation_errors_second_page.yml', $operationId);
-        $expectedContent['links'] = $this->getExpectedContentWithPaginationLinks([
+        $expectedContent['links'] = [
             'self'  => $url,
             'first' => $url . '?page%5Bsize%5D=2',
             'prev'  => $url . '?page%5Bsize%5D=2',
             'next'  => $url . '?page%5Bnumber%5D=3&page%5Bsize%5D=2',
-        ]);
+        ];
         $this->assertResponseContains($expectedContent, $response);
     }
 
@@ -137,11 +138,11 @@ class AsyncOperationErrorsTest extends RestJsonApiTestCase
         );
         $url = sprintf('{baseUrl}/asyncoperations/%d/errors', $operationId);
         $expectedContent = $this->updateIds('get_async_operation_errors_last_page.yml', $operationId);
-        $expectedContent['links'] = $this->getExpectedContentWithPaginationLinks([
+        $expectedContent['links'] = [
             'self'  => $url,
             'first' => $url . '?page%5Bsize%5D=2',
             'prev'  => $url . '?page%5Bnumber%5D=3&page%5Bsize%5D=2',
-        ]);
+        ];
         $this->assertResponseContains($expectedContent, $response);
     }
 

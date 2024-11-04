@@ -14,6 +14,7 @@ class WorkflowDefinitionScopeListenerTest extends WorkflowTestCase
 {
     private const WITH_SCOPES_CONFIG_DIR = '/Tests/Functional/DataFixtures/WithScopes';
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

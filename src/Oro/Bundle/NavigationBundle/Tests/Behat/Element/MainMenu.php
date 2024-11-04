@@ -13,9 +13,7 @@ class MainMenu extends Element
     /** @var Element */
     private $dropDown;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function init()
     {
         $this->dropDown = $this;
@@ -52,9 +50,7 @@ class MainMenu extends Element
         return $link;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function hasLink($path)
     {
         try {

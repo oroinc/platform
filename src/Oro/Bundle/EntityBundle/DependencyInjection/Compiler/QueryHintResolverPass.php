@@ -16,9 +16,7 @@ class QueryHintResolverPass implements CompilerPassInterface
 {
     use TaggedServiceTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $tagName = 'oro_entity.query_hint';

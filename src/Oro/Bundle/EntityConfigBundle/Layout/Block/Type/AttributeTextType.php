@@ -35,9 +35,7 @@ class AttributeTextType extends AbstractType
         $this->defaultVisible = $defaultVisible;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(BlockView $view, BlockInterface $block, Options $options)
     {
         $attributeProxy = $this->createAttributeProxy($options);
@@ -46,9 +44,7 @@ class AttributeTextType extends AbstractType
         BlockUtils::setViewVarsFromOptions($view, $options, ['entity', 'value', 'fieldName', 'className']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(
@@ -66,9 +62,7 @@ class AttributeTextType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getName()
     {
         return self::NAME;

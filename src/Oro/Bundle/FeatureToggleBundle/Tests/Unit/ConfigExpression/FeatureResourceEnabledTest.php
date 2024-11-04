@@ -16,6 +16,7 @@ class FeatureResourceEnabledTest extends \PHPUnit\Framework\TestCase
     /** @var FeatureResourceEnabled */
     private $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->featureChecker = $this->createMock(FeatureChecker::class);

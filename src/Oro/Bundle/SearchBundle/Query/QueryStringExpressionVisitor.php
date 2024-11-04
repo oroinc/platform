@@ -10,9 +10,7 @@ use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 
 class QueryStringExpressionVisitor extends ExpressionVisitor
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkComparison(Comparison $comparison)
     {
         list($type, $field) = Criteria::explodeFieldTypeName($comparison->getField());
@@ -42,17 +40,13 @@ class QueryStringExpressionVisitor extends ExpressionVisitor
         ));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkValue(Value $value)
     {
         return $value->getValue();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkCompositeExpression(CompositeExpression $expr)
     {
         $expressionList = [];

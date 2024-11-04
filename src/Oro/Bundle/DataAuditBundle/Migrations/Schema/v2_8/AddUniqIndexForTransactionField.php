@@ -14,9 +14,7 @@ class AddUniqIndexForTransactionField implements
     Migration,
     OrderedMigrationInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $queries->addPreQuery(new RemoveAuditDuplicatesQuery());
@@ -39,9 +37,7 @@ class AddUniqIndexForTransactionField implements
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOrder(): int
     {
         return 2;

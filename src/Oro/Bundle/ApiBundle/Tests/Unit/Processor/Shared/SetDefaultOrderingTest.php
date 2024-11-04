@@ -17,6 +17,7 @@ class SetDefaultOrderingTest extends GetListProcessorTestCase
     /** @var SetDefaultOrdering */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

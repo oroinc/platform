@@ -13,25 +13,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CollectionExtension extends AbstractTypeExtension
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getExtendedTypes(): iterable
     {
         return [CollectionType::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('add_label', 'oro.form.collection.add');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $view->vars['add_label'] = $options['add_label'];

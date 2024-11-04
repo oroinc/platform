@@ -36,15 +36,14 @@ class EmailBodySyncCommand extends Command implements CronCommandScheduleDefinit
         $this->synchronizer = $synchronizer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDefaultDefinition(): string
     {
         return '*/30 * * * *';
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function configure()
     {
         $this
@@ -87,6 +86,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $store = new SemaphoreStore();

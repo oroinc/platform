@@ -17,6 +17,7 @@ class AclConfigurationPassTest extends \PHPUnit\Framework\TestCase
 
     private AclConfigurationPass $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = new ContainerBuilder();

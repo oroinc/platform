@@ -14,6 +14,7 @@ class TwigPostProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var TwigPostProcessor */
     private $postProcessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->twig = $this->createMock(Environment::class);

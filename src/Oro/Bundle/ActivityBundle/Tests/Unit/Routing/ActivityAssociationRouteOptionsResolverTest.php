@@ -28,6 +28,7 @@ class ActivityAssociationRouteOptionsResolverTest extends \PHPUnit\Framework\Tes
     /** @var ActivityAssociationRouteOptionsResolver */
     private $routeOptionsResolver;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->groupingConfigProvider = $this->getMockBuilder(ConfigProvider::class)

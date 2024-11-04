@@ -25,6 +25,7 @@ class DeleteEntitiesByDeleteHandlerTest extends DeleteListProcessorTestCase
     /** @var DeleteEntitiesByDeleteHandler */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

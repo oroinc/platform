@@ -20,6 +20,7 @@ class SectionConfigurationProvider implements ConfigurationProviderInterface
         $this->sectionName = $sectionName;
     }
 
+    #[\Override]
     public function getConfiguration(): array
     {
         $config = $this->configurationProvider->getConfiguration();

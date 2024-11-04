@@ -10,9 +10,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
  */
 class FieldProvider extends EntityFieldProvider
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function addEntityFields(array &$result, string $className, int $options): void
     {
         // Exclusions are not used in workflow.
@@ -48,9 +46,7 @@ class FieldProvider extends EntityFieldProvider
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isIgnoredRelation(ClassMetadata $metadata, $associationName)
     {
         // skip workflow and collection relations

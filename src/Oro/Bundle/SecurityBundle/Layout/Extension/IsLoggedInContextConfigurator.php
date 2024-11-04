@@ -18,9 +18,7 @@ class IsLoggedInContextConfigurator implements ContextConfiguratorInterface
         $this->tokenAccessor = $tokenAccessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureContext(ContextInterface $context)
     {
         $context->getResolver()

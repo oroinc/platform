@@ -18,9 +18,7 @@ class DynamicTranslationLoader implements DynamicTranslationLoaderInterface
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function loadTranslations(array $locales, bool $includeSystem): array
     {
         /** @var EntityManagerInterface $em */

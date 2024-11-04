@@ -41,6 +41,7 @@ class SyncProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $eventDispatcher;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);

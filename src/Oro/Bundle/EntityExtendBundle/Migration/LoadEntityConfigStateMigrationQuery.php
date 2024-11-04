@@ -21,9 +21,7 @@ class LoadEntityConfigStateMigrationQuery extends ParametrizedMigrationQuery
         $this->storage = $storage;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -32,9 +30,7 @@ class LoadEntityConfigStateMigrationQuery extends ParametrizedMigrationQuery
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->loadEntityConfigStates($logger);

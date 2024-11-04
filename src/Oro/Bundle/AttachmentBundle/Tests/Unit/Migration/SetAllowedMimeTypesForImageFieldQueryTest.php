@@ -23,6 +23,7 @@ class SetAllowedMimeTypesForImageFieldQueryTest extends \PHPUnit\Framework\TestC
     /** @var SetAllowedMimeTypesForImageFieldQuery */
     private $updateAttachmentOptionQuery;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);

@@ -22,9 +22,6 @@ class PropertyMetadata extends MemberMetadata
     private const PROPERTY_REAL       = 1;
     private const PROPERTY_VIRTUAL    = 2;
 
-    /**
-     * @inheritDoc
-     */
     public function __construct(string $class, string $name)
     {
         if (self::PROPERTY_NOT_EXISTS === $this->getPropertyType($class, $name)) {
@@ -34,9 +31,7 @@ class PropertyMetadata extends MemberMetadata
         parent::__construct($class, $name, $name);
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     protected function newReflectionMember($objectOrClassName): \ReflectionMethod|\ReflectionProperty
     {
         $className = \is_string($objectOrClassName) ? $objectOrClassName : \get_class($objectOrClassName);
@@ -76,9 +71,7 @@ class PropertyMetadata extends MemberMetadata
         return null;
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function getPropertyValue($containingValue): mixed
     {
         $reflProperty = $this->getReflectionMember($containingValue);

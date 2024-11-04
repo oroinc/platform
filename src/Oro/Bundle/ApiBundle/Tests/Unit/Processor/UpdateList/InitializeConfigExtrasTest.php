@@ -11,6 +11,7 @@ class InitializeConfigExtrasTest extends UpdateListProcessorTestCase
     /** @var InitializeConfigExtras */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

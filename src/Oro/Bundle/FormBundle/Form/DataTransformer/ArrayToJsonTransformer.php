@@ -17,9 +17,7 @@ class ArrayToJsonTransformer implements DataTransformerInterface
         $this->allowNull = $allowNull;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         if (null === $value || [] === $value) {
@@ -37,9 +35,7 @@ class ArrayToJsonTransformer implements DataTransformerInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if ('' === $value || '[]' === $value || '{}' === $value || null === $value) {

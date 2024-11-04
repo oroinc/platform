@@ -20,6 +20,7 @@ class Duplicator implements DuplicatorInterface
     protected ?MatcherFactory $matcherFactory;
     protected array           $defaultRules = [];
 
+    #[\Override]
     public function duplicate(mixed $object, array $settings = []): mixed
     {
         $deepCopy = new DeepCopy();

@@ -7,16 +7,18 @@ use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigConverter;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Component\EntitySerializer\AssociationQuery;
 
 class ConfigConverterTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderRegistry */
+    /** @var EntityOverrideProviderRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $entityOverrideProviderRegistry;
 
     /** @var ConfigConverter */
     private $configConverter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityOverrideProviderRegistry = $this->createMock(EntityOverrideProviderRegistry::class);
@@ -24,7 +26,7 @@ class ConfigConverterTest extends \PHPUnit\Framework\TestCase
         $this->configConverter = new ConfigConverter($this->entityOverrideProviderRegistry);
     }
 
-    public function testConvertConfigWithoutParentResourceClass()
+    public function testConvertConfigWithoutParentResourceClass(): void
     {
         $config = [
             'exclusion_policy' => 'all'
@@ -35,7 +37,20 @@ class ConfigConverterTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($convertedConfig->has('skip_acl_for_root_entity'));
     }
 
-    public function testConvertConfigWithParentResourceClass()
+    public function testConvertConfigWithSkipAclForRootEntity(): void
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'skip_acl_for_root_entity' => true
+        ];
+
+        $convertedConfig = $this->configConverter->convertConfig($config);
+
+        self::assertTrue($convertedConfig->has('skip_acl_for_root_entity'));
+        self::assertTrue($convertedConfig->get('skip_acl_for_root_entity'));
+    }
+
+    public function testConvertConfigWithParentResourceClass(): void
     {
         $config = [
             'exclusion_policy'      => 'all',
@@ -51,7 +66,7 @@ class ConfigConverterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider convertConfigWithAssociationQueryDataProvider
      */
-    public function testConvertConfigWithAssociationQuery(?string $targetType)
+    public function testConvertConfigWithAssociationQuery(?string $targetType): void
     {
         $requestType = new RequestType(['test']);
         $associationName = 'association1';
@@ -96,6 +111,47 @@ class ConfigConverterTest extends \PHPUnit\Framework\TestCase
         self::assertSame($isCollection, $associationQuery->isCollection());
     }
 
+    /**
+     * @dataProvider convertConfigWithAssociationQueryDataProvider
+     */
+    public function testConvertConfigWithAssociationQueryForEnum(?string $targetType): void
+    {
+        $requestType = new RequestType(['test']);
+        $associationName = 'association1';
+        $targetClass = 'Extend\Entity\EV_Test_Target_Class';
+        $qb = $this->createMock(QueryBuilder::class);
+
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                $associationName => [
+                    'target_class'      => $targetClass,
+                    'association_query' => $qb
+                ]
+            ]
+        ];
+        $isCollection = true;
+        if ($targetType) {
+            $config['fields'][$associationName]['target_type'] = $targetType;
+            if ('to-one' === $targetType) {
+                $isCollection = false;
+            }
+        }
+
+        $this->entityOverrideProviderRegistry->expects(self::never())
+            ->method('getEntityOverrideProvider');
+
+        $this->configConverter->setRequestType($requestType);
+        $convertedConfig = $this->configConverter->convertConfig($config);
+
+        /** @var AssociationQuery $associationQuery */
+        $associationQuery = $convertedConfig->getField($associationName)->get('association_query');
+        self::assertInstanceOf(AssociationQuery::class, $associationQuery);
+        self::assertEquals(EnumOption::class, $associationQuery->getTargetEntityClass());
+        self::assertSame($qb, $associationQuery->getQueryBuilder());
+        self::assertSame($isCollection, $associationQuery->isCollection());
+    }
+
     public function convertConfigWithAssociationQueryDataProvider(): array
     {
         return [
@@ -105,7 +161,7 @@ class ConfigConverterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testConvertConfigWithAssociationQueryAndWhenTargetClassIsModelThatOverridesEntity()
+    public function testConvertConfigWithAssociationQueryAndWhenTargetClassIsModelThatOverridesEntity(): void
     {
         $requestType = new RequestType(['test']);
         $associationName = 'association1';
@@ -144,7 +200,7 @@ class ConfigConverterTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($associationQuery->isCollection());
     }
 
-    public function testConvertConfigWithAssociationQueryButWithoutRequestType()
+    public function testConvertConfigWithAssociationQueryButWithoutRequestType(): void
     {
         $associationName = 'association1';
         $targetClass = 'Test\TargetClass';

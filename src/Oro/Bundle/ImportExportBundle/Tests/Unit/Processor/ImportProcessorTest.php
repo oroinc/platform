@@ -26,6 +26,7 @@ class ImportProcessorTest extends \PHPUnit\Framework\TestCase
     private array $item = ['test' => 'test'];
     private \stdClass $object;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->object = new \stdClass();

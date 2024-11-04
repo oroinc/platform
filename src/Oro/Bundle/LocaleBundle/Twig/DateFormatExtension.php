@@ -26,9 +26,7 @@ class DateFormatExtension extends AbstractExtension implements ServiceSubscriber
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -104,9 +102,7 @@ class DateFormatExtension extends AbstractExtension implements ServiceSubscriber
             ->getDateTimeFormat($dateType, $timeType, $locale);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

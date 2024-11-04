@@ -30,26 +30,31 @@ class ExtendEntityLocator implements FileLocator
         }
     }
 
+    #[\Override]
     public function findMappingFile($className)
     {
         return $className;
     }
 
+    #[\Override]
     public function getAllClassNames($globalBasename)
     {
         return $this->classNames;
     }
 
+    #[\Override]
     public function fileExists($className)
     {
         return true;
     }
 
+    #[\Override]
     public function getPaths()
     {
         return [];
     }
 
+    #[\Override]
     public function getFileExtension()
     {
         return '';

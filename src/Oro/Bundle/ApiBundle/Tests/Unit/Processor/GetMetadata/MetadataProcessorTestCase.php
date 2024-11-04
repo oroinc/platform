@@ -23,6 +23,7 @@ class MetadataProcessorTestCase extends \PHPUnit\Framework\TestCase
     protected ConfigExtensionRegistry $configExtensionRegistry;
     protected ConfigLoaderFactory $configLoaderFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new MetadataContext();

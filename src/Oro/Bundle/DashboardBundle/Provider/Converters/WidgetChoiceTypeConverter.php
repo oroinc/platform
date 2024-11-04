@@ -8,9 +8,7 @@ class WidgetChoiceTypeConverter extends ConfigValueConverterAbstract
 {
     const ALL_ITEMS = 'all';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConvertedValue(array $widgetConfig, $value = null, array $config = [], array $options = [])
     {
         if ($value === null) {
@@ -20,9 +18,7 @@ class WidgetChoiceTypeConverter extends ConfigValueConverterAbstract
         return parent::getConvertedValue($widgetConfig, $value, $config, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFormValue(array $config, $value)
     {
         if ($value === null) {
@@ -32,9 +28,7 @@ class WidgetChoiceTypeConverter extends ConfigValueConverterAbstract
         return parent::getFormValue($config, $value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getViewValue($value)
     {
         return implode(',', (array)$value);

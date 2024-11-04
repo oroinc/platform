@@ -12,6 +12,7 @@ class HtmlPurifierTelValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var HtmlPurifierTelValidator */
     private $validator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->uri = new \HTMLPurifier_URI('scheme', 'userinfo', 'host', 'port', 'path', 'query', 'fragment');

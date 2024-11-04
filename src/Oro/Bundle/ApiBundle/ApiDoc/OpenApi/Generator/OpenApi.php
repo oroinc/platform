@@ -15,9 +15,7 @@ class OpenApi extends OA\OpenApi
     private array $collectionExistence = [];
     private array $itemExistence = [];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function ref(string $ref)
     {
         if (!str_starts_with($ref, OA\Components::COMPONENTS_PREFIX)) {

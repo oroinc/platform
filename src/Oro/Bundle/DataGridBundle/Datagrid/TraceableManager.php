@@ -21,6 +21,7 @@ class TraceableManager implements ManagerInterface, ResetInterface
     {
     }
 
+    #[\Override]
     public function getDatagrid($name, $parameters = null, array $additionalParameters = [])
     {
         $datagrid = $this->manager->getDatagrid($name, $parameters, $additionalParameters);
@@ -31,6 +32,7 @@ class TraceableManager implements ManagerInterface, ResetInterface
         return $this->saveAndGetDatagrid($datagrid, $name, $key);
     }
 
+    #[\Override]
     public function getDatagridByRequestParams($name, array $additionalParameters = [])
     {
         $datagrid = $this->manager->getDatagridByRequestParams($name, $additionalParameters);
@@ -41,6 +43,7 @@ class TraceableManager implements ManagerInterface, ResetInterface
         return $this->saveAndGetDatagrid($datagrid, $name, $key);
     }
 
+    #[\Override]
     public function getConfigurationForGrid($name)
     {
         /** @var DatagridConfiguration $configuration */
@@ -60,6 +63,7 @@ class TraceableManager implements ManagerInterface, ResetInterface
         return $this->configurations[$hash] ?? [];
     }
 
+    #[\Override]
     public function reset()
     {
         $this->datagrids = [];

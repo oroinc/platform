@@ -45,9 +45,7 @@ class AssignDraftableFields extends AbstractAction
         $this->chainDraftableFieldsExclusionProvider = $chainDraftableFieldsExclusionProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options): ActionInterface
     {
         $this->options = $this->getOptionResolver()->resolve($options);
@@ -55,9 +53,7 @@ class AssignDraftableFields extends AbstractAction
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context): void
     {
         $entity = $this->contextAccessor->getValue($context, $this->options[self::OBJECT]);

@@ -27,6 +27,7 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
     /** @var NestedObjectMetadataHelper */
     private $nestedObjectMetadataHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->metadataHelper = $this->createMock(MetadataHelper::class);

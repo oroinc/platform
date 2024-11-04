@@ -20,12 +20,14 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\Environment\TestActivityScopeProv
 
 class WorkflowDefinitionRepositoryTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
         $this->loadFixtures([LoadWorkflowDefinitionScopes::class]);
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $this->getActivityScopeProvider()->setCurrentTestActivity(null);

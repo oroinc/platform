@@ -33,16 +33,19 @@ class TaggableEntityStub implements Taggable
         $this->id = $id;
     }
 
+    #[\Override]
     public function getTags()
     {
         return $this->tags;
     }
 
+    #[\Override]
     public function setTags($tags)
     {
         $this->tags = $tags;
     }
 
+    #[\Override]
     public function getTaggableId()
     {
         return 'stub' . $this->id;

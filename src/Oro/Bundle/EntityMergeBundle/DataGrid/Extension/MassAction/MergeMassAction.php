@@ -40,9 +40,7 @@ class MergeMassAction extends AbstractMassAction
         $this->entityConfigProvider = $entityConfigProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setOptions(ActionConfiguration $options)
     {
         foreach (self::DEFAULT_OPTIONS as $name => $value) {

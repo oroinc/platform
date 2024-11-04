@@ -14,9 +14,7 @@ class ArrayData implements DataInterface
         $this->data = $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toArray()
     {
         return $this->data;

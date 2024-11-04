@@ -49,7 +49,7 @@ class OwnerChecker
         EntityOwnerAccessor $ownerAccessor,
         AuthorizationCheckerInterface $authorizationChecker,
         TokenAccessorInterface $tokenAccessor,
-        OwnerTreeProvider $treeProvider,
+        OwnerTreeProviderInterface $treeProvider,
         AclVoterInterface $aclVoter
     ) {
         $this->doctrineHelper = $doctrineHelper;

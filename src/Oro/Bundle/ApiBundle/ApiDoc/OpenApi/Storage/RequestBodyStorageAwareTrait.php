@@ -9,9 +9,6 @@ trait RequestBodyStorageAwareTrait
 {
     private ?RequestBodyStorage $requestBodyStorage = null;
 
-    /**
-     * {@inheritDoc}
-     */
     public function setRequestBodyStorage(?RequestBodyStorage $requestBodyStorage): void
     {
         $this->requestBodyStorage = $requestBodyStorage;

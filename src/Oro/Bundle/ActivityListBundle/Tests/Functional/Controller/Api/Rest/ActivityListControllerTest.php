@@ -9,6 +9,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class ActivityListControllerTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());

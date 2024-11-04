@@ -115,9 +115,7 @@ class ActivityController extends AbstractController
         return $this->container->get(MultiGridProvider::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

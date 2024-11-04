@@ -25,9 +25,7 @@ class DateTimeExtension extends AbstractTypeExtension
     public const HTML5_FORMAT_WITHOUT_TIMEZONE = DateTimeType::HTML5_FORMAT;
     public const HTML5_FORMAT_WITH_TIMEZONE = "yyyy-MM-dd'T'HH:mm:ssZZZZZ";
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(['format' => self::HTML5_FORMAT_WITH_TIMEZONE]);
@@ -41,9 +39,7 @@ class DateTimeExtension extends AbstractTypeExtension
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $pattern = is_string($options['format']) ? $options['format'] : null;
@@ -56,9 +52,7 @@ class DateTimeExtension extends AbstractTypeExtension
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         if (array_key_exists('type', $view->vars) && 'datetime-local' === $view->vars['type']) {
@@ -69,9 +63,7 @@ class DateTimeExtension extends AbstractTypeExtension
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getExtendedTypes(): iterable
     {
         return [DateTimeType::class];

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FormBundle\Form\Type\CollectionType;
@@ -26,10 +27,10 @@ class EnumValueCollectionType extends AbstractType
     }
 
     /**
-     * {@inheritdoc}
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -74,30 +75,22 @@ class EnumValueCollectionType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['multiple'] = $this->isMultipleSelectEnable($options['config_id']);
         $view->vars['show_form_when_empty'] = false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['validation_ignore_if_not_changed'] = true;
     }
 
-    /**
-     * @param $field
-     * @return bool
-     */
-    protected function isMultipleSelectEnable($field)
+    protected function isMultipleSelectEnable(ConfigIdInterface $field): bool
     {
-        return $this->typeHelper->getFieldType($field) === 'multiEnum';
+        return ExtendHelper::isMultiEnumType($this->typeHelper->getFieldType($field));
     }
 
     /**
@@ -130,8 +123,7 @@ class EnumValueCollectionType extends AbstractType
                 return true;
             }
             if ($constraintName) {
-                $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
-                if ($this->typeHelper->isImmutable('enum', $enumValueClassName, null, $constraintName)) {
+                if ($this->typeHelper->isImmutable('enum', EnumOption::class, $fieldName, $constraintName)) {
                     // is immutable
                     return true;
                 }
@@ -141,25 +133,18 @@ class EnumValueCollectionType extends AbstractType
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return CollectionType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_entity_extend_enum_value_collection';

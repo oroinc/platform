@@ -16,17 +16,13 @@ class WorkflowTranslationFilter extends WorkflowFilter
 {
     private ?TranslationKeyGenerator $generator = null;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFieldOptions(): array
     {
         return array_merge(parent::getFieldOptions(), ['multiple' => false]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         QueryBuilderUtil::checkIdentifier($fieldName);
@@ -60,9 +56,7 @@ class WorkflowTranslationFilter extends WorkflowFilter
         return $this->generator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function findRelatedJoin(FilterDatasourceAdapterInterface $ds)
     {
         // related joins configured manually

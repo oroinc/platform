@@ -15,6 +15,7 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessEntities;
 
 class ProcessJobRepositoryTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

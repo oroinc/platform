@@ -11,6 +11,7 @@ class NumberTypeFormatterTest extends \PHPUnit\Framework\TestCase
     /** @var NumberTypeFormatter */
     private $formatter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $numberFormatter = $this->createMock(NumberFormatter::class);

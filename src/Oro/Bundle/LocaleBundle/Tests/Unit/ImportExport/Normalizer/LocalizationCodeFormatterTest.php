@@ -10,6 +10,7 @@ class LocalizationCodeFormatterTest extends \PHPUnit\Framework\TestCase
     /** @var LocalizationCodeFormatter */
     private $formatter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formatter = new LocalizationCodeFormatter();

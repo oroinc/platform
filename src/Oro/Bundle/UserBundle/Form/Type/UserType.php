@@ -53,9 +53,7 @@ class UserType extends AbstractType
         $this->choicesForUserProvider = $choicesForUserProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $this->addEntityFields($builder);
@@ -180,9 +178,7 @@ class UserType extends AbstractType
         $form->add('plainPassword', RepeatedType::class, $passwordOptions);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -193,17 +189,12 @@ class UserType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getName(): string
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_user_user';

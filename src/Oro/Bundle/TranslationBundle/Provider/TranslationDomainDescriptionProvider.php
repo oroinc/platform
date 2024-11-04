@@ -7,9 +7,7 @@ namespace Oro\Bundle\TranslationBundle\Provider;
  */
 class TranslationDomainDescriptionProvider implements TranslationDomainDescriptionProviderInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getTranslationDomainDescription(string $domain): ?string
     {
         switch ($domain) {

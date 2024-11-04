@@ -22,6 +22,7 @@ class MenuUpdateApplierTest extends \PHPUnit\Framework\TestCase
 
     private MenuUpdateApplier $applier;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->menuUpdateToMenuItemPropagator = $this->createMock(MenuUpdateToMenuItemPropagatorInterface::class);

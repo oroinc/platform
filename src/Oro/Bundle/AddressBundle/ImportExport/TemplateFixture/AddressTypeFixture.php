@@ -7,17 +7,13 @@ use Oro\Bundle\ImportExportBundle\TemplateFixture\AbstractTemplateRepository;
 
 class AddressTypeFixture extends AbstractTemplateRepository
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityClass()
     {
         return 'Oro\Bundle\AddressBundle\Entity\AddressType';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function createEntity($key)
     {
         return new AddressType($key);
@@ -27,6 +23,7 @@ class AddressTypeFixture extends AbstractTemplateRepository
      * @param string $key
      * @param AddressType $entity
      */
+    #[\Override]
     public function fillEntityData($key, $entity)
     {
         $label = ucfirst($entity->getName()) . ' Type';

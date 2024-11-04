@@ -15,6 +15,7 @@ class CloneObjectTest extends \PHPUnit\Framework\TestCase
     /** @var CloneObject */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->action = new CloneObject(new ContextAccessor());

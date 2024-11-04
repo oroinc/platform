@@ -13,6 +13,7 @@ class CronCommandFeatureCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var CronCommandFeatureChecker */
     private $checker;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->featureChecker = $this->createMock(FeatureChecker::class);

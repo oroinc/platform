@@ -19,6 +19,7 @@ class ExtendFieldFileFormOptionsProvider implements ExtendFieldFormOptionsProvid
         $this->entityConfigManager = $entityConfigManager;
     }
 
+    #[\Override]
     public function getOptions(string $className, string $fieldName): array
     {
         $className = ClassUtils::getRealClass($className);

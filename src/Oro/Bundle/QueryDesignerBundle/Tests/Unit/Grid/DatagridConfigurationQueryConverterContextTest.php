@@ -10,6 +10,7 @@ class DatagridConfigurationQueryConverterContextTest extends \PHPUnit\Framework\
     /** @var DatagridConfigurationQueryConverterContext */
     private $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new DatagridConfigurationQueryConverterContext();

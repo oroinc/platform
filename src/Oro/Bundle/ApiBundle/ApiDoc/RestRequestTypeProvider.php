@@ -28,25 +28,19 @@ class RestRequestTypeProvider implements
         $this->requestTypeMap[$view] = $requestTypes;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setRestDocViewDetector(RestDocViewDetector $docViewDetector): void
     {
         $this->docViewDetector = $docViewDetector;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         $this->docViewDetector = null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getRequestType(): ?RequestType
     {
         $view = $this->docViewDetector->getView();

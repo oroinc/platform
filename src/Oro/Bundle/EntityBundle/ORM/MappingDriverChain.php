@@ -17,9 +17,7 @@ class MappingDriverChain extends BaseMappingDriverChain
     /** @var bool[] */
     private $isTransientCache = [];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isTransient($className)
     {
         if (isset($this->isTransientCache[$className])) {
@@ -32,9 +30,7 @@ class MappingDriverChain extends BaseMappingDriverChain
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function loadMetadataForClass($className, ClassMetadata $metadata)
     {
         foreach ($this->getDrivers() as $namespace => $driver) {

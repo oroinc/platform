@@ -12,6 +12,7 @@ class MaxRelatedEntitiesConfigExtraTest extends \PHPUnit\Framework\TestCase
     /** @var MaxRelatedEntitiesConfigExtra */
     private $extra;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extra = new MaxRelatedEntitiesConfigExtra(self::MAX_RELATED_ENTITIES);

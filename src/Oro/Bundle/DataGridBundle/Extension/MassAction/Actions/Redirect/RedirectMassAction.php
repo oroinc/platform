@@ -10,9 +10,7 @@ class RedirectMassAction extends AbstractMassAction
     /** @var array */
     protected $requiredOptions = ['route'];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setOptions(ActionConfiguration $options)
     {
         if (empty($options['frontend_handle'])) {

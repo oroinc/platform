@@ -22,9 +22,7 @@ class AclVoter extends AclVoterDecorator
         BasicPermission::DELETE
     ];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function vote(TokenInterface $token, $subject, array $attributes): int
     {
         if ($subject instanceof DraftableInterface && DraftHelper::isDraft($subject)) {

@@ -32,6 +32,7 @@ class ThemeImagePlaceholderProvider implements ImagePlaceholderProviderInterface
         $this->placeholderName = $placeholderName;
     }
 
+    #[\Override]
     public function getPath(
         string $filter,
         string $format = '',

@@ -18,9 +18,7 @@ class LoadEmailThreadContextItems extends AbstractLoadEmailContextItems
 {
     private ?int $emailId = null;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ListContext $context */
@@ -76,9 +74,7 @@ class LoadEmailThreadContextItems extends AbstractLoadEmailContextItems
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createResultItem(
         string $id,
         string $entityClass,
@@ -90,9 +86,7 @@ class LoadEmailThreadContextItems extends AbstractLoadEmailContextItems
         return new EmailThreadContextItem($id, $entityClass, $entityId, $entityName, $entityUrl, $isContext);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function buildResultItemId(array $record, RequestType $requestType): string
     {
         return sprintf(

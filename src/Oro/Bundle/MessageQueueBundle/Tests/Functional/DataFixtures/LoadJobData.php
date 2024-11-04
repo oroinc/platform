@@ -75,17 +75,13 @@ class LoadJobData extends AbstractFixture implements ContainerAwareInterface
         ],
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $jobHandler = $this->container->get('oro_message_queue.job.manager');

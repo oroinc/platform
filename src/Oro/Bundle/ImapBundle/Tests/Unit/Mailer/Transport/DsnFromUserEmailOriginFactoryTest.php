@@ -17,6 +17,7 @@ class DsnFromUserEmailOriginFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var DsnFromUserEmailOriginFactory */
     private $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->oauthManagerRegistry = $this->createMock(OAuthManagerRegistry::class);

@@ -11,17 +11,17 @@ class ProcessorStub extends AbstractConfigurableStepElement implements
     ItemProcessorInterface,
     StepExecutionAwareInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process($item)
     {
     }
 
+    #[\Override]
     public function setStepExecution(StepExecution $stepExecution)
     {
     }
 
+    #[\Override]
     public function getConfigurationFields(): array
     {
         return [];

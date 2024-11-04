@@ -27,6 +27,7 @@ class PlaceholderTokenParserTest extends \PHPUnit\Framework\TestCase
     /** @var PlaceholderTokenParser */
     private $tokenParser;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->stream = new TokenStream([]);

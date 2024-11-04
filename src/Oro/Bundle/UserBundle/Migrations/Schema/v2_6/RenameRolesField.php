@@ -18,9 +18,7 @@ class RenameRolesField implements Migration, ContainerAwareInterface
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         if (!$this->container->get(ApplicationState::class)->isInstalled()) {

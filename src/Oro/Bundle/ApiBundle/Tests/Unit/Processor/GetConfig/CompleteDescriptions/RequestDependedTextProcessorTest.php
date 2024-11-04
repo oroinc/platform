@@ -10,6 +10,7 @@ class RequestDependedTextProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var RequestDependedTextProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processor = new RequestDependedTextProcessor();

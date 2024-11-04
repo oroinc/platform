@@ -21,6 +21,7 @@ class CompleteUpsertConfigTest extends ConfigProcessorTestCase
     /** @var CompleteUpsertConfig */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

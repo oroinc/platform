@@ -26,9 +26,7 @@ class EntityValidationLoader extends YamlFileLoader
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function loadClassMetadata(ClassMetadata $metadata): bool
     {
         return false;
@@ -39,6 +37,7 @@ class EntityValidationLoader extends YamlFileLoader
      *
      * @return string[]
      */
+    #[\Override]
     public function getMappedClasses(): array
     {
         if (null === $this->mappedClasses) {

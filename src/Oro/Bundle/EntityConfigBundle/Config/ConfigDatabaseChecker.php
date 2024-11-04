@@ -23,9 +23,7 @@ class ConfigDatabaseChecker extends DatabaseChecker
         $this->lockObject = $lockObject;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function isDatabaseChecked(): ?bool
     {
         $isChecked = parent::isDatabaseChecked();

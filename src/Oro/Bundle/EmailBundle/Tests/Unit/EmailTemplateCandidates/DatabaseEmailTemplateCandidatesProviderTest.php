@@ -17,6 +17,7 @@ class DatabaseEmailTemplateCandidatesProviderTest extends TestCase
 
     private DatabaseEmailTemplateCandidatesProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

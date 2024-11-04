@@ -9,16 +9,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class UpdateListStartChunkJobsTopic extends AbstractUpdateListTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.api.update_list.start_chunk_jobs';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Starts child jobs that are used to process API batch operation chunks.';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         parent::configureMessageBody($resolver);

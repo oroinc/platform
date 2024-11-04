@@ -20,9 +20,7 @@ class TraceableProcessorRegistry implements ProcessorRegistryInterface
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getProcessor(string $processorId): ProcessorInterface
     {
         return new TraceableProcessor(

@@ -15,9 +15,7 @@ class ImportsLayoutUpdateExtension implements ConfigLayoutUpdateGeneratorExtensi
 {
     const NODE_IMPORTS = 'imports';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function prepare(GeneratorData $data, VisitorCollection $visitorCollection)
     {
         $source = $data->getSource();

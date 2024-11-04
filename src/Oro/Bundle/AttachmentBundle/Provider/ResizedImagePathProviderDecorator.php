@@ -25,9 +25,7 @@ class ResizedImagePathProviderDecorator implements ResizedImagePathProviderInter
         $this->prefixLength = \strlen($this->prefix);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPathForResizedImage(File $entity, int $width, int $height, string $format = ''): string
     {
         return $this->removePrefix(
@@ -35,9 +33,7 @@ class ResizedImagePathProviderDecorator implements ResizedImagePathProviderInter
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPathForFilteredImage(File $entity, string $filterName, string $format = ''): string
     {
         return $this->removePrefix(

@@ -8,9 +8,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class EnumValuesUniqueValidatorTest extends ConstraintValidatorTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function createValidator()
     {
         return new EnumValuesUniqueValidator();

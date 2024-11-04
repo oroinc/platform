@@ -18,9 +18,7 @@ class IsMobileContextConfigurator implements ContextConfiguratorInterface
         $this->userAgentProvider = $userAgentProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureContext(ContextInterface $context)
     {
         $context->getResolver()

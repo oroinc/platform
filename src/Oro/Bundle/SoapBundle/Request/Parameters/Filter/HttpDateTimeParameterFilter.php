@@ -7,9 +7,7 @@ namespace Oro\Bundle\SoapBundle\Request\Parameters\Filter;
  */
 class HttpDateTimeParameterFilter implements ParameterFilterInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function filter($rawValue, $operator)
     {
         // datetime value hack due to the fact that some clients pass + encoded as %20 and not %2B,

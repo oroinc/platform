@@ -752,6 +752,25 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         $element->click();
     }
 
+    /**
+     * Sort grid by column strictly
+     * Example: When sort grid by Created at strictly
+     * Example: But when I sort grid by First Name again strictly
+     * Example: When I sort "Quotes Grid" by Updated At strictly
+     *
+     * @When /^(?:|when )(?:|I )sort grid by (?P<field>(?:|[\w\s]*(?<!again)))(?:| again) strictly$/
+     * @When /^(?:|when )(?:|I )sort "(?P<gridName>[^"]+)" by (?P<field>(?:|[\w\s]*(?<!again)))(?:| again) strictly$/
+     * @When /^(?:|I )sort "(?P<gridName>[^"]+)" by "(?P<field>.*)"(?:| again) strictly$/
+     * @When /^(?:|I )sort grid by "(?P<field>.*)"(?:| again) strictly$/
+     */
+    public function sortGridStrictlyBy($field, $gridName = null)
+    {
+        $grid = $this->getGrid($gridName);
+        $element = $grid->getElement($grid->getMappedChildElementName('GridHeader'))->getElement($field);
+        $element->focus();
+        $element->click();
+    }
+
     //@codingStandardsIgnoreStart
     /**
      * @Then /^(?P<column>[\w\s]+) in (?P<rowNumber1>(?:|first|second|[\d]+)) row must be (?P<comparison>(?:|lower|greater|equal)) then in (?P<rowNumber2>(?:|first|second|[\d]+)) row$/

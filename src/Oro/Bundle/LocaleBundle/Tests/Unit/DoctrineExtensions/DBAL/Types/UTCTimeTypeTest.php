@@ -14,6 +14,7 @@ class UTCTimeTypeTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractPlatform|\PHPUnit\Framework\MockObject\MockObject */
     private $platform;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new UTCTimeType();

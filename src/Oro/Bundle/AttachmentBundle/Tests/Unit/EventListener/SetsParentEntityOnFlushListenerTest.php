@@ -28,6 +28,7 @@ class SetsParentEntityOnFlushListenerTest extends \PHPUnit\Framework\TestCase
 
     private SetsParentEntityOnFlushListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

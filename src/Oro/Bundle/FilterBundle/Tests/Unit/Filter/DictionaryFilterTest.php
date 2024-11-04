@@ -28,6 +28,7 @@ class DictionaryFilterTest extends OrmTestCase
     /** @var DictionaryFilter */
     private $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->getTestEntityManager();
@@ -109,10 +110,10 @@ class DictionaryFilterTest extends OrmTestCase
             ->from(TestEntity::class, 'o');
 
         $values = [
-            new TestEnumValue('val1', 'Value1'),
-            new TestEnumValue('val2', 'Value2')
+            new TestEnumValue('test', 'Test', 'val1'),
+            new TestEnumValue('test', 'Test', 'val2')
         ];
-        $data   = [
+        $data = [
             'value' => $values
         ];
 
@@ -145,11 +146,11 @@ class DictionaryFilterTest extends OrmTestCase
             ->from(TestEntity::class, 'o');
 
         $values = [
-            new TestEnumValue('val1', 'Value1'),
-            new TestEnumValue('val2', 'Value2')
+            new TestEnumValue('test', 'Test', 'val1'),
+            new TestEnumValue('test', 'Test', 'val2')
         ];
-        $data   = [
-            'type'  => ChoiceFilterType::TYPE_NOT_CONTAINS,
+        $data = [
+            'type' => ChoiceFilterType::TYPE_NOT_CONTAINS,
             'value' => $values
         ];
 

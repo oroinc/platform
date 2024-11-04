@@ -16,9 +16,7 @@ class LoggerExtension extends AbstractExtension
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onStart(Context $context)
     {
         $context->setLogger($this->logger);

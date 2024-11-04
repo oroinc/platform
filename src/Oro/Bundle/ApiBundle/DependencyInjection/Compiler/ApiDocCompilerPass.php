@@ -40,9 +40,7 @@ class ApiDocCompilerPass implements CompilerPassInterface
     private const API_CACHE_MANAGER_SERVICE = 'oro_api.cache_manager';
     private const TWIG = 'twig';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         if (!$this->isApplicable($container)) {

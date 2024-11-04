@@ -9,9 +9,6 @@ trait SchemaStorageAwareTrait
 {
     private ?SchemaStorage $schemaStorage = null;
 
-    /**
-     * {@inheritDoc}
-     */
     public function setSchemaStorage(?SchemaStorage $schemaStorage): void
     {
         $this->schemaStorage = $schemaStorage;

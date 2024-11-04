@@ -26,6 +26,7 @@ class DataGridTagListenerTest extends \PHPUnit\Framework\TestCase
     /** @var DataGridTagListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->generator = $this->createMock(TagGeneratorInterface::class);

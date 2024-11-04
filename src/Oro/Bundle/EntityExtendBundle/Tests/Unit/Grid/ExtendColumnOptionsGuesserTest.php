@@ -7,6 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Grid\ExtendColumnOptionsGuesser;
 use Symfony\Component\Form\Guess\Guess;
 
@@ -21,6 +22,7 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendColumnOptionsGuesser */
     private $guesser;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
@@ -45,12 +47,12 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
         $class = 'TestClass';
         $property = 'testProp';
 
-        $extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $enumConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
-            ->with('extend')
-            ->willReturn($extendConfigProvider);
-        $extendConfigProvider->expects($this->once())
+            ->with('enum')
+            ->willReturn($enumConfigProvider);
+        $enumConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($class, $property)
             ->willReturn(false);
@@ -83,12 +85,12 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
         $class = 'TestClass';
         $property = 'testProp';
 
-        $extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $enumConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
-            ->with('extend')
-            ->willReturn($extendConfigProvider);
-        $extendConfigProvider->expects($this->once())
+            ->with('enum')
+            ->willReturn($enumConfigProvider);
+        $enumConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($class, $property)
             ->willReturn(false);
@@ -123,17 +125,18 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
 
         $config = new Config(new FieldConfigId('extend', $class, $property, 'enum'));
         $config->set('target_entity', 'Test\EnumValue');
+        $config->set('enum_code', 'enum_code');
 
-        $extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $enumConfigProvider = $this->createMock(ConfigProvider::class);
         $this->configManager->expects($this->once())
             ->method('getProvider')
-            ->with('extend')
-            ->willReturn($extendConfigProvider);
-        $extendConfigProvider->expects($this->once())
+            ->with('enum')
+            ->willReturn($enumConfigProvider);
+        $enumConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($class, $property)
             ->willReturn(true);
-        $extendConfigProvider->expects($this->once())
+        $enumConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($class, $property)
             ->willReturn($config);
@@ -142,10 +145,10 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             [
                 'frontend_type' => Property::TYPE_HTML,
-                'type'          => 'twig',
-                'template'      => '@OroEntityExtend/Datagrid/Property/enum.html.twig',
-                'context'       => [
-                    'entity_class' => $config->get('target_entity')
+                'type' => 'twig',
+                'template' => '@OroEntityExtend/Datagrid/Property/enum.html.twig',
+                'context' => [
+                    'enum_code' => $config->get('enum_code')
                 ]
             ],
             $guess->getOptions()
@@ -168,13 +171,16 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
         $property = 'testProp';
 
         $config = new Config(new FieldConfigId('extend', $class, $property, 'enum'));
-        $config->set('target_entity', 'Test\EnumValue');
+        $config->set('enum_code', 'enum_code');
 
         $extendConfigProvider = $this->createMock(ConfigProvider::class);
-        $this->configManager->expects($this->once())
+        $enumConfigProvider = $this->createMock(ConfigProvider::class);
+
+        $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
-            ->with('extend')
-            ->willReturn($extendConfigProvider);
+            ->withConsecutive(['extend'], ['enum'])
+            ->willReturnOnConsecutiveCalls($extendConfigProvider, $enumConfigProvider);
+
         $extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($class, $property)
@@ -184,12 +190,22 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
             ->with($class, $property)
             ->willReturn($config);
 
+        $enumConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($class, $property)
+            ->willReturn(true);
+        $enumConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($class, $property)
+            ->willReturn($config);
+
         $guess = $this->guesser->guessFilter($class, $property, 'enum');
         $this->assertEquals(
             [
-                'type'       => 'enum',
+                'type' => 'enum',
                 'null_value' => ':empty:',
-                'class'      => 'Test\EnumValue'
+                'class' => EnumOption::class,
+                'enum_code' => 'enum_code'
             ],
             $guess->getOptions()
         );
@@ -202,18 +218,19 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
         $property = 'testProp';
 
         $config = new Config(new FieldConfigId('extend', $class, $property, 'enum'));
-        $config->set('target_entity', 'Test\EnumValue');
+        $config->set('enum_code', 'enum_code');
 
-        $extendConfigProvider = $this->createMock(ConfigProvider::class);
+        $enumConfigProvider = $this->createMock(ConfigProvider::class);
+
         $this->configManager->expects($this->once())
             ->method('getProvider')
-            ->with('extend')
-            ->willReturn($extendConfigProvider);
-        $extendConfigProvider->expects($this->once())
+            ->with('enum')
+            ->willReturn($enumConfigProvider);
+        $enumConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($class, $property)
             ->willReturn(true);
-        $extendConfigProvider->expects($this->once())
+        $enumConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($class, $property)
             ->willReturn($config);
@@ -222,11 +239,11 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             [
                 'frontend_type' => Property::TYPE_HTML,
-                'export_type'   => 'list',
-                'type'          => 'twig',
-                'template'      => '@OroEntityExtend/Datagrid/Property/multiEnum.html.twig',
-                'context'       => [
-                    'entity_class' => 'Test\EnumValue'
+                'export_type' => 'list',
+                'type' => 'twig',
+                'template' => '@OroEntityExtend/Datagrid/Property/multiEnum.html.twig',
+                'context' => [
+                    'enum_code' => 'enum_code'
                 ]
             ],
             $guess->getOptions()
@@ -255,13 +272,16 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
         $property = 'testProp';
 
         $config = new Config(new FieldConfigId('extend', $class, $property, 'enum'));
-        $config->set('target_entity', 'Test\EnumValue');
+        $config->set('enum_code', 'enum_code');
 
         $extendConfigProvider = $this->createMock(ConfigProvider::class);
-        $this->configManager->expects($this->once())
+        $enumConfigProvider = $this->createMock(ConfigProvider::class);
+
+        $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
-            ->with('extend')
-            ->willReturn($extendConfigProvider);
+            ->withConsecutive(['extend'], ['enum'])
+            ->willReturnOnConsecutiveCalls($extendConfigProvider, $enumConfigProvider);
+
         $extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with($class, $property)
@@ -271,12 +291,22 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit\Framework\TestCase
             ->with($class, $property)
             ->willReturn($config);
 
+        $enumConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($class, $property)
+            ->willReturn(true);
+        $enumConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($class, $property)
+            ->willReturn($config);
+
         $guess = $this->guesser->guessFilter($class, $property, 'multiEnum');
         $this->assertEquals(
             [
-                'type'       => 'multi_enum',
+                'type' => 'multi_enum',
                 'null_value' => ':empty:',
-                'class'      => 'Test\EnumValue'
+                'class' => EnumOption::class,
+                'enum_code' => 'enum_code'
             ],
             $guess->getOptions()
         );

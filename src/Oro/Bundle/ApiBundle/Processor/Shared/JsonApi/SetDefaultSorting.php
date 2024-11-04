@@ -14,9 +14,7 @@ use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
  */
 class SetDefaultSorting extends BaseSetDefaultSorting
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getDefaultValue(EntityDefinitionConfig $config, ?SortersConfig $configOfSorters): array
     {
         $orderBy = $config->getOrderBy();

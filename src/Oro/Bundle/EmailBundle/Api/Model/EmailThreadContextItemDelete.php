@@ -29,9 +29,7 @@ class EmailThreadContextItemDelete implements EntityHolderInterface
         return $this->id;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEntity(): object
     {
         return $this->entity;

@@ -61,17 +61,13 @@ abstract class AbstractImportStrategy implements StrategyInterface, ContextAware
         $this->databaseHelper = $databaseHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setEntityName(string $entityName): void
     {
         $this->entityName = $entityName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setImportExportContext(ContextInterface $context)
     {
         $this->context = $context;

@@ -58,6 +58,7 @@ abstract class AbstractFileReader extends AbstractReader implements ClosableInte
     /**
      * @throws InvalidConfigurationException
      */
+    #[\Override]
     protected function initializeFromContext(ContextInterface $context)
     {
         if (!$context->hasOption(Context::OPTION_FILE_PATH)) {
@@ -103,9 +104,7 @@ abstract class AbstractFileReader extends AbstractReader implements ClosableInte
         return $this->header;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function close()
     {
         $this->header = null;

@@ -7,6 +7,7 @@ namespace Oro\Bundle\BatchBundle\Step;
  */
 class CumulativeItemStep extends ItemStep
 {
+    #[\Override]
     protected function createStepExecutor(): StepExecutor
     {
         return new CumulativeStepExecutor();

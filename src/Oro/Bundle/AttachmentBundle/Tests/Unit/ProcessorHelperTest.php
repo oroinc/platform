@@ -11,6 +11,7 @@ class ProcessorHelperTest extends TestCase
 
     private ProcessorHelper $processorHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->checkProcessors();

@@ -33,9 +33,7 @@ class CurrencyExtension extends AbstractExtension implements ServiceSubscriberIn
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -48,9 +46,7 @@ class CurrencyExtension extends AbstractExtension implements ServiceSubscriberIn
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFilters()
     {
         return [
@@ -139,9 +135,7 @@ class CurrencyExtension extends AbstractExtension implements ServiceSubscriberIn
         return Currencies::getName($currency, $displayLocale);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

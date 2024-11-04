@@ -13,6 +13,7 @@ class UrlConverterTest extends \PHPUnit\Framework\TestCase
     /** @var UrlConverter */
     private $urlConverter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->router = $this->createMock(RouterInterface::class);

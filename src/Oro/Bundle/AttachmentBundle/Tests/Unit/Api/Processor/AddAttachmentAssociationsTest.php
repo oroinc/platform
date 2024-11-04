@@ -16,6 +16,7 @@ class AddAttachmentAssociationsTest extends ConfigProcessorTestCase
     /** @var AddAttachmentAssociations */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

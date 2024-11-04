@@ -21,19 +21,17 @@ class RangeConstraintConverter implements ConstraintConverterInterface
         $this->propertyAccessor = $propertyAccessor;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function supports(Constraint $constraint, ?FormInterface $form = null): bool
     {
         return $constraint instanceof Range && !isset($constraint->payload['jsValidation']);
     }
 
     /**
-     * {@inheritDoc}
      *
      * @param Range $constraint
      */
+    #[\Override]
     public function convertConstraint(Constraint $constraint, ?FormInterface $form = null): ?Constraint
     {
         $convertedConstraint = clone $constraint;

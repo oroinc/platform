@@ -29,17 +29,13 @@ abstract class AbstractConfigurationChildBuilder implements ConfigurationChildBu
      */
     abstract protected function getDefaultOptions(): array;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function supports(array $option): bool
     {
         return $option['type'] === static::getType();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildOption(FormBuilderInterface $builder, array $option): void
     {
         $builder->add(
@@ -58,6 +54,7 @@ abstract class AbstractConfigurationChildBuilder implements ConfigurationChildBu
             });
     }
 
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $formOptions, array $themeOption): void
     {
         if ($this->isApplicablePreviews($themeOption)) {

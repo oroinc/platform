@@ -12,6 +12,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class RequiredRegionValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator(): RequiredRegionValidator
     {
         return new RequiredRegionValidator();

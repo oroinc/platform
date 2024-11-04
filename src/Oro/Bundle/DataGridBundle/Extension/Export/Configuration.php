@@ -12,9 +12,7 @@ class Configuration implements ConfigurationInterface
 {
     public const XLSX_MAX_EXPORT_RECORDS = 10000;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $builder = new TreeBuilder('export');

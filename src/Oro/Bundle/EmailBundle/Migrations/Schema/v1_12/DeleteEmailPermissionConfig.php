@@ -9,9 +9,7 @@ use Psr\Log\LoggerInterface;
 
 class DeleteEmailPermissionConfig extends ParametrizedMigrationQuery
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -20,9 +18,7 @@ class DeleteEmailPermissionConfig extends ParametrizedMigrationQuery
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->doExecute($logger);

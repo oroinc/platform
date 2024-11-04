@@ -10,11 +10,13 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class FormEntityConfiguration implements EntityConfigInterface
 {
+    #[\Override]
     public function getSectionName(): string
     {
         return 'form';
     }
 
+    #[\Override]
     public function configure(NodeBuilder $nodeBuilder): void
     {
         $nodeBuilder

@@ -29,9 +29,7 @@ class TagSubscriber implements EventSubscriberInterface
         $this->taggableHelper = $taggableHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

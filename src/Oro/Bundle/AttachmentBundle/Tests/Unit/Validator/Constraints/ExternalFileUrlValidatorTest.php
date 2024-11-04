@@ -14,12 +14,14 @@ class ExternalFileUrlValidatorTest extends ConstraintValidatorTestCase
     /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $logger;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);
         parent::setUp();
     }
 
+    #[\Override]
     protected function createValidator(): ConstraintValidator
     {
         return new ExternalFileUrlValidator($this->logger);

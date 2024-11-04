@@ -24,6 +24,7 @@ class RestrictionManagerTest extends \PHPUnit\Framework\TestCase
     /** @var RestrictionManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->userAgentProvider = $this->createMock(UserAgentProvider::class);

@@ -10,9 +10,7 @@ class EntityPaginationExtension extends AbstractExtension
     const ENTITY_PAGINATION_PATH = '[options][entity_pagination]';
     const ENTITY_PAGINATION_TARGET_PATH = '[options][entity_pagination_target]';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return
@@ -21,9 +19,7 @@ class EntityPaginationExtension extends AbstractExtension
             && null !== $config->offsetGetByPath(self::ENTITY_PAGINATION_PATH);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function processConfigs(DatagridConfiguration $config)
     {
         $pagination = $config->offsetGetByPath(self::ENTITY_PAGINATION_PATH);

@@ -22,9 +22,7 @@ class TagVirtualFieldProvider implements VirtualFieldProviderInterface
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isVirtualField($className, $fieldName)
     {
         return
@@ -32,9 +30,7 @@ class TagVirtualFieldProvider implements VirtualFieldProviderInterface
             && $this->taggableHelper->isTaggable($className);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVirtualFieldQuery($className, $fieldName)
     {
         return [
@@ -47,9 +43,7 @@ class TagVirtualFieldProvider implements VirtualFieldProviderInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVirtualFields($className)
     {
         if ($this->taggableHelper->isTaggable($className)) {

@@ -14,9 +14,7 @@ class CommandStub extends Command implements FeatureCheckerAwareInterface
     /** @var FeatureChecker */
     private $featureChecker;
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function setFeatureChecker(FeatureChecker $featureChecker)
     {
         $this->featureChecker = $featureChecker;

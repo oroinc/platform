@@ -25,17 +25,13 @@ class UserLoader implements UserLoaderInterface
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getUserClass(): string
     {
         return User::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function loadUser(string $login): ?UserInterface
     {
         $user = $this->loadUserByIdentifier($login);
@@ -46,17 +42,13 @@ class UserLoader implements UserLoaderInterface
         return $user;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function loadUserByIdentifier(string $username): ?UserInterface
     {
         return $this->getRepository()->findOneBy(['username' => $username]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function loadUserByEmail(string $email): ?UserInterface
     {
         return $this->getRepository()->findUserByEmail(

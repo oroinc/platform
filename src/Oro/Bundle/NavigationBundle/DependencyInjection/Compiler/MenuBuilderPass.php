@@ -16,9 +16,7 @@ class MenuBuilderPass implements CompilerPassInterface
 {
     use TaggedServiceTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $this->processMenu($container);

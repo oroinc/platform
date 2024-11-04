@@ -389,11 +389,25 @@ oro_api:
             supported_operators: ['=', '!=']
         association:
             factory: ['@oro_api.filter_factory.extended_association', 'createFilter']
+        nestedAssociation:
+            factory: [ '@oro_api.filter_factory.nested_association', 'createFilter' ]
         primaryField:
             class: Oro\Bundle\ApiBundle\Filter\PrimaryFieldFilter
         nestedTree:
             class: Oro\Bundle\ApiBundle\Filter\NestedTreeFilter
             supported_operators: ['>', '>=']
+
+    filter_disallow_array_data_types:
+        - string
+        - text
+        - boolean
+
+    filter_disallow_range_data_types:
+        - string
+        - text
+        - boolean
+        - guid
+        - currency
 
     error_title_overrides:
         'percent range constraint': 'range constraint'

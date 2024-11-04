@@ -9,6 +9,7 @@ class ContextCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var ContextChecker */
     private $contextChecker;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->contextChecker = new ContextChecker();

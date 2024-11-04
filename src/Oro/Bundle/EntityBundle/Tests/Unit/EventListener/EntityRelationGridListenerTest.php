@@ -21,6 +21,7 @@ class EntityRelationGridListenerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityRelationGridListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->cm = $this->createMock(ConfigManager::class);

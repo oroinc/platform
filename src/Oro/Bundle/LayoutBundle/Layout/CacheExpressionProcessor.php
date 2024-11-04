@@ -15,9 +15,7 @@ class CacheExpressionProcessor extends ExpressionProcessor
 {
     private bool $cached = false;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function processExpressions(
         array &$values,
         ContextInterface $context,
@@ -35,9 +33,7 @@ class CacheExpressionProcessor extends ExpressionProcessor
         $this->processValues($values, $context, $data, $evaluate, $encoding);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function processExpression(
         ParsedExpression $expr,
         ContextInterface $context,
@@ -52,9 +48,7 @@ class CacheExpressionProcessor extends ExpressionProcessor
         return parent::processExpression($expr, $context, $data, $evaluate, $encoding);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function processClosure(\Closure $value, ContextInterface $context, ?DataAccessorInterface $data)
     {
         if ($this->cached) {
@@ -64,9 +58,7 @@ class CacheExpressionProcessor extends ExpressionProcessor
         return parent::processClosure($value, $context, $data);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function processClosureWithExtraParams(
         ClosureWithExtraParams $value,
         ContextInterface $context,

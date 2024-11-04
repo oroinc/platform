@@ -7,6 +7,7 @@ use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityIdMetadataInterface;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 
 /**
  * Provides a functionality to load an entity from the database.
@@ -14,10 +15,12 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 class EntityLoader
 {
     private DoctrineHelper $doctrineHelper;
+    private QueryHintResolverInterface $queryHintResolver;
 
-    public function __construct(DoctrineHelper $doctrineHelper)
+    public function __construct(DoctrineHelper $doctrineHelper, QueryHintResolverInterface $queryHintResolver)
     {
         $this->doctrineHelper = $doctrineHelper;
+        $this->queryHintResolver = $queryHintResolver;
     }
 
     /**
@@ -42,8 +45,9 @@ class EntityLoader
             return $em->find($entityClass, $entityId);
         }
 
+        $hints = $metadata->getHints();
         $criteria = $this->buildFindCriteria($entityId, $metadata);
-        if ($this->isEntityIdentifierEqualToPrimaryKey($criteria, $em->getClassMetadata($entityClass))) {
+        if (!$hints && $this->isEntityIdentifierEqualToPrimaryKey($criteria, $em->getClassMetadata($entityClass))) {
             if (\is_array($entityId)) {
                 $entityId = $criteria;
             }
@@ -57,7 +61,12 @@ class EntityLoader
             $qb->setParameter($fieldName, $fieldValue);
         }
 
-        return $qb->getQuery()->getOneOrNullResult();
+        $query = $qb->getQuery();
+        if ($hints) {
+            $this->queryHintResolver->resolveHints($query, $hints);
+        }
+
+        return $query->getOneOrNullResult();
     }
 
     private function buildFindCriteria(mixed $entityId, EntityIdMetadataInterface $metadata): array

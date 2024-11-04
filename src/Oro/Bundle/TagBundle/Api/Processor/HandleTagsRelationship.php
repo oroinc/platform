@@ -24,9 +24,7 @@ class HandleTagsRelationship implements ProcessorInterface
         $this->handler = $handler;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ChangeRelationshipContext $context */

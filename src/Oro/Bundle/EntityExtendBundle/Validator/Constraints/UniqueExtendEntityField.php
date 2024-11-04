@@ -12,17 +12,13 @@ class UniqueExtendEntityField extends Constraint
     /** @var string */
     public $similarFieldMessage = 'This name conflicts with existing \'{{ field }}\' field.';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validatedBy(): string
     {
         return UniqueExtendEntityFieldValidator::ALIAS;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;

@@ -19,6 +19,7 @@ class LoadTestEntityData extends AbstractFixture
         self::TEST_ENTITY_2 => ['message' => 'new message', 'description' => 'Test Description']
     ];
 
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         foreach ($this->activities as $name => $activity) {

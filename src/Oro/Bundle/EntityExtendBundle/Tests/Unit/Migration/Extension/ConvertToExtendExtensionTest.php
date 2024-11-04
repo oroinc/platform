@@ -35,6 +35,7 @@ class ConvertToExtendExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ConvertToExtendExtension */
     private $convertToExtendExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityMetadataHelper = $this->createMock(EntityMetadataHelper::class);

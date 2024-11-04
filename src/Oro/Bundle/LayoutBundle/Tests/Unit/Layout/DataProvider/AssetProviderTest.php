@@ -13,6 +13,7 @@ class AssetProviderTest extends \PHPUnit\Framework\TestCase
     /** @var AssetProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->packages = $this->createMock(Packages::class);

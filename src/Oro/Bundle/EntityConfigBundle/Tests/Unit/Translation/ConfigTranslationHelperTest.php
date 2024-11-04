@@ -20,6 +20,7 @@ class ConfigTranslationHelperTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigTranslationHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translator = $this->createMock(Translator::class);

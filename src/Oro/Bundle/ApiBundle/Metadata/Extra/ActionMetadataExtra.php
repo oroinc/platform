@@ -26,17 +26,13 @@ class ActionMetadataExtra implements MetadataExtraInterface
         $this->parentAction = $parentAction;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getName(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureContext(MetadataContext $context): void
     {
         $context->setTargetAction($this->action);
@@ -45,9 +41,7 @@ class ActionMetadataExtra implements MetadataExtraInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getCacheKeyPart(): ?string
     {
         $result = self::NAME . ':' . $this->action;

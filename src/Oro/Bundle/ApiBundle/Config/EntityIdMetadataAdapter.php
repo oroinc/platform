@@ -18,32 +18,27 @@ class EntityIdMetadataAdapter implements EntityIdMetadataInterface
         $this->config = $config;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getClassName(): string
     {
         return $this->className;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getIdentifierFieldNames(): array
     {
         return $this->config->getIdentifierFieldNames();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getPropertyPath(string $propertyName): ?string
     {
-        $field = $this->config->getField($propertyName);
-        if (null === $field) {
-            return null;
-        }
+        return $this->config->getField($propertyName)?->getPropertyPath($propertyName);
+    }
 
-        return $field->getPropertyPath($propertyName);
+    #[\Override]
+    public function getHints(): array
+    {
+        return $this->config->getHints();
     }
 }

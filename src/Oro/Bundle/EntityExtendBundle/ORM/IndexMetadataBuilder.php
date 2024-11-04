@@ -30,17 +30,13 @@ class IndexMetadataBuilder implements MetadataBuilderInterface
         $this->nameGenerator        = $nameGenerator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports(ConfigInterface $extendConfig)
     {
         return $extendConfig->is('index');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function build(ClassMetadataBuilder $metadataBuilder, ConfigInterface $extendConfig)
     {
         $className = $extendConfig->getId()->getClassName();

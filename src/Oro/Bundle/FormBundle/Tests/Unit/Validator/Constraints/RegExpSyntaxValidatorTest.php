@@ -9,6 +9,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class RegExpSyntaxValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator(): ConstraintValidator
     {
         return new RegExpSyntaxValidator();

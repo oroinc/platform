@@ -22,6 +22,7 @@ class FileStrategyEventListenerTest extends WebTestCase
 {
     private FileStrategyEventListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());

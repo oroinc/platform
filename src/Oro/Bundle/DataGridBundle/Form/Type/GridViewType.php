@@ -26,8 +26,8 @@ class GridViewType extends AbstractType
      *     '-1': 'ASC',
      *     '1': 'DESC'
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -81,9 +81,7 @@ class GridViewType extends AbstractType
             ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -92,17 +90,12 @@ class GridViewType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_datagrid_grid_view';

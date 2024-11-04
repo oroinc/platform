@@ -20,6 +20,7 @@ class AddressFormatterTest extends \PHPUnit\Framework\TestCase
     /** @var AddressFormatter */
     private $addressFormatter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->localeSettings = $this->createMock(LocaleSettings::class);

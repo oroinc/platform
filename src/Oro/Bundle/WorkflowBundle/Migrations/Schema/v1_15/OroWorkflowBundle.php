@@ -8,6 +8,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroWorkflowBundle implements Migration
 {
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $this->createOroWorkflowTransTriggerTable($schema);

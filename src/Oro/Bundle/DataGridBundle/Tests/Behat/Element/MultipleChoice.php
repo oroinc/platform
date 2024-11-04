@@ -119,14 +119,18 @@ class MultipleChoice extends AbstractGridFilterItem
      */
     protected function findElementByText($items, $text)
     {
-        /** @var NodeElement $input */
-        foreach ($items as $input) {
-            if (stripos($input->getText(), $text) !== false) {
-                return $input;
+        $foundItem = null;
+        foreach ($items as $item) {
+            if (strtolower($item->getText()) === strtolower($text)) {
+                $foundItem = $item;
+                break;
+            }
+            if (null === $foundItem && stripos($item->getText(), $text) !== false) {
+                $foundItem = $item;
             }
         }
 
-        return null;
+        return $foundItem;
     }
 
     /**
@@ -139,16 +143,21 @@ class MultipleChoice extends AbstractGridFilterItem
      */
     protected function findElementByTextStrict($items, $text)
     {
-        /** @var NodeElement $input */
-        foreach ($items as $input) {
-            if (strpos($input->getText(), $text) !== false) {
-                return $input;
+        $foundItem = null;
+        foreach ($items as $item) {
+            if ($item->getText() === $text) {
+                $foundItem = $item;
+                break;
+            }
+            if (null === $foundItem && str_contains($item->getText(), $text)) {
+                $foundItem = $item;
             }
         }
 
-        return null;
+        return $foundItem;
     }
 
+    #[\Override]
     public function open()
     {
         parent::open();
@@ -156,6 +165,7 @@ class MultipleChoice extends AbstractGridFilterItem
         $this->getDriver()->waitForAjax();
     }
 
+    #[\Override]
     public function close()
     {
         $dropDownMask = $this->getPage()->find('css', '.oro-dropdown-mask');

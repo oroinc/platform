@@ -29,7 +29,7 @@ class PlaceholderFilter
     {
         if ($entity instanceof User &&
             $entity->getAuthStatus() &&
-            $entity->getAuthStatus()->getId() !== UserManager::STATUS_ACTIVE
+            $entity->getAuthStatus()->getInternalId() !== UserManager::STATUS_ACTIVE
         ) {
             return false;
         }

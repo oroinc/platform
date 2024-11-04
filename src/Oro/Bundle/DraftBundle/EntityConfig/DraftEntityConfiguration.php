@@ -10,11 +10,13 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class DraftEntityConfiguration implements EntityConfigInterface
 {
+    #[\Override]
     public function getSectionName(): string
     {
         return 'draft';
     }
 
+    #[\Override]
     public function configure(NodeBuilder $nodeBuilder): void
     {
         $nodeBuilder

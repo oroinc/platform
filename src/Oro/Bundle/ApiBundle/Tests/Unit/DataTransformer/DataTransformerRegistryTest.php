@@ -22,6 +22,7 @@ class DataTransformerRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var DataTransformerRegistry */
     private $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->transformer1 = $this->createMock(DataTransformerInterface::class);

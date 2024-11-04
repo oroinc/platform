@@ -14,6 +14,7 @@ class MetadataRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var MetadataRegistry */
     private $metadataRegistry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->metadataBuilder = $this->createMock(MetadataBuilder::class);

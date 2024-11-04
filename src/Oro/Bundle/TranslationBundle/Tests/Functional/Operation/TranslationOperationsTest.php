@@ -11,6 +11,7 @@ use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadTranslations;
  */
 class TranslationOperationsTest extends ActionTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());

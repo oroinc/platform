@@ -14,6 +14,7 @@ class EntityConfigGridListener extends AbstractConfigGridListener
      */
     protected $moduleChoices;
 
+    #[\Override]
     public function onBuildAfter(BuildAfter $event)
     {
         $datasource = $event->getDatagrid()->getDatasource();
@@ -24,6 +25,7 @@ class EntityConfigGridListener extends AbstractConfigGridListener
         }
     }
 
+    #[\Override]
     public function onBuildBefore(BuildBefore $event)
     {
         $this->doBuildBefore($event, 'cev', PropertyConfigContainer::TYPE_ENTITY);

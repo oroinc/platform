@@ -11,6 +11,7 @@ class CredentialsNotificationSenderPassTest extends \PHPUnit\Framework\TestCase
     /** @var CredentialsNotificationSenderPass */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new CredentialsNotificationSenderPass();

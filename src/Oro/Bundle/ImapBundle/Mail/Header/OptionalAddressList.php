@@ -9,11 +9,7 @@ use Laminas\Mail\AddressList;
  */
 class OptionalAddressList extends AddressList
 {
-    /**
-     * {@inheritdoc}
-     *
-     * Do not throw exception in case if $address is empty
-     */
+    #[\Override]
     public function addFromString($address, $comment = null)
     {
         if (empty($address)) {

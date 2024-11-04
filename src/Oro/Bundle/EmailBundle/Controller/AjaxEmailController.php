@@ -80,6 +80,7 @@ class AjaxEmailController extends AbstractController
         return $this->container->get(EmailHandler::class);
     }
 
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

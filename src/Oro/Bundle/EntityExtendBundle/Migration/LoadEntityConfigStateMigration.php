@@ -16,9 +16,7 @@ class LoadEntityConfigStateMigration implements Migration, DataStorageExtensionA
 {
     use DataStorageExtensionAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         if ($schema instanceof ExtendSchema) {

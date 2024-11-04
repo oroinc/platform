@@ -12,11 +12,13 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 class PostExportTopicTest extends AbstractTopicTestCase
 {
+    #[\Override]
     protected function getTopic(): TopicInterface
     {
         return new PostExportTopic();
     }
 
+    #[\Override]
     public function validBodyDataProvider(): array
     {
         $onlyRequiredOptionsSet = [
@@ -49,6 +51,7 @@ class PostExportTopicTest extends AbstractTopicTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
+    #[\Override]
     public function invalidBodyDataProvider(): array
     {
         return [

@@ -11,6 +11,7 @@ class NotTest extends \PHPUnit\Framework\TestCase
 {
     private Condition\Not $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->condition = new Condition\Not();

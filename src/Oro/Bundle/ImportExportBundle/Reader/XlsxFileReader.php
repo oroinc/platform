@@ -20,9 +20,7 @@ class XlsxFileReader extends AbstractFileReader
     /** @var RowIterator */
     private $rowIterator;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function read($context = null): ?array
     {
         if (!$context instanceof ContextInterface) {
@@ -65,9 +63,7 @@ class XlsxFileReader extends AbstractFileReader
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initializeByContext(ContextInterface $context): void
     {
         parent::initializeByContext($context);
@@ -88,6 +84,7 @@ class XlsxFileReader extends AbstractFileReader
         }
     }
 
+    #[\Override]
     public function close()
     {
         $this->rowIterator = null;

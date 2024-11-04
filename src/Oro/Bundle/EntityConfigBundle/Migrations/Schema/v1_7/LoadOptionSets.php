@@ -16,17 +16,13 @@ class LoadOptionSets implements
 {
     use DataStorageExtensionAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOrder()
     {
         return 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $queries->addQuery(new LoadOptionSetsQuery($this->dataStorageExtension));

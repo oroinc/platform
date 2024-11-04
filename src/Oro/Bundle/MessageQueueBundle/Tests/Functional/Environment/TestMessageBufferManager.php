@@ -12,9 +12,7 @@ use Oro\Bundle\MessageQueueBundle\Client\MessageBufferManager;
  */
 class TestMessageBufferManager extends MessageBufferManager
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function isTransactionActive(Connection $connection): bool
     {
         return $connection->getTransactionNestingLevel() === 1;

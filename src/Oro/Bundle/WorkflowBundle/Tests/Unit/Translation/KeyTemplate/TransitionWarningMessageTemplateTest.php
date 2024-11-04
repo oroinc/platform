@@ -6,7 +6,7 @@ use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionWarningMessageTe
 
 class TransitionWarningMessageTemplateTest extends TemplateTestCase
 {
-    /** {@inheritdoc} */
+    #[\Override]
     public function getTemplateInstance()
     {
         return new TransitionWarningMessageTemplate();
@@ -17,11 +17,13 @@ class TransitionWarningMessageTemplateTest extends TemplateTestCase
         $this->assertName(TransitionWarningMessageTemplate::NAME);
     }
 
+    #[\Override]
     public function testGetTemplate()
     {
         $this->assertTemplate('oro.workflow.{{ workflow_name }}.transition.{{ transition_name }}.warning_message');
     }
 
+    #[\Override]
     public function testGetRequiredKeys()
     {
         $this->assertRequiredKeys(['workflow_name', 'transition_name']);

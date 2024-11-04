@@ -26,6 +26,7 @@ class GetPropertyNode extends Node
         parent::__construct(['node' => $node, 'attribute' => $attribute, 'arguments' => $arguments]);
     }
 
+    #[\Override]
     public function compile(Compiler $compiler): void
     {
         $compiler
@@ -34,6 +35,7 @@ class GetPropertyNode extends Node
             ->raw($this->nodes['attribute']->attributes['value']);
     }
 
+    #[\Override]
     public function evaluate(array $functions, array $values)
     {
         $evaluatedNode = $this->nodes['node']->evaluate($functions, $values);
@@ -61,6 +63,7 @@ class GetPropertyNode extends Node
         return self::$propertyAccessor;
     }
 
+    #[\Override]
     public function toArray(): array
     {
         return [$this->nodes['node'], '.', $this->nodes['attribute']];

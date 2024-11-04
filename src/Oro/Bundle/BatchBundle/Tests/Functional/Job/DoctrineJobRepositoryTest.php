@@ -16,6 +16,7 @@ class DoctrineJobRepositoryTest extends WebTestCase
     /** @var DoctrineJobRepository */
     private $doctrineJobRepository;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -23,9 +24,7 @@ class DoctrineJobRepositoryTest extends WebTestCase
         $this->loadFixtures([LoadDoctrineJobRepositoryData::class]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getDataFixturesExecutorEntityManager()
     {
         return $this->doctrineJobRepository->getJobManager();

@@ -26,9 +26,7 @@ class UserDeleteHandlerExtension extends AbstractEntityDeleteHandlerExtension
         $this->ownerDeletionManager = $ownerDeletionManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function assertDeleteGranted($entity): void
     {
         /** @var User $entity */

@@ -21,6 +21,7 @@ class GetLanguageTranslationMetricsActionTest extends \PHPUnit\Framework\TestCas
     private GetLanguageTranslationMetricsAction $action2;
     private array $metrics;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->codeWithoutTranslations = 'fr_FR';

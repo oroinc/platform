@@ -6,6 +6,7 @@ class JsonSerializableClass implements \JsonSerializable
 {
     public $keyPublic = 'public';
 
+    #[\Override]
     public function jsonSerialize(): array
     {
         return [

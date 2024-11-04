@@ -36,10 +36,10 @@ class EmailTemplateSyntaxValidator extends ConstraintValidator
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof EmailTemplateSyntax) {

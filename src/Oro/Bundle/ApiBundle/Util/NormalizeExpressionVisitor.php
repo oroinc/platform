@@ -21,9 +21,7 @@ class NormalizeExpressionVisitor extends ExpressionVisitor
         $this->placeholders = $placeholders;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkComparison(Comparison $comparison)
     {
         return new Comparison(
@@ -33,17 +31,13 @@ class NormalizeExpressionVisitor extends ExpressionVisitor
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkValue(Value $value)
     {
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkCompositeExpression(CompositeExpression $expr)
     {
         return new CompositeExpression(

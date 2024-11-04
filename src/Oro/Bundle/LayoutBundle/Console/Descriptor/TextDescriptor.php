@@ -11,9 +11,7 @@ use Symfony\Component\Console\Helper\Table;
  */
 class TextDescriptor extends AbstractDescriptor
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function describeDefaults(array $options): void
     {
         $this->output->section('Context');
@@ -37,9 +35,7 @@ class TextDescriptor extends AbstractDescriptor
         $this->output->listing($options['data_providers']);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function describeBlockType(BlockTypeInterface $blockType, array $blockOptions = []): void
     {
         $this->output->writeln(sprintf('<options=underscore>Class:</> %s', $blockOptions['class']));
@@ -70,9 +66,7 @@ class TextDescriptor extends AbstractDescriptor
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function describeDataProvider($dataProvider, array $options = []): void
     {
         $this->output->text('<options=underscore>Name:</> '.$options['name']);

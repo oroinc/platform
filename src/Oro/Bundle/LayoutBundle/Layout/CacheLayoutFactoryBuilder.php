@@ -43,9 +43,7 @@ class CacheLayoutFactoryBuilder extends LayoutFactoryBuilder
         parent::__construct($expressionProcessor, $blockViewCache);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getLayoutFactory()
     {
         $this->cacheMetadataProvider->reset();

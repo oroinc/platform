@@ -18,9 +18,7 @@ class ChainParameterFilter implements ParameterFilterInterface
         $this->filters = $filters;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function filter($rawValue, $operator)
     {
         foreach ($this->filters as $filter) {

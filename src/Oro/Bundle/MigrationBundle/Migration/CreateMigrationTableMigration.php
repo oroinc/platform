@@ -8,9 +8,7 @@ class CreateMigrationTableMigration implements Migration
 {
     const MIGRATION_TABLE = 'oro_migrations';
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->createTable(self::MIGRATION_TABLE);

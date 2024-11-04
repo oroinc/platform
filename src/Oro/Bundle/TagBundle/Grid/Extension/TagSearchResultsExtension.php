@@ -42,9 +42,7 @@ class TagSearchResultsExtension extends AbstractExtension
         $this->nameResolver = $nameResolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return
@@ -52,9 +50,7 @@ class TagSearchResultsExtension extends AbstractExtension
             && $config->offsetGetByPath(self::TYPE_PATH) === self::TYPE_VALUE;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
         $rows = $result->getData();
@@ -97,9 +93,7 @@ class TagSearchResultsExtension extends AbstractExtension
         $result->setData($resultRows);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPriority()
     {
         return 10;

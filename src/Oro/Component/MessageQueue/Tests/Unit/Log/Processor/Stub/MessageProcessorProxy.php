@@ -17,16 +17,12 @@ class MessageProcessorProxy implements MessageProcessorInterface, ValueHolderInt
         $this->messageProcessor = $messageProcessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getWrappedValueHolderValue(): ?object
     {
         return $this->messageProcessor;

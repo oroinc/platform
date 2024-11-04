@@ -9,6 +9,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Form;
 
 class SystemConfigForm extends Form
 {
+    #[\Override]
     public function fill(TableNode $table)
     {
         foreach ($table->getRows() as list($label, $value)) {

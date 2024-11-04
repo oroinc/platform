@@ -9,9 +9,7 @@ use Oro\Bundle\SearchBundle\Query\Query;
  */
 class TextFilteredObjectMapper extends ObjectMapper
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setDataValue($alias, $objectData, $fieldConfig, $value, $isArray = false)
     {
         $objectData = parent::setDataValue($alias, $objectData, $fieldConfig, $value, $isArray);
@@ -28,8 +26,8 @@ class TextFilteredObjectMapper extends ObjectMapper
     /**
      * Clear HTML in text fields
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     protected function clearTextValue($fieldName, $value)
     {
         $value = $this->htmlTagHelper->stripTags((string)$value);

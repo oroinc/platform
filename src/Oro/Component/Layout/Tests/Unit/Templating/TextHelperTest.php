@@ -10,6 +10,7 @@ class TextHelperTest extends \PHPUnit\Framework\TestCase
     /** @var TextHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);

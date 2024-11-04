@@ -19,6 +19,7 @@ class EmailFactoryTest extends \PHPUnit\Framework\TestCase
 
     private EmailFactory $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->parentMessageIdProvider = $this->createMock(ParentMessageIdProvider::class);

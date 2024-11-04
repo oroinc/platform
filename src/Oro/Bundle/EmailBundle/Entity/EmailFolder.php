@@ -422,6 +422,7 @@ class EmailFolder
      *
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return sprintf('EmailFolder(%s)', $this->fullName);

@@ -17,6 +17,7 @@ class AddPageNumberToInfoRecordTest extends GetListProcessorTestCase
     /** @var AddPageNumberToInfoRecord */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

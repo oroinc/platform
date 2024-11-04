@@ -18,6 +18,7 @@ class ChartOptionsBuilderTest extends \PHPUnit\Framework\TestCase
     private DateHelper|MockObject $dateHelper;
     private DatagridInterface|MockObject $datagrid;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityFieldProvider = $this->createMock(EntityFieldProvider::class);

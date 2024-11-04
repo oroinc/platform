@@ -11,9 +11,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowEntityAcl;
 
 class LoadWorkflowEntityAcls extends AbstractFixture implements DependentFixtureInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $this->createAcl($manager, 'test_active_flow1', 'name');
@@ -41,9 +39,7 @@ class LoadWorkflowEntityAcls extends AbstractFixture implements DependentFixture
         $this->addReference($workflowName . '_' . $attribute, $acl);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [LoadWorkflowAwareEntities::class];

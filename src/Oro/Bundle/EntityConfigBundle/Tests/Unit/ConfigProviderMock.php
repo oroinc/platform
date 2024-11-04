@@ -96,9 +96,7 @@ class ConfigProviderMock extends ConfigProvider
         return $config;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getId(
         string $className = null,
         string $fieldName = null,
@@ -109,9 +107,7 @@ class ConfigProviderMock extends ConfigProvider
             : new EntityConfigId($this->getScope(), $className);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasConfig(string $className, string $fieldName = null): bool
     {
         return $fieldName
@@ -119,9 +115,7 @@ class ConfigProviderMock extends ConfigProvider
             : isset($this->entityConfigs[$className]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasConfigById(ConfigIdInterface $configId): bool
     {
         return $configId instanceof FieldConfigId
@@ -129,9 +123,7 @@ class ConfigProviderMock extends ConfigProvider
             : $this->hasConfig($configId->getClassName());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfig(string $className = null, string $fieldName = null): ConfigInterface
     {
         if (!$this->hasConfig($className, $fieldName)) {
@@ -155,9 +147,7 @@ class ConfigProviderMock extends ConfigProvider
             : $this->entityConfigs[$className];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigById(ConfigIdInterface $configId): ConfigInterface
     {
         return $configId instanceof FieldConfigId
@@ -165,9 +155,7 @@ class ConfigProviderMock extends ConfigProvider
             : $this->getConfig($configId->getClassName());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getIds(string $className = null, bool $withHidden = false): array
     {
         $result = [];
@@ -200,9 +188,7 @@ class ConfigProviderMock extends ConfigProvider
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigs(string $className = null, bool $withHidden = false): array
     {
         $result = [];

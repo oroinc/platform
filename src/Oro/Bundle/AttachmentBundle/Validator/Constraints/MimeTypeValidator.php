@@ -29,9 +29,7 @@ class MimeTypeValidator extends ConstraintValidator
         $this->allowedImageMimeTypes = $allowedImageMimeTypes;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof MimeType) {

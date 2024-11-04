@@ -7,25 +7,19 @@ use Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions\MultipleAssociationEnti
 
 class ActivityEntityConfigDumperExtension extends MultipleAssociationEntityConfigDumperExtension
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getAssociationScope()
     {
         return 'activity';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getAssociationAttributeName()
     {
         return 'activities';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getAssociationKind()
     {
         return ActivityScope::ASSOCIATION_KIND;

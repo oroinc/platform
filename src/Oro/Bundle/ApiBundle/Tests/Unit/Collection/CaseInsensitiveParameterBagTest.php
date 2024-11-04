@@ -9,6 +9,7 @@ class CaseInsensitiveParameterBagTest extends \PHPUnit\Framework\TestCase
     /** @var CaseInsensitiveParameterBag */
     private $caseInsensitiveParameterBag;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->caseInsensitiveParameterBag = new CaseInsensitiveParameterBag();

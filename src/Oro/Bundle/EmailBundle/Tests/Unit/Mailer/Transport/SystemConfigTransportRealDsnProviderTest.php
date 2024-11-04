@@ -19,6 +19,7 @@ class SystemConfigTransportRealDsnProviderTest extends \PHPUnit\Framework\TestCa
     /** @var SystemConfigTransportRealDsnProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->smtpSettingsProvider = $this->createMock(SmtpSettingsProviderInterface::class);

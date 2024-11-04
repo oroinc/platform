@@ -12,6 +12,7 @@ class AjaxAction extends AbstractAction
     /**
      * @return array
      */
+    #[\Override]
     public function getOptions()
     {
         $options = parent::getOptions();

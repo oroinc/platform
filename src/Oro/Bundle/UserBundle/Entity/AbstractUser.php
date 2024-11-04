@@ -111,9 +111,6 @@ abstract class AbstractUser implements
     #[ConfigField(defaultValues: ['importexport' => ['excluded' => true]])]
     protected ?\DateTimeInterface $passwordChangedAt = null;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct()
     {
         $this->salt = base_convert(sha1(uniqid(mt_rand(), true)), 16, 36);
@@ -123,6 +120,7 @@ abstract class AbstractUser implements
     /**
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return (string)$this->getUserIdentifier();
@@ -136,22 +134,17 @@ abstract class AbstractUser implements
         return $this->id;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getUsername()
     {
         return $this->username;
     }
 
+    #[\Override]
     public function getUserIdentifier(): string
     {
         return $this->username;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUserIdentifier($username): self
     {
         $this->username = $username;
@@ -159,9 +152,7 @@ abstract class AbstractUser implements
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setUsername($username): self
     {
         $this->username = $username;
@@ -193,19 +184,17 @@ abstract class AbstractUser implements
         ] = $serialized;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLastLogin()
     {
         return $this->lastLogin;
     }
 
     /**
-     * {@inheritdoc}
      *
      * @return AbstractUser
      */
+    #[\Override]
     public function setLastLogin(\DateTime $time = null)
     {
         $this->lastLogin = $time;
@@ -213,19 +202,17 @@ abstract class AbstractUser implements
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLoginCount()
     {
         return $this->loginCount;
     }
 
     /**
-     * {@inheritdoc}
      *
      * @return AbstractUser
      */
+    #[\Override]
     public function setLoginCount($count)
     {
         $this->loginCount = $count;
@@ -233,9 +220,7 @@ abstract class AbstractUser implements
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getSalt(): ?string
     {
         return $this->salt;
@@ -253,17 +238,13 @@ abstract class AbstractUser implements
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPassword(): ?string
     {
         return $this->password;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setPassword(?string $password): self
     {
         $this->password = $password;
@@ -271,17 +252,13 @@ abstract class AbstractUser implements
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getPlainPassword(): ?string
     {
         return $this->plainPassword;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setPlainPassword(?string $password): self
     {
         $this->plainPassword = $password;
@@ -353,6 +330,7 @@ abstract class AbstractUser implements
     /**
      * @return Role[]
      */
+    #[\Override]
     public function getUserRoles(): array
     {
         return $this->userRoles->toArray();
@@ -384,9 +362,7 @@ abstract class AbstractUser implements
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addUserRole(Role $role): self
     {
         if (!$this->hasRole($role)) {
@@ -397,10 +373,10 @@ abstract class AbstractUser implements
     }
 
     /**
-     * {@inheritdoc}
      *
      * @return string[]
      */
+    #[\Override]
     public function getRoles(): array
     {
         return array_map(static fn (Role $role) => (string) $role, $this->getUserRoles());
@@ -435,9 +411,7 @@ abstract class AbstractUser implements
         return (bool)$this->getUserRole($roleName);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function eraseCredentials()
     {
         $this->plainPassword = null;
@@ -448,14 +422,13 @@ abstract class AbstractUser implements
      *
      * @return OrganizationInterface|Organization
      */
+    #[\Override]
     public function getOrganization()
     {
         return $this->organization;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setOrganization(OrganizationInterface $organization = null)
     {
         $this->organization = $organization;
@@ -463,19 +436,17 @@ abstract class AbstractUser implements
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfirmationToken()
     {
         return $this->confirmationToken;
     }
 
     /**
-     * {@inheritdoc}
      *
      * @return AbstractUser
      */
+    #[\Override]
     public function setConfirmationToken($token)
     {
         $this->confirmationToken = $token;
@@ -483,17 +454,13 @@ abstract class AbstractUser implements
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function generateToken()
     {
         return base_convert(bin2hex(hash('sha256', uniqid(mt_rand(), true), true)), 16, 36);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isPasswordRequestNonExpired($ttl)
     {
         $passwordRequestAt = $this->getPasswordRequestedAt();
@@ -505,16 +472,17 @@ abstract class AbstractUser implements
     /**
      * @return \DateTime
      */
+    #[\Override]
     public function getPasswordRequestedAt()
     {
         return $this->passwordRequestedAt;
     }
 
     /**
-     * {@inheritdoc}
      *
      * @return AbstractUser
      */
+    #[\Override]
     public function setPasswordRequestedAt(\DateTime $time = null)
     {
         $this->passwordRequestedAt = $time;
@@ -522,19 +490,17 @@ abstract class AbstractUser implements
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPasswordChangedAt()
     {
         return $this->passwordChangedAt;
     }
 
     /**
-     * {@inheritdoc}
      *
      * @return AbstractUser
      */
+    #[\Override]
     public function setPasswordChangedAt(\DateTime $time = null)
     {
         $this->passwordChangedAt = $time;
@@ -576,9 +542,7 @@ abstract class AbstractUser implements
      */
     abstract public function getOrganizations(bool $onlyEnabled = false);
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isEqualTo(SymfonyUserInterface $user): bool
     {
         if ($this->getPassword() !== $user->getPassword()) {

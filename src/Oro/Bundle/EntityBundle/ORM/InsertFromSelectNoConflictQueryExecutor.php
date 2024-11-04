@@ -21,9 +21,7 @@ class InsertFromSelectNoConflictQueryExecutor implements InsertQueryExecutorInte
         $this->onConflictIgnoredFields = $onConflictIgnoredFields;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function execute(string $className, array $fields, QueryBuilder $selectQueryBuilder): int
     {
         $insertToTableName = $this->helper->getTableName($className);

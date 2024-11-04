@@ -43,9 +43,7 @@ class ChannelActionHandlerDispatcherDecorator implements ChannelActionHandlerInt
         $this->errorHandler = $errorHandler;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handleAction(Channel $channel)
     {
         $event = $this->eventFactory->create($channel);

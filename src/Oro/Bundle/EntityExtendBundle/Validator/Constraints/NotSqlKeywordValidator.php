@@ -21,9 +21,7 @@ class NotSqlKeywordValidator extends ConstraintValidator
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (null === $value || '' === $value) {

@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Validator\Constraint;
@@ -27,9 +28,7 @@ class UniqueEnumNameValidator extends ConstraintValidator
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (null === $value || '' === $value) {
@@ -72,7 +71,7 @@ class UniqueEnumNameValidator extends ConstraintValidator
         // at first check if an enum entity with the given code is already exist
         $entityConfigs = $extendConfigProvider->getConfigs(null, true);
         foreach ($entityConfigs as $entityConfig) {
-            if (!$entityConfig->is('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS)) {
+            if (!$entityConfig->is('inherit', EnumOptionInterface::class)) {
                 continue;
             }
             $enumEntityConfig = $enumConfigProvider->getConfig($entityConfig->getId()->getClassName());
@@ -102,7 +101,7 @@ class UniqueEnumNameValidator extends ConstraintValidator
                     // ignore a field for which the validation was called
                     continue;
                 }
-                if (!in_array($fieldConfigId->getFieldType(), ['enum', 'multiEnum'])) {
+                if (!ExtendHelper::isEnumerableType($fieldConfigId->getFieldType())) {
                     continue;
                 }
                 if (!$fieldConfig->in('state', [ExtendScope::STATE_NEW])) {

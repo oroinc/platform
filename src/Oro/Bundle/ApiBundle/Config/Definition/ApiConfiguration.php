@@ -31,9 +31,7 @@ class ApiConfiguration implements ConfigurationInterface
         $this->maxNestingLevel = $maxNestingLevel ?? $extensionRegistry->getMaxNestingLevel();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder(self::ROOT_NODE);

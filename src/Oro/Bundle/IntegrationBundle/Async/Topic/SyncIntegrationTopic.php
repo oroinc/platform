@@ -18,16 +18,19 @@ class SyncIntegrationTopic extends AbstractTopic implements JobAwareTopicInterfa
         $this->transportBatchSize = $transportBatchSize;
     }
 
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.integration.sync_integration';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Synchronizes an integration';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver
@@ -51,6 +54,7 @@ class SyncIntegrationTopic extends AbstractTopic implements JobAwareTopicInterfa
             ->addAllowedTypes('transport_batch_size', 'int');
     }
 
+    #[\Override]
     public function createJobName($messageBody): string
     {
         return 'oro_integration:sync_integration:' . $messageBody['integration_id'];

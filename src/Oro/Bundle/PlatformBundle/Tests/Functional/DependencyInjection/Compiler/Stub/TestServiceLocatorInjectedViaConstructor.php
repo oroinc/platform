@@ -7,9 +7,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 class TestServiceLocatorInjectedViaConstructor extends TestServiceLocatorInjection
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(parent::getSubscribedServices(), [

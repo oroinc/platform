@@ -8,9 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class TransitionPageFormTemplateDataProvider implements FormTemplateDataProviderInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getData($entity, FormInterface $form, Request $request)
     {
         return [

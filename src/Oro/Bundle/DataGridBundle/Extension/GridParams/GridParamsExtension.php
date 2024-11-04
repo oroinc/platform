@@ -11,9 +11,7 @@ use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
  */
 class GridParamsExtension extends AbstractExtension
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return
@@ -21,9 +19,7 @@ class GridParamsExtension extends AbstractExtension
             && $config->isOrmDatasource();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
         $params = $this->getParameters()->all();

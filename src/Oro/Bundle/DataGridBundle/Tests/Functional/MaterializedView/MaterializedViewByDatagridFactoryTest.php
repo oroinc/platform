@@ -20,6 +20,7 @@ class MaterializedViewByDatagridFactoryTest extends WebTestCase
 
     private DatagridManager $datagridManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], self::generateBasicAuthHeader());
@@ -31,6 +32,7 @@ class MaterializedViewByDatagridFactoryTest extends WebTestCase
         $this->datagridManager = self::getContainer()->get('oro_datagrid.datagrid.manager');
     }
 
+    #[\Override]
     public static function tearDownAfterClass(): void
     {
         self::deleteAllMaterializedViews(self::getContainer());

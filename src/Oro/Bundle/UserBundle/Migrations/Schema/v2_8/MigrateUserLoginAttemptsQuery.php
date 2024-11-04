@@ -12,17 +12,13 @@ class MigrateUserLoginAttemptsQuery extends ParametrizedMigrationQuery
     private const READ_BATCH_SIZE = 1000;
     private const INSERT_BATCH_SIZE = 100;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return 'Migrate data from "oro_logger_log_entry" to "oro_user_login".';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->doExecute($logger);

@@ -12,9 +12,7 @@ class OroConfigBundle implements Migration, NameGeneratorAwareInterface
 {
     use NameGeneratorAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $this->updateConfigForeignKey($schema);

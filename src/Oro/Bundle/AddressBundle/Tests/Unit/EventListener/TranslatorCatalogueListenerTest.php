@@ -9,8 +9,6 @@ use Oro\Bundle\AddressBundle\Entity\Repository\CountryTranslationRepository;
 use Oro\Bundle\AddressBundle\Entity\Repository\RegionTranslationRepository;
 use Oro\Bundle\AddressBundle\EventListener\TranslatorCatalogueListener;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
-use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepositoryInterface;
-use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Event\AfterCatalogueInitialize;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -25,30 +23,44 @@ class TranslatorCatalogueListenerTest extends TestCase
 
     private EntityManagerInterface|MockObject $entityManager;
 
-    private TranslationRepository|MockObject $translationRepository;
-
     private AddressTypeTranslationRepository|MockObject $addressTypeTranslationRepository;
 
     private CountryTranslationRepository|MockObject $countryTranslationRepository;
 
     private RegionTranslationRepository|MockObject $regionTranslationRepository;
+    private TranslationRepository|MockObject $translationRepository;
 
     private MessageCatalogueInterface|MockObject $messageCatalogue;
 
-    private const array ADDRESS_TYPE_TRANSLATION_DATA = ["billing", "shipping"];
+    private const ADDRESS_TYPE_TRANSLATION_DATA = [
+        'billing' => 'entities.address_type.billing',
+        'shipping' => 'entities.address_type.shipping'
+    ];
 
-    private const array COUNTRY_TRANSLATION_DATA = ["BR", "BS", "BT", "BV", "BW"];
+    private const COUNTRY_TRANSLATION_DATA = [
+        'BR' => 'entities.country.BR',
+        'BS' => 'entities.country.BS',
+        'BT' => 'entities.country.BT',
+        'BV' => 'entities.country.BV',
+        'BW' => 'entities.country.BW',
+    ];
 
-    private const array REGION_TRANSLATION_DATA = ["AD-02", "AD-03", "AD-04", "AD-05", "AD-06"];
+    private const REGION_TRANSLATION_DATA = [
+        'AD-02' => 'entities.region.AD-02',
+        'AD-03' => 'entities.region.AD-03',
+        'AD-04' => 'entities.region.AD-04',
+        'AD-05' => 'entities.region.AD-05',
+        'AD-06' => 'entities.region.AD-06',
+    ];
 
     protected function setUp(): void
     {
         $this->managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->translationRepository = $this->createMock(TranslationRepository::class);
         $this->addressTypeTranslationRepository = $this->createMock(AddressTypeTranslationRepository::class);
         $this->countryTranslationRepository = $this->createMock(CountryTranslationRepository::class);
         $this->regionTranslationRepository = $this->createMock(RegionTranslationRepository::class);
+        $this->translationRepository = $this->createMock(TranslationRepository::class);
         $this->messageCatalogue = $this->createMock(MessageCatalogueInterface::class);
         $this->listener = new TranslatorCatalogueListener(
             $this->managerRegistry
@@ -58,7 +70,6 @@ class TranslatorCatalogueListenerTest extends TestCase
     public function testOnAfterCatalogueDumpUpdateDefaultTranslations(): void
     {
         $this->getRepositoryCallsTest();
-        $this->getRepositoryAllIdentitiesCallsTest();
         $this->messageCatalogueCallsTest(Translator::DEFAULT_LOCALE, ['entities']);
         $this->updateDefaultTranslationsCallsTest();
 
@@ -69,50 +80,10 @@ class TranslatorCatalogueListenerTest extends TestCase
     public function testOnAfterCatalogueDumpUpdateTranslations(): void
     {
         $this->getRepositoryCallsTest();
-        $this->getRepositoryAllIdentitiesCallsTest();
         $this->messageCatalogueCallsTest('de', ['entities']);
         $this->updateTranslationsCallsTest('de');
 
         $event = new AfterCatalogueInitialize($this->messageCatalogue);
-        $this->listener->onAfterCatalogueInit($event);
-    }
-
-    public function testOnAfterCatalogueDumpUpdateTranslationException(): void
-    {
-        $repo = new \stdClass();
-
-        $this
-            ->messageCatalogue
-            ->expects(self::once())
-            ->method('getDomains')
-            ->willReturn(['entities']);
-
-        $this
-            ->managerRegistry
-            ->expects(self::any())
-            ->method('getRepository')
-            ->with(Translation::class)
-            ->willReturn($this->translationRepository);
-
-        $this
-            ->managerRegistry
-            ->expects(self::any())
-            ->method('getManagerForClass')
-            ->willReturn($this->entityManager);
-
-        $this
-            ->entityManager
-            ->expects(self::any())
-            ->method('getRepository')
-            ->willReturn($repo);
-
-        $event = new AfterCatalogueInitialize($this->messageCatalogue);
-        self::expectException(\InvalidArgumentException::class);
-        self::expectExceptionMessage(sprintf(
-            'Expected repository of type "%s", "%s" given',
-            TranslationRepositoryInterface::class,
-            get_class($repo)
-        ));
         $this->listener->onAfterCatalogueInit($event);
     }
 
@@ -123,11 +94,6 @@ class TranslatorCatalogueListenerTest extends TestCase
             ->expects(self::any())
             ->method('getDomains')
             ->willReturn(['unknown']);
-
-        $this
-            ->managerRegistry
-            ->expects(self::never())
-            ->method('getRepository');
 
         $this
             ->managerRegistry
@@ -147,20 +113,13 @@ class TranslatorCatalogueListenerTest extends TestCase
     {
         $this
             ->managerRegistry
-            ->expects(self::exactly(3))
-            ->method('getRepository')
-            ->with(Translation::class)
-            ->willReturn($this->translationRepository);
-
-        $this
-            ->managerRegistry
-            ->expects(self::exactly(3))
+            ->expects(self::exactly(6))
             ->method('getManagerForClass')
             ->willReturn($this->entityManager);
 
         $this
             ->entityManager
-            ->expects(self::exactly(3))
+            ->expects(self::exactly(6))
             ->method('getRepository')
             ->willReturnCallback(function (string $className) {
                 $repositoryClass = $className.'Repository';
@@ -171,67 +130,25 @@ class TranslatorCatalogueListenerTest extends TestCase
             });
     }
 
-    private function getRepositoryAllIdentitiesCallsTest(): void
-    {
-        $this
-            ->translationRepository
-            ->expects(self::exactly(3))
-            ->method('findDomainTranslations')
-            ->willReturn([]);
-
-        $this
-            ->addressTypeTranslationRepository
-            ->expects(self::once())
-            ->method('getAllIdentities')
-            ->willReturn(self::ADDRESS_TYPE_TRANSLATION_DATA);
-
-        $this
-            ->countryTranslationRepository
-            ->expects(self::once())
-            ->method('getAllIdentities')
-            ->willReturn(self::COUNTRY_TRANSLATION_DATA);
-
-        $this
-            ->regionTranslationRepository
-            ->expects(self::once())
-            ->method('getAllIdentities')
-            ->willReturn(self::REGION_TRANSLATION_DATA);
-    }
-
     private function updateDefaultTranslationsCallsTest(): void
     {
         $this
             ->addressTypeTranslationRepository
             ->expects(self::once())
             ->method('updateDefaultTranslations')
-            ->with([
-                'billing' => 'entities.address_type.billing',
-                'shipping' => 'entities.address_type.shipping'
-            ]);
+            ->with(self::ADDRESS_TYPE_TRANSLATION_DATA);
 
         $this
             ->countryTranslationRepository
             ->expects(self::once())
             ->method('updateDefaultTranslations')
-            ->with([
-                'BR' => 'entities.country.BR',
-                'BS' => 'entities.country.BS',
-                'BT' => 'entities.country.BT',
-                'BV' => 'entities.country.BV',
-                'BW' => 'entities.country.BW',
-            ]);
+            ->with(self::COUNTRY_TRANSLATION_DATA);
 
         $this
             ->regionTranslationRepository
             ->expects(self::once())
             ->method('updateDefaultTranslations')
-            ->with([
-                'AD-02' => 'entities.region.AD-02',
-                'AD-03' => 'entities.region.AD-03',
-                'AD-04' => 'entities.region.AD-04',
-                'AD-05' => 'entities.region.AD-05',
-                'AD-06' => 'entities.region.AD-06',
-            ]);
+            ->with(self::REGION_TRANSLATION_DATA);
     }
 
     private function updateTranslationsCallsTest(string $locale): void
@@ -240,34 +157,19 @@ class TranslatorCatalogueListenerTest extends TestCase
             ->addressTypeTranslationRepository
             ->expects(self::once())
             ->method('updateTranslations')
-            ->with([
-                'billing' => 'entities.address_type.billing',
-                'shipping' => 'entities.address_type.shipping'
-            ], $locale);
+            ->with(self::ADDRESS_TYPE_TRANSLATION_DATA, $locale);
 
         $this
             ->countryTranslationRepository
             ->expects(self::once())
             ->method('updateTranslations')
-            ->with([
-                'BR' => 'entities.country.BR',
-                'BS' => 'entities.country.BS',
-                'BT' => 'entities.country.BT',
-                'BV' => 'entities.country.BV',
-                'BW' => 'entities.country.BW',
-            ], $locale);
+            ->with(self::COUNTRY_TRANSLATION_DATA, $locale);
 
         $this
             ->regionTranslationRepository
             ->expects(self::once())
             ->method('updateTranslations')
-            ->with([
-                'AD-02' => 'entities.region.AD-02',
-                'AD-03' => 'entities.region.AD-03',
-                'AD-04' => 'entities.region.AD-04',
-                'AD-05' => 'entities.region.AD-05',
-                'AD-06' => 'entities.region.AD-06',
-            ], $locale);
+            ->with(self::REGION_TRANSLATION_DATA, $locale);
     }
 
     private function messageCatalogueCallsTest(string $locale, array $domains = []): void
@@ -281,9 +183,18 @@ class TranslatorCatalogueListenerTest extends TestCase
         $this
             ->messageCatalogue
             ->expects(self::any())
-            ->method('get')
-            ->willReturnCallback(function (string $id, string $domain): string {
-                return sprintf('%s.%s', $domain, $id);
+            ->method('all')
+            ->willReturnCallback(function (string $domain): array {
+                $data = self::ADDRESS_TYPE_TRANSLATION_DATA +
+                    self::COUNTRY_TRANSLATION_DATA +
+                    self::REGION_TRANSLATION_DATA;
+                foreach ($data as $key => $val) {
+                    $prefix = explode('.', $val)[1];
+                    $data[sprintf('%s.%s', $prefix, $key)] = $val;
+                    unset($data[$key]);
+                }
+
+                return $data;
             });
 
         $this

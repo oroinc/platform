@@ -20,6 +20,7 @@ class EmailTemplateContextCollectLocalizationAwareEventListenerTest extends Test
 
     private EmailTemplateContextCollectLocalizationAwareEventListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->preferredLocalizationProvider = $this->createMock(PreferredLocalizationProviderInterface::class);

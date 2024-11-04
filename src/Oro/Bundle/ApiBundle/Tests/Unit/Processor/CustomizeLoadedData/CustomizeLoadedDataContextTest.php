@@ -18,6 +18,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
 {
     private CustomizeLoadedDataContext $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new CustomizeLoadedDataContext();

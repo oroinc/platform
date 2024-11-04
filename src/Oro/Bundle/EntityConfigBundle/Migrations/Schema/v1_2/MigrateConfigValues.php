@@ -13,17 +13,13 @@ class MigrateConfigValues implements Migration, OrderedMigrationInterface, Renam
 {
     use RenameExtensionAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getOrder()
     {
         return 1;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $schema->getTable('oro_entity_config')

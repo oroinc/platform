@@ -17,17 +17,13 @@ class FileField extends Element implements SuiteAwareInterface
      */
     protected $suite;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setValue($filename)
     {
         $this->attachFile($this->getFilePath($filename));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setSuite(Suite $suite)
     {
         $this->suite = $suite;

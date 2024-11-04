@@ -9,17 +9,13 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class DropOldTable implements Migration, OrderedMigrationInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getOrder()
     {
         return 30;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $schema->dropTable('oro_grid_view_user');

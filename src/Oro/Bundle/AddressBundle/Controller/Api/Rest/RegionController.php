@@ -29,9 +29,7 @@ class RegionController extends RestGetController
         return $this->handleGetRequest($id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_address.api.manager.region');

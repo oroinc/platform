@@ -13,6 +13,7 @@ class JoinTest extends \PHPUnit\Framework\TestCase
     /** @var Func\Join */
     protected $function;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->function = new Func\Join();

@@ -27,9 +27,7 @@ class TemplateFixtureReader extends IteratorBasedReader
         $this->templateManager = $templateManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function initializeFromContext(ContextInterface $context)
     {
         if (!$context->hasOption('entityName')) {

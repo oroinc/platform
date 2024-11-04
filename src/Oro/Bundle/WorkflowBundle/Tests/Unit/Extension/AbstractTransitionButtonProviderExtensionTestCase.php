@@ -38,6 +38,7 @@ abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUni
     /** @var AbstractButtonProviderExtension */
     protected $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);

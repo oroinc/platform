@@ -35,6 +35,7 @@ class DatagridExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
 
     private DatagridExportMessageProcessor $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->jobRunner = $this->createMock(JobRunner::class);

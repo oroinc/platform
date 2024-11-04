@@ -17,6 +17,7 @@ class PhpConfigProviderTest extends \PHPUnit\Framework\TestCase
 
     private string $cacheFile;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->cacheFile = $this->getTempFile('PhpConfigProvider');

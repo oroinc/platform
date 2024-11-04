@@ -21,9 +21,7 @@ class EntityConfiguration implements ConfigurationInterface
     public const VIRTUAL_RELATIONS       = 'virtual_relations';
     public const ENTITY_NAME_FORMATS     = 'entity_name_formats';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder(self::ROOT_NODE);

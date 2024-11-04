@@ -31,9 +31,7 @@ class DateTimeFormatter implements DateTimeFormatterInterface
         $this->translator     = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function format($date, $dateType = null, $timeType = null, $locale = null, $timeZone = null, $pattern = null)
     {
         if (!$timeZone) {
@@ -53,17 +51,13 @@ class DateTimeFormatter implements DateTimeFormatterInterface
         return $date;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function formatDate($date, $dateType = null, $locale = null, $timeZone = null)
     {
         return $this->format($date, $dateType, \IntlDateFormatter::NONE, $locale, $timeZone);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function formatYear($date, $dateType = null, $locale = null, $timeZone = null)
     {
         $pattern = $this->translator->trans('oro.locale.date_format.year', [], null, $locale);
@@ -71,9 +65,7 @@ class DateTimeFormatter implements DateTimeFormatterInterface
         return $this->format($date, $dateType, \IntlDateFormatter::NONE, $locale, $timeZone, $pattern);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function formatQuarter($date, $dateType = null, $locale = null, $timeZone = null)
     {
         $pattern = $this->translator->trans('oro.locale.date_format.quarter', [], null, $locale);
@@ -81,9 +73,7 @@ class DateTimeFormatter implements DateTimeFormatterInterface
         return $this->format($date, $dateType, \IntlDateFormatter::NONE, $locale, $timeZone, $pattern);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function formatMonth($date, $dateType = null, $locale = null, $timeZone = null)
     {
         $pattern = $this->translator->trans('oro.locale.date_format.month', [], null, $locale);
@@ -91,9 +81,7 @@ class DateTimeFormatter implements DateTimeFormatterInterface
         return $this->format($date, $dateType, \IntlDateFormatter::NONE, $locale, $timeZone, $pattern);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function formatDay($date, $dateType = null, $locale = null, $timeZone = null)
     {
         $pattern = $this->translator->trans('oro.locale.date_format.day', [], null, $locale);
@@ -101,17 +89,13 @@ class DateTimeFormatter implements DateTimeFormatterInterface
         return $this->format($date, $dateType, \IntlDateFormatter::NONE, $locale, $timeZone, $pattern);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function formatTime($date, $timeType = null, $locale = null, $timeZone = null)
     {
         return $this->format($date, \IntlDateFormatter::NONE, $timeType, $locale, $timeZone);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPattern($dateType, $timeType, $locale = null, $value = null)
     {
         return $this->updatePattern($dateType, $timeType, $locale);
@@ -224,9 +208,7 @@ class DateTimeFormatter implements DateTimeFormatterInterface
         return (int)$dateType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDateTime($date)
     {
         if ($date === false || $date === null) {

@@ -27,9 +27,7 @@ class ValidateRequestData implements ProcessorInterface
         $this->allowIncludedResources = $allowIncludedResources;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ChangeSubresourceContext $context */

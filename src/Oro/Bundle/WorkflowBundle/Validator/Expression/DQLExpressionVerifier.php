@@ -12,9 +12,7 @@ use Oro\Bundle\WorkflowBundle\Validator\Expression\Exception\ExpressionException
  */
 class DQLExpressionVerifier implements ExpressionVerifierInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function verify($expression)
     {
         if (!$expression instanceof AbstractQuery) {

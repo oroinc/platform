@@ -26,9 +26,7 @@ class DefaultColumnOptionsGuesser extends AbstractColumnOptionsGuesser
         'row_array'    => Property::TYPE_ROW_ARRAY,
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function guessFormatter($class, $property, $type)
     {
         $options = [

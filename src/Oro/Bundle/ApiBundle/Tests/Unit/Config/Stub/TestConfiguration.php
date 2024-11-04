@@ -8,25 +8,19 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 class TestConfiguration implements ConfigurationSectionInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configure(NodeBuilder $node): void
     {
         $node->end()->useAttributeAsKey('name')->prototype('variable');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(string $section): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setSettings(ConfigurationSettingsInterface $settings): void
     {
     }

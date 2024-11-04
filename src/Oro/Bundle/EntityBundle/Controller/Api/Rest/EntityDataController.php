@@ -45,9 +45,6 @@ class EntityDataController extends AbstractFOSRestController
         return $this->handleView($view);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getManager()
     {
         return $this->container->get('oro_entity.manager.api.entity_data_api_manager');

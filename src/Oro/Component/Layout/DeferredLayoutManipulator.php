@@ -133,9 +133,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
         $this->rawLayoutBuilder = $rawLayoutBuilder;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function add(
         $id,
         $parentId,
@@ -153,9 +151,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function remove($id)
     {
         $this->actions[self::GROUP_REMOVE][++$this->lastIndex] = [
@@ -169,9 +165,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function move($id, $parentId = null, $siblingId = null, $prepend = null)
     {
         $this->actions[self::GROUP_ADD][++$this->lastIndex] = [
@@ -183,9 +177,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addAlias($alias, $id)
     {
         $this->actions[self::GROUP_ADD][++$this->lastIndex] = [
@@ -197,9 +189,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function removeAlias($alias)
     {
         $this->actions[self::GROUP_REMOVE][++$this->lastIndex] = [
@@ -211,9 +201,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setOption($id, $optionName, $optionValue)
     {
         $this->actions[self::GROUP_ADD][++$this->lastIndex] = [
@@ -225,9 +213,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function appendOption($id, $optionName, $optionValue)
     {
         $this->actions[self::GROUP_ADD][++$this->lastIndex] = [
@@ -239,9 +225,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function subtractOption($id, $optionName, $optionValue)
     {
         $this->actions[self::GROUP_ADD][++$this->lastIndex] = [
@@ -253,9 +237,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function replaceOption($id, $optionName, $oldOptionValue, $newOptionValue)
     {
         $this->actions[self::GROUP_ADD][++$this->lastIndex] = [
@@ -267,9 +249,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function removeOption($id, $optionName)
     {
         $this->actions[self::GROUP_ADD][++$this->lastIndex] = [
@@ -281,9 +261,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function changeBlockType($id, $blockType, $optionsCallback = null)
     {
         $this->actions[self::GROUP_ADD][++$this->lastIndex] = [
@@ -295,9 +273,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setBlockTheme($themes, $id = null)
     {
         $this->actions[self::GROUP_ADD][++$this->lastIndex] = [
@@ -309,9 +285,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setFormTheme($themes)
     {
         $this->actions[self::GROUP_ADD][++$this->lastIndex] = [
@@ -323,9 +297,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function clear()
     {
         $this->rawLayoutBuilder->clear();
@@ -337,17 +309,13 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getNumberOfAddedItems()
     {
         return $this->addCounter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function applyChanges(ContextInterface $context, $finalize = false)
     {
         $this->addCounter = 0;
@@ -767,6 +735,7 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     /**
      * @return array
      */
+    #[\Override]
     public function getNotAppliedActions()
     {
         $exActions = [];

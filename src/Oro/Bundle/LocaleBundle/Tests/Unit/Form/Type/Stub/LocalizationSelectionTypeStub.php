@@ -9,26 +9,19 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 class LocalizationSelectionTypeStub extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('value', OroChoiceType::class);
         $builder->add('use_parent_scope_value', ParentScopeCheckbox::class, ['value' => 1]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_locale_localization_selection';

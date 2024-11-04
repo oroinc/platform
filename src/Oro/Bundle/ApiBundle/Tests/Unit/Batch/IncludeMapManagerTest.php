@@ -35,6 +35,7 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
     /** @var IncludeMapManager */
     private $includeMapManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->itemKeyBuilder = new ItemKeyBuilder();

@@ -11,9 +11,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class DumpWorkflowTranslationsCommandTest extends WebTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

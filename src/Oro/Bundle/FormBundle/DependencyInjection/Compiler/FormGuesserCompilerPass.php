@@ -14,6 +14,7 @@ class FormGuesserCompilerPass implements CompilerPassInterface
 {
     use PriorityTaggedServiceTrait;
 
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $guessers = $this->findAndSortTaggedServices('form.type_guesser', $container);

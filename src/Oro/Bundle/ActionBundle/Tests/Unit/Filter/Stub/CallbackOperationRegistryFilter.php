@@ -16,7 +16,7 @@ class CallbackOperationRegistryFilter implements OperationRegistryFilterInterfac
         $this->callable = $callable;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function filter(array $operations, OperationFindCriteria $findCriteria)
     {
         return call_user_func($this->callable, $operations, $findCriteria);

@@ -17,9 +17,7 @@ class SetTestCurrentDepartmentEntityIdForSubresource implements ProcessorInterfa
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var SubresourceContext $context */

@@ -32,6 +32,7 @@ class FormHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var FormHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->form = $this->createMock(FormInterface::class);

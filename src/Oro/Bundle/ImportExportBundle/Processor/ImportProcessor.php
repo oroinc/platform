@@ -25,9 +25,7 @@ class ImportProcessor implements ContextAwareProcessor, EntityNameAwareInterface
 
     protected string $entityName = '';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setEntityName(string $entityName): void
     {
         $this->entityName = $entityName;
@@ -41,6 +39,7 @@ class ImportProcessor implements ContextAwareProcessor, EntityNameAwareInterface
         }
     }
 
+    #[\Override]
     public function setImportExportContext(ContextInterface $context): void
     {
         $this->context = $context;
@@ -69,9 +68,7 @@ class ImportProcessor implements ContextAwareProcessor, EntityNameAwareInterface
         $this->strategy = $strategy;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process($item)
     {
         $this->context->setValue('rawItemData', $item);

@@ -10,6 +10,7 @@ class EventsCompilerPassTest extends \PHPUnit\Framework\TestCase
     /** @var EventsCompilerPass */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new EventsCompilerPass();

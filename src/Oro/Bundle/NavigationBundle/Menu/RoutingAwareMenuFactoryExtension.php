@@ -18,16 +18,12 @@ class RoutingAwareMenuFactoryExtension implements ExtensionInterface
         $this->router = $router;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildItem(ItemInterface $item, array $options): void
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildOptions(array $options): array
     {
         if (!empty($options['route']) && ($options['extras']['isAllowed'] ?? true)) {

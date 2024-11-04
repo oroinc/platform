@@ -16,9 +16,7 @@ class OperationExecutionType extends AbstractType
 
     const NAME = 'oro_action_operation_execution';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -33,17 +31,12 @@ class OperationExecutionType extends AbstractType
         $resolver->setDefined(['csrf_protection']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();

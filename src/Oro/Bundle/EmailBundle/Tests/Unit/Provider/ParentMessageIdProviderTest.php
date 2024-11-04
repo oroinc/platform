@@ -16,6 +16,7 @@ class ParentMessageIdProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ParentMessageIdProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->repository = $this->createMock(EmailRepository::class);

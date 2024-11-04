@@ -15,12 +15,14 @@ class ImapConnectionConfigurationValidatorTest extends ConstraintValidatorTestCa
     /** @var ImapSettingsChecker|\PHPUnit\Framework\MockObject\MockObject */
     private $checker;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->checker = $this->createMock(ImapSettingsChecker::class);
         parent::setUp();
     }
 
+    #[\Override]
     protected function createValidator()
     {
         return new ImapConnectionConfigurationValidator($this->checker);

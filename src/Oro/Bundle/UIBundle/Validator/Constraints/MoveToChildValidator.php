@@ -25,8 +25,8 @@ class MoveToChildValidator extends ConstraintValidator
      * @param TreeCollection $collection
      * @param MoveToChild    $constraint
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function validate($collection, Constraint $constraint)
     {
         if (!$collection instanceof TreeCollection) {

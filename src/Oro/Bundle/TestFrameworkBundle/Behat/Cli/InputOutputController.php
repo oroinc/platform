@@ -19,9 +19,7 @@ class InputOutputController implements Controller
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configure(SymfonyCommand $command)
     {
         $command
@@ -41,9 +39,7 @@ class InputOutputController implements Controller
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(InputInterface $input, OutputInterface $output)
     {
         // $input->getOption('skip-isolators') returns:

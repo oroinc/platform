@@ -20,6 +20,7 @@ class SchemaTest extends WebTestCase
     use SchemaTrait;
     use CommandTestingTrait;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

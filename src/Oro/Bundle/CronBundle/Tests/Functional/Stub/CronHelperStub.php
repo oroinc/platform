@@ -23,6 +23,7 @@ class CronHelperStub extends CronHelper
         $this->cron = $cron;
     }
 
+    #[\Override]
     public function createCron(string $definition): CronExpression
     {
         return $this->cron ?? $this->cronHelper->createCron($definition);

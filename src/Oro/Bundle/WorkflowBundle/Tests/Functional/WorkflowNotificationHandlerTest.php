@@ -14,6 +14,7 @@ class WorkflowNotificationHandlerTest extends WebTestCase
     /** @var NotificationManager */
     private $notificationManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

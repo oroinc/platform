@@ -9,17 +9,13 @@ use Oro\Bundle\TagBundle\Form\Type\Filter\TagsReportFilterType;
  */
 class TagsReportFilter extends TagsDictionaryFilter
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getFormType()
     {
         return TagsReportFilterType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getEntityClassName()
     {
         return $this->get('entityClass');

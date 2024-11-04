@@ -38,9 +38,7 @@ class SchemaDumperExtension extends AbstractExtension implements ServiceSubscrib
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -104,9 +102,7 @@ class SchemaDumperExtension extends AbstractExtension implements ServiceSubscrib
         return $this->defaultColumnOptions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

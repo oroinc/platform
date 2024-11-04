@@ -28,9 +28,7 @@ class SkipTagTrackingPass implements CompilerPassInterface
         'Oro\Bundle\MessageQueueBundle\Entity\Job',
     ];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if ($container->hasDefinition(self::SERVICE_ID)) {

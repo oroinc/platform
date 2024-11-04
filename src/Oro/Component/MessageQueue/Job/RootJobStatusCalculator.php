@@ -36,6 +36,7 @@ class RootJobStatusCalculator implements RootJobStatusCalculatorInterface
         $this->doctrine = $doctrine;
     }
 
+    #[\Override]
     public function calculate(Job $job): void
     {
         $rootJob = $this->getRootJob($job);

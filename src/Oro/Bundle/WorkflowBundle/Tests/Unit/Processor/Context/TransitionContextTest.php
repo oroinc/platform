@@ -17,6 +17,7 @@ class TransitionContextTest extends \PHPUnit\Framework\TestCase
 {
     private TransitionContext $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new TransitionContext();

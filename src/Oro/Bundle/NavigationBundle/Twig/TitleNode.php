@@ -27,6 +27,7 @@ class TitleNode extends Node
      *
      * @throws SyntaxError
      */
+    #[\Override]
     public function compile(Compiler $compiler)
     {
         $node = $this->getNode('expr');

@@ -73,9 +73,7 @@ class NormalizeIncludedData implements ProcessorInterface
         $this->upsertCriteriaBuilder = $upsertCriteriaBuilder;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var FormContext&SingleItemContext $context */
@@ -325,6 +323,7 @@ class NormalizeIncludedData implements ProcessorInterface
             $meta,
             JsonApiDoc::META_UPDATE,
             JsonApiDoc::META_UPSERT,
+            JsonApiDoc::META_VALIDATE,
             $this->buildPointer($pointer, JsonApiDoc::META),
             $this->context
         );

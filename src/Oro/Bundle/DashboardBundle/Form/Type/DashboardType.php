@@ -4,9 +4,9 @@ namespace Oro\Bundle\DashboardBundle\Form\Type;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
-use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumOptionRepository;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumChoiceType;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -27,15 +27,13 @@ class DashboardType extends AbstractType
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('label', TextType::class, array('required' => true, 'label' => 'oro.dashboard.label'));
 
-        /** @var EnumValueRepository $enumRepo */
-        $enumRepo = $this->doctrine->getRepository(ExtendHelper::buildEnumValueClassName('dashboard_type'));
+        /** @var EnumOptionRepository $enumRepo */
+        $enumRepo = $this->doctrine->getRepository(EnumOption::class);
         if ($enumRepo->count([]) > 1) {
             $fieldOptions = [
                 'required'    => true,
@@ -54,7 +52,7 @@ class DashboardType extends AbstractType
                 /** @var Dashboard $dashboard */
                 $dashboard = $event->getData();
                 if (null === $dashboard->getDashboardType()) {
-                    $defaultItems = $enumRepo->getDefaultValues();
+                    $defaultItems = $enumRepo->getDefaultValues('dashboard_type');
                     $dashboard->setDashboardType(reset($defaultItems));
                 }
             });
@@ -69,9 +67,7 @@ class DashboardType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -80,9 +76,7 @@ class DashboardType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_dashboard';

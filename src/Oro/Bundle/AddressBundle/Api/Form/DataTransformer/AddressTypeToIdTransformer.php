@@ -20,17 +20,13 @@ class AddressTypeToIdTransformer implements DataTransformerInterface
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (null === $value) {

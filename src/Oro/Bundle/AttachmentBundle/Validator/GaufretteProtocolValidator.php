@@ -23,9 +23,7 @@ class GaufretteProtocolValidator implements ProtocolValidatorInterface
         $this->gaufretteProtocols = array_filter($gaufretteProtocols);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isSupportedProtocol(string $protocol): bool
     {
         return

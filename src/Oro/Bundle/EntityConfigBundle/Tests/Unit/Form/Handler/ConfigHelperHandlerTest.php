@@ -40,6 +40,7 @@ class ConfigHelperHandlerTest extends \PHPUnit\Framework\TestCase
 
     private ConfigHelperHandler $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactory::class);

@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityConfigBundle\Attribute\Type;
 
 use Laminas\Stdlib\Guard\ArrayOrTraversableGuardTrait;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 
 /**
@@ -14,17 +14,13 @@ class MultiEnumAttributeType extends EnumAttributeType
 {
     use ArrayOrTraversableGuardTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isSortable(FieldConfigModel $attribute)
     {
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSearchableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
         $this->ensureTraversable($originalValue);
@@ -37,20 +33,18 @@ class MultiEnumAttributeType extends EnumAttributeType
         return implode(' ', $values);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFilterableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
         $this->ensureTraversable($originalValue);
 
         $value = [];
 
-        /** @var AbstractEnumValue[] $originalValue */
+        /** @var EnumOptionInterface[] $originalValue */
         foreach ($originalValue as $enum) {
             $this->ensureSupportedType($enum);
 
-            $key = sprintf('%s_enum.%s', $attribute->getFieldName(), $enum->getId());
+            $key = sprintf('%s_enum.%s', $attribute->getFieldName(), $enum->getInternalId());
 
             $value[$key] = 1;
         }
@@ -58,9 +52,7 @@ class MultiEnumAttributeType extends EnumAttributeType
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSortableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
     {
         throw new \RuntimeException('Not supported');
@@ -70,7 +62,7 @@ class MultiEnumAttributeType extends EnumAttributeType
      * @param string $originalValue
      * @throws \InvalidArgumentException
      */
-    protected function ensureTraversable($originalValue)
+    protected function ensureTraversable($originalValue): void
     {
         $this->guardForArrayOrTraversable($originalValue, 'Value', \InvalidArgumentException::class);
     }

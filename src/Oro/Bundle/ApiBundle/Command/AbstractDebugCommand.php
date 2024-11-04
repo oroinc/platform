@@ -30,6 +30,7 @@ abstract class AbstractDebugCommand extends Command
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function configure(): void
     {
         $this

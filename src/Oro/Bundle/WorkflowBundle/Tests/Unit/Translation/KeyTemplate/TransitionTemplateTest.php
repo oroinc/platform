@@ -6,7 +6,7 @@ use Oro\Bundle\WorkflowBundle\Translation\KeyTemplate\TransitionTemplate;
 
 class TransitionTemplateTest extends TemplateTestCase
 {
-    /** {@inheritdoc} */
+    #[\Override]
     public function getTemplateInstance()
     {
         return new TransitionTemplate();
@@ -17,11 +17,13 @@ class TransitionTemplateTest extends TemplateTestCase
         $this->assertName(TransitionTemplate::NAME);
     }
 
+    #[\Override]
     public function testGetTemplate()
     {
         $this->assertTemplate('oro.workflow.{{ workflow_name }}.transition.{{ transition_name }}');
     }
 
+    #[\Override]
     public function testGetRequiredKeys()
     {
         $this->assertRequiredKeys(['workflow_name', 'transition_name']);

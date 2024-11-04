@@ -14,9 +14,7 @@ class UpdateDefaultLocalizationFormattingCode extends AbstractFixture
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         /** @var Localization $defaultLocalization */

@@ -12,6 +12,7 @@ class ClearCacheOnConfigUpdateListenerTest extends \PHPUnit\Framework\TestCase
 
     private ClearCacheOnConfigUpdateListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->listener = new ClearCacheOnConfigUpdateListener(self::SAMPLE_CONFIG_PARAMETER);

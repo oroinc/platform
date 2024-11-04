@@ -20,6 +20,7 @@ class FeatureDependAuthenticatorCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var FeatureDependAuthenticatorChecker */
     private $checker;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->featureChecker = $this->createMock(FeatureChecker::class);

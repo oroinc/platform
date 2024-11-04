@@ -29,6 +29,7 @@ class FieldNameValidationHelperTest extends \PHPUnit\Framework\TestCase
     /** @var FieldNameValidationHelper */
     private $validationHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $configManager = $this->createMock(ConfigManager::class);

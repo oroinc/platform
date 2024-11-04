@@ -17,6 +17,7 @@ class CollectionNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var CollectionNormalizer */
     private $normalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->serializer = $this->createMock(Serializer::class);

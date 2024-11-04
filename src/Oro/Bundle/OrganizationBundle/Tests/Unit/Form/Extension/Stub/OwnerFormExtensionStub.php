@@ -7,9 +7,7 @@ use Oro\Bundle\OrganizationBundle\Form\Extension\OwnerFormExtension as BaseOwner
 
 class OwnerFormExtensionStub extends BaseOwnerFormExtension
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function isBusinessUnitAvailableForCurrentUser(BusinessUnit $businessUnit)
     {
         return true;

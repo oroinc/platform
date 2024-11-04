@@ -58,9 +58,7 @@ class MarkMassActionHandler implements MassActionHandlerInterface
         $this->emailManager = $emailManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function handle(MassActionHandlerArgs $args): MassActionResponseInterface
     {
         $data = $args->getData();

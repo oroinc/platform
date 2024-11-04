@@ -9,25 +9,19 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class UserFixture extends AbstractTemplateRepository implements TemplateFixtureInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityClass()
     {
         return 'Oro\Bundle\UserBundle\Entity\User';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getData()
     {
         return $this->getEntityData('John Doo');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function createEntity($key)
     {
         return new User();
@@ -37,6 +31,7 @@ class UserFixture extends AbstractTemplateRepository implements TemplateFixtureI
      * @param string $key
      * @param User   $entity
      */
+    #[\Override]
     public function fillEntityData($key, $entity)
     {
         $businessUnitRepo = $this->templateManager

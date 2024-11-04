@@ -16,6 +16,7 @@ class StartHandleProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var StartHandleProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflowManager = $this->createMock(WorkflowManager::class);

@@ -22,38 +22,28 @@ abstract class MaintenanceModeIsolator implements IsolatorInterface
         $this->phpExecutablePath = (new PhpExecutableFinder())->find();
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function isApplicable(ContainerInterface $container)
     {
         return true;
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function restoreState(RestoreStateEvent $event)
     {
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function terminate(AfterFinishTestsEvent $event)
     {
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function beforeTest(BeforeIsolatedTestEvent $event)
     {
     }
 
-    /**
-     * @inheritDoc
-     */
+    #[\Override]
     public function isOutdatedState()
     {
         return false;

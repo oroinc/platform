@@ -12,6 +12,7 @@ class ActiveDashboardTest extends \PHPUnit\Framework\TestCase
     /** @var ActiveDashboard */
     private $activeDashboard;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->activeDashboard = new ActiveDashboard();

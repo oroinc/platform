@@ -9,9 +9,6 @@ trait ModelStorageAwareTrait
 {
     private ?ModelStorage $modelStorage = null;
 
-    /**
-     * {@inheritDoc}
-     */
     public function setModelStorage(?ModelStorage $modelStorage): void
     {
         $this->modelStorage = $modelStorage;

@@ -14,9 +14,7 @@ class ChartTypeEventListener implements EventSubscriberInterface
      */
     protected $optionsGroups = ['settings', 'data_schema'];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

@@ -33,6 +33,7 @@ class ConfigImagePlaceholderProvider implements ImagePlaceholderProviderInterfac
         $this->configKey = $configKey;
     }
 
+    #[\Override]
     public function getPath(
         string $filter,
         string $format = '',

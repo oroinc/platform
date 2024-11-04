@@ -9,9 +9,9 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 class OroNavigationBundle implements Migration
 {
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         // @codingStandardsIgnoreStart

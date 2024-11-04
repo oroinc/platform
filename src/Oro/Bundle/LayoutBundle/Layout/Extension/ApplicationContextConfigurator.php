@@ -17,9 +17,7 @@ class ApplicationContextConfigurator implements ContextConfiguratorInterface
         $this->kernel = $kernel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureContext(ContextInterface $context)
     {
         $context->getResolver()

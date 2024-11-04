@@ -11,9 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class WorkflowLabel extends Label
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function trans(TranslatorInterface $translator)
     {
         return $translator->trans($this->label, [], WorkflowTranslationHelper::TRANSLATION_DOMAIN);
@@ -25,6 +23,7 @@ class WorkflowLabel extends Label
      * @return WorkflowLabel
      */
     // @codingStandardsIgnoreStart
+    #[\Override]
     public static function __set_state($data)
     {
         return new WorkflowLabel($data['label']);

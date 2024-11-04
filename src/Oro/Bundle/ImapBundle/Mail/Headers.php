@@ -41,9 +41,9 @@ use Oro\Bundle\ImapBundle\Mail\Header\HeaderLoader;
 class Headers extends BaseHeaders
 {
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public static function fromString($string, $EOL = self::EOL)
     {
         $headers = new static();
@@ -101,9 +101,7 @@ class Headers extends BaseHeaders
         return $headers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addHeader(HeaderInterface $header)
     {
         $key = $this->normalizeFieldName($header->getFieldName());
@@ -119,17 +117,13 @@ class Headers extends BaseHeaders
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function normalizeFieldName($fieldName)
     {
         return parent::normalizeFieldName($fieldName);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPluginClassLoader()
     {
         if ($this->pluginClassLoader === null) {
@@ -139,9 +133,7 @@ class Headers extends BaseHeaders
         return $this->pluginClassLoader;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function loadHeader($headerLine)
     {
         [$name,] = GenericHeader::splitHeaderLine($headerLine);

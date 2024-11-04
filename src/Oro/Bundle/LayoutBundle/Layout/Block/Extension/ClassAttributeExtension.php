@@ -23,9 +23,7 @@ class ClassAttributeExtension extends BaseClassAttributeExtension
         $this->encoderRegistry = $encoderRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(BlockView $view, BlockInterface $block)
     {
         $context = $block->getContext();

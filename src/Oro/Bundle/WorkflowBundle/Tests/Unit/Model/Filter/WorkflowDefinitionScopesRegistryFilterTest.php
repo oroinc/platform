@@ -22,6 +22,7 @@ class WorkflowDefinitionScopesRegistryFilterTest extends \PHPUnit\Framework\Test
     /** @var WorkflowDefinitionScopesRegistryFilter */
     private $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->scopeManager = $this->createMock(ScopeManager::class);

@@ -122,17 +122,20 @@ abstract class AbstractOwnerTreeProvider implements OwnerTreeProviderInterface, 
         return $result;
     }
 
+    #[\Override]
     public function clearCache(): void
     {
         $this->cache->clear();
     }
 
+    #[\Override]
     public function warmUpCache(): void
     {
         $this->cache->delete(self::CACHE_KEY);
         $this->getTree();
     }
 
+    #[\Override]
     public function getTree(): OwnerTreeInterface
     {
         return $this->cache->get(self::CACHE_KEY, function () {

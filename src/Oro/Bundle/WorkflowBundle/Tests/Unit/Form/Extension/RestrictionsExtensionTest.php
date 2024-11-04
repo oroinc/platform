@@ -27,6 +27,7 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
     /** @var RestrictionsExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->restrictionsManager = $this->createMock(RestrictionManager::class);
@@ -130,9 +131,7 @@ class RestrictionsExtensionTest extends FormIntegrationTestCase
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getExtensions()
     {
         return [new PreloadedExtension([], [FormType::class => [$this->extension]])];

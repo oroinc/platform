@@ -16,6 +16,7 @@ class ItemTest extends \PHPUnit\Framework\TestCase
 {
     private Item $item;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->item = new Item();

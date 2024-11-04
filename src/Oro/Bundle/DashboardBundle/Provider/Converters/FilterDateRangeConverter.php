@@ -69,10 +69,10 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function getConvertedValue(array $widgetConfig, $value = null, array $config = [], array $options = [])
     {
         if ($value === null) {
@@ -163,9 +163,7 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
         return $dateData;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFormValue(array $converterAttributes, $value)
     {
         if ($value === null) {
@@ -176,10 +174,10 @@ class FilterDateRangeConverter extends ConfigValueConverterAbstract
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function getViewValue($value)
     {
         $start = $this->getCompiledDate($value['start'] ?? '');

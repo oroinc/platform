@@ -21,9 +21,6 @@ class ExceptionListener extends BaseExceptionListener
 
     private array $excludedRoutes = [];
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(
         TokenStorageInterface $tokenStorage,
         AuthenticationTrustResolverInterface $trustResolver,
@@ -54,9 +51,7 @@ class ExceptionListener extends BaseExceptionListener
         $this->excludedRoutes = $excludedRoutes;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setTargetPath(Request $request): void
     {
         if (!$request->hasSession() ||

@@ -38,17 +38,13 @@ class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements 
 
     private ConfigLoaderFactory $factory;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setConfigLoaderFactory(ConfigLoaderFactory $factory): void
     {
         $this->factory = $factory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(array $config): mixed
     {
         $field = new EntityDefinitionFieldConfig();

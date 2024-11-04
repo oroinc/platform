@@ -67,6 +67,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
     /** @var Organization */
     private $currentOrg;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);
@@ -97,6 +98,7 @@ class OwnerValidatorTest extends ConstraintValidatorTestCase
         parent::setUp();
     }
 
+    #[\Override]
     protected function createValidator(): OwnerValidator
     {
         return new OwnerValidator(

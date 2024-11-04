@@ -38,6 +38,7 @@ class WorkflowDataNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
     private $attributeManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->attributeNormalizer = $this->createMock(AttributeNormalizer::class);

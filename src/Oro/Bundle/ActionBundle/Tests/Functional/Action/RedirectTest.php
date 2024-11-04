@@ -24,6 +24,7 @@ class RedirectTest extends WebTestCase
     /** @var RouterInterface */
     private $router;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
@@ -35,6 +36,7 @@ class RedirectTest extends WebTestCase
         $this->loadFixtures([LoadItems::class]);
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $this->configModifier->resetCache();

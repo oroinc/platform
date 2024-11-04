@@ -12,9 +12,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class ComputeTranslationId implements ProcessorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeLoadedDataContext $context */

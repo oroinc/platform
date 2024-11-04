@@ -18,6 +18,7 @@ class OroAssetsInstallCommand extends AbstractCommand
     /** @var string */
     protected static $defaultName = 'oro:assets:install';
 
+    #[\Override]
     protected function configure()
     {
         $this
@@ -60,6 +61,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($this->getContainer()->getParameter('kernel.environment') === 'test') {

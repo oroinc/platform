@@ -27,6 +27,7 @@ class LocalizationChoicesProviderTest extends \PHPUnit\Framework\TestCase
     /** @var LocalizationChoicesProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->localizationManager = $this->createMock(LocalizationManager::class);

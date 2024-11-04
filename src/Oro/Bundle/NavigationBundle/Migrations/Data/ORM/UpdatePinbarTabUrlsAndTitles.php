@@ -22,6 +22,7 @@ class UpdatePinbarTabUrlsAndTitles extends AbstractFixture implements ContainerA
 
     private const BATCH_SIZE = 200;
 
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $this->updateTitles($manager);

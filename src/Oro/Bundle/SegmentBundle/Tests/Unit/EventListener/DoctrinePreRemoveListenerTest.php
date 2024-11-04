@@ -23,6 +23,7 @@ class DoctrinePreRemoveListenerTest extends \PHPUnit\Framework\TestCase
     /** @var DoctrinePreRemoveListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);

@@ -34,9 +34,7 @@ abstract class AbstractTranslatableEntityFixture extends AbstractFixture impleme
      */
     protected $translationLocales;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $this->translator = $this->container->get('translator');

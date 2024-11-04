@@ -13,9 +13,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class CollectFormErrors extends BaseCollectFormErrors
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function collectFormErrors(FormContext $context): void
     {
         parent::collectFormErrors($context);

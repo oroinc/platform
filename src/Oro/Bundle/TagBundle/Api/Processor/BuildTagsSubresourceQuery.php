@@ -25,9 +25,7 @@ class BuildTagsSubresourceQuery implements ProcessorInterface
         $this->taggableHelper = $taggableHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var SubresourceContext $context */

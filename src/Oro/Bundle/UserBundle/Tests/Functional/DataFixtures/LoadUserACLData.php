@@ -61,17 +61,13 @@ class LoadUserACLData extends AbstractFixture implements ContainerAwareInterface
         ]
     ];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadBusinessUnitData::class, LoadBusinessUnit::class, LoadOrganization::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $this->loadRoles($manager);

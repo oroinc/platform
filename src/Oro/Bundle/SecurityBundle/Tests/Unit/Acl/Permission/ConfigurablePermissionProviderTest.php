@@ -14,6 +14,7 @@ class ConfigurablePermissionProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigurablePermissionProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configurationProvider = $this->createMock(ConfigurablePermissionConfigurationProvider::class);

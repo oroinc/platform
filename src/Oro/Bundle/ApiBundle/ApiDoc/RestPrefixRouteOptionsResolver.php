@@ -22,9 +22,7 @@ class RestPrefixRouteOptionsResolver implements RouteOptionsResolverInterface
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function resolve(Route $route, RouteCollectionAccessor $routes): void
     {
         $path = $route->getPath();

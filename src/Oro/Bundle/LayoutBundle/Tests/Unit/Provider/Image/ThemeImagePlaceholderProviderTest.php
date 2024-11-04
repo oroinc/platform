@@ -20,6 +20,7 @@ class ThemeImagePlaceholderProviderTest extends \PHPUnit\Framework\TestCase
 
     private ThemeImagePlaceholderProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->contextStack = $this->createMock(LayoutContextStack::class);

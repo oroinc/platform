@@ -21,6 +21,7 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
     /** @var AttributeAssembler */
     private $assembler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->actionData = $this->createMock(ActionData::class);

@@ -27,6 +27,7 @@ class DataFixturesLoaderTest extends \PHPUnit\Framework\TestCase
 
     private Kernel $kernel;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);

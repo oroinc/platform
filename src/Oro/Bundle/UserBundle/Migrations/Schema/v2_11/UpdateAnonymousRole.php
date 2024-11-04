@@ -15,6 +15,7 @@ class UpdateAnonymousRole extends ParametrizedMigrationQuery implements Migratio
     const IS_AUTHENTICATED_ANONYMOUSLY  = 'IS_AUTHENTICATED_ANONYMOUSLY';
     const PUBLIC_ACCESS  = 'PUBLIC_ACCESS';
 
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -23,6 +24,7 @@ class UpdateAnonymousRole extends ParametrizedMigrationQuery implements Migratio
         return $logger->getMessages();
     }
 
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->doExecute($logger);
@@ -48,6 +50,7 @@ class UpdateAnonymousRole extends ParametrizedMigrationQuery implements Migratio
         }
     }
 
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $queries->addQuery(new self());

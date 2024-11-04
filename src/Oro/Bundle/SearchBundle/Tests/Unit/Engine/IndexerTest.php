@@ -37,6 +37,7 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
     /** @var Indexer */
     private $indexService;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->config = require rtrim(__DIR__, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'searchConfig.php';

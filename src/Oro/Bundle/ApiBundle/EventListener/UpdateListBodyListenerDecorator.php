@@ -22,6 +22,7 @@ class UpdateListBodyListenerDecorator implements BodyListenerInterface
         $this->routes = $routes;
     }
 
+    #[\Override]
     public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();

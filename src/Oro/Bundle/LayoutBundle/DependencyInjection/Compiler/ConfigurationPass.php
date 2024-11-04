@@ -28,9 +28,7 @@ class ConfigurationPass implements CompilerPassInterface
     private const THEME_CONFIG_SERVICE = 'oro_layout.theme_extension.configuration';
     private const THEME_CONFIG_EXTENSION_TAG_NAME = 'layout.theme_config_extension';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $servicesForServiceLocator = [];

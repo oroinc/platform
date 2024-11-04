@@ -43,9 +43,7 @@ class LayoutContext implements ContextInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getResolver()
     {
         if ($this->resolver === null) {
@@ -55,9 +53,7 @@ class LayoutContext implements ContextInterface
         return $this->resolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function resolve()
     {
         if ($this->resolved) {
@@ -90,25 +86,19 @@ class LayoutContext implements ContextInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isResolved()
     {
         return $this->resolved;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function has($name)
     {
         return \array_key_exists($name, $this->items);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function get($name)
     {
         if (!\array_key_exists($name, $this->items)) {
@@ -118,9 +108,7 @@ class LayoutContext implements ContextInterface
         return $this->items[$name];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOr($name, $default = null)
     {
         return \array_key_exists($name, $this->items)
@@ -128,9 +116,7 @@ class LayoutContext implements ContextInterface
             : $default;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function set($name, $value)
     {
         if ($this->resolved && !$this->has($name)) {
@@ -142,9 +128,7 @@ class LayoutContext implements ContextInterface
         $this->items[$name] = $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function remove($name)
     {
         if ($this->resolved && $this->has($name)) {
@@ -156,25 +140,19 @@ class LayoutContext implements ContextInterface
         unset($this->items[$name]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function data()
     {
         return $this->dataCollection;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetExists($name): bool
     {
         return \array_key_exists($name, $this->items);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetGet($name): mixed
     {
         if (!\array_key_exists($name, $this->items)) {
@@ -184,17 +162,13 @@ class LayoutContext implements ContextInterface
         return $this->items[$name];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetSet($name, $value): void
     {
         $this->set($name, $value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetUnset($name): void
     {
         $this->remove($name);
@@ -208,9 +182,7 @@ class LayoutContext implements ContextInterface
         return new OptionsResolver();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getHash()
     {
         if (!$this->isResolved()) {

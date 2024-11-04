@@ -51,6 +51,8 @@ $config->setRules([
         // https://github.com/php-fig/fig-standards/pull/1206#issuecomment-628873709 ) and
         // and a PR to php-cs-fixer will be proposed based on that decision to address it one way or the other.
         'class_definition' => false,
+        'general_phpdoc_annotation_remove' => ['annotations' => ['inheritDoc'], 'case_sensitive' => false],
+        'no_empty_phpdoc' => true,
     ])
     ->setFinder($finder)
     ->setRiskyAllowed(true)

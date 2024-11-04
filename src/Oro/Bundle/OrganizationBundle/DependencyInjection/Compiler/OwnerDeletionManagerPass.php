@@ -19,9 +19,7 @@ class OwnerDeletionManagerPass implements CompilerPassInterface
     private const MANAGER_SERVICE  = 'oro_organization.owner_deletion_manager';
     private const CHECKER_TAG_NAME = 'oro_organization.owner_assignment_checker';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $services = [];

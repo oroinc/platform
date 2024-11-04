@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityConfigBundle\ImportExport\Strategy;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Helper\ConfigModelConstraintsHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Model\EnumValue;
+use Oro\Bundle\EntityExtendBundle\Model\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
@@ -50,9 +50,7 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
         $this->fieldValidationHelper = $fieldValidationHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process($entity)
     {
         $this->assertEnvironment($entity);
@@ -161,7 +159,7 @@ class EntityFieldImportStrategy extends AbstractImportStrategy
 
                 if ($scope === 'enum') {
                     foreach ($scopeData[$code] as $key => $enumFields) {
-                        $result = $this->strategyHelper->validateEntity(EnumValue::createFromArray($enumFields));
+                        $result = $this->strategyHelper->validateEntity(EnumOption::createFromArray($enumFields));
                         if ($result) {
                             $errors[] = sprintf('%s.%s.%s: %s', $scope, $code, $key, implode(' ', $result));
                         }

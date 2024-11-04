@@ -11,6 +11,7 @@ class LoadReportTypes extends AbstractFixture
     /**
      * Load available report types
      */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $tableReport = new ReportType(ReportType::TYPE_TABLE);

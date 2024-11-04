@@ -49,6 +49,7 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
     /** @var MassActionDispatcher */
     private $massActionDispatcher;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->manager = $this->createMock(ManagerInterface::class);

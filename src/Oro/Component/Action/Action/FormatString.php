@@ -12,9 +12,7 @@ class FormatString extends AbstractAction
      */
     protected $options;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $result = strtr($this->getString($context), $this->getArguments($context));
@@ -27,8 +25,8 @@ class FormatString extends AbstractAction
      *  - string - string used to format, first argument of strtr
      *  - arguments - array of format parameters, second argument of strtr
      *
-     * {@inheritDoc}
      */
+    #[\Override]
     public function initialize(array $options)
     {
         if (empty($options['attribute'])) {

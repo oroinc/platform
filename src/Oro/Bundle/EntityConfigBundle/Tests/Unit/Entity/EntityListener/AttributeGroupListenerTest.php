@@ -19,6 +19,7 @@ class AttributeGroupListenerTest extends \PHPUnit\Framework\TestCase
     /** @var AttributeGroupListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManagerInterface::class);

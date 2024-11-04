@@ -13,10 +13,10 @@ class Configuration implements ConfigurationInterface
     public const ROOT_NODE_NAME = 'dashboards';
 
     /**
-     * {@inheritDoc}
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
+    #[\Override]
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder(self::ROOT_NODE_NAME);

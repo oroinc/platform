@@ -34,6 +34,7 @@ class PersistentBatchWriterTest extends \PHPUnit\Framework\TestCase
     /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
     private $entityManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);

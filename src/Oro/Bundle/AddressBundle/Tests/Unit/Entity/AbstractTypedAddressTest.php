@@ -10,6 +10,7 @@ class AbstractTypedAddressTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractTypedAddress */
     private $address;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->address = $this->getMockForAbstractClass(AbstractTypedAddress::class);

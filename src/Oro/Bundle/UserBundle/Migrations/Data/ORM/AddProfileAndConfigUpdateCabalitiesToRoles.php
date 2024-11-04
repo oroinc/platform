@@ -6,17 +6,13 @@ use Oro\Bundle\SecurityBundle\Migrations\Data\ORM\AbstractLoadAclData;
 
 class AddProfileAndConfigUpdateCabalitiesToRoles extends AbstractLoadAclData
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDataPath()
     {
         return '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getAclData()
     {
         return [

@@ -30,6 +30,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
     /** @var CollectFormErrors */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

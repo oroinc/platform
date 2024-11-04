@@ -38,6 +38,7 @@ class OperationFormHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var FlashBagInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $flashBag;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);

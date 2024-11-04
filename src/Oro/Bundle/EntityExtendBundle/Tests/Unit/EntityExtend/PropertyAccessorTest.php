@@ -24,6 +24,7 @@ class PropertyAccessorTest extends \PHPUnit\Framework\TestCase
 {
     private PropertyAccessorInterface $propertyAccessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax();

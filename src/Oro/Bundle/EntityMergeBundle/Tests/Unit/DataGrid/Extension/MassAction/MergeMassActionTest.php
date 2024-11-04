@@ -15,6 +15,7 @@ class MergeMassActionTest extends \PHPUnit\Framework\TestCase
 
     private MergeMassAction $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $entityConfigProvider = $this->createMock(ConfigProvider::class);

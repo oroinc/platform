@@ -33,6 +33,7 @@ class TestEmailOwner implements EmailOwnerInterface
         }
     }
 
+    #[\Override]
     public function getEmailFields()
     {
         return $this->emailFields;
@@ -43,11 +44,13 @@ class TestEmailOwner implements EmailOwnerInterface
         $this->emailFields = $emailFields;
     }
 
+    #[\Override]
     public function getId()
     {
         return $this->id;
     }
 
+    #[\Override]
     public function getFirstName(): ?string
     {
         return $this->firstName;
@@ -60,6 +63,7 @@ class TestEmailOwner implements EmailOwnerInterface
         return $this;
     }
 
+    #[\Override]
     public function getLastName(): ?string
     {
         return $this->lastName;

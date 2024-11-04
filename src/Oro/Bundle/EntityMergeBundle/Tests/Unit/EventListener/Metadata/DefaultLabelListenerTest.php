@@ -19,6 +19,7 @@ class DefaultLabelListenerTest extends \PHPUnit\Framework\TestCase
     /** @var DefaultLabelListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityConfigHelper = $this->createMock(EntityConfigHelper::class);

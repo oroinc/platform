@@ -37,9 +37,7 @@ class ButtonWidgetAction extends AbstractAction
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getOptions()
     {
         $options = parent::getOptions();

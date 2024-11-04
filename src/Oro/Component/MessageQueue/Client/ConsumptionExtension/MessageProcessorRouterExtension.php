@@ -29,6 +29,7 @@ class MessageProcessorRouterExtension extends AbstractExtension
         $this->noopMessageProcessorName = $noopMessageProcessorName;
     }
 
+    #[\Override]
     public function onPreReceived(Context $context): void
     {
         if ($context->getMessageProcessorName()) {

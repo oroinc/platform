@@ -26,6 +26,7 @@ class EmailCaseInsensitiveOptionValidatorTest extends ConstraintValidatorTestCas
     /** @var DatagridRouteHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $datagridRouteHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->userRepository = $this->createMock(UserRepository::class);
@@ -34,9 +35,7 @@ class EmailCaseInsensitiveOptionValidatorTest extends ConstraintValidatorTestCas
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createValidator()
     {
         $doctrine = $this->createMock(ManagerRegistry::class);

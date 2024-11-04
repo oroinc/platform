@@ -21,6 +21,7 @@ class DateGroupingFilterTest extends \PHPUnit\Framework\TestCase
     /** @var DateGroupingFilter */
     private $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formFactory = $this->createMock(FormFactoryInterface::class);

@@ -13,9 +13,7 @@ class ComputeEmailUserFolders implements ProcessorInterface
 {
     private const FOLDERS_FIELD_NAME = 'folders';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeLoadedDataContext $context */

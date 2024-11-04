@@ -20,6 +20,7 @@ class FormStub extends AbstractType
     /**
      * @return string
      */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return $this->name;

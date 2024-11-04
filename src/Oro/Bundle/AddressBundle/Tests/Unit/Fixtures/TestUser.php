@@ -24,6 +24,7 @@ class TestUser implements UserInterface
         return $this->phone;
     }
 
+    #[\Override]
     public function getRoles(): array
     {
     }
@@ -40,10 +41,12 @@ class TestUser implements UserInterface
     {
     }
 
+    #[\Override]
     public function eraseCredentials()
     {
     }
 
+    #[\Override]
     public function getUserIdentifier(): string
     {
         return '';

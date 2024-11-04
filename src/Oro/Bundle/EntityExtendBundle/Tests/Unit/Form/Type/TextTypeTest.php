@@ -11,9 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType as SymfonyTextType;
 
 class TextTypeTest extends AbstractConfigTypeTestCase
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFormType(): AbstractType
     {
         return new TextType(

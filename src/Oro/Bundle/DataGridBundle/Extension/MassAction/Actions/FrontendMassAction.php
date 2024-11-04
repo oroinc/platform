@@ -6,9 +6,7 @@ use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 
 class FrontendMassAction extends AbstractMassAction
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setOptions(ActionConfiguration $options)
     {
         if (empty($options['frontend_type'])) {

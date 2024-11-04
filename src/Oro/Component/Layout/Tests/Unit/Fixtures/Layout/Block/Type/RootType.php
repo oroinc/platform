@@ -6,9 +6,7 @@ use Oro\Component\Layout\Block\Type\AbstractContainerType;
 
 class RootType extends AbstractContainerType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'root';

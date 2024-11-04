@@ -24,6 +24,7 @@ class AutoResponseListenerTest extends \PHPUnit\Framework\TestCase
     /** @var AutoResponseListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->autoResponseManager = $this->createMock(AutoResponseManager::class);

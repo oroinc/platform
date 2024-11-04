@@ -20,9 +20,7 @@ class BusinessUnitTreeTransformer implements DataTransformerInterface
         $this->manager = $manager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (!$value) {
@@ -41,9 +39,7 @@ class BusinessUnitTreeTransformer implements DataTransformerInterface
         return $this->manager->getBusinessUnitRepo()->find($value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         if (!is_array($value) && !$value) {

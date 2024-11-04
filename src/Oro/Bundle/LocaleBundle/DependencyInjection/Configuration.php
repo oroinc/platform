@@ -20,9 +20,7 @@ class Configuration implements ConfigurationInterface
     public const ENABLED_LOCALIZATIONS = 'enabled_localizations';
     public const DEFAULT_LOCALIZATION  = 'default_localization';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder(self::ROOT_NAME);

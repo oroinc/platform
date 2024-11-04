@@ -19,6 +19,7 @@ class EnumIdChoiceTypeTest extends TypeTestCase
     /** @var EnumIdChoiceType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

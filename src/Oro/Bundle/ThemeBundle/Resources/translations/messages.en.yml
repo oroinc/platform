@@ -29,10 +29,6 @@ oro:
         label: Configuration
       organization:
         label: Organization
-      fields:
-        type:
-          choices:
-            storefront: Storefront
       preview:
         text: '*please note that elements other than the selected one may differ on the actual website'
         collapse:

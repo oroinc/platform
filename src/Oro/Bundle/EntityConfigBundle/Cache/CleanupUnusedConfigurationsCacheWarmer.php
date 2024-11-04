@@ -30,17 +30,13 @@ class CleanupUnusedConfigurationsCacheWarmer implements CacheWarmerInterface
         $this->appState = $appState;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isOptional(): bool
     {
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function warmUp(string $cacheDir): array
     {
         if (!$this->appState->isInstalled()) {

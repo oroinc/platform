@@ -40,9 +40,7 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
         $this->connection = $connection;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function add(StatisticModelInterface $model)
     {
         $this->collection[] = $model;
@@ -105,9 +103,7 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
         return $this->paths = $paths;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function flush()
     {
         $this->connection->connect();
@@ -124,9 +120,7 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
         $this->collection = [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
     {
         $orderBy = $orderBy ?: ['id', 'DESC'];
@@ -169,9 +163,7 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
         return $models;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function find($id)
     {
         if (isset($this->collection[$id])) {
@@ -220,25 +212,19 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
         return $qb->execute();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function findAll()
     {
         throw new \RuntimeException('It\'s prohibited call "findAll" on statistics. Use "findBy" method');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function findOneBy(array $criteria)
     {
         throw new \RuntimeException('Not implemented');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getClassName()
     {
         return $this->className;
@@ -252,6 +238,7 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
         $this->className = $className;
     }
 
+    #[\Override]
     public function setAvgStrategy(AvgStrategyInterface $avgStrategy)
     {
         $this->avgStrategy = $avgStrategy;

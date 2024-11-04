@@ -16,6 +16,7 @@ class FieldAclTest extends AclTestCase
     /** @var TestEntity */
     private $testEntity;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

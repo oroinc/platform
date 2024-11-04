@@ -27,6 +27,7 @@ class SearchEntityFilterTypeTest extends FormIntegrationTestCase
     /** @var SearchEntityFilterType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
@@ -117,9 +118,7 @@ class SearchEntityFilterTypeTest extends FormIntegrationTestCase
         $this->assertEquals(EntityFilterType::class, $this->type->getParent());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $translator = $this->createMock(TranslatorInterface::class);

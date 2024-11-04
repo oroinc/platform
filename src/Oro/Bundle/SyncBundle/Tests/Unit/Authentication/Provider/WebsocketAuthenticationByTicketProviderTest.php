@@ -30,6 +30,7 @@ class WebsocketAuthenticationByTicketProviderTest extends \PHPUnit\Framework\Tes
     private TicketDigestGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject $ticketDigestGenerator;
     private UserProviderInterface|\PHPUnit\Framework\MockObject\MockObject $userProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->ticketDigestGenerator = $this->createMock(TicketDigestGeneratorInterface::class);

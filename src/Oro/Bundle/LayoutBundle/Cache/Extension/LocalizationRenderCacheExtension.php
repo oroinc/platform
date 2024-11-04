@@ -19,9 +19,7 @@ class LocalizationRenderCacheExtension implements RenderCacheExtensionInterface
         $this->currentLocalizationProvider = $currentLocalizationProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function alwaysVaryBy(): array
     {
         $localization = $this->currentLocalizationProvider->getCurrentLocalization();

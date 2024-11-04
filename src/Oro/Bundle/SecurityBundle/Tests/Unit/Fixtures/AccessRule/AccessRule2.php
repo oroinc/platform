@@ -11,11 +11,13 @@ class AccessRule2 implements AccessRuleInterface
 {
     private $isApplicable = true;
 
+    #[\Override]
     public function process(Criteria $criteria): void
     {
         $criteria->andExpression(new Comparison(new Path('organization'), Comparison::EQ, 1));
     }
 
+    #[\Override]
     public function isApplicable(Criteria $criteria): bool
     {
         return $this->isApplicable;

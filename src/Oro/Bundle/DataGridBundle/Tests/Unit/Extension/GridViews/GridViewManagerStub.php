@@ -14,9 +14,7 @@ class GridViewManagerStub extends GridViewManager
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAllGridViews(AbstractUser $user = null, $gridName = null)
     {
         $currentUser = new User();

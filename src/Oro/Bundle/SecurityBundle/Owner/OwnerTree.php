@@ -86,9 +86,7 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
     }
     // @codingStandardsIgnoreEnd
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getUserOrganizationId($userId)
     {
         if (!isset($this->userOwningOrganizationId[$userId])) {
@@ -98,9 +96,7 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
         return $this->userOwningOrganizationId[$userId];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getUserOrganizationIds($userId)
     {
         if (!isset($this->userOrganizationIds[$userId])) {
@@ -110,9 +106,7 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
         return $this->userOrganizationIds[$userId];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getUserBusinessUnitId($userId)
     {
         if (!isset($this->userOwningBusinessUnitId[$userId])) {
@@ -122,9 +116,7 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
         return $this->userOwningBusinessUnitId[$userId];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getUserBusinessUnitIds($userId, $organizationId = null)
     {
         if ($organizationId) {
@@ -142,9 +134,7 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
         return $this->userBusinessUnitIds[$userId];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getUsersAssignedToBusinessUnit($businessUnitId)
     {
         if (!isset($this->assignedBusinessUnitUserIds[$businessUnitId])) {
@@ -154,9 +144,7 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
         return $this->assignedBusinessUnitUserIds[$businessUnitId];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getUsersAssignedToBusinessUnits(array $businessUnitIds)
     {
         $userIds = array_intersect_key($this->assignedBusinessUnitUserIds, array_flip($businessUnitIds));
@@ -171,9 +159,7 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBusinessUnitOrganizationId($businessUnitId)
     {
         if (!isset($this->businessUnitOwningOrganizationId[$businessUnitId])) {
@@ -183,9 +169,7 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
         return $this->businessUnitOwningOrganizationId[$businessUnitId];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOrganizationBusinessUnitIds($organizationId)
     {
         if (!isset($this->organizationBusinessUnitIds[$organizationId])) {
@@ -195,9 +179,7 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
         return $this->organizationBusinessUnitIds[$organizationId];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSubordinateBusinessUnitIds($businessUnitId)
     {
         if (!isset($this->subordinateBusinessUnitIds[$businessUnitId])) {
@@ -207,9 +189,7 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
         return $this->subordinateBusinessUnitIds[$businessUnitId];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getUserSubordinateBusinessUnitIds($userId, $organizationId = null)
     {
         $buIds = $this->getUserBusinessUnitIds($userId, $organizationId);
@@ -227,9 +207,7 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
         return $resultBuIds;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBusinessUnitsIdByUserOrganizations($userId)
     {
         $resultBuIds = [];
@@ -243,9 +221,7 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
         return $resultBuIds;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAllBusinessUnitIds()
     {
         $resultBuIds = [];
@@ -256,9 +232,7 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
         return $resultBuIds;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addBusinessUnit($businessUnitId, $owningOrganizationId = null)
     {
         if (null !== $owningOrganizationId) {
@@ -272,25 +246,19 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setSubordinateBusinessUnitIds($parentBusinessUnitId, $businessUnitIds)
     {
         $this->subordinateBusinessUnitIds[$parentBusinessUnitId] = $businessUnitIds;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTree()
     {
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addUser($userId, $owningBusinessUnitId = null)
     {
         if (null !== $owningBusinessUnitId) {
@@ -302,9 +270,7 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addUserBusinessUnit($userId, $organizationId, $businessUnitId = null)
     {
         if (null !== $businessUnitId) {
@@ -314,9 +280,7 @@ class OwnerTree implements OwnerTreeInterface, OwnerTreeBuilderInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addUserOrganization($userId, $organizationId)
     {
         $this->userOrganizationIds[$userId][] = $organizationId;

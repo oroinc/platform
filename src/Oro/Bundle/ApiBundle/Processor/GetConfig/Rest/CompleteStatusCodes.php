@@ -17,9 +17,9 @@ use Symfony\Component\HttpFoundation\Response;
 class CompleteStatusCodes extends AbstractCompleteStatusCodes
 {
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     protected function addStatusCodes(StatusCodesConfig $statusCodes, ?string $targetAction): void
     {
         switch ($targetAction) {

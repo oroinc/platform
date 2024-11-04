@@ -18,6 +18,7 @@ class TitleAttributeReaderTest extends \PHPUnit\Framework\TestCase
     private MockObject $controllerClassProvider;
     private MockObject $reader;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->controllerClassProvider = $this->createMock(ControllerClassProvider::class);

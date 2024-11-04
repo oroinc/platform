@@ -24,9 +24,7 @@ class CacheableDynamicTranslationLoader implements DynamicTranslationLoaderInter
         $this->sanitizationError = $sanitizationError;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function loadTranslations(array $locales, bool $includeSystem): array
     {
         return $this->cache->get($locales, function (array $notCachedLocales) use ($includeSystem) {

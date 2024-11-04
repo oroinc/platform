@@ -15,6 +15,7 @@ use Oro\Component\MessageQueue\StatusCalculator\QueryCalculator;
  */
 class QueryCalculatorTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -22,6 +23,7 @@ class QueryCalculatorTest extends WebTestCase
         $this->loadFixtures([LoadJobData::class]);
     }
 
+    #[\Override]
     protected function getDataFixturesExecutorEntityManager()
     {
         return $this->getContainer()->get('doctrine')->getManagerForClass(Job::class);

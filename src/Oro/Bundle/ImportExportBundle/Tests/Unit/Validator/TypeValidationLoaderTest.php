@@ -31,6 +31,7 @@ class TypeValidationLoaderTest extends \PHPUnit\Framework\TestCase
     /** @var TypeValidationLoader */
     private $loader;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extendConfigProvider = $this->createMock(ConfigProvider::class);

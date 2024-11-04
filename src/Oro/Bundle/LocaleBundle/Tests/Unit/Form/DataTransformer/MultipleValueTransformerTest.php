@@ -15,6 +15,7 @@ class MultipleValueTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var MultipleValueTransformer */
     private $transformer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->transformer = new MultipleValueTransformer(self::FIELD_DEFAULT, self::FIELD_VALUES);

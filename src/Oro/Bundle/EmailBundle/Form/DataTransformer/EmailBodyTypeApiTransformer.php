@@ -8,9 +8,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class EmailBodyTypeApiTransformer implements DataTransformerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         if (null === $value) {
@@ -20,9 +18,7 @@ class EmailBodyTypeApiTransformer implements DataTransformerInterface
         return $value ? 'text' : 'html';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (!$value) {

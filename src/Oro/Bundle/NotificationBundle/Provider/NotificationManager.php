@@ -56,6 +56,7 @@ class NotificationManager implements ResetInterface
         $this->cache->delete(self::RULES_CACHE_KEY);
     }
 
+    #[\Override]
     public function reset(): void
     {
         $this->notificationRules = null;

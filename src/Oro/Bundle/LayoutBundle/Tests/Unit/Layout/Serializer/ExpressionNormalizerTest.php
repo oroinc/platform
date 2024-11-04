@@ -16,6 +16,7 @@ class ExpressionNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var ExpressionNormalizer */
     private $normalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->cache = $this->createMock(ExpressionLanguageCache::class);

@@ -35,9 +35,7 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
     /** @var array */
     protected $sleepBetweenAttempt = [5, 10, 20, 40];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function init(Transport $transportEntity)
     {
         $this->resetAttemptCount();

@@ -45,9 +45,7 @@ class Path implements ExpressionInterface
         return $this->field;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visit(Visitor $visitor)
     {
         return $visitor->walkPath($this);

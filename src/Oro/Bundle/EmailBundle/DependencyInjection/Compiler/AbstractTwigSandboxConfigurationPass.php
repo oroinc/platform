@@ -14,9 +14,7 @@ abstract class AbstractTwigSandboxConfigurationPass implements CompilerPassInter
     private const EMAIL_TEMPLATE_SANDBOX_SECURITY_POLICY_SERVICE_KEY = 'oro_email.twig.email_security_policy';
     private const EMAIL_TEMPLATE_RENDERER_SERVICE_KEY = 'oro_email.twig.email_environment';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $this->registerFunctions($container);

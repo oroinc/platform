@@ -30,6 +30,7 @@ class LayoutFactoryBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var LayoutFactoryBuilder */
     private $layoutFactoryBuilder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->expressionProcessor = $this->createMock(ExpressionProcessor::class);

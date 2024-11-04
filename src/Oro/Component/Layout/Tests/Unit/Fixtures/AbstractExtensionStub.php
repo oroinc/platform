@@ -36,26 +36,31 @@ class AbstractExtensionStub extends AbstractExtension
         $this->loadedDataProviders        = $loadedDataProviders;
     }
 
+    #[\Override]
     protected function loadTypes()
     {
         return $this->loadedTypes;
     }
 
+    #[\Override]
     protected function loadTypeExtensions()
     {
         return $this->loadedTypeExtensions;
     }
 
+    #[\Override]
     protected function loadLayoutUpdates(LayoutItemInterface $item)
     {
         return $this->loadedLayoutUpdates;
     }
 
+    #[\Override]
     protected function loadContextConfigurators()
     {
         return $this->loadedContextConfigurators;
     }
 
+    #[\Override]
     protected function loadDataProviders()
     {
         return $this->loadedDataProviders;

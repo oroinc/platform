@@ -34,9 +34,7 @@ class EntityConfigPass implements CompilerPassInterface
 
     private const APP_CONFIG_PATH = '../config/oro/entity';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $configManager = $container->getDefinition(self::CONFIG_MANAGER_SERVICE);

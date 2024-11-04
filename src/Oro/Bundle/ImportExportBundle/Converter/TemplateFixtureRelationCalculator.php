@@ -19,9 +19,7 @@ class TemplateFixtureRelationCalculator implements RelationCalculatorInterface
         $this->fieldHelper     = $fieldHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMaxRelatedEntities($entityName, $fieldName)
     {
         $maxFields = 1;

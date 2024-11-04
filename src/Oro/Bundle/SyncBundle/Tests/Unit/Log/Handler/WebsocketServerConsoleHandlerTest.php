@@ -19,6 +19,7 @@ class WebsocketServerConsoleHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var WebsocketServerConsoleHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->consoleHandler = $this->createMock(SymfonyConsoleHandler::class);

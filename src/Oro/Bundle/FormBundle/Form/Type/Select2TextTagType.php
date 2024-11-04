@@ -11,6 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class Select2TextTagType extends AbstractType
 {
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
@@ -27,6 +28,7 @@ class Select2TextTagType extends AbstractType
         );
     }
 
+    #[\Override]
     public function getParent(): string
     {
         return Select2HiddenType::class;

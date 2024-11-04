@@ -29,6 +29,7 @@ class ChannelDeleteManagerTest extends TestCase
     /** @var DeleteManager */
     private $deleteManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->testIntegration = new Integration();

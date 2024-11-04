@@ -22,9 +22,7 @@ class LocalizedFallbackValueNameProvider implements EntityNameProviderInterface
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getName($format, $locale, $entity)
     {
         if ($entity instanceof AbstractLocalizedFallbackValue) {
@@ -38,9 +36,7 @@ class LocalizedFallbackValueNameProvider implements EntityNameProviderInterface
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getNameDQL($format, $locale, $className, $alias)
     {
         if (is_a($className, AbstractLocalizedFallbackValue::class, true)) {

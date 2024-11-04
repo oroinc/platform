@@ -36,9 +36,7 @@ class NullValueTransformer implements DataTransformerInterface
         $this->transformer = $transformer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         if (null === $value) {
@@ -48,9 +46,7 @@ class NullValueTransformer implements DataTransformerInterface
         return $this->transformer->transform($value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         $result = $this->transformer->reverseTransform($value ?? '');

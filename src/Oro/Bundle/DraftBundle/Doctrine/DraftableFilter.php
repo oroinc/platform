@@ -21,6 +21,7 @@ class DraftableFilter extends SQLFilter
      *
      * @return string The constraint SQL if there is available, empty string otherwise.
      */
+    #[\Override]
     public function addFilterConstraint(ClassMetadata $targetEntity, $targetTableAlias)
     {
         if (!$this->isDraftableEntity($targetEntity)) {

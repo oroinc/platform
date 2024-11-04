@@ -17,9 +17,7 @@ class EmailNotificationHandler implements FormHandlerInterface
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process($data, FormInterface $form, Request $request)
     {
         if (!$data instanceof EmailNotification) {

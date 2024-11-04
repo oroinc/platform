@@ -29,17 +29,13 @@ class NormalizeResultActionProcessor extends ActionProcessor implements LoggerAw
 {
     protected ?LoggerInterface $logger = null;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setLogger(LoggerInterface $logger): void
     {
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function executeProcessors(ComponentContextInterface $context): void
     {
         /** @var NormalizeResultContext $context */

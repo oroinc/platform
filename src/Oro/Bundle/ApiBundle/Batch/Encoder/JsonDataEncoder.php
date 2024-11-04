@@ -11,9 +11,7 @@ class JsonDataEncoder implements DataEncoderInterface
 {
     private ?string $headerSectionName = null;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function encodeItems(array $items): string
     {
         $resultItems = [];
@@ -42,9 +40,7 @@ class JsonDataEncoder implements DataEncoderInterface
         return JsonUtil::encode($resultItems);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setHeaderSectionName(?string $name): void
     {
         $this->headerSectionName = $name;

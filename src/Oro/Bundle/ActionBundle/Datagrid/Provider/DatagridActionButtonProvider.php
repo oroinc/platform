@@ -68,12 +68,13 @@ class DatagridActionButtonProvider implements DatagridActionProviderInterface
         $this->groups = $groups;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function hasActions(DatagridConfiguration $configuration)
     {
         return 0 !== count($this->getButtons($this->getButtonSearchContext($configuration), $configuration));
     }
 
+    #[\Override]
     public function applyActions(DatagridConfiguration $configuration)
     {
         if (!$this->hasActions($configuration)) {

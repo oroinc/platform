@@ -18,17 +18,13 @@ class AddEmailActivityGrouping extends AbstractFixture implements DependentFixtu
 {
     private const BATCH_SIZE = 100;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [AddEmailActivityLists::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $criteria = new Criteria();

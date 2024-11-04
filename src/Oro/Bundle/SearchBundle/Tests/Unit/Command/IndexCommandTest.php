@@ -19,6 +19,7 @@ class IndexCommandTest extends \PHPUnit\Framework\TestCase
     /** @var IndexCommand */
     private $command;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

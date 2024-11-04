@@ -16,9 +16,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class InitializeConfigExtras implements ProcessorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ChangeSubresourceContext $context */

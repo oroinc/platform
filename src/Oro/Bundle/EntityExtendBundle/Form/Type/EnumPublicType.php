@@ -3,13 +3,16 @@
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Enum public form type.
+ */
 class EnumPublicType extends AbstractType
 {
     /** @var EnumTypeHelper */
@@ -20,9 +23,7 @@ class EnumPublicType extends AbstractType
         $this->typeHelper = $typeHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setNormalizer(
@@ -38,25 +39,18 @@ class EnumPublicType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_entity_extend_enum_public';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return ChoiceType::class;
@@ -95,8 +89,7 @@ class EnumPublicType extends AbstractType
                 // a new field reuses public enum
                 return true;
             }
-            $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
-            if ($this->typeHelper->isImmutable('enum', $enumValueClassName, null, 'public')) {
+            if ($this->typeHelper->isImmutable('enum', EnumOption::class, null, 'public')) {
                 // is immutable
                 return true;
             }

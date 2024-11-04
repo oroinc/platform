@@ -14,7 +14,7 @@
                     <div class="alert alert-success" role="alert">
                         {{ 'oro.user.password.reset_password.message'|trans({ '%email%': email }) }}
                     </div>
-                    <a href="{{ path('oro_user_security_login') }}">&laquo; {{ 'Return to Login'|trans }}</a>
+                    <a href="{{ resetFormReturnPath|default(path('oro_user_security_login')) }}">&laquo; {{ 'Return to Login'|trans }}</a>
                 </fieldset>
             </form>
         </div>

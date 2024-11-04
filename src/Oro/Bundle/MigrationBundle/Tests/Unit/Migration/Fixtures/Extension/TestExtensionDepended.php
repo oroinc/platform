@@ -6,6 +6,7 @@ class TestExtensionDepended implements TestExtensionAwareInterface
 {
     protected $testExtension;
 
+    #[\Override]
     public function setTestExtension(TestExtension $testExtension)
     {
         $this->testExtension = $testExtension;

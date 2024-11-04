@@ -12,6 +12,7 @@ class UpdateSchemaListenerTest extends \PHPUnit\Framework\TestCase
 
     private UpdateSchemaListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->interruptConsumptionCache = $this->createMock(CacheItemPoolInterface::class);

@@ -7,6 +7,7 @@ use Doctrine\ORM\Query\Parameter;
 use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ExpressionValue;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NinComparisonExpression;
+use Oro\Bundle\ApiBundle\Tests\Unit\Stub\FieldDqlExpressionProviderStub;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class NinComparisonExpressionTest extends \PHPUnit\Framework\TestCase
@@ -17,6 +18,7 @@ class NinComparisonExpressionTest extends \PHPUnit\Framework\TestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            new FieldDqlExpressionProviderStub(),
             $this->createMock(EntityClassResolver::class)
         );
         $field = 'e.test';
@@ -48,6 +50,7 @@ class NinComparisonExpressionTest extends \PHPUnit\Framework\TestCase
         $expressionVisitor = new QueryExpressionVisitor(
             [],
             [],
+            new FieldDqlExpressionProviderStub(),
             $this->createMock(EntityClassResolver::class)
         );
         $field = 'e.test';

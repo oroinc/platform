@@ -7,10 +7,12 @@ use Oro\Bundle\DataAuditBundle\Tests\Unit\Fixture\LoggableClass as BaseLoggableC
 
 class LoggableClass extends BaseLoggableClas implements Proxy
 {
+    #[\Override]
     public function __load()
     {
     }
 
+    #[\Override]
     public function __isInitialized()
     {
         return false;

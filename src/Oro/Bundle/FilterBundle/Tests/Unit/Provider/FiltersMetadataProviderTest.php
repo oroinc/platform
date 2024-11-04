@@ -17,6 +17,7 @@ class FiltersMetadataProviderTest extends \PHPUnit\Framework\TestCase
     /** @var FiltersMetadataProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configurationProvider = $this->createMock(RawConfigurationProvider::class);

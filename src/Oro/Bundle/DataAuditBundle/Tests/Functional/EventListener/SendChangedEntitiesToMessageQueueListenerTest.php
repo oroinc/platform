@@ -30,6 +30,7 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
 {
     use MessageQueueExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -1069,6 +1070,38 @@ class SendChangedEntitiesToMessageQueueListenerTest extends WebTestCase
                 'entity_class' => TestAuditDataOwner::class,
                 'entity_id' => $entity->getId(),
                 'change_set' => array_merge(['stringProperty' => ['string', 'new string']], $additionalChanges),
+            ]
+        ];
+        $this->assertEquals($expectedEntitiesUpdated, $additionalMessage['message']['entities_updated']);
+    }
+
+    public function testShouldSendEntityChangesWhenNoChangesInAdditionalUpdates()
+    {
+        $em = $this->getEntityManager();
+        $entity = new TestAuditDataOwner();
+        $entity->setStringProperty('string');
+        $em->persist($entity);
+        $em->flush();
+
+        $sentMessages = self::getSentMessages();
+        $this->assertCount(1, $sentMessages);
+
+        $storage = self::getContainer()->get('oro_dataaudit.model.additional_entity_changes_to_audit_storage');
+        $storage->addEntityUpdate($em, $entity, ['additionalChanges' => ['old', 'old']]);
+
+        $entity->setStringProperty('new string');
+        $em->persist($entity);
+        $em->flush();
+
+        $sentMessages = self::getSentMessages();
+        $this->assertCount(2, $sentMessages);
+        $additionalMessage = end($sentMessages);
+        $this->assertEquals(AuditChangedEntitiesTopic::getName(), $additionalMessage['topic']);
+        $expectedEntitiesUpdated = [
+            spl_object_hash($entity) => [
+                'entity_class' => TestAuditDataOwner::class,
+                'entity_id' => $entity->getId(),
+                'change_set' => ['stringProperty' => ['string', 'new string']]
             ]
         ];
         $this->assertEquals($expectedEntitiesUpdated, $additionalMessage['message']['entities_updated']);

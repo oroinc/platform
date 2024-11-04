@@ -9,6 +9,7 @@ class ImagesTemplateProviderTest extends TestCase
 {
     private ImagesTemplateProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider = new ImagesTemplateProvider();

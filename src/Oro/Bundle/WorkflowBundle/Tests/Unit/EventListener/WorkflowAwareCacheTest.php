@@ -25,6 +25,7 @@ class WorkflowAwareCacheTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowAwareCache */
     private $workflowAwareCache;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->cache = $this->createMock(CacheInterface::class);

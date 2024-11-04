@@ -21,9 +21,7 @@ class SentinelReplication extends BaseSentinelReplication
         $this->preferSlave = $preferSlave;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function pickSlave()
     {
         $slave = $this->pickPreferredSlave();
@@ -34,9 +32,7 @@ class SentinelReplication extends BaseSentinelReplication
         return $slave;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function assertConnectionRole(NodeConnectionInterface $connection, $role)
     {
         // do not validate the connection role for read-only operations

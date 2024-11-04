@@ -29,9 +29,7 @@ class EmailHolderStub implements EmailHolderInterface
         $this->email = $email;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEmail()
     {
         return $this->email;

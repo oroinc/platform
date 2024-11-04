@@ -211,9 +211,7 @@ class GridController extends AbstractController
         return $renderParams;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

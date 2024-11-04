@@ -24,6 +24,7 @@ class LanguageTranslationCompletenessAndAvailabilityListenerTest extends \PHPUni
     /** @var LanguageTranslationCompletenessAndAvailabilityListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translationMetricsProvider = $this->createMock(TranslationMetricsProviderInterface::class);

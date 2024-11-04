@@ -22,6 +22,7 @@ class CommandProducedWarning extends Constraint
         $this->expectedWarningMessage = $expectedWarningMessage;
     }
 
+    #[\Override]
     protected function matches($commandTester): bool
     {
         /** @var \Symfony\Component\Console\Tester\CommandTester $commandTester */
@@ -38,6 +39,7 @@ class CommandProducedWarning extends Constraint
         return 0 === count($this->errors);
     }
 
+    #[\Override]
     protected function failureDescription($commandTester): string
     {
         /** @var \Symfony\Component\Console\Tester\CommandTester $commandTester */
@@ -48,6 +50,7 @@ class CommandProducedWarning extends Constraint
         );
     }
 
+    #[\Override]
     public function toString(): string
     {
         return 'command produced a warning';

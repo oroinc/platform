@@ -103,9 +103,6 @@ class AttributeFamily implements
     #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
     protected ?Organization $owner = null;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct()
     {
         $this->labels = new ArrayCollection();
@@ -293,22 +290,19 @@ class AttributeFamily implements
     /**
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return (string)$this->getDefaultLabel()->getString();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toString()
     {
         return 'code:'.$this->getCode();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getHash()
     {
         $data = [];

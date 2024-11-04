@@ -6,6 +6,7 @@ use Oro\Bundle\BatchBundle\Item\Support\ClosableInterface;
 
 class ClosableWriterStub extends WriterStub implements ClosableInterface
 {
+    #[\Override]
     public function close()
     {
     }

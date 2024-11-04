@@ -18,6 +18,7 @@ class AclProtectedQueryFactory extends QueryFactory
 {
     private QueryModifierRegistry $queryModifier;
     private ?RequestType $requestType = null;
+    private ?array $options = null;
 
     public function __construct(
         SerializerDoctrineHelper $doctrineHelper,
@@ -38,9 +39,17 @@ class AclProtectedQueryFactory extends QueryFactory
         $this->requestType = $requestType;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    public function getOptions(): ?array
+    {
+        return $this->options;
+    }
+
+    public function setOptions(?array $options): void
+    {
+        $this->options = $options;
+    }
+
+    #[\Override]
     public function getQuery(QueryBuilder $qb, EntityConfig $config): Query
     {
         if (null === $this->requestType) {
@@ -49,13 +58,50 @@ class AclProtectedQueryFactory extends QueryFactory
 
         // ensure that FROM clause is initialized
         $qb->getRootAliases();
+
         // do query modification
+        $previousConfigValues = $this->updateConfig($config);
+        try {
+            $this->modifyQuery($qb, $config);
+
+            return parent::getQuery($qb, $config);
+        } finally {
+            $this->restoreConfig($config, $previousConfigValues);
+        }
+    }
+
+    private function modifyQuery(QueryBuilder $qb, EntityConfig $config): void
+    {
         $this->queryModifier->modifyQuery(
             $qb,
             (bool)$config->get(AclProtectedQueryResolver::SKIP_ACL_FOR_ROOT_ENTITY),
             $this->requestType
         );
+    }
 
-        return parent::getQuery($qb, $config);
+    private function updateConfig(EntityConfig $config): array
+    {
+        $previousConfigValues = [];
+        if ($this->options) {
+            foreach ($this->options as $key => $value) {
+                $previousConfigValues[$key] = $config->has($key)
+                    ? ['v' => $config->get($key)]
+                    : null;
+                $config->set($key, $value);
+            }
+        }
+
+        return $previousConfigValues;
+    }
+
+    private function restoreConfig(EntityConfig $config, array $previousConfigValues): void
+    {
+        foreach ($previousConfigValues as $key => $value) {
+            if (null === $value) {
+                $config->remove($key);
+            } else {
+                $config->set($key, $value['v']);
+            }
+        }
     }
 }

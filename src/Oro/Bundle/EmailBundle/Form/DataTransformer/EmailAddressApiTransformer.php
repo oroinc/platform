@@ -20,9 +20,7 @@ class EmailAddressApiTransformer implements DataTransformerInterface
         $this->multiple = $multiple;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         if ($this->multiple) {
@@ -48,9 +46,7 @@ class EmailAddressApiTransformer implements DataTransformerInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if ($this->multiple) {

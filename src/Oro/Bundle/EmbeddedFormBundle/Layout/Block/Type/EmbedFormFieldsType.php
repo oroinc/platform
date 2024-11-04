@@ -36,9 +36,7 @@ class EmbedFormFieldsType extends AbstractFormType
         $this->formLayoutBuilder = $formLayoutBuilder;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
@@ -73,27 +71,21 @@ class EmbedFormFieldsType extends AbstractFormType
         $resolver->setDefined(['form_data']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildBlock(BlockBuilderInterface $builder, LayoutOptions $options)
     {
         $formAccessor = $this->getFormAccessor($builder->getContext(), $options);
         $this->formLayoutBuilder->build($formAccessor, $builder, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(BlockView $view, BlockInterface $block, LayoutOptions $options)
     {
         BlockUtils::setViewVarsFromOptions($view, $options, ['form_data', 'render_rest']);
         parent::buildView($view, $block, $options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(BlockView $view, BlockInterface $block)
     {
         $formAccessor = $this->getFormAccessor($block->getContext(), $view->vars);
@@ -123,17 +115,13 @@ class EmbedFormFieldsType extends AbstractFormType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent()
     {
         return ContainerType::NAME;

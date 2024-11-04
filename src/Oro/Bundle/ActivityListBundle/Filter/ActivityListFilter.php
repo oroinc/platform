@@ -87,17 +87,13 @@ class ActivityListFilter extends EntityFilter
         $this->relatedActivityDatagridFactory = $relatedActivityDatagridFactory;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMetadata()
     {
         return [];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         if (!$ds instanceof OrmFilterDatasourceAdapter) {
@@ -337,17 +333,13 @@ class ActivityListFilter extends EntityFilter
         return $matches[0];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFormType()
     {
         return ActivityListFilterType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function createForm(): FormInterface
     {
         return $this->formFactory->create($this->getFormType());

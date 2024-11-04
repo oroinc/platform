@@ -12,6 +12,7 @@ class RetryHelperTest extends \PHPUnit\Framework\TestCase
     /** @var RetryHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->helper = new RetryHelper();

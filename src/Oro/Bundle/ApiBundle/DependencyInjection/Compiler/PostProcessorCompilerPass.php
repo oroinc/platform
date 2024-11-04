@@ -17,9 +17,7 @@ class PostProcessorCompilerPass implements CompilerPassInterface
     private const POST_PROCESSOR_REGISTRY_SERVICE_ID = 'oro_api.post_processor_registry';
     private const POST_PROCESSOR_TAG = 'oro.api.post_processor';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $services = [];

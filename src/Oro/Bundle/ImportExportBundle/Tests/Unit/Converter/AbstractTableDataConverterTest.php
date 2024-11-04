@@ -38,6 +38,7 @@ class AbstractTableDataConverterTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractTableDataConverter */
     private $dataConverter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $dataConverter = $this->getMockForAbstractClass(AbstractTableDataConverter::class);

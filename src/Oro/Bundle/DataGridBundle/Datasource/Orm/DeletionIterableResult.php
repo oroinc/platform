@@ -11,9 +11,7 @@ use Oro\Bundle\BatchBundle\ORM\Query\ResultIterator\IdentifierWithoutOrderByIter
  */
 class DeletionIterableResult extends IterableResult
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getIterationStrategy()
     {
         if (null === $this->iterationStrategy) {

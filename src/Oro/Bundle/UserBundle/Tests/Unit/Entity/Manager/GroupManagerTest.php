@@ -17,6 +17,7 @@ class GroupManagerTest extends \PHPUnit\Framework\TestCase
 
     private $group;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);

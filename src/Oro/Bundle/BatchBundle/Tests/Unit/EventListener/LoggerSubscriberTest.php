@@ -28,6 +28,7 @@ class LoggerSubscriberTest extends \PHPUnit\Framework\TestCase
     /** @var LoggerSubscriber */
     private $subscriber;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->logger = new BufferingLogger();

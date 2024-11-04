@@ -8,6 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestProductType;
 
 class GetWithRenamedFieldsTest extends RestJsonApiTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

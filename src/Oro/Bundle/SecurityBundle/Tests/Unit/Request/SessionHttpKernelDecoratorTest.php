@@ -3,40 +3,43 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Request;
 
 use Oro\Bundle\SecurityBundle\Request\SessionHttpKernelDecorator;
+use Oro\Bundle\SecurityBundle\Request\SessionStorageOptionsManipulator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class SessionHttpKernelDecoratorTest extends \PHPUnit\Framework\TestCase
+final class SessionHttpKernelDecoratorTest extends TestCase
 {
-    private const SESSION_OPTIONS = [
-        'name'            => 'CONSOLE',
-        'cookie_path'     => '/console',
-        'cookie_lifetime' => 10
+    private const array SESSION_OPTIONS = [
+        'name' => 'CONSOLE',
+        'cookie_path' => '/console',
+        'cookie_lifetime' => 10,
     ];
 
-    /** @var HttpKernel|\PHPUnit\Framework\MockObject\MockObject */
-    private $kernel;
+    private HttpKernel|MockObject $kernel;
 
-    /** @var ContainerInterface */
-    private $container;
+    private ContainerStub|ContainerInterface $container;
 
-    /** @var SessionHttpKernelDecorator */
-    private $kernelDecorator;
+    private SessionHttpKernelDecorator $kernelDecorator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->kernel = $this->createMock(HttpKernel::class);
         $this->container = new ContainerStub([
-            'session.storage.options' => self::SESSION_OPTIONS
+            'oro_security.session.storage.options' => self::SESSION_OPTIONS,
+            'session.storage.options' => self::SESSION_OPTIONS,
         ]);
+        $sessionStorageOptionsManipulator = new SessionStorageOptionsManipulator($this->container);
 
-        $this->kernelDecorator = new SessionHttpKernelDecorator($this->kernel, $this->container);
+        $this->kernelDecorator = new SessionHttpKernelDecorator($this->kernel, $sessionStorageOptionsManipulator);
     }
 
-    public function testTerminate()
+    public function testTerminate(): void
     {
         $request = Request::create('http://localhost/admin/test.php');
         $response = $this->createMock(Response::class);
@@ -48,7 +51,7 @@ class SessionHttpKernelDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->kernelDecorator->terminate($request, $response);
     }
 
-    public function testHandleForApplicationInRootDir()
+    public function testHandleForApplicationInRootDir(): void
     {
         $request = $this->createMock(Request::class);
         $request->expects(self::once())
@@ -74,7 +77,7 @@ class SessionHttpKernelDecoratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHandleForApplicationInSubDir()
+    public function testHandleForApplicationInSubDir(): void
     {
         $request = $this->createMock(Request::class);
         $request->expects(self::once())
@@ -96,7 +99,7 @@ class SessionHttpKernelDecoratorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHandleForApplicationInSubDirInCaseOfSeveralRequests()
+    public function testHandleForApplicationInSubDirInCaseOfSeveralRequests(): void
     {
         $request = $this->createMock(Request::class);
         $request->expects(self::once())

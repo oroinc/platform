@@ -13,15 +13,14 @@ class UrlInfoTypeTest extends FormIntegrationTestCase
     /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $router;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->router = $this->createMock(RouterInterface::class);
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

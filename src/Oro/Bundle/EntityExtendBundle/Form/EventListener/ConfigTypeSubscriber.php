@@ -29,9 +29,7 @@ class ConfigTypeSubscriber implements EventSubscriberInterface
         $this->schemaUpdateRequired = $schemaUpdateRequired;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

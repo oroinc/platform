@@ -13,9 +13,7 @@ class TestArrayObject implements ToArrayInterface
         $this->items = $items;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function toArray(): array
     {
         return $this->items;

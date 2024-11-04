@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 abstract class AbstractRestApiTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

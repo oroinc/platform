@@ -10,6 +10,7 @@ class ClassFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var ClassFactory */
     private $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->factory = new ClassFactory('gaufrette://');

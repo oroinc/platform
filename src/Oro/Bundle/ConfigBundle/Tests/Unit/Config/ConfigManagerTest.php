@@ -62,6 +62,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->defaultValueProvider = $this->createMock(ValueProviderInterface::class);

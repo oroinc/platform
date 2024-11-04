@@ -16,9 +16,7 @@ class SortersConfigLoader extends AbstractConfigLoader
         ConfigUtil::EXCLUDE       => 'setExcluded'
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(array $config): mixed
     {
         $sorters = new SortersConfig();

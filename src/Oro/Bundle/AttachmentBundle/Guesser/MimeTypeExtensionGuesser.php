@@ -16,33 +16,25 @@ class MimeTypeExtensionGuesser implements MimeTypesInterface
         'msg' => ['application/vnd.ms-outlook'],
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isGuesserSupported(): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function guessMimeType(string $path): ?string
     {
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getExtensions(string $mimeType): array
     {
         return $this->mimeExtensionMap[$mimeType] ?? [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMimeTypes(string $ext): array
     {
         return $this->extensionMimeMap[$ext] ?? [];

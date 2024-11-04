@@ -17,9 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class AclRoleType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -63,9 +61,7 @@ class AclRoleType extends AbstractType
         $builder->addEventSubscriber(new ChangeRoleSubscriber());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -74,17 +70,12 @@ class AclRoleType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_user_role_form';

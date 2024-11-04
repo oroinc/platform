@@ -26,9 +26,7 @@ class ExcludeChangeCommentSubresources implements ProcessorInterface
         $this->commentAssociationProvider = $commentAssociationProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CollectSubresourcesContext $context */

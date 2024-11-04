@@ -18,6 +18,7 @@ class LayoutThemeEmailTemplateLoader extends FilesystemLoader implements EmailTe
 {
     use EmailTemplateLoaderParsingTrait;
 
+    #[\Override]
     public function exists($name): bool
     {
         $templateName = $this->normalizeName($name);
@@ -40,6 +41,7 @@ class LayoutThemeEmailTemplateLoader extends FilesystemLoader implements EmailTe
         return preg_replace('#/{2,}#', '/', str_replace('\\', '/', $templateName));
     }
 
+    #[\Override]
     public function getCacheKey($name): string
     {
         if (!$this->exists($name)) {
@@ -51,6 +53,7 @@ class LayoutThemeEmailTemplateLoader extends FilesystemLoader implements EmailTe
         return parent::getCacheKey($templateName);
     }
 
+    #[\Override]
     public function isFresh($name, $time): bool
     {
         $templateName = $this->normalizeName($name);
@@ -58,6 +61,7 @@ class LayoutThemeEmailTemplateLoader extends FilesystemLoader implements EmailTe
         return parent::isFresh($templateName, $time);
     }
 
+    #[\Override]
     public function getSourceContext($name): Source
     {
         $templateName = $this->normalizeName($name);
@@ -69,6 +73,7 @@ class LayoutThemeEmailTemplateLoader extends FilesystemLoader implements EmailTe
         return new Source(file_get_contents($path), $name, $path);
     }
 
+    #[\Override]
     public function getEmailTemplate(string $name): EmailTemplateModel
     {
         return EmailTemplateModel::createFromContent(

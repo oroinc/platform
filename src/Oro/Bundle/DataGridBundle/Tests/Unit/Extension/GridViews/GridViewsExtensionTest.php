@@ -43,6 +43,7 @@ class GridViewsExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var GridViewsExtension */
     private $gridViewsExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);

@@ -19,6 +19,7 @@ class BooleanFilterTypeTest extends FormIntegrationTestCase
 
     private BooleanFilterType $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new BooleanFilterType();
@@ -26,9 +27,7 @@ class BooleanFilterTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $translator = $this->createMock(TranslatorInterface::class);

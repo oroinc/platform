@@ -11,17 +11,13 @@ class IsCaptchaVerified extends Constraint
 {
     public string $message = 'oro.form.captcha.captcha_not_verified';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return Constraint::PROPERTY_CONSTRAINT;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validatedBy(): string
     {
         return IsCaptchaVerifiedValidator::class;

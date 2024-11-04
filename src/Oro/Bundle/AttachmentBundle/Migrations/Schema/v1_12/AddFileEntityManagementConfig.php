@@ -14,6 +14,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  */
 class AddFileEntityManagementConfig implements Migration
 {
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $queries->addPostQuery(new UpdateEntityConfigEntityValueQuery(

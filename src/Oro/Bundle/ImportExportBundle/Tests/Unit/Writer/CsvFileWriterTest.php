@@ -31,6 +31,7 @@ class CsvFileWriterTest extends \PHPUnit\Framework\TestCase
     /** @var CsvFileWriter */
     private $writer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->contextRegistry = $this->getMockBuilder(ContextRegistry::class)

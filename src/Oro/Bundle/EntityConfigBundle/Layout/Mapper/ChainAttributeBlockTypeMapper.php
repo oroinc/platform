@@ -34,9 +34,7 @@ class ChainAttributeBlockTypeMapper extends AbstractAttributeBlockTypeMapper
         $this->defaultBlockType = $blockType;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockType(FieldConfigModel $attribute)
     {
         foreach ($this->mappers as $mapper) {

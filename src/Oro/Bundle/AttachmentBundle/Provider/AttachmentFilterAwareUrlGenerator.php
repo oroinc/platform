@@ -27,9 +27,7 @@ class AttachmentFilterAwareUrlGenerator implements UrlGeneratorInterface
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function generate(string $name, array $parameters = [], int $referenceType = self::ABSOLUTE_PATH): string
     {
         if (!empty($parameters['filter'])) {
@@ -57,17 +55,13 @@ class AttachmentFilterAwareUrlGenerator implements UrlGeneratorInterface
         return $url;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setContext(RequestContext $context): void
     {
         $this->urlGenerator->setContext($context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getContext(): RequestContext
     {
         return $this->urlGenerator->getContext();

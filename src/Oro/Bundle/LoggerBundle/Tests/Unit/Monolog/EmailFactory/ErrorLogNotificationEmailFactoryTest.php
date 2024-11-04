@@ -15,6 +15,7 @@ class ErrorLogNotificationEmailFactoryTest extends \PHPUnit\Framework\TestCase
 
     private ErrorLogNotificationEmailFactory $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

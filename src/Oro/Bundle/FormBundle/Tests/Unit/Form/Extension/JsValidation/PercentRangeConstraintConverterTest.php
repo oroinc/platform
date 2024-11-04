@@ -13,6 +13,7 @@ class PercentRangeConstraintConverterTest extends TestCase
 {
     private PercentRangeConstraintConverter $converter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->converter = new PercentRangeConstraintConverter();

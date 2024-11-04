@@ -28,6 +28,7 @@ class MessageBodyResolverExtensionTest extends \PHPUnit\Framework\TestCase
 
     private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->topicRegistry = $this->createMock(TopicRegistry::class);

@@ -13,33 +13,25 @@ class Not extends AbstractCondition
     /** @var ExpressionInterface */
     protected $operand;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'not';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toArray()
     {
         return $this->convertToArray($this->operand);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function compile($factoryAccessor)
     {
         return $this->convertToPhpCode($this->operand, $factoryAccessor);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (1 === count($options)) {
@@ -62,9 +54,7 @@ class Not extends AbstractCondition
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isConditionAllowed($context)
     {
         return !$this->operand->evaluate($context, $this->errors);

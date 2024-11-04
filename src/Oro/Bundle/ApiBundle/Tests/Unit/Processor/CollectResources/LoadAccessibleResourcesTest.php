@@ -16,6 +16,7 @@ class LoadAccessibleResourcesTest extends \PHPUnit\Framework\TestCase
     /** @var LoadAccessibleResources */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityOverrideProviderRegistry = $this->createMock(EntityOverrideProviderRegistry::class);

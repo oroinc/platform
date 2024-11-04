@@ -51,9 +51,7 @@ class Table extends BaseTable
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function addColumn($columnName, $typeName, array $options = [])
     {
         parent::addColumn($columnName, $typeName, $options);
@@ -61,10 +59,8 @@ class Table extends BaseTable
         return $this->getColumn($columnName);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     // @codingStandardsIgnoreStart
+    #[\Override]
     protected function _addColumn(BaseColumn $column)
     {
         if (get_class($column) !== static::COLUMN_CLASS && static::COLUMN_CLASS !== 'Doctrine\DBAL\Schema\Column') {

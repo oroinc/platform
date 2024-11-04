@@ -14,9 +14,6 @@ class PredefinedLanguageCodeDocumentationProvider
         $this->predefinedLanguageCodeResolverRegistry = $predefinedLanguageCodeResolverRegistry;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getDocumentation(): ?string
     {
         $descriptions = $this->predefinedLanguageCodeResolverRegistry->getDescriptions();

@@ -20,17 +20,13 @@ class GenerateUuidAction extends AbstractAction
     /** @var string|PropertyPathInterface */
     private $attributePath;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context): void
     {
         $this->contextAccessor->setValue($context, $this->attributePath, UUIDGenerator::v4());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options): self
     {
         if (empty($options)) {

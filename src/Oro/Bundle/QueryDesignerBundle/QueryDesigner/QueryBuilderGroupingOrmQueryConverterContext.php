@@ -15,9 +15,7 @@ class QueryBuilderGroupingOrmQueryConverterContext extends GroupingOrmQueryConve
     /** @var string */
     private $rootEntityAlias;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         parent::reset();

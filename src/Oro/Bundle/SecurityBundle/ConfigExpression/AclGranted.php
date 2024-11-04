@@ -46,17 +46,13 @@ class AclGranted extends AbstractCondition implements ContextAccessorAwareInterf
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'acl';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toArray()
     {
         $params = [$this->attributes];
@@ -67,9 +63,7 @@ class AclGranted extends AbstractCondition implements ContextAccessorAwareInterf
         return $this->convertToArray($params);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function compile($factoryAccessor)
     {
         $params = [$this->attributes];
@@ -81,15 +75,13 @@ class AclGranted extends AbstractCondition implements ContextAccessorAwareInterf
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * Configuration example:
      *
      * @acl: ['contact_view']
      * @acl: ['EDIT', 'Acme\DemoBundle\Entity\Contact']
      *
      * {@see \Oro\Bundle\SecurityBundle\Authorization\AuthorizationChecker::isGranted} for details.
      */
+    #[\Override]
     public function initialize(array $options)
     {
         $count = count($options);
@@ -113,9 +105,7 @@ class AclGranted extends AbstractCondition implements ContextAccessorAwareInterf
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isConditionAllowed($context)
     {
         if (!$this->tokenAccessor->getToken()) {

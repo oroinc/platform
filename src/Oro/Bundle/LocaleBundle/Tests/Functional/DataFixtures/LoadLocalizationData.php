@@ -42,6 +42,7 @@ class LoadLocalizationData extends AbstractFixture implements ContainerAwareInte
         ]
     ];
 
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         // Preload all required Languages

@@ -13,6 +13,7 @@ class MakeTimestampableFieldsReadOnlyTest extends ConfigProcessorTestCase
     /** @var MakeTimestampableFieldsReadOnly */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

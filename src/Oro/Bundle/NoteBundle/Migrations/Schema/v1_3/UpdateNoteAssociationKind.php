@@ -23,9 +23,7 @@ class UpdateNoteAssociationKind implements
     use ActivityExtensionAwareTrait;
     use ExtendNameGeneratorAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $query = new UpdateNoteAssociationKindQuery(

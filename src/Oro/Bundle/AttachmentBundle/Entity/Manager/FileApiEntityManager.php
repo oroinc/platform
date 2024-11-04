@@ -48,9 +48,7 @@ class FileApiEntityManager extends ApiEntityManager
         return $this->urlGenerator->generate('oro_api_get_file', ['id' => $fileId, '_format' => 'binary']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function serializeOne($id)
     {
         if (!$this->authorizationChecker->isGranted('VIEW', new ObjectIdentity($id, File::class))) {
@@ -60,9 +58,7 @@ class FileApiEntityManager extends ApiEntityManager
         return parent::serializeOne($id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getSerializationConfig()
     {
         $config = [

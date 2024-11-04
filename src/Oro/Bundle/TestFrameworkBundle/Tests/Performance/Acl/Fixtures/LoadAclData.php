@@ -11,6 +11,7 @@ class LoadAclData extends AbstractFixture implements OrderedFixtureInterface
     /**
      * Load ACL Resource
      */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $loginAcl = $manager->getRepository('Oro\Bundle\UserBundle\Entity\Acl')
@@ -31,6 +32,7 @@ class LoadAclData extends AbstractFixture implements OrderedFixtureInterface
         $manager->flush();
     }
 
+    #[\Override]
     public function getOrder()
     {
         return 100;

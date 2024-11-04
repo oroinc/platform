@@ -29,6 +29,7 @@ class JsTranslationDumperTest extends \PHPUnit\Framework\TestCase
     /** @var JsTranslationDumper */
     private $dumper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->generator = $this->createMock(JsTranslationGenerator::class);
@@ -46,11 +47,13 @@ class JsTranslationDumperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    #[\Override]
     public static function assertFileExists(string $filename, string $message = ''): void
     {
         self::assertTrue(self::$fileManager->hasFile($filename), $message);
     }
 
+    #[\Override]
     public static function assertStringEqualsFile(
         string $expectedFile,
         string $actualString,

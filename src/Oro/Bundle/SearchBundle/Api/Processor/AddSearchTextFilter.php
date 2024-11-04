@@ -21,9 +21,7 @@ class AddSearchTextFilter implements ProcessorInterface
         $this->searchMappingProvider = $searchMappingProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */

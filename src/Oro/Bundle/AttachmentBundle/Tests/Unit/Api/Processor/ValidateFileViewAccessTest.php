@@ -17,6 +17,7 @@ class ValidateFileViewAccessTest extends GetProcessorTestCase
     /** @var ValidateFileViewAccess */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

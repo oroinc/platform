@@ -13,6 +13,7 @@ class LexerTest extends \PHPUnit\Framework\TestCase
 {
     private Lexer $lexer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $translatorMock = $this->createMock(TranslatorInterface::class);

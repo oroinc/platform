@@ -6,7 +6,7 @@ use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\ImportExport\Strategy\EntityFieldImportStrategy;
-use Oro\Bundle\EntityExtendBundle\Model\EnumValue;
+use Oro\Bundle\EntityExtendBundle\Model\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\ConfigModelAwareConstraintInterface;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\EnumValuesUnique;
@@ -45,6 +45,7 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
     /** @var ConstraintFactory|\PHPUnit\Framework\MockObject\MockObject */
     private $constraintFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fieldTypeProvider = $this->createMock(FieldTypeProvider::class);
@@ -206,7 +207,7 @@ class EntityFieldImportStrategyTest extends \PHPUnit\Framework\TestCase
             ->method('validateEntity')
             ->withConsecutive(
                 [$entity],
-                [EnumValue::createFromArray(['id' => null, 'label' => 'label'])],
+                [EnumOption::createFromArray(['id' => null, 'label' => 'label'])],
                 [
                     [
                         [

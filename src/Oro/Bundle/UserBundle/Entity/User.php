@@ -13,7 +13,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\ConfigField;
-use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityTrait;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
@@ -35,8 +35,8 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  * @SuppressWarnings(PHPMD.TooManyFields)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  *
- * @method setAuthStatus(AbstractEnumValue $enum)
- * @method AbstractEnumValue getAuthStatus()
+ * @method setAuthStatus(EnumOptionInterface $enum)
+ * @method EnumOptionInterface getAuthStatus()
  * @mixin OroUserBundle_Entity_User
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -231,17 +231,13 @@ class User extends AbstractUser implements
         $this->groups = new ArrayCollection();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEmailFields()
     {
         return ['email'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setUsername($username): static
     {
         parent::setUsername($username);
@@ -257,9 +253,7 @@ class User extends AbstractUser implements
         return $this->usernameLowercase;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFirstName()
     {
         return $this->firstName;
@@ -277,9 +271,7 @@ class User extends AbstractUser implements
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLastName()
     {
         return $this->lastName;
@@ -297,9 +289,7 @@ class User extends AbstractUser implements
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMiddleName()
     {
         return $this->middleName;
@@ -319,9 +309,7 @@ class User extends AbstractUser implements
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getNamePrefix()
     {
         return $this->namePrefix;
@@ -341,9 +329,7 @@ class User extends AbstractUser implements
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getNameSuffix()
     {
         return $this->nameSuffix;
@@ -429,9 +415,7 @@ class User extends AbstractUser implements
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getApiKeys()
     {
         return $this->apiKeys;
@@ -624,9 +608,7 @@ class User extends AbstractUser implements
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEmail()
     {
         return $this->email;
@@ -847,9 +829,7 @@ class User extends AbstractUser implements
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getUserRoles(): array
     {
         $roles[] = parent::getUserRoles();
@@ -916,9 +896,7 @@ class User extends AbstractUser implements
         return $this->organizations->contains($organization);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOrganizations(bool $onlyEnabled = false)
     {
         if ($onlyEnabled) {
@@ -962,9 +940,7 @@ class User extends AbstractUser implements
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function __unserialize(array $serialized): void
     {
         parent::__unserialize($serialized);

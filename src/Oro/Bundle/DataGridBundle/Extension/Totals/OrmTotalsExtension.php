@@ -37,17 +37,13 @@ class OrmTotalsExtension extends AbstractExtension
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return parent::isApplicable($config) && $config->isOrmDatasource();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function processConfigs(DatagridConfiguration $config)
     {
         $totalRows = $this->validateConfiguration(
@@ -64,17 +60,13 @@ class OrmTotalsExtension extends AbstractExtension
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
         $this->masterQB = clone $datasource->getQueryBuilder();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
         $onlyOnePage  = $result->getTotalRecords() === count($result->getData());
@@ -106,9 +98,7 @@ class OrmTotalsExtension extends AbstractExtension
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $metaData)
     {
         $totals = $config->offsetGetByPath(Configuration::TOTALS_PATH);
@@ -118,9 +108,7 @@ class OrmTotalsExtension extends AbstractExtension
             ->offsetAddToArray(MetadataObject::REQUIRED_MODULES_KEY, ['orodatagrid/js/totals-builder']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPriority()
     {
         // should visit after all extensions

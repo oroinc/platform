@@ -18,9 +18,7 @@ class ReplaceStrategy implements StrategyInterface
         $this->accessor = $accessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function merge(FieldData $fieldData)
     {
         $entityData    = $fieldData->getEntityData();
@@ -44,17 +42,13 @@ class ReplaceStrategy implements StrategyInterface
         $this->accessor->setValue($masterEntity, $fieldMetadata, $value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports(FieldData $fieldData)
     {
         return $fieldData->getMode() == MergeModes::REPLACE;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'replace';

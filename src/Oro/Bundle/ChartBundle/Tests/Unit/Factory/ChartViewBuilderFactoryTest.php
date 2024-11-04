@@ -15,6 +15,7 @@ class ChartViewBuilderFactoryTest extends \PHPUnit\Framework\TestCase
 
     private ConfigProvider|MockObject $chartConfigProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->chartViewBuilder = $this->createMock(ChartViewBuilder::class);

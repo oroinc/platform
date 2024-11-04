@@ -16,11 +16,15 @@ use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\CriteriaConnector;
 use Oro\Bundle\ApiBundle\Util\CriteriaNormalizer;
 use Oro\Bundle\ApiBundle\Util\CriteriaPlaceholdersResolver;
+use Oro\Bundle\ApiBundle\Util\FieldDqlExpressionProviderInterface;
 use Oro\Bundle\ApiBundle\Util\OptimizeJoinsDecisionMaker;
 use Oro\Bundle\ApiBundle\Util\OptimizeJoinsFieldVisitorFactory;
 use Oro\Bundle\ApiBundle\Util\RequireJoinsDecisionMaker;
 use Oro\Bundle\ApiBundle\Util\RequireJoinsFieldVisitorFactory;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Component\Testing\Unit\ORM\Mocks\ConnectionMock;
 use Oro\Component\Testing\Unit\ORM\Mocks\DatabasePlatformMock;
 
@@ -32,9 +36,14 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
 {
     private const ENTITY_NAMESPACE = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\\';
 
+    /** @var FieldDqlExpressionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $fieldDqlExpressionProvider;
+    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    private $configManager;
     private EntityClassResolver $entityClassResolver;
     private CriteriaConnector $criteriaConnector;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -44,6 +53,8 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         $connection = $this->em->getConnection();
         $connection->setDatabasePlatform($platform);
 
+        $this->fieldDqlExpressionProvider = $this->createMock(FieldDqlExpressionProviderInterface::class);
+        $this->configManager = $this->createMock(ConfigManager::class);
         $this->entityClassResolver = new EntityClassResolver($this->doctrine);
 
         $expressionVisitorFactory = new QueryExpressionVisitorFactory(
@@ -60,9 +71,11 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
                 'NEQ_OR_EMPTY'      => new Expression\NeqOrEmptyComparisonExpression(),
                 'EXISTS'            => new Expression\ExistsComparisonExpression(),
                 'EMPTY'             => new Expression\EmptyComparisonExpression(),
+                'MEMBER_OF'         => new Expression\MemberOfComparisonExpression(),
                 'ALL_MEMBER_OF'     => new Expression\AllMemberOfComparisonExpression(),
                 'ALL_NOT_MEMBER_OF' => new Expression\AllMemberOfComparisonExpression(true)
             ],
+            $this->fieldDqlExpressionProvider,
             $this->entityClassResolver
         );
 
@@ -70,10 +83,12 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             new CriteriaNormalizer(
                 $this->doctrineHelper,
                 new RequireJoinsFieldVisitorFactory(new RequireJoinsDecisionMaker()),
-                new OptimizeJoinsFieldVisitorFactory(new OptimizeJoinsDecisionMaker())
+                new OptimizeJoinsFieldVisitorFactory(new OptimizeJoinsDecisionMaker()),
+                $this->configManager
             ),
             new CriteriaPlaceholdersResolver(),
             $expressionVisitorFactory,
+            $this->fieldDqlExpressionProvider,
             $this->entityClassResolver
         );
     }
@@ -92,8 +107,13 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
 
         self::assertEquals(
             $expectedDql,
-            str_replace(self::ENTITY_NAMESPACE, 'Test:', $qb->getDQL())
+            $this->prepareDqlToCompare($qb->getDQL())
         );
+    }
+
+    private function prepareDqlToCompare(string $dql): string
+    {
+        return str_replace([self::ENTITY_NAMESPACE, EnumOption::class], ['Test:', 'Test:EnumOption'], $dql);
     }
 
     private static function comparison(string $field, string $operator, mixed $value): Comparison
@@ -122,11 +142,22 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
     {
         $criteria = $this->createCriteria();
         $criteria->orderBy(['id' => Criteria::ASC, 'category.name' => Criteria::ASC]);
-        $this->assertQuery(
-            $criteria,
+
+        $qb = new QueryBuilder($this->em);
+        $qb->select('e')->from(Entity\User::class, 'e');
+
+        $this->fieldDqlExpressionProvider->expects(self::exactly(2))
+            ->method('getFieldDqlExpression')
+            ->with(self::identicalTo($qb))
+            ->willReturn(null);
+
+        $this->criteriaConnector->applyCriteria($qb, $criteria);
+
+        self::assertEquals(
             'SELECT e FROM Test:User e'
             . ' LEFT JOIN e.category category'
-            . ' ORDER BY e.id ASC, category.name ASC'
+            . ' ORDER BY e.id ASC, category.name ASC',
+            $this->prepareDqlToCompare($qb->getDQL())
         );
     }
 
@@ -134,11 +165,116 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
     {
         $criteria = $this->createCriteria();
         $criteria->orderBy(['id' => Criteria::ASC, 'category' => Criteria::ASC]);
-        $this->assertQuery(
-            $criteria,
+
+        $qb = new QueryBuilder($this->em);
+        $qb->select('e')->from(Entity\User::class, 'e');
+
+        $this->fieldDqlExpressionProvider->expects(self::exactly(2))
+            ->method('getFieldDqlExpression')
+            ->with(self::identicalTo($qb))
+            ->willReturn(null);
+
+        $this->criteriaConnector->applyCriteria($qb, $criteria);
+
+        self::assertEquals(
             'SELECT e FROM Test:User e'
             . ' LEFT JOIN e.category category'
-            . ' ORDER BY e.id ASC, e.category ASC'
+            . ' ORDER BY e.id ASC, e.category ASC',
+            $this->prepareDqlToCompare($qb->getDQL())
+        );
+    }
+
+    public function testOrderByForFieldWithDqlExpression()
+    {
+        $criteria = $this->createCriteria();
+        $criteria->orderBy(['id' => Criteria::ASC, 'category.name' => Criteria::ASC]);
+
+        $qb = new QueryBuilder($this->em);
+        $qb->select('e')->from(Entity\User::class, 'e');
+
+        $this->fieldDqlExpressionProvider->expects(self::exactly(2))
+            ->method('getFieldDqlExpression')
+            ->with(self::identicalTo($qb))
+            ->willReturnMap([
+                [$qb, 'id', null],
+                [$qb, 'category.name', 'UPPER(category.name)'],
+            ]);
+
+        $this->criteriaConnector->applyCriteria($qb, $criteria);
+
+        self::assertEquals(
+            'SELECT e FROM Test:User e'
+            . ' LEFT JOIN e.category category'
+            . ' ORDER BY e.id ASC, UPPER(category.name) ASC',
+            $this->prepareDqlToCompare($qb->getDQL())
+        );
+    }
+
+    public function testOrderByEnumField()
+    {
+        $criteria = $this->createCriteria();
+        $criteria->orderBy(['enumField' => Criteria::ASC]);
+
+        $qb = new QueryBuilder($this->em);
+        $qb->select('e')->from(Entity\User::class, 'e');
+
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(Entity\User::class, 'enumField')
+            ->willReturn(true);
+        $this->configManager->expects(self::once())
+            ->method('getId')
+            ->with('extend', Entity\User::class, 'enumField')
+            ->willReturn(new FieldConfigId('extend', Entity\User::class, 'enumField', 'enum'));
+
+        $this->fieldDqlExpressionProvider->expects(self::once())
+            ->method('getFieldDqlExpression')
+            ->with(self::identicalTo($qb))
+            ->willReturn("JSON_EXTRACT(e.serialized_data, 'enumField')");
+
+        $this->criteriaConnector->applyCriteria($qb, $criteria);
+
+        self::assertEquals(
+            'SELECT e FROM Test:User e'
+            . ' ORDER BY JSON_EXTRACT(e.serialized_data, \'enumField\') ASC',
+            $this->prepareDqlToCompare($qb->getDQL())
+        );
+    }
+
+    public function testOrderByMultiEnumField()
+    {
+        $criteria = $this->createCriteria();
+        $criteria->orderBy(['enumField' => Criteria::ASC]);
+
+        $qb = new QueryBuilder($this->em);
+        $qb->select('e')->from(Entity\User::class, 'e');
+
+        $this->configManager->expects(self::exactly(2))
+            ->method('hasConfig')
+            ->with(Entity\User::class, 'enumField')
+            ->willReturn(true);
+        $this->configManager->expects(self::exactly(2))
+            ->method('getId')
+            ->with('extend', Entity\User::class, 'enumField')
+            ->willReturn(new FieldConfigId('extend', Entity\User::class, 'enumField', 'multiEnum'));
+
+        $this->fieldDqlExpressionProvider->expects(self::once())
+            ->method('getFieldDqlExpression')
+            ->with(self::identicalTo($qb))
+            ->willReturn(sprintf(
+                "JSONB_ARRAY_CONTAINS_JSON(e.serialized_data, 'enumField', CONCAT('\"', {entity:%s}.id, '\"')) = true",
+                EnumOption::class
+            ));
+
+        $this->criteriaConnector->applyCriteria($qb, $criteria);
+
+        self::assertEquals(
+            'SELECT e FROM Test:User e'
+            . ' LEFT JOIN Test:EnumOption enumField WITH'
+            . ' JSONB_ARRAY_CONTAINS_JSON(e.serialized_data, \'enumField\', CONCAT(\'"\', enumField.id, \'"\')) = true'
+            . ' ORDER BY JSONB_ARRAY_CONTAINS_JSON(e.serialized_data, \'enumField\','
+            . ' CONCAT(\'"\', {entity:Test:EnumOption}.id, \'"\')) = true ASC',
+            $this->prepareDqlToCompare($qb->getDQL())
         );
     }
 
@@ -195,6 +331,76 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             . ' INNER JOIN e.category category'
             . ' INNER JOIN e.groups groups'
             . ' WHERE e.category = :e_category AND e.groups = :e_groups'
+        );
+    }
+
+    public function testWhereByEnumField()
+    {
+        $criteria = $this->createCriteria();
+        $criteria->andWhere($criteria::expr()->eq('enumField', 'test'));
+
+        $qb = new QueryBuilder($this->em);
+        $qb->select('e')->from(Entity\User::class, 'e');
+
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(Entity\User::class, 'enumField')
+            ->willReturn(true);
+        $this->configManager->expects(self::once())
+            ->method('getId')
+            ->with('extend', Entity\User::class, 'enumField')
+            ->willReturn(new FieldConfigId('extend', Entity\User::class, 'enumField', 'enum'));
+
+        $this->fieldDqlExpressionProvider->expects(self::once())
+            ->method('getFieldDqlExpression')
+            ->with(self::identicalTo($qb))
+            ->willReturn("JSON_EXTRACT(e.serialized_data, 'enumField')");
+
+        $this->criteriaConnector->applyCriteria($qb, $criteria);
+
+        self::assertEquals(
+            'SELECT e FROM Test:User e'
+            . ' WHERE JSON_EXTRACT(e.serialized_data, \'enumField\') = :e_enumField',
+            $this->prepareDqlToCompare($qb->getDQL())
+        );
+    }
+
+    public function testWhereByMultiEnumField()
+    {
+        $criteria = $this->createCriteria();
+        $criteria->andWhere($criteria::expr()->memberOf('enumField', ['test']));
+
+        $qb = new QueryBuilder($this->em);
+        $qb->select('e')->from(Entity\User::class, 'e');
+
+        $this->configManager->expects(self::exactly(2))
+            ->method('hasConfig')
+            ->with(Entity\User::class, 'enumField')
+            ->willReturn(true);
+        $this->configManager->expects(self::exactly(2))
+            ->method('getId')
+            ->with('extend', Entity\User::class, 'enumField')
+            ->willReturn(new FieldConfigId('extend', Entity\User::class, 'enumField', 'multiEnum'));
+
+        $this->fieldDqlExpressionProvider->expects(self::once())
+            ->method('getFieldDqlExpression')
+            ->with(self::identicalTo($qb))
+            ->willReturn(sprintf(
+                "JSONB_ARRAY_CONTAINS_JSON(e.serialized_data, 'enumField', CONCAT('\"', {entity:%s}.id, '\"')) = true",
+                EnumOption::class
+            ));
+
+        $this->criteriaConnector->applyCriteria($qb, $criteria);
+
+        self::assertEquals(
+            'SELECT e FROM Test:User e'
+            . ' INNER JOIN Test:EnumOption enumField WITH'
+            . ' JSONB_ARRAY_CONTAINS_JSON(e.serialized_data, \'enumField\', CONCAT(\'"\', enumField.id, \'"\')) = true'
+            . ' WHERE EXISTS('
+            . 'SELECT enumField_subquery1 FROM Test:EnumOption enumField_subquery1'
+            . ' WHERE JSONB_ARRAY_CONTAINS_JSON(e.serialized_data, \'enumField\','
+            . ' CONCAT(\'"\', enumField_subquery1.id, \'"\')) = true AND enumField_subquery1 IN(:e_enumField))',
+            $this->prepareDqlToCompare($qb->getDQL())
         );
     }
 
@@ -774,7 +980,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
             . ' LEFT JOIN account.roles account_roles'
             . ' WHERE (role.name = :role_name AND account.name = :account_name) AND e.name = :e_name'
             . ' ORDER BY role.name ASC, group.id ASC',
-            str_replace(self::ENTITY_NAMESPACE, 'Test:', $qb->getDQL())
+            $this->prepareDqlToCompare($qb->getDQL())
         );
     }
 }

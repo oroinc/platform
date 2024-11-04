@@ -64,6 +64,7 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EmailActivityListProvider */
     private $emailActivityListProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

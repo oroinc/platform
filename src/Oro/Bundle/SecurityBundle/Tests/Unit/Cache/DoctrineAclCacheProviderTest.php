@@ -21,6 +21,7 @@ class DoctrineAclCacheProviderTest extends \PHPUnit\Framework\TestCase
 
     protected DoctrineAclCacheProvider $aclCacheProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);

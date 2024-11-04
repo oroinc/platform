@@ -12,6 +12,7 @@ class FileNameProviderTest extends \PHPUnit\Framework\TestCase
     /** @var FileNameProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider = new FileNameProvider();

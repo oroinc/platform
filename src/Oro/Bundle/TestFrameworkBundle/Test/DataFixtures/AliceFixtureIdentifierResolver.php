@@ -14,9 +14,7 @@ class AliceFixtureIdentifierResolver implements FixtureIdentifierResolverInterfa
         $this->kernel = $kernel;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function resolveId($fixture)
     {
         if (is_object($fixture)) {

@@ -25,6 +25,7 @@ class WorkflowDefinitionConfigurationBuilderTest extends \PHPUnit\Framework\Test
     /** @var WorkflowAssembler|\PHPUnit\Framework\MockObject\MockObject */
     private $workflowAssembler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflowAssembler = $this->createMock(WorkflowAssembler::class);

@@ -25,7 +25,7 @@ class KernelIsolator implements IsolatorInterface
         $this->kernel = $kernel;
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function start(BeforeStartTestsEvent $event)
     {
         $event->writeln('<info>Booting the Kernel</info>');
@@ -33,58 +33,50 @@ class KernelIsolator implements IsolatorInterface
         $this->kernel->boot();
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function beforeTest(BeforeIsolatedTestEvent $event)
     {
         $this->kernel->shutdown();
         $this->kernel->boot();
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function afterTest(AfterIsolatedTestEvent $event)
     {
         $this->kernel->shutdown();
         $this->kernel->boot();
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function terminate(AfterFinishTestsEvent $event)
     {
         $this->kernel->shutdown();
     }
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function isApplicable(ContainerInterface $container)
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isOutdatedState()
     {
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function restoreState(RestoreStateEvent $event)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'Kernel';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTag()
     {
         return 'kernel';

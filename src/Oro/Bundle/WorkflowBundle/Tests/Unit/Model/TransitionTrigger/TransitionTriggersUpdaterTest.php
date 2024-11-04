@@ -32,6 +32,7 @@ class TransitionTriggersUpdaterTest extends \PHPUnit\Framework\TestCase
     /** @var TransitionTriggersUpdater */
     private $updater;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

@@ -47,6 +47,7 @@ class DraftRedirectAction extends AbstractAction
         $this->router = $router;
     }
 
+    #[\Override]
     public function initialize(array $options): DraftRedirectAction
     {
         $this->options = $this->getOptionResolver()->resolve($options);
@@ -54,9 +55,7 @@ class DraftRedirectAction extends AbstractAction
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function executeAction($context): void
     {
         $this->contextAccessor->setValue($context, new PropertyPath(self::REDIRECT_PATH), $this->getUrl($context));

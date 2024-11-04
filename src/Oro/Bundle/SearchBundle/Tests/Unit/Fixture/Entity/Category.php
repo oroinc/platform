@@ -113,6 +113,7 @@ class Category
         return $this->products;
     }
 
+    #[\Override]
     public function __toString()
     {
         return (string) $this->name;

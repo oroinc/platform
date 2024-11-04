@@ -69,9 +69,7 @@ class LocalizedFallbackValueCollectionTransformer implements DataTransformerInte
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         if (null === $value) {
@@ -132,9 +130,7 @@ class LocalizedFallbackValueCollectionTransformer implements DataTransformerInte
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (null === $value) {

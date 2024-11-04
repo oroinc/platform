@@ -28,6 +28,7 @@ class SendEmailNotificationTemplateProcessorTest extends TestCase
     private EntityManagerInterface|MockObject $entityManager;
     private SendEmailNotificationTemplateProcessor $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $managerRegistry = $this->createMock(ManagerRegistry::class);

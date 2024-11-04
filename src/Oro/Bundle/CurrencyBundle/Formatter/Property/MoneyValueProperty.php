@@ -29,6 +29,7 @@ class MoneyValueProperty extends AbstractProperty
      *
      * @throws InvalidRoundingTypeException
      */
+    #[\Override]
     protected function format($value)
     {
         return $this->formatter->format($value);
@@ -39,6 +40,7 @@ class MoneyValueProperty extends AbstractProperty
      *
      * @return float
      */
+    #[\Override]
     protected function getRawValue(ResultRecordInterface $record)
     {
         try {

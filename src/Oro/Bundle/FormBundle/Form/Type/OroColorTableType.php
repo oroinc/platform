@@ -13,9 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OroColorTableType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         // TODO: ConditionalReverseTransformer is a workaround
@@ -31,9 +29,7 @@ class OroColorTableType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
@@ -44,9 +40,7 @@ class OroColorTableType extends AbstractType
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         // TODO: make sure a value is processed by transformers; a problem happens after submitting disabled form
@@ -70,25 +64,18 @@ class OroColorTableType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return HiddenType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_color_table';

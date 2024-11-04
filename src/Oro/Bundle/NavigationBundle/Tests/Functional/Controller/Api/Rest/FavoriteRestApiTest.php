@@ -11,11 +11,13 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class FavoriteRestApiTest extends AbstractRestApiTest
 {
+    #[\Override]
     protected function getItemType(): string
     {
         return 'favorite';
     }
 
+    #[\Override]
     protected function getItemId(): int
     {
         return $this->getReference(NavigationItemData::NAVIGATION_ITEM_FAVORITE_1)->getId();

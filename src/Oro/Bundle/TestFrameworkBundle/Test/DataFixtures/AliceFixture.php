@@ -21,9 +21,7 @@ abstract class AliceFixture implements
      */
     abstract protected function loadData();
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $aliceReferenceRepository = $this->loader->getReferenceRepository();
@@ -53,17 +51,13 @@ abstract class AliceFixture implements
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setReferenceRepository(ReferenceRepository $referenceRepository)
     {
         $this->referenceRepository = $referenceRepository;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setLoader(AliceFixtureLoader $loader)
     {
         $this->loader = $loader;

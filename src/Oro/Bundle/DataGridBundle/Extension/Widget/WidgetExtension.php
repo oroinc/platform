@@ -18,9 +18,7 @@ class WidgetExtension extends AbstractExtension
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data): void
     {
         $request = $this->requestStack->getCurrentRequest();
@@ -32,9 +30,7 @@ class WidgetExtension extends AbstractExtension
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config): bool
     {
         $request = $this->requestStack->getCurrentRequest();

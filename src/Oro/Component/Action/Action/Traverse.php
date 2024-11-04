@@ -33,9 +33,7 @@ class Traverse extends AbstractAction
         $this->configurableAction = $configurableAction;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $array  = $this->getArray($context);
@@ -58,9 +56,9 @@ class Traverse extends AbstractAction
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function initialize(array $options)
     {
         if (empty($options[self::OPTION_KEY_ARRAY])) {

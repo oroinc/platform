@@ -24,17 +24,13 @@ class SearchFieldResolver implements FieldResolverInterface
         $this->fieldMappings = $fieldMappings;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function resolveFieldName(string $fieldName): string
     {
         return $this->resolveFieldByFieldMappings($fieldName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function resolveFieldType(string $fieldName): string
     {
         $fieldName = $this->resolveFieldByFieldMappings($fieldName, true);

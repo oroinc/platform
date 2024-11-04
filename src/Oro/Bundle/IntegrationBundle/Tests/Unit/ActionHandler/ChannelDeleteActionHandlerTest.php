@@ -14,6 +14,7 @@ class ChannelDeleteActionHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var ChannelDeleteActionHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->deleteManager = $this->createMock(DeleteManager::class);

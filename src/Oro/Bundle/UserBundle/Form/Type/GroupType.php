@@ -15,9 +15,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class GroupType extends AbstractType
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -51,9 +49,7 @@ class GroupType extends AbstractType
             );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -64,17 +60,12 @@ class GroupType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_user_group';

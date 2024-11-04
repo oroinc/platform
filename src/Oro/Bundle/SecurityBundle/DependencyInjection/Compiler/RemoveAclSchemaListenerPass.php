@@ -14,9 +14,7 @@ class RemoveAclSchemaListenerPass implements CompilerPassInterface
 {
     const ACL_SCHEMA_LISTENER_SERVICE_ID = 'security.acl.dbal.schema_listener';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if ($container->has(self::ACL_SCHEMA_LISTENER_SERVICE_ID)) {

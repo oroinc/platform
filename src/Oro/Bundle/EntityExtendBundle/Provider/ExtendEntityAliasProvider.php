@@ -15,14 +15,9 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
  */
 class ExtendEntityAliasProvider implements EntityAliasProviderInterface
 {
-    /** @var EntityAliasConfigBag */
-    private $config;
-
-    /** @var ConfigManager */
-    private $configManager;
-
-    /** @var DuplicateEntityAliasResolver */
-    private $duplicateResolver;
+    private EntityAliasConfigBag $config;
+    private ConfigManager $configManager;
+    private DuplicateEntityAliasResolver $duplicateResolver;
     private Inflector $inflector;
 
     public function __construct(
@@ -37,19 +32,16 @@ class ExtendEntityAliasProvider implements EntityAliasProviderInterface
         $this->inflector = $inflector;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityAlias($entityClass)
     {
-        if (!$this->configManager->hasConfig($entityClass)) {
-            return null;
+        // check for enums
+        if (ExtendHelper::isOutdatedEnumOptionEntity($entityClass)) {
+            return $this->getEntityAliasForEnum($entityClass, ExtendHelper::getEnumCode($entityClass));
         }
 
-        // check for enums
-        $enumCode = $this->configManager->getEntityConfig('enum', $entityClass)->get('code');
-        if ($enumCode) {
-            return $this->getEntityAliasForEnum($entityClass, $enumCode);
+        if (!$this->configManager->hasConfig($entityClass)) {
+            return null;
         }
 
         // check for dictionaries

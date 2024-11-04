@@ -14,9 +14,7 @@ class OroImapBundle implements Migration, DatabasePlatformAwareInterface
 {
     use DatabasePlatformAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_email_origin');

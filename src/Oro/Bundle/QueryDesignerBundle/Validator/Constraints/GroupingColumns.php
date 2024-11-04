@@ -13,9 +13,7 @@ class GroupingColumns extends Constraint
     /** @var string */
     public $message = 'oro.query_designer.grouping.column_exists';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;

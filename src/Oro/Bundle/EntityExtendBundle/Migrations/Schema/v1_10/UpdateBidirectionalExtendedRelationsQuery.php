@@ -20,25 +20,19 @@ class UpdateBidirectionalExtendedRelationsQuery extends AbstractEntityConfigQuer
 
     const LIMIT = 100;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return 'Update all extended relations with `bidirectional` option set to true';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRowBatchLimit()
     {
         return static::LIMIT;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function processRow(array $row, LoggerInterface $logger)
     {
         $data = $this->connection->convertToPHPValue($row['data'], 'array');

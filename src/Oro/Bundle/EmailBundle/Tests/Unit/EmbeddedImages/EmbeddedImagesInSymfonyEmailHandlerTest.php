@@ -14,6 +14,7 @@ class EmbeddedImagesInSymfonyEmailHandlerTest extends \PHPUnit\Framework\TestCas
 
     private EmbeddedImagesInSymfonyEmailHandler $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->embeddedImagesExtractor = $this->createMock(EmbeddedImagesExtractor::class);

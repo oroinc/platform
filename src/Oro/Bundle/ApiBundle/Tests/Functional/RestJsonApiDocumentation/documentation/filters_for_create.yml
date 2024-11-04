@@ -1,0 +1,13 @@
+filters:
+    'fields[businessunits]':
+        requirement: '.+'
+    'fields[organizations]':
+        requirement: '.+'
+    'fields[testapidepartments]':
+        requirement: '.+'
+    'fields[testapiemployees]':
+        requirement: '.+'
+    'include':
+        requirement: '.+'
+    'meta':
+        requirement: '.+'

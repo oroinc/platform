@@ -10,6 +10,7 @@ class LazyTestCronCommand extends Command implements CronCommandScheduleDefiniti
     protected static $defaultName = 'oro:cron:test:lazy';
     protected static $defaultDescription = 'Test lazy CRON command.';
 
+    #[\Override]
     public function getDefaultDefinition(): string
     {
         return '0 0 * * *';

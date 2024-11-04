@@ -18,11 +18,13 @@ class BasicImagineBinaryFilter implements ImagineBinaryFilterInterface
         $this->filterManager = $filterManager;
     }
 
+    #[\Override]
     public function applyFilter(BinaryInterface $binary, string $filter, array $runtimeConfig = []): ?BinaryInterface
     {
         return $this->filterManager->applyFilter($binary, $filter, $runtimeConfig);
     }
 
+    #[\Override]
     public function apply(BinaryInterface $binary, array $runtimeConfig = []): ?BinaryInterface
     {
         return $this->filterManager->apply($binary, $runtimeConfig);

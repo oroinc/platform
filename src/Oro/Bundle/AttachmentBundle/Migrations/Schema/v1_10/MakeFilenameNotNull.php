@@ -12,9 +12,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  */
 class MakeFilenameNotNull implements Migration
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $table = $schema->getTable('oro_attachment_file');

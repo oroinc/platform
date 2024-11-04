@@ -14,40 +14,30 @@ class TestConfigSection implements ConfigExtraSectionInterface
         $this->name = $name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureContext(ConfigContext $context): void
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isPropagable(): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigType(): string
     {
         return $this->name;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCacheKeyPart(): ?string
     {
         return null;

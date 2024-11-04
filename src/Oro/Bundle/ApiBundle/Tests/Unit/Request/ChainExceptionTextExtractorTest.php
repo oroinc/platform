@@ -16,6 +16,7 @@ class ChainExceptionTextExtractorTest extends \PHPUnit\Framework\TestCase
     /** @var ExceptionTextExtractorInterface[]|\PHPUnit\Framework\MockObject\MockObject[] */
     private $extractors;
 
+    #[\Override]
     protected function setUp(): void
     {
         $firstExtractor = $this->createMock(ExceptionTextExtractorInterface::class);

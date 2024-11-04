@@ -7,17 +7,13 @@ namespace Oro\Bundle\ConfigBundle\Provider;
  */
 class SystemConfigurationFormProvider extends AbstractProvider
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getTreeName(): string
     {
         return 'system_configuration';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getParentCheckboxLabel(): string
     {
         return 'oro.config.system_configuration.use_default';

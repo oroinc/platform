@@ -28,6 +28,7 @@ class ColumnsExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ColumnsExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->columnsStateProvider = $this->createMock(DatagridStateProviderInterface::class);

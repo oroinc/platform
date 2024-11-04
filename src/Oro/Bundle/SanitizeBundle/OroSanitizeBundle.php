@@ -11,9 +11,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class OroSanitizeBundle extends Bundle
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);

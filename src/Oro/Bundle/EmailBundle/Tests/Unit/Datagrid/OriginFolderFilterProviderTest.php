@@ -34,6 +34,7 @@ class OriginFolderFilterProviderTest extends \PHPUnit\Framework\TestCase
     /** @var OriginFolderFilterProvider */
     private $originFolderFilterProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->originQuery = $this->createMock(AbstractQuery::class);

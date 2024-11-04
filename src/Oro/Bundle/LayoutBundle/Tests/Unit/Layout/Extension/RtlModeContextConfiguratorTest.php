@@ -20,6 +20,7 @@ class RtlModeContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     /** @var RtlModeContextConfigurator */
     private $contextConfigurator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->themeManager = $this->createMock(ThemeManager::class);

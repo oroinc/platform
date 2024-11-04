@@ -24,9 +24,7 @@ class CleanConfigurationHandler implements ConfigurationHandlerInterface
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handle(array $configuration)
     {
         if (!$this->isApplicable() || !$configuration) {

@@ -18,17 +18,13 @@ class DatabaseCatalogueLoader implements CatalogueLoaderInterface
         $this->provider = $provider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getLoaderName(): string
     {
         return 'database';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getCatalogue(string $locale): MessageCatalogue
     {
         return $this->provider->getMessageCatalogueByLocaleAndScope($locale);

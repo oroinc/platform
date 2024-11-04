@@ -55,9 +55,7 @@ class FieldType extends AbstractType
         $this->fieldTypeProvider = $fieldTypeProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -102,9 +100,7 @@ class FieldType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver
@@ -123,9 +119,7 @@ class FieldType extends AbstractType
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $fieldName = $view->children['fieldName'];
@@ -139,17 +133,12 @@ class FieldType extends AbstractType
         $view->vars['excludeTypes'] = $options['excludeTypes'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_entity_extend_field_type';
@@ -207,10 +196,7 @@ class FieldType extends AbstractType
         return array_flip($relationTypes);
     }
 
-    /**
-     * @return array
-     */
-    public function getTranslatedTypeChoices()
+    public function getTranslatedTypeChoices(): array
     {
         return array_merge($this->getTranslatedFieldTypes(), $this->getTranslatedRelationTypes());
     }

@@ -21,6 +21,7 @@ class PostExportMessageProcessorTest extends WebTestCase
     use MessageQueueExtension;
     use JobsAwareTestTrait;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

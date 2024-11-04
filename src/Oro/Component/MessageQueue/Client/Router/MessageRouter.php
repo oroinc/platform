@@ -35,9 +35,7 @@ class MessageRouter implements MessageRouterInterface
         $this->destinationMetaRegistry = $destinationMetaRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handle(Message $message): iterable
     {
         $topicName = $message->getProperty(Config::PARAMETER_TOPIC_NAME);

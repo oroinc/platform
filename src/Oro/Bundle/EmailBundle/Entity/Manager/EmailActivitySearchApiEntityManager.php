@@ -25,9 +25,7 @@ class EmailActivitySearchApiEntityManager extends ActivitySearchApiEntityManager
         $this->setClass($class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getListQueryBuilder($limit = 10, $page = 1, $criteria = [], $orderBy = null, $joins = [])
     {
         $searchQueryBuilder = parent::getListQueryBuilder($limit, $page, $criteria, $orderBy, $joins);

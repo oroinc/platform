@@ -17,6 +17,7 @@ class TagsGuesserTest extends \PHPUnit\Framework\TestCase
     /** @var TagsGuesser */
     private $guesser;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityRoutingHelper = $this->createMock(EntityRoutingHelper::class);

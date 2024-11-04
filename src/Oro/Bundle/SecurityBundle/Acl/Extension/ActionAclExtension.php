@@ -35,17 +35,13 @@ class ActionAclExtension extends AbstractAclExtension
         $this->maskBuilder = new ActionMaskBuilder();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getExtensionKey()
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($type, $id)
     {
         if (ObjectIdentityFactory::ROOT_IDENTITY_TYPE === $type) {
@@ -57,25 +53,19 @@ class ActionAclExtension extends AbstractAclExtension
             && $this->actionMetadataProvider->isKnownAction(ObjectIdentityHelper::removeGroupName($type));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDefaultPermission()
     {
         return self::PERMISSION_EXECUTE;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPermissionGroupMask($mask)
     {
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPermissions($mask = null, $setOnly = false, $byCurrentGroup = false)
     {
         if (null === $mask || !$setOnly || 0 !== $mask) {
@@ -85,25 +75,19 @@ class ActionAclExtension extends AbstractAclExtension
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null, $aclGroup = null)
     {
         return [self::PERMISSION_EXECUTE];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getClasses()
     {
         return $this->actionMetadataProvider->getActions();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAccessLevelNames($object, $permissionName = null)
     {
         return [
@@ -112,9 +96,7 @@ class ActionAclExtension extends AbstractAclExtension
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAccessLevel($mask, $permission = null, $object = null)
     {
         return 0 === $mask
@@ -122,9 +104,7 @@ class ActionAclExtension extends AbstractAclExtension
             : AccessLevel::SYSTEM_LEVEL;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validateMask($mask, $object, $permission = null)
     {
         if (0 === $mask) {
@@ -137,9 +117,7 @@ class ActionAclExtension extends AbstractAclExtension
         throw $this->createInvalidAclMaskException($mask, $object);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getObjectIdentity($val)
     {
         $type = $id = $group = null;
@@ -154,41 +132,31 @@ class ActionAclExtension extends AbstractAclExtension
         return new ObjectIdentity($id, ObjectIdentityHelper::buildType($type, $group));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMaskBuilder($permission)
     {
         return clone $this->maskBuilder;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAllMaskBuilders()
     {
         return [clone $this->maskBuilder];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMaskPattern($mask)
     {
         return ActionMaskBuilder::getPatternFor($mask);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getServiceBits($mask)
     {
         return $mask & ActionMaskBuilder::SERVICE_BITS;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function removeServiceBits($mask)
     {
         return $mask & ActionMaskBuilder::REMOVE_SERVICE_BITS;

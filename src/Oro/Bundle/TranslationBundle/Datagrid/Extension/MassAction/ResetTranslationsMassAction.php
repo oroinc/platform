@@ -11,9 +11,7 @@ class ResetTranslationsMassAction extends AbstractMassAction
     /** @var array */
     protected $requiredOptions = ['data_identifier'];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setOptions(ActionConfiguration $options)
     {
         if (empty($options['handler'])) {
@@ -35,17 +33,13 @@ class ResetTranslationsMassAction extends AbstractMassAction
         return parent::setOptions($options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getAllowedRequestTypes()
     {
         return [Request::METHOD_POST];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getRequestType()
     {
         return Request::METHOD_POST;

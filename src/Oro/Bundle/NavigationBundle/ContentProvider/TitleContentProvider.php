@@ -18,9 +18,7 @@ class TitleContentProvider implements ContentProviderInterface
         $this->titleService = $titleService;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getContent()
     {
         return $this->titleService->render([], null, null, null, true);

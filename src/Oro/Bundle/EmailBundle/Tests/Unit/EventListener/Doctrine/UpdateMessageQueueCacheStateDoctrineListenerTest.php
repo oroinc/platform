@@ -23,6 +23,7 @@ class UpdateMessageQueueCacheStateDoctrineListenerTest extends TestCase
 
     private UnitOfWork|MockObject $unitOfWork;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->cacheState = $this->createMock(CacheState::class);

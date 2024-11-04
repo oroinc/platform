@@ -10,6 +10,7 @@ class ProcessorDecoratorTest extends \PHPUnit\Framework\TestCase
     /** @var ProcessorDecorator */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processor = new ProcessorDecorator(new Processor(), []);

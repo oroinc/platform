@@ -17,6 +17,7 @@ class ExternalFileMimeTypeValidator extends ConstraintValidator
      * @param ExternalFile|string|null $value ExternalFile model or MIME type
      * @param Constraint $constraint
      */
+    #[\Override]
     public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof ExternalFileMimeType) {

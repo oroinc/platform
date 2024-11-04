@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\SecurityBundle\Request;
 
-use Oro\Component\PhpUtils\ReflectionUtil;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -14,79 +12,43 @@ use Symfony\Component\HttpKernel\TerminableInterface;
  */
 class SessionHttpKernelDecorator implements HttpKernelInterface, TerminableInterface
 {
-    private const SESSION_OPTIONS_PARAMETER_NAME = 'session.storage.options';
-    private const COOKIE_PATH_OPTION = 'cookie_path';
+    private ?array $originalSessionOptions = null;
 
-    /** @var HttpKernelInterface */
-    protected $kernel;
-
-    /** @var ContainerInterface */
-    protected $container;
-
-    /** @var array|null */
-    private $collectedSessionOptions;
+    private ?array $currentSessionOptions = null;
 
     public function __construct(
-        HttpKernelInterface $kernel,
-        ContainerInterface $container
+        private HttpKernelInterface $innerKernel,
+        private SessionStorageOptionsManipulator $sessionStorageOptionsManipulator
     ) {
-        $this->kernel = $kernel;
-        $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handle(Request $request, int $type = self::MAIN_REQUEST, bool $catch = true): Response
     {
-        if (null === $this->collectedSessionOptions) {
-            $this->collectedSessionOptions = $this->applyBasePathToCookiePath(
-                $request->getBasePath(),
-                $this->getSessionOptions()
-            );
-        }
-        $this->setSessionOptions($this->collectedSessionOptions);
-
-        return $this->kernel->handle($request, $type, $catch);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function terminate(Request $request, Response $response)
-    {
-        if ($this->kernel instanceof TerminableInterface) {
-            $this->kernel->terminate($request, $response);
-        }
-    }
-
-    protected function applyBasePathToCookiePath(string $basePath, array $options): array
-    {
-        if ($basePath && '/' !== $basePath) {
-            $existingCookiePath = $options[self::COOKIE_PATH_OPTION] ?? '/';
-            $options[self::COOKIE_PATH_OPTION] = $basePath . $existingCookiePath;
+        if (null === $this->originalSessionOptions) {
+            $this->originalSessionOptions = $this->sessionStorageOptionsManipulator->getOriginalSessionOptions();
         }
 
-        return $options;
-    }
+        if ($this->currentSessionOptions === null) {
+            $this->currentSessionOptions = $this->originalSessionOptions;
+            $basePath = $request->getBasePath();
 
-    protected function getSessionOptions(): array
-    {
-        return $this->container->getParameter(self::SESSION_OPTIONS_PARAMETER_NAME);
-    }
-
-    protected function setSessionOptions(array $options): void
-    {
-        $parametersProperty = ReflectionUtil::getProperty(new \ReflectionClass($this->container), 'parameters');
-        if (null === $parametersProperty) {
-            throw new \LogicException(sprintf(
-                'The class "%s" does not have "parameters" property.',
-                get_class($this->container)
-            ));
+            if ($basePath && '/' !== $basePath) {
+                $existingCookiePath = $this->originalSessionOptions['cookie_path'] ?? '/';
+                $this->currentSessionOptions['cookie_path'] = $basePath . $existingCookiePath;
+            }
         }
-        $parametersProperty->setAccessible(true);
-        $parameters = $parametersProperty->getValue($this->container);
-        $parameters[self::SESSION_OPTIONS_PARAMETER_NAME] = $options;
-        $parametersProperty->setValue($this->container, $parameters);
+
+        $this->sessionStorageOptionsManipulator->setSessionOptions($this->currentSessionOptions);
+
+        return $this->innerKernel->handle($request, $type, $catch);
+    }
+
+    #[\Override]
+    public function terminate(Request $request, Response $response): void
+    {
+        if ($this->innerKernel instanceof TerminableInterface) {
+            $this->innerKernel->terminate($request, $response);
+        }
     }
 }

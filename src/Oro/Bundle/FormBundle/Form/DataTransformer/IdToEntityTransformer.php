@@ -27,9 +27,7 @@ class IdToEntityTransformer implements DataTransformerInterface
         $this->className = $className;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         if (!$value) {
@@ -40,9 +38,7 @@ class IdToEntityTransformer implements DataTransformerInterface
             ->find($this->className, $value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (!is_object($value) || !is_a($value, $this->className, true)) {

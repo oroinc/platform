@@ -32,9 +32,7 @@ class CreateNoteAction extends AbstractAction
         $this->activityManager = $activityManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         $argsCount = count($options);
@@ -67,9 +65,7 @@ class CreateNoteAction extends AbstractAction
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $message = $this->contextAccessor->getValue($context, $this->options['message']);

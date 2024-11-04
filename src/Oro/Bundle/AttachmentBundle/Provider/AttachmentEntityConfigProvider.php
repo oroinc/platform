@@ -20,9 +20,7 @@ class AttachmentEntityConfigProvider implements AttachmentEntityConfigProviderIn
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getFieldConfig(string $entityClass, string $fieldName): ?ConfigInterface
     {
         if (!$this->entityConfigManager->hasConfig($entityClass, $fieldName)) {
@@ -39,9 +37,7 @@ class AttachmentEntityConfigProvider implements AttachmentEntityConfigProviderIn
             ->getFieldConfig('attachment', $entityClass, $fieldName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEntityConfig(string $entityClass): ?ConfigInterface
     {
         if (!$this->entityConfigManager->hasConfig($entityClass)) {

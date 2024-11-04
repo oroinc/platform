@@ -25,8 +25,13 @@ abstract class AbstractGlobalOptionsProvider implements GlobalOptionsProviderInt
             /**
              * Starting from Symfony 2.8 event 'ConsoleCommandEvent' fires after all definitions were merged.
              */
-            $inputDefinition->addOption($option);
-            $commandDefinition->addOption($option);
+            if (!$inputDefinition->hasOption($option->getName())) {
+                $inputDefinition->addOption($option);
+            }
+
+            if (!$commandDefinition->hasOption($option->getName())) {
+                $commandDefinition->addOption($option);
+            }
         }
     }
 }

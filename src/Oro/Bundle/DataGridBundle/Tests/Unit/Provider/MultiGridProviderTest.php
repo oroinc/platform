@@ -29,6 +29,7 @@ class MultiGridProviderTest extends \PHPUnit\Framework\TestCase
     /** @var MultiGridProvider */
     private $multiGridProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);

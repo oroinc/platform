@@ -20,9 +20,7 @@ class EmailFolderViewList extends AbstractViewsList
         $this->mailboxChoiceList = $mailboxChoiceList;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getViewsList()
     {
         $views = [

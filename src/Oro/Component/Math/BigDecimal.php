@@ -168,17 +168,13 @@ final class BigDecimal extends BigNumber
         return $this->getTargetObject()->getFractionalPart();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toBigDecimal()
     {
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function __unserialize(array $serialized): void
     {
         if ($this->getTargetObject() !== null) {

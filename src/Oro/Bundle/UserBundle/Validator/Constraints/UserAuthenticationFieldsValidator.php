@@ -20,9 +20,7 @@ class UserAuthenticationFieldsValidator extends ConstraintValidator
         $this->userManager = $userManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($entity, Constraint $constraint)
     {
         if (!$constraint instanceof UserAuthenticationFields) {

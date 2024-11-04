@@ -13,6 +13,7 @@ class BroadcastTopicTest extends \PHPUnit\Framework\TestCase
 {
     private BroadcastTopic $broadcast;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->broadcast = new BroadcastTopic('broadcast_topic');

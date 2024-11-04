@@ -25,9 +25,7 @@ class DoctrineJobRepository implements JobRepositoryInterface
         $this->managerRegistry = $doctrine;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function createJobExecution(JobInstance $jobInstance): JobExecution
     {
         if (null !== $jobInstance->getId()) {
@@ -44,9 +42,7 @@ class DoctrineJobRepository implements JobRepositoryInterface
         return $jobExecution;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function updateJobExecution(JobExecution $jobExecution): JobExecution
     {
         $jobManager = $this->getJobManager();
@@ -65,9 +61,7 @@ class DoctrineJobRepository implements JobRepositoryInterface
         return $jobExecution;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function updateStepExecution(StepExecution $stepExecution): StepExecution
     {
         $jobManager = $this->getJobManager();

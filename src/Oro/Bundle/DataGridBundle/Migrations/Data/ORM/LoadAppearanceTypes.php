@@ -22,6 +22,7 @@ class LoadAppearanceTypes extends AbstractFixture
         ],
     ];
 
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         foreach ($this->data as $name => $typeData) {

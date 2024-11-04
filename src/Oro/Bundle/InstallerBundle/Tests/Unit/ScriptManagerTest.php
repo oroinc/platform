@@ -11,6 +11,7 @@ class ScriptManagerTest extends \PHPUnit\Framework\TestCase
 {
     private ScriptManager $scriptManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $kernel = $this->createMock(KernelInterface::class);

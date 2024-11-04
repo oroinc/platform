@@ -13,9 +13,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class ValidateParentEntityIdExists implements ProcessorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var SubresourceContext $context */

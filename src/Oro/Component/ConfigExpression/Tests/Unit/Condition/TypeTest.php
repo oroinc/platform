@@ -13,6 +13,7 @@ class TypeTest extends \PHPUnit\Framework\TestCase
     /** @var Condition\Type */
     private $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->condition = new Condition\Type();

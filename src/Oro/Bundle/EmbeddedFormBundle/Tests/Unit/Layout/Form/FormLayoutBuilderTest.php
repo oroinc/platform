@@ -33,6 +33,7 @@ class FormLayoutBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var FormLayoutBuilder */
     private $builder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->layoutManipulator = $this->createMock(LayoutManipulatorInterface::class);

@@ -8,6 +8,7 @@ class MassNotificationTest extends \PHPUnit\Framework\TestCase
 {
     private MassNotification $massNotification;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->massNotification = new MassNotification();

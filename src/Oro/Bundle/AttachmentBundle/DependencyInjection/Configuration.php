@@ -21,9 +21,7 @@ class Configuration implements ConfigurationInterface
     /** Bytes in one MB. Used to calculate exact bytes in certain MB amount. */
     public const BYTES_MULTIPLIER = 1048576;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('oro_attachment');

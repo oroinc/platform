@@ -27,9 +27,7 @@ class AttachmentAssociationProvider implements ResetInterface
         $this->attachmentAssociationHelper = $attachmentAssociationHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         $this->attachmentAssociationNames = [];

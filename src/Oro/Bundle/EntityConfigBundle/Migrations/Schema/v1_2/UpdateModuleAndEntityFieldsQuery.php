@@ -9,9 +9,7 @@ use Psr\Log\LoggerInterface;
 
 class UpdateModuleAndEntityFieldsQuery extends ParametrizedMigrationQuery
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -20,17 +18,12 @@ class UpdateModuleAndEntityFieldsQuery extends ParametrizedMigrationQuery
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->doExecute($logger);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function doExecute(LoggerInterface $logger, $dryRun = false)
     {
         $getSql = 'SELECT id, class_name FROM oro_entity_config';

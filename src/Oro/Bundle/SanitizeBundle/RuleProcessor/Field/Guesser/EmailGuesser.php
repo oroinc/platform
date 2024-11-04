@@ -16,6 +16,7 @@ class EmailGuesser implements GuesserInterface
     {
     }
 
+    #[\Override]
     public function guessProcessor(string $fieldName, ClassMetadata $metadata): ?ProcessorInterface
     {
         if (!preg_match("/((^[e|E])|E|_e)mail(_|[A-Z0-9]|$)/", $fieldName)) {

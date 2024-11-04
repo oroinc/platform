@@ -51,9 +51,7 @@ class CopyTaggingToNewEntity extends AbstractAction
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (!empty($options[static::PATH_SOURCE]) && !$options[static::PATH_SOURCE] instanceof PropertyPathInterface) {
@@ -71,9 +69,7 @@ class CopyTaggingToNewEntity extends AbstractAction
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $em = $this->doctrineHelper->getEntityManagerForClass(Tagging::class);

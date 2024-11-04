@@ -9,9 +9,7 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\GetSubresource\GetSubresourceCont
  */
 class GetSubresourceProcessor extends SubresourceProcessor
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createContextObject(): GetSubresourceContext
     {
         return new GetSubresourceContext($this->configProvider, $this->metadataProvider);

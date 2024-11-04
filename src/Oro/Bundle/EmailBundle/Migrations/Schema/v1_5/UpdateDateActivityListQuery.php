@@ -12,6 +12,7 @@ class UpdateDateActivityListQuery extends ParametrizedMigrationQuery
     /**
      * {inheritdoc}
      */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -23,6 +24,7 @@ class UpdateDateActivityListQuery extends ParametrizedMigrationQuery
     /**
      * {inheritdoc}
      */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->migrateActivityDates($logger);

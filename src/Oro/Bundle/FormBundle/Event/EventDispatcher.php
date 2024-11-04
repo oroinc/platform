@@ -10,9 +10,7 @@ use Symfony\Component\EventDispatcher\ImmutableEventDispatcher;
  */
 class EventDispatcher extends ImmutableEventDispatcher
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function dispatch(object $event, string $eventName = null): object
     {
         parent::dispatch($event, $eventName);

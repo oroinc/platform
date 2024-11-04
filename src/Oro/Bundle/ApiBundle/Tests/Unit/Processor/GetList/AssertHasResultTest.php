@@ -10,6 +10,7 @@ class AssertHasResultTest extends GetListProcessorTestCase
     /** @var AssertHasResult */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

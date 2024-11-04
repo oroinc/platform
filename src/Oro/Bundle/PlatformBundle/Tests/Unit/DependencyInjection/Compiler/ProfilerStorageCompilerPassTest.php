@@ -13,6 +13,7 @@ class ProfilerStorageCompilerPassTest extends \PHPUnit\Framework\TestCase
     /** @var ProfilerStorageCompilerPass */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new ProfilerStorageCompilerPass();

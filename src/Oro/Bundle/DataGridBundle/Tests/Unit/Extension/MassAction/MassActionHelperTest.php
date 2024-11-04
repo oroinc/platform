@@ -26,6 +26,7 @@ class MassActionHelperTest extends \PHPUnit\Framework\TestCase
     /** @var MassActionHelper */
     private $massActionHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);

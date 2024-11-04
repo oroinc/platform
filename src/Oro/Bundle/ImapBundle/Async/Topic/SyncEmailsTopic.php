@@ -12,16 +12,19 @@ class SyncEmailsTopic extends AbstractTopic
 {
     public const NAME = 'oro.imap.sync_emails';
 
+    #[\Override]
     public static function getName(): string
     {
         return self::NAME;
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Synchronize multiple emails via IMAP';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver

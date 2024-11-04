@@ -23,6 +23,7 @@ class ExportType extends AbstractType
         $this->processorRegistry = $processorRegistry;
     }
 
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add(
@@ -82,6 +83,7 @@ class ExportType extends AbstractType
         return sprintf('oro.importexport.export.%s', $alias);
     }
 
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -94,17 +96,12 @@ class ExportType extends AbstractType
         $resolver->setAllowedTypes('processorAlias', ['string', 'array', 'null']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;

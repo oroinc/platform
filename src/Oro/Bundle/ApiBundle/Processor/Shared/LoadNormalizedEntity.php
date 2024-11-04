@@ -20,10 +20,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class LoadNormalizedEntity implements ProcessorInterface
 {
-    public const OPERATION_NAME = 'normalized_entity_loaded';
-
-    private ActionProcessorBagInterface $processorBag;
-    private bool $reuseExistingEntity;
+    public const string OPERATION_NAME = 'normalized_entity_loaded';
 
     /**
      * @param ActionProcessorBagInterface $processorBag
@@ -31,15 +28,13 @@ class LoadNormalizedEntity implements ProcessorInterface
      *                                                         by the "get" action and use the entity
      *                                                         from the current context
      */
-    public function __construct(ActionProcessorBagInterface $processorBag, bool $reuseExistingEntity = false)
-    {
-        $this->processorBag = $processorBag;
-        $this->reuseExistingEntity = $reuseExistingEntity;
+    public function __construct(
+        private ActionProcessorBagInterface $processorBag,
+        private bool $reuseExistingEntity = false
+    ) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CreateContext|UpdateContext $context */
@@ -79,7 +74,9 @@ class LoadNormalizedEntity implements ProcessorInterface
         $getContext->setParentAction($context->getAction());
         $getContext->setClassName($context->getClassName());
         $getContext->setId($context->getId());
-        if ($this->reuseExistingEntity && $context->hasResult()) {
+        if ($context->hasResult()
+            && ($this->reuseExistingEntity || $context->getConfig()?->isValidationEnabled())
+        ) {
             $getContext->setResult($context->getResult());
         }
         $getContext->skipGroup(ApiActionGroup::SECURITY_CHECK);

@@ -14,9 +14,7 @@ class UpdateColumns implements
     Migration,
     OrderedMigrationInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         $auditTable = $schema->getTable('oro_audit');
@@ -24,9 +22,7 @@ class UpdateColumns implements
         $auditTable->changeColumn('transaction_id', ['length' => 36]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOrder(): int
     {
         return 1;

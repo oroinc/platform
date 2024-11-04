@@ -16,6 +16,7 @@ class ThemeRenderCacheExtension implements RenderCacheExtensionInterface
         $this->layoutContextStack = $layoutContextStack;
     }
 
+    #[\Override]
     public function alwaysVaryBy(): array
     {
         $context = $this->layoutContextStack->getCurrentContext();

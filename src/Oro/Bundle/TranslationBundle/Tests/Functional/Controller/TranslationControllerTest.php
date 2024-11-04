@@ -17,6 +17,7 @@ class TranslationControllerTest extends WebTestCase
     private const DATAGRID_NAME = 'oro-translation-translations-grid';
     private const RESET_ACTION_NAME = 'oro_translation_translation_reset';
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());

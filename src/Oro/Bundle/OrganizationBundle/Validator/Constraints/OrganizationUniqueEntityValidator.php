@@ -27,9 +27,7 @@ class OrganizationUniqueEntityValidator extends UniqueEntityValidator
         parent::__construct($registry);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($entity, Constraint $constraint)
     {
         $className = $this->doctrineHelper->getEntityClass($entity);

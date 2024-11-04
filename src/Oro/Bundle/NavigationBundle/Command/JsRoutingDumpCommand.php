@@ -46,9 +46,7 @@ class JsRoutingDumpCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function configure()
     {
         $this
@@ -98,9 +96,7 @@ class JsRoutingDumpCommand extends Command
         ;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $format = $input->getOption('format');

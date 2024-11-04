@@ -17,6 +17,7 @@ class DateTimeFormatter implements ValueFormatterInterface
      * @param \DateTime $value
      * @return string
      */
+    #[\Override]
     public function format($value): string
     {
         if (!$value instanceof \DateTime) {

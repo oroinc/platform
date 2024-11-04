@@ -12,6 +12,7 @@ class TranslationDomainProviderTest extends WebTestCase
 {
     private TranslationDomainProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -19,9 +20,7 @@ class TranslationDomainProviderTest extends WebTestCase
         $this->loadFixtures([LoadTranslations::class]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function postFixtureLoad()
     {
         parent::postFixtureLoad();

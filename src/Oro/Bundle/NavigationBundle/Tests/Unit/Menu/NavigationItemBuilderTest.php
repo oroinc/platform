@@ -25,6 +25,7 @@ class NavigationItemBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var NavigationItemBuilder */
     private $builder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);

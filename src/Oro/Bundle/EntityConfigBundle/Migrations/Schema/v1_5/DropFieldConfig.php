@@ -19,9 +19,7 @@ class DropFieldConfig implements Migration
         'status_id' => ['Oro\\Bundle\\UserBundle\\Entity\\User']
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         foreach ($this->fields as $fieldName => $entityClasses) {

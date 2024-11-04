@@ -30,9 +30,7 @@ class CommandWithArgsFilter extends StringFilter
         $this->tokenizer = $tokenizer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
         $this->ds = $ds;
@@ -67,9 +65,7 @@ class CommandWithArgsFilter extends StringFilter
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function parseValue(array $data)
     {
         switch ($data['type']) {

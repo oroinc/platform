@@ -16,6 +16,7 @@ class GaufretteResolverFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var GaufretteResolverFactory */
     private $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->factory = new GaufretteResolverFactory();

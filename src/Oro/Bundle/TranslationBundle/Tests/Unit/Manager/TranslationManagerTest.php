@@ -46,6 +46,7 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
     /** @var TranslationManager */
     private $translationManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->domainProvider = $this->createMock(TranslationDomainProvider::class);

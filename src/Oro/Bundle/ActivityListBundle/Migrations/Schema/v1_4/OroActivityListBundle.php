@@ -25,9 +25,7 @@ class OroActivityListBundle implements
     use ConnectionAwareTrait;
     use ExtendNameGeneratorAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $this->renameActivityTables($schema, $queries);

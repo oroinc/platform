@@ -9,6 +9,7 @@ class GridFilterChoiceTree extends GridFilterStringItem
      *
      * @param string|array $value
      */
+    #[\Override]
     public function setFilterValue($value)
     {
         /** @var ChoiceTreeInput $input */

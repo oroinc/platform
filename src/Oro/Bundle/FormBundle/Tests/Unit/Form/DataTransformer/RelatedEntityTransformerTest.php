@@ -29,6 +29,7 @@ class RelatedEntityTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var RelatedEntityTransformer */
     private $transformer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

@@ -10,6 +10,7 @@ class EmbeddedImagesExtractorTest extends \PHPUnit\Framework\TestCase
 {
     private EmbeddedImagesExtractor $extractor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $mimeTypes = new MimeTypes(['image/png' => ['png']]);

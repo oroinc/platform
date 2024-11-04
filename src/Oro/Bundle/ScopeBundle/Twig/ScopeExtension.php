@@ -21,9 +21,7 @@ class ScopeExtension extends AbstractExtension implements ServiceSubscriberInter
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -53,6 +51,7 @@ class ScopeExtension extends AbstractExtension implements ServiceSubscriberInter
         return $this->container->get(ScopeManager::class)->getScopeEntities($scopeType);
     }
 
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

@@ -14,17 +14,13 @@ use Oro\Component\ChainProcessor\ProcessorIterator;
  */
 class NormalizeValueProcessor extends ByStepActionProcessor
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createContextObject(): NormalizeValueContext
     {
         return new NormalizeValueContext();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function executeProcessors(ComponentContextInterface $context): void
     {
         /** @var NormalizeValueContext $context */
@@ -49,9 +45,7 @@ class NormalizeValueProcessor extends ByStepActionProcessor
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getProcessors(ContextInterface $context): ProcessorIterator
     {
         $action = $context->getAction();

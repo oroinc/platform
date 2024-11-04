@@ -13,6 +13,7 @@ class TemplateEntityRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var TemplateEntityRegistry */
     private $entityRegistry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityRegistry = new TemplateEntityRegistry();

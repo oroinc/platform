@@ -10,9 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class MakeTestLoggerServicePersistentPass extends RegisterPersistentServicesPass
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getPersistentServices(ContainerBuilder $container): array
     {
         return ['oro_api.tests.customize_form_data_logger'];

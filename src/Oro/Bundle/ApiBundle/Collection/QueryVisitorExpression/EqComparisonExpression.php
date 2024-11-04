@@ -9,9 +9,7 @@ use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
  */
 class EqComparisonExpression implements ComparisonExpressionInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkComparisonExpression(
         QueryExpressionVisitor $visitor,
         string $field,

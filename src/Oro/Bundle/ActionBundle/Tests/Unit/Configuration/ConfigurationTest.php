@@ -144,7 +144,8 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                                 'param' => 'value'
                             ],
                             'data' => [
-                                'attribute' => 'attrValue'
+                                'attribute' => 'attrValue',
+                                'attribute-with-dash' => 'attrValue'
                             ]
                         ],
                         'datagrid_options' => [
@@ -253,7 +254,8 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                                 'param' => 'value'
                             ],
                             'data' => [
-                                'attribute' => 'attrValue'
+                                'attribute' => 'attrValue',
+                                'attribute-with-dash' => 'attrValue'
                             ]
                         ],
                         'form_options' => [

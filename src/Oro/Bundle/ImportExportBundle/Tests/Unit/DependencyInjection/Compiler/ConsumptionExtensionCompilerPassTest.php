@@ -16,6 +16,7 @@ class ConsumptionExtensionCompilerPassTest extends \PHPUnit\Framework\TestCase
 {
     private ConsumptionExtensionCompilerPass $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new ConsumptionExtensionCompilerPass();

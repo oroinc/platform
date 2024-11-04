@@ -54,17 +54,13 @@ class LoggedUserVariablesProvider implements SystemVariablesProviderInterface
         $this->htmlTagHelper = $htmlTagHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVariableDefinitions(): array
     {
         return $this->getVariables(false);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVariableValues(): array
     {
         return $this->getVariables(true);

@@ -17,6 +17,7 @@ class ContentProviderListenerTest extends \PHPUnit\Framework\TestCase
     /** @var ContentProviderListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->contentProviderManager = $this->createMock(ContentProviderManager::class);

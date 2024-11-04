@@ -15,9 +15,7 @@ class ExpressionAssembler extends AbstractAssembler
         $this->factory = $factory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function assemble(array $configuration)
     {
         if (!$this->isExpression($configuration)) {

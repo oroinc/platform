@@ -39,11 +39,11 @@ class TransitionCronTriggerHandler implements TransitionTriggerHandlerInterface
     }
 
     /**
-     * {@inheritdoc}
      * @throws \Exception
      * @throws \InvalidArgumentException
      * @throws \Oro\Bundle\WorkflowBundle\Exception\WorkflowException
      */
+    #[\Override]
     public function process(BaseTransitionTrigger $trigger, TransitionTriggerMessage $message)
     {
         if (!$trigger instanceof TransitionCronTrigger) {

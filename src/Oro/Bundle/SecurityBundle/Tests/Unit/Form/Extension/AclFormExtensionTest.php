@@ -21,6 +21,7 @@ class AclFormExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var AclFormExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->aclFieldExtension = $this->createMock(AclProtectedFieldTypeExtension::class);

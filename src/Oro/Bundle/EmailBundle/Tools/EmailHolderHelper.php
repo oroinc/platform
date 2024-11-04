@@ -33,9 +33,7 @@ class EmailHolderHelper implements ResetInterface
         $this->extendConfigProvider = $extendConfigProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset()
     {
         $this->sortedTargetEntities = null;

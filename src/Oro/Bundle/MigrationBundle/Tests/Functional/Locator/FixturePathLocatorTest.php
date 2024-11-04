@@ -12,6 +12,7 @@ class FixturePathLocatorTest extends WebTestCase
      */
     private $serviceLocator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

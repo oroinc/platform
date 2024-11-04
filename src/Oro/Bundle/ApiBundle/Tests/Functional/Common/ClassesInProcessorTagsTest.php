@@ -9,6 +9,7 @@ use Oro\Component\ChainProcessor\ProcessorBag;
 
 class ClassesInProcessorTagsTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -19,7 +20,7 @@ class ClassesInProcessorTagsTest extends WebTestCase
         return self::getContainer()->get('oro_api.tests.processor_bag');
     }
 
-    public function testClassesFromProcessorTagsExist()
+    public function testClassesFromProcessorTagsExist(): void
     {
         $errors = [];
         $processorBag = $this->getProcessorBag();
@@ -27,7 +28,9 @@ class ClassesInProcessorTagsTest extends WebTestCase
             $context = new Context();
             $context->setAction($action);
             $processors = $processorBag->getProcessors($context);
-            $processors->setApplicableChecker(new ValidateClassExistenceApplicableChecker());
+            $processors->setApplicableChecker(new ValidateClassExistenceApplicableChecker(
+                self::getContainer()->get('oro_entity_extend.entity_class_provider.enum_option')
+            ));
             try {
                 foreach ($processors as $processor) {
                     // do nothing; existence of classes is validated by the applicable checker

@@ -26,6 +26,7 @@ class ActivityListAccessRuleTest extends \PHPUnit\Framework\TestCase
     /** @var ActivityListAccessRule */
     private $rule;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->builder = $this->createMock(AclConditionDataBuilderInterface::class);

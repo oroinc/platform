@@ -45,6 +45,7 @@ class IntegrationHandlerTest extends TestCase
     /** @var Integration */
     private $entity;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->request = new Request();

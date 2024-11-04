@@ -14,16 +14,19 @@ use Symfony\Component\Validator\Validation;
  */
 class SendEmailTemplateTopic extends AbstractTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.email.send_email_template';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Send localized emails to specified recipients using specified email template.';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver

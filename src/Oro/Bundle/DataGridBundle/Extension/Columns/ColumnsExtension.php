@@ -33,16 +33,14 @@ class ColumnsExtension extends AbstractExtension
     /**
      * Should be applied after FormatterExtension.
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function getPriority()
     {
         return -10;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $datagridConfiguration)
     {
         if (!parent::isApplicable($datagridConfiguration)) {
@@ -54,9 +52,7 @@ class ColumnsExtension extends AbstractExtension
         return count($columnsConfig) > 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visitMetadata(DatagridConfiguration $datagridConfiguration, MetadataObject $metadata)
     {
         $datagridParameters = $this->getParameters();

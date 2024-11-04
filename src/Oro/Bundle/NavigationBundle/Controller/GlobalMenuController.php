@@ -79,9 +79,7 @@ class GlobalMenuController extends AbstractMenuController
         return parent::move($request, $menuName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function checkAcl(array $context)
     {
         if (!$this->isGranted('oro_config_system')) {
@@ -90,9 +88,7 @@ class GlobalMenuController extends AbstractMenuController
         parent::checkAcl($context);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function handleUpdate(
         MenuUpdateInterface $menuUpdate,
         array $context,

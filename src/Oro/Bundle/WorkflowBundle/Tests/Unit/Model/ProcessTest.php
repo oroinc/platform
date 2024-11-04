@@ -23,6 +23,7 @@ class ProcessTest extends \PHPUnit\Framework\TestCase
     /** @var Process */
     private $process;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processDefinition = $this->createMock(ProcessDefinition::class);

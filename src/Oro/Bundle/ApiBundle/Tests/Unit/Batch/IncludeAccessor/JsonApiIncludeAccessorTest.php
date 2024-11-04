@@ -10,6 +10,7 @@ class JsonApiIncludeAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var JsonApiIncludeAccessor */
     private $includeAccessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->includeAccessor = new JsonApiIncludeAccessor(new ItemKeyBuilder());

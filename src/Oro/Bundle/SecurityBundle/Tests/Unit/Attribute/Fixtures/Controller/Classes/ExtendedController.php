@@ -17,6 +17,7 @@ class ExtendedController extends MainTestController
     /**
      * @return Response
      */
+    #[\Override]
     public function test2Action()
     {
         return new Response('test');
@@ -28,6 +29,7 @@ class ExtendedController extends MainTestController
     #[AclAncestor(
         id: "user_test_main_controller_action1",
     )]
+    #[\Override]
     public function test3Action()
     {
         return new Response('test');
@@ -42,6 +44,7 @@ class ExtendedController extends MainTestController
         groupName: "Another Group",
         label: "Action 4 Rewrite",
     )]
+    #[\Override]
     public function test4Action()
     {
         return new Response('test');

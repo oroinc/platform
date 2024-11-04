@@ -30,9 +30,7 @@ class MediaCacheManagerRegistry implements MediaCacheManagerRegistryInterface
         $this->protectedMediaCacheManager = $protectedMediaCacheManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getManagerForFile(File $file): GaufretteFileManager
     {
         if ($this->fileAccessControlChecker->isCoveredByAcl($file)) {

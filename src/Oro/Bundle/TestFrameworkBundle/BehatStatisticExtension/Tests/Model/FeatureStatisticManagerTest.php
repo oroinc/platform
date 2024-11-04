@@ -29,6 +29,7 @@ class FeatureStatisticManagerTest extends \PHPUnit\Framework\TestCase
     /** @var FeatureStatisticManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->featureRepository = $this->createMock(StatisticRepository::class);

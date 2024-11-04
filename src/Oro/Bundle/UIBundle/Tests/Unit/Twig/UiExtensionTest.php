@@ -41,6 +41,7 @@ class UiExtensionTest extends TestCase
 
     private UiExtension $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->environment = $this->createMock(Environment::class);

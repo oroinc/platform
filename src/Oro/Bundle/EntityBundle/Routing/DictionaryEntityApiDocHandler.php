@@ -29,9 +29,7 @@ class DictionaryEntityApiDocHandler implements HandlerInterface
         $this->entityClassNameProvider = $entityClassNameProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handle(ApiDoc $annotation, array $annotations, Route $route, \ReflectionMethod $method)
     {
         if ($route->getOption('group') !== DictionaryEntityRouteOptionsResolver::ROUTE_GROUP) {

@@ -26,33 +26,25 @@ class ImapEmailGoogleOAuthManager extends AbstractOAuthManager
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getType(): string
     {
         return AccountTypeModel::ACCOUNT_TYPE_GMAIL;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isOAuthEnabled(): bool
     {
         return $this->configManager->get('oro_imap.enable_google_imap');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConnectionFormTypeClass(): string
     {
         return ConfigurationGmailType::class;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setOriginDefaults(UserEmailOrigin $origin): void
     {
         $origin->setImapHost(GmailImap::DEFAULT_GMAIL_HOST);

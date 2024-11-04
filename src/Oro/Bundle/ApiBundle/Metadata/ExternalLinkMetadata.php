@@ -39,9 +39,7 @@ class ExternalLinkMetadata extends LinkMetadata
         $this->defaultParams = $defaultParams;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function toArray(): array
     {
         $result = parent::toArray();
@@ -56,9 +54,7 @@ class ExternalLinkMetadata extends LinkMetadata
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getHref(DataAccessorInterface $dataAccessor): ?string
     {
         if (empty($this->urlParams)) {

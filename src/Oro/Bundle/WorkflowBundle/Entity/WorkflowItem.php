@@ -156,9 +156,6 @@ class WorkflowItem implements EntityAwareInterface, ExtendEntityInterface, Actio
 
     protected bool $locked = false;
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct()
     {
         $this->transitionRecords = new ArrayCollection();
@@ -413,9 +410,7 @@ class WorkflowItem implements EntityAwareInterface, ExtendEntityInterface, Actio
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntity()
     {
         return $this->entity;
@@ -691,6 +686,7 @@ class WorkflowItem implements EntityAwareInterface, ExtendEntityInterface, Actio
         return $this;
     }
 
+    #[\Override]
     public function getActionDataStorage(): AbstractStorage
     {
         return $this->getData();
@@ -699,6 +695,7 @@ class WorkflowItem implements EntityAwareInterface, ExtendEntityInterface, Actio
     /**
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return sprintf(

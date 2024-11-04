@@ -58,22 +58,19 @@ class AttachmentController extends RestController
      *
      * @return ApiEntityManager
      */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_attachment.manager.api');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getForm()
     {
         throw new \BadMethodCallException('Form is not available.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFormHandler()
     {
         throw new \BadMethodCallException('FormHandler is not available.');

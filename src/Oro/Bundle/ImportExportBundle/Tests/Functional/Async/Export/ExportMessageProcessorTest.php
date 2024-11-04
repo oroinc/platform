@@ -16,6 +16,7 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
  */
 class ExportMessageProcessorTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

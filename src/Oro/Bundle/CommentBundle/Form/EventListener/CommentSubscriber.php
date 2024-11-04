@@ -8,9 +8,7 @@ use Symfony\Component\Form\FormEvents;
 
 class CommentSubscriber implements EventSubscriberInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

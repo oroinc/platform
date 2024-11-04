@@ -24,9 +24,7 @@ class FeatureExtension extends AbstractExtension
         $this->featureChecker = $featureChecker;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return
@@ -34,9 +32,7 @@ class FeatureExtension extends AbstractExtension
             && $config->isOrmDatasource();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function processConfigs(DatagridConfiguration $config)
     {
         $config->offsetSetByPath(
@@ -48,9 +44,7 @@ class FeatureExtension extends AbstractExtension
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
         /** @var OrmDatasource $datasource */

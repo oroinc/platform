@@ -7,9 +7,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class CompilerPass2 implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
     }

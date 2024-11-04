@@ -12,6 +12,7 @@ class AssertResultSchemaTest extends GetListProcessorTestCase
     /** @var AssertResultSchema */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

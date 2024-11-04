@@ -14,9 +14,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetCorsAllowMethods implements ProcessorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var OptionsContext $context */

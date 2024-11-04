@@ -7,9 +7,7 @@ use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 
 class EntityExclusionProvider implements ExclusionProviderInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isIgnoredEntity($className)
     {
         return in_array(
@@ -18,17 +16,13 @@ class EntityExclusionProvider implements ExclusionProviderInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isIgnoredField(ClassMetadata $metadata, $fieldName)
     {
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isIgnoredRelation(ClassMetadata $metadata, $associationName)
     {
         return false;

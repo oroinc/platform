@@ -13,6 +13,7 @@ class ExtractEntityIdTest extends FormProcessorTestCase
 {
     private ExtractEntityId $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

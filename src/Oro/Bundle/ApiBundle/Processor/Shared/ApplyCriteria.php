@@ -20,9 +20,7 @@ class ApplyCriteria implements ProcessorInterface
         $this->criteriaConnector = $criteriaConnector;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

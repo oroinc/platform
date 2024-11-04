@@ -20,6 +20,7 @@ class EmailGuesserTest extends TestCase
     private ?ExtendEntityMetadataProvider $extendEntityMetadataProvider = null;
     private ?ProcessorHelper $processorHelper = null;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->emailProcessorMock = self::createMock(EmailProcessor::class);

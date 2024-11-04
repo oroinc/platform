@@ -36,6 +36,7 @@ class MetadataBuilderTest extends \PHPUnit\Framework\TestCase
     /** @var MetadataBuilder */
     private $metadataBuilder;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->metadataFactory = $this->createMock(MetadataFactory::class);

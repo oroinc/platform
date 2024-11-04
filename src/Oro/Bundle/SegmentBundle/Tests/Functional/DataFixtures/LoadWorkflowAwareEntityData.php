@@ -10,9 +10,7 @@ class LoadWorkflowAwareEntityData extends AbstractFixture
 {
     const COUNT = 50;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         for ($i = 1; $i <= self::COUNT; $i++) {

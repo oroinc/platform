@@ -12,9 +12,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class RouterPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $container->getDefinition('oro_ui.router')

@@ -18,6 +18,7 @@ class CompositeFormatterTest extends \PHPUnit\Framework\TestCase
     /** @var CompositeFormatter */
     private $compositeFormatter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->docViewDetector = $this->createMock(RestDocViewDetector::class);

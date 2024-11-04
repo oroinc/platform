@@ -14,6 +14,7 @@ class TransitionTranslationHelperTest extends \PHPUnit\Framework\TestCase
     /** @var TransitionTranslationHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);

@@ -12,9 +12,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class MimeTypesToStringTransformer implements DataTransformerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         if (is_string($value)) {
@@ -26,9 +24,7 @@ class MimeTypesToStringTransformer implements DataTransformerInterface
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if ('' === $value) {

@@ -13,6 +13,7 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
     /** @var MetadataHelper */
     private $metadataHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->metadataHelper = new MetadataHelper();

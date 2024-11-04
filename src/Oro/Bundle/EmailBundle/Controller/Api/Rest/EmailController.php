@@ -126,22 +126,19 @@ class EmailController extends RestController
      *
      * @return EmailApiEntityManager
      */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_email.manager.email.api');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getForm()
     {
         return $this->container->get('oro_email.form.email.api');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFormHandler()
     {
         return $this->container->get('oro_email.form.handler.email.api');

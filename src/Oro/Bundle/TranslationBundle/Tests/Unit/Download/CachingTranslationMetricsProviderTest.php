@@ -50,6 +50,7 @@ class CachingTranslationMetricsProviderTest extends \PHPUnit\Framework\TestCase
     /** @var CachingTranslationMetricsProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->cache = $this->createMock(CacheInterface::class);

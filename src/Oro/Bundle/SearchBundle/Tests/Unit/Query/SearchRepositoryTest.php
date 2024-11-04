@@ -18,6 +18,7 @@ class SearchRepositoryTest extends \PHPUnit\Framework\TestCase
     /** @var SearchRepository */
     private $repository;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->queryFactory = $this->createMock(QueryFactoryInterface::class);

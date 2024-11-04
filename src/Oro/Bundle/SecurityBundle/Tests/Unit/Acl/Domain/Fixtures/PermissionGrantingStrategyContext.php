@@ -28,6 +28,7 @@ class PermissionGrantingStrategyContext implements PermissionGrantingStrategyCon
         $this->extensionSelector = $selector;
     }
 
+    #[\Override]
     public function getObject()
     {
         return $this->object;
@@ -38,6 +39,7 @@ class PermissionGrantingStrategyContext implements PermissionGrantingStrategyCon
         $this->object = $object;
     }
 
+    #[\Override]
     public function getSecurityToken()
     {
         return $this->token;
@@ -48,6 +50,7 @@ class PermissionGrantingStrategyContext implements PermissionGrantingStrategyCon
         $this->token = $token;
     }
 
+    #[\Override]
     public function getAclExtension()
     {
         return $this->extensionSelector->select($this->object);
@@ -58,6 +61,7 @@ class PermissionGrantingStrategyContext implements PermissionGrantingStrategyCon
         $this->oneShotIsGrantedObserver = $observer;
     }
 
+    #[\Override]
     public function setTriggeredMask($mask, $accessLevel)
     {
     }

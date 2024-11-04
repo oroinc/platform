@@ -12,9 +12,7 @@ class EnumValuesUniqueValidator extends ConstraintValidator
 {
     public const ALIAS = 'oro_entity_extend.validator.unique_enum_values';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (empty($value)) {

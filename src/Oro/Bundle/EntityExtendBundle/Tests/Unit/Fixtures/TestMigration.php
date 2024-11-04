@@ -13,9 +13,7 @@ class TestMigration implements Migration, ExtendExtensionAwareInterface
 {
     use ExtendExtensionAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_user_access_role');

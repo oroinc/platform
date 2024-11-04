@@ -29,6 +29,7 @@ class LoadNormalizedRelationshipTest extends ChangeRelationshipProcessorTestCase
     /** @var LoadNormalizedRelationship */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -13,6 +13,7 @@ class EmailNotificationTest extends \PHPUnit\Framework\TestCase
 {
     private EmailNotification $entity;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entity = new EmailNotification();

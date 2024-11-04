@@ -11,9 +11,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class OroSSOExtension extends Extension implements PrependExtensionInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function prepend(ContainerBuilder $container): void
     {
         if ($container instanceof ExtendedContainerBuilder) {
@@ -21,9 +19,7 @@ class OroSSOExtension extends Extension implements PrependExtensionInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(array $configs, ContainerBuilder $container): void
     {
         $serviceLoader = new YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));

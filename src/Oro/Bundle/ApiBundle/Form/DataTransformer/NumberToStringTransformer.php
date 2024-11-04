@@ -17,9 +17,7 @@ class NumberToStringTransformer implements DataTransformerInterface
         $this->scale = $scale;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         if (null === $value) {
@@ -33,9 +31,7 @@ class NumberToStringTransformer implements DataTransformerInterface
         return (string)$value;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (!\is_string($value)) {

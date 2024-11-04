@@ -9,6 +9,7 @@ class SessionHandlerFactoryTest extends \PHPUnit\Framework\TestCase
 {
     private ServiceLocator $locatorMock;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->locatorMock = self::createMock(ServiceLocator::class);

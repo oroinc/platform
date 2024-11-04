@@ -29,8 +29,8 @@ class WebpAwarePictureSourcesProvider implements PictureSourcesProviderInterface
     /**
      * Adds WebP image variants if current oro_attachment.webp_strategy is "if_supported".
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function getFilteredPictureSources(?File $file, string $filterName = 'original'): array
     {
         $sources = $this->innerPictureSourcesProvider->getFilteredPictureSources($file, $filterName);
@@ -53,8 +53,8 @@ class WebpAwarePictureSourcesProvider implements PictureSourcesProviderInterface
     /**
      * Adds WebP image variants if current oro_attachment.webp_strategy is "if_supported".
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function getResizedPictureSources(?File $file, int $width, int $height): array
     {
         $sources = $this->innerPictureSourcesProvider->getResizedPictureSources($file, $width, $height);

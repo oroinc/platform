@@ -43,9 +43,7 @@ abstract class AbstractDriver implements DriverInterface
         $this->cacheDir  = $cacheDir;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load($file)
     {
         $className = $this->generateClassName($file);
@@ -63,9 +61,7 @@ abstract class AbstractDriver implements DriverInterface
         return new $className($this);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getUpdateFilenamePattern($fileExtension)
     {
         return '/\.' . $fileExtension . '$/';

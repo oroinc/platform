@@ -18,6 +18,7 @@ class ImagineFilterConfigurationDecoratorTest extends \PHPUnit\Framework\TestCas
     /** @var ImagineFilterConfigurationDecorator */
     private $imagineFilterConfigurationDecorator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->filterConfiguration = $this->createMock(FilterConfiguration::class);

@@ -7,17 +7,13 @@ use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 abstract class MultipleAssociationEntityConfigDumperExtension extends AbstractAssociationEntityConfigDumperExtension
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getAssociationType()
     {
         return RelationType::MANY_TO_MANY;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isTargetEntityApplicable(ConfigInterface $targetEntityConfig)
     {
         $entityClasses = $targetEntityConfig->get($this->getAssociationAttributeName());
@@ -25,9 +21,7 @@ abstract class MultipleAssociationEntityConfigDumperExtension extends AbstractAs
         return !empty($entityClasses);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function preUpdate()
     {
         $targetEntityConfigs = $this->getTargetEntityConfigs();

@@ -13,9 +13,7 @@ use Twig\NodeVisitor\NodeVisitorInterface;
  */
 class GetAttrNodeVisitor implements NodeVisitorInterface
 {
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function enterNode(Node $node, Environment $env): Node
     {
         // Make sure this is a GetAttrExpression (and not a subclass)
@@ -43,17 +41,13 @@ class GetAttrNodeVisitor implements NodeVisitorInterface
         return new GetAttrNode($nodes, $attributes, $node->getTemplateLine(), $node->getNodeTag());
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function leaveNode(Node $node, Environment $env): Node
     {
         return $node;
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function getPriority()
     {
         return 0;

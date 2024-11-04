@@ -7,14 +7,13 @@ namespace Oro\Bundle\ThemeBundle\Form\Configuration;
  */
 class RadioBuilder extends AbstractChoiceBuilder
 {
-    #[\Override] public static function getType(): string
+    #[\Override]
+    public static function getType(): string
     {
         return 'radio';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getDefaultOptions(): array
     {
         return [

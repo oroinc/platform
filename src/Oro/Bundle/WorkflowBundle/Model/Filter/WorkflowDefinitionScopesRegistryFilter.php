@@ -23,9 +23,7 @@ class WorkflowDefinitionScopesRegistryFilter implements WorkflowDefinitionFilter
         $this->managerRegistry = $managerRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function filter(Collection $workflowDefinitions)
     {
         $scopeAwareDefinitions = $workflowDefinitions->filter(

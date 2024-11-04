@@ -20,6 +20,7 @@ class ActionGroupExecutorTest extends \PHPUnit\Framework\TestCase
     /** @var ActionGroupExecutor */
     private $actionGroupExecutor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->actionGroupRegistry = $this->createMock(ActionGroupRegistry::class);

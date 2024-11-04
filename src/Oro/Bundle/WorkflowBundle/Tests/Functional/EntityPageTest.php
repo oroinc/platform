@@ -11,6 +11,7 @@ class EntityPageTest extends WebTestCase
     /** @var EntityManager */
     private $entityManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());

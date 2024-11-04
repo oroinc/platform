@@ -5,9 +5,6 @@ namespace Oro\Component\Layout\Form\RendererEngine;
 use Symfony\Component\Form\FormRendererEngineInterface as BaseFormRendererEngineInterfaceInterface;
 use Symfony\Component\Form\FormView;
 
-/**
- * {@inheritdoc}
- */
 interface FormRendererEngineInterface extends BaseFormRendererEngineInterfaceInterface
 {
     /**

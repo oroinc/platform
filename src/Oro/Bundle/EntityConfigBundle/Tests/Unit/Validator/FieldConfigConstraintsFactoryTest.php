@@ -14,6 +14,7 @@ class FieldConfigConstraintsFactoryTest extends \PHPUnit\Framework\TestCase
 
     private FieldConfigConstraintsFactory $constraintsFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $providers = new \ArrayIterator([

@@ -12,16 +12,19 @@ class AttributeRemovedFromFamilyTopic extends AbstractTopic
 {
     public const NAME = 'oro_entity_config.attribute_was_removed_from_family';
 
+    #[\Override]
     public static function getName(): string
     {
         return self::NAME;
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Removes an attribute from family';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver

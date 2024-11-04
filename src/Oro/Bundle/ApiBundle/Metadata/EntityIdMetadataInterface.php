@@ -24,4 +24,10 @@ interface EntityIdMetadataInterface
      * Returns NULL if the property does not exist.
      */
     public function getPropertyPath(string $propertyName): ?string;
+
+    /**
+     * Gets Doctrine query hints.
+     * Each hint can be a string or an associative array with "name" and "value" keys.
+     */
+    public function getHints(): array;
 }

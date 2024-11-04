@@ -34,6 +34,7 @@ class DatabasePlatformMock extends AbstractPlatform
     /**
      * @override
      */
+    #[\Override]
     public function prefersIdentityColumns()
     {
         return $this->prefersIdentityColumns;
@@ -42,50 +43,59 @@ class DatabasePlatformMock extends AbstractPlatform
     /**
      * @override
      */
+    #[\Override]
     public function prefersSequences()
     {
         return $this->prefersSequences;
     }
 
     /** @override */
+    #[\Override]
     public function getSequenceNextValSQL($sequenceName)
     {
         return $this->sequenceNextValSql;
     }
 
     /** @override */
+    #[\Override]
     public function getBooleanTypeDeclarationSQL(array $field)
     {
     }
 
     /** @override */
+    #[\Override]
     public function getIntegerTypeDeclarationSQL(array $field)
     {
     }
 
     /** @override */
+    #[\Override]
     public function getBigIntTypeDeclarationSQL(array $field)
     {
     }
 
     /** @override */
+    #[\Override]
     public function getSmallIntTypeDeclarationSQL(array $field)
     {
     }
 
     /** @override */
     // @codingStandardsIgnoreStart
+    #[\Override]
     protected function _getCommonIntegerTypeDeclarationSQL(array $columnDef)
     {
         // @codingStandardsIgnoreEnd
     }
 
     /** @override */
+    #[\Override]
     public function getVarcharTypeDeclarationSQL(array $field)
     {
     }
 
     /** @override */
+    #[\Override]
     public function getClobTypeDeclarationSQL(array $field)
     {
     }
@@ -107,6 +117,7 @@ class DatabasePlatformMock extends AbstractPlatform
         $this->_sequenceNextValSql = $sql;
     }
 
+    #[\Override]
     public function getName()
     {
         return $this->name;
@@ -117,6 +128,7 @@ class DatabasePlatformMock extends AbstractPlatform
         $this->name = $name;
     }
 
+    #[\Override]
     protected function initializeDoctrineTypeMappings()
     {
     }
@@ -124,21 +136,25 @@ class DatabasePlatformMock extends AbstractPlatform
     /**
      * Gets the SQL Snippet used to declare a BLOB column type.
      */
+    #[\Override]
     public function getBlobTypeDeclarationSQL(array $field)
     {
         throw DBALException::notSupported(__METHOD__);
     }
 
+    #[\Override]
     public function supportsSequences(): bool
     {
         return true;
     }
 
+    #[\Override]
     public function supportsIdentityColumns(): bool
     {
         return $this->prefersIdentityColumns;
     }
 
+    #[\Override]
     protected function getReservedKeywordsClass()
     {
         return $this->reservedKeywordsClass ?? parent::getReservedKeywordsClass();

@@ -15,6 +15,7 @@ class SerializedFieldProviderTest extends \PHPUnit\Framework\TestCase
     /** @var SerializedFieldProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $serializedFieldProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extendConfigProvider = $this->createMock(ConfigProvider::class);

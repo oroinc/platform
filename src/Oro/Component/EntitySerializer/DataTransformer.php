@@ -18,9 +18,7 @@ class DataTransformer implements DataTransformerInterface
         $this->container = $container;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function transform(mixed $value, array $config, array $context): mixed
     {
         if (isset($config[ConfigUtil::DATA_TRANSFORMER])) {

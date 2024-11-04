@@ -9,6 +9,7 @@ class OrganizationRememberMeFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var OrganizationRememberMeFactory */
     private $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->factory = new OrganizationRememberMeFactory();

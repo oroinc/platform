@@ -12,6 +12,7 @@ class ThemeFactoryTest extends TestCase
 {
     private ThemeFactory $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->factory = new ThemeFactory(PropertyAccess::createPropertyAccessor());

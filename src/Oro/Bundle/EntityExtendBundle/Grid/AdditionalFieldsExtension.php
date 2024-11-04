@@ -16,9 +16,7 @@ class AdditionalFieldsExtension extends AbstractFieldsExtension
 
     private const ENTITY_NAME_CONFIG_PATH = '[options][entity_name]';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config): bool
     {
         return
@@ -27,17 +25,13 @@ class AdditionalFieldsExtension extends AbstractFieldsExtension
             && \count($config->offsetGetByPath(self::ADDITIONAL_FIELDS_CONFIG_PATH, [])) > 0;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getEntityName(DatagridConfiguration $config): string
     {
         return $config->offsetGetByPath(self::ENTITY_NAME_CONFIG_PATH);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFields(DatagridConfiguration $config): array
     {
         $entityClassName = $this->entityClassResolver->getEntityClass($this->getEntityName($config));
@@ -62,9 +56,7 @@ class AdditionalFieldsExtension extends AbstractFieldsExtension
         return $fields;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function prepareColumnOptions(FieldConfigId $field, array &$columnOptions): void
     {
         parent::prepareColumnOptions($field, $columnOptions);

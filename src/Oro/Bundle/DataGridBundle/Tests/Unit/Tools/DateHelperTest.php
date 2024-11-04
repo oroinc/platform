@@ -13,6 +13,7 @@ class DateHelperTest extends \PHPUnit\Framework\TestCase
     /** @var DateHelper */
     private $dateHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->localeSettings = $this->createMock(LocaleSettings::class);

@@ -9,9 +9,9 @@ use Oro\Bundle\TranslationBundle\Entity\Translation;
 class TranslationImportStrategy extends ConfigurableAddOrReplaceStrategy
 {
     /**
-     * {@inheritdoc}
      * @param Translation $entity
      */
+    #[\Override]
     public function process($entity)
     {
         $itemData = $this->context->getValue('itemData');
@@ -26,9 +26,9 @@ class TranslationImportStrategy extends ConfigurableAddOrReplaceStrategy
     }
 
     /**
-     * {@inheritdoc}
      * @param Translation $entity
      */
+    #[\Override]
     protected function findExistingEntity($entity, array $searchContext = [])
     {
         return $this->getTranslationRepository()

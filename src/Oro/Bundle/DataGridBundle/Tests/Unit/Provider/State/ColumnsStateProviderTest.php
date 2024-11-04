@@ -15,6 +15,7 @@ class ColumnsStateProviderTest extends AbstractStateProviderTest
     /** @var ColumnsStateProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -39,9 +39,7 @@ class PriorityNamedTaggedServiceCompilerPass implements CompilerPassInterface
         $this->isServiceOptional = $isServiceOptional;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if ($this->isServiceOptional && !$container->hasDefinition($this->serviceId)) {

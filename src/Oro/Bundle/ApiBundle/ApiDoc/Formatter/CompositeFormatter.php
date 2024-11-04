@@ -25,17 +25,13 @@ class CompositeFormatter implements FormatterInterface
         $this->formatters[$view] = $formatter;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function format(array $collection)
     {
         return $this->getFormatter()->format($collection);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function formatOne(ApiDoc $annotation)
     {
         return $this->getFormatter()->formatOne($annotation);

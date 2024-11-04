@@ -26,14 +26,10 @@ Feature: Entity select fields
       | Option 2 |
       | option 2 |
     And save and close form
-    And should see "Field saved" flash message
-    When I click update schema
-    Then I should see "Schema updated" flash message
+    Then I should see "Field saved" flash message
 
   Scenario: Can create Multi-Select field
-    Given I filter Name as is equal to "User"
-    And click View User in grid
-    And click "Create Field"
+    Given I click "Create Field"
     And fill form with:
       | Field name | multiSelectField |
       | Type       | Multi-Select     |
@@ -46,9 +42,7 @@ Feature: Entity select fields
       | Option 2 |
       | option 2 |
     And save and close form
-    And should see "Field saved" flash message
-    When I click update schema
-    Then I should see "Schema updated" flash message
+    Then I should see "Field saved" flash message
 
   Scenario: Cannot create Select field if there are several options with the same label
     Given I go to System/Entities/Entity Management

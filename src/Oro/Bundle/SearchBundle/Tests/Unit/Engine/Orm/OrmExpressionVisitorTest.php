@@ -23,6 +23,7 @@ class OrmExpressionVisitorTest extends \PHPUnit\Framework\TestCase
     /** @var OrmExpressionVisitor */
     private $visitor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->driver = $this->createMock(BaseDriver::class);

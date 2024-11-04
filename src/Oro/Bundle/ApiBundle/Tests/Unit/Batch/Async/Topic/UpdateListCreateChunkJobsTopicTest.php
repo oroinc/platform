@@ -10,11 +10,13 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 
 class UpdateListCreateChunkJobsTopicTest extends AbstractTopicTestCase
 {
+    #[\Override]
     protected function getTopic(): TopicInterface
     {
         return new UpdateListCreateChunkJobsTopic();
     }
 
+    #[\Override]
     public function validBodyDataProvider(): array
     {
         $requiredOptionsSet = [
@@ -56,6 +58,7 @@ class UpdateListCreateChunkJobsTopicTest extends AbstractTopicTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
+    #[\Override]
     public function invalidBodyDataProvider(): array
     {
         return [

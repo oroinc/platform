@@ -8,6 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class DateRangeFilterTypeTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -25,9 +25,7 @@ class FixJsonStatusCodeErrorRenderer implements ErrorRendererInterface
         $this->jsonContentTypes = $jsonContentTypes;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function render(\Throwable $exception): FlattenException
     {
         $flattenException = $this->innerErrorRenderer->render($exception);

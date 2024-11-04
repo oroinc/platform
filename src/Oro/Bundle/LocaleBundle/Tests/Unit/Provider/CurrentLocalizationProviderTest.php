@@ -23,16 +23,19 @@ class CurrentLocalizationProviderTest extends TestCase
 
     private TranslatableListener|MockObject $translatableListener;
 
+    #[\Override]
     public static function setUpBeforeClass(): void
     {
         self::$defaultLocale = \Locale::getDefault();
     }
 
+    #[\Override]
     public static function tearDownAfterClass(): void
     {
         \Locale::setDefault(self::$defaultLocale);
     }
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->localizationManager = $this->createMock(LocalizationManager::class);

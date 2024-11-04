@@ -21,6 +21,7 @@ class DefaultRelationFieldValidatorTest extends ConstraintValidatorTestCase
 {
     private const ENTITY_CLASS = 'Test\Entity';
 
+    #[\Override]
     protected function createValidator()
     {
         $extendConfigProvider = new ConfigProviderMock($this->createMock(ConfigManager::class), 'extend');

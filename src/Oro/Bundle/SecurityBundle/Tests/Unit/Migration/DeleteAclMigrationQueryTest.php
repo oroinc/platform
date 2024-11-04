@@ -20,6 +20,7 @@ class DeleteAclMigrationQueryTest extends \PHPUnit\Framework\TestCase
     /** @var ObjectIdentityInterface */
     private $oid;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);

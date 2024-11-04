@@ -11,11 +11,13 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
 {
     private string $defaultLocale;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->defaultLocale = \Locale::getDefault();
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         \Locale::setDefault($this->defaultLocale);

@@ -20,9 +20,7 @@ class ThemeConfigurationTestProvider extends ThemeConfigurationProvider
         ],
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getThemeNames(): array
     {
         return array_merge(
@@ -31,9 +29,7 @@ class ThemeConfigurationTestProvider extends ThemeConfigurationProvider
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getThemeDefinition(string $themeName): ?array
     {
         return self::THEME_DEFINITIONS[$themeName] ?? parent::getThemeDefinition($themeName);

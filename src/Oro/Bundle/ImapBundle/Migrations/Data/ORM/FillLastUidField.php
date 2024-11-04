@@ -13,9 +13,7 @@ use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
  */
 class FillLastUidField extends AbstractFixture
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $folders = $manager->getRepository(ImapEmailFolder::class)->findAll();

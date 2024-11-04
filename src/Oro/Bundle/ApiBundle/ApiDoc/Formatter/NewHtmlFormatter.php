@@ -10,9 +10,7 @@ use Nelmio\ApiDocBundle\DataTypes as ApiDocDataTypes;
  */
 class NewHtmlFormatter extends HtmlFormatter
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function renderOne(array $data)
     {
         // use overwritten template to render correct URL to documentation root
@@ -25,9 +23,7 @@ class NewHtmlFormatter extends HtmlFormatter
         ));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function render(array $collection)
     {
         // use overwritten template to render correct URL to documentation root
@@ -40,9 +36,7 @@ class NewHtmlFormatter extends HtmlFormatter
         ));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getNewName($name, $data, $parentName = null)
     {
         if ($parentName) {
@@ -52,9 +46,7 @@ class NewHtmlFormatter extends HtmlFormatter
         return $name;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function compressNestedParameters(array $data, $parentName = null, $ignoreNestedReadOnly = false)
     {
         $newParams = parent::compressNestedParameters($data, $parentName, $ignoreNestedReadOnly);
@@ -110,9 +102,7 @@ class NewHtmlFormatter extends HtmlFormatter
         return $data;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function processCollection(array $collection)
     {
         $array = [];

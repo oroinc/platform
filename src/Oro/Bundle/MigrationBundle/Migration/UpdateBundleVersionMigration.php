@@ -17,9 +17,7 @@ class UpdateBundleVersionMigration implements Migration, FailIndependentMigratio
         $this->migrations = $migrations;
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $bundleVersions = $this->getLatestSuccessMigrationVersions();

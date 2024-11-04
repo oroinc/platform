@@ -12,6 +12,7 @@ class BaseProductTest extends \PHPUnit\Framework\TestCase
 
     private BaseProduct $entity;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entity = new BaseProduct();

@@ -12,9 +12,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class JsRoutingPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $container->getDefinition('fos_js_routing.dump_command')

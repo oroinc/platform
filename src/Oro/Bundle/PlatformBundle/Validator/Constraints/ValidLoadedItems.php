@@ -26,17 +26,13 @@ class ValidLoadedItems extends Constraint
     /** @var array|null */
     public $constraints;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::PROPERTY_CONSTRAINT;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDefaultOption(): ?string
     {
         return 'constraints';

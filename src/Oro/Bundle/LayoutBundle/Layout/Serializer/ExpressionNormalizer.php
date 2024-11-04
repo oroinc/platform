@@ -29,9 +29,7 @@ class ExpressionNormalizer implements
         $this->expressionLanguageCache = $expressionLanguageCache;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getShortTypeName(string $type): ?string
     {
         return ParsedExpression::class === $type
@@ -39,9 +37,7 @@ class ExpressionNormalizer implements
             : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTypeName(string $shortType): ?string
     {
         return self::SHORT_TYPE === $shortType
@@ -49,17 +45,13 @@ class ExpressionNormalizer implements
             : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supportsNormalization($data, $format = null): bool
     {
         return $data instanceof ParsedExpression;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function normalize($object, string $format = null, array $context = [])
     {
         /** @var ParsedExpression $object */
@@ -85,17 +77,13 @@ class ExpressionNormalizer implements
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supportsDenormalization($data, string $type, string $format = null): bool
     {
         return ParsedExpression::class === $type;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         if (\array_key_exists(self::DATA_NODES, $data)) {

@@ -26,9 +26,7 @@ class ValidateEntityObjectAccess implements ProcessorInterface
         $this->permission = $permission;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var SingleItemContext $context */

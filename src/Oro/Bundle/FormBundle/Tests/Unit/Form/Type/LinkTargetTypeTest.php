@@ -11,9 +11,7 @@ class LinkTargetTypeTest extends \PHPUnit\Framework\TestCase
     /** @var LinkTargetType */
     private $type;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new LinkTargetType();

@@ -14,11 +14,11 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class LocalizationValidator extends ConstraintValidator
 {
     /**
-     * {@inheritdoc}
      *
      * @param Entity\Localization $localization
      * @param Constraints\Localization $constraint
      */
+    #[\Override]
     public function validate($localization, Constraint $constraint)
     {
         if (!$localization instanceof Entity\Localization) {

@@ -23,9 +23,7 @@ class Configuration implements ConfigurationInterface
         $this->types = $types;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $builder = new TreeBuilder('filters');

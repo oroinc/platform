@@ -41,6 +41,7 @@ class Subquery implements ExpressionInterface
         return $this->criteria;
     }
 
+    #[\Override]
     public function visit(Visitor $visitor)
     {
         return $visitor->walkSubquery($this);

@@ -76,9 +76,7 @@ class SearchHandler implements SearchHandlerInterface, LoggerAwareInterface
         $this->properties = $properties;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getProperties()
     {
         return $this->properties;
@@ -125,9 +123,7 @@ class SearchHandler implements SearchHandlerInterface, LoggerAwareInterface
         $this->objectManager    = $objectManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function search($query, $page, $perPage, $searchById = false)
     {
         $this->checkAllDependenciesInjected();
@@ -154,9 +150,7 @@ class SearchHandler implements SearchHandlerInterface, LoggerAwareInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function convertItem($item)
     {
         $result = [];
@@ -172,9 +166,7 @@ class SearchHandler implements SearchHandlerInterface, LoggerAwareInterface
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityName()
     {
         return $this->entityName;

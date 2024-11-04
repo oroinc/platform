@@ -14,6 +14,7 @@ class CaptchaProtectedFormSelectTypeTest extends TypeTestCase
 {
     private CaptchaProtectedFormsRegistry|MockObject $formsRegistry;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

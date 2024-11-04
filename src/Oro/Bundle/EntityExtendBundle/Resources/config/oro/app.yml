@@ -8,3 +8,14 @@ oro_message_queue:
         - 'oro_entity_extend.entity_field_iterator'
         - 'oro_entity_extend.entity_field.extension'
         - 'oro_entity_extend.accessor.cache_item_pool'
+
+oro_entity_serialized_fields:
+    dbal_types:
+        enum: string
+        multiEnum: jsonb
+
+doctrine:
+    dbal:
+        types:
+            enum: Doctrine\DBAL\Types\StringType
+            multiEnum: Doctrine\DBAL\Types\ArrayType

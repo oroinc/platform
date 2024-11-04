@@ -2,6 +2,9 @@ dependencies:
     - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization
     - Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit
 
+Oro\Bundle\EntityExtendBundle\Entity\EnumOption:
+    TestEnum{1..11}:
+        __construct: ['api_enum2', 'Item <current()>', '<current()>']
 Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDepartment:
     TestDepartment1:
         name: TestDepartment1

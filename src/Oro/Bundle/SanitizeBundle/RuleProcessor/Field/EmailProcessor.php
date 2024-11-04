@@ -20,11 +20,13 @@ class EmailProcessor implements ProcessorInterface
     ) {
     }
 
+    #[\Override]
     public static function getProcessorName(): string
     {
         return 'email';
     }
 
+    #[\Override]
     public function getIncompatibilityMessages(
         string $fieldName,
         ClassMetadata $metadata,
@@ -42,9 +44,7 @@ class EmailProcessor implements ProcessorInterface
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSqls(string $fieldName, ClassMetadata $metadata, array $sanitizeRuleOptions = []): array
     {
         $quotedColumnName = $this->helper->getQuotedColumnName($fieldName, $metadata);

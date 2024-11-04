@@ -15,6 +15,7 @@ class PhpFileCacheTest extends \PHPUnit\Framework\TestCase
      */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider = new PhpFileCache('test_namespace', 0, $this->getTempDir('oro_cache'));

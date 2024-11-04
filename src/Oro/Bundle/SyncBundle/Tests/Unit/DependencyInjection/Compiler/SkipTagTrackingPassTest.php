@@ -22,6 +22,7 @@ class SkipTagTrackingPassTest extends \PHPUnit\Framework\TestCase
     /** @var SkipTagTrackingPass */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new SkipTagTrackingPass();

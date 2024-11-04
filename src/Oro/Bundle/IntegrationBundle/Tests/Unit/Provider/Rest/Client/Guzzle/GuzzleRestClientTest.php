@@ -23,6 +23,7 @@ class GuzzleRestClientTest extends \PHPUnit\Framework\TestCase
     /** @var GuzzleRestClient */
     private $client;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->sourceClient = $this->createMock(Client::class);

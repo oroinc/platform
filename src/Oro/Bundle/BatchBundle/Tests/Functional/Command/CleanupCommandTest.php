@@ -11,6 +11,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class CleanupCommandTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

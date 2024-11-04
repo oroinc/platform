@@ -51,17 +51,13 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports(EmailOrigin $origin)
     {
         return $origin instanceof UserEmailOrigin;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function loadEmailBody(EmailFolder $folder, Email $email, EntityManager $em)
     {
         /** @var UserEmailOrigin $origin */

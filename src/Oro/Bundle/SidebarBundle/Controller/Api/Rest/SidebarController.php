@@ -131,6 +131,7 @@ class SidebarController extends AbstractFOSRestController
         return SidebarState::class;
     }
 
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

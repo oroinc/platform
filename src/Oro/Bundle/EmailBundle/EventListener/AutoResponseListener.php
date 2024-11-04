@@ -28,9 +28,7 @@ class AutoResponseListener extends MailboxEmailListener implements
         $this->container = $container;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

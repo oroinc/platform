@@ -19,6 +19,7 @@ class DateEarlierThanValidator extends ConstraintValidator
      *
      * @throws UnexpectedTypeException
      */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         $root = $this->context->getRoot();

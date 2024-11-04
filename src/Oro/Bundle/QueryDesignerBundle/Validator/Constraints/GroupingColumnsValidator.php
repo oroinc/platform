@@ -14,9 +14,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
  */
 class GroupingColumnsValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof GroupingColumns) {

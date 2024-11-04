@@ -15,6 +15,7 @@ abstract class AbstractRoundingServiceTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
     protected $configManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

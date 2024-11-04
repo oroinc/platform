@@ -44,9 +44,7 @@ class OptimizedProcessorIterator extends ProcessorIterator
         $this->processorGroups = $processorGroups;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getGroup(): ?string
     {
         if (-1 === $this->index || !$this->valid()) {
@@ -56,9 +54,7 @@ class OptimizedProcessorIterator extends ProcessorIterator
         return $this->processorGroups[$this->index];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getProcessorAttributes(): ?array
     {
         $attributes = parent::getProcessorAttributes();
@@ -72,9 +68,7 @@ class OptimizedProcessorIterator extends ProcessorIterator
         return $attributes;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function nextApplicable(): void
     {
         while ($this->index <= $this->maxIndex) {

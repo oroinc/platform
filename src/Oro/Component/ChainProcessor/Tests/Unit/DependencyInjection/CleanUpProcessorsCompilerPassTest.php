@@ -12,6 +12,7 @@ class CleanUpProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
     /** @var CleanUpProcessorsCompilerPass */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new CleanUpProcessorsCompilerPass('simple_factory', 'processor');

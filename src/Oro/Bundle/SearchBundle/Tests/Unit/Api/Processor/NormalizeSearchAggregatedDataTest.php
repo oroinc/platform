@@ -21,6 +21,7 @@ class NormalizeSearchAggregatedDataTest extends GetListProcessorTestCase
     /** @var NormalizeSearchAggregatedData */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

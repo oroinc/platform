@@ -7,6 +7,7 @@ namespace Oro\Bundle\CronBundle\Async\Topic;
  */
 class RunCommandDelayedTopic extends RunCommandTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.cron.run_command.delayed';

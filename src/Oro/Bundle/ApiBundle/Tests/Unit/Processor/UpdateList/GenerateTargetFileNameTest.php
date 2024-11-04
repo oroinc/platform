@@ -13,6 +13,7 @@ class GenerateTargetFileNameTest extends UpdateListProcessorTestCase
     /** @var GenerateTargetFileName */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

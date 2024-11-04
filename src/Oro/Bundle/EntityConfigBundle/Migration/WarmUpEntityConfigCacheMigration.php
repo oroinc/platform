@@ -23,9 +23,7 @@ class WarmUpEntityConfigCacheMigration implements Migration, ResetContainerMigra
         $this->commandExecutor = $commandExecutor;
     }
 
-    /**
-     * @inheritdoc
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $queries->addQuery(

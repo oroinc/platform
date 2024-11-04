@@ -30,10 +30,10 @@ class ExportProcessor implements ContextAwareProcessor, EntityNameAwareProcessor
     /**
      * Processes entity to export format
      *
-     * {@inheritdoc}
      *
      * @throws RuntimeException
      */
+    #[\Override]
     public function process($item)
     {
         if (!$this->serializer) {
@@ -55,6 +55,7 @@ class ExportProcessor implements ContextAwareProcessor, EntityNameAwareProcessor
     /**
      * @throws InvalidConfigurationException
      */
+    #[\Override]
     public function setImportExportContext(ContextInterface $context): void
     {
         $this->context = $context;
@@ -88,9 +89,7 @@ class ExportProcessor implements ContextAwareProcessor, EntityNameAwareProcessor
         $this->dataConverter = $dataConverter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setEntityName(string $entityName): void
     {
         $this->entityName = $entityName;

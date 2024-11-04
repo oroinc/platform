@@ -37,9 +37,7 @@ class ReplaceStrategy implements StrategyInterface
         $this->activityManager = $activityManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function merge(FieldData $fieldData)
     {
         $entityData    = $fieldData->getEntityData();
@@ -98,17 +96,13 @@ class ReplaceStrategy implements StrategyInterface
         return $queryBuilder->getQuery()->getResult();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports(FieldData $fieldData)
     {
         return $fieldData->getMode() === MergeModes::ACTIVITY_REPLACE;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'activity_replace';

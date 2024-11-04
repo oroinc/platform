@@ -15,17 +15,13 @@ class AdditionalMetadataCacheWarmer implements CacheWarmerInterface
         $this->additionalMetadataProvider = $additionalMetadataProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isOptional(): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function warmUp($cacheDir): array
     {
         $this->additionalMetadataProvider->warmUpMetadata();

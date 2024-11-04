@@ -19,6 +19,7 @@ class LoadTaxonomyWithTagsData extends AbstractFixture
     const SECOND_TAXONOMY = 'second_taxonomy';
     const THIRD_TAXONOMY = 'third_taxonomy';
 
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $this->loadTaxonomies($manager);

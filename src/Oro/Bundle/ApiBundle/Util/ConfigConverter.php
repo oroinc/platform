@@ -4,6 +4,8 @@ namespace Oro\Bundle\ApiBundle\Util;
 
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Component\EntitySerializer\AssociationQuery;
 use Oro\Component\EntitySerializer\ConfigConverter as BaseConfigConverter;
 use Oro\Component\EntitySerializer\EntityConfig;
@@ -27,21 +29,19 @@ class ConfigConverter extends BaseConfigConverter
         $this->requestType = $requestType;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function buildEntityConfig(EntityConfig $result, array $config): void
     {
         parent::buildEntityConfig($result, $config);
 
-        if (!empty($config[ConfigUtil::PARENT_RESOURCE_CLASS])) {
+        if (($config[AclProtectedQueryResolver::SKIP_ACL_FOR_ROOT_ENTITY] ?? false)
+            || !empty($config[ConfigUtil::PARENT_RESOURCE_CLASS])
+        ) {
             $result->set(AclProtectedQueryResolver::SKIP_ACL_FOR_ROOT_ENTITY, true);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function setAssociationQuery(FieldConfig $result, array $config): void
     {
         if (isset($config[ConfigUtil::ASSOCIATION_QUERY])) {
@@ -60,6 +60,10 @@ class ConfigConverter extends BaseConfigConverter
     {
         if (null === $this->requestType) {
             return $class;
+        }
+
+        if (ExtendHelper::isOutdatedEnumOptionEntity($class)) {
+            return EnumOption::class;
         }
 
         $entityClass = $this->entityOverrideProviderRegistry

@@ -16,6 +16,7 @@ class LanguageTest extends \PHPUnit\Framework\TestCase
     /** @var Language */
     private $language;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->config = $this->createMock(\HTMLPurifier_Config::class);

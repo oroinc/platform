@@ -10,6 +10,7 @@ use Oro\Bundle\SearchBundle\Exception\TypeCastingException;
  */
 abstract class AbstractTypeCastingHandler implements TypeCastingHandlerInterface
 {
+    #[\Override]
     public function castValue(mixed $value): mixed
     {
         if (is_scalar($value) || $value instanceof \DateTime) {

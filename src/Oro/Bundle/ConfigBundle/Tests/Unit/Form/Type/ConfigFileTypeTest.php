@@ -24,6 +24,7 @@ class ConfigFileTypeTest extends FormIntegrationTestCase
     /** @var ConfigFileType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->transformer = $this->createMock(ConfigFileDataTransformer::class);
@@ -84,9 +85,7 @@ class ConfigFileTypeTest extends FormIntegrationTestCase
         self::assertEquals(self::FILE1_ID, $form->getData());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

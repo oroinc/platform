@@ -23,9 +23,7 @@ abstract class AbstractDynamicFieldsExtension extends AbstractExtension implemen
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [

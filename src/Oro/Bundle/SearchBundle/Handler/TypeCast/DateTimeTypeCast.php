@@ -9,6 +9,7 @@ use Oro\Bundle\SearchBundle\Query\Query;
  */
 class DateTimeTypeCast extends AbstractTypeCastingHandler
 {
+    #[\Override]
     public function castValue(mixed $value): mixed
     {
         if ($this->isSupported($value)) {
@@ -18,11 +19,13 @@ class DateTimeTypeCast extends AbstractTypeCastingHandler
         return parent::castValue($value);
     }
 
+    #[\Override]
     public function isSupported($value): bool
     {
         return $value instanceof \DateTime;
     }
 
+    #[\Override]
     public static function getType(): string
     {
         return Query::TYPE_DATETIME;

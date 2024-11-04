@@ -35,9 +35,7 @@ class LoadReportsData extends AbstractFixture
         ],
     ];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         /** @var BusinessUnit $owner */

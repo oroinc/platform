@@ -12,18 +12,14 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  */
 interface EmailSynchronizerInterface
 {
-    public function setMessageProducer(MessageProducerInterface $producer);
+    public function setMessageProducer(MessageProducerInterface $producer): void;
 
-    public function setTokenStorage(TokenStorageInterface $tokenStorage);
+    public function setTokenStorage(TokenStorageInterface $tokenStorage): void;
 
     /**
      * Returns TRUE if this class supports synchronization of the given origin.
-     *
-     * @param EmailOrigin $origin
-     *
-     * @return bool
      */
-    public function supports(EmailOrigin $origin);
+    public function supports(EmailOrigin $origin): bool;
 
     /**
      * Performs a synchronization of emails for one email origin.
@@ -38,12 +34,14 @@ interface EmailSynchronizerInterface
      * @param int $maxTasks             The maximum number of email origins which can be synchronized
      *                                  Set -1 to unlimited
      *                                  Defaults to 1
-     *
-     * @return int
-     *
      * @throws \Exception
      */
-    public function sync($maxConcurrentTasks, $minExecIntervalInMin, $maxExecTimeInMin = -1, $maxTasks = 1);
+    public function sync(
+        int $maxConcurrentTasks,
+        int $minExecIntervalInMin,
+        int $maxExecTimeInMin = -1,
+        int $maxTasks = 1
+    ): int;
 
     /**
      * Performs a synchronization of emails for the given email origins.
@@ -53,19 +51,17 @@ interface EmailSynchronizerInterface
      *
      * @throws \Exception
      */
-    public function syncOrigins(array $originIds, SynchronizationProcessorSettings $settings = null);
+    public function syncOrigins(array $originIds, SynchronizationProcessorSettings $settings = null): void;
 
     /**
      * Schedule origins sync job
-     *
-     * @return bool
      */
-    public function supportScheduleJob();
+    public function supportScheduleJob(): bool;
 
     /**
      * Schedule origins sync job
      *
      * @param int[] $originIds
      */
-    public function scheduleSyncOriginsJob(array $originIds);
+    public function scheduleSyncOriginsJob(array $originIds): void;
 }

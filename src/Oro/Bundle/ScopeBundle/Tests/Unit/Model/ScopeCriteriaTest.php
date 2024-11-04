@@ -16,6 +16,7 @@ class ScopeCriteriaTest extends \PHPUnit\Framework\TestCase
     /** @var ClassMetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
     private $classMetadataFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->classMetadataFactory = $this->createMock(ClassMetadataFactory::class);

@@ -12,9 +12,7 @@ use Oro\Bundle\SecurityBundle\Tests\Functional\Environment\Entity\TestSecurityPe
  */
 class QueryWithSubqueriesTest extends AclTestCase
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

@@ -27,9 +27,7 @@ class AdditionalEmailsSubscriber implements EventSubscriberInterface
         $this->associationProvider = $associationProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

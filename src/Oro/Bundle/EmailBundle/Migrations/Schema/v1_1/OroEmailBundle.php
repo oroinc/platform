@@ -13,17 +13,13 @@ class OroEmailBundle implements Migration, DatabasePlatformAwareInterface, Order
 {
     use DatabasePlatformAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getOrder(): int
     {
         return 1;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         // update data in accordance with new column requirement

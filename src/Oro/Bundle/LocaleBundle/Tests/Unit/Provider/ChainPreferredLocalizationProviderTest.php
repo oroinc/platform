@@ -17,6 +17,7 @@ class ChainPreferredLocalizationProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ChainPreferredLocalizationProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->innerProviderA = $this->createMock(PreferredLocalizationProviderInterface::class);

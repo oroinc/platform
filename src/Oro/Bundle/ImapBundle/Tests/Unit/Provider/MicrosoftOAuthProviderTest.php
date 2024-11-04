@@ -38,6 +38,7 @@ class MicrosoftOAuthProviderTest extends \PHPUnit\Framework\TestCase
     /** @var MicrosoftOAuthProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->httpClient = $this->createMock(HttpClientInterface::class);

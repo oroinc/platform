@@ -13,6 +13,7 @@ class ParserTest extends \PHPUnit\Framework\TestCase
     /** @var Parser */
     private $parser;
 
+    #[\Override]
     protected function setUp(): void
     {
         $localeSettings = $this->createMock(LocaleSettings::class);

@@ -16,6 +16,7 @@ class HtmlTagExtensionTest extends \PHPUnit\Framework\TestCase
     /* @var HtmlTagExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->htmlTagHelper = $this->createMock(HtmlTagHelper::class);

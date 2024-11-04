@@ -8,17 +8,13 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroReportBundleInstaller implements Installation
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMigrationVersion(): string
     {
         return 'v2_4';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         /** Tables generation **/

@@ -42,9 +42,7 @@ class ErrorCompleter extends AbstractErrorCompleter
         $this->filterNamesRegistry = $filterNamesRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function complete(Error $error, RequestType $requestType, EntityMetadata $metadata = null): void
     {
         $this->completeStatusCode($error);
@@ -54,9 +52,7 @@ class ErrorCompleter extends AbstractErrorCompleter
         $this->completeSource($error, $requestType, $metadata);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function fixIncludedEntityPath(
         string $entityPath,
         Error $error,

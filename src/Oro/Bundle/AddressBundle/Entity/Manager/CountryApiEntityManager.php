@@ -9,9 +9,7 @@ use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
  */
 class CountryApiEntityManager extends ApiEntityManager
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getSerializationConfig()
     {
         return [

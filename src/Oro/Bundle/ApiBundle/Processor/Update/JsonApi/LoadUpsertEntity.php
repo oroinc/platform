@@ -40,9 +40,9 @@ class LoadUpsertEntity implements ProcessorInterface
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var UpdateContext $context */

@@ -29,9 +29,7 @@ class EntityAliasLoader extends BaseEntityAliasLoader
         $this->entityOverrideProvider = $entityOverrideProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getEntityAlias(string $entityClass): ?EntityAlias
     {
         // do not add aliases for entities that were overridden

@@ -13,6 +13,7 @@ class DisableUpdateOperationTest extends FormProcessorTestCase
 {
     private DisableUpdateOperation $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

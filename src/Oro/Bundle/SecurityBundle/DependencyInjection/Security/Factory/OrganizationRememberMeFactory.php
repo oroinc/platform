@@ -19,14 +19,13 @@ class OrganizationRememberMeFactory extends RememberMeFactory implements Firewal
         $this->options['csrf_protected_mode'] = false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getKey(): string
     {
         return 'organization-remember-me';
     }
 
+    #[\Override]
     public function createAuthenticator(
         ContainerBuilder $container,
         string $firewallName,
@@ -59,6 +58,7 @@ class OrganizationRememberMeFactory extends RememberMeFactory implements Firewal
         return $authenticatorId;
     }
 
+    #[\Override]
     public function createListeners(ContainerBuilder $container, string $firewallName, array $config): array
     {
         $listenerId = 'oro_security.authentication.listener.rememberme.' . $firewallName;

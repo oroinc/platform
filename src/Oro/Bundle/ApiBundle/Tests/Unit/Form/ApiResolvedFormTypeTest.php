@@ -27,6 +27,7 @@ class ApiResolvedFormTypeTest extends \PHPUnit\Framework\TestCase
     /** @var ApiResolvedFormTypeFactory */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->innerType = $this->createMock(ResolvedFormTypeInterface::class);

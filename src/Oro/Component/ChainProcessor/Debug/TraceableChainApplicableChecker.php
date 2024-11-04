@@ -18,9 +18,7 @@ class TraceableChainApplicableChecker extends ChainApplicableChecker
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function executeChecker(
         ApplicableCheckerInterface $checker,
         ContextInterface $context,

@@ -27,6 +27,7 @@ class DatagridTypeTest extends BlockTypeTestCase
     /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $authorizationChecker;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

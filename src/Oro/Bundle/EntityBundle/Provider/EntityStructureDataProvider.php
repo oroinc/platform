@@ -22,6 +22,7 @@ class EntityStructureDataProvider
     private TranslatorInterface $translator;
     private CacheInterface $cache;
 
+    private const OPTIONS = 'options';
     private const ENTITY_PROPERTY_MAPPINGS = [
         'name'         => 'setClassName',
         'label'        => 'setLabel',
@@ -116,6 +117,11 @@ class EntityStructureDataProvider
             foreach (self::FIELD_PROPERTY_MAPPINGS as $name => $method) {
                 if (isset($field[$name])) {
                     $model->{$method}($field[$name]);
+                }
+            }
+            if (isset($field[self::OPTIONS]) && is_array($field[self::OPTIONS])) {
+                foreach ($field[self::OPTIONS] as $optionName => $optionValue) {
+                    $model->addOption($optionName, $optionValue);
                 }
             }
             $structure->addField($model);

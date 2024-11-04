@@ -14,9 +14,6 @@ class PercentToLocalizedStringTransformer extends Symfony54PercentToLocalizedStr
     /** @var string|null */
     private $type;
 
-    /**
-     * {@inheritDoc}
-     */
     public function __construct($scale = null, $type = null)
     {
         parent::__construct($scale, $type);
@@ -24,9 +21,7 @@ class PercentToLocalizedStringTransformer extends Symfony54PercentToLocalizedStr
         $this->type = $type;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reverseTransform($value): int|float|null
     {
         $result = parent::reverseTransform($value);
@@ -37,9 +32,7 @@ class PercentToLocalizedStringTransformer extends Symfony54PercentToLocalizedStr
         return $result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getNumberFormatter(): \NumberFormatter
     {
         $formatter = new \NumberFormatter(\Locale::getDefault(), \NumberFormatter::DECIMAL);

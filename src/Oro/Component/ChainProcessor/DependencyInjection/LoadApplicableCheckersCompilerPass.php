@@ -28,9 +28,7 @@ class LoadApplicableCheckersCompilerPass implements CompilerPassInterface
         $this->applicableCheckerTagName = $applicableCheckerTagName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition($this->processorBagServiceId)

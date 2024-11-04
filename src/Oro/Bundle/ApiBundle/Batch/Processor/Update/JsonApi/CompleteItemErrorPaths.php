@@ -23,9 +23,9 @@ class CompleteItemErrorPaths extends BaseCompleteItemErrorPaths
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     protected function completeItemErrorPath(
         Error $error,
         BatchUpdateItem $item,

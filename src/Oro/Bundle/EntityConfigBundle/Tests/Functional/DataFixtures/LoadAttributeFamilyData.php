@@ -30,17 +30,13 @@ class LoadAttributeFamilyData extends AbstractFixture implements DependentFixtur
         ],
     ];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadAttributeGroupData::class, LoadOrganization::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $configManager = $this->container->get('oro_entity_config.config_manager');

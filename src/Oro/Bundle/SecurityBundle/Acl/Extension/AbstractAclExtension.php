@@ -14,49 +14,37 @@ abstract class AbstractAclExtension implements AclExtensionInterface
     /** @var array [permission => [mask, ...], ...] */
     protected $map;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFieldExtension()
     {
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMasks($permission)
     {
         return $this->map[$permission] ?? null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasMasks($permission)
     {
         return \array_key_exists($permission, $this->map);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function adaptRootMask($rootMask, $object)
     {
         return $rootMask;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDefaultPermission()
     {
         return '';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function decideIsGranting($triggeredMask, $object, TokenInterface $securityToken)
     {
         return true;

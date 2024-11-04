@@ -29,6 +29,7 @@ class OroSecurityExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var OroSecurityExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);

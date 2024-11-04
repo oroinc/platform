@@ -10,17 +10,13 @@ use Oro\Bundle\WindowsBundle\Entity\WindowsState;
 
 class LoadWindowsStateData extends AbstractFixture implements DependentFixtureInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadUser::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $state = new WindowsState();

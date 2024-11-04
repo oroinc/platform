@@ -67,9 +67,7 @@ class ItemStep extends AbstractStep implements StepExecutionWarningHandlerInterf
         return $this->processor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfiguration(): array
     {
         $stepElements = [
@@ -92,9 +90,7 @@ class ItemStep extends AbstractStep implements StepExecutionWarningHandlerInterf
         return $configuration;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setConfiguration(array $config): void
     {
         $stepElements = [
@@ -110,6 +106,7 @@ class ItemStep extends AbstractStep implements StepExecutionWarningHandlerInterf
         }
     }
 
+    #[\Override]
     public function getConfigurableStepElements(): array
     {
         return [
@@ -119,9 +116,7 @@ class ItemStep extends AbstractStep implements StepExecutionWarningHandlerInterf
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doExecute(StepExecution $stepExecution)
     {
         if (null !== $this->batchSize) {
@@ -185,9 +180,7 @@ class ItemStep extends AbstractStep implements StepExecutionWarningHandlerInterf
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handleWarning($element, $name, $reason, array $reasonParameters, $item): void
     {
         $this->stepExecution->addWarning($name, $reason, $reasonParameters, $item);

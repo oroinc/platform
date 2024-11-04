@@ -16,6 +16,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
 
     private ConfigProvider $configurationProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $cacheFile = $this->getTempFile('ChartConfigurationProvider');

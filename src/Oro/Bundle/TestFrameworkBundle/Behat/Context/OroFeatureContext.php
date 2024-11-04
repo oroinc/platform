@@ -25,9 +25,7 @@ class OroFeatureContext extends RawMinkContext implements AppKernelAwareInterfac
         $this->getDriver()->waitForAjax();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSession($name = null)
     {
         $session = parent::getSession($name);

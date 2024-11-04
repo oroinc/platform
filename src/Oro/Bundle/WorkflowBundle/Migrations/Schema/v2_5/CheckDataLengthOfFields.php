@@ -11,9 +11,7 @@ class CheckDataLengthOfFields implements MigrationQuery, ConnectionAwareInterfac
 {
     use ConnectionAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return [
@@ -25,9 +23,7 @@ class CheckDataLengthOfFields implements MigrationQuery, ConnectionAwareInterfac
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $conflicts = '';

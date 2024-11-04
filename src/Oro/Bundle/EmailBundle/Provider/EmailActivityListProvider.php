@@ -111,9 +111,7 @@ class EmailActivityListProvider implements
         $this->commentAssociationHelper = $commentAssociationHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicableTarget($entityClass, $accessible = true)
     {
         return $this->activityAssociationHelper->isActivityAssociationEnabled(
@@ -123,9 +121,7 @@ class EmailActivityListProvider implements
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRoutes($entity)
     {
         return [
@@ -135,18 +131,18 @@ class EmailActivityListProvider implements
     }
 
     /**
-     * {@inheritdoc}
      * @param Email $entity
      */
+    #[\Override]
     public function getSubject($entity)
     {
         return $entity->getSubject();
     }
 
     /**
-     * {@inheritdoc}
      * @param Email $entity
      */
+    #[\Override]
     public function getDescription($entity)
     {
         if ($entity->getEmailBody()) {
@@ -156,36 +152,34 @@ class EmailActivityListProvider implements
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOwner($entity)
     {
         return null;
     }
 
     /**
-     * {@inheritdoc}
      * @param Email $entity
      */
+    #[\Override]
     public function getCreatedAt($entity)
     {
         return $entity->getSentAt();
     }
 
     /**
-     * {@inheritdoc}
      * @param Email $entity
      */
+    #[\Override]
     public function getUpdatedAt($entity)
     {
         return $entity->getSentAt();
     }
 
     /**
-     * {@inheritdoc}
      * @param Email $entity
      */
+    #[\Override]
     public function getOrganization($entity)
     {
         $emailAddressOwner = $entity->getFromEmailAddress()->getOwner();
@@ -213,9 +207,7 @@ class EmailActivityListProvider implements
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getData(ActivityList $activityList)
     {
         $relatedActivityClass = $activityList->getRelatedActivityClass();
@@ -249,25 +241,19 @@ class EmailActivityListProvider implements
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTemplate()
     {
         return '@OroEmail/Email/js/activityItemTemplate.html.twig';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getGroupedTemplate(): string
     {
         return '@OroEmail/Email/js/groupedActivityItemTemplate.html.twig';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getActivityId($entity)
     {
         if ($this->doctrineHelper->getEntityClass($entity) === EmailUser::class) {
@@ -277,9 +263,7 @@ class EmailActivityListProvider implements
         return $this->doctrineHelper->getSingleEntityIdentifier($entity);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable($entity)
     {
         if (\is_object($entity)) {
@@ -295,25 +279,21 @@ class EmailActivityListProvider implements
     }
 
     /**
-     * {@inheritdoc}
      * @param Email $entity
      */
+    #[\Override]
     public function getTargetEntities($entity)
     {
         return $entity->getActivityTargets() ?? [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isCommentsEnabled($entityClass)
     {
         return $this->commentAssociationHelper->isCommentAssociationEnabled($entityClass);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getGroupedEntities($entity, $associatedEntityClass = null, $associatedEntityId = null): array
     {
         /** @var Email $entity */
@@ -357,9 +337,7 @@ class EmailActivityListProvider implements
         return $queryBuilder->getQuery()->getResult();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function collapseGroupedItems(array $items): array
     {
         $emailIds = [];
@@ -401,9 +379,7 @@ class EmailActivityListProvider implements
         return $items;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getActivityOwners($entity, ActivityList $activityList)
     {
         $entity = $this->getEmailEntity($entity);
@@ -473,9 +449,7 @@ class EmailActivityListProvider implements
         return $activityOwners;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isActivityListApplicable(ActivityList $activityList): bool
     {
         return $activityList->getActivityOwners()->count() > 0;

@@ -27,6 +27,7 @@ class OwnershipEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCa
     /** @var OwnershipEntityConfigDumperExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

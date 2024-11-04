@@ -23,9 +23,7 @@ class NavigationElementsContentProvider implements ContentProviderInterface
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getContent()
     {
         $navigationElements = $this->configurationProvider->getNavigationElements();

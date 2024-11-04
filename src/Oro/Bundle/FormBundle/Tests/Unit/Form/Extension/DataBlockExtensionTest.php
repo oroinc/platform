@@ -14,6 +14,7 @@ class DataBlockExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var DataBlockExtension */
     private $formExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formExtension = new DataBlockExtension();

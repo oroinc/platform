@@ -37,6 +37,7 @@ class IsGrantedWorkflowTransitionTest extends \PHPUnit\Framework\TestCase
     /** @var IsGrantedWorkflowTransition */
     private $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);

@@ -19,17 +19,13 @@ class AssetConfigCacheWarmer implements CacheWarmerInterface
         $this->cache = $cache;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isOptional(): bool
     {
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function warmUp(string $cacheDir): array
     {
         $this->cache->warmUp($cacheDir);

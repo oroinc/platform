@@ -45,9 +45,7 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions(): array
     {
         return [
@@ -323,9 +321,7 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
         return $file;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

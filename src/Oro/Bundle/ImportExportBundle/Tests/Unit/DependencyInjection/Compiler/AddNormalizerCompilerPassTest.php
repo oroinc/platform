@@ -11,6 +11,7 @@ class AddNormalizerCompilerPassTest extends \PHPUnit\Framework\TestCase
     /** @var AddNormalizerCompilerPass */
     private $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new AddNormalizerCompilerPass();

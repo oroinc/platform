@@ -15,9 +15,7 @@ class LoadUsersAvatarsDigitalAssets extends AbstractFixture implements Dependent
 {
     use UserUtilityTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [
@@ -25,9 +23,7 @@ class LoadUsersAvatarsDigitalAssets extends AbstractFixture implements Dependent
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         // Creates file with invalid reference to digital asset.

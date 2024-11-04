@@ -11,9 +11,7 @@ class BufferingLogger extends AbstractLogger
 {
     private array $logs = [];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function log($level, $message, array $context = []): void
     {
         $this->logs[] = [$level, $message, $context];

@@ -13,6 +13,7 @@ class SegmentSnapshotTest extends \PHPUnit\Framework\TestCase
     /** @var SegmentSnapshot */
     private $entity;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->segment = new Segment();

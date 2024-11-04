@@ -28,6 +28,7 @@ class TranslationWriterTest extends \PHPUnit\Framework\TestCase
     /** @var TranslationWriter */
     private $writer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);

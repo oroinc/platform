@@ -13,9 +13,7 @@ use Oro\Bundle\UserBundle\Migrations\Data\ORM\UpdateUserEntitiesWithOrganization
  */
 class AddEmailActivityLists extends AddActivityListsData implements DependentFixtureInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [
@@ -24,9 +22,7 @@ class AddEmailActivityLists extends AddActivityListsData implements DependentFix
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $this->addActivityListsForActivityClass(

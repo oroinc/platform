@@ -15,9 +15,7 @@ class CredentialsNotificationSenderPass implements CompilerPassInterface
     const NOTIFICATION_CHANNEL_TAG = 'oro_imap.origin_credentials.notification_sender';
     const NOTIFICATION_USER_CHANNEL_TAG = 'oro_imap.origin_credentials.user_notification_sender';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition(self::SERVICE_KEY)) {

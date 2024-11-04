@@ -15,9 +15,7 @@ class TestTransport extends Transport
         $this->parameters = new ParameterBag($parameters);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSettingsBag()
     {
         return $this->parameters;

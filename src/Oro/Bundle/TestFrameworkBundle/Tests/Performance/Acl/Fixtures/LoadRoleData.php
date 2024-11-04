@@ -12,6 +12,7 @@ class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface
     /**
      * Load roles full_access_role
      */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $role_template_access = new Role('ROLE_LOGIN_ACCESS');
@@ -27,6 +28,7 @@ class LoadRoleData extends AbstractFixture implements OrderedFixtureInterface
         $manager->flush();
     }
 
+    #[\Override]
     public function getOrder()
     {
         return 1;

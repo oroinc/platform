@@ -41,9 +41,7 @@ class ResetTranslationsMassActionHandler implements MassActionHandlerInterface
         $this->producer = $producer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function handle(MassActionHandlerArgs $args): MassActionResponseInterface
     {
         $datasource = $args->getDatagrid()->getDatasource();

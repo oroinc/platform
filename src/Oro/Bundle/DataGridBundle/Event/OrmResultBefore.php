@@ -33,9 +33,7 @@ class OrmResultBefore extends Event implements GridEventInterface
         $this->query    = $query;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDatagrid()
     {
         return $this->datagrid;

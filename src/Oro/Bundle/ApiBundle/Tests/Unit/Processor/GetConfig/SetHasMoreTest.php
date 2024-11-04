@@ -10,6 +10,7 @@ class SetHasMoreTest extends ConfigProcessorTestCase
     /** @var SetHasMore */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

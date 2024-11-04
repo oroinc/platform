@@ -18,6 +18,7 @@ class CommonTemplateDataProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var CommonTemplateDataProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processor = new CommonTemplateDataProcessor();

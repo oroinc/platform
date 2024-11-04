@@ -11,9 +11,6 @@ class InvalidHeaderException extends \RuntimeException
 {
     const MESSAGE_PATTERN = 'Unable to parse the header "%s". Reason: "%s".';
 
-    /**
-     * {@inheritdoc}
-     */
     public function __construct(string $header, \Throwable $exception)
     {
         $message = sprintf(self::MESSAGE_PATTERN, $this->getHeaderName($header), $exception->getMessage());

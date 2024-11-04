@@ -9,6 +9,7 @@ class AddressTypeTest extends \PHPUnit\Framework\TestCase
     /** @var AddressType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->type = new AddressType('billing');

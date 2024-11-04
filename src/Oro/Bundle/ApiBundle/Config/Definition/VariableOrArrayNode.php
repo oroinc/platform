@@ -9,40 +9,30 @@ use Symfony\Component\Config\Definition\ArrayNode;
  */
 class VariableOrArrayNode extends ArrayNode
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function preNormalize($value): mixed
     {
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function normalizeValue($value): mixed
     {
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function finalizeValue($value): mixed
     {
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function validateType($value)
     {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function mergeValues($leftSide, $rightSide): mixed
     {
         if (\is_array($leftSide) && \is_array($rightSide)) {

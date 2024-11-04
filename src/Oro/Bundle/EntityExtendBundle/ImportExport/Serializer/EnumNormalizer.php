@@ -4,8 +4,9 @@ namespace Oro\Bundle\EntityExtendBundle\ImportExport\Serializer;
 
 use Doctrine\Common\Util\ClassUtils;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
-use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
-use Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Provider\EnumOptionsProvider;
 use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 
@@ -16,49 +17,52 @@ class EnumNormalizer implements ContextAwareNormalizerInterface, ContextAwareDen
 {
     protected FieldHelper $fieldHelper;
 
-    protected EnumValueProvider $enumValueProvider;
+    protected EnumOptionsProvider $enumOptionsProvider;
 
-    public function __construct(FieldHelper $fieldHelper, EnumValueProvider $enumValueProvider)
+    public function __construct(FieldHelper $fieldHelper, EnumOptionsProvider $enumOptionsProvider)
     {
         $this->fieldHelper = $fieldHelper;
-        $this->enumValueProvider = $enumValueProvider;
+        $this->enumOptionsProvider = $enumOptionsProvider;
     }
 
     /**
-     * @param AbstractEnumValue $object
+     * @param EnumOptionInterface $object
      *
-     * {@inheritdoc}
      */
+    #[\Override]
     public function normalize($object, string $format = null, array $context = []): ?array
     {
-        if (!$object instanceof AbstractEnumValue) {
+        if (!$object instanceof EnumOptionInterface) {
             return null;
         }
 
         if (!empty($context['mode']) && $context['mode'] === 'short') {
-            return $this->getShortData($object);
+            return $this->getShortData($object, $context);
         }
 
         return [
             'id' => $object->getId(),
+            'enumCode' => $object->getEnumCode(),
             'name' => $object->getName(),
+            'internalId' => $object->getInternalId(),
             'priority' => (int)$object->getPriority(),
             'is_default' => (bool)$object->isDefault(),
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function denormalize($data, string $type, string $format = null, array $context = [])
     {
         $reflection = new \ReflectionClass($type);
 
-        $choices = $this->enumValueProvider->getEnumChoices($type);
+        $choices = $this->enumOptionsProvider->getEnumChoicesByCode($type);
+        // isset is used instead of empty as $data['id'] could be "0"
+        $id = isset($data['id']) && '' !== $data['id'] ? $data['id'] : $choices[$data['name'] ?? ''] ?? '';
+
         $args = [
-            // isset is used instead of empty as $data['id'] could be "0"
-            'id' => $data['id'] ?? $choices[($data['name'] ?? '')] ?? null,
+            'enumCode' => $data['enumCode'] ?? '',
             'name' => $data['name'] ?? '',
+            'internalId' => $data['internalId'] ?? explode('.', $id)[1] ?? '',
             'priority' => empty($data['priority']) ? 0 : $data['priority'],
             'default' => !empty($data['default']),
         ];
@@ -66,28 +70,26 @@ class EnumNormalizer implements ContextAwareNormalizerInterface, ContextAwareDen
         return $reflection->newInstanceArgs($args);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
-        return is_a($type, AbstractEnumValue::class, true);
+        return is_a($type, EnumOptionInterface::class, true);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supportsNormalization($data, string $format = null, array $context = []): bool
     {
-        return $data instanceof AbstractEnumValue;
+        return $data instanceof EnumOptionInterface;
     }
 
-    protected function getShortData(AbstractEnumValue $object): array
+    protected function getShortData(EnumOptionInterface $object, $context): array
     {
-        if ($this->fieldHelper->getConfigValue(ClassUtils::getClass($object), 'name', 'identity')) {
-            return ['name' => $object->getName()];
-        }
+        $owner = isset($context['entityName'])
+            ? $this->fieldHelper->getExtendConfigOwner($context['entityName'], $context['fieldName'])
+            : ClassUtils::getClass($object);
 
-        return ['id' => $object->getId()];
+        return $owner === ExtendScope::OWNER_CUSTOM
+            ? ['name' => (string)$object]
+            : ['id' => $object->getInternalId()];
     }
 }

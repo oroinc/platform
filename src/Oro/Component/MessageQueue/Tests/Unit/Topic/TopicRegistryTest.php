@@ -16,6 +16,7 @@ class TopicRegistryTest extends \PHPUnit\Framework\TestCase
 
     private TopicRegistry $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->topicServiceProvider = $this->createMock(ServiceProviderInterface::class);

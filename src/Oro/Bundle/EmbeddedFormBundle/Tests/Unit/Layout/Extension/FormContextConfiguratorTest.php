@@ -23,6 +23,7 @@ class FormContextConfiguratorTest extends \PHPUnit\Framework\TestCase
     /** @var FormContextConfigurator */
     private $contextConfigurator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);

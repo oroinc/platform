@@ -21,9 +21,7 @@ class SuiteDividerController implements Controller
         $this->suiteConfigRegistry = $suiteConfigRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configure(SymfonyCommand $command)
     {
         $command
@@ -39,9 +37,7 @@ class SuiteDividerController implements Controller
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(InputInterface $input, OutputInterface $output)
     {
         if (!$divider = (int) $input->getOption('suite-divider')) {

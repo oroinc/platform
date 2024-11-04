@@ -29,7 +29,7 @@ interface DocumentBuilderInterface
     /**
      * Gets a string representation of the given entity identifier.
      */
-    public function getEntityId(mixed $entity, RequestType $requestType, EntityMetadata $metadata): string;
+    public function getEntityId(mixed $entity, RequestType $requestType, EntityMetadata $metadata): mixed;
 
     /**
      * Sets metadata that are linked to data.

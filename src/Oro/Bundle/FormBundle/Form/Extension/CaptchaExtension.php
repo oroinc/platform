@@ -26,6 +26,7 @@ class CaptchaExtension extends AbstractTypeExtension
     ) {
     }
 
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (!$this->canAddCaptcha($builder, $options)) {
@@ -53,6 +54,7 @@ class CaptchaExtension extends AbstractTypeExtension
         );
     }
 
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefault('captcha_protection_enabled', false);

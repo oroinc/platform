@@ -10,9 +10,7 @@ use Symfony\Component\Form\FormBuilderInterface;
  */
 class ReportChartSchemaCollectionType extends ConfigProviderAwareType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $chartNames = $this->configProvider->getChartNames();
@@ -31,17 +29,13 @@ class ReportChartSchemaCollectionType extends ConfigProviderAwareType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_report_chart_data_schema_collection';

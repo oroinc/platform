@@ -10,9 +10,7 @@ use Oro\Bundle\FormBundle\Autocomplete\SearchHandler;
  */
 class AuthenticatedRolesHandler extends SearchHandler
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function findById($query)
     {
         $queryBuilder = $this->entityRepository->createQueryBuilder('r')
@@ -22,9 +20,7 @@ class AuthenticatedRolesHandler extends SearchHandler
         return $this->aclHelper->apply($queryBuilder)->getResult();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function searchEntities($search, $firstResult, $maxResults)
     {
         $queryBuilder = $this->entityRepository->createQueryBuilder('r')

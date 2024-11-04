@@ -9,6 +9,7 @@ class WorkflowResultTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowResult */
     private $result;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->result = new WorkflowResult();

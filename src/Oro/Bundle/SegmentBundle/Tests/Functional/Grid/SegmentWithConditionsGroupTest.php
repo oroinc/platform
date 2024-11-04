@@ -19,6 +19,7 @@ class SegmentWithConditionsGroupTest extends WebTestCase
     /** @var bool */
     private $groupingEnabled;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -30,6 +31,7 @@ class SegmentWithConditionsGroupTest extends WebTestCase
             ->get('oro_query_designer.conditions_group_merge_same_entity_conditions');
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         self::getConfigManager()

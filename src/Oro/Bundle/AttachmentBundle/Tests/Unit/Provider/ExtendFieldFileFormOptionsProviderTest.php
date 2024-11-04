@@ -14,6 +14,7 @@ class ExtendFieldFileFormOptionsProviderTest extends \PHPUnit\Framework\TestCase
 
     private ExtendFieldFileFormOptionsProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityConfigManager = $this->createMock(EntityConfigManager::class);

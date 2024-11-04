@@ -31,6 +31,7 @@ class ConsumeMessagesCommand extends Command
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function configure()
     {
         $this->configureLimitsExtensions();
@@ -52,6 +53,7 @@ HELP
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $queueName = $input->getArgument('queue');

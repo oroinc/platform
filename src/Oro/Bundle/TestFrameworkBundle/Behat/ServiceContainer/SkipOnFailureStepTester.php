@@ -20,11 +20,13 @@ class SkipOnFailureStepTester implements StepTester
     {
     }
 
+    #[\Override]
     public function setUp(Environment $env, FeatureNode $feature, StepNode $step, $skip): Setup
     {
         return $this->baseTester->setUp($env, $feature, $step, $skip);
     }
 
+    #[\Override]
     public function test(Environment $env, FeatureNode $feature, StepNode $step, $skip): StepResult
     {
         if ($this->failedFeatures->isFailureFeature($this->getFeatureHelperId($feature))) {
@@ -34,6 +36,7 @@ class SkipOnFailureStepTester implements StepTester
         return $this->baseTester->test($env, $feature, $step, $skip);
     }
 
+    #[\Override]
     public function tearDown(
         Environment $env,
         FeatureNode $feature,

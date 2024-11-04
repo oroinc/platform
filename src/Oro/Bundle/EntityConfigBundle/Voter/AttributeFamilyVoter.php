@@ -15,7 +15,6 @@ class AttributeFamilyVoter extends AbstractEntityVoter implements ServiceSubscri
 {
     const ATTRIBUTE_DELETE = 'delete';
 
-    /** {@inheritDoc} */
     protected $supportedAttributes = [self::ATTRIBUTE_DELETE];
 
     private ContainerInterface $container;
@@ -26,9 +25,7 @@ class AttributeFamilyVoter extends AbstractEntityVoter implements ServiceSubscri
         $this->container = $container;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
@@ -36,9 +33,7 @@ class AttributeFamilyVoter extends AbstractEntityVoter implements ServiceSubscri
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getPermissionForAttribute($class, $identifier, $attribute)
     {
         return $this->getAttributeFamilyManager()->isAttributeFamilyDeletable($identifier) ?

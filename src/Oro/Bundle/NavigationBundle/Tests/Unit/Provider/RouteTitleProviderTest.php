@@ -21,6 +21,7 @@ class RouteTitleProviderTest extends TestCase
 
     private RouteTitleProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->readerRegistry = $this->createMock(TitleReaderRegistry::class);

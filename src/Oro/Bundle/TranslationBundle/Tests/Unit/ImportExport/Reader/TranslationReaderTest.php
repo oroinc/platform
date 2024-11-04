@@ -23,6 +23,7 @@ class TranslationReaderTest extends \PHPUnit\Framework\TestCase
     /** @var TranslationReader */
     private $reader;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->languageRepository = $this->createMock(LanguageRepository::class);

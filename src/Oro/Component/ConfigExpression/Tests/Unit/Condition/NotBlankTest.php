@@ -12,6 +12,7 @@ class NotBlankTest extends \PHPUnit\Framework\TestCase
 {
     private Condition\NotBlank $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->condition = new Condition\NotBlank();

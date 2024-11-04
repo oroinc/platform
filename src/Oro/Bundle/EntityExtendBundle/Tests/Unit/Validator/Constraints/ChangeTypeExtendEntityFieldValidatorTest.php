@@ -16,12 +16,14 @@ class ChangeTypeExtendEntityFieldValidatorTest extends ConstraintValidatorTestCa
     /** @var FieldNameValidationHelper|\PHPUnit\Framework\MockObject\MockObject */
     private $fieldNameValidationHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fieldNameValidationHelper = $this->createMock(FieldNameValidationHelper::class);
         parent::setUp();
     }
 
+    #[\Override]
     protected function createValidator()
     {
         return new ChangeTypeExtendEntityFieldValidator($this->fieldNameValidationHelper);

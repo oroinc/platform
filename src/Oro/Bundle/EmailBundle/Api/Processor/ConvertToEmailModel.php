@@ -14,9 +14,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class ConvertToEmailModel implements ProcessorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var SingleItemContext|FormContext $context */

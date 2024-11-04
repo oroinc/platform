@@ -14,9 +14,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  */
 class StateConsumerInitialData implements Migration
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $queries->addPostQuery(

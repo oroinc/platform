@@ -10,6 +10,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
+use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
 use Oro\Bundle\QueryDesignerBundle\QueryDesigner\FunctionProviderInterface;
 
 abstract class OrmQueryConverterTestCase extends \PHPUnit\Framework\TestCase
@@ -119,6 +120,11 @@ abstract class OrmQueryConverterTestCase extends \PHPUnit\Framework\TestCase
     protected function getEntityNameResolver(): EntityNameResolver
     {
         return $this->createMock(EntityNameResolver::class);
+    }
+
+    protected function getEnumTypeHelper(): EnumTypeHelper
+    {
+        return $this->createMock(EnumTypeHelper::class);
     }
 
     /**

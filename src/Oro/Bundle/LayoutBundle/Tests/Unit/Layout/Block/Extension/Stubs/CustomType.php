@@ -22,6 +22,7 @@ class CustomType extends AbstractType
     /**
      * @return string
      */
+    #[\Override]
     public function getName()
     {
         return $this->name;

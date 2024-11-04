@@ -18,6 +18,7 @@ class DestinationPageResolverTest extends \PHPUnit\Framework\TestCase
     /** @var DestinationPageResolver */
     private $resolver;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->router = $this->createMock(RouterInterface::class);

@@ -13,6 +13,7 @@ class ChainExclusionProviderTest extends \PHPUnit\Framework\TestCase
     /** @var \PHPUnit\Framework\MockObject\MockObject[] */
     private array $providers = [];
 
+    #[\Override]
     protected function setUp(): void
     {
         $highPriorityProvider = $this->createMock(ExclusionProviderInterface::class);

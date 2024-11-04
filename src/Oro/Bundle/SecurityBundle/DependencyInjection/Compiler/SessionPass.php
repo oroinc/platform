@@ -2,11 +2,9 @@
 
 namespace Oro\Bundle\SecurityBundle\DependencyInjection\Compiler;
 
-use Oro\Bundle\SecurityBundle\Request\SessionHttpKernelDecorator;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * - Configures HTTP session to be able to set the cookie path for session cookie if application
@@ -18,26 +16,11 @@ class SessionPass implements CompilerPassInterface
 {
     public const HTTP_KERNEL_DECORATOR_SERVICE = 'oro_security.http_kernel.session_path';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
-        $this->decorateHttpKernel($container);
         $this->tagNativeFileSessionHandler($container);
         $this->processSessionHandlers($container);
-    }
-
-    public function decorateHttpKernel(ContainerBuilder $container): void
-    {
-        $container
-            ->register(self::HTTP_KERNEL_DECORATOR_SERVICE, SessionHttpKernelDecorator::class)
-            ->setArguments([
-                new Reference('.inner'),
-                new Reference('service_container')
-            ])
-            ->setDecoratedService('http_kernel', null, 250)
-            ->setPublic(false);
     }
 
     public function tagNativeFileSessionHandler(ContainerBuilder $container): void

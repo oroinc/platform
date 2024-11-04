@@ -57,9 +57,7 @@ class TestBufferedMessageProducer extends BufferedMessageProducer
         $this->stopped = true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function send($topic, $message)
     {
         if ($this->stopped) {

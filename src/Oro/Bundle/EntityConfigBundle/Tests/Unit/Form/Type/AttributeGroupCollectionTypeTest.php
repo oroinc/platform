@@ -16,9 +16,7 @@ use Oro\Component\Testing\Unit\PreloadedExtension;
 
 class AttributeGroupCollectionTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * {#@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $attributeManagerMock = $this->createMock(AttributeManager::class);

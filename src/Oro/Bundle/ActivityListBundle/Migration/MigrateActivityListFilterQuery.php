@@ -23,9 +23,7 @@ class MigrateActivityListFilterQuery extends ParametrizedSqlMigrationQuery
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function processQueries(LoggerInterface $logger, $dryRun = false)
     {
         $reports = $this->connection->createQueryBuilder()

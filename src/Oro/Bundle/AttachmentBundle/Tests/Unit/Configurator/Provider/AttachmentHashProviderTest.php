@@ -17,6 +17,7 @@ class AttachmentHashProviderTest extends \PHPUnit\Framework\TestCase
 
     private AttachmentHashProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->attachmentPostProcessorsProvider = $this->createMock(AttachmentPostProcessorsProvider::class);

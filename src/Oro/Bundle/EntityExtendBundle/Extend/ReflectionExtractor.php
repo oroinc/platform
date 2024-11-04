@@ -41,9 +41,7 @@ class ReflectionExtractor extends BasicReflectionExtractor
         $this->inflector = InflectorFactory::create();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getReadInfo(string $class, string $property, array $context = []): ?PropertyReadInfo
     {
         $info = parent::getReadInfo($class, $property, $context);
@@ -75,9 +73,7 @@ class ReflectionExtractor extends BasicReflectionExtractor
         return $info;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getWriteInfo(string $class, string $property, array $context = []): ?PropertyWriteInfo
     {
         $info = parent::getWriteInfo($class, $property, $context);

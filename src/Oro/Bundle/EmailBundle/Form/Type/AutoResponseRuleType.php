@@ -28,9 +28,7 @@ class AutoResponseRuleType extends AbstractQueryDesignerType
         $this->autoResponseRuleSubscriber = $autoResponseRuleSubscriber;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         parent::buildForm($builder, $options);
@@ -64,9 +62,7 @@ class AutoResponseRuleType extends AbstractQueryDesignerType
         $builder->addEventSubscriber($this->autoResponseRuleSubscriber);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
@@ -77,17 +73,12 @@ class AutoResponseRuleType extends AbstractQueryDesignerType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return static::NAME;

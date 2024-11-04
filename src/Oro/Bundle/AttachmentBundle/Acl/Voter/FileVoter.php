@@ -20,7 +20,6 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
  */
 class FileVoter extends AbstractEntityVoter implements ServiceSubscriberInterface
 {
-    /** {@inheritDoc} */
     protected $supportedAttributes = [BasicPermission::VIEW, BasicPermission::EDIT, BasicPermission::DELETE];
 
     private AuthorizationCheckerInterface $authorizationChecker;
@@ -38,9 +37,7 @@ class FileVoter extends AbstractEntityVoter implements ServiceSubscriberInterfac
         $this->container = $container;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
@@ -50,9 +47,7 @@ class FileVoter extends AbstractEntityVoter implements ServiceSubscriberInterfac
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function vote(TokenInterface $token, $object, array $attributes): int
     {
         $this->token = $token;
@@ -63,9 +58,7 @@ class FileVoter extends AbstractEntityVoter implements ServiceSubscriberInterfac
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getPermissionForAttribute($class, $identifier, $attribute)
     {
         /** @var File $file */

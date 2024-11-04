@@ -11,6 +11,7 @@ class SubmitFormTest extends FormProcessorTestCase
     /** @var SubmitForm */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

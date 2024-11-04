@@ -29,9 +29,7 @@ class ModifyExpressionVisitorStub extends ModifyExpressionVisitor
         $this->walkValueCallback = $callback;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function walkComparison(Comparison $comparison): mixed
     {
         if (null !== $this->walkComparisonCallback) {
@@ -41,9 +39,7 @@ class ModifyExpressionVisitorStub extends ModifyExpressionVisitor
         return parent::walkComparison($comparison);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function walkValue(Value $value): mixed
     {
         if (null !== $this->walkValueCallback) {

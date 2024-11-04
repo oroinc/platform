@@ -25,9 +25,7 @@ class DynamicAssetVersionPass implements CompilerPassInterface
         $this->packageName = $packageName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $assetVersionServiceId = sprintf(self::ASSET_VERSION_SERVICE_TEMPLATE, $this->packageName);

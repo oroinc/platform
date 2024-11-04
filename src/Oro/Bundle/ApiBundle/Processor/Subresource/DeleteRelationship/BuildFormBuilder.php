@@ -23,9 +23,7 @@ class BuildFormBuilder extends BaseBuildFormBuilder
         $this->propertyAccessor = $propertyAccessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getFormBuilder(ChangeRelationshipContext $context): FormBuilderInterface
     {
         $formBuilder = parent::getFormBuilder($context);

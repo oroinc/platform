@@ -10,13 +10,14 @@ use Symfony\Component\Yaml\Yaml;
 
 class OroDistributionExtension extends Extension
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
+        if ($container->getParameter('kernel.environment') === 'dev') {
+            $loader->load('services_dev.yml');
+        }
 
         $this->loadTwigResources($container);
     }

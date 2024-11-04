@@ -12,6 +12,7 @@ class SetWwwAuthenticateResponseHeaderTest extends UnhandledErrorProcessorTestCa
     /** @var SetWwwAuthenticateResponseHeader */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

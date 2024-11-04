@@ -14,6 +14,7 @@ class AttachmentCustomFieldTypeTest extends RestJsonApiTestCase
     private $blankFileContent = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA'
         . '1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAApJREFUCNdjYAAAAAIAAeIhvDMAAAAASUVORK5CYII=';
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

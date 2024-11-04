@@ -36,14 +36,13 @@ class FileItem implements EmptyItem, ExtendEntityInterface
     #[ORM\Column(name: 'sort_order', type: Types::INTEGER, options: ['default' => 0])]
     protected ?int $sortOrder = 0;
 
+    #[\Override]
     public function __toString(): string
     {
         return (string)$this->getId();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isEmpty()
     {
         return null === $this->getFile();

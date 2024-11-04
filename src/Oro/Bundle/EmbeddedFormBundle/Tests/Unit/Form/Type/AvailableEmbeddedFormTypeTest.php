@@ -15,6 +15,7 @@ class AvailableEmbeddedFormTypeTest extends \PHPUnit\Framework\TestCase
     /** @var AvailableEmbeddedFormType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->manager = $this->createMock(EmbeddedFormManager::class);

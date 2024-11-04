@@ -16,7 +16,6 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
  */
 class LocalizationVoter extends AbstractEntityVoter implements ServiceSubscriberInterface
 {
-    /** {@inheritDoc} */
     protected $supportedAttributes = [BasicPermission::DELETE];
 
     private ContainerInterface $container;
@@ -26,9 +25,7 @@ class LocalizationVoter extends AbstractEntityVoter implements ServiceSubscriber
         parent::__construct($doctrineHelper);
         $this->container = $container;
     }
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
@@ -36,9 +33,7 @@ class LocalizationVoter extends AbstractEntityVoter implements ServiceSubscriber
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getPermissionForAttribute($class, $identifier, $attribute)
     {
         return $this->getDefaultLocalizationId() === $identifier || $this->isLastLocalization()

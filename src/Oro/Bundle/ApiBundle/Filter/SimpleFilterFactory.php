@@ -41,9 +41,7 @@ class SimpleFilterFactory implements FilterFactoryInterface
         $this->filterOperatorRegistry = $filterOperatorRegistry;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function createFilter(string $filterType, array $options = []): ?StandaloneFilter
     {
         if (!isset($this->factories[$filterType]) && !isset($this->filters[$filterType])) {

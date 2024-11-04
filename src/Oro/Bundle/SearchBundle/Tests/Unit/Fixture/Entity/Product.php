@@ -177,6 +177,7 @@ class Product
         return $this->createDate;
     }
 
+    #[\Override]
     public function __toString()
     {
         return (string)$this->name;

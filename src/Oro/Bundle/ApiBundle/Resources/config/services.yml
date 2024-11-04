@@ -77,6 +77,7 @@ services:
             - '@oro_api.criteria_normalizer'
             - '@oro_api.criteria_placeholders_resolver'
             - '@oro_api.query.expression_visitor_factory'
+            - '@oro_api.query.field_dql_expression_provider'
             - '@oro_entity.orm.entity_class_resolver'
 
     oro_api.criteria_normalizer:
@@ -85,6 +86,7 @@ services:
             - '@oro_api.doctrine_helper'
             - '@oro_api.query.require_joins_field_visitor_factory'
             - '@oro_api.query.optimize_joins_field_visitor_factory'
+            - '@oro_entity_config.config_manager'
 
     oro_api.criteria_placeholders_resolver:
         class: Oro\Bundle\ApiBundle\Util\CriteriaPlaceholdersResolver
@@ -105,6 +107,11 @@ services:
     oro_api.query.optimize_joins_decision_maker:
         class: Oro\Bundle\ApiBundle\Util\OptimizeJoinsDecisionMaker
 
+    oro_api.query.field_dql_expression_provider:
+        class: Oro\Bundle\ApiBundle\Util\FieldDqlExpressionProvider
+        arguments:
+            - '@oro_entity_config.config_manager'
+
     oro_api.doctrine_helper:
         class: Oro\Bundle\ApiBundle\Util\DoctrineHelper
         arguments:
@@ -124,6 +131,7 @@ services:
         class: Oro\Bundle\ApiBundle\Util\EntityLoader
         arguments:
             - '@oro_api.doctrine_helper'
+            - '@oro_entity.query_hint_resolver'
 
     oro_api.acl_protected_entity_loader:
         class: Oro\Bundle\ApiBundle\Util\AclProtectedEntityLoader
@@ -131,6 +139,7 @@ services:
             - '@oro_api.doctrine_helper'
             - '@oro_api.entity_id_helper'
             - '@oro_api.query_acl_helper'
+            - '@oro_entity.query_hint_resolver'
 
     oro_api.entity_accessor:
         class: Oro\Bundle\ApiBundle\Util\EntityDataAccessor
@@ -586,12 +595,22 @@ services:
             - !abstract '$container defined in Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityIdResolverCompilerPass'
             - '@oro_api.request_expression_matcher'
 
-    oro_api.rest.entity_id_transformer:
+    oro_api.rest.entity_id_transformer.rest_json_api:
         class: Oro\Bundle\ApiBundle\Request\Rest\EntityIdTransformer
         arguments:
             - '@oro_api.value_normalizer'
+            - ['rest', 'json_api']
+            - true
         tags:
-            - { name: oro.api.entity_id_transformer, requestType: rest }
+            - { name: oro.api.entity_id_transformer, requestType: json_api&rest }
+
+    oro_api.rest.entity_id_transformer.rest_plain:
+        class: Oro\Bundle\ApiBundle\Request\Rest\EntityIdTransformer
+        arguments:
+            - '@oro_api.value_normalizer'
+            - ['rest']
+        tags:
+            - { name: oro.api.entity_id_transformer, requestType: '!json_api&rest' }
 
     oro_api.exception_text_extractor:
         class: Oro\Bundle\ApiBundle\Request\ChainExceptionTextExtractor
@@ -961,12 +980,12 @@ services:
         class: Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser
         abstract: true
         arguments:
-            - '@file_locator'
+            - '@oro_api.file_locator_decorator'
 
     oro_api.resource_doc_parser.default:
         class: Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser
         arguments:
-            - '@file_locator'
+            - '@oro_api.file_locator_decorator'
         tags:
             - { name: oro.api.resource_doc_parser, requestType: rest&json_api, priority: -10 }
             - { name: oro.api.resource_doc_parser, requestType: rest, priority: -20 }
@@ -1352,3 +1371,10 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
             - { name: monolog.logger, channel: api }
+
+    oro_api.file_locator_decorator:
+        class: Oro\Bundle\ApiBundle\Decorator\OroFileLocatorDecorator
+        public: false
+        arguments:
+            $decorated: '@file_locator'
+            $projectDir: '%kernel.project_dir%'

@@ -16,6 +16,7 @@ class TextFilterTypeTest extends AbstractTypeTestCase
     /** @var TextFilterType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $translator = $this->createMockTranslator();
@@ -26,17 +27,13 @@ class TextFilterTypeTest extends AbstractTypeTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getTestFormType(): AbstractType
     {
         return $this->type;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptionsDataProvider(): array
     {
         return [
@@ -59,9 +56,7 @@ class TextFilterTypeTest extends AbstractTypeTestCase
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function bindDataProvider(): array
     {
         return [

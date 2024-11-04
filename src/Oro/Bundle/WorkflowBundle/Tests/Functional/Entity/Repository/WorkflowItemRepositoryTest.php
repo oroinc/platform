@@ -16,6 +16,7 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefiniti
 
 class WorkflowItemRepositoryTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

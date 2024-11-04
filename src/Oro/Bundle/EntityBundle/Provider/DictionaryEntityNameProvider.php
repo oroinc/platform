@@ -29,9 +29,7 @@ class DictionaryEntityNameProvider implements EntityNameProviderInterface
         $this->propertyAccessor = $propertyAccessor;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getName($format, $locale, $entity)
     {
         $fieldNames = $this->getRepresentationFieldNames(ClassUtils::getClass($entity));
@@ -51,9 +49,7 @@ class DictionaryEntityNameProvider implements EntityNameProviderInterface
         return $this->propertyAccessor->getValue($entity, $fieldNames[0]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getNameDQL($format, $locale, $className, $alias)
     {
         $fieldNames = $this->getRepresentationFieldNames($className);

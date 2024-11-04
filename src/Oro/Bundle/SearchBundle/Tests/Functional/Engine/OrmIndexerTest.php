@@ -19,6 +19,7 @@ class OrmIndexerTest extends WebTestCase
 {
     use SearchExtensionTrait;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -29,6 +30,7 @@ class OrmIndexerTest extends WebTestCase
         }
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $this->clearIndexTextTable();

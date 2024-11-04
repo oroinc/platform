@@ -14,6 +14,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
     private const TEST_DEFINITION_NAME = 'TEST_DEFINITION';
     private const RELATED_ENTITY = WorkflowAwareEntity::class;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateWsseAuthHeader());

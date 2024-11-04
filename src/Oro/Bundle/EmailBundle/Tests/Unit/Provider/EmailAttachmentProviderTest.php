@@ -30,6 +30,7 @@ class EmailAttachmentProviderTest extends \PHPUnit\Framework\TestCase
     /** @var EmailAttachmentProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $emailAttachmentProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->emailThreadProvider = $this->createMock(EmailThreadProvider::class);

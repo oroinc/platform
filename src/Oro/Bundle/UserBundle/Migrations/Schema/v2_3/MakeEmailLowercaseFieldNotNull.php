@@ -12,17 +12,13 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
  */
 class MakeEmailLowercaseFieldNotNull implements Migration, OrderedMigrationInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getOrder()
     {
         return 20;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         $table = $schema->getTable('oro_user');

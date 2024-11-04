@@ -11,17 +11,13 @@ class WidgetPathProvider implements PathProviderInterface, ContextAwareInterface
     /** @var ContextInterface */
     protected $context;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setContext(ContextInterface $context)
     {
         $this->context = $context;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPaths(array $existingPaths)
     {
         $widgetName = $this->context->getOr('widget_container');

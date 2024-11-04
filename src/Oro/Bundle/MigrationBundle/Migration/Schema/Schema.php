@@ -33,9 +33,7 @@ class Schema extends BaseSchema
         return new $tableClass($args);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function createTable($tableName)
     {
         parent::createTable($tableName);
@@ -54,10 +52,8 @@ class Schema extends BaseSchema
         return $table;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     // @codingStandardsIgnoreStart
+    #[\Override]
     protected function _addTable(BaseTable $table)
     {
         if (get_class($table) !== static::TABLE_CLASS && static::TABLE_CLASS !== 'Doctrine\DBAL\Schema\Table') {

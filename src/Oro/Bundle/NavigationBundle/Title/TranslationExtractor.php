@@ -29,9 +29,7 @@ class TranslationExtractor implements ExtractorInterface
         $this->controllerClassProvider = $controllerClassProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function extract($directory, MessageCatalogue $catalogue)
     {
         $routes = $this->getRoutesByBundleDir($directory);
@@ -41,9 +39,7 @@ class TranslationExtractor implements ExtractorInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setPrefix($prefix)
     {
         $this->prefix = $prefix;

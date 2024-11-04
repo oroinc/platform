@@ -17,9 +17,7 @@ class DoctrineAclCacheUserInfoProvider implements DoctrineAclCacheUserInfoProvid
         $this->tokenAccessor = $tokenAccessor;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getCurrentUserCacheKeyInfo(): array
     {
         if ($this->tokenAccessor->hasUser()) {

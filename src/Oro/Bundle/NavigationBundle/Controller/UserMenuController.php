@@ -89,9 +89,7 @@ class UserMenuController extends AbstractMenuController
         return [ScopeUserCriteriaProvider::USER => $this->getUser()->getId()];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function checkAcl(array $context)
     {
         if (!$this->isGranted(
@@ -104,9 +102,7 @@ class UserMenuController extends AbstractMenuController
         parent::checkAcl($context);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getMenu(string $menuName, array $context): ItemInterface
     {
         if (array_key_exists(ScopeUserCriteriaProvider::USER, $context)) {

@@ -24,6 +24,7 @@ class SchemaDumperExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var SchemaDumperExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
  */
 class SortersByAssociationTest extends RestJsonApiTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -40,6 +41,24 @@ class SortersByAssociationTest extends RestJsonApiTestCase
         $response = $this->cget(
             ['entity' => 'testapientity1'],
             ['sort' => '-enumField,id', 'filter[id][neq]' => '<toString(@entity1_null->id)>']
+        );
+
+        $this->assertResponseContains(['data' => $expectedRows], $response);
+    }
+
+    public function testSorterForMultiEnum()
+    {
+        $expectedRows = [
+            ['id' => '<toString(@entity1_4->id)>'],
+            ['id' => '<toString(@entity1_3->id)>'],
+            ['id' => '<toString(@entity1_2->id)>'],
+            ['id' => '<toString(@entity1_1->id)>']
+        ];
+        $this->prepareExpectedRows($expectedRows);
+
+        $response = $this->cget(
+            ['entity' => 'testapientity1'],
+            ['sort' => '-multiEnumField,id', 'filter[id][neq]' => '<toString(@entity1_null->id)>']
         );
 
         $this->assertResponseContains(['data' => $expectedRows], $response);

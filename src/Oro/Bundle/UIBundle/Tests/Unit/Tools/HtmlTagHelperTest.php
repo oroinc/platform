@@ -21,6 +21,7 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
 
     private HtmlTagHelper $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->htmlTagProvider = $this->createMock(HtmlTagProvider::class);

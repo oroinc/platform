@@ -34,6 +34,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $association1 = new AssociationMetadata('association1');
         $entityMetadata->addAssociation($association1);
         $entityMetadata->addLink('link1', new ExternalLinkMetadata('url1'));
+        $entityMetadata->setHints(['HINT_TEST']);
 
         $entityMetadataClone = clone $entityMetadata;
 
@@ -71,6 +72,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $association1->setDataType('testDataType');
         $entityMetadata->addAssociation($association1);
         $entityMetadata->addLink('link1', new ExternalLinkMetadata('url1'));
+        $entityMetadata->setHints(['HINT_TEST']);
 
         self::assertEquals(
             [
@@ -80,6 +82,7 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
                 'identifiers'              => ['field1'],
                 'test_scalar'              => 'value',
                 'test_object'              => $objValue,
+                'hints'                    => ['HINT_TEST'],
                 'meta_properties'          => [
                     'metaProperty1' => [
                         'data_type' => 'testDataType'
@@ -478,6 +481,15 @@ class EntityMetadataTest extends \PHPUnit\Framework\TestCase
         $entityMetadata->removeLink('link2');
         self::assertCount(0, $entityMetadata->getLinks());
         self::assertFalse($entityMetadata->hasLink('link2'));
+    }
+
+    public function testHints()
+    {
+        $entityMetadata = new EntityMetadata('Test\Class');
+        self::assertSame([], $entityMetadata->getHints());
+
+        $entityMetadata->setHints(['HINT_TEST']);
+        self::assertSame(['HINT_TEST'], $entityMetadata->getHints());
     }
 
     public function testHasIdentifierFieldsOnlyForEmptyMetadata()

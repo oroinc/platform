@@ -15,9 +15,7 @@ class SortByPredefinedIds implements ProcessorInterface
 {
     public const SORTED_IDS = '_sorted_ids';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         $sortedIds = $context->get(self::SORTED_IDS);

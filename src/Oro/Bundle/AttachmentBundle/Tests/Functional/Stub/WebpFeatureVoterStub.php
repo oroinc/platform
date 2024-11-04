@@ -29,9 +29,7 @@ class WebpFeatureVoterStub implements VoterInterface
         $this->stubWebpStrategy = null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function vote($feature, $scopeIdentifier = null)
     {
         if (null !== $this->stubWebpStrategy && 'attachment_webp' === $feature) {

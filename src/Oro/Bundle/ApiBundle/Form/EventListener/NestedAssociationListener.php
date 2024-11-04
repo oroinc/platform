@@ -27,9 +27,7 @@ class NestedAssociationListener implements EventSubscriberInterface
         $this->config = $config;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

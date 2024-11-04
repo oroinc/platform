@@ -15,6 +15,7 @@ class NormalizeEntityTypeTest extends \PHPUnit\Framework\TestCase
     /** @var NormalizeEntityType */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityAliasResolverRegistry = $this->createMock(EntityAliasResolverRegistry::class);

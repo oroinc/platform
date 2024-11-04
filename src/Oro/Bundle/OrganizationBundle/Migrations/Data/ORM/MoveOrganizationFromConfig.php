@@ -15,9 +15,7 @@ class MoveOrganizationFromConfig extends AbstractFixture implements ContainerAwa
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $applicationName = $this->container->get('oro_config.global')->get('oro_ui.application_name');

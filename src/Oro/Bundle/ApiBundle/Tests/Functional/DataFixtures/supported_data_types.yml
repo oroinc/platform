@@ -39,8 +39,8 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
         fieldSimpleArray: [2, 3, 4]
         fieldJsonArray: {key2: value2}
         fieldJson: {key2: value2}
-        fieldDateTime: <(new DateTime('2010-11-01 10:12:13 UTC'))>
-        fieldDate: <(new DateTime('2010-11-01 00:00:00 UTC'))>
+        fieldDateTime: <(new DateTime('2010-11-02 10:12:13 UTC'))>
+        fieldDate: <(new DateTime('2010-11-02 00:00:00 UTC'))>
         fieldTime: <(new DateTime('1970-01-01 10:12:13 UTC'))>
         fieldGuid: '12c9746c-f44d-4a84-a72c-bdf750c70568'
         fieldPercent: 0.2
@@ -65,9 +65,9 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
         fieldSimpleArray: [3, 4, 5]
         fieldJsonArray: {key3: value3}
         fieldJson: {key3: value3}
-        fieldDateTime: <(new DateTime('2010-12-01 10:13:14 UTC'))>
+        fieldDateTime: <(new DateTime('2010-12-01 11:13:14 UTC'))>
         fieldDate: <(new DateTime('2010-12-01 00:00:00 UTC'))>
-        fieldTime: <(new DateTime('1970-01-01 10:13:14 UTC'))>
+        fieldTime: <(new DateTime('1970-01-01 11:13:14 UTC'))>
         fieldGuid: '311e3b02-3cd2-4228-aff3-bafe9b0826de'
         fieldPercent: 0.3
         fieldPercent100: 30.0
@@ -91,7 +91,7 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
         fieldSimpleArray: [10, 11, 12]
         fieldJsonArray: {key10: value10}
         fieldJson: {key10: value10}
-        fieldDateTime: <(new DateTime('2010-12-10 10:10:10 UTC'))>
+        fieldDateTime: <(new DateTime('2010-10-10 10:10:10 UTC'))>
         fieldDate: <(new DateTime('2010-10-10 00:00:00 UTC'))>
         fieldTime: <(new DateTime('1970-01-01 10:10:10 UTC'))>
         fieldGuid: '4253a910-5692-4510-bbd1-9beca05ee168'

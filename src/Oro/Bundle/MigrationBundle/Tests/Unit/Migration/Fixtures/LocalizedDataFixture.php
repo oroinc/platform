@@ -23,6 +23,7 @@ class LocalizedDataFixture extends AbstractFixture implements LocalizationOption
         return $this->language;
     }
 
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         // do nothing

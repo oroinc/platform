@@ -23,6 +23,7 @@ class LoggingHydratorWarmer extends CacheWarmer
     /**
      * {inheritdoc}
      */
+    #[\Override]
     public function warmUp($cacheDir): array
     {
         $this->createLoggingHydrators(
@@ -34,6 +35,7 @@ class LoggingHydratorWarmer extends CacheWarmer
     /**
      * {inheritdoc}
      */
+    #[\Override]
     public function isOptional(): bool
     {
         return false;

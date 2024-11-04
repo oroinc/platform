@@ -29,6 +29,7 @@ class BuildQueryTest extends GetListProcessorOrmRelatedTestCase
     /** @var BuildQuery */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

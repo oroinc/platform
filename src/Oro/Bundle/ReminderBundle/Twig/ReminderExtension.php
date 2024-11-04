@@ -51,9 +51,7 @@ class ReminderExtension extends AbstractExtension implements ServiceSubscriberIn
         return $this->container->get(ManagerRegistry::class)->getManagerForClass(Reminder::class);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -89,9 +87,7 @@ class ReminderExtension extends AbstractExtension implements ServiceSubscriberIn
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

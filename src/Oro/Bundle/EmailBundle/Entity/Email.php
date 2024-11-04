@@ -723,6 +723,7 @@ class Email implements ActivityInterface, ExtendEntityInterface
     /**
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         return (string)$this->getSubject();

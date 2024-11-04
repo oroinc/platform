@@ -13,6 +13,7 @@ class JobInstanceTest extends \PHPUnit\Framework\TestCase
 
     private JobInstance $jobInstance;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->jobInstance = new JobInstance(self::CONNECTOR, self::TYPE, self::ALIAS);

@@ -19,9 +19,7 @@ class HTMLPurifier extends \HTMLPurifier implements TranslatorAwareInterface
      */
     private $filters = [];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function purify($html, $config = null): string
     {
         $config = $config ? \HTMLPurifier_Config::create($config) : $this->config;

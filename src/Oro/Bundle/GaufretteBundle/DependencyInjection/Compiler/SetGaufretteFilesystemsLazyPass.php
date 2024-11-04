@@ -11,9 +11,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class SetGaufretteFilesystemsLazyPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $filesystemMapDef = $container->getDefinition('knp_gaufrette.filesystem_map');

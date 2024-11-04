@@ -24,6 +24,7 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendConfigProcessor */
     private $generator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

@@ -79,6 +79,13 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
      */
     public const EVENT_POST_SAVE_DATA = 'post_save_data';
 
+    /**
+     * This event is dispatched before the database transaction is rolled back for
+     * API requests with the "validate" meta flag.
+     * @see \Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandler
+     */
+    public const EVENT_ROLLBACK_VALIDATED_REQUEST = 'rollback_validated_request';
+
     /** the form event name */
     private const EVENT = 'event';
 
@@ -222,6 +229,7 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
      *
      * @return object[]
      */
+    #[\Override]
     public function getAllEntities(bool $mainOnly = false): array
     {
         $includedEntities = $this->getIncludedEntities();
@@ -328,6 +336,7 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
     /**
      * This method is just an alias for getData.
      */
+    #[\Override]
     public function getResult(): mixed
     {
         return $this->data;
@@ -336,22 +345,19 @@ class CustomizeFormDataContext extends CustomizeDataContext implements ChangeCon
     /**
      * This method is just an alias for setData.
      */
+    #[\Override]
     public function setResult(mixed $data): void
     {
         $this->data = $data;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function hasResult(): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function removeResult(): void
     {
         throw new \BadMethodCallException('Not implemented.');

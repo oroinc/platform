@@ -21,9 +21,7 @@ class QueryExpressionCompilerPass implements CompilerPassInterface
     private const COMPARISON_EXPRESSION_TAG = 'oro.api.query.comparison_expression';
     private const COMPARISON_EXPRESSION_OPERATOR = 'operator';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $compositeExpressions = $this->getExpressions(

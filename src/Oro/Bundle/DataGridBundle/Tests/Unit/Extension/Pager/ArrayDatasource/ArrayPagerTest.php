@@ -10,6 +10,7 @@ class ArrayPagerTest extends \PHPUnit\Framework\TestCase
     /** @var ArrayPager */
     private $arrayPager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->arrayPager = new ArrayPager();

@@ -19,6 +19,7 @@ class ConfigurationProviderTest extends TestCase
 
     private ConfigurationProvider $configurationProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->rawConfigurationProvider = $this->createMock(RawConfigurationProviderInterface::class);

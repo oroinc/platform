@@ -18,17 +18,13 @@ class NonExtendedEntityBidirectional extends Constraint
      */
     public $unidirectionalNotAllowedMessage = 'The field can\'t be set to \'No\' when relation type is \'oneToMany\'';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return static::CLASS_CONSTRAINT;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validatedBy(): string
     {
         return static::VALIDATOR_ALIAS;

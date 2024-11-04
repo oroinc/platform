@@ -19,6 +19,7 @@ class ObjectIdentityFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var ObjectIdentityFactory */
     private $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->factory = new ObjectIdentityFactory(

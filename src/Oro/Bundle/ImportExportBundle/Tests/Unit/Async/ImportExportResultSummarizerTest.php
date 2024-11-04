@@ -29,6 +29,7 @@ class ImportExportResultSummarizerTest extends \PHPUnit\Framework\TestCase
     /** @var ImportExportResultSummarizer */
     private $summarizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);

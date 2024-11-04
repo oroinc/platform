@@ -33,9 +33,7 @@ class SqlMigrationQuery implements MigrationQuery, ConnectionAwareInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setConnection(Connection $connection)
     {
         $this->connection = $connection;
@@ -51,9 +49,7 @@ class SqlMigrationQuery implements MigrationQuery, ConnectionAwareInterface
         $this->queries[] = $query;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         if (empty($this->queries)) {
@@ -65,9 +61,7 @@ class SqlMigrationQuery implements MigrationQuery, ConnectionAwareInterface
         return $this->queries;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         foreach ($this->queries as $query) {

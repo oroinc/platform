@@ -28,6 +28,7 @@ abstract class AbstractLoader extends Loader
      *
      * @return RouteCollection
      */
+    #[\Override]
     public function load($resource, $type = null)
     {
         $routes = new EnhancedRouteCollection();

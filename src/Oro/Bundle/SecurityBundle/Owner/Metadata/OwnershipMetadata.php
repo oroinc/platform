@@ -47,81 +47,61 @@ class OwnershipMetadata implements OwnershipMetadataInterface
         $this->initialize();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getOwnerType(): int
     {
         return $this->ownerType;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function hasOwner(): bool
     {
         return self::OWNER_TYPE_NONE !== $this->ownerType;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isOrganizationOwned(): bool
     {
         return self::OWNER_TYPE_ORGANIZATION === $this->ownerType;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isBusinessUnitOwned(): bool
     {
         return self::OWNER_TYPE_BUSINESS_UNIT === $this->ownerType;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isUserOwned(): bool
     {
         return self::OWNER_TYPE_USER === $this->ownerType;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getOwnerFieldName(): string
     {
         return $this->ownerFieldName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getOwnerColumnName(): string
     {
         return $this->ownerColumnName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getOrganizationFieldName(): string
     {
         return $this->organizationFieldName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getOrganizationColumnName(): string
     {
         return $this->organizationColumnName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getAccessLevelNames(): array
     {
         if (!$this->hasOwner()) {

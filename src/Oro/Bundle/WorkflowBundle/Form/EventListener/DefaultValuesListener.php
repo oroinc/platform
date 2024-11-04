@@ -55,9 +55,7 @@ class DefaultValuesListener implements EventSubscriberInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return array(FormEvents::PRE_SET_DATA => 'setDefaultValues');

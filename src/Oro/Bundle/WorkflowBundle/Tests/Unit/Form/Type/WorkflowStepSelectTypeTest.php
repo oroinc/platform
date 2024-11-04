@@ -38,6 +38,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
     /** @var WorkflowStepSelectType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
@@ -59,9 +60,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         $classMetadata = $this->createMock(ClassMetadata::class);

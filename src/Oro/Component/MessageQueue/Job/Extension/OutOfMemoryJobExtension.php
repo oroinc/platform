@@ -27,41 +27,31 @@ class OutOfMemoryJobExtension extends AbstractExtension
         $this->jobProcessor = $jobProcessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPreRunUnique(Job $job): void
     {
         $this->init($job);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPostRunUnique(Job $job, $jobResult): void
     {
         $this->clear();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPreRunDelayed(Job $job): void
     {
         $this->init($job);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPostRunDelayed(Job $job, $jobResult): void
     {
         $this->clear();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onError(Job $job): void
     {
         $this->clear();

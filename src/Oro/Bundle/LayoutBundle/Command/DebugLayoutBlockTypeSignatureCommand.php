@@ -30,6 +30,7 @@ class DebugLayoutBlockTypeSignatureCommand extends Command
         parent::__construct();
     }
 
+    #[\Override]
     public function configure()
     {
         $this
@@ -46,6 +47,7 @@ HELP
     /**
      * @noinspection PhpMissingParentCallCommonInspection
      */
+    #[\Override]
     public function execute(InputInterface $input, OutputInterface $output)
     {
         sort($this->blockTypes);

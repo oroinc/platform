@@ -215,6 +215,7 @@ class BlockConfig implements FormConfigInterface
     /**
      * @return array
      */
+    #[\Override]
     public function toArray()
     {
         $subBlocks = [];

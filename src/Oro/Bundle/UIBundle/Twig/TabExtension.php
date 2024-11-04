@@ -31,9 +31,7 @@ class TabExtension extends AbstractExtension implements ServiceSubscriberInterfa
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -151,9 +149,7 @@ class TabExtension extends AbstractExtension implements ServiceSubscriberInterfa
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

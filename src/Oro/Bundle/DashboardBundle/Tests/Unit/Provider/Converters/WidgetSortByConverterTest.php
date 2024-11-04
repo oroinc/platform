@@ -13,6 +13,7 @@ class WidgetSortByConverterTest extends \PHPUnit\Framework\TestCase
     /** @var WidgetSortByConverter */
     private $widgetSortByConverter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $configId = $this->createMock(ConfigIdInterface::class);

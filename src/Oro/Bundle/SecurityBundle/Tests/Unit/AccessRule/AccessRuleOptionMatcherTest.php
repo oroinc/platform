@@ -19,6 +19,7 @@ class AccessRuleOptionMatcherTest extends \PHPUnit\Framework\TestCase
     /** @var AccessRuleOptionMatcher */
     private $matcher;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);

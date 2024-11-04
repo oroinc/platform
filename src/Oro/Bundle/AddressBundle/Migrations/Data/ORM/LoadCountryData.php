@@ -18,17 +18,13 @@ class LoadCountryData extends AbstractTranslatableEntityFixture implements Versi
     private const COUNTRY_PREFIX = 'country';
     private const REGION_PREFIX  = 'region';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getVersion(): string
     {
         return '1.5';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function loadEntities(ObjectManager $manager): void
     {
         $this->loadCountriesAndRegions($manager, $this->getDataFromFile($this->getFileName()));

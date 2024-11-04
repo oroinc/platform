@@ -125,6 +125,7 @@ class Item implements TestFrameworkEntityInterface
         return isset($this->$name);
     }
 
+    #[\Override]
     public function __toString()
     {
         return (string) $this->stringValue;

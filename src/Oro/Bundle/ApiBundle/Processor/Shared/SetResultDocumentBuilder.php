@@ -20,9 +20,7 @@ class SetResultDocumentBuilder implements ProcessorInterface
         $this->documentBuilderFactory = $documentBuilderFactory;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

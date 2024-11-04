@@ -30,9 +30,7 @@ class OpenApiSpecificationExtension extends AbstractExtension implements Service
         $this->container = $container;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getFilters(): array
     {
         return [
@@ -86,9 +84,7 @@ class OpenApiSpecificationExtension extends AbstractExtension implements Service
         return '<span class="nowrap">' . implode('</span>; <span class="nowrap">', $entityNames) . '</span>';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

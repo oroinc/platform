@@ -16,9 +16,7 @@ class RequestPredefinedLanguageCodeResolver implements PredefinedLanguageCodeRes
         $this->requestStack = $requestStack;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDescription(): string
     {
         return <<<MARKDOWN
@@ -26,9 +24,7 @@ class RequestPredefinedLanguageCodeResolver implements PredefinedLanguageCodeRes
 MARKDOWN;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function resolve(): string
     {
         return $this->requestStack->getCurrentRequest()?->getLocale() ?? 'en';

@@ -6,9 +6,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Datagrid;
 
 class CustomEntityDatagrid extends Datagrid
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize()
     {
         parent::initialize();

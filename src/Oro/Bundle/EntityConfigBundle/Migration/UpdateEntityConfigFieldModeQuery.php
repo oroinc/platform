@@ -33,9 +33,7 @@ class UpdateEntityConfigFieldModeQuery extends ParametrizedMigrationQuery
         $this->mode = $mode;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         $logger = new ArrayLogger();
@@ -44,9 +42,7 @@ class UpdateEntityConfigFieldModeQuery extends ParametrizedMigrationQuery
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->process($logger);

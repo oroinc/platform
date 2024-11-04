@@ -12,6 +12,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class NotEmptyColumnsValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator(): NotEmptyColumnsValidator
     {
         return new NotEmptyColumnsValidator();

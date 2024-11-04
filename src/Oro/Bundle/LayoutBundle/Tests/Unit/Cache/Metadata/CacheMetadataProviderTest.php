@@ -21,6 +21,7 @@ class CacheMetadataProviderTest extends \PHPUnit\Framework\TestCase
 
     private CacheMetadataProvider $cacheMetadataProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->defaultProvider = $this->createMock(CacheMetadataProviderInterface::class);

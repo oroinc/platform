@@ -25,6 +25,7 @@ class ConfigHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

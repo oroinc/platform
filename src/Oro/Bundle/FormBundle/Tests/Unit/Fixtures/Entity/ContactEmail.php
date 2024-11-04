@@ -24,17 +24,13 @@ class ContactEmail implements PrimaryItem
     #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     protected ?Contact $owner = null;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isPrimary()
     {
         return $this->primary;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setPrimary($value)
     {
         $this->primary = $value;

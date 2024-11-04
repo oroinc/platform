@@ -27,6 +27,7 @@ class ImapEmailManagerTest extends TestCase
     /** @var ImapEmailManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->connector = $this->createMock(ImapConnector::class);

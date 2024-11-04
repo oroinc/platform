@@ -10,6 +10,7 @@ class ParameterAssemblerTest extends \PHPUnit\Framework\TestCase
     /** @var ParameterAssembler */
     private $assembler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->assembler = new ParameterAssembler();

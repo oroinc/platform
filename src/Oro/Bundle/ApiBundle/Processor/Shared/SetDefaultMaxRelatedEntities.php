@@ -19,9 +19,7 @@ class SetDefaultMaxRelatedEntities implements ProcessorInterface
         $this->maxRelatedEntitiesLimit = $maxRelatedEntitiesLimit;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

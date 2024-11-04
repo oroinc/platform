@@ -20,9 +20,7 @@ class Configuration implements ConfigurationInterface
         $this->defaultPerPage = $cm->get('oro_data_grid.default_per_page');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $builder = new TreeBuilder('toolbarOptions');

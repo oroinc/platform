@@ -8,9 +8,7 @@ use Oro\Bundle\EmailBundle\Model\FolderType;
 
 class LoadEmailToOtherFolderData extends LoadEmailData
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFolder(EmailOrigin $origin): EmailFolder
     {
         $folder = new EmailFolder();

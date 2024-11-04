@@ -14,9 +14,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetTargetAction implements ProcessorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var BatchUpdateItemContext $context */
@@ -37,7 +35,8 @@ class SetTargetAction implements ProcessorInterface
         $operationFlags = MetaOperationParser::getOperationFlags(
             $meta,
             JsonApiDoc::META_UPDATE,
-            JsonApiDoc::META_UPSERT
+            JsonApiDoc::META_UPSERT,
+            JsonApiDoc::META_VALIDATE
         );
 
         if (null === $operationFlags) {

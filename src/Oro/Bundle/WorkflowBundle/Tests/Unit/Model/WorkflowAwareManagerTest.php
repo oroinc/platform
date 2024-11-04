@@ -18,6 +18,7 @@ class WorkflowAwareManagerTest extends \PHPUnit\Framework\TestCase
 
     private string $testWorkflowName = 'test_workflow';
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->workflowManager = $this->createMock(WorkflowManager::class);

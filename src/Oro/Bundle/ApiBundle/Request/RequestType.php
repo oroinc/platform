@@ -95,17 +95,13 @@ class RequestType implements ToArrayInterface
         $this->str = null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function toArray(): array
     {
         return $this->aspects;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function __toString()
     {
         if (null === $this->str) {

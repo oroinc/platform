@@ -32,12 +32,14 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
 {
     use RolePermissionExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
         $this->loadFixtures([LoadOrganization::class]);
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $this->getBatchUpdateExceptionController()->clear();

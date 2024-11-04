@@ -9,6 +9,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class NoTagsValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator()
     {
         return new NoTagsValidator();

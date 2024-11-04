@@ -12,6 +12,7 @@ class SkipUnsupportedBinariesByMimeTypeFilterDecoratorTest extends \PHPUnit\Fram
 
     private UnsupportedBinaries\SkipUnsupportedBinariesByMimeTypeFilterDecorator $filterDecorator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->decoratedFilter = $this->createMock(ImagineBinaryFilterInterface::class);

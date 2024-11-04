@@ -11,9 +11,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class OroSecurityExtension extends Extension implements PrependExtensionInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(array $configs, ContainerBuilder $container): void
     {
         $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
@@ -38,11 +36,14 @@ class OroSecurityExtension extends Extension implements PrependExtensionInterfac
         $this->configurePermissionsPolicy($container, $config);
 
         $container->setParameter('oro_security.login_target_path_excludes', $config['login_target_path_excludes']);
+
+        $container->setParameter(
+            'oro_security.session.storage.options',
+            $container->getParameter('session.storage.options')
+        );
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function prepend(ContainerBuilder $container): void
     {
         $container->setParameter('session_handler', 'oro.session_handler');

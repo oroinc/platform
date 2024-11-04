@@ -27,6 +27,7 @@ class TemplateRendererConfigProvider implements TemplateRendererConfigProviderIn
         $this->configCacheKey = $configCacheKey;
     }
 
+    #[\Override]
     public function getConfiguration(): array
     {
         if (null === $this->configuration) {
@@ -38,6 +39,7 @@ class TemplateRendererConfigProvider implements TemplateRendererConfigProviderIn
         return $this->configuration;
     }
 
+    #[\Override]
     public function getSystemVariableValues(): array
     {
         if (null === $this->systemVariables) {
@@ -47,6 +49,7 @@ class TemplateRendererConfigProvider implements TemplateRendererConfigProviderIn
         return $this->systemVariables;
     }
 
+    #[\Override]
     public function getEntityVariableProcessors(string $entityClass): array
     {
         if (!isset($this->entityVariableProcessors[$entityClass])) {
@@ -57,6 +60,7 @@ class TemplateRendererConfigProvider implements TemplateRendererConfigProviderIn
         return $this->entityVariableProcessors[$entityClass];
     }
 
+    #[\Override]
     public function clearCache(): void
     {
         $this->cache->delete($this->configCacheKey);

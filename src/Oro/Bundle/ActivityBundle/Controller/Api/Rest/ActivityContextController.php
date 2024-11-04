@@ -33,9 +33,7 @@ class ActivityContextController extends RestGetController
         return $this->buildResponse($result, self::ACTION_LIST, ['result' => $result]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_activity.manager.activity_context.api');

@@ -32,6 +32,7 @@ class TransitionTriggerProcessor implements MessageProcessorInterface, LoggerAwa
         $this->logger = new NullLogger();
     }
 
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session): string
     {
         $triggerMessage = TransitionTriggerMessage::createFromArray($message->getBody());

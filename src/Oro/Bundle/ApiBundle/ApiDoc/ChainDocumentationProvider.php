@@ -26,9 +26,7 @@ class ChainDocumentationProvider implements DocumentationProviderInterface
         $this->matcher = $matcher;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDocumentation(RequestType $requestType): ?string
     {
         $paragraphs = [];

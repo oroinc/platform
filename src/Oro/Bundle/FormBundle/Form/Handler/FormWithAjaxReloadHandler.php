@@ -22,6 +22,7 @@ class FormWithAjaxReloadHandler implements FormHandlerInterface
         $this->doctrine = $doctrine;
     }
 
+    #[\Override]
     public function process($data, FormInterface $form, Request $request): bool
     {
         $form->setData($data);

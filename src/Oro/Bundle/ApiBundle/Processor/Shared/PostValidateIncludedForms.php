@@ -19,9 +19,7 @@ class PostValidateIncludedForms implements ProcessorInterface
         $this->validator = $validator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var FormContext $context */

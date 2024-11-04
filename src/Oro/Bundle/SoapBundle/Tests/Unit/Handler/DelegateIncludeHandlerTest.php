@@ -17,6 +17,7 @@ class DelegateIncludeHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var DelegateIncludeHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = new Container();

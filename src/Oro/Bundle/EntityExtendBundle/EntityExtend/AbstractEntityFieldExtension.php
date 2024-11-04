@@ -64,6 +64,7 @@ abstract class AbstractEntityFieldExtension implements EntityFieldExtensionInter
         return $this->extensionCache[$transport->getClass()][$extensionClass][$key];
     }
 
+    #[\Override]
     public function isset(EntityFieldProcessTransport $transport): void
     {
         $this->propertyExists($transport);
@@ -74,6 +75,7 @@ abstract class AbstractEntityFieldExtension implements EntityFieldExtensionInter
         return [];
     }
 
+    #[\Override]
     public function getMethods(EntityFieldProcessTransport $transport): array
     {
         return [];
@@ -233,6 +235,7 @@ abstract class AbstractEntityFieldExtension implements EntityFieldExtensionInter
         }
     }
 
+    #[\Override]
     public function getMethodInfo(EntityFieldProcessTransport $transport): void
     {
         $methods = $this->getMethodsData($transport);

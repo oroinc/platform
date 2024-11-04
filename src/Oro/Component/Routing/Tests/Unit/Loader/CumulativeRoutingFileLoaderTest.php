@@ -26,6 +26,7 @@ class CumulativeRoutingFileLoaderTest extends \PHPUnit\Framework\TestCase
     /** @var CumulativeRoutingFileLoader */
     private $loader;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->kernel = $this->createMock(KernelInterface::class);

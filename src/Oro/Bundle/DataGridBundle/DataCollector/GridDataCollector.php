@@ -25,12 +25,14 @@ class GridDataCollector extends DataCollector implements LateDataCollectorInterf
     ) {
     }
 
+    #[\Override]
     public function collect(Request $request, Response $response, ?\Throwable $exception = null)
     {
         $this->currentRequest = $request ?: null;
         $this->data = [];
     }
 
+    #[\Override]
     public function reset()
     {
         parent::reset();
@@ -40,6 +42,7 @@ class GridDataCollector extends DataCollector implements LateDataCollectorInterf
         }
     }
 
+    #[\Override]
     public function getName()
     {
         return 'datagrids';
@@ -70,6 +73,7 @@ class GridDataCollector extends DataCollector implements LateDataCollectorInterf
         ];
     }
 
+    #[\Override]
     public function lateCollect()
     {
         if ($this->manager instanceof TraceableManager) {

@@ -12,6 +12,7 @@ class WidgetSortByTypeTest extends TypeTestCase
     /** @var EntityFieldProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $fieldProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fieldProvider = $this->createMock(EntityFieldProvider::class);
@@ -19,9 +20,7 @@ class WidgetSortByTypeTest extends TypeTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

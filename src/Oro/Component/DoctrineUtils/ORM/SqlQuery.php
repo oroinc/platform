@@ -34,18 +34,14 @@ class SqlQuery extends AbstractQuery
         return $this->qb;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getSQL()
     {
         return $this->qb->getSQL();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     // @codingStandardsIgnoreStart
+    #[\Override]
     protected function _doExecute()
     {
         $parameters = [];
@@ -85,6 +81,7 @@ class SqlQuery extends AbstractQuery
      *
      * @return void
      */
+    #[\Override]
     public function __clone()
     {
         parent::__clone();

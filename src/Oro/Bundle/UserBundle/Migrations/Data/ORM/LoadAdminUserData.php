@@ -21,9 +21,7 @@ class LoadAdminUserData extends AbstractFixture implements DependentFixtureInter
     public const DEFAULT_ADMIN_USERNAME = 'admin';
     public const DEFAULT_ADMIN_EMAIL = 'admin@example.com';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [
@@ -32,9 +30,7 @@ class LoadAdminUserData extends AbstractFixture implements DependentFixtureInter
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $adminRole = $manager->getRepository(Role::class)

@@ -22,17 +22,13 @@ class WarmUpEntityConfigCacheMigrationQuery implements MigrationQuery, ResetCont
         $this->commandExecutor = $commandExecutor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription()
     {
         return 'Warm up entity configs cache';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $this->commandExecutor->runCommand(

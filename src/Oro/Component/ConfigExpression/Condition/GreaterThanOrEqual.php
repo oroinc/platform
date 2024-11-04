@@ -7,17 +7,13 @@ namespace Oro\Component\ConfigExpression\Condition;
  */
 class GreaterThanOrEqual extends AbstractComparison
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'gte';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doCompare($left, $right)
     {
         return $left >= $right;

@@ -14,17 +14,13 @@ class LoadWorkflowEmailTemplates extends AbstractFixture implements DependentFix
 {
     public const WFA_EMAIL_TEMPLATE_NAME = 'wfa_email_template';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadOrganization::class, LoadUser::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         $template = '%s="{{ entity.url.%s }}";';

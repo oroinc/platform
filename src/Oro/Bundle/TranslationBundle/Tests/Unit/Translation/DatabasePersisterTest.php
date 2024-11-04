@@ -52,6 +52,7 @@ class DatabasePersisterTest extends \PHPUnit\Framework\TestCase
     /** @var DatabasePersister */
     private $persister;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManagerInterface::class);

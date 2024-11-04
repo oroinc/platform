@@ -23,6 +23,7 @@ class AssignActiveUserTest extends \PHPUnit\Framework\TestCase
     /** @var AssignActiveUser */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);

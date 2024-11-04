@@ -37,6 +37,7 @@ class ProcessDefinitionsConfiguratorTest extends \PHPUnit\Framework\TestCase
     /** @var ProcessDefinitionsConfigurator */
     private $processDefinitionsConfigurator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configurationBuilder = $this->createMock(ProcessConfigurationBuilder::class);

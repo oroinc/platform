@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityIdMetadataInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
@@ -19,15 +20,18 @@ class AclProtectedEntityLoader
     private DoctrineHelper $doctrineHelper;
     private EntityIdHelper $entityIdHelper;
     private QueryAclHelper $queryAclHelper;
+    private QueryHintResolverInterface $queryHintResolver;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityIdHelper $entityIdHelper,
-        QueryAclHelper $queryAclHelper
+        QueryAclHelper $queryAclHelper,
+        QueryHintResolverInterface $queryHintResolver
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->entityIdHelper = $entityIdHelper;
         $this->queryAclHelper = $queryAclHelper;
+        $this->queryHintResolver = $queryHintResolver;
     }
 
     /**
@@ -54,16 +58,18 @@ class AclProtectedEntityLoader
         RequestType $requestType
     ): ?object {
         // try to load an entity by ACL protected query
-        $qb = $this->getFindEntityQueryBuilder($entityClass, $entityId, $metadata);
-        $entity = $this->queryAclHelper->protectQuery($qb, $config, $requestType)->getOneOrNullResult();
+        $entity = $this->queryAclHelper->protectQuery(
+            $this->getFindEntityQueryBuilder($entityClass, $entityId, $metadata),
+            $config,
+            $requestType
+        )->getOneOrNullResult();
         if (null === $entity) {
             // use a query without ACL protection to check if an entity exists in DB
-            $qb = $this->getFindEntityQueryBuilder($entityClass, $entityId, $metadata);
-            $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
-            if (\count($idFieldNames) !== 0) {
-                $qb->select('e.' . reset($idFieldNames));
-            }
-            $notAclProtectedData = $qb->getQuery()->getOneOrNullResult(Query::HYDRATE_ARRAY);
+            $notAclProtectedData = $this->getNotAclProtectedQuery(
+                $entityClass,
+                $this->getFindEntityQueryBuilder($entityClass, $entityId, $metadata),
+                $config
+            )->getOneOrNullResult(Query::HYDRATE_ARRAY);
             if ($notAclProtectedData) {
                 throw new AccessDeniedException('No access to the entity.');
             }
@@ -96,16 +102,18 @@ class AclProtectedEntityLoader
     ): ?object {
         $criteria = $this->buildFindByCriteria($criteria, $metadata);
         // try to load an entity by ACL protected query
-        $qb = $this->getFindEntityByQueryBuilder($entityClass, $criteria);
-        $entity = $this->queryAclHelper->protectQuery($qb, $config, $requestType)->getOneOrNullResult();
+        $entity = $this->queryAclHelper->protectQuery(
+            $this->getFindEntityByQueryBuilder($entityClass, $criteria),
+            $config,
+            $requestType
+        )->getOneOrNullResult();
         if (null === $entity) {
             // use a query without ACL protection to check if an entity exists in DB
-            $qb = $this->getFindEntityByQueryBuilder($entityClass, $criteria);
-            $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
-            if (\count($idFieldNames) !== 0) {
-                $qb->select('e.' . reset($idFieldNames));
-            }
-            $notAclProtectedData = $qb->getQuery()->getOneOrNullResult(Query::HYDRATE_ARRAY);
+            $notAclProtectedData = $this->getNotAclProtectedQuery(
+                $entityClass,
+                $this->getFindEntityByQueryBuilder($entityClass, $criteria),
+                $config
+            )->getOneOrNullResult(Query::HYDRATE_ARRAY);
             if ($notAclProtectedData) {
                 throw new AccessDeniedException('No access to the entity.');
             }
@@ -155,5 +163,24 @@ class AclProtectedEntityLoader
         }
 
         return $result;
+    }
+
+    private function getNotAclProtectedQuery(
+        string $entityClass,
+        QueryBuilder $qb,
+        EntityDefinitionConfig $config
+    ): Query {
+        $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
+        if (\count($idFieldNames) !== 0) {
+            $qb->select('e.' . reset($idFieldNames));
+        }
+
+        $query = $qb->getQuery();
+        $hints = $config->getHints();
+        if ($hints) {
+            $this->queryHintResolver->resolveHints($query, $hints);
+        }
+
+        return $query;
     }
 }

@@ -11,6 +11,7 @@ class ImportActionTest extends \PHPUnit\Framework\TestCase
     /** @var ImportAction */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->action = new ImportAction();

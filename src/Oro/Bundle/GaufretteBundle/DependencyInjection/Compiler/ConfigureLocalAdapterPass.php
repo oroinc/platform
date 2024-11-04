@@ -11,9 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class ConfigureLocalAdapterPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $container->getDefinition('knp_gaufrette.adapter.local')

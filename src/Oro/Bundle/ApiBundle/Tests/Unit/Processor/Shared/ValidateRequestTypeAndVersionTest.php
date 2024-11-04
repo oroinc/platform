@@ -12,6 +12,7 @@ class ValidateRequestTypeAndVersionTest extends GetListProcessorTestCase
     /** @var ValidateRequestTypeAndVersion */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

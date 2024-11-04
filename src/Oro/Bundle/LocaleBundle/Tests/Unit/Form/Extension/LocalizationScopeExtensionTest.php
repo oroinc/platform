@@ -21,6 +21,7 @@ class LocalizationScopeExtensionTest extends FormIntegrationTestCase
     /** @var LocalizationScopeExtension */
     private $localizationScopeExtension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->scopeManager = $this->createMock(ScopeManager::class);
@@ -51,9 +52,7 @@ class LocalizationScopeExtensionTest extends FormIntegrationTestCase
         $this->assertEquals([ScopeType::class], LocalizationScopeExtension::getExtendedTypes());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getExtensions()
     {
         return [

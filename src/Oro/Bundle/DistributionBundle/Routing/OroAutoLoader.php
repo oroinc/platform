@@ -20,9 +20,7 @@ class OroAutoLoader extends AbstractLoader
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load($file, $type = null)
     {
         $routes = parent::load($file, $type);

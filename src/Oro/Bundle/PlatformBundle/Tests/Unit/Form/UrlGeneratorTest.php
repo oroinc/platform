@@ -18,6 +18,7 @@ class UrlGeneratorTest extends \PHPUnit\Framework\TestCase
     /** @var UrlGenerator */
     private $generator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->packageProvider = $this->createMock(PackageProvider::class);

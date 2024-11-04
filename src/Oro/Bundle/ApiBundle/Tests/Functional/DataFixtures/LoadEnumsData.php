@@ -4,20 +4,20 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Persistence\ObjectManager;
-use Extend\Entity\EV_Api_Enum1 as TestEnum1;
-use Extend\Entity\EV_Api_Enum2 as TestEnum2;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 
 class LoadEnumsData extends AbstractFixture
 {
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         for ($i = 0; $i <= 4; $i++) {
-            $enum = new TestEnum1((string)$i, sprintf('Item %d', $i), $i - 1, !(bool)$i);
+            $enum = new EnumOption('api_enum1', sprintf('Item %d', $i), (string)$i, $i - 1, !(bool)$i);
             $this->addReference(sprintf('enum1_%d', $i), $enum);
             $manager->persist($enum);
         }
         for ($i = 1; $i <= 4; $i++) {
-            $enum = new TestEnum2((string)$i, sprintf('Item %d', $i), $i - 1, !(bool)$i);
+            $enum = new EnumOption('api_enum2', sprintf('Item %d', $i), (string)$i, $i - 1, !(bool)$i);
             $this->addReference(sprintf('enum2_%d', $i), $enum);
             $manager->persist($enum);
         }

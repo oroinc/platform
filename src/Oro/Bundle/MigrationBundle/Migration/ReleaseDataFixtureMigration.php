@@ -29,9 +29,7 @@ class ReleaseDataFixtureMigration implements Migration
         $this->mappingData = $mappingData;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         foreach ($this->fixturesData as $fixtureData) {

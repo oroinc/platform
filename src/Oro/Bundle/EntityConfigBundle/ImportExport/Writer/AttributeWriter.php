@@ -24,6 +24,7 @@ class AttributeWriter extends EntityFieldWriter
      * @param FieldConfigModel $fieldConfigModel
      * @param string $state
      */
+    #[\Override]
     protected function setExtendData(FieldConfigModel $fieldConfigModel, $state)
     {
         parent::setExtendData($fieldConfigModel, $state);
@@ -42,7 +43,9 @@ class AttributeWriter extends EntityFieldWriter
 
         $isSerialized = $this->serializedFieldProvider->isSerialized($fieldConfigModel);
         $extendConfig = $extendProvider->getConfig($className, $fieldName);
-        $extendConfig->set('is_serialized', $isSerialized);
+        if (!$extendConfig->has('is_serialized') || $extendConfig->get('is_serialized') !== $isSerialized) {
+            $extendConfig->set('is_serialized', $isSerialized);
+        }
         $this->configManager->persist($extendConfig);
     }
 }

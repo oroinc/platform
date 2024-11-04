@@ -18,9 +18,7 @@ class FormattersPass implements CompilerPassInterface
     private const MANAGER_SERVICE = 'oro_ui.formatter';
     private const FORMATTER_TAG   = 'oro_formatter';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $formatters = [];

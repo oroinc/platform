@@ -23,9 +23,7 @@ class OpenApiSpecificationType extends AbstractType
         $this->openApiChoicesProvider = $openApiChoicesProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -62,17 +60,13 @@ class OpenApiSpecificationType extends AbstractType
             ]);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('data_class', OpenApiSpecification::class);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_openapi_specification';

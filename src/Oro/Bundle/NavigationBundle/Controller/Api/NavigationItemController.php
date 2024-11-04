@@ -224,9 +224,7 @@ class NavigationItemController extends AbstractFOSRestController
         return User::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

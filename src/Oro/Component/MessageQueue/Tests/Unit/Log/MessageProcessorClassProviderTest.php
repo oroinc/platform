@@ -14,6 +14,7 @@ class MessageProcessorClassProviderTest extends \PHPUnit\Framework\TestCase
 
     private MessageProcessorClassProvider $messageProcessorClassProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->messageProcessorRegistry = $this->createMock(MessageProcessorRegistryInterface::class);

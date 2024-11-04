@@ -20,6 +20,7 @@ abstract class AbstractImportTopic extends AbstractTopic
         $this->batchSize = $batchSize;
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $batchSize = $this->batchSize;

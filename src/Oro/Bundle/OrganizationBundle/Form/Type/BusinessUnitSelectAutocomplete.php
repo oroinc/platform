@@ -18,9 +18,6 @@ class BusinessUnitSelectAutocomplete extends AbstractType
 {
     const NAME = 'oro_type_business_unit_select_autocomplete';
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return self::NAME;
@@ -48,9 +45,7 @@ class BusinessUnitSelectAutocomplete extends AbstractType
         $this->businessUnitManager = $businessUnitManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (isset($options['configs']['multiple']) &&  $options['configs']['multiple'] === true) {
@@ -65,9 +60,7 @@ class BusinessUnitSelectAutocomplete extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -83,9 +76,7 @@ class BusinessUnitSelectAutocomplete extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return OroJquerySelect2HiddenType::class;

@@ -8,9 +8,7 @@ class DomainObjectStub implements DomainObjectInterface
 {
     public const IDENTIFIER = 'identifier';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getObjectIdentifier()
     {
         return self::IDENTIFIER;

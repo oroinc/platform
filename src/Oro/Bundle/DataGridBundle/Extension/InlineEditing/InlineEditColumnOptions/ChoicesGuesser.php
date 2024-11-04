@@ -23,9 +23,9 @@ class ChoicesGuesser implements GuesserInterface
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function guessColumnOptions($columnName, $entityName, $column, $isEnabledInline = false)
     {
         $entityManager = $this->doctrineHelper->getEntityManager($entityName);

@@ -22,6 +22,7 @@ class FieldSessionStorageTest extends \PHPUnit\Framework\TestCase
     /** @var FieldSessionStorage */
     private $storage;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->session = $this->createMock(Session::class);

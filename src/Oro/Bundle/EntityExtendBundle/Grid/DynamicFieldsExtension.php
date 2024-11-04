@@ -13,6 +13,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeFamilyRepository;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * Adds extended entity fields to datagrids.
@@ -43,9 +44,7 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
         $this->selectedFieldsProvider = $selectedFieldsProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config): bool
     {
         if (!parent::isApplicable($config) || !$config->getExtendedEntityClassName()) {
@@ -62,17 +61,13 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
         return $extendProvider->getConfig($entityClassName)->is('is_extend');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getPriority(): int
     {
         return 300;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildExpression(array $fields, DatagridConfiguration $config, string $alias): void
     {
         if ($this->selectedFieldsProvider) {
@@ -83,29 +78,25 @@ class DynamicFieldsExtension extends AbstractFieldsExtension
         parent::buildExpression($fields, $config, $alias);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getEntityName(DatagridConfiguration $config): string
     {
         return $config->getExtendedEntityClassName();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function prepareColumnOptions(FieldConfigId $field, array &$columnOptions): void
     {
         parent::prepareColumnOptions($field, $columnOptions);
-
-        if ($this->getFieldConfig('datagrid', $field)->is('show_filter')) {
+        if ($this->getFieldConfig('datagrid', $field)->is('show_filter')
+            || (ExtendHelper::isEnumerableType($field->getFieldType())
+                && $this->getFieldConfig('datagrid', $field)->is('is_visible'))
+        ) {
             $columnOptions[DatagridGuesser::FILTER]['renderable'] = true;
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getFields(DatagridConfiguration $config): array
     {
         return $this->excludeDanglingAttributes($config, parent::getFields($config));

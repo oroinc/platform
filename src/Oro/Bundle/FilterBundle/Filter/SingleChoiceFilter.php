@@ -10,9 +10,7 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\ChoiceFilterType;
  */
 class SingleChoiceFilter extends ChoiceFilter
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function buildComparisonExpr(
         FilterDatasourceAdapterInterface $ds,
         $comparisonType,
@@ -27,9 +25,7 @@ class SingleChoiceFilter extends ChoiceFilter
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function prepareData(array $data): array
     {
         if (isset($data['value']) && !$this->getOr('keep_string_value', false) && is_numeric($data['value'])) {
@@ -39,9 +35,7 @@ class SingleChoiceFilter extends ChoiceFilter
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function parseValue(array $data)
     {
         if (!isset($data['value']) || !$data['value']) {

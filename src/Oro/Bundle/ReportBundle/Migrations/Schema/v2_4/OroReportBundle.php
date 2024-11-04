@@ -8,6 +8,7 @@ use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroReportBundle implements Migration
 {
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         if ($schema->hasTable('oro_calendar_date')) {

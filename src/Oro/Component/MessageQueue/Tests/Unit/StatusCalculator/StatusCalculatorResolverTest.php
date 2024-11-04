@@ -23,6 +23,7 @@ class StatusCalculatorResolverTest extends \PHPUnit\Framework\TestCase
     /** @var StatusCalculatorResolver */
     private $statusCalculatorResolver;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->queryCalculator = $this->createMock(QueryCalculator::class);

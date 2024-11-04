@@ -13,9 +13,7 @@ class EmailSynchronizerPass implements CompilerPassInterface
 
     const SERVICE_TOKEN_STORAGE = 'security.token_storage';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition(self::SERVICE_KEY)) {

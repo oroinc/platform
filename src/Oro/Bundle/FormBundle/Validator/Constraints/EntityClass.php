@@ -16,9 +16,7 @@ class EntityClass extends Constraint
 {
     public $message = 'This value should be entity class or alias.';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validatedBy(): string
     {
         return 'oro_form.entity_class_validator';

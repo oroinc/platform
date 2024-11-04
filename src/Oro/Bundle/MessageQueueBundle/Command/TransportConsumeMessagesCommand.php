@@ -37,6 +37,7 @@ class TransportConsumeMessagesCommand extends ConsumeMessagesCommand
         $this->logger = $logger;
     }
 
+    #[\Override]
     protected function consume(QueueConsumer $consumer, ExtensionInterface $extension): void
     {
         $this->consumerState->startConsumption();
@@ -48,6 +49,7 @@ class TransportConsumeMessagesCommand extends ConsumeMessagesCommand
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function getConsumerExtension(array $extensions): ExtensionInterface
     {
         return new ChainExtension($extensions, $this->consumerState);
@@ -57,6 +59,7 @@ class TransportConsumeMessagesCommand extends ConsumeMessagesCommand
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpMissingParentCallCommonInspection
      */
+    #[\Override]
     protected function getLoggerExtension(InputInterface $input, OutputInterface $output): ExtensionInterface
     {
         return new LoggerExtension($this->logger);

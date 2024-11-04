@@ -11,6 +11,7 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefiniti
 
 class WorkflowDefinitionControllerTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());

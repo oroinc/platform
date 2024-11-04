@@ -32,9 +32,7 @@ class RenameExtendTablesAndColumns implements
 
     const OLD_CUSTOM_TABLE_PREFIX = 'oro_extend_';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries)
     {
         /** @var ConfigManager $configManager */

@@ -11,17 +11,13 @@ use Oro\Bundle\UserBundle\Entity\User;
 
 class LoadUserRoleData extends AbstractFixture implements DependentFixtureInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadUser::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         for ($i = 1; $i <= 3; $i++) {

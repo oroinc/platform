@@ -30,11 +30,13 @@ class CsvFileWriter extends CsvFileStreamWriter implements StepExecutionAwareInt
      *
      * @return resource
      */
+    #[\Override]
     protected function open()
     {
         return fopen($this->filePath, 'a');
     }
 
+    #[\Override]
     public function write(array $items)
     {
         parent::write($items);
@@ -42,6 +44,7 @@ class CsvFileWriter extends CsvFileStreamWriter implements StepExecutionAwareInt
         $this->clearWriter->write($items);
     }
 
+    #[\Override]
     public function setStepExecution(StepExecution $stepExecution)
     {
         $this->clearWriter->setStepExecution($stepExecution);
@@ -49,9 +52,7 @@ class CsvFileWriter extends CsvFileStreamWriter implements StepExecutionAwareInt
         $this->setImportExportContext($context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setImportExportContext(ContextInterface $context)
     {
         if (!$context->hasOption(Context::OPTION_FILE_PATH)) {

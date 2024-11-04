@@ -13,16 +13,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ExecuteProcessJobTopic extends AbstractTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.workflow.execute_process_job';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Execute workflow process job.';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver

@@ -30,6 +30,7 @@ class BatchFlushDataHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var BatchFlushDataHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

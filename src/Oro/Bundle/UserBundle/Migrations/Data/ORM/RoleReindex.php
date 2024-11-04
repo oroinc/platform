@@ -19,9 +19,7 @@ class RoleReindex extends AbstractFixture implements ContainerAwareInterface
 {
     use ContainerAwareTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         /** @var EntityManagerInterface $em */

@@ -48,9 +48,7 @@ class OpenApiGenerator implements OpenApiGeneratorInterface
         $this->openApiVersion = $openApiVersion;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function generate(array $options = []): OA\OpenApi
     {
         $contextProperties = ['version' => $this->openApiVersion ?? OA\OpenApi::VERSION_3_1_0];

@@ -21,17 +21,13 @@ class AddressTypeType extends AbstractType
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addViewTransformer(new AddressTypeToIdTransformer($this->doctrineHelper));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('compound', false);

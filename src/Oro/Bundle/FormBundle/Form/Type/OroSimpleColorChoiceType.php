@@ -11,9 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OroSimpleColorChoiceType extends AbstractSimpleColorPickerType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
@@ -34,9 +32,7 @@ class OroSimpleColorChoiceType extends AbstractSimpleColorPickerType
             );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         parent::buildView($view, $form, $options);
@@ -47,25 +43,18 @@ class OroSimpleColorChoiceType extends AbstractSimpleColorPickerType
         $view->vars['empty_color']       = $options['empty_color'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return ChoiceType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_simple_color_choice';

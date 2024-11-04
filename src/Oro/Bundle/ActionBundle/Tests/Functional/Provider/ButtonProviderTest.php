@@ -29,6 +29,7 @@ class ButtonProviderTest extends WebTestCase
     /** @var PhpArrayConfigCacheModifier */
     private $configModifier;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -37,6 +38,7 @@ class ButtonProviderTest extends WebTestCase
         $this->configModifier = new PhpArrayConfigCacheModifier($this->configProvider);
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         $this->getContainer()->get('oro_action.tests.provider.button.extension')

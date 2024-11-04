@@ -29,23 +29,12 @@ use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
  */
 class ImapEmailSynchronizer extends AbstractEmailSynchronizer
 {
-    /** @var string */
-    protected static $messageQueueTopic = SyncEmailsTopic::NAME;
-
-    /** @var ImapEmailSynchronizationProcessorFactory */
-    protected $syncProcessorFactory;
-
-    /** @var ImapConnectorFactory */
-    protected $connectorFactory;
-
-    /** @var SymmetricCrypterInterface */
-    protected $encryptor;
-
-    /** @var OAuthManagerRegistry */
-    protected $oauthManagerRegistry;
-
-    /** @var SyncCredentialsIssueManager */
-    private $credentialsIssueManager;
+    protected static string $messageQueueTopic = SyncEmailsTopic::NAME;
+    protected ImapEmailSynchronizationProcessorFactory $syncProcessorFactory;
+    protected ImapConnectorFactory $connectorFactory;
+    protected SymmetricCrypterInterface $encryptor;
+    protected OAuthManagerRegistry $oauthManagerRegistry;
+    private SyncCredentialsIssueManager $credentialsIssueManager;
 
     public function __construct(
         ManagerRegistry $doctrine,
@@ -64,15 +53,13 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
         $this->oauthManagerRegistry = $oauthManagerRegistry;
     }
 
-    public function setCredentialsManager(SyncCredentialsIssueManager $credentialsIssueManager)
+    public function setCredentialsManager(SyncCredentialsIssueManager $credentialsIssueManager): void
     {
         $this->credentialsIssueManager = $credentialsIssueManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supports(EmailOrigin $origin)
+    #[\Override]
+    public function supports(EmailOrigin $origin): bool
     {
         return ($origin instanceof UserEmailOrigin) && $this->isTypeSupported($origin->getAccountType());
     }
@@ -83,18 +70,14 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
             || $this->oauthManagerRegistry->isOauthImapEnabled($accountType);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getEmailOriginClass()
+    #[\Override]
+    protected function getEmailOriginClass(): string
     {
         return UserEmailOrigin::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function supportScheduleJob()
+    #[\Override]
+    public function supportScheduleJob(): bool
     {
         return true;
     }
@@ -105,7 +88,8 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
      * @param UserEmailOrigin $origin
      * @return ImapEmailSynchronizationProcessor
      */
-    protected function createSynchronizationProcessor($origin)
+    #[\Override]
+    protected function createSynchronizationProcessor(object $origin): ImapEmailSynchronizationProcessor
     {
         $manager = $this->oauthManagerRegistry->hasManager($origin->getAccountType())
             ? $this->oauthManagerRegistry->getManager($origin->getAccountType())
@@ -135,14 +119,12 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function delegateToProcessor(
         EmailOrigin $origin,
         AbstractEmailSynchronizationProcessor $processor,
         SynchronizationProcessorSettings $settings = null
-    ) {
+    ): void {
         try {
             parent::delegateToProcessor($origin, $processor, $settings);
         } catch (SocketTimeoutException $ex) {
@@ -160,10 +142,8 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function doSyncOrigin(EmailOrigin $origin, SynchronizationProcessorSettings $settings = null)
+    #[\Override]
+    protected function doSyncOrigin(EmailOrigin $origin, SynchronizationProcessorSettings $settings = null): void
     {
         try {
             parent::doSyncOrigin($origin, $settings);

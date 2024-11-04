@@ -53,9 +53,7 @@ class BlockFactory implements BlockFactoryInterface
         $this->expressionProcessor = $expressionProcessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function createBlockView(RawLayout $rawLayout, ContextInterface $context)
     {
         $this->initializeState($rawLayout, $context);

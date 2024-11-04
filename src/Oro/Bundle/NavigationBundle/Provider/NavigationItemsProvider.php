@@ -40,9 +40,7 @@ class NavigationItemsProvider implements NavigationItemsProviderInterface, Featu
         $this->urlMatcher = $urlMatcher;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getNavigationItems(
         UserInterface $user,
         Organization $organization,

@@ -24,6 +24,7 @@ class MutableFormEventSubscriber implements EventSubscriberInterface
     /**
      * @return array
      */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return self::$events;

@@ -12,6 +12,7 @@ class FilterProcessorContextTest extends \PHPUnit\Framework\TestCase
     /** @var FilterProcessorContext */
     private $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new FilterProcessorContext();

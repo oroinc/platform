@@ -12,6 +12,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class NotEmptySortingValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator(): NotEmptySortingValidator
     {
         return new NotEmptySortingValidator();

@@ -15,6 +15,7 @@ class GedmoTranslationMapperTest extends \PHPUnit\Framework\TestCase
     /** @var GedmoTranslationMapper */
     private $mapper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->mapper = new GedmoTranslationMapper();

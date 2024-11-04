@@ -20,6 +20,7 @@ class OroMoneyTypeTest extends FormIntegrationTestCase
     /** @var OroMoneyType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->localeSettings = $this->createMock(LocaleSettings::class);
@@ -30,9 +31,7 @@ class OroMoneyTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

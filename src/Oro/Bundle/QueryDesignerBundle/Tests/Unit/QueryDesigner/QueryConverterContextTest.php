@@ -17,6 +17,7 @@ class QueryConverterContextTest extends \PHPUnit\Framework\TestCase
     /** @var QueryConverterContext */
     private $context;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = new QueryConverterContext();

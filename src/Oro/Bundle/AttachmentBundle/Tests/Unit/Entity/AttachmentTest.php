@@ -12,6 +12,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
     /** @var Attachment */
     private $entity;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entity = new Attachment();

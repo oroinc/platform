@@ -22,6 +22,7 @@ class LayoutPageDataStartTransitionProcessorTest extends \PHPUnit\Framework\Test
     /** @var LayoutPageDataStartTransitionProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->helper = $this->createMock(TransitionTranslationHelper::class);

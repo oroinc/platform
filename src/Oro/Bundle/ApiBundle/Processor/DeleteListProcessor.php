@@ -9,9 +9,7 @@ use Oro\Bundle\ApiBundle\Processor\DeleteList\DeleteListContext;
  */
 class DeleteListProcessor extends RequestActionProcessor
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function createContextObject(): DeleteListContext
     {
         return new DeleteListContext($this->configProvider, $this->metadataProvider);

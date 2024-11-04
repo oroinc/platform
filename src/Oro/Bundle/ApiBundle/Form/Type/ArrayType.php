@@ -12,17 +12,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ArrayType extends AbstractType
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addViewTransformer(new ArrayDataTransformer());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver

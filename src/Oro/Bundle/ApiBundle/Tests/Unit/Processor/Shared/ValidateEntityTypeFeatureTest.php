@@ -15,6 +15,7 @@ class ValidateEntityTypeFeatureTest extends GetListProcessorTestCase
     /** @var ValidateEntityTypeFeature */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

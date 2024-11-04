@@ -13,6 +13,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class EmailFoldersValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator()
     {
         return new EmailFoldersValidator();

@@ -18,9 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class MultipleAssociationChoiceType extends AbstractAssociationType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         parent::buildForm($builder, $options);
@@ -56,9 +54,7 @@ class MultipleAssociationChoiceType extends AbstractAssociationType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
@@ -85,9 +81,7 @@ class MultipleAssociationChoiceType extends AbstractAssociationType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $disabledValues = $this->getReadOnlyValues($options);
@@ -100,25 +94,18 @@ class MultipleAssociationChoiceType extends AbstractAssociationType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_entity_extend_multiple_association_choice';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return SymfonyChoiceType::class;

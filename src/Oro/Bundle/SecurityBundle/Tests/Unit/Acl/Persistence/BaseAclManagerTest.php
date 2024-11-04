@@ -14,6 +14,7 @@ class BaseAclManagerTest extends \PHPUnit\Framework\TestCase
     /** @var BaseAclManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->manager = new BaseAclManager();

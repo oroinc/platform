@@ -26,9 +26,7 @@ class ChainVirtualRelationProvider implements VirtualRelationProviderInterface
         $this->configProvider = $configProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isVirtualRelation($className, $fieldName)
     {
         foreach ($this->providers as $provider) {
@@ -40,17 +38,13 @@ class ChainVirtualRelationProvider implements VirtualRelationProviderInterface
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVirtualRelationQuery($className, $fieldName)
     {
         return $this->findProvider($className, $fieldName)->getVirtualRelationQuery($className, $fieldName);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVirtualRelations($className)
     {
         if (!$this->isEntityAccessible($className)) {
@@ -71,9 +65,7 @@ class ChainVirtualRelationProvider implements VirtualRelationProviderInterface
         return $relations;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargetJoinAlias($className, $fieldName, $selectFieldName = null)
     {
         return $this->findProvider($className, $fieldName)

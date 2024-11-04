@@ -11,16 +11,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class AddEmailAssociationsTopic extends AbstractTopic implements JobAwareTopicInterface
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.email.add_association_to_emails';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Add association to multiple emails';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver
@@ -34,6 +37,7 @@ class AddEmailAssociationsTopic extends AbstractTopic implements JobAwareTopicIn
             ->addAllowedTypes('targetClass', 'string');
     }
 
+    #[\Override]
     public function createJobName($messageBody): string
     {
         asort($messageBody['emailIds']);

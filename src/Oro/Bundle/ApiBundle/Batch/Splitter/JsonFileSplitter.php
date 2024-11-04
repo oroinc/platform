@@ -50,137 +50,103 @@ class JsonFileSplitter implements FileSplitterInterface
     /** @var array [section key => the number of chunks, ...] */
     private array $processedChunkCounts = [];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getChunkSize(): int
     {
         return $this->chunkSize;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setChunkSize(int $size): void
     {
         $this->chunkSize = $size;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getChunkSizePerSection(): array
     {
         return $this->chunkSizePerSection;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setChunkSizePerSection(array $sizes): void
     {
         $this->chunkSizePerSection = $sizes;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getChunkCountLimit(): ?int
     {
         return $this->chunkCountLimit;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setChunkCountLimit(?int $limit): void
     {
         $this->chunkCountLimit = $limit;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getChunkCountLimitPerSection(): array
     {
         return $this->chunkCountLimitPerSection;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setChunkCountLimitPerSection(array $limits): void
     {
         $this->chunkCountLimitPerSection = $limits;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getChunkFileNameTemplate(): ?string
     {
         return $this->chunkFileNameTemplate;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setChunkFileNameTemplate(?string $template): void
     {
         $this->chunkFileNameTemplate = $template;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getHeaderSectionName(): ?string
     {
         return $this->headerSectionName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setHeaderSectionName(?string $name): void
     {
         $this->headerSectionName = $name;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getPrimarySectionName(): ?string
     {
         return $this->primarySectionName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setPrimarySectionName(?string $name): void
     {
         $this->primarySectionName = $name;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getSectionNamesToSplit(): array
     {
         return $this->sectionNamesToSplit;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setSectionNamesToSplit(array $names): void
     {
         $this->sectionNamesToSplit = $names;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function splitFile(string $fileName, FileManager $srcFileManager, FileManager $destFileManager): array
     {
         $this->destFileManager = $destFileManager;

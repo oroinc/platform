@@ -37,17 +37,13 @@ class LoadGridViewData extends AbstractFixture implements DependentFixtureInterf
         ]
     ];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies(): array
     {
         return [LoadUserData::class, LoadUser::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
         foreach (static::$data as $name => $data) {

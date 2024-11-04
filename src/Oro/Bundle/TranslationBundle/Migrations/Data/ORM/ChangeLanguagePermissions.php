@@ -19,9 +19,9 @@ use Oro\Bundle\UserBundle\Entity\Role;
 class ChangeLanguagePermissions extends AbstractUpdatePermissions
 {
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         if (!$this->container->get(ApplicationState::class)->isInstalled()) {

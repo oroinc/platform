@@ -11,9 +11,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class WebsocketOriginRegistryPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $container->getDefinition('gos_web_socket.registry.origins')

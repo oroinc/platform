@@ -19,6 +19,7 @@ class JobManagerTest extends WebTestCase
     /** @var JobManager */
     private $jobManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -269,9 +270,7 @@ class JobManagerTest extends WebTestCase
         $this->assertNull($this->getJobRepository()->findJobById($job->getId()));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getDataFixturesExecutorEntityManager(): EntityManagerInterface
     {
         return $this->getJobEntityManager();

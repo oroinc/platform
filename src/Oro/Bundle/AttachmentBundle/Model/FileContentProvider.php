@@ -23,9 +23,7 @@ class FileContentProvider implements BinaryDataProviderInterface
         $this->fileManager = $fileManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getData()
     {
         return $this->fileManager->getContent($this->fileName);

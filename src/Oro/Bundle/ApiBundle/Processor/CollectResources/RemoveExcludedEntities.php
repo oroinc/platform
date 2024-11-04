@@ -18,9 +18,7 @@ class RemoveExcludedEntities implements ProcessorInterface
         $this->exclusionProviderRegistry = $exclusionProviderRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CollectResourcesContext $context */

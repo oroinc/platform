@@ -15,33 +15,24 @@ class AclAccessLevelSelectorType extends AbstractType
     const NAME = 'oro_acl_access_level_selector';
     const TRANSLATE_KEY_ACCESS_LEVEL = 'oro.security.access-level';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return ChoiceType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -49,9 +40,7 @@ class AclAccessLevelSelectorType extends AbstractType
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $parent = $form->getParent()->getParent()->getParent();

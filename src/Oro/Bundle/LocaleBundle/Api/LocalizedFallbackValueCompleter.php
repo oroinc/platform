@@ -22,9 +22,7 @@ class LocalizedFallbackValueCompleter implements CustomDataTypeCompleterInterfac
 
     private const LOCALIZED_FALLBACK_VALUE_PREFIX = 'localizedFallbackValue:';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function completeCustomDataType(
         ClassMetadata $metadata,
         EntityDefinitionConfig $definition,

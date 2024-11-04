@@ -10,6 +10,7 @@ class TimePicker extends Element
     /**
      * @param \DateTime $dateTime
      */
+    #[\Override]
     public function setValue($dateTime)
     {
         $this->spin(

@@ -18,6 +18,7 @@ class AclVoterDecoratorTest extends \PHPUnit\Framework\TestCase
     /** @var AclVoterDecorator */
     private $decorator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->wrapped = $this->createMock(AclVoterInterface::class);

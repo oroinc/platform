@@ -23,9 +23,7 @@ class FeaturesTopicController implements Controller
     ) {
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configure(SymfonyCommand $command)
     {
         $command
@@ -39,9 +37,9 @@ class FeaturesTopicController implements Controller
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function execute(InputInterface $input, OutputInterface $output)
     {
         if (false === $input->getParameterOption('--topics')) {

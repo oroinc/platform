@@ -35,6 +35,7 @@ class FixedIntegerType extends AbstractType
         self::BIGINT => ['min' => -9007199254740991, 'max' => 9007199254740991] # JS support (MAX safe integers).
     ];
 
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
@@ -48,6 +49,7 @@ class FixedIntegerType extends AbstractType
         ]);
     }
 
+    #[\Override]
     public function getParent(): string
     {
         return IntegerType::class;

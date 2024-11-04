@@ -36,9 +36,7 @@ class RequestMailboxes extends AbstractAction
         $this->processStorage = $processStorage;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $settingsClass = $this->contextAccessor->getValue($context, $this->processType);
@@ -54,9 +52,7 @@ class RequestMailboxes extends AbstractAction
         $this->contextAccessor->setValue($context, $this->attribute, $results);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (count($options) !== 3) {

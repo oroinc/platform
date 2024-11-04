@@ -20,6 +20,7 @@ class SmtpConnectionConfigurationValidatorTest extends ConstraintValidatorTestCa
     /** @var SmtpSettingsFactory|\PHPUnit\Framework\MockObject\MockObject */
     private $smtpSettingsFactory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->checker = $this->createMock(SmtpSettingsChecker::class);
@@ -27,6 +28,7 @@ class SmtpConnectionConfigurationValidatorTest extends ConstraintValidatorTestCa
         parent::setUp();
     }
 
+    #[\Override]
     protected function createValidator()
     {
         return new SmtpConnectionConfigurationValidator(

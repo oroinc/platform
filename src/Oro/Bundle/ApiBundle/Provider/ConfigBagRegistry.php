@@ -67,9 +67,7 @@ class ConfigBagRegistry implements ResetInterface
         return $configBag;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         foreach ($this->cache as $configBag) {

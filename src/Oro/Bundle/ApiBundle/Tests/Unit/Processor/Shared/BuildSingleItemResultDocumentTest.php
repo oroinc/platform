@@ -24,6 +24,7 @@ class BuildSingleItemResultDocumentTest extends GetProcessorTestCase
     /** @var BuildSingleItemResultDocument */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

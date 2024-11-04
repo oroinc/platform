@@ -18,9 +18,7 @@ class EntitiesToJsonTransformer implements DataTransformerInterface
         $this->entityManager = $entityManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         if (!$value) {
@@ -41,9 +39,7 @@ class EntitiesToJsonTransformer implements DataTransformerInterface
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (!$value) {

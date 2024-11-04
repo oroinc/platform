@@ -44,9 +44,7 @@ class EmailThreadActivityContextApiEntityManager extends ActivityContextApiEntit
         $this->setClass(Email::class);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getActivityTargets(object $entity): array
     {
         /** @var Email $entity */

@@ -19,6 +19,7 @@ class FileLockManagerTest extends \PHPUnit\Framework\TestCase
     /** @var FileLockManager */
     private $fileLockManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->lockFactory = $this->createMock(LockFactory::class);

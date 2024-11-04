@@ -57,9 +57,7 @@ class ContextsExtension extends AbstractTypeExtension implements ServiceSubscrib
         $this->container = $container;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
@@ -69,9 +67,7 @@ class ContextsExtension extends AbstractTypeExtension implements ServiceSubscrib
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (!$this->isApplicable($options)) {
@@ -155,9 +151,7 @@ class ContextsExtension extends AbstractTypeExtension implements ServiceSubscrib
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         if (!$this->isApplicable($options)) {
@@ -167,9 +161,7 @@ class ContextsExtension extends AbstractTypeExtension implements ServiceSubscrib
         $view->children['contexts']->vars['extra_field'] = true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

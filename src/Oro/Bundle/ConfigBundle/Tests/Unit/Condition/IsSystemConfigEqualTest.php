@@ -14,6 +14,7 @@ class IsSystemConfigEqualTest extends \PHPUnit\Framework\TestCase
     /** @var IsSystemConfigEqual */
     private $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

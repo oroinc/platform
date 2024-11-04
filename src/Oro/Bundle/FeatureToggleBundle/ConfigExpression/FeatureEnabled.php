@@ -33,23 +33,13 @@ class FeatureEnabled extends AbstractCondition implements ContextAccessorAwareIn
         $this->featureChecker = $featureChecker;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'feature_enabled';
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * Configuration examples:
-     *
-     * '@feature_enabled': ['feature_name']
-     * '@feature_enabled': ['feature': 'feature_name']
-     * '@feature_enabled': ['feature': 'feature_name', 'scope_identifier': $.scopeId]
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         $optionsCount = count($options);
@@ -69,9 +59,7 @@ class FeatureEnabled extends AbstractCondition implements ContextAccessorAwareIn
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toArray()
     {
         $params = [$this->feature];
@@ -82,9 +70,7 @@ class FeatureEnabled extends AbstractCondition implements ContextAccessorAwareIn
         return $this->convertToArray($params);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function compile($factoryAccessor)
     {
         $params = [$this->feature];
@@ -95,9 +81,7 @@ class FeatureEnabled extends AbstractCondition implements ContextAccessorAwareIn
         return $this->convertToPhpCode($params, $factoryAccessor);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isConditionAllowed($context)
     {
         $feature = $this->resolveValue($context, $this->feature);

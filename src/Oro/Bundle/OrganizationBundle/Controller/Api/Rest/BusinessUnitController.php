@@ -96,9 +96,7 @@ class BusinessUnitController extends RestController
         return $this->handleGetRequest($id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function transformEntityField($field, &$value)
     {
         switch ($field) {
@@ -124,9 +122,7 @@ class BusinessUnitController extends RestController
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getPreparedItem($entity, $resultFields = [])
     {
         $result = parent::getPreparedItem($entity);
@@ -153,25 +149,19 @@ class BusinessUnitController extends RestController
         return $this->handleDeleteRequest($id);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getManager()
     {
         return $this->container->get('oro_organization.business_unit.manager.api');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getForm()
     {
         return $this->container->get('oro_organization.form.business_unit.api');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFormHandler()
     {
         return $this->container->get('oro_organization.form.handler.business_unit.api');

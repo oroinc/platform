@@ -79,9 +79,7 @@ class LazyResult extends Result
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getElements()
     {
         $this->initializeElements();
@@ -89,9 +87,7 @@ class LazyResult extends Result
         return $this->elements;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getRecordsCount()
     {
         if (null === $this->recordsCount) {
@@ -101,9 +97,7 @@ class LazyResult extends Result
         return $this->recordsCount;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAggregatedData()
     {
         if (null === $this->aggregatedData) {
@@ -113,9 +107,7 @@ class LazyResult extends Result
         return $this->aggregatedData;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toArray()
     {
         $this->initializeElements();
@@ -123,9 +115,7 @@ class LazyResult extends Result
         return parent::toArray();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function first()
     {
         $this->initializeElements();
@@ -133,9 +123,7 @@ class LazyResult extends Result
         return parent::first();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function last()
     {
         $this->initializeElements();
@@ -143,9 +131,7 @@ class LazyResult extends Result
         return parent::last();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function key()
     {
         $this->initializeElements();
@@ -153,9 +139,7 @@ class LazyResult extends Result
         return parent::key();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function next()
     {
         $this->initializeElements();
@@ -163,9 +147,7 @@ class LazyResult extends Result
         return parent::next();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function current()
     {
         $this->initializeElements();
@@ -173,9 +155,7 @@ class LazyResult extends Result
         return parent::current();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function remove($key)
     {
         $this->initializeElements();
@@ -183,9 +163,7 @@ class LazyResult extends Result
         return parent::remove($key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function removeElement($element)
     {
         $this->initializeElements();
@@ -193,9 +171,7 @@ class LazyResult extends Result
         return parent::removeElement($element);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function containsKey($key)
     {
         $this->initializeElements();
@@ -203,9 +179,7 @@ class LazyResult extends Result
         return parent::containsKey($key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function contains($element)
     {
         $this->initializeElements();
@@ -213,9 +187,7 @@ class LazyResult extends Result
         return parent::contains($element);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function exists(\Closure $p)
     {
         $this->initializeElements();
@@ -223,9 +195,7 @@ class LazyResult extends Result
         return parent::exists($p);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function indexOf($element)
     {
         $this->initializeElements();
@@ -233,9 +203,7 @@ class LazyResult extends Result
         return parent::indexOf($element);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function get($key)
     {
         $this->initializeElements();
@@ -243,9 +211,7 @@ class LazyResult extends Result
         return parent::get($key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getKeys()
     {
         $this->initializeElements();
@@ -253,9 +219,7 @@ class LazyResult extends Result
         return parent::getKeys();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getValues()
     {
         $this->initializeElements();
@@ -263,9 +227,7 @@ class LazyResult extends Result
         return parent::getValues();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function count(): int
     {
         $this->initializeElements();
@@ -273,9 +235,7 @@ class LazyResult extends Result
         return parent::count();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function set($key, $value)
     {
         $this->initializeElements();
@@ -283,9 +243,7 @@ class LazyResult extends Result
         parent::set($key, $value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function add($element)
     {
         $this->initializeElements();
@@ -293,9 +251,7 @@ class LazyResult extends Result
         return parent::add($element);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isEmpty()
     {
         $this->initializeElements();
@@ -306,8 +262,8 @@ class LazyResult extends Result
     /**
      * Required by interface IteratorAggregate.
      *
-     * {@inheritDoc}
      */
+    #[\Override]
     public function getIterator(): \Traversable
     {
         $this->initializeElements();
@@ -315,9 +271,7 @@ class LazyResult extends Result
         return parent::getIterator();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function map(\Closure $func)
     {
         $this->initializeElements();
@@ -325,9 +279,7 @@ class LazyResult extends Result
         return parent::map($func);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function filter(\Closure $p)
     {
         $this->initializeElements();
@@ -335,9 +287,7 @@ class LazyResult extends Result
         return parent::filter($p);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function forAll(\Closure $p)
     {
         $this->initializeElements();
@@ -345,9 +295,7 @@ class LazyResult extends Result
         return parent::forAll($p);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function partition(\Closure $p)
     {
         $this->initializeElements();
@@ -355,9 +303,7 @@ class LazyResult extends Result
         return parent::partition($p);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function slice($offset, $length = null)
     {
         $this->initializeElements();
@@ -365,9 +311,7 @@ class LazyResult extends Result
         return parent::slice($offset, $length);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function matching(Criteria $criteria)
     {
         $this->initializeElements();

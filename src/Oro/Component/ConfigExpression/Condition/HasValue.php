@@ -17,33 +17,25 @@ class HasValue extends AbstractCondition implements ContextAccessorAwareInterfac
     /** @var mixed */
     protected $value;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'has';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toArray()
     {
         return $this->convertToArray($this->value);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function compile($factoryAccessor)
     {
         return $this->convertToPhpCode($this->value, $factoryAccessor);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (1 === count($options)) {
@@ -57,9 +49,7 @@ class HasValue extends AbstractCondition implements ContextAccessorAwareInterfac
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isConditionAllowed($context)
     {
         if ($this->value instanceof PropertyPathInterface) {

@@ -10,6 +10,7 @@ class ResourcePathProvidersPassTest extends \PHPUnit\Framework\TestCase
 {
     private ResourcePathProvidersPass $compiler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->compiler = new ResourcePathProvidersPass();

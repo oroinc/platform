@@ -19,6 +19,7 @@ class UserMultiSelectTypeTest extends \PHPUnit\Framework\TestCase
     /** @var UserMultiSelectType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->em = $this->createMock(EntityManager::class);

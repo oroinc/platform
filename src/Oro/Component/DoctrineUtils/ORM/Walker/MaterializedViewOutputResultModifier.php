@@ -21,6 +21,7 @@ class MaterializedViewOutputResultModifier extends AbstractOutputResultModifier
 {
     public const USE_MATERIALIZED_VIEW = 'USE_MATERIALIZED_VIEW';
 
+    #[\Override]
     public function walkSelectStatement(AST\SelectStatement $AST, string $result): string
     {
         if (!$this->hasMaterializedViewHint()) {
@@ -40,6 +41,7 @@ class MaterializedViewOutputResultModifier extends AbstractOutputResultModifier
     /**
      * Replaces the whole 'FROM ... table_alias ...' clause with 'FROM "your_materialized_view" table_alias'.
      */
+    #[\Override]
     public function walkFromClause($fromClause, string $result): string
     {
         if (!$this->hasMaterializedViewHint()) {
@@ -64,6 +66,7 @@ class MaterializedViewOutputResultModifier extends AbstractOutputResultModifier
      * Replaces "SELECT ..." clause with "SELECT *" to fetch all columns that are present in the backing query of
      * the materialized view.
      */
+    #[\Override]
     public function walkSelectClause($selectClause, string $result): string
     {
         return $this->hasMaterializedViewHint() ? 'SELECT * ' : $result;
@@ -81,21 +84,25 @@ class MaterializedViewOutputResultModifier extends AbstractOutputResultModifier
         return $databasePlatform->getName() === 'postgresql';
     }
 
+    #[\Override]
     public function walkWhereClause($whereClause, string $result): string
     {
         return $this->hasMaterializedViewHint() ? '' : $result;
     }
 
+    #[\Override]
     public function walkGroupByClause($groupByClause, string $result): string
     {
         return $this->hasMaterializedViewHint() ? '' : $result;
     }
 
+    #[\Override]
     public function walkHavingClause($havingClause, string $result): string
     {
         return $this->hasMaterializedViewHint() ? '' : $result;
     }
 
+    #[\Override]
     public function walkOrderByClause($orderByClause, string $result): string
     {
         return $this->hasMaterializedViewHint() ? '' : $result;

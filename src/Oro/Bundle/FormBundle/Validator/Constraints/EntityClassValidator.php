@@ -24,9 +24,7 @@ class EntityClassValidator extends ConstraintValidator
         $this->entityClassNameHelper = $entityClassNameHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (null === $value || '' === $value) {

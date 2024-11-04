@@ -25,6 +25,7 @@ class WindowsStateManagerRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var WindowsStateManagerRegistry */
     private $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->manager1 = $this->createMock(WindowsStateManager::class);

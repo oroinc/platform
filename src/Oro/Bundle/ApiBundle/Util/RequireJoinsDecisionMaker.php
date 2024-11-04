@@ -10,9 +10,7 @@ use Doctrine\Common\Collections\Expr\Comparison;
  */
 class RequireJoinsDecisionMaker implements RequireJoinsDecisionMakerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isJoinRequired(Comparison $comparison, $resolvedValue): bool
     {
         switch ($comparison->getOperator()) {

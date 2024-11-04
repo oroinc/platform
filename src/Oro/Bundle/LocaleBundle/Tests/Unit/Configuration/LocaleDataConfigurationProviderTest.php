@@ -14,6 +14,7 @@ class LocaleDataConfigurationProviderTest extends \PHPUnit\Framework\TestCase
 
     private LocaleDataConfigurationProvider $configurationProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $cacheFile = $this->getTempFile('LocaleDataConfigurationProvider');

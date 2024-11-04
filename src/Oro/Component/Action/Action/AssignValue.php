@@ -12,9 +12,7 @@ class AssignValue extends AbstractAction
      */
     protected $assigns = [];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         foreach ($this->assigns as $assignOptions) {
@@ -48,9 +46,7 @@ class AssignValue extends AbstractAction
         return array_key_exists('value', $options) ? $options['value'] : $options[1];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if ($this->isMassAssign($options)) {

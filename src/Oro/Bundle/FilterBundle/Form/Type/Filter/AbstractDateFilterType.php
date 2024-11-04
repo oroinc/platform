@@ -102,9 +102,7 @@ abstract class AbstractDateFilterType extends AbstractType
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
@@ -159,6 +157,7 @@ abstract class AbstractDateFilterType extends AbstractType
         return $this->dateVarsChoices;
     }
 
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['widget_options'] = $options['widget_options'];
@@ -166,9 +165,7 @@ abstract class AbstractDateFilterType extends AbstractType
         $view->vars['date_vars']      = $options['date_vars'];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         if (!isset($options['date_parts'])) {

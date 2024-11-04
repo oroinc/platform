@@ -13,9 +13,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
  */
 class NormalizeRequestData extends AbstractNormalizeRequestData
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ChangeSubresourceContext $context */

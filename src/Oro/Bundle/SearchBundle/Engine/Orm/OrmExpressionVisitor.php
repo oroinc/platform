@@ -39,9 +39,7 @@ class OrmExpressionVisitor extends ExpressionVisitor
         $this->setOrderBy = $setOrderBy;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkComparison(Comparison $comparison)
     {
         $value = $comparison->getValue()->getValue();
@@ -94,17 +92,13 @@ class OrmExpressionVisitor extends ExpressionVisitor
         return $this->driver->addNonTextField($this->qb, $index, $searchCondition);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkValue(Value $value)
     {
         $value->getValue();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkCompositeExpression(CompositeExpression $expr)
     {
         $expressionObjectList = [];

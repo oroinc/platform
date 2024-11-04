@@ -26,9 +26,7 @@ class StringComparisonFilter extends ComparisonFilter
         $this->allowEmpty = $allowEmpty;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getValueNormalizationOptions(): array
     {
         $options = parent::getValueNormalizationOptions();

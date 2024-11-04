@@ -59,9 +59,7 @@ class EntityListener implements OptionalListenerInterface, ServiceSubscriberInte
         $this->container = $container;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

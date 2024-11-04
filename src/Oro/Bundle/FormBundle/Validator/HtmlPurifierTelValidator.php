@@ -4,19 +4,11 @@ namespace Oro\Bundle\FormBundle\Validator;
 
 class HtmlPurifierTelValidator extends \HTMLPurifier_URIScheme
 {
-    /**
-     * {@inheritdoc}
-     */
     public $browsable = false;
 
-    /**
-     * {@inheritdoc}
-     */
     public $may_omit_host = true;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function doValidate(&$uri, $config, $context)
     {
         $uri->userinfo = null;

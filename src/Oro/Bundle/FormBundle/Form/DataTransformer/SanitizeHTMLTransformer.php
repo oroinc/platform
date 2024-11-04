@@ -30,17 +30,13 @@ class SanitizeHTMLTransformer implements DataTransformerInterface
         $this->scope = $scope;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         return $this->htmlTagHelper->sanitize($value, $this->scope);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function reverseTransform($value)
     {
         return $this->htmlTagHelper->sanitize($value, $this->scope);

@@ -14,17 +14,13 @@ class AttributeConfiguration extends Constraint
      */
     public $message = 'oro.entity_extend.validator.attribute_configuration.error_configuration';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validatedBy(): string
     {
         return AttributeConfigurationValidator::ALIAS;

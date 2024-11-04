@@ -15,6 +15,7 @@ class AttachmentAuditStrategyProcessor extends DefaultUnidirectionalFieldAuditSt
      * @throws MappingException
      * @throws ReflectionException
      */
+    #[\Override]
     public function processInverseCollections(array $sourceEntityData): array
     {
         $sourceEntityId = $sourceEntityData['entity_id'];

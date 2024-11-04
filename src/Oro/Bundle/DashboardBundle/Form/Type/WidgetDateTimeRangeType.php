@@ -15,9 +15,7 @@ class WidgetDateTimeRangeType extends AbstractType
 {
     const NAME = 'oro_type_widget_datetime_range';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['datetime_range_metadata'] = [
@@ -42,9 +40,7 @@ class WidgetDateTimeRangeType extends AbstractType
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['datetime_range_metadata'] = array_merge(
@@ -53,9 +49,7 @@ class WidgetDateTimeRangeType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -66,25 +60,18 @@ class WidgetDateTimeRangeType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return DateTimeRangeFilterType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return static::NAME;

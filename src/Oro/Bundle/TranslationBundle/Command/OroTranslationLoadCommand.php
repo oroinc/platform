@@ -42,6 +42,7 @@ final class OroTranslationLoadCommand extends Command
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function configure()
     {
         $this
@@ -78,6 +79,7 @@ HELP
      * @throws \Exception
      * @noinspection PhpMissingParentCallCommonInspection
      */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $availableLocales = $this->languageProvider->getAvailableLanguageCodes();

@@ -10,6 +10,7 @@ class WidgetTest extends \PHPUnit\Framework\TestCase
     /** @var Widget */
     private $widget;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->widget = new Widget();

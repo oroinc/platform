@@ -40,9 +40,7 @@ class ReindexEntityMessageProcessor implements MessageProcessorInterface, TopicS
         $this->producer = $producer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(MessageInterface $message, SessionInterface $session)
     {
         $classes = $message->getBody();
@@ -99,9 +97,7 @@ class ReindexEntityMessageProcessor implements MessageProcessorInterface, TopicS
         return $entityClasses;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [ReindexTopic::getName()];

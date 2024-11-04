@@ -21,6 +21,7 @@ class LoadParentEntityTest extends ChangeRelationshipProcessorTestCase
     /** @var LoadParentEntity */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

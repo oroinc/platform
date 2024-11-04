@@ -10,9 +10,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityProvider;
  */
 class EmailTemplateEntityProvider extends EntityProvider
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function addEntities(array &$result, $applyExclusions, $translate)
     {
         parent::addEntities($result, $applyExclusions, $translate);

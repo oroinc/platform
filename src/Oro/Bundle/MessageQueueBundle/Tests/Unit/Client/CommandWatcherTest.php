@@ -18,9 +18,7 @@ class CommandWatcherTest extends \PHPUnit\Framework\TestCase
     /** @var CommandWatcher */
     private $commandWatcher;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function setUp(): void
     {
         $this->bufferedProducer = $this->createMock(BufferedMessageProducer::class);

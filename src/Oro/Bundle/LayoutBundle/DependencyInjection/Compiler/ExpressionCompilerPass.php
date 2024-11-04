@@ -17,9 +17,7 @@ class ExpressionCompilerPass implements CompilerPassInterface
     private const EXPRESSION_LANGUAGE_SERVICE_ID = 'oro_layout.expression_language';
     private const EXPRESSION_LANGUAGE_PROVIDER_TAG_NAME = 'layout.expression_language_provider';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $this->loadExpressionEncoders($container);

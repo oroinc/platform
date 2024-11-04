@@ -34,17 +34,13 @@ class GroupedActionsWidgetProvider implements WidgetProviderInterface
         $this->buttonProvider = $buttonProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function supports($object)
     {
         return $this->buttonProvider->hasButtons($this->getButtonSearchContext($object));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getWidgets($object)
     {
         $result = [];

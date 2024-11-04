@@ -11,19 +11,17 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 abstract class AbstractAssociationTransformer implements DataTransformerInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function transform($value)
     {
         return null;
     }
 
     /**
-     * {@inheritDoc}
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function reverseTransform($value)
     {
         if (null === $value || '' === $value) {

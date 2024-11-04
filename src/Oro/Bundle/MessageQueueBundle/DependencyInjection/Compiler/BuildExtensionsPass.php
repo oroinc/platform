@@ -17,9 +17,7 @@ class BuildExtensionsPass implements CompilerPassInterface
 {
     use TaggedServiceTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $this->processConsumptionExtensions($container);

@@ -12,9 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class Percent100Type extends AbstractType
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addViewTransformer(new Percent100ToLocalizedStringTransformer(
@@ -24,9 +22,7 @@ class Percent100Type extends AbstractType
         ));
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver

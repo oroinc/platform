@@ -28,9 +28,7 @@ class TranslateAction extends AbstractAction
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $id = $this->contextAccessor->getValue($context, $this->options[self::OPTION_KEY_ID]);
@@ -68,9 +66,7 @@ class TranslateAction extends AbstractAction
         $this->contextAccessor->setValue($context, $this->options[self::OPTION_KEY_ATTRIBUTE], $result);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (empty($options[self::OPTION_KEY_ID])) {

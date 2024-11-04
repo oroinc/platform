@@ -14,6 +14,7 @@ use Oro\Component\Layout\ContextInterface;
  */
 class DataCollectorBasicLayoutNameProvider implements DataCollectorLayoutNameProviderInterface
 {
+    #[\Override]
     public function getNameByContext(ContextInterface $context): string
     {
         $name = 'Request';

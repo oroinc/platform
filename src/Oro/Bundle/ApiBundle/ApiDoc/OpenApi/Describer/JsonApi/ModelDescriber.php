@@ -40,17 +40,13 @@ class ModelDescriber implements
         $this->resourceInfoProvider = $resourceInfoProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         $this->includedSectionModelName = null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function describe(
         OA\OpenApi $api,
         OA\Schema $schema,
@@ -83,6 +79,7 @@ class ModelDescriber implements
         }
     }
 
+    #[\Override]
     public function describeUnion(OA\OpenApi $api, OA\Schema $schema, array $modelNames, bool $isCollection): void
     {
         $schema->type = Util::TYPE_OBJECT;

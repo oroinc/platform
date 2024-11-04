@@ -12,16 +12,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class AttachmentRemoveImageTopic extends AbstractTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro_attachment.remove_image';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Removes image files related to removed attachment related entities.';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver

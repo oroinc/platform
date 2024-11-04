@@ -8,9 +8,7 @@ namespace Oro\Component\Config\Loader;
  */
 class NullCumulativeFileLoader extends CumulativeFileLoader
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function loadFile($file)
     {
         return null;

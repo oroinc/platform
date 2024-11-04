@@ -25,6 +25,7 @@ class ExportExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var ExportExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);

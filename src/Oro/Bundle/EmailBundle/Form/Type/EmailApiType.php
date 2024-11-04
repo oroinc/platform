@@ -26,10 +26,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 class EmailApiType extends AbstractType
 {
     /**
-     * {@inheritdoc}
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -141,9 +141,7 @@ class EmailApiType extends AbstractType
         $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -155,17 +153,12 @@ class EmailApiType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_email_email_api';

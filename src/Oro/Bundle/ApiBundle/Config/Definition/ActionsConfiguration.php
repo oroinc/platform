@@ -25,9 +25,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
         $this->sectionName = $sectionName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configure(NodeBuilder $node): void
     {
         /** @var NodeBuilder $actionNode */
@@ -65,9 +63,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
         $this->configureActionNode($actionNode);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(string $section): bool
     {
         return 'entities.entity' === $section;
@@ -94,6 +90,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
             ->scalarNode(ConfigUtil::DOCUMENTATION)->cannotBeEmpty()->end()
             ->scalarNode(ConfigUtil::ACL_RESOURCE)->end()
             ->integerNode(ConfigUtil::MAX_RESULTS)->min(-1)->end()
+            ->booleanNode(ConfigUtil::DISABLE_PAGING)->end()
             ->integerNode(ConfigUtil::PAGE_SIZE)
                 ->min(-1)
                 ->validate()
@@ -166,6 +163,12 @@ class ActionsConfiguration extends AbstractConfigurationSection
      */
     private function postProcessActionConfig(array $config): array
     {
+        if (\array_key_exists(ConfigUtil::DISABLE_PAGING, $config)) {
+            if ($config[ConfigUtil::DISABLE_PAGING] && !\array_key_exists(ConfigUtil::PAGE_SIZE, $config)) {
+                $config[ConfigUtil::PAGE_SIZE] = -1;
+            }
+            unset($config[ConfigUtil::DISABLE_PAGING]);
+        }
         if (\array_key_exists(ConfigUtil::PAGE_SIZE, $config)
             && -1 === $config[ConfigUtil::PAGE_SIZE]
             && !\array_key_exists(ConfigUtil::MAX_RESULTS, $config)
@@ -208,7 +211,7 @@ class ActionsConfiguration extends AbstractConfigurationSection
         return $config;
     }
 
-    public function addStatusCodesNode(NodeBuilder $node): void
+    private function addStatusCodesNode(NodeBuilder $node): void
     {
         /** @var ArrayNodeDefinition $parentNode */
         $codeNode = $node

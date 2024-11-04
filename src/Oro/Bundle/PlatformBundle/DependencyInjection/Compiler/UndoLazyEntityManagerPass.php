@@ -14,9 +14,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class UndoLazyEntityManagerPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if ('test' === $container->getParameter('kernel.environment')) {

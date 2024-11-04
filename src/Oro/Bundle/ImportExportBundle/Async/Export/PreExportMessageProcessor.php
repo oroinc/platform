@@ -28,17 +28,13 @@ class PreExportMessageProcessor extends PreExportMessageProcessorAbstract
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedTopics()
     {
         return [PreExportTopic::getName()];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExportingEntityIds(array $body)
     {
         if (isset($body['organizationId'])) {
@@ -57,9 +53,7 @@ class PreExportMessageProcessor extends PreExportMessageProcessorAbstract
         return $ids;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getDelayedJobCallback(array $body, array $ids = [])
     {
         if (!empty($ids)) {
@@ -77,9 +71,7 @@ class PreExportMessageProcessor extends PreExportMessageProcessorAbstract
         };
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getMessageBody(MessageInterface $message)
     {
         $messageBody = $message->getBody();

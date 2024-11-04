@@ -15,6 +15,7 @@ class FileContentProviderTest extends \PHPUnit\Framework\TestCase
     /** @var FileContentProvider */
     private $fileContentProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fileManager = $this->createMock(FileManager::class);

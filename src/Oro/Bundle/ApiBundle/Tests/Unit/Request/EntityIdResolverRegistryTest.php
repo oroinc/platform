@@ -28,6 +28,7 @@ class EntityIdResolverRegistryTest extends \PHPUnit\Framework\TestCase
     /** @var EntityIdResolverRegistry */
     private $registry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->resolver1 = $this->createMock(EntityIdResolverInterface::class);

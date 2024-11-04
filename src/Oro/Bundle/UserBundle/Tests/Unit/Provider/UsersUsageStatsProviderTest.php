@@ -19,6 +19,7 @@ class UsersUsageStatsProviderTest extends TestCase
     private OrganizationRestrictionProviderInterface|MockObject $organizationRestrictionProvider;
     private UsersUsageStatsProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->objectManager = $this->createMock(ObjectManager::class);

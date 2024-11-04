@@ -14,9 +14,7 @@ class InternalEmailFlagManager implements EmailFlagManagerInterface
     const FLAG_UNSEEN = 'UNSEEN';
     const FLAG_SEEN = 'SEEN';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setFlags(EmailFolder $folder, Email $email, $flags)
     {
         /**
@@ -25,17 +23,13 @@ class InternalEmailFlagManager implements EmailFlagManagerInterface
          */
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setUnseen(EmailFolder $folder, Email $email)
     {
         $this->setFlags($folder, $email, [self::FLAG_UNSEEN]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setSeen(EmailFolder $folder, Email $email)
     {
         $this->setFlags($folder, $email, [self::FLAG_SEEN]);

@@ -16,6 +16,7 @@ class InsertFromSelectWriterTest extends \PHPUnit\Framework\TestCase
     /** @var InsertFromSelectWriter */
     private $writer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->queryExecutor = $this->createMock(InsertFromSelectQueryExecutor::class);

@@ -19,6 +19,7 @@ class SocketNotificationSenderTest extends \PHPUnit\Framework\TestCase
     /** @var SocketNotificationSender */
     private $sender;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->websocketClient = $this->createMock(WebsocketClientInterface::class);

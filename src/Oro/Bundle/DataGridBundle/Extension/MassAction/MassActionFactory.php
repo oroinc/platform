@@ -21,6 +21,7 @@ class MassActionFactory extends ActionFactory
      *
      * @throws RuntimeException if the requested action has invalid configuration
      */
+    #[\Override]
     public function createAction($actionName, array $actionConfig)
     {
         $action = parent::createAction($actionName, $actionConfig);

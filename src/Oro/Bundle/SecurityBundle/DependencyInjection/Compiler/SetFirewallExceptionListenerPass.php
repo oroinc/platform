@@ -11,9 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class SetFirewallExceptionListenerPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $container

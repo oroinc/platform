@@ -20,6 +20,7 @@ final class ConfigurationValidatorTest extends TestCase
 
     private ConfigurationValidator $configurationValidator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $configurationBuildersProvider = $this->createMock(ConfigurationBuildersProvider::class);

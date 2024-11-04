@@ -18,33 +18,25 @@ class UserStub implements EmailInterface
         $this->email = $email;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEmailField()
     {
         return 'email';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEmail()
     {
         return $this->email;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getEmailOwner()
     {
         return $this;

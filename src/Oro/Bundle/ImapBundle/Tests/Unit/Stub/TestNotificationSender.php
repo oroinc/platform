@@ -9,6 +9,7 @@ class TestNotificationSender implements NotificationSenderInterface
 {
     public $processedOrigins = [];
 
+    #[\Override]
     public function sendNotification(UserEmailOrigin $emailOrigin)
     {
         $this->processedOrigins[] = $emailOrigin;

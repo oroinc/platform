@@ -16,9 +16,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class PinbarTabRepository extends EntityRepository implements NavigationRepositoryInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getNavigationItems($user, Organization $organization, $type = null, $options = array())
     {
         $qb = $this->createNavigationItemsQueryBuiler($user, $organization, $type);

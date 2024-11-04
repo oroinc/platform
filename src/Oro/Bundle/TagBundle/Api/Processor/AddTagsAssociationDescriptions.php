@@ -43,9 +43,7 @@ class AddTagsAssociationDescriptions implements ProcessorInterface
         $this->entityNameProvider = $entityNameProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */

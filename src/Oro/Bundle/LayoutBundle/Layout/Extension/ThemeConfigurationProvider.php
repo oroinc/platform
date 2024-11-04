@@ -34,9 +34,7 @@ class ThemeConfigurationProvider extends PhpArrayConfigProvider implements Theme
         $this->folderPattern = $folderPattern;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getThemeNames(): array
     {
         $config = $this->doGetConfig();
@@ -44,9 +42,7 @@ class ThemeConfigurationProvider extends PhpArrayConfigProvider implements Theme
         return array_keys($config);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getThemeDefinition(string $themeName): ?array
     {
         $config = $this->doGetConfig();
@@ -54,9 +50,7 @@ class ThemeConfigurationProvider extends PhpArrayConfigProvider implements Theme
         return $config[$themeName] ?? null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function doLoadConfig(ResourcesContainerInterface $resourcesContainer)
     {
         $configs = [];

@@ -19,9 +19,7 @@ class ContextMetadataAccessor implements MetadataAccessorInterface
         $this->context = $context;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMetadata(string $className): ?EntityMetadata
     {
         return is_a($this->context->getClassName(), $this->resolveClassName($className), true)

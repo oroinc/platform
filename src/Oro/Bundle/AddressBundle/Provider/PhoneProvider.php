@@ -50,9 +50,7 @@ class PhoneProvider implements PhoneProviderInterface, ResetInterface
         $this->extendConfigProvider = $extendConfigProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset()
     {
         $this->sortedTargetEntities = null;
@@ -78,6 +76,7 @@ class PhoneProvider implements PhoneProviderInterface, ResetInterface
      *
      * @return string|null The phone number or null if the object has no phone
      */
+    #[\Override]
     public function getPhoneNumber($object)
     {
         if (!is_object($object)) {
@@ -118,6 +117,7 @@ class PhoneProvider implements PhoneProviderInterface, ResetInterface
      *
      * @return array of phone number, phone owner
      */
+    #[\Override]
     public function getPhoneNumbers($object)
     {
         if (!is_object($object)) {

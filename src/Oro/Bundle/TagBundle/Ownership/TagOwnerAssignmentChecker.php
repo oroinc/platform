@@ -10,9 +10,7 @@ use Oro\Bundle\OrganizationBundle\Ownership\OwnerAssignmentCheckerInterface;
  */
 class TagOwnerAssignmentChecker implements OwnerAssignmentCheckerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function hasAssignments(
         $ownerId,
         string $entityClassName,

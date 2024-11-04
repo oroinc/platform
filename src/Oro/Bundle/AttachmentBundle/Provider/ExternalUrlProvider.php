@@ -18,9 +18,7 @@ class ExternalUrlProvider implements FileUrlProviderInterface
         $this->innerFileUrlProvider = $innerFileUrlProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFileUrl(
         File $file,
         string $action = self::FILE_ACTION_GET,
@@ -29,9 +27,7 @@ class ExternalUrlProvider implements FileUrlProviderInterface
         return $file->getExternalUrl() ?? $this->innerFileUrlProvider->getFileUrl($file, $action, $referenceType);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getResizedImageUrl(
         File $file,
         int $width,
@@ -43,9 +39,7 @@ class ExternalUrlProvider implements FileUrlProviderInterface
                 ->getResizedImageUrl($file, $width, $height, $format, $referenceType);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFilteredImageUrl(
         File $file,
         string $filterName,

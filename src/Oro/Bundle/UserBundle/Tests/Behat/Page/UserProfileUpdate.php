@@ -6,9 +6,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Page;
 
 class UserProfileUpdate extends Page
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function open(array $parameters = [])
     {
         $userMenu = $this->elementFactory->createElement('UserMenu');

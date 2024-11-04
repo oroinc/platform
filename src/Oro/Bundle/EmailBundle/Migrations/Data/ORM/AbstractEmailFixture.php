@@ -27,17 +27,13 @@ abstract class AbstractEmailFixture extends AbstractFixture implements
     private ?User $adminUser = null;
     private ?Organization $organization = null;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [LoadAdminUserData::class];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $emailTemplates = $this->getEmailTemplatesList($this->getEmailsDir());

@@ -7,9 +7,7 @@ use Symfony\Component\Console\Command\Command;
 
 class CronCommandStub extends Command implements CronCommandScheduleDefinitionInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDefaultDefinition(): string
     {
         return '*/1 * * * *';

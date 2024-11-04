@@ -8,9 +8,7 @@ use Oro\Bundle\UserBundle\Entity\Role;
 
 class LoadAllRolesData extends AbstractFixture
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $roleRepo = $manager->getRepository(Role::class);

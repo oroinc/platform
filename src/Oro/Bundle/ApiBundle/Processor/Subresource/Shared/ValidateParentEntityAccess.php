@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Bundle\ApiBundle\Util\QueryAclHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -26,20 +27,21 @@ class ValidateParentEntityAccess implements ProcessorInterface
     private DoctrineHelper $doctrineHelper;
     private EntityIdHelper $entityIdHelper;
     private QueryAclHelper $queryAclHelper;
+    private QueryHintResolverInterface $queryHintResolver;
 
     public function __construct(
         DoctrineHelper $doctrineHelper,
         EntityIdHelper $entityIdHelper,
-        QueryAclHelper $queryAclHelper
+        QueryAclHelper $queryAclHelper,
+        QueryHintResolverInterface $queryHintResolver
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->entityIdHelper = $entityIdHelper;
         $this->queryAclHelper = $queryAclHelper;
+        $this->queryHintResolver = $queryHintResolver;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var SubresourceContext $context */
@@ -100,9 +102,9 @@ class ValidateParentEntityAccess implements ProcessorInterface
             ->getOneOrNullResult(Query::HYDRATE_ARRAY);
         if (!$data) {
             // use a query without ACL protection to check if an entity exists in DB
-            $data = $this->getQueryBuilder($parentEntityClass, $parentEntityId, $parentMetadata)
-                ->getQuery()
-                ->getOneOrNullResult(Query::HYDRATE_ARRAY);
+            $query = $this->getQueryBuilder($parentEntityClass, $parentEntityId, $parentMetadata)->getQuery();
+            $this->queryHintResolver->resolveHints($query, $parentConfig->getHints());
+            $data = $query->getOneOrNullResult(Query::HYDRATE_ARRAY);
             if ($data) {
                 throw new AccessDeniedException('No access to the parent entity.');
             }
@@ -120,11 +122,7 @@ class ValidateParentEntityAccess implements ProcessorInterface
         if (\count($idFieldNames) !== 0) {
             $qb->select('e.' . reset($idFieldNames));
         }
-        $this->entityIdHelper->applyEntityIdentifierRestriction(
-            $qb,
-            $parentEntityId,
-            $parentMetadata
-        );
+        $this->entityIdHelper->applyEntityIdentifierRestriction($qb, $parentEntityId, $parentMetadata);
 
         return $qb;
     }

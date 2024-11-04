@@ -14,6 +14,7 @@ class HasPropertyTest extends \PHPUnit\Framework\TestCase
     /** @var Condition\HasProperty */
     private $condition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->condition = new Condition\HasProperty();

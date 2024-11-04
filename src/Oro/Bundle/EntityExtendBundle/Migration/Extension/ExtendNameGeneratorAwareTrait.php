@@ -11,7 +11,7 @@ use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
  */
 trait ExtendNameGeneratorAwareTrait
 {
-    private ExtendDbIdentifierNameGenerator $nameGenerator;
+    protected ExtendDbIdentifierNameGenerator $nameGenerator;
 
     public function setNameGenerator(DbIdentifierNameGenerator $nameGenerator): void
     {

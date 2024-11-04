@@ -6,6 +6,7 @@ use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\PropertyAccess\NonTraversa
 
 class PropertyAccessorNonTraversableArrayObjectTest extends PropertyAccessorArrayAccessTest
 {
+    #[\Override]
     protected function getContainer(array $array)
     {
         return new NonTraversableArrayObject($array);

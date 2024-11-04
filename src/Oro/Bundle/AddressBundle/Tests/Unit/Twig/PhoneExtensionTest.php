@@ -16,6 +16,7 @@ class PhoneExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var PhoneExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider = $this->createMock(PhoneProvider::class);

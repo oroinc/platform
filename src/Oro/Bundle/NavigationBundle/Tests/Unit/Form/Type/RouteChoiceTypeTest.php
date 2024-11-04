@@ -35,6 +35,7 @@ class RouteChoiceTypeTest extends FormIntegrationTestCase
     /** @var RouteChoiceType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->router = $this->createMock(RouterInterface::class);

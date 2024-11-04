@@ -25,9 +25,7 @@ class SetDataCustomizationHandler implements ProcessorInterface
         $this->customizationProcessor = $customizationProcessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */

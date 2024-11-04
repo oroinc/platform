@@ -13,6 +13,7 @@ class TranslationUpdateListTest extends RestJsonApiUpdateListTestCase
 {
     use ResolveTranslationIdTrait;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

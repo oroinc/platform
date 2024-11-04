@@ -44,6 +44,7 @@ class DefaultGridViewLoadListenerTest extends \PHPUnit\Framework\TestCase
     /** @var DefaultGridViewLoadListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityClassResolver = $this->createMock(EntityClassResolver::class);

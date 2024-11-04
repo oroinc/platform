@@ -53,9 +53,7 @@ abstract class AbstractLoadEntityWorkflowDemoData extends AbstractFixture implem
         return [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         //Backup Original Token

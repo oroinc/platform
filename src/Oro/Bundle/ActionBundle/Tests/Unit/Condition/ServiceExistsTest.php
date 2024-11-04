@@ -21,6 +21,7 @@ class ServiceExistsTest extends \PHPUnit\Framework\TestCase
     /** @var ServiceExists */
     private $serviceExists;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);

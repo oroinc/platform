@@ -12,6 +12,7 @@ class InvalidateCacheScheduleArgumentsBuilder implements InvalidateCacheSchedule
      *
      * @return string[]
      */
+    #[\Override]
     public function build(DataStorageInterface $dataStorage)
     {
         $excludeParameters = [

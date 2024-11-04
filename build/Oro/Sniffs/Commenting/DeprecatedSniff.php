@@ -21,17 +21,11 @@ class DeprecatedSniff implements Sniff
         'JS',
     ];
 
-    /**
-     * {@inheritDoc}
-     */
     public function register()
     {
         return array_diff(Tokens::$commentTokens, Tokens::$phpcsCommentTokens);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function process(File $phpcsFile, $stackPtr)
     {
         $tokens = $phpcsFile->getTokens();

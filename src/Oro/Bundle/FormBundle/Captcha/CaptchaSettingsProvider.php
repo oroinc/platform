@@ -16,6 +16,7 @@ class CaptchaSettingsProvider implements CaptchaSettingsProviderInterface
     ) {
     }
 
+    #[\Override]
     public function isProtectionAvailable(): bool
     {
         if (!$this->configManager->get(Configuration::getConfigKey(Configuration::ENABLED_CAPTCHA))) {
@@ -25,6 +26,7 @@ class CaptchaSettingsProvider implements CaptchaSettingsProviderInterface
         return $this->getCaptchaService()->isConfigured();
     }
 
+    #[\Override]
     public function isFormProtected(string $formName): bool
     {
         $protectedForms = $this->configManager->get(
@@ -37,6 +39,7 @@ class CaptchaSettingsProvider implements CaptchaSettingsProviderInterface
         return false;
     }
 
+    #[\Override]
     public function getFormType(): string
     {
         return $this->getCaptchaService()->getFormType();

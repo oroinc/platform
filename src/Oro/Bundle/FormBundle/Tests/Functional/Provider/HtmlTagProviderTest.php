@@ -102,6 +102,7 @@ class HtmlTagProviderTest extends WebTestCase
     /** @var HtmlTagProvider */
     private $htmlTagProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

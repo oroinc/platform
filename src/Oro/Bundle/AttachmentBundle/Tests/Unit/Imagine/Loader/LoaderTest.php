@@ -18,6 +18,7 @@ class LoaderTest extends \PHPUnit\Framework\TestCase
     private string $directory;
     private SymfonyFilesystem $fileSystem;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fileSystem = new SymfonyFilesystem();
@@ -27,6 +28,7 @@ class LoaderTest extends \PHPUnit\Framework\TestCase
         StreamWrapper::register();
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         StreamWrapper::getFilesystemMap()->clear();

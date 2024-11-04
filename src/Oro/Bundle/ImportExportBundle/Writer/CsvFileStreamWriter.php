@@ -47,9 +47,7 @@ abstract class CsvFileStreamWriter extends FileStreamWriter
         $this->escape = chr(0);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function write(array $items)
     {
         // write a header if needed
@@ -114,6 +112,7 @@ abstract class CsvFileStreamWriter extends FileStreamWriter
     /**
      * Closes an open file.
      */
+    #[\Override]
     public function close()
     {
         if ($this->fileHandle) {
@@ -133,9 +132,7 @@ abstract class CsvFileStreamWriter extends FileStreamWriter
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setImportExportContext(ContextInterface $context)
     {
         if ($context->hasOption(Context::OPTION_DELIMITER)) {

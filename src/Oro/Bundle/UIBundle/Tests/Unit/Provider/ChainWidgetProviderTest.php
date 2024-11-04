@@ -19,6 +19,7 @@ class ChainWidgetProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ChainWidgetProvider */
     private $chainProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->highPriorityProvider = $this->createMock(WidgetProviderInterface::class);

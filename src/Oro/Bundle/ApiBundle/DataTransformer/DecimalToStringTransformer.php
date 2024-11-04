@@ -11,9 +11,7 @@ use Oro\Component\EntitySerializer\DataTransformerInterface;
  */
 class DecimalToStringTransformer implements DataTransformerInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function transform(mixed $value, array $config, array $context): mixed
     {
         if (null === $value) {

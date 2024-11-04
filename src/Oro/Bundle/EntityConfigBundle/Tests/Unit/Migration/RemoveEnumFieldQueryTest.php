@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Migration;
 use Doctrine\DBAL\Connection;
 
 use Doctrine\DBAL\Statement;
-use Oro\Bundle\EntityConfigBundle\Migration\RemoveEnumFieldQuery;
+use Oro\Bundle\EntityConfigBundle\Migration\RemoveOutdatedEnumFieldQuery;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -16,6 +16,7 @@ class RemoveEnumFieldQueryTest extends TestCase
 
     private Connection|MockObject $connector;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->connector = $this->createMock(Connection::class);
@@ -24,7 +25,7 @@ class RemoveEnumFieldQueryTest extends TestCase
 
     public function testExecuteConfigFieldIsAbsent(): void
     {
-        $migration = new RemoveEnumFieldQuery('TestClassName', 'TestFieldName');
+        $migration = new RemoveOutdatedEnumFieldQuery('TestClassName', 'TestFieldName');
         $migration->setConnection($this->connector);
 
         $this->connector->expects(self::once())
@@ -41,7 +42,7 @@ class RemoveEnumFieldQueryTest extends TestCase
      */
     public function testExecute($entityClass, $fieldName, $enumClass, $extendKey, $fieldPhpData, $entityPhpData): void
     {
-        $migration = new RemoveEnumFieldQuery($entityClass, $fieldName);
+        $migration = new RemoveOutdatedEnumFieldQuery($entityClass, $fieldName);
         $migration->setConnection($this->connector);
 
         $this->connector->expects(self::exactly(3))

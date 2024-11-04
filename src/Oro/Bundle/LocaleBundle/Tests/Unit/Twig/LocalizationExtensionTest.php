@@ -24,6 +24,7 @@ class LocalizationExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var LocalizationExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->languageCodeFormatter = $this->createMock(LanguageCodeFormatter::class);

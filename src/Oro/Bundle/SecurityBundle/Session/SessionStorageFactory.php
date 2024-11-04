@@ -21,6 +21,7 @@ class SessionStorageFactory implements SessionStorageFactoryInterface
         $this->sessionBags = $sessionBags;
     }
 
+    #[\Override]
     public function createStorage(?Request $request): SessionStorageInterface
     {
         $storage = $this->innerSessionStorageFactory->createStorage($request);

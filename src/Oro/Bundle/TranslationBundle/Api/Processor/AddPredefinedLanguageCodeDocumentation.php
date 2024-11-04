@@ -19,9 +19,7 @@ class AddPredefinedLanguageCodeDocumentation implements ProcessorInterface
         $this->documentationProvider = $documentationProvider;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ConfigContext $context */

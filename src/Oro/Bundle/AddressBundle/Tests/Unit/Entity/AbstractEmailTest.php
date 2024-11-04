@@ -9,6 +9,7 @@ class AbstractEmailTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractEmail */
     private $email;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->email = $this->createEmail();

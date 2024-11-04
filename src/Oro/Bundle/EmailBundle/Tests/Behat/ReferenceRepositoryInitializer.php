@@ -9,9 +9,7 @@ use OroEntityProxy\OroEmailBundle\EmailAddressProxy;
 
 class ReferenceRepositoryInitializer implements ReferenceRepositoryInitializerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function init(ManagerRegistry $doctrine, Collection $referenceRepository): void
     {
         $referenceRepository->set(

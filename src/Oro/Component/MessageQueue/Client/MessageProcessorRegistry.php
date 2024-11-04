@@ -11,9 +11,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
  */
 class MessageProcessorRegistry extends ServiceLocator implements MessageProcessorRegistryInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function get(string $id): MessageProcessorInterface
     {
         if (!$id || !$this->has($id)) {

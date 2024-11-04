@@ -37,9 +37,6 @@ abstract class AbstractDateFilter extends AbstractFilter
     /** @var DateFilterModifier */
     protected $dateFilterModifier;
 
-    /**
-     * {@inheritdoc}
-     */
     protected $joinOperators = [
         DateRangeFilterType::TYPE_NOT_BETWEEN => DateRangeFilterType::TYPE_BETWEEN,
         DateRangeFilterType::TYPE_NOT_EQUAL   => DateRangeFilterType::TYPE_EQUAL,
@@ -61,9 +58,7 @@ abstract class AbstractDateFilter extends AbstractFilter
         $this->dateFilterModifier = $dateFilterModifier;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function buildExpr(FilterDatasourceAdapterInterface $ds, $comparisonType, $fieldName, $data)
     {
         $dateStartValue = $data['date_start'];
@@ -102,9 +97,7 @@ abstract class AbstractDateFilter extends AbstractFilter
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function prepareData(array $data): array
     {
         $valueKeys = [];
@@ -137,9 +130,7 @@ abstract class AbstractDateFilter extends AbstractFilter
         return $data;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function parseData($data)
     {
         $data = parent::parseData($data);
@@ -383,9 +374,7 @@ abstract class AbstractDateFilter extends AbstractFilter
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMetadata()
     {
         $formView = $this->getFormView();

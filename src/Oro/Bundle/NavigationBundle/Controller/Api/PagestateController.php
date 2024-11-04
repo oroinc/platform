@@ -216,9 +216,7 @@ class PagestateController extends AbstractFOSRestController
         return $this->handleView($this->view('', Response::HTTP_NOT_FOUND));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

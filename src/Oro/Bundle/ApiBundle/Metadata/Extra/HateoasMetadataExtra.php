@@ -24,25 +24,19 @@ class HateoasMetadataExtra implements MetadataExtraInterface
         $this->queryStringAccessor = $queryStringAccessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureContext(MetadataContext $context): void
     {
         // no any modifications of the MetadataContext is required
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getCacheKeyPart(): ?string
     {
         return self::NAME;

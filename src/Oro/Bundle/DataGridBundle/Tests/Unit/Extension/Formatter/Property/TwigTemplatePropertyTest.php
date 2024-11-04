@@ -18,6 +18,7 @@ class TwigTemplatePropertyTest extends \PHPUnit\Framework\TestCase
     /** @var TwigTemplateProperty */
     private $property;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->twig = $this->createMock(Environment::class);

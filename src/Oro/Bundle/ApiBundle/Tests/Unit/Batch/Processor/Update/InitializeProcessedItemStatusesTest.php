@@ -10,6 +10,7 @@ class InitializeProcessedItemStatusesTest extends BatchUpdateProcessorTestCase
     /** @var InitializeProcessedItemStatuses */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

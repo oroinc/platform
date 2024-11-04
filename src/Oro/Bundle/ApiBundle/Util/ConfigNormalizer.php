@@ -12,10 +12,10 @@ use Oro\Component\EntitySerializer\ConfigNormalizer as BaseConfigNormalizer;
 class ConfigNormalizer extends BaseConfigNormalizer
 {
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     protected function doNormalizeConfig(array $config): array
     {
         if (!empty($config[ConfigUtil::FIELDS])) {

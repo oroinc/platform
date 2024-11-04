@@ -10,16 +10,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class IndexEntitiesByTypeTopic extends AbstractTopic
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.search.index_entity_type';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Index entities by class name';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver

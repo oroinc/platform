@@ -22,9 +22,7 @@ class ConsoleCommandSubscriber implements EventSubscriberInterface
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

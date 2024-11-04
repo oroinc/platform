@@ -20,6 +20,7 @@ class AbstractStepTest extends \PHPUnit\Framework\TestCase
     /** @var AbstractStep|\PHPUnit\Framework\MockObject\MockObject */
     private $step;
 
+    #[\Override]
     protected function setUp(): void
     {
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);

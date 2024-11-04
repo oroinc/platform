@@ -14,6 +14,7 @@ class MenuNodeDefinitionTest extends \PHPUnit\Framework\TestCase
     /** @var MenuNodeDefinition */
     private $definition;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->builder = new MenuTreeBuilder();

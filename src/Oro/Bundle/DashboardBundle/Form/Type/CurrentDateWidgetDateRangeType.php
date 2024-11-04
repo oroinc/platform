@@ -27,32 +27,19 @@ class CurrentDateWidgetDateRangeType extends AbstractType
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return self::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?string
     {
         return WidgetDateRangeType::class;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * Example of converted option "update_dependent_date_range_fields" value:
-     *  [
-     *      AbstractDateFilterType::TYPE_ALL_TIME => [
-     *          'select[name$="[dateRange2][type]] => AbstractDateFilterType::TYPE_NONE,
-     *      ],
-     *  ]
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
         parent::finishView($view, $form, $options);
@@ -73,16 +60,7 @@ class CurrentDateWidgetDateRangeType extends AbstractType
         $view->vars['datetime_range_metadata']['dependentDateRangeFields'] = $dependentDateRangeFields;
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * Example of "update_dependent_date_range_fields" option value:
-     *  [
-     *      'TYPE_ALL_TIME' => [
-     *          'dateRange2' => 'TYPE_NONE',
-     *      ],
-     *  ]
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);

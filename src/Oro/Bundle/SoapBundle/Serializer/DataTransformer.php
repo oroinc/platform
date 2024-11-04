@@ -18,9 +18,7 @@ class DataTransformer implements DataTransformerInterface
         $this->innerDataTransformer = $innerDataTransformer;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function transform(mixed $value, array $config, array $context): mixed
     {
         $value = $this->innerDataTransformer->transform($value, $config, $context);

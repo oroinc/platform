@@ -19,6 +19,7 @@ class DefaultEmailUserOwnerListenerTest extends \PHPUnit\Framework\TestCase
     /** @var DefaultEmailUserOwnerListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->defaultUserProvider = $this->createMock(DefaultUserProvider::class);

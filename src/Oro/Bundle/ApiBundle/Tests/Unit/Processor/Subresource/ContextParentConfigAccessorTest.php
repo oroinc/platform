@@ -17,6 +17,7 @@ class ContextParentConfigAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var ContextParentConfigAccessor */
     private $configAccessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->context = $this->createMock(SubresourceContext::class);

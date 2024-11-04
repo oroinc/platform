@@ -25,9 +25,7 @@ class LoadTagsData extends AbstractFixture
         ]
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $this->loadActivities($manager);

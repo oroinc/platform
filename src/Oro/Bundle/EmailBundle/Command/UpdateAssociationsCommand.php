@@ -28,6 +28,7 @@ class UpdateAssociationsCommand extends Command
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
+    #[\Override]
     protected function configure()
     {
         $this->setDescription('Updates email associations.')
@@ -46,6 +47,7 @@ HELP
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @noinspection PhpMissingParentCallCommonInspection
      */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->producer->send(UpdateEmailAssociationsTopic::getName(), []);

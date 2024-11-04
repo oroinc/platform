@@ -44,9 +44,7 @@ class PrepareNewEmailModelToSave implements ProcessorInterface
         $this->tokenAccessor = $tokenAccessor;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */

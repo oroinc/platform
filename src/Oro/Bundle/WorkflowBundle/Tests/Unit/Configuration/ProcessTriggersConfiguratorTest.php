@@ -42,6 +42,7 @@ class ProcessTriggersConfiguratorTest extends \PHPUnit\Framework\TestCase
     /** @var ProcessTriggersConfigurator */
     private $processTriggersConfigurator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configurationBuilder = $this->createMock(ProcessConfigurationBuilder::class);

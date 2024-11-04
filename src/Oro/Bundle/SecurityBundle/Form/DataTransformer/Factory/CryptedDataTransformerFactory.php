@@ -24,9 +24,7 @@ class CryptedDataTransformerFactory implements CryptedDataTransformerFactoryInte
         $this->crypter = $crypter;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function create()
     {
         $transformer = new CryptedDataTransformer($this->crypter);

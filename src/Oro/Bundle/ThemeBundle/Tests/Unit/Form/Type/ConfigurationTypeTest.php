@@ -19,6 +19,7 @@ final class ConfigurationTypeTest extends FormIntegrationTestCase
     private ConfigurationType $type;
     private Packages|MockBuilder $packages;
 
+    #[\Override]
     public function setUp(): void
     {
         $this->packages = $this->createMock(Packages::class);
@@ -328,6 +329,7 @@ final class ConfigurationTypeTest extends FormIntegrationTestCase
         ];
     }
 
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

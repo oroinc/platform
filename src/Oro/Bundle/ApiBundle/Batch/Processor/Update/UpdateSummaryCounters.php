@@ -28,9 +28,7 @@ class UpdateSummaryCounters implements ProcessorInterface
         $this->entityIdHelper = $entityIdHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var BatchUpdateContext $context */

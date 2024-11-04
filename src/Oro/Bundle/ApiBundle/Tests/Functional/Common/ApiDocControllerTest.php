@@ -15,6 +15,7 @@ class ApiDocControllerTest extends WebTestCase
 {
     use ApiFeatureTrait;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());

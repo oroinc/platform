@@ -19,6 +19,7 @@ class PhoneProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     private $extendConfigProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extendConfigProvider = $this->createMock(ConfigProvider::class);

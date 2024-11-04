@@ -30,9 +30,7 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
         $this->sortersConfiguration = new SortersConfiguration();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setSettings(ConfigurationSettingsInterface $settings): void
     {
         parent::setSettings($settings);
@@ -41,9 +39,7 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
         $this->sortersConfiguration->setSettings($settings);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configure(NodeBuilder $node): void
     {
         /** @var NodeBuilder $subresourceNode */
@@ -60,9 +56,7 @@ class SubresourcesConfiguration extends AbstractConfigurationSection
         $this->configureSubresourceNode($subresourceNode);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(string $section): bool
     {
         return 'entities.entity' === $section;

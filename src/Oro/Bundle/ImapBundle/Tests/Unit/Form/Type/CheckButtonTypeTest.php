@@ -8,9 +8,7 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class CheckButtonTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

@@ -24,6 +24,7 @@ class FileConstraintFromEntityFieldConfigValidatorTest extends \PHPUnit\Framewor
     /** @var FileConstraintFromEntityFieldConfigValidator */
     private $validator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fileValidator = $this->createMock(FileValidator::class);

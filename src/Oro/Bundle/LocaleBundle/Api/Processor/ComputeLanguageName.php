@@ -19,9 +19,7 @@ class ComputeLanguageName implements ProcessorInterface
         $this->formatter = $formatter;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeLoadedDataContext $context */

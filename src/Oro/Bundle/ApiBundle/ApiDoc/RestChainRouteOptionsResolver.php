@@ -35,9 +35,7 @@ class RestChainRouteOptionsResolver implements RouteOptionsResolverInterface, Re
         $this->underlyingViews = $underlyingViews;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function resolve(Route $route, RouteCollectionAccessor $routes): void
     {
         if (empty($this->resolvers)) {
@@ -58,9 +56,7 @@ class RestChainRouteOptionsResolver implements RouteOptionsResolverInterface, Re
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset(): void
     {
         foreach ($this->resolvers as [$resolver, $resolverView]) {

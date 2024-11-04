@@ -14,6 +14,7 @@ class ExtendFieldFileDamFormOptionsProviderTest extends \PHPUnit\Framework\TestC
 
     private ExtendFieldFileDamFormOptionsProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityConfigManager = $this->createMock(EntityConfigManager::class);

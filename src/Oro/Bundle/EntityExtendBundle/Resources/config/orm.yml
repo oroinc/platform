@@ -30,10 +30,3 @@ services:
             - '@oro_entity_config.provider.extend'
         tags:
             - { name: doctrine.event_listener, event: loadClassMetadata }
-
-    oro_entity_extend.listener.save_multi_enum_entity_listener:
-        class: Oro\Bundle\EntityExtendBundle\EventListener\SaveMultiEnumEntityListener
-        arguments:
-            - '@Doctrine\Inflector\Inflector'
-        tags:
-            - { name: doctrine.event_listener, event: onFlush }

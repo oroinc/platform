@@ -21,6 +21,7 @@ class TemplateFixtureReaderTest extends \PHPUnit\Framework\TestCase
     /** @var TemplateFixtureReader */
     private $reader;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->templateManager = $this->createMock(TemplateManager::class);

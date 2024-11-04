@@ -17,9 +17,7 @@ class CollectResourcesContext extends ApiContext
     /** @var string[] */
     private array $accessibleAsAssociationResources = [];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function initialize(): void
     {
         parent::initialize();

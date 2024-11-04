@@ -21,6 +21,7 @@ class RoleListenerTest extends \PHPUnit\Framework\TestCase
     /** @var RoleListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->aclSidManager = $this->createMock(AclSidManager::class);

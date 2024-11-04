@@ -22,6 +22,7 @@ class FullAccessTest extends WebTestCase
     /** @var TestEntity */
     private $testEntity;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());

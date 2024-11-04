@@ -19,25 +19,19 @@ class LayoutRenderer implements LayoutRendererInterface
         $this->formRendererEngine = $formRendererEngine;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function renderBlock(BlockView $view)
     {
         return $this->innerRenderer->searchAndRenderBlock($view, 'widget');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setBlockTheme(BlockView $view, $themes)
     {
         $this->innerRenderer->setTheme($view, $themes);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setFormTheme($themes)
     {
         $this->formRendererEngine->addDefaultThemes($themes);

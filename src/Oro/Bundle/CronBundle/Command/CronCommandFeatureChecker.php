@@ -16,9 +16,7 @@ class CronCommandFeatureChecker implements CronCommandFeatureCheckerInterface
         $this->featureChecker = $featureChecker;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isFeatureEnabled(string $commandName): bool
     {
         return $this->featureChecker->isResourceEnabled($commandName, 'cron_jobs');

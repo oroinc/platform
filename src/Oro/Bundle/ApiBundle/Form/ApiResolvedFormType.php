@@ -27,41 +27,31 @@ class ApiResolvedFormType implements ResolvedFormTypeInterface
         $this->innerType = $innerType;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return $this->innerType->getBlockPrefix();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getParent(): ?ResolvedFormTypeInterface
     {
         return $this->innerType->getParent();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getInnerType(): FormTypeInterface
     {
         return $this->innerType->getInnerType();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getTypeExtensions(): array
     {
         return $this->innerType->getTypeExtensions();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function createBuilder(
         FormFactoryInterface $factory,
         string $name,
@@ -99,41 +89,31 @@ class ApiResolvedFormType implements ResolvedFormTypeInterface
         return $builder;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function createView(FormInterface $form, FormView $parent = null): FormView
     {
         return $this->innerType->createView($form, $parent);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $this->innerType->buildForm($builder, $options);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $this->innerType->buildView($view, $form, $options);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function finishView(FormView $view, FormInterface $form, array $options): void
     {
         $this->innerType->finishView($view, $form, $options);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getOptionsResolver(): OptionsResolver
     {
         return $this->innerType->getOptionsResolver();

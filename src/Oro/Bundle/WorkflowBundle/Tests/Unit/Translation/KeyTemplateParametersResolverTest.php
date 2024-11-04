@@ -14,6 +14,7 @@ class KeyTemplateParametersResolverTest extends \PHPUnit\Framework\TestCase
     /** @var KeyTemplateParametersResolver */
     private $resolver;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);

@@ -17,6 +17,7 @@ class UpdateExtendConfigMigrationQueryTest extends \PHPUnit\Framework\TestCase
     /** @var string */
     private $temporaryFilePath;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->commandExecutor = $this->createMock(CommandExecutor::class);

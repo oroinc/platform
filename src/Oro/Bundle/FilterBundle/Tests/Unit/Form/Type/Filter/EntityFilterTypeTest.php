@@ -16,6 +16,7 @@ class EntityFilterTypeTest extends AbstractTypeTestCase
     /** @var EntityFilterType */
     private $type;
 
+    #[\Override]
     protected function setUp(): void
     {
         $translator = $this->createMockTranslator();
@@ -35,9 +36,7 @@ class EntityFilterTypeTest extends AbstractTypeTestCase
         $this->type = new EntityFilterType($translator);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getTestFormType(): AbstractType
     {
         return $this->type;
@@ -48,9 +47,7 @@ class EntityFilterTypeTest extends AbstractTypeTestCase
         $this->assertEquals(ChoiceFilterType::class, $this->type->getParent());
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptionsDataProvider(): array
     {
         return [
@@ -67,6 +64,7 @@ class EntityFilterTypeTest extends AbstractTypeTestCase
     /**
      * @dataProvider bindDataProvider
      */
+    #[\Override]
     public function testBindData(
         array $bindData,
         array $formData,
@@ -76,9 +74,7 @@ class EntityFilterTypeTest extends AbstractTypeTestCase
         // bind method should be tested in functional test
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function bindDataProvider(): array
     {
         return [];

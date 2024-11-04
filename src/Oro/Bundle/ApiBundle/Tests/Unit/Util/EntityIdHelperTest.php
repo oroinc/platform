@@ -19,6 +19,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
 {
     private EntityIdHelper $entityIdHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

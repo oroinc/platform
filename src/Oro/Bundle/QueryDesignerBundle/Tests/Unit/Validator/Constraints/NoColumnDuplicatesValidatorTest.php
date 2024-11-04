@@ -12,6 +12,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class NoColumnDuplicatesValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator(): NoColumnDuplicatesValidator
     {
         return new NoColumnDuplicatesValidator();

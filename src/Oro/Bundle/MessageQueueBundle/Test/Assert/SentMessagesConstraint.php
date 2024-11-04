@@ -22,6 +22,7 @@ class SentMessagesConstraint extends \PHPUnit\Framework\Constraint\Constraint
         $this->messages = $messages;
     }
 
+    #[\Override]
     public function evaluate($other, string $description = '', bool $returnResult = false): ?bool
     {
         $comparatorFactory = \SebastianBergmann\Comparator\Factory::getInstance();
@@ -50,9 +51,7 @@ class SentMessagesConstraint extends \PHPUnit\Framework\Constraint\Constraint
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toString(): string
     {
         return 'messages ' . $this->exporter()->export($this->messages);

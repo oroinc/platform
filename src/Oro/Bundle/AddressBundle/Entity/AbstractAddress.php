@@ -155,6 +155,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @return string
      */
+    #[\Override]
     public function getStreet()
     {
         return $this->street;
@@ -178,6 +179,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @return string
      */
+    #[\Override]
     public function getStreet2()
     {
         return $this->street2;
@@ -201,6 +203,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @return string
      */
+    #[\Override]
     public function getCity()
     {
         return $this->city;
@@ -257,6 +260,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @return string
      */
+    #[\Override]
     public function getRegionName()
     {
         return $this->getRegion() ? $this->getRegion()->getName() : $this->getRegionText();
@@ -267,6 +271,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @return string
      */
+    #[\Override]
     public function getRegionCode()
     {
         return $this->getRegion() ? $this->getRegion()->getCode() : '';
@@ -303,6 +308,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @return string
      */
+    #[\Override]
     public function getPostalCode()
     {
         return $this->postalCode;
@@ -336,6 +342,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @return string
      */
+    #[\Override]
     public function getCountryName()
     {
         return $this->getCountry() ? $this->getCountry()->getName() : '';
@@ -346,6 +353,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @return string
      */
+    #[\Override]
     public function getCountryIso3()
     {
         return $this->getCountry() ? $this->getCountry()->getIso3Code() : '';
@@ -356,6 +364,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @return string
      */
+    #[\Override]
     public function getCountryIso2()
     {
         return $this->getCountry() ? $this->getCountry()->getIso2Code() : '';
@@ -379,6 +388,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @return string
      */
+    #[\Override]
     public function getOrganization()
     {
         return $this->organization;
@@ -402,6 +412,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @return string
      */
+    #[\Override]
     public function getNamePrefix()
     {
         return $this->namePrefix;
@@ -425,6 +436,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @return string
      */
+    #[\Override]
     public function getFirstName()
     {
         return $this->firstName;
@@ -448,6 +460,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @return string
      */
+    #[\Override]
     public function getMiddleName()
     {
         return $this->middleName;
@@ -471,6 +484,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @return string
      */
+    #[\Override]
     public function getLastName()
     {
         return $this->lastName;
@@ -494,6 +508,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @return string
      */
+    #[\Override]
     public function getNameSuffix()
     {
         return $this->nameSuffix;
@@ -578,6 +593,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @return string
      */
+    #[\Override]
     public function __toString()
     {
         $data = [
@@ -603,6 +619,7 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function isEmpty()
     {
         return empty($this->label)

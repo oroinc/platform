@@ -18,6 +18,7 @@ class SymfonyDebugToolbarReplaceListenerTest extends TestCase
     /** @var SymfonyDebugToolbarReplaceListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->kernel = $this->createMock(KernelInterface::class);

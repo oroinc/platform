@@ -11,11 +11,13 @@ use Symfony\Component\ExpressionLanguage\Compiler;
  */
 class CollectionMethodAnyNode extends AbstractCollectionMethodCallNode
 {
+    #[\Override]
     public static function getMethod(): string
     {
         return 'any';
     }
 
+    #[\Override]
     public function compile(Compiler $compiler): void
     {
         $compiler
@@ -35,6 +37,7 @@ class CollectionMethodAnyNode extends AbstractCollectionMethodCallNode
             ->raw('}, get_defined_vars())');
     }
 
+    #[\Override]
     protected function doEvaluate(iterable $evaluatedNode, array $functions, array $values, string $itemName): bool
     {
         foreach ($evaluatedNode as $item) {

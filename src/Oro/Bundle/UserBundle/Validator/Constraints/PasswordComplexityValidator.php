@@ -33,9 +33,7 @@ class PasswordComplexityValidator extends ConstraintValidator
         $this->configProvider = $configProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof PasswordComplexity) {

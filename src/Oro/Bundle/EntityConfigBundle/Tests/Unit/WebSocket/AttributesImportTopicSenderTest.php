@@ -28,6 +28,7 @@ class AttributesImportTopicSenderTest extends \PHPUnit\Framework\TestCase
     /** @var AttributesImportTopicSender */
     private $attributesImportTopicSender;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->websocketClient = $this->createMock(WebsocketClientInterface::class);

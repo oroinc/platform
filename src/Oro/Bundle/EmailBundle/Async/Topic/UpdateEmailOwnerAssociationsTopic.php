@@ -11,16 +11,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class UpdateEmailOwnerAssociationsTopic extends AbstractTopic implements JobAwareTopicInterface
 {
+    #[\Override]
     public static function getName(): string
     {
         return 'oro.email.update_email_owner_associations';
     }
 
+    #[\Override]
     public static function getDescription(): string
     {
         return 'Update multiple emails for email owner';
     }
 
+    #[\Override]
     public function configureMessageBody(OptionsResolver $resolver): void
     {
         $resolver
@@ -32,6 +35,7 @@ class UpdateEmailOwnerAssociationsTopic extends AbstractTopic implements JobAwar
             ->addAllowedTypes('ownerClass', 'string');
     }
 
+    #[\Override]
     public function createJobName($messageBody): string
     {
         asort($messageBody['ownerIds']);

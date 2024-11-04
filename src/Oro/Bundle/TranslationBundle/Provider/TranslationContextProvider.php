@@ -45,9 +45,7 @@ class TranslationContextProvider implements ResetInterface
         return $this->context[$id];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function reset()
     {
         $this->context = [];

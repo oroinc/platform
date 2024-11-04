@@ -12,9 +12,7 @@ class EmailOriginApiEntityManager extends ApiEntityManager
     /** @var array */
     private $emailOriginProperties;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getSerializationConfig()
     {
         $config = [

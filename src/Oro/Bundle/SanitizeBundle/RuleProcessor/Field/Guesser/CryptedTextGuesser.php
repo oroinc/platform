@@ -16,6 +16,7 @@ class CryptedTextGuesser implements GuesserInterface
     {
     }
 
+    #[\Override]
     public function guessProcessor(string $fieldName, ClassMetadata $metadata): ?ProcessorInterface
     {
         return $this->helper->getFieldType($fieldName, $metadata) === 'crypted_text' ? $this->processor : null;

@@ -21,6 +21,7 @@ class TranslationManagerTest extends WebTestCase
     /** @var TranslationRepository */
     private $repository;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

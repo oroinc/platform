@@ -21,9 +21,7 @@ abstract class AbstractQueryDesignerType extends AbstractType
 {
     const DATE_GROUPING_FORM_NAME = 'dateGrouping';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -62,9 +60,7 @@ abstract class AbstractQueryDesignerType extends AbstractType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['query_type']);
@@ -171,9 +167,7 @@ abstract class AbstractQueryDesignerType extends AbstractType
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['field_condition_options'] = $options['field_condition_options'];

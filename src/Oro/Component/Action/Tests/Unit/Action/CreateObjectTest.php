@@ -15,6 +15,7 @@ class CreateObjectTest extends \PHPUnit\Framework\TestCase
     /** @var CreateObject */
     private $action;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->action = new CreateObject(new ContextAccessor());

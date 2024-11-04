@@ -13,9 +13,7 @@ abstract class AbstractProcessor implements ProcessorInterface
 {
     private array $options = [];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var NormalizeValueContext $context */

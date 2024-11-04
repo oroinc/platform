@@ -23,9 +23,9 @@ class EmailEntityNameProvider implements EntityNameProviderInterface
     }
 
     /**
-     * {@inheritdoc}
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
+    #[\Override]
     public function getName($format, $locale, $entity)
     {
         if (!$this->isSupported($format)) {
@@ -60,9 +60,7 @@ class EmailEntityNameProvider implements EntityNameProviderInterface
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getNameDQL($format, $locale, $className, $alias)
     {
         return false;

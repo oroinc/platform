@@ -34,9 +34,7 @@ class WidgetEntityJquerySelect2HiddenType extends OroJquerySelect2HiddenType
         $this->doctrineHelper = $doctrineHelper;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventListener(
@@ -51,9 +49,7 @@ class WidgetEntityJquerySelect2HiddenType extends OroJquerySelect2HiddenType
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $vars = [
@@ -112,17 +108,13 @@ class WidgetEntityJquerySelect2HiddenType extends OroJquerySelect2HiddenType
         return $this->entityManager->getRepository($entityClass)->findBy([$identityField => $ids]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_widget_entity_jqueryselect2_hidden';

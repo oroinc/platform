@@ -9,9 +9,7 @@ use Oro\Bundle\FilterBundle\Form\Type\Filter\NumberFilterType;
  */
 class CurrencyFilter extends NumberRangeFilter
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function init($name, array $params)
     {
         $params[FilterUtility::FRONTEND_TYPE_KEY] = 'number-range';

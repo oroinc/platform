@@ -25,9 +25,7 @@ class LoadRecipientListData extends AbstractFixture implements DependentFixtureI
      */
     private $manager;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $this->manager = $manager;
@@ -119,9 +117,7 @@ class LoadRecipientListData extends AbstractFixture implements DependentFixtureI
         return $group;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [LoadUserData::class];

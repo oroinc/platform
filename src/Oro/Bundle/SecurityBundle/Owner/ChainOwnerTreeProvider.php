@@ -17,9 +17,7 @@ class ChainOwnerTreeProvider implements OwnerTreeProviderInterface
         $this->providers = $providers;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function supports(): bool
     {
         foreach ($this->providers as $provider) {
@@ -31,6 +29,7 @@ class ChainOwnerTreeProvider implements OwnerTreeProviderInterface
         return false;
     }
 
+    #[\Override]
     public function getTree(): OwnerTreeInterface
     {
         foreach ($this->providers as $provider) {
@@ -42,9 +41,7 @@ class ChainOwnerTreeProvider implements OwnerTreeProviderInterface
         throw new UnsupportedOwnerTreeProviderException('Supported provider not found in chain');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function clearCache(): void
     {
         foreach ($this->providers as $provider) {
@@ -52,9 +49,7 @@ class ChainOwnerTreeProvider implements OwnerTreeProviderInterface
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function warmUpCache(): void
     {
         foreach ($this->providers as $provider) {

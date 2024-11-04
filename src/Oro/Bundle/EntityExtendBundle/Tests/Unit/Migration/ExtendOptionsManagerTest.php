@@ -15,6 +15,7 @@ class ExtendOptionsManagerTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendOptionsManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->manager = new ExtendOptionsManager(ConfigurationHandlerMock::getInstance());

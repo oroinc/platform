@@ -27,6 +27,7 @@ class LocalFileManagerTest extends \PHPUnit\Framework\TestCase
     /** @var SymfonyFilesystem */
     private $fileSystem;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->rootDirectory = $this->getTempDir('LocalFileManager');

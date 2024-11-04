@@ -11,9 +11,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class WidgetDefinitionConfiguration implements ConfigurationInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('sidebar_widgets');

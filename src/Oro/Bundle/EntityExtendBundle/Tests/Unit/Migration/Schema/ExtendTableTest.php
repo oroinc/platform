@@ -25,6 +25,7 @@ class ExtendTableTest extends \PHPUnit\Framework\TestCase
     /** @var ExtendTable */
     private $table;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->extendOptionsManager = $this->createMock(ExtendOptionsManager::class);

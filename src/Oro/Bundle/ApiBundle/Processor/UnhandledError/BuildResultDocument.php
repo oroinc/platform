@@ -12,17 +12,13 @@ use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
  */
 class BuildResultDocument extends BaseBuildResultDocument
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function processResult(DocumentBuilderInterface $documentBuilder, Context $context): void
     {
         throw new RuntimeException('Invalid error handling: the context must contain an error object.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getExceptionLoggingContext(Context $context): array
     {
         return ['action' => $context->getAction()];

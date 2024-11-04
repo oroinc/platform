@@ -28,6 +28,7 @@ class ConfigurableFingersCrossedHandlerTest extends TestCase
 
     private TestHandler $testNestedHandler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->config = $this->createMock(LogLevelConfig::class);

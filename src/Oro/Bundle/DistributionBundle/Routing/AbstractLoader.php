@@ -51,9 +51,7 @@ abstract class AbstractLoader extends CumulativeRoutingFileLoader
         return $event->getCollection();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function loadRoutes(RouteCollection $routes)
     {
         if (null === $this->cache) {

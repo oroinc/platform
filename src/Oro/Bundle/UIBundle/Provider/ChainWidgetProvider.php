@@ -19,17 +19,13 @@ class ChainWidgetProvider implements WidgetProviderInterface
         $this->providers = $providers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($object)
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getWidgets($object)
     {
         $result = [];

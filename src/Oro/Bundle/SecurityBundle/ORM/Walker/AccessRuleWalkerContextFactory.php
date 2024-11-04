@@ -25,9 +25,7 @@ class AccessRuleWalkerContextFactory implements AccessRuleWalkerContextFactoryIn
         $this->accessRuleExecutor = $accessRuleExecutor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function createContext(string $permission): AccessRuleWalkerContext
     {
         $token = $this->tokenStorage->getToken();

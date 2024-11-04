@@ -14,6 +14,7 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Event\ValueRenderEvent;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FormBundle\Entity\PriorityItem;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -64,9 +65,6 @@ class ExtendFieldValueRenderListener
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function beforeValueRender(ValueRenderEvent $event)
     {
         $value = $event->getFieldValue();
@@ -85,6 +83,21 @@ class ExtendFieldValueRenderListener
                 $value,
                 $event->getFieldConfigId()
             );
+
+            $event->setFieldViewValue($viewData);
+        }
+
+        if (is_iterable($value) && ExtendHelper::isMultiEnumType($type)) {
+            $viewData['values'] = [];
+            foreach ($value as $item) {
+                try {
+                    $getValuefromEnumRef = ['id' => $item->getId(), 'title' => $item->getDefaultName()];
+                } catch (\Throwable $exception) {
+                    // Multi enum option entity is not found (reference is not actual)
+                    continue;
+                }
+                $viewData['values'][] = $getValuefromEnumRef;
+            }
 
             $event->setFieldViewValue($viewData);
         }

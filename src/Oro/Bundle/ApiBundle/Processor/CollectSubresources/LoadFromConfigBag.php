@@ -38,9 +38,7 @@ class LoadFromConfigBag extends LoadSubresources
         $this->configBagRegistry = $configBagRegistry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CollectSubresourcesContext $context */

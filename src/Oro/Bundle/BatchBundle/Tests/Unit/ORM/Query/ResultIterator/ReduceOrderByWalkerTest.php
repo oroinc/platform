@@ -21,6 +21,7 @@ class ReduceOrderByWalkerTest extends \PHPUnit\Framework\TestCase
     /** @var ReduceOrderByWalker */
     private $reduceOrderByWalker;
 
+    #[\Override]
     protected function setUp(): void
     {
         $rootMetadata = new ClassMetadata('Entity\Root');

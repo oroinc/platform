@@ -13,6 +13,7 @@ class AttributeRelationsTransformerTest extends \PHPUnit\Framework\TestCase
     /** @var AttributeRelationsTransformer */
     private $dataTransformer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->dataTransformer = new AttributeRelationsTransformer(null);

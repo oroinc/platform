@@ -55,6 +55,18 @@ empty_order_by:
             order_by: []
     expected: []
 
+page_size:
+    config:
+        get_list:
+            page_size: 10
+        get_subresource:
+            page_size: -1
+    expected:
+        get_list:
+            page_size: 10
+        get_subresource:
+            page_size: -1
+
 sorting:
     config:
         get_list:

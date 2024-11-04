@@ -12,6 +12,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
  */
 class ExpressionLanguageProvider implements ExpressionFunctionProviderInterface
 {
+    #[\Override]
     public function getFunctions(): array
     {
         return [

@@ -17,6 +17,7 @@ class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
     /** @var StrategyValidationEventListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->listener = new StrategyValidationEventListener(PropertyAccess::createPropertyAccessor());

@@ -19,9 +19,7 @@ abstract class AbstractEntityConfigQuery extends ParametrizedMigrationQuery
 
     abstract public function processRow(array $row, LoggerInterface $logger);
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger)
     {
         $steps = ceil($this->getEntityConfigCount() / $this->getRowBatchLimit());

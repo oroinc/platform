@@ -9,7 +9,6 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ExtendEntityConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
@@ -39,14 +38,13 @@ class UpdateEnumEntityTranslations extends AbstractFixture implements VersionedF
     /** @var TranslationManager */
     private $translationManager;
 
+    #[\Override]
     public function getVersion()
     {
         return '1.0';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         if ($this->container->get(ApplicationState::class)->isInstalled()) {
@@ -79,7 +77,7 @@ class UpdateEnumEntityTranslations extends AbstractFixture implements VersionedF
                     continue;
                 }
 
-                if (!\in_array($fieldType, [EnumTypeHelper::TYPE_ENUM, EnumTypeHelper::MULTI_ENUM], false)) {
+                if (!ExtendHelper::isEnumerableType($fieldType)) {
                     continue;
                 }
 

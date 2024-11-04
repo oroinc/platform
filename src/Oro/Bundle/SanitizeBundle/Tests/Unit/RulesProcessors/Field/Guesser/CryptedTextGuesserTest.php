@@ -22,6 +22,7 @@ final class CryptedTextGuesserTest extends TestCase
     private ExtendEntityMetadataProvider&MockObject $extendEntityMetadataProvider;
     private ?ProcessorHelper $processorHelper = null;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->md5ProcessorMock = self::createMock(Md5Processor::class);

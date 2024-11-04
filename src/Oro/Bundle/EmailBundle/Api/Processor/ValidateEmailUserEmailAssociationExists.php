@@ -14,9 +14,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class ValidateEmailUserEmailAssociationExists implements ProcessorInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CustomizeFormDataContext $context */

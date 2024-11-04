@@ -7,6 +7,7 @@ use Oro\Bundle\TranslationBundle\Tests\Functional\DataFixtures\LoadLanguages;
 
 class OroTranslationLoadCommandTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

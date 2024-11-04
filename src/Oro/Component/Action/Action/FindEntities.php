@@ -27,9 +27,7 @@ class FindEntities extends AbstractAction
         $this->registry = $registry;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function executeAction($context)
     {
         $entities = $this->getEntitiesByConditions($context);
@@ -37,9 +35,7 @@ class FindEntities extends AbstractAction
         $this->contextAccessor->setValue($context, $this->options['attribute'], $entities);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (empty($options['class'])) {

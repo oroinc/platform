@@ -22,9 +22,7 @@ class DeleteConfigQuery extends ParametrizedMigrationQuery
         $this->section = $section;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDescription(): array
     {
         $logger = new ArrayLogger();
@@ -33,9 +31,7 @@ class DeleteConfigQuery extends ParametrizedMigrationQuery
         return $logger->getMessages();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function execute(LoggerInterface $logger): void
     {
         $this->processQueries($logger);

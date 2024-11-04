@@ -31,6 +31,7 @@ class WorkflowItemListenerTest extends \PHPUnit\Framework\TestCase
     /** @var WorkflowItemListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);

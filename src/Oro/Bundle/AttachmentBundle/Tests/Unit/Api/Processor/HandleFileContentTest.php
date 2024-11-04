@@ -19,6 +19,7 @@ class HandleFileContentTest extends CustomizeFormDataProcessorTestCase
     /** @var HandleFileContent */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

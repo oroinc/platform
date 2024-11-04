@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
  */
 class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $bundle1 = new Fixtures\BarBundle\BarBundle();
@@ -39,6 +40,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
             ]);
     }
 
+    #[\Override]
     protected function tearDown(): void
     {
         CumulativeResourceManager::getInstance()->clear();
@@ -1302,6 +1304,36 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
 
         $extension = new OroApiExtension();
         $extension->load([$config], $container);
+    }
+
+    public function testLoadFilterDisallowDataTypes()
+    {
+        $container = $this->getContainer();
+
+        $extension = new OroApiExtension();
+        $extension->load(
+            [
+                [
+                    'filter_disallow_array_data_types' => ['text'],
+                    'filter_disallow_range_data_types' => ['string']
+                ],
+                [
+                    'filter_disallow_array_data_types' => ['string'],
+                    'filter_disallow_range_data_types' => ['boolean']
+                ]
+            ],
+            $container
+        );
+
+        $completeFiltersProcessorDef = $container->getDefinition('oro_api.get_config.complete_filters');
+        self::assertEquals(
+            ['text', 'string'],
+            $completeFiltersProcessorDef->getArgument(2)
+        );
+        self::assertEquals(
+            ['string', 'boolean'],
+            $completeFiltersProcessorDef->getArgument(3)
+        );
     }
 
     public function testRegisterDefaultConfigParameters()

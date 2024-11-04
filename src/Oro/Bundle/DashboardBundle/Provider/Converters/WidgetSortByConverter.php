@@ -29,9 +29,7 @@ class WidgetSortByConverter extends ConfigValueConverterAbstract
         $this->translator = $translator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getViewValue($value)
     {
         if (empty($value['property']) ||

@@ -15,9 +15,7 @@ use Symfony\Component\Form\FormInterface;
  */
 class CollectionTypeSubscriber implements EventSubscriberInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

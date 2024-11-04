@@ -15,6 +15,7 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
 {
     private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->translator = $this->createMock(TranslatorInterface::class);

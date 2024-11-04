@@ -8,6 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class EntityFieldAccessorsHelperTest extends WebTestCase
 {
+    #[\Override]
     public function setUp(): void
     {
         $this->bootKernel();

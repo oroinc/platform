@@ -44,9 +44,7 @@ class ContainerResetExtension extends AbstractExtension implements ChainExtensio
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setChainExtension(ExtensionInterface $chainExtension)
     {
         foreach ($this->clearers as $clearer) {
@@ -56,9 +54,7 @@ class ContainerResetExtension extends AbstractExtension implements ChainExtensio
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPostReceived(Context $context)
     {
         $processorName = $context->getMessageProcessorName();

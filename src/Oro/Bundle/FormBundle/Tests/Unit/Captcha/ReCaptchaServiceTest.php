@@ -23,6 +23,7 @@ class ReCaptchaServiceTest extends TestCase
     private SymmetricCrypterInterface|MockObject $crypter;
     private ReCaptchaService $captchaService;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->reCaptchaClientFactory = $this->createMock(ReCaptchaClientFactory::class);

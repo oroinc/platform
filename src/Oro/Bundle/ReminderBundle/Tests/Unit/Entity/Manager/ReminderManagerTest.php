@@ -30,6 +30,7 @@ class ReminderManagerTest extends TestCase
     /** @var ReminderManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);

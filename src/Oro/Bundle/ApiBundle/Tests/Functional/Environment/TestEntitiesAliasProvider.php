@@ -8,9 +8,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface;
 
 class TestEntitiesAliasProvider implements EntityAliasProviderInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityAlias($entityClass)
     {
         if (!str_starts_with($entityClass, 'Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity')) {

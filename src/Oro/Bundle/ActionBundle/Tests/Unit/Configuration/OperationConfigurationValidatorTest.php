@@ -28,6 +28,7 @@ class OperationConfigurationValidatorTest extends \PHPUnit\Framework\TestCase
     /** @var OperationConfigurationValidator */
     private $validator;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->controllerClassProvider = $this->createMock(ControllerClassProvider::class);

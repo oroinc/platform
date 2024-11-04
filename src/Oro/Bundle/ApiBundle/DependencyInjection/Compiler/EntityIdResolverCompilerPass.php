@@ -17,9 +17,7 @@ class EntityIdResolverCompilerPass implements CompilerPassInterface
     private const RESOLVER_REGISTRY_SERVICE_ID = 'oro_api.entity_id_resolver_registry';
     private const RESOLVER_TAG = 'oro.api.entity_id_resolver';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $services = [];

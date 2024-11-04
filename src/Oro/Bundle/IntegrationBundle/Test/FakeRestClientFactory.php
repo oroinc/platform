@@ -16,9 +16,7 @@ class FakeRestClientFactory implements RestClientFactoryInterface
     /** @var string Fixture file path */
     protected $fixtureFile;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function createRestClient($baseUrl, array $defaultOptions)
     {
         $fakeClient = new FakeRestClient();

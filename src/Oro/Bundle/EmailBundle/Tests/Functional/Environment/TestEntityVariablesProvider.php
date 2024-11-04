@@ -10,9 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Item;
 
 class TestEntityVariablesProvider implements EntityVariablesProviderInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVariableDefinitions(): array
     {
         return [
@@ -36,9 +34,7 @@ class TestEntityVariablesProvider implements EntityVariablesProviderInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVariableGetters(): array
     {
         return [
@@ -51,9 +47,7 @@ class TestEntityVariablesProvider implements EntityVariablesProviderInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getVariableProcessors(string $entityClass): array
     {
         if (Organization::class === $entityClass) {

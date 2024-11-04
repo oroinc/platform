@@ -50,9 +50,7 @@ class DashboardExtension extends AbstractExtension implements ServiceSubscriberI
         return $this->container->get('oro_report.entity_provider');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -88,9 +86,7 @@ class DashboardExtension extends AbstractExtension implements ServiceSubscriberI
         return $this->getEntityProvider()->getEntities();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

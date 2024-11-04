@@ -11,17 +11,13 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class SortersConfigExtension extends AbstractConfigExtension
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityConfigurationSections(): array
     {
         return [ConfigUtil::SORTERS => new SortersConfiguration()];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityConfigurationLoaders(): array
     {
         return [ConfigUtil::SORTERS => new SortersConfigLoader()];

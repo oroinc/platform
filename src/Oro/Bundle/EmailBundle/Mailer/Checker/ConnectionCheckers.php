@@ -17,6 +17,7 @@ class ConnectionCheckers implements ConnectionCheckerInterface
         $this->connectionCheckers = $connectionCheckers;
     }
 
+    #[\Override]
     public function supports(Dsn $dsn): bool
     {
         foreach ($this->connectionCheckers as $connectionChecker) {
@@ -28,9 +29,7 @@ class ConnectionCheckers implements ConnectionCheckerInterface
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function checkConnection(Dsn $dsn, string &$error = null): bool
     {
         foreach ($this->connectionCheckers as $connectionChecker) {

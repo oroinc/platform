@@ -10,17 +10,13 @@ use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AbstractFixture;
 
 class LoadEmailActivityData extends AbstractFixture implements DependentFixtureInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [LoadCommentData::class];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         $activityList1 = new ActivityList();

@@ -66,9 +66,6 @@ class ClassCommentSniff extends BaseClassCommentSniff
         ],
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     public function register()
     {
         return [
@@ -78,9 +75,6 @@ class ClassCommentSniff extends BaseClassCommentSniff
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(File $phpcsFile, $stackPtr)
     {
         parent::process($phpcsFile, $stackPtr);

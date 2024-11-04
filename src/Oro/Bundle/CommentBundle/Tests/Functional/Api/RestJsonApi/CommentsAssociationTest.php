@@ -12,6 +12,7 @@ use Oro\Bundle\NoteBundle\Entity\Note;
  */
 class CommentsAssociationTest extends RestJsonApiTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

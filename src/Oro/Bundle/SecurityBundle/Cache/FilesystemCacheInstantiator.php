@@ -21,6 +21,7 @@ class FilesystemCacheInstantiator implements CacheInstantiatorInterface
         $this->cacheDirectory = $cacheDirectory;
     }
 
+    #[\Override]
     public function getCacheInstance(string $namespace): AdapterInterface
     {
         if (!\array_key_exists($namespace, $this->caches)) {

@@ -23,6 +23,7 @@ class ConfigurableImportStrategyHelperTest extends WebTestCase
     /** @var ConfigurableImportStrategyHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

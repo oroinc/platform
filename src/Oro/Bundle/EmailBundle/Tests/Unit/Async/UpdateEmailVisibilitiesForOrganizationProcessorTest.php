@@ -34,6 +34,7 @@ class UpdateEmailVisibilitiesForOrganizationProcessorTest extends OrmTestCase
     /** @var UpdateEmailVisibilitiesForOrganizationProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->jobRunner = $this->createMock(JobRunner::class);

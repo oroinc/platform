@@ -22,6 +22,7 @@ class LayoutTest extends LayoutTestCase
 
     private LayoutContextStack|\PHPUnit\Framework\MockObject\MockObject $layoutContextStack;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->renderer = $this->createMock(LayoutRendererInterface::class);

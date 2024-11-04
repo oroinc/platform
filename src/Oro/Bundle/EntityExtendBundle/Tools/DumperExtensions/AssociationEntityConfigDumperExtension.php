@@ -14,33 +14,25 @@ abstract class AssociationEntityConfigDumperExtension extends AbstractAssociatio
      */
     abstract protected function getAssociationEntityClass();
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getAssociationType()
     {
         return RelationType::MANY_TO_ONE;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getAssociationAttributeName()
     {
         return 'enabled';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isTargetEntityApplicable(ConfigInterface $targetEntityConfig)
     {
         return $targetEntityConfig->is($this->getAssociationAttributeName());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function preUpdate()
     {
         $targetEntityConfigs = $this->getTargetEntityConfigs();

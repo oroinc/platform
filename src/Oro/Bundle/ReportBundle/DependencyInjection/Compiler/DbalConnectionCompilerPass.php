@@ -16,9 +16,7 @@ class DbalConnectionCompilerPass implements CompilerPassInterface
     public const CONNECTION_PARAM_NAME        = 'oro_report.dbal.connection';
     public const DATAGRID_PREFIXES_PARAM_NAME = 'oro_report.dbal.datagrid_prefixes';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if ($container->hasParameter(self::CONNECTION_PARAM_NAME)) {

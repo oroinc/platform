@@ -36,9 +36,7 @@ class MetadataContext extends ApiContext
     private array $extras = [];
     private EntityDefinitionConfig $config;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function initialize(): void
     {
         parent::initialize();

@@ -21,9 +21,9 @@ class TranslationProcessor implements ConfigurationHandlerInterface, WorkflowDef
     }
 
     /**
-     * {@inheritdoc}
      * @throws \InvalidArgumentException
      */
+    #[\Override]
     public function handle(array $configuration)
     {
         if (empty($configuration['name'])) {
@@ -53,9 +53,9 @@ class TranslationProcessor implements ConfigurationHandlerInterface, WorkflowDef
     }
 
     /**
-     * {@inheritdoc}
      * @throws \InvalidArgumentException
      */
+    #[\Override]
     public function prepare($workflowName, array $configuration)
     {
         $translationFieldsIterator = $this->getConfigurationIterator($workflowName, $configuration);

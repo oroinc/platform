@@ -17,9 +17,7 @@ class CurrencyFormatter implements FormatterInterface
         $this->formatter = $formatter;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function format($value, array $formatterArguments = [])
     {
         return $this->formatter->formatCurrency(
@@ -32,9 +30,7 @@ class CurrencyFormatter implements FormatterInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDefaultValue()
     {
         return 0;

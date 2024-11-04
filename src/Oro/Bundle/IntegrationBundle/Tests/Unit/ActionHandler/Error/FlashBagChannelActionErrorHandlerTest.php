@@ -18,6 +18,7 @@ class FlashBagChannelActionErrorHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var FlashBagChannelActionErrorHandler */
     private $errorHandler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->session = $this->createMock(Session::class);

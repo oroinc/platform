@@ -11,9 +11,7 @@ class Config implements \IteratorAggregate
 {
     private array $items = [];
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->items);

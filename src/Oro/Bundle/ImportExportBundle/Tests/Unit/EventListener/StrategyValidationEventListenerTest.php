@@ -16,6 +16,7 @@ class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
     /** @var StrategyValidationEventListener */
     private $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configurableDataConverter = $this->createMock(ConfigurableTableDataConverter::class);

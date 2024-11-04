@@ -19,6 +19,7 @@ class NumberExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var NumberExtension */
     private $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formatter = $this->createMock(NumberFormatter::class);

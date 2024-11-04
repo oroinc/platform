@@ -12,6 +12,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class ConfigValueRepositoryTest extends WebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();
@@ -29,13 +30,13 @@ class ConfigValueRepositoryTest extends WebTestCase
 
         $configValues = $this->getRepository()->findBy(['section' => $section]);
 
-        $this->assertNotEmpty($configValues);
+        self::assertNotEmpty($configValues);
 
         $this->getRepository()->removeBySection($section);
 
         $configValues = $this->getRepository()->findBy(['section' => $section]);
 
-        $this->assertEmpty($configValues);
+        self::assertEmpty($configValues);
     }
 
     public function testGetConfigValues(): void
@@ -48,7 +49,7 @@ class ConfigValueRepositoryTest extends WebTestCase
             $configValue->getName()
         );
 
-        $this->assertEquals([$configValue], $result);
+        self::assertEquals([$configValue], $result);
     }
 
     public function testGetConfigValueRecordIds(): void
@@ -62,6 +63,23 @@ class ConfigValueRepositoryTest extends WebTestCase
             $configValue->getName()
         );
 
-        $this->assertEquals([$configValue->getConfig()->getRecordId()], $result);
+        self::assertEquals([$configValue->getConfig()->getRecordId()], $result);
+    }
+
+    public function getConfigValueByRecordId(): void
+    {
+        /** @var ConfigValue $configValue */
+        $configValue = $this->getRepository()->findOneBy([
+            'section' => 'additional',
+            'name' => 'additional_section_scalar_value'
+        ]);
+
+        $result = $this->getRepository()->getConfigValueByRecordId(
+            $configValue->getConfig()->getRecordId(),
+            $configValue->getSection(),
+            $configValue->getName()
+        );
+
+        self::assertEquals($configValue, $result);
     }
 }

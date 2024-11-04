@@ -17,6 +17,7 @@ class IntlNumberFormatterFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var IntlNumberFormatterFactory */
     private $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         IntlTestHelper::requireIntl($this);

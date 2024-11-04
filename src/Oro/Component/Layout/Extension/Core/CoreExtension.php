@@ -8,9 +8,7 @@ use Oro\Component\Layout\Extension\AbstractExtension;
 
 class CoreExtension extends AbstractExtension
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function loadTypes()
     {
         return [
@@ -19,9 +17,7 @@ class CoreExtension extends AbstractExtension
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function loadTypeExtensions()
     {
         return [

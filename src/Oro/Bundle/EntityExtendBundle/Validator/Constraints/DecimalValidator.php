@@ -11,9 +11,7 @@ use Symfony\Component\Validator\ConstraintValidator;
  */
 class DecimalValidator extends ConstraintValidator
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function validate($value, Constraint $constraint)
     {
         if ($this->isEmpty($value)) {

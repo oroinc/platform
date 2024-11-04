@@ -11,9 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class ReplaceTwigEnvironmentPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $container->getDefinition('twig')

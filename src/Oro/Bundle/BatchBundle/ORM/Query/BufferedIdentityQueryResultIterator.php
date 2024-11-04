@@ -85,12 +85,7 @@ class BufferedIdentityQueryResultIterator extends AbstractBufferedQueryResultIte
      */
     private $rows;
 
-    /**
-     * {@inheritDoc}
-     *
-     * $bufferSize applies to Root Entities,
-     * OneToMany joins will result in increasing number of actual fetched rows in a batch
-     */
+    #[\Override]
     public function setBufferSize($bufferSize)
     {
         parent::setBufferSize($bufferSize);
@@ -116,17 +111,13 @@ class BufferedIdentityQueryResultIterator extends AbstractBufferedQueryResultIte
         return $this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function key(): int
     {
         return $this->position;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function next(): void
     {
         if (null === $this->identifiers) {
@@ -149,9 +140,7 @@ class BufferedIdentityQueryResultIterator extends AbstractBufferedQueryResultIte
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function rewind(): void
     {
         $this->offset = -1;
@@ -165,9 +154,7 @@ class BufferedIdentityQueryResultIterator extends AbstractBufferedQueryResultIte
         $this->next();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function count(): int
     {
         if ($this->totalCount === null) {
@@ -187,9 +174,7 @@ class BufferedIdentityQueryResultIterator extends AbstractBufferedQueryResultIte
         return $this->totalCount;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function initializeQuery(Query $query)
     {
         $this->maxResults = $query->getMaxResults();

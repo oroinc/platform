@@ -18,41 +18,31 @@ class JobExtension extends AbstractExtension
         $this->consumerState = $consumerState;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPreRunUnique(Job $job)
     {
         $this->consumerState->setJob($job);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPostRunUnique(Job $job, $jobResult)
     {
         $this->consumerState->setJob();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPreRunDelayed(Job $job)
     {
         $this->consumerState->setJob($job);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPostRunDelayed(Job $job, $jobResult)
     {
         $this->consumerState->setJob();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onCancel(Job $job)
     {
         $this->consumerState->setJob();

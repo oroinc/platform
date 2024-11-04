@@ -9,6 +9,7 @@ abstract class AssociationTypeTestCase extends AbstractConfigTypeTestCase
     /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
     protected $groupingConfigProvider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->groupingConfigProvider = $this->createMock(ConfigProvider::class);
@@ -16,6 +17,7 @@ abstract class AssociationTypeTestCase extends AbstractConfigTypeTestCase
         parent::setUp();
     }
 
+    #[\Override]
     protected function setConfigProvidersForSubmitTest(array &$configProviders): void
     {
         parent::setConfigProvidersForSubmitTest($configProviders);

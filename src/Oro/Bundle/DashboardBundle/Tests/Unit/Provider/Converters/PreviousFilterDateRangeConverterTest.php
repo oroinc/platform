@@ -22,6 +22,7 @@ class PreviousFilterDateRangeConverterTest extends \PHPUnit\Framework\TestCase
     /** @var PreviousFilterDateRangeConverter */
     private $converter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formatter = $this->createMock(DateTimeFormatterInterface::class);

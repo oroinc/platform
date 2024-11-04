@@ -25,6 +25,7 @@ class AddAssociationValidatorsTest extends ConfigProcessorTestCase
     /** @var AddAssociationValidators */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

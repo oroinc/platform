@@ -27,9 +27,7 @@ class LoadProcessorsCompilerPass implements CompilerPassInterface
         $this->processorTagName = $processorTagName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition($this->processorBagConfigBuilderServiceId)

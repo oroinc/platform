@@ -12,9 +12,7 @@ class WebsocketRouterCachePass implements CompilerPassInterface
 {
     private const ROUTER_SERVICE_ID = 'gos_pubsub_router.router.websocket';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $routerDef = $container->getDefinition(self::ROUTER_SERVICE_ID);

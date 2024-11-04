@@ -15,6 +15,7 @@ class CaptchaServiceRegistryTest extends TestCase
     private CaptchaServiceInterface|MockObject $captchaService;
     private CaptchaServiceRegistry $captchaServiceRegistry;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);

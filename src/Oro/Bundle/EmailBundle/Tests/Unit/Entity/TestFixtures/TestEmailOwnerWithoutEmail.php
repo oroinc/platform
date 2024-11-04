@@ -28,21 +28,25 @@ class TestEmailOwnerWithoutEmail implements EmailOwnerInterface
         }
     }
 
+    #[\Override]
     public function getEmailFields()
     {
         return null;
     }
 
+    #[\Override]
     public function getId()
     {
         return $this->id;
     }
 
+    #[\Override]
     public function getFirstName()
     {
         return $this->firstName;
     }
 
+    #[\Override]
     public function getLastName()
     {
         return $this->lastName;

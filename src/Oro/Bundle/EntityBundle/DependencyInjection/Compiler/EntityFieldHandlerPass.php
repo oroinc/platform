@@ -11,9 +11,7 @@ class EntityFieldHandlerPass implements CompilerPassInterface
     const HANDLER_PROCESSOR_SERVICE = 'oro_entity.form.entity_field.handler.processor.handler_processor';
     const TAG = 'oro_entity.form.entity_field.handler';
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition(self::HANDLER_PROCESSOR_SERVICE)) {

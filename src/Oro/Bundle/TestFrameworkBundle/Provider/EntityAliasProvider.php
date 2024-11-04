@@ -18,9 +18,7 @@ class EntityAliasProvider implements EntityAliasProviderInterface
         'Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity',
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityAlias($entityClass)
     {
         if (in_array($entityClass, self::$classes)) {

@@ -26,9 +26,7 @@ class ImagineFilterConfigurationDecorator extends FilterConfiguration
         $this->filterLoaderServiceLink = $filterLoaderServiceLink;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function get($filter)
     {
         $this->filterLoaderServiceLink->getService()->load();
@@ -36,17 +34,13 @@ class ImagineFilterConfigurationDecorator extends FilterConfiguration
         return $this->filterConfiguration->get($filter);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function set($filter, array $config)
     {
         return $this->filterConfiguration->set($filter, $config);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function all()
     {
         $this->filterLoaderServiceLink->getService()->load();

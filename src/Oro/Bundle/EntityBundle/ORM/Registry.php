@@ -33,9 +33,7 @@ class Registry extends BaseRegistry
         $this->defaultQueryCacheLifetime = $defaultQueryCacheLifetime;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getService($name): object
     {
         if (isset($this->cachedManagerServices[$name])) {
@@ -55,18 +53,14 @@ class Registry extends BaseRegistry
         return $manager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function resetService($name): void
     {
         unset($this->cachedManagerServices[$name]);
         parent::resetService($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function resetManager($name = null)
     {
         $this->managersMap = [];
@@ -75,9 +69,7 @@ class Registry extends BaseRegistry
         return parent::resetManager($name);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getManagerForClass($class)
     {
         if (\array_key_exists($class, $this->managersMap)) {
@@ -94,12 +86,9 @@ class Registry extends BaseRegistry
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * The default Doctrine's implementation is overridden to avoid unnecessary loading
-     * of all managers if the alias belongs to the default manager.
      * @see \Doctrine\Persistence\ManagerRegistry::getAliasNamespace
      */
+    #[\Override]
     public function getAliasNamespace($alias)
     {
         $names = $this->getManagerNames();

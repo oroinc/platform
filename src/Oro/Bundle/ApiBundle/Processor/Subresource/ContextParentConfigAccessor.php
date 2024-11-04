@@ -18,9 +18,7 @@ class ContextParentConfigAccessor implements ConfigAccessorInterface
         $this->context = $context;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfig(string $className): ?EntityDefinitionConfig
     {
         return is_a($this->context->getParentClassName(), $className, true)

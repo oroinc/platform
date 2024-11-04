@@ -18,6 +18,7 @@ class LostItemsBuilder implements BuilderInterface
      */
     private array $menuUpdateApplierContexts = [];
 
+    #[\Override]
     public function build(ItemInterface $menu, array $options = [], $alias = null): void
     {
         if (!$menu->isDisplayed()) {

@@ -9,6 +9,7 @@ class ChunkSizeProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ChunkSizeProvider */
     private $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->provider = new ChunkSizeProvider(

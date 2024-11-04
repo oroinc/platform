@@ -32,9 +32,7 @@ class CallServiceMethod extends AbstractAction
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         if (empty($options['service'])) {
@@ -51,10 +49,10 @@ class CallServiceMethod extends AbstractAction
     }
 
     /**
-     * {@inheritdoc}
      *
      * @throws InvalidParameterException
      */
+    #[\Override]
     protected function executeAction($context)
     {
         $service = $this->getService($context);

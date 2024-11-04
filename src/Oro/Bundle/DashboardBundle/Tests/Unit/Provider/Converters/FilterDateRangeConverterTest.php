@@ -49,6 +49,7 @@ class FilterDateRangeConverterTest extends \PHPUnit\Framework\TestCase
     /** @var FilterDateRangeConverter */
     private $converter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formatter = $this->createMock(DateTimeFormatterInterface::class);

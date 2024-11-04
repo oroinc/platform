@@ -13,9 +13,7 @@ class NoColumnDuplicates extends Constraint
     /** @var string */
     public $message = 'oro.query_designer.columns.duplicates';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getTargets(): string|array
     {
         return self::CLASS_CONSTRAINT;

@@ -32,6 +32,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
     /** @var OroRichTextType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
@@ -50,9 +51,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

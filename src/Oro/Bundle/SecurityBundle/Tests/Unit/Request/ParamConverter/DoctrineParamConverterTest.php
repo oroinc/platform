@@ -26,6 +26,7 @@ class DoctrineParamConverterTest extends \PHPUnit\Framework\TestCase
     /** @var DoctrineParamConverter */
     private $converter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);

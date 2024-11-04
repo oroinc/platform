@@ -37,6 +37,7 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var MenuFactory */
     private $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->urlMatcher = $this->createMock(UrlMatcherInterface::class);

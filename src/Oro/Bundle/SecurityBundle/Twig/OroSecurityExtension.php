@@ -35,9 +35,7 @@ class OroSecurityExtension extends AbstractExtension implements ServiceSubscribe
         $this->container = $container;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFunctions()
     {
         return [
@@ -48,9 +46,7 @@ class OroSecurityExtension extends AbstractExtension implements ServiceSubscribe
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getFilters()
     {
         return [
@@ -117,9 +113,7 @@ class OroSecurityExtension extends AbstractExtension implements ServiceSubscribe
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return [

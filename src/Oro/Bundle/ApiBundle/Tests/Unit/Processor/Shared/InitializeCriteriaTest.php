@@ -18,6 +18,7 @@ class InitializeCriteriaTest extends GetListProcessorOrmRelatedTestCase
     /** @var InitializeCriteria */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

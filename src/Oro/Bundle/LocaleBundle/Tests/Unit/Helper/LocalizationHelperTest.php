@@ -22,6 +22,7 @@ class LocalizationHelperTest extends \PHPUnit\Framework\TestCase
     /** @var LocalizationHelper */
     private $helper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->localizationManager = $this->createMock(LocalizationManager::class);

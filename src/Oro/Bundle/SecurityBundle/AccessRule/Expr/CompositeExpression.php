@@ -45,9 +45,7 @@ class CompositeExpression implements ExpressionInterface
         return $this->type;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function visit(Visitor $visitor)
     {
         return $visitor->walkCompositeExpression($this);

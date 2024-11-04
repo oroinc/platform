@@ -71,6 +71,7 @@ final class BigRational extends BigNumber
      *
      * @return BigInteger
      */
+    #[\Override]
     public function quotient($that = null) // $that - only for compatible with parent class
     {
         /** @var BrickBigInteger $brickBigInteger */
@@ -84,6 +85,7 @@ final class BigRational extends BigNumber
      *
      * @return BigInteger
      */
+    #[\Override]
     public function remainder($that = null) // $that - only for compatible with parent class
     {
         /** @var BrickBigInteger $brickBigInteger */
@@ -97,6 +99,7 @@ final class BigRational extends BigNumber
      *
      * @return BigInteger[]
      */
+    #[\Override]
     public function quotientAndRemainder($that = null) // $that - only for compatible with parent class
     {
         /** @var BrickBigInteger[] $brickBigIntegerArray */
@@ -135,17 +138,13 @@ final class BigRational extends BigNumber
         return new static($brickBigRational);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toBigRational()
     {
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function __unserialize(array $serialized): void
     {
         if ($this->getTargetObject() !== null) {

@@ -11,9 +11,7 @@ class PropertyPathTitleDataConverter extends ConfigurableTableDataConverter
      */
     protected $relationDelimiter = '.';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getFieldHeader($entityName, $field)
     {
         return $field['name'];

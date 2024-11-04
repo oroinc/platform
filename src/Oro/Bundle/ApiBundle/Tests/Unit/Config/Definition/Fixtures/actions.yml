@@ -235,6 +235,80 @@ invalid_page_size:
     expected: []
     error: 'The value -2 is too small for path "entity.actions.get_list.page_size". Should be greater than or equal to -1'
 
+enable_paging:
+    config:
+        actions:
+            get_list:
+                disable_paging: false
+    expected:
+        actions:
+            get_list: []
+
+disable_paging:
+    config:
+        actions:
+            get_list:
+                disable_paging: true
+    expected:
+        actions:
+            get_list:
+                page_size: -1
+                max_results: -1
+
+enable_paging_but_page_size_disable_it:
+    config:
+        actions:
+            get_list:
+                disable_paging: false
+                page_size: -1
+    expected:
+        actions:
+            get_list:
+                page_size: -1
+                max_results: -1
+
+disable_paging_and_page_size_disable_it:
+    config:
+        actions:
+            get_list:
+                disable_paging: true
+                page_size: -1
+    expected:
+        actions:
+            get_list:
+                page_size: -1
+                max_results: -1
+
+enable_paging_and_custom_page_size:
+    config:
+        actions:
+            get_list:
+                disable_paging: false
+                page_size: 100
+    expected:
+        actions:
+            get_list:
+                page_size: 100
+
+disable_paging_but_custom_page_size:
+    config:
+        actions:
+            get_list:
+                disable_paging: true
+                page_size: 100
+    expected:
+        actions:
+            get_list:
+                page_size: 100
+
+invalid_value_for_disable_paging:
+    config:
+        actions:
+            get_list:
+                disable_paging: 123
+    expected: []
+    error: 'Invalid type for path "entity.actions.get_list.disable_paging". Expected "bool", but got "int"'
+
 empty_order_by:
     config:
         actions:

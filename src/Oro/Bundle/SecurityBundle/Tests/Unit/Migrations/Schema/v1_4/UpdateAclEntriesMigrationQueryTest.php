@@ -35,6 +35,7 @@ class UpdateAclEntriesMigrationQueryTest extends \PHPUnit\Framework\TestCase
     /** @var UpdateAclEntriesMigrationQuery */
     private $query;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);

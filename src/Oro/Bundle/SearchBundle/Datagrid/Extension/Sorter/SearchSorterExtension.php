@@ -20,9 +20,7 @@ class SearchSorterExtension extends AbstractSorterExtension
         'datetime' => 'datetime',
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return
@@ -30,9 +28,7 @@ class SearchSorterExtension extends AbstractSorterExtension
             && parent::isApplicable($config);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function addSorterToDatasource(array $sorter, $direction, DatasourceInterface $datasource)
     {
         $sortKey = $sorter['data_name'];

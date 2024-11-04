@@ -26,9 +26,7 @@ class TypeValidationLoader extends AbstractFieldConfigBasedValidationLoader
         $this->fieldConfigProvider = $fieldConfigProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function processFieldConfig(ClassMetadata $metadata, ConfigInterface $fieldConfig): void
     {
         if (!$this->isApplicable($metadata, $fieldConfig)) {

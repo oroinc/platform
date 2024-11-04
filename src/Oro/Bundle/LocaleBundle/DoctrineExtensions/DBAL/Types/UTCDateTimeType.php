@@ -14,9 +14,7 @@ class UTCDateTimeType extends DateTimeType
     /** @var null|\DateTimeZone */
     private static $utc = null;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
         if ($value === null) {
@@ -32,9 +30,7 @@ class UTCDateTimeType extends DateTimeType
         return parent::convertToDatabaseValue($value, $platform);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {
         if ($value === null) {

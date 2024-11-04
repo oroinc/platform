@@ -10,7 +10,7 @@ class GeneratedValueStrategyListenerPass implements CompilerPassInterface
     const SERVICE_NAME = 'oro_entity.listener.orm.generated_value_strategy_listener';
     const DOCTRINE_CONNECTIONS_PARAM = 'doctrine.connections';
 
-    /** {@inheritdoc} */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         if (!$container->hasDefinition(self::SERVICE_NAME)) {

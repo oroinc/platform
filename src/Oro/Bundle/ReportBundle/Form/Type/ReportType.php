@@ -16,9 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ReportType extends AbstractQueryDesignerType
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -53,9 +51,7 @@ class ReportType extends AbstractQueryDesignerType
         $builder->addEventSubscriber(new DateGroupingFormSubscriber());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
@@ -72,17 +68,12 @@ class ReportType extends AbstractQueryDesignerType
         $resolver->setDefaults($options);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getName()
     {
         return $this->getBlockPrefix();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBlockPrefix(): string
     {
         return 'oro_report';

@@ -39,9 +39,7 @@ class TranslationContextResolver implements TranslationContextResolverInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function resolve($id)
     {
         if (!str_starts_with($id, KeyTemplate\WorkflowTemplate::KEY_PREFIX)) {

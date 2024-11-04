@@ -16,6 +16,7 @@ class SystemConfigConnectionCheckerTest extends \PHPUnit\Framework\TestCase
 
     private SystemConfigConnectionChecker $checker;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->connectionCheckers = $this->createMock(ConnectionCheckerInterface::class);

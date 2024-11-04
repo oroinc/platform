@@ -12,17 +12,13 @@ class OroEntityConfigBundleInstaller implements Installation, AttachmentExtensio
 {
     use AttachmentExtensionAwareTrait;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getMigrationVersion(): string
     {
-        return 'v1_17';
+        return 'v1_18';
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function up(Schema $schema, QueryBag $queries): void
     {
         /** Tables generation **/

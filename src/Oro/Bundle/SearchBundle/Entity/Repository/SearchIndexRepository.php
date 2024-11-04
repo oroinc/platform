@@ -111,17 +111,13 @@ class SearchIndexRepository extends ServiceEntityRepository implements DBALPersi
         $this->getDriverRepo()->truncateIndex();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function writeItem(AbstractItem $item)
     {
         $this->getDriverRepo()->writeItem($item);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function flushWrites()
     {
         $this->getDriverRepo()->flushWrites();

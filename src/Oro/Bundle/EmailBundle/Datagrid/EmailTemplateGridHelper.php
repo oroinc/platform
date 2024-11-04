@@ -48,9 +48,7 @@ class EmailTemplateGridHelper extends BaseGridHelper
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getEntityNames()
     {
         $result = [];

@@ -14,15 +14,14 @@ class OroPlaceholderPasswordTypeTest extends FormIntegrationTestCase
     /** @var OroPlaceholderPasswordType */
     private $formType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->formType = new OroPlaceholderPasswordType();
         parent::setUp();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getExtensions(): array
     {
         return [

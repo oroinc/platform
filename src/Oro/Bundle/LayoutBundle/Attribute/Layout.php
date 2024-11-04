@@ -118,11 +118,13 @@ class Layout extends ConfigurationAnnotation
             && empty($this->vars);
     }
 
+    #[\Override]
     public function getAliasName()
     {
         return 'layout';
     }
 
+    #[\Override]
     public function allowArray()
     {
         return false;

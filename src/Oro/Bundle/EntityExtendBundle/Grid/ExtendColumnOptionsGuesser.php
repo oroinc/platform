@@ -7,6 +7,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Guess\ColumnGuess;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface as Property;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 
 /**
  * Column options Guesser for extend field configs.
@@ -21,35 +22,33 @@ class ExtendColumnOptionsGuesser extends AbstractColumnOptionsGuesser
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function guessFormatter($class, $property, $type)
     {
         switch ($type) {
             case 'enum':
-                $extendFieldConfig = $this->getFieldConfig('extend', $class, $property);
-                if ($extendFieldConfig) {
+                $enumFieldConfig = $this->getFieldConfig('enum', $class, $property);
+                if ($enumFieldConfig) {
                     $options = [
                         'frontend_type' => Property::TYPE_HTML,
-                        'type'          => 'twig',
-                        'template'      => '@OroEntityExtend/Datagrid/Property/enum.html.twig',
-                        'context'       => [
-                            'entity_class' => $extendFieldConfig->get('target_entity')
+                        'type' => 'twig',
+                        'template' => '@OroEntityExtend/Datagrid/Property/enum.html.twig',
+                        'context' => [
+                            'enum_code' => $enumFieldConfig->get('enum_code'),
                         ]
                     ];
                 }
                 break;
             case 'multiEnum':
-                $extendFieldConfig = $this->getFieldConfig('extend', $class, $property);
-                if ($extendFieldConfig) {
+                $enumFieldConfig = $this->getFieldConfig('enum', $class, $property);
+                if ($enumFieldConfig) {
                     $options = [
                         'frontend_type' => Property::TYPE_HTML,
-                        'export_type'   => 'list',
-                        'type'          => 'twig',
-                        'template'      => '@OroEntityExtend/Datagrid/Property/multiEnum.html.twig',
-                        'context'       => [
-                            'entity_class' => $extendFieldConfig->get('target_entity')
+                        'export_type' => 'list',
+                        'type' => 'twig',
+                        'template' => '@OroEntityExtend/Datagrid/Property/multiEnum.html.twig',
+                        'context' => [
+                            'enum_code' => $enumFieldConfig->get('enum_code'),
                         ]
                     ];
                 }
@@ -61,9 +60,7 @@ class ExtendColumnOptionsGuesser extends AbstractColumnOptionsGuesser
             : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function guessSorter($class, $property, $type)
     {
         if ($type === 'multiEnum') {
@@ -76,29 +73,27 @@ class ExtendColumnOptionsGuesser extends AbstractColumnOptionsGuesser
         return null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function guessFilter($class, $property, $type)
     {
         switch ($type) {
             case 'enum':
-                $extendFieldConfig = $this->getFieldConfig('extend', $class, $property);
-                if ($extendFieldConfig) {
+                if ($this->getFieldConfig('extend', $class, $property)) {
                     $options = [
-                        'type'       => 'enum',
+                        'type' => 'enum',
                         'null_value' => ':empty:',
-                        'class'      => $extendFieldConfig->get('target_entity')
+                        'class' => EnumOption::class,
+                        'enum_code' => $this->getFieldConfig('enum', $class, $property)?->get('enum_code')
                     ];
                 }
                 break;
             case 'multiEnum':
-                $extendFieldConfig = $this->getFieldConfig('extend', $class, $property);
-                if ($extendFieldConfig) {
+                if ($this->getFieldConfig('extend', $class, $property)) {
                     $options = [
-                        'type'       => 'multi_enum',
+                        'type' => 'multi_enum',
                         'null_value' => ':empty:',
-                        'class'      => $extendFieldConfig->get('target_entity')
+                        'class' => EnumOption::class,
+                        'enum_code' => $this->getFieldConfig('enum', $class, $property)?->get('enum_code')
                     ];
                 }
                 break;

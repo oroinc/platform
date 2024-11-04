@@ -16,9 +16,7 @@ class MultiAttemptsClientDecoratorListener extends AbstractClientDecoratorListen
     use LoggerAwareTrait;
     use MultiAttemptsConfigTrait;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function attachDecorator(ClientCreatedAfterEvent $event, array $configuration)
     {
         $client = new MultiAttemptsClientDecorator(
@@ -29,33 +27,25 @@ class MultiAttemptsClientDecoratorListener extends AbstractClientDecoratorListen
         $event->setClient($client);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getDefaultConfigurationParameters()
     {
         return $this->multiAttemptsDefaultConfigurationParameters;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getConfigurationKey()
     {
         return self::$multiAttemptsConfigKey;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isEnabled(array $configuration)
     {
         return $this->getMultiAttemptsEnabledParameter($configuration);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function isApplicable(ClientCreatedAfterEvent $event)
     {
         return true;

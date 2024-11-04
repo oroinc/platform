@@ -51,49 +51,37 @@ class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
         $this->maskBuilder = new MaskBuilder();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getExtensionKey()
     {
         return WorkflowAclExtension::NAME;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function supports($type, $id)
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getClasses()
     {
         throw new \LogicException('Workflow Transition ACL Extension does not support "getClasses" method.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getObjectIdentity($val)
     {
         throw new \LogicException('Workflow Transition ACL Extension does not support "getObjectIdentity" method.');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null, $aclGroup = null)
     {
         return $this->permissions;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function decideIsGranting($triggeredMask, $object, TokenInterface $securityToken)
     {
         if (!$this->isSupportedObject($object)) {
@@ -103,33 +91,25 @@ class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
         return $this->isAccessGranted($triggeredMask, $object, $securityToken);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getMaskPattern($mask)
     {
         return MaskBuilder::getPatternFor($mask);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getServiceBits($mask)
     {
         return $mask & MaskBuilder::SERVICE_BITS;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function removeServiceBits($mask)
     {
         return $mask & MaskBuilder::REMOVE_SERVICE_BITS;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function parseDescriptor($descriptor, &$type, &$id, &$group)
     {
         $descriptor = ObjectIdentityHelper::removeFieldName($descriptor);
@@ -141,8 +121,8 @@ class WorkflowTransitionAclExtension extends AbstractWorkflowAclExtension
      * Process start transition. For the start transitions with init options return null class cause this transition
      * will start from the entity from the init options.
      *
-     * {@inheritDoc}
      */
+    #[\Override]
     protected function getObjectClassName($object)
     {
         if (\is_string($object)) {

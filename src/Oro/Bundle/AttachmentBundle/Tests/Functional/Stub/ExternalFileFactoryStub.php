@@ -42,9 +42,7 @@ class ExternalFileFactoryStub extends ExternalFileFactory
         $this->innerFactory = $innerFactory;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function createFromUrl(string $url): ExternalFile
     {
         if (\array_key_exists($url, self::MOCKED_FILES)) {

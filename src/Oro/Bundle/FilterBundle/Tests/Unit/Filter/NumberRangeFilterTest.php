@@ -19,6 +19,7 @@ class NumberRangeFilterTest extends NumberFilterTest
     /** @var NumberRangeFilter */
     protected $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -32,6 +33,7 @@ class NumberRangeFilterTest extends NumberFilterTest
     /**
      * @dataProvider parseDataProvider
      */
+    #[\Override]
     public function testParseData($data, $expected)
     {
         $this->assertEquals(
@@ -114,6 +116,7 @@ class NumberRangeFilterTest extends NumberFilterTest
         ];
     }
 
+    #[\Override]
     public function parseDataProvider(): array
     {
         return [

@@ -23,6 +23,7 @@ class SearchAggregationFilterTest extends \PHPUnit\Framework\TestCase
     /** @var SearchAggregationFilter */
     private $filter;
 
+    #[\Override]
     protected function setUp(): void
     {
         $fieldMappings = ['field1' => 'field_1'];

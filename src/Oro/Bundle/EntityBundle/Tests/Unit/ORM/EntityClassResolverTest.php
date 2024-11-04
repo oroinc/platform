@@ -15,6 +15,7 @@ class EntityClassResolverTest extends \PHPUnit\Framework\TestCase
     /** @var EntityClassResolver */
     private $resolver;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->doctrine = $this->createMock(ManagerRegistry::class);

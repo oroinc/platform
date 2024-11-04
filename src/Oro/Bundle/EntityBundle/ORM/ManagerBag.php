@@ -30,9 +30,7 @@ class ManagerBag implements ManagerBagInterface
         $this->managerNames[] = $managerName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getManagers()
     {
         $result = [];

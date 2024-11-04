@@ -36,9 +36,7 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
     private ?BatchFlushDataHandlerInterface $flushDataHandler = null;
     private ?ParameterBagInterface $sharedData = null;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function initialize(): void
     {
         parent::initialize();

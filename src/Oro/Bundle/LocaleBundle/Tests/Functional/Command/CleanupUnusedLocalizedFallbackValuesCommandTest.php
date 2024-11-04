@@ -13,6 +13,7 @@ class CleanupUnusedLocalizedFallbackValuesCommandTest extends WebTestCase
 {
     private ?LocalizedFallbackValueRepository $repository = null;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

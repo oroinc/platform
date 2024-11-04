@@ -11,6 +11,7 @@ class LayoutContextStackTest extends \PHPUnit\Framework\TestCase
 {
     private LayoutContextStack $layoutContextStack;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->layoutContextStack = new LayoutContextStack();

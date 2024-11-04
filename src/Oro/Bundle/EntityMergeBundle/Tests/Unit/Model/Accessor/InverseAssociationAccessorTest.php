@@ -16,6 +16,7 @@ class InverseAssociationAccessorTest extends \PHPUnit\Framework\TestCase
     /** @var InverseAssociationAccessor */
     private $accessor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $repository = $this->createMock(ObjectRepository::class);

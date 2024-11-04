@@ -26,6 +26,7 @@ class CustomerStub implements NameInterface
     /**
      * @return string
      */
+    #[\Override]
     public function getName()
     {
         return $this->name;

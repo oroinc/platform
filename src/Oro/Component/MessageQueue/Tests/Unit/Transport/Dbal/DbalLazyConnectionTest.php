@@ -19,6 +19,7 @@ class DbalLazyConnectionTest extends \PHPUnit\Framework\TestCase
     /** @var DbalLazyConnection */
     private $connection;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->dbalConnection = $this->createMock(Connection::class);

@@ -22,6 +22,7 @@ class MigrationExecutorTest extends MigrationExecutorTestCase
     /** @var MigrationExecutor */
     private $executor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -125,9 +126,7 @@ class MigrationExecutorTest extends MigrationExecutorTestCase
         self::assertNotEmpty($schema->getTables()); // schema was updated
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function getTables(): array
     {
         return [

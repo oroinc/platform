@@ -22,9 +22,7 @@ class ObjectType extends AbstractType
         $this->formHelper = $formHelper;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var EntityMetadata $metadata */
@@ -35,9 +33,7 @@ class ObjectType extends AbstractType
         $this->formHelper->addFormFields($builder, $metadata, $config);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver

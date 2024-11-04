@@ -10,9 +10,7 @@ class UnionOutputResultModifier extends AbstractOutputResultModifier
     public const HINT_UNION_KEY = 'walker_hook_union';
     public const HINT_UNION_VALUE = 'walker_hook_union_value';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function walkSubselect($subselect, string $result)
     {
         $query = $this->getQuery();

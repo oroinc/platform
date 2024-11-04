@@ -24,6 +24,7 @@ class ProtectQueryByAclTest extends GetListProcessorOrmRelatedTestCase
     /** @var ProtectQueryByAcl */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

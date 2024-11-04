@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query\Expr\Join;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
@@ -10,13 +11,13 @@ use Oro\Bundle\ApiBundle\Provider\ExtendedAssociationProvider;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * Completes the configuration of different kind of custom associations.
- * @see \Oro\Bundle\ApiBundle\Request\DataType::isNestedObject
- * @see \Oro\Bundle\ApiBundle\Request\DataType::isNestedAssociation
- * @see \Oro\Bundle\ApiBundle\Request\DataType::isExtendedAssociation
  */
 class CustomAssociationCompleter implements CustomDataTypeCompleterInterface
 {
@@ -34,9 +35,7 @@ class CustomAssociationCompleter implements CustomDataTypeCompleterInterface
         $this->extendedAssociationProvider = $extendedAssociationProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function completeCustomDataType(
         ClassMetadata $metadata,
         EntityDefinitionConfig $definition,
@@ -56,6 +55,12 @@ class CustomAssociationCompleter implements CustomDataTypeCompleterInterface
         } elseif (DataType::isExtendedAssociation($dataType)) {
             $this->completeExtendedAssociation($metadata->name, $fieldName, $field, $version, $requestType);
             $result = true;
+        } else {
+            $targetClass = $field->getTargetClass();
+            if ($targetClass && ExtendHelper::isOutdatedEnumOptionEntity($targetClass)) {
+                $this->completeEnumAssociation($metadata, $fieldName, $field, $version, $requestType);
+                $result = true;
+            }
         }
 
         return $result;
@@ -106,6 +111,41 @@ class CustomAssociationCompleter implements CustomDataTypeCompleterInterface
         } else {
             $field->setFormOption('mapped', false);
         }
+    }
+
+    private function completeEnumAssociation(
+        ClassMetadata $metadata,
+        string $fieldName,
+        EntityDefinitionFieldConfig $field,
+        string $version,
+        RequestType $requestType
+    ): void {
+        $this->associationHelper->completeAssociation($field, $field->getTargetClass(), $version, $requestType);
+        $qb = $this->doctrineHelper->createQueryBuilder(EnumOption::class, 'r');
+        $fieldName = $field->getPropertyPath($fieldName);
+        QueryBuilderUtil::checkField($fieldName);
+        if ($field->isCollectionValuedAssociation()) {
+            $qb->innerJoin(
+                $metadata->getName(),
+                'e',
+                Join::WITH,
+                sprintf(
+                    "JSONB_ARRAY_CONTAINS_JSON(e.serialized_data, '%s', CONCAT('\"', r.id, '\"')) = true",
+                    $fieldName
+                )
+            );
+        } else {
+            $qb->innerJoin(
+                $metadata->getName(),
+                'e',
+                Join::WITH,
+                sprintf(
+                    "JSON_EXTRACT(e.serialized_data, '%s') = r.id",
+                    $fieldName
+                )
+            );
+        }
+        $field->setAssociationQuery($qb);
     }
 
     private function getExtendedAssociationTargetType(string $associationType): string

@@ -30,6 +30,7 @@ class EntityAttributeNormalizerTest extends \PHPUnit\Framework\TestCase
     /** @var EntityAttributeNormalizer */
     private $normalizer;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->registry = $this->createMock(ManagerRegistry::class);

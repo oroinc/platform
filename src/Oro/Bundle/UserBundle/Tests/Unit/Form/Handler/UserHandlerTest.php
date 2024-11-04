@@ -42,6 +42,7 @@ class UserHandlerTest extends TestCase
 
     private UserHandler $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->form = $this->createMock(FormInterface::class);

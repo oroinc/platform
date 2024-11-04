@@ -17,33 +17,25 @@ class Join extends AbstractFunction
     /** @var array */
     protected $values;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getName()
     {
         return 'join';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function toArray()
     {
         return $this->convertToArray(array_merge([$this->glue], $this->values));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function compile($factoryAccessor)
     {
         return $this->convertToPhpCode(array_merge([$this->glue], $this->values), $factoryAccessor);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function initialize(array $options)
     {
         $count = count($options);
@@ -61,9 +53,7 @@ class Join extends AbstractFunction
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function getMessageParameters($context)
     {
         $values = array_map(
@@ -79,9 +69,7 @@ class Join extends AbstractFunction
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     protected function doEvaluate($context)
     {
         $glue = $this->resolveValue($context, $this->glue);

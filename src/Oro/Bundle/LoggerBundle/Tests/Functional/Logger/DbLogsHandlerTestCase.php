@@ -16,6 +16,7 @@ abstract class DbLogsHandlerTestCase extends WebTestCase
     /** @var EntityRepository */
     private $repo;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->initClient();

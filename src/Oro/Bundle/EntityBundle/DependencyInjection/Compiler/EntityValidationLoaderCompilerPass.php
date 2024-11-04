@@ -12,9 +12,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class EntityValidationLoaderCompilerPass implements CompilerPassInterface
 {
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $loaderServiceId = 'oro_entity.entity_validation_loader';

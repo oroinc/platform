@@ -28,6 +28,7 @@ class AvailableSuiteSetsControllerTest extends \PHPUnit\Framework\TestCase
     /** @var AvailableSuiteSetsController */
     private $controller;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->suiteConfigRegistry = $this->createMock(SuiteConfigurationRegistry::class);

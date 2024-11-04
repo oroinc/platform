@@ -25,17 +25,13 @@ class CompositeIdentifierFilter extends AbstractCompositeIdentifierFilter implem
     private EntityIdTransformerRegistry $entityIdTransformerRegistry;
     private ?EntityIdTransformerInterface $entityIdTransformer = null;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setRequestType(RequestType $requestType): void
     {
         $this->requestType = $requestType;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function setMetadata(EntityMetadata $metadata): void
     {
         $this->metadata = $metadata;
@@ -51,9 +47,7 @@ class CompositeIdentifierFilter extends AbstractCompositeIdentifierFilter implem
         return $this->metadata->getProperty($fieldName)->getPropertyPath();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function apply(Criteria $criteria, FilterValue $value = null): void
     {
         if (null !== $value) {
@@ -66,17 +60,13 @@ class CompositeIdentifierFilter extends AbstractCompositeIdentifierFilter implem
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function isListOfIdentifiers(mixed $value): bool
     {
         return parent::isListOfIdentifiers($value) && !ArrayUtil::isAssoc($value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function buildEqualExpression(array $value): Expression
     {
         $expressions = [];
@@ -87,9 +77,7 @@ class CompositeIdentifierFilter extends AbstractCompositeIdentifierFilter implem
         return new CompositeExpression(CompositeExpression::TYPE_AND, $expressions);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function buildNotEqualExpression(array $value): Expression
     {
         $expressions = [];
@@ -100,9 +88,7 @@ class CompositeIdentifierFilter extends AbstractCompositeIdentifierFilter implem
         return new CompositeExpression(CompositeExpression::TYPE_OR, $expressions);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function parseIdentifier(mixed $value): mixed
     {
         return $this->entityIdTransformer->reverseTransform($value, $this->metadata);

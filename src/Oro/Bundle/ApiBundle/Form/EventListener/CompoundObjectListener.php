@@ -22,9 +22,7 @@ class CompoundObjectListener implements EventSubscriberInterface
 {
     private bool $setDataToNull = false;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public static function getSubscribedEvents(): array
     {
         return [

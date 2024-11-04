@@ -18,6 +18,7 @@ class ConsoleErrorHandlerTest extends \PHPUnit\Framework\TestCase
     /** @var ConsoleErrorHandler */
     private $handler;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->consumerState = new ConsumerState();

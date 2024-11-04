@@ -13,6 +13,7 @@ class OriginRegistryFactoryTest extends \PHPUnit\Framework\TestCase
     /** @var OriginRegistryFactory */
     private $factory;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->originProvider = $this->createMock(OriginProviderInterface::class);

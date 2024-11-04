@@ -15,6 +15,7 @@ class LayoutManagerTest extends \PHPUnit\Framework\TestCase
 
     private LayoutManager $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->builder = $this->createMock(LayoutBuilderInterface::class);

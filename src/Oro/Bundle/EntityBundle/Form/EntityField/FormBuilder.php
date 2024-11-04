@@ -8,6 +8,9 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\CurrencyBundle\Form\Type\CurrencyType;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FormBundle\Form\Type\OroDateTimeType;
 use Oro\Bundle\FormBundle\Form\Type\OroDateType;
 use Oro\Bundle\FormBundle\Form\Type\OroPercentType;
@@ -49,7 +52,8 @@ class FormBuilder
 
     public function __construct(
         FormFactory $formFactory,
-        ManagerRegistry $registry
+        ManagerRegistry $registry,
+        protected EnumTypeHelper $enumTypeHelper
     ) {
         $this->formFactory = $formFactory;
         $this->registry = $registry;
@@ -133,6 +137,10 @@ class FormBuilder
             $data = $this->getAssociationTypeOptions($metaData, $fieldName);
         }
 
+        if (ExtendHelper::isEnumerableType($this->enumTypeHelper->getEnumFieldType(get_class($entity), $fieldName))) {
+            $data = $this->getEnumType();
+        }
+
         if (is_array($data)) {
             $currentType = $data['type'];
             if (array_key_exists($currentType, $this->fieldTypeMap)) {
@@ -207,5 +215,15 @@ class FormBuilder
         $em = $this->registry->getManager();
 
         return $em->getClassMetadata($className);
+    }
+
+    protected function getEnumType(): array
+    {
+        $data['type'] = 'entity';
+        $data['options'] = [
+            'class' => EnumOption::class,
+        ];
+
+        return $data;
     }
 }

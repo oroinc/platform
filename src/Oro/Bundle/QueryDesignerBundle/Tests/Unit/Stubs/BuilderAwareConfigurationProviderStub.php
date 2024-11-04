@@ -17,30 +17,25 @@ class BuilderAwareConfigurationProviderStub implements ConfigurationProviderInte
         $this->builder = $builder;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isApplicable(string $gridName): bool
     {
         throw new \BadMethodCallException('not implemented');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getConfiguration(string $gridName): DatagridConfiguration
     {
         throw new \BadMethodCallException('not implemented');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getBuilder(): DatagridConfigurationBuilder
     {
         return $this->builder;
     }
 
+    #[\Override]
     public function isValidConfiguration(string $gridName): bool
     {
         throw new \BadMethodCallException('not implemented');

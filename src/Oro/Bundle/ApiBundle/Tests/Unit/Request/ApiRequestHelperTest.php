@@ -9,6 +9,7 @@ class ApiRequestHelperTest extends \PHPUnit\Framework\TestCase
     /** @var ApiRequestHelper */
     private $apiRequestHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->apiRequestHelper = new ApiRequestHelper('^/api/(?!(rest|doc)($|/.*))');

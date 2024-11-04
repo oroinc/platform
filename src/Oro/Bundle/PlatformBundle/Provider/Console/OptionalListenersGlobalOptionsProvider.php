@@ -24,6 +24,7 @@ class OptionalListenersGlobalOptionsProvider extends AbstractGlobalOptionsProvid
         $this->listenersManager = $listenerManager;
     }
 
+    #[\Override]
     public function addGlobalOptions(Command $command)
     {
         $options = [
@@ -41,6 +42,7 @@ class OptionalListenersGlobalOptionsProvider extends AbstractGlobalOptionsProvid
         $this->addOptionsToCommand($command, $options);
     }
 
+    #[\Override]
     public function resolveGlobalOptions(InputInterface $input): void
     {
         $listeners = $this->getListenersToDisable($input);

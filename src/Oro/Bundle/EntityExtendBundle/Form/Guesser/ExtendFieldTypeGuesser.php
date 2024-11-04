@@ -43,9 +43,7 @@ class ExtendFieldTypeGuesser extends AbstractFormGuesser
         $this->extendFieldFormOptionsProvider = $extendFieldFormOptionsProvider;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function guessType($className, $property): ?TypeGuess
     {
         if (!$this->extendConfigProvider->hasConfig($className, $property)) {

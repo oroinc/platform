@@ -24,9 +24,7 @@ class DoctrineClearIdentityMapExtension extends AbstractExtension
         $this->managers = $managers;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPostReceived(Context $context): void
     {
         $managers = $this->getAliveManagers();

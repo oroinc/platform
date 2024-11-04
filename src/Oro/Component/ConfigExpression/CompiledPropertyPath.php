@@ -42,25 +42,19 @@ final class CompiledPropertyPath implements \IteratorAggregate, PropertyPathInte
         $this->isIndex  = $isIndex;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function __toString(): string
     {
         return (string)$this->path;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getLength(): int
     {
         return count($this->elements);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getParent(): ?PropertyPathInterface
     {
         if ($this->getLength() <= 1) {
@@ -79,22 +73,19 @@ final class CompiledPropertyPath implements \IteratorAggregate, PropertyPathInte
     /**
      * Returns a new iterator for this path.
      */
+    #[\Override]
     public function getIterator(): PropertyPathIteratorInterface
     {
         return new PropertyPathIterator($this);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getElements(): array
     {
         return $this->elements;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getElement($index): string
     {
         if (!isset($this->elements[$index])) {
@@ -104,9 +95,7 @@ final class CompiledPropertyPath implements \IteratorAggregate, PropertyPathInte
         return $this->elements[$index];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isProperty($index): bool
     {
         if (!isset($this->isIndex[$index])) {
@@ -116,9 +105,7 @@ final class CompiledPropertyPath implements \IteratorAggregate, PropertyPathInte
         return !$this->isIndex[$index];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isIndex($index): bool
     {
         if (!isset($this->isIndex[$index])) {

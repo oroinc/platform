@@ -2,34 +2,17 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
-class WorkflowRecordContext
+/**
+ * Represents a context for filtering applicable workflows.
+ */
+final readonly class WorkflowRecordContext
 {
-    /**
-     * @var object
-     */
-    private $entity;
-
-    /**
-     * @param object $entity
-     */
-    public function __construct($entity)
-    {
-        if (!is_object($entity)) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Instance of entity object is required. Got `%s` instead.',
-                    gettype($entity)
-                )
-            );
-        }
-
-        $this->entity = $entity;
+    public function __construct(
+        private object $entity
+    ) {
     }
 
-    /**
-     * @return object
-     */
-    public function getEntity()
+    public function getEntity(): object
     {
         return $this->entity;
     }

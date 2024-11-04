@@ -104,6 +104,7 @@ class EntityMetadataLoader
     private function createEntityMetadata(ClassMetadata $classMetadata, EntityDefinitionConfig $config): EntityMetadata
     {
         $entityMetadata = $this->metadataFactory->createEntityMetadata($classMetadata);
+        $entityMetadata->setHints($config->getHints());
         $configuredIdFieldNames = $config->getIdentifierFieldNames();
         if (!empty($configuredIdFieldNames)) {
             if ($entityMetadata->hasIdentifierGenerator()

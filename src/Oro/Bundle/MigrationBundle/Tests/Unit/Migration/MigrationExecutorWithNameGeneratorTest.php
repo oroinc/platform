@@ -15,6 +15,7 @@ class MigrationExecutorWithNameGeneratorTest extends MigrationExecutorTestCase
     private DbIdentifierNameGenerator $nameGenerator;
     private MigrationExecutorWithNameGenerator $executor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

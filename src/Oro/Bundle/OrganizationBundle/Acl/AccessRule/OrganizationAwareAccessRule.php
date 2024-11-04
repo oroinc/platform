@@ -22,17 +22,13 @@ class OrganizationAwareAccessRule implements AccessRuleInterface
         $this->organizationFieldName = $organizationFieldName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(Criteria $criteria): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(Criteria $criteria): void
     {
         $this->organizationRestrictionProvider->applyOrganizationRestrictionsToAccessRuleCriteria(

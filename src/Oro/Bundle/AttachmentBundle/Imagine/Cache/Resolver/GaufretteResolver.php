@@ -36,25 +36,19 @@ class GaufretteResolver implements ResolverInterface
         $this->cachePrefix = ltrim(str_replace('//', '/', $cachePrefix), '/');
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function resolve($path, $filter)
     {
         return $this->getBaseUrl() . '/' . $this->getFileUrl($path, $filter);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function isStored($path, $filter)
     {
         return $this->fileManager->hasFile($this->getFilePath($path, $filter));
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function store(BinaryInterface $binary, $path, $filter)
     {
         $this->fileManager->writeToStorage(
@@ -63,9 +57,7 @@ class GaufretteResolver implements ResolverInterface
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function remove(array $paths, array $filters)
     {
         if (empty($filters)) {

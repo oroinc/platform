@@ -21,9 +21,7 @@ class PrepareFormData implements ProcessorInterface
         $this->propertyAccessor = $propertyAccessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ChangeSubresourceContext $context */

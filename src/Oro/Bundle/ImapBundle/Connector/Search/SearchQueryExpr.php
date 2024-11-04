@@ -99,65 +99,49 @@ class SearchQueryExpr implements SearchQueryExprInterface, \Iterator, \ArrayAcce
         return $isComplex;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function current(): SearchQueryExprInterface
     {
         return $this->items[$this->position];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function next(): void
     {
         ++$this->position;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function key(): int
     {
         return $this->position;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function valid(): bool
     {
         return isset($this->items[$this->position]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function rewind(): void
     {
         $this->position = 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetExists($offset): bool
     {
         return isset($this->items[$offset]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetGet($offset): SearchQueryExprInterface
     {
         return $this->items[$offset];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetSet($offset, $value): void
     {
         if (is_null($offset)) {
@@ -167,9 +151,7 @@ class SearchQueryExpr implements SearchQueryExprInterface, \Iterator, \ArrayAcce
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function offsetUnset($offset): void
     {
         unset($this->items[$offset]);

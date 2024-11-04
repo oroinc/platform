@@ -17,9 +17,7 @@ class LayoutManagerPass implements CompilerPassInterface
     const EF_LAYOUT_FACTORY_BUILDER_SERVICE_ID = 'oro_embedded_form.layout_factory_builder';
     const EF_LAYOUT_MANGER_SERVICE_ID = 'oro_embedded_form.layout_manager';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContainerBuilder $container)
     {
         $layoutFactoryBuilderDef = $container->findDefinition(self::LAYOUT_FACTORY_BUILDER_SERVICE_ID);

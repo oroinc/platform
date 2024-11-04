@@ -52,6 +52,7 @@ abstract class AbstractPager implements \Iterator, \Countable, PagerInterface
      *
      * @return boolean
      */
+    #[\Override]
     public function haveToPaginate()
     {
         return $this->getMaxPerPage() && $this->getNbResults() > $this->getMaxPerPage();
@@ -174,6 +175,7 @@ abstract class AbstractPager implements \Iterator, \Countable, PagerInterface
      *
      * @return integer
      */
+    #[\Override]
     public function getNbResults()
     {
         return (int)$this->nbResults;
@@ -194,6 +196,7 @@ abstract class AbstractPager implements \Iterator, \Countable, PagerInterface
      *
      * @return integer
      */
+    #[\Override]
     public function getFirstPage()
     {
         return 1;
@@ -204,6 +207,7 @@ abstract class AbstractPager implements \Iterator, \Countable, PagerInterface
      *
      * @return integer
      */
+    #[\Override]
     public function getLastPage()
     {
         return $this->lastPage;
@@ -228,6 +232,7 @@ abstract class AbstractPager implements \Iterator, \Countable, PagerInterface
      *
      * @return integer
      */
+    #[\Override]
     public function getPage()
     {
         return $this->page;
@@ -238,6 +243,7 @@ abstract class AbstractPager implements \Iterator, \Countable, PagerInterface
      *
      * @return integer
      */
+    #[\Override]
     public function getNextPage()
     {
         return min($this->getPage() + 1, $this->getLastPage());
@@ -248,6 +254,7 @@ abstract class AbstractPager implements \Iterator, \Countable, PagerInterface
      *
      * @return integer
      */
+    #[\Override]
     public function getPreviousPage()
     {
         return max($this->getPage() - 1, $this->getFirstPage());
@@ -258,6 +265,7 @@ abstract class AbstractPager implements \Iterator, \Countable, PagerInterface
      *
      * @param integer $page
      */
+    #[\Override]
     public function setPage($page)
     {
         $this->page = intval($page);
@@ -273,6 +281,7 @@ abstract class AbstractPager implements \Iterator, \Countable, PagerInterface
      *
      * @return integer
      */
+    #[\Override]
     public function getMaxPerPage()
     {
         return $this->maxPerPage;
@@ -283,6 +292,7 @@ abstract class AbstractPager implements \Iterator, \Countable, PagerInterface
      *
      * @param integer $max
      */
+    #[\Override]
     public function setMaxPerPage($max)
     {
         if ($max > 0) {
@@ -381,9 +391,7 @@ abstract class AbstractPager implements \Iterator, \Countable, PagerInterface
         $this->resultsCounter = 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function current(): mixed
     {
         $this->initializeIteratorIfNotInitialized();
@@ -391,9 +399,7 @@ abstract class AbstractPager implements \Iterator, \Countable, PagerInterface
         return current($this->results);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function key(): mixed
     {
         $this->initializeIteratorIfNotInitialized();
@@ -401,9 +407,7 @@ abstract class AbstractPager implements \Iterator, \Countable, PagerInterface
         return key($this->results);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function next(): void
     {
         $this->initializeIteratorIfNotInitialized();
@@ -413,9 +417,7 @@ abstract class AbstractPager implements \Iterator, \Countable, PagerInterface
         next($this->results);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function rewind(): void
     {
         $this->initializeIteratorIfNotInitialized();
@@ -425,9 +427,7 @@ abstract class AbstractPager implements \Iterator, \Countable, PagerInterface
         reset($this->results);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function valid(): bool
     {
         $this->initializeIteratorIfNotInitialized();
@@ -435,9 +435,7 @@ abstract class AbstractPager implements \Iterator, \Countable, PagerInterface
         return $this->resultsCounter > 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function count(): int
     {
         return $this->getNbResults();

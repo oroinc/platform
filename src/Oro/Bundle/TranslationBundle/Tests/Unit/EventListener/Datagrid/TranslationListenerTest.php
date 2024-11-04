@@ -16,6 +16,7 @@ class TranslationListenerTest extends \PHPUnit\Framework\TestCase
 
     private TranslationListener $listener;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->languageProvider = $this->createMock(LanguageProvider::class);

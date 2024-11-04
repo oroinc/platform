@@ -17,9 +17,7 @@ class ChainResourceChecker implements ResourceCheckerInterface
         $this->resourceCheckerRegistry = $resourceCheckerRegistry;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isResourceEnabled(
         string $entityClass,
         string $action,

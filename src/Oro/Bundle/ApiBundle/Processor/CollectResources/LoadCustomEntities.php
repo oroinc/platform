@@ -21,9 +21,7 @@ class LoadCustomEntities implements ProcessorInterface
         $this->configManager = $configManager;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var CollectResourcesContext $context */

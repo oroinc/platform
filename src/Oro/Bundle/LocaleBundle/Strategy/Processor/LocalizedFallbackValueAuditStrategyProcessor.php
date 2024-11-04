@@ -25,6 +25,7 @@ class LocalizedFallbackValueAuditStrategyProcessor implements EntityAuditStrateg
         $this->storage = $storage;
     }
 
+    #[\Override]
     public function processInverseCollections(array $sourceEntityData): array
     {
         $fieldData = [];
@@ -74,11 +75,13 @@ class LocalizedFallbackValueAuditStrategyProcessor implements EntityAuditStrateg
         return $fieldsData;
     }
 
+    #[\Override]
     public function processChangedEntities(array $sourceEntityData): array
     {
         return [];
     }
 
+    #[\Override]
     public function processInverseRelations(array $sourceEntityData): array
     {
         return [];

@@ -19,6 +19,7 @@ class TagFieldListenerTest extends \PHPUnit\Framework\TestCase
 
     private Environment $environment;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->event = $this->createMock(BeforeViewRenderEvent::class);

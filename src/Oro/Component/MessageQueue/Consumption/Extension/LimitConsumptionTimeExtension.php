@@ -20,25 +20,19 @@ class LimitConsumptionTimeExtension extends AbstractExtension
         $this->timeLimit = $timeLimit;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onBeforeReceive(Context $context)
     {
         $this->checkTime($context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onIdle(Context $context)
     {
         $this->checkTime($context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function onPostReceived(Context $context)
     {
         $this->checkTime($context);

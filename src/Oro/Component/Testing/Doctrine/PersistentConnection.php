@@ -23,9 +23,7 @@ class PersistentConnection extends Connection
      */
     protected static $persistentTransactionNestingLevels;
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function connect()
     {
         if ($this->isConnected()) {
@@ -51,9 +49,7 @@ class PersistentConnection extends Connection
         return true;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function close($force = false)
     {
         if ($force) {
@@ -62,25 +58,19 @@ class PersistentConnection extends Connection
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function beginTransaction()
     {
         $this->wrapTransactionNestingLevel('beginTransaction');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function commit()
     {
         $this->wrapTransactionNestingLevel('commit');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function rollBack()
     {
         try {
@@ -96,9 +86,7 @@ class PersistentConnection extends Connection
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isTransactionActive()
     {
         $this->setTransactionNestingLevel($this->getPersistentTransactionNestingLevel());

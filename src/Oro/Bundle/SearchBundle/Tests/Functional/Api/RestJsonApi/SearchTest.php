@@ -18,6 +18,7 @@ class SearchTest extends RestJsonApiTestCase
 {
     use SearchExtensionTrait;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -27,6 +28,7 @@ class SearchTest extends RestJsonApiTestCase
         self::reindex();
     }
 
+    #[\Override]
     public static function tearDownAfterClass(): void
     {
         parent::tearDownAfterClass();

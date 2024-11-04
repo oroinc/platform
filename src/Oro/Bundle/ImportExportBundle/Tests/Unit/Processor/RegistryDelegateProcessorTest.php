@@ -30,6 +30,7 @@ class RegistryDelegateProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var RegistryDelegateProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->processorRegistry = $this->createMock(ProcessorRegistry::class);

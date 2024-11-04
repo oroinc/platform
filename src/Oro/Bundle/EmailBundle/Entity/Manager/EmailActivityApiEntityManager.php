@@ -70,9 +70,7 @@ class EmailActivityApiEntityManager extends ApiEntityManager
         return $entity[0]->getId();
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getListQueryBuilder($limit = 10, $page = 1, $criteria = [], $orderBy = null, $joins = [])
     {
         $currentUser = $this->securityTokenStorage->getToken()->getUser();

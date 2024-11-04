@@ -32,9 +32,7 @@ class PinbarTabData extends AbstractFixture implements DependentFixtureInterface
         ],
     ];
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getDependencies()
     {
         return [
@@ -42,9 +40,7 @@ class PinbarTabData extends AbstractFixture implements DependentFixtureInterface
         ];
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function load(ObjectManager $manager)
     {
         foreach (self::$pinbarTabs as $key => $data) {

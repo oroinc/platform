@@ -39,6 +39,7 @@ class FileExtensionTest extends TestCase
     private FileExtension $extension;
     private File $file;
 
+    #[\Override]
     protected function setUp(): void
     {
         $managerRegistry = $this->createMock(ManagerRegistry::class);

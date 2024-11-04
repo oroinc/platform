@@ -10,6 +10,7 @@ class EntityFallbackFieldsStoragePassTest extends \PHPUnit\Framework\TestCase
     /** @var ContainerBuilder */
     private $container;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = new ContainerBuilder();

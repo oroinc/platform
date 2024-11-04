@@ -22,9 +22,7 @@ class MoneyValueTypeFormatter implements TypeFormatterInterface
         $this->roundingService = $roundingService;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function formatType($value, $type)
     {
         if (MoneyValueType::TYPE !== $type) {

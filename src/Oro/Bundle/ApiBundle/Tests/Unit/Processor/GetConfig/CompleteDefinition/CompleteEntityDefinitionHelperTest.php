@@ -15,6 +15,7 @@ use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Provider\ExclusionProviderRegistry;
 use Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityFieldFilteringHelper;
@@ -27,7 +28,6 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -62,6 +62,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     /** @var CompleteEntityDefinitionHelper */
     private $completeEntityDefinitionHelper;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -1519,11 +1520,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ]
         ]);
         $context = new ConfigContext();
-        $context->setClassName(TestEnumValue::class);
+        $context->setClassName(Category::class);
         $context->setVersion(self::TEST_VERSION);
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
-        $rootEntityMetadata = $this->getClassMetadataMock(TestEnumValue::class);
+        $rootEntityMetadata = $this->getClassMetadataMock(Category::class);
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
@@ -1536,7 +1537,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
-            ->with(TestEnumValue::class)
+            ->with(Category::class)
             ->willReturn($rootEntityMetadata);
 
         $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
@@ -1551,12 +1552,12 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
 
         $this->entityOverrideProvider->expects(self::once())
             ->method('getSubstituteEntityClass')
-            ->with(TestEnumValue::class)
+            ->with(Category::class)
             ->willReturn(null);
 
         $this->dictionaryProvider->expects(self::once())
             ->method('isSupportedEntityClass')
-            ->with(TestEnumValue::class)
+            ->with(Category::class)
             ->willReturn(true);
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
@@ -1584,11 +1585,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ]
         ]);
         $context = new ConfigContext();
-        $context->setClassName(TestEnumValue::class);
+        $context->setClassName(Category::class);
         $context->setVersion(self::TEST_VERSION);
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
-        $rootEntityMetadata = $this->getClassMetadataMock(TestEnumValue::class);
+        $rootEntityMetadata = $this->getClassMetadataMock(Category::class);
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
@@ -1601,7 +1602,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
-            ->with(TestEnumValue::class)
+            ->with(Category::class)
             ->willReturn($rootEntityMetadata);
 
         $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
@@ -1616,12 +1617,12 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
 
         $this->entityOverrideProvider->expects(self::once())
             ->method('getSubstituteEntityClass')
-            ->with(TestEnumValue::class)
+            ->with(Category::class)
             ->willReturn(null);
 
         $this->dictionaryProvider->expects(self::once())
             ->method('isSupportedEntityClass')
-            ->with(TestEnumValue::class)
+            ->with(Category::class)
             ->willReturn(true);
 
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
@@ -1650,11 +1651,11 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ]
         ]);
         $context = new ConfigContext();
-        $context->setClassName(TestEnumValue::class);
+        $context->setClassName(Category::class);
         $context->setVersion(self::TEST_VERSION);
         $context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
-        $rootEntityMetadata = $this->getClassMetadataMock(TestEnumValue::class);
+        $rootEntityMetadata = $this->getClassMetadataMock(Category::class);
         $rootEntityMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
@@ -1667,7 +1668,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityMetadataForClass')
-            ->with(TestEnumValue::class)
+            ->with(Category::class)
             ->willReturn($rootEntityMetadata);
 
         $exclusionProvider = $this->createMock(ExclusionProviderInterface::class);
@@ -1682,7 +1683,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
 
         $this->entityOverrideProvider->expects(self::once())
             ->method('getSubstituteEntityClass')
-            ->with(TestEnumValue::class)
+            ->with(Category::class)
             ->willReturn(null);
 
         $this->dictionaryProvider->expects(self::never())

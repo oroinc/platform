@@ -197,6 +197,7 @@ class WidgetController extends AbstractFOSRestController
         return $this->handleView($this->view([], Response::HTTP_NO_CONTENT));
     }
 
+    #[\Override]
     public static function getSubscribedServices(): array
     {
         return array_merge(

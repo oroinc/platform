@@ -12,6 +12,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class GroupingColumnsValidatorTest extends ConstraintValidatorTestCase
 {
+    #[\Override]
     protected function createValidator(): GroupingColumnsValidator
     {
         return new GroupingColumnsValidator();

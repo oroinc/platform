@@ -28,9 +28,7 @@ class LoadNormalizedRelationship implements ProcessorInterface
         $this->processorBag = $processorBag;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ChangeRelationshipContext $context */

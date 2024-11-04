@@ -42,6 +42,7 @@ class EmailAttachmentManagerTest extends \PHPUnit\Framework\TestCase
     /** @var EmailAttachmentManager */
     private $emailAttachmentManager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->fileManager = $this->createMock(FileManager::class);

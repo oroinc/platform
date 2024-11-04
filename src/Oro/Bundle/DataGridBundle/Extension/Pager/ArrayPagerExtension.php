@@ -17,18 +17,14 @@ class ArrayPagerExtension extends AbstractPagerExtension
      */
     protected $pager;
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getPriority()
     {
         // ArrayPagerExtension must be executed after ArraySorterExtension which has parent value - 260
         return -270;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function isApplicable(DatagridConfiguration $config)
     {
         return
@@ -36,9 +32,7 @@ class ArrayPagerExtension extends AbstractPagerExtension
             && $config->getDatasourceType() === ArrayDatasource::TYPE;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
         if (!$datasource instanceof ArrayDatasource) {

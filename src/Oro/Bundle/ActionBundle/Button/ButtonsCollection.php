@@ -127,17 +127,13 @@ class ButtonsCollection implements \IteratorAggregate, \Countable
         return $this->buttonsList;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function getIterator(): \Traversable
     {
         return new \ArrayIterator($this->toList());
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function count(): int
     {
         return count($this->toArray());

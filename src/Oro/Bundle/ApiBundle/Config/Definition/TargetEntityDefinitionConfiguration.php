@@ -43,9 +43,7 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection
         $this->parentSectionName = $sectionName;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function configure(NodeBuilder $node): void
     {
         $sectionName = $this->sectionName;

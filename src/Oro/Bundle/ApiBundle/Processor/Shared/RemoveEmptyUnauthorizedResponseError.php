@@ -12,9 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class RemoveEmptyUnauthorizedResponseError implements ProcessorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var Context $context */

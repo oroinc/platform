@@ -13,9 +13,7 @@ class FeatureConfigurationExtension implements ConfigurationExtensionInterface
     const WORKFLOWS_NODE_NAME = 'workflows';
     const PROCESSES_NODE_NAME = 'processes';
 
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function extendConfigurationTree(NodeBuilder $node)
     {
         $node

@@ -4,9 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Test\DataFixtures;
 
 class FixtureIdentifierResolver implements FixtureIdentifierResolverInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function resolveId($fixture)
     {
         if (is_object($fixture)) {

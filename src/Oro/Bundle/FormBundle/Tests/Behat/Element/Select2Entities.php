@@ -13,9 +13,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element;
  */
 class Select2Entities extends Element implements ClearableInterface
 {
-    /**
-     * {@inheritdoc}
-     */
+    #[\Override]
     public function setValue($values)
     {
         $values = true === is_array($values) ? $values : [$values];
@@ -103,6 +101,7 @@ class Select2Entities extends Element implements ClearableInterface
     /**
      * Focus on input and wait until it will be focused
      */
+    #[\Override]
     public function focus()
     {
         $mask = $this->getPage()->find('css', '#select2-drop-mask');
@@ -123,6 +122,7 @@ class Select2Entities extends Element implements ClearableInterface
         });
     }
 
+    #[\Override]
     public function blur()
     {
         $this->close();
@@ -191,11 +191,13 @@ class Select2Entities extends Element implements ClearableInterface
         });
     }
 
+    #[\Override]
     public function clear()
     {
         $this->clearExcept();
     }
 
+    #[\Override]
     public function getValue()
     {
         $valueElements = $this->getParent()->getParent()->findAll('css', 'li.select2-search-choice');

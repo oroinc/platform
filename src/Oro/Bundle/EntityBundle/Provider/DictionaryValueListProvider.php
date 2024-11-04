@@ -22,9 +22,7 @@ class DictionaryValueListProvider implements DictionaryValueListProviderInterfac
         $this->doctrine = $doctrine;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function supports(string $className): bool
     {
         if (!$this->configManager->hasConfig($className)) {
@@ -36,9 +34,7 @@ class DictionaryValueListProvider implements DictionaryValueListProviderInterfac
         return $groups && \in_array('dictionary', $groups, true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getValueListQueryBuilder(string $className): QueryBuilder
     {
         /** @var EntityManagerInterface $em */
@@ -49,9 +45,7 @@ class DictionaryValueListProvider implements DictionaryValueListProviderInterfac
             ->from($className, 'e');
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getSerializationConfig(string $className): array
     {
         /** @var EntityManagerInterface $em */
@@ -94,9 +88,7 @@ class DictionaryValueListProvider implements DictionaryValueListProviderInterfac
         ];
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     public function getSupportedEntityClasses(): array
     {
         $result = [];

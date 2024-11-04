@@ -15,6 +15,7 @@ use Oro\Bundle\TestFrameworkBundle\Entity\Item;
  */
 class EngineStatisticalTest extends SearchBundleWebTestCase
 {
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();

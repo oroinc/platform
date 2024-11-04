@@ -15,6 +15,7 @@ class TopicManagerTest extends \PHPUnit\Framework\TestCase
     /** @var TopicManager */
     private $manager;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->app = $this->createMock(WampServerInterface::class);

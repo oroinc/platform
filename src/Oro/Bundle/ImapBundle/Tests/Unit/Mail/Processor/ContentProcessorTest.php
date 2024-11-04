@@ -18,6 +18,7 @@ class ContentProcessorTest extends \PHPUnit\Framework\TestCase
     /** @var ContentProcessor */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->part = $this->createMock(Part::class);

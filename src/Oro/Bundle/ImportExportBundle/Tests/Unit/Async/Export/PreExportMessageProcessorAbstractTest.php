@@ -45,6 +45,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
     /** @var PreExportMessageProcessorStub */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->jobRunner = $this->createMock(JobRunner::class);

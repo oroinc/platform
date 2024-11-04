@@ -5,8 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeFormData;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandlerContext;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
+use PHPUnit\Framework\TestCase;
 
-class FlushDataHandlerContextTest extends \PHPUnit\Framework\TestCase
+class FlushDataHandlerContextTest extends TestCase
 {
     public function testContext(): void
     {
@@ -17,5 +18,9 @@ class FlushDataHandlerContextTest extends \PHPUnit\Framework\TestCase
 
         self::assertSame($entityContexts, $context->getEntityContexts());
         self::assertSame($sharedData, $context->getSharedData());
+        self::assertFalse($context->isBatchOperation());
+
+        $context = new FlushDataHandlerContext($entityContexts, $sharedData, true);
+        self::assertTrue($context->isBatchOperation());
     }
 }
