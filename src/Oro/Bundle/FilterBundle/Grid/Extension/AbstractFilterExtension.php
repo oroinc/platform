@@ -146,7 +146,7 @@ abstract class AbstractFilterExtension extends AbstractExtension
      */
     protected function updateState(array $filters, DatagridConfiguration $config, MetadataObject $metadata): void
     {
-        $filtersState = $this->filtersStateProvider->getState($config, $this->getParameters());
+        $filtersState = $this->filtersStateProvider->getStateFromParameters($config, $this->getParameters());
         $initialFiltersState = $this->filtersStateProvider->getDefaultState($config);
 
         foreach ($filters as $filterName => $filter) {

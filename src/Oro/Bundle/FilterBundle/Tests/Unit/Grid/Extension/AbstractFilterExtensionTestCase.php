@@ -151,7 +151,7 @@ abstract class AbstractFilterExtensionTestCase extends \PHPUnit\Framework\TestCa
     {
         $this->filtersStateProvider
             ->expects(self::once())
-            ->method('getState')
+            ->method('getStateFromParameters')
             ->with(self::isInstanceOf(DatagridConfiguration::class), $this->datagridParameters)
             ->willReturn($filtersState);
 

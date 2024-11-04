@@ -75,7 +75,7 @@ abstract class AbstractSelectedFieldsProviderTestCase extends \PHPUnit\Framework
     protected function mockGetState(array $state): void
     {
         $this->datagridStateProvider->expects(self::once())
-            ->method('getState')
+            ->method('getStateFromParameters')
             ->with($this->datagridConfiguration, $this->parameterBag)
             ->willReturn($state);
     }
