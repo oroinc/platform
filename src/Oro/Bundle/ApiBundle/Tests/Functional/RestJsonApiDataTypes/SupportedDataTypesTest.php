@@ -386,7 +386,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
             'BigInt NULL'                  => ['fieldBigInt', null, null, null],
             'BigInt Zero'                  => ['fieldBigInt', '0', '0', '0'],
             'BigInt Zero (int)'            => ['fieldBigInt', 0, '0', '0'],
-            'Boolean NULL'                 => ['fieldBoolean', null, null, null],
+            'Boolean NULL'                 => ['fieldBoolean', null, false, null],
             'Boolean FALSE'                => ['fieldBoolean', false, false, false],
             'Decimal NULL'                 => ['fieldDecimal', null, null, null],
             'Decimal Zero'                 => ['fieldDecimal', '0', '0', '0.00000000'],

@@ -91,7 +91,7 @@ class DefaultValuesTest extends DefaultAndNullTestCase
 
         $result = self::jsonToArray($response->getContent());
         self::assertNull($result['data']['attributes']['withDefaultValueString']);
-        self::assertNull($result['data']['attributes']['withDefaultValueBoolean']);
+        self::assertFalse($result['data']['attributes']['withDefaultValueBoolean']);
         self::assertNull($result['data']['attributes']['withDefaultValueInteger']);
 
         $entity = $this->loadTestEntity((int)$result['data']['id']);
