@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "259e9f30af4edac974e8785bd6274fde",
+    "content-hash": "5e49d250448c626b6e16b4744abe121f",
     "packages": [
         {
             "name": "ass/xmlsecurity",
@@ -5082,7 +5082,7 @@
             "dist": {
                 "type": "path",
                 "url": "../serialized-fields",
-                "reference": "4c918dbc2cf00e9e5e3a5a9bc4e485cd6fbbe9d0"
+                "reference": "1860365cfb616f5a7e778f0b2e3a540a379655e6"
             },
             "require": {
                 "oro/platform": "6.1.*"
@@ -5107,7 +5107,7 @@
             "authors": [
                 {
                     "name": "Oro, Inc",
-                    "homepage": "http://www.orocrm.com"
+                    "homepage": "https://oroinc.com/"
                 }
             ],
             "description": "OroPlatform Serialized Fields",
@@ -14452,7 +14452,7 @@
             "dist": {
                 "type": "path",
                 "url": "../twig-inspector",
-                "reference": "6ec311c40e5cc491957e9f59b36d31009e58304a"
+                "reference": "185aed1b4c34aff0676267566f71390707e338cc"
             },
             "require": {
                 "php": ">=7.4",
@@ -14481,7 +14481,7 @@
             "authors": [
                 {
                     "name": "Oro, Inc",
-                    "homepage": "http://www.orocrm.com"
+                    "homepage": "https://oroinc.com/"
                 }
             ],
             "description": "Oro Twig Inspector adds the possibility to find twig templates and blocks used for rendering HTML pages faster during development",
