@@ -232,46 +232,6 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
                     new EntityDefinitionConfigExtra()
                 ]
             ],
-            'with target class'                            => [
-                'config'         => [
-                    'fields' => [
-                        'association' => [
-                            'target_class' => 'Test\AssociationTargetEntity',
-                            'fields'       => [
-                                'id' => null
-                            ]
-                        ]
-                    ]
-                ],
-                'targetConfig'   => [
-                    'identifier_field_names' => ['id'],
-                    'fields'                 => [
-                        'id' => [
-                            'data_type' => 'string'
-                        ]
-                    ]
-                ],
-                'extras'         => [],
-                'expectedConfig' => [
-                    'fields' => [
-                        'association' => [
-                            'fields'                 => [
-                                'id' => [
-                                    'data_type' => 'string'
-                                ]
-                            ],
-                            'exclusion_policy'       => 'all',
-                            'target_class'           => 'Test\AssociationTargetEntity',
-                            'identifier_field_names' => ['id'],
-                            'collapse'               => true
-                        ]
-                    ]
-                ],
-                'expectedExtras' => [
-                    new FilterIdentifierFieldsConfigExtra(),
-                    new EntityDefinitionConfigExtra()
-                ]
-            ],
             'without fields'                               => [
                 'config'         => [
                     'fields' => [
@@ -577,6 +537,144 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
                 ]
             ]
         ];
+    }
+
+    public function testCompleteAssociationWithTargetClass()
+    {
+        $targetClass = 'Test\TargetEntity';
+        $baseTargetClass = 'Test\BaseTargetEntity';
+        $config = $this->createConfigObject([
+            'fields' => [
+                'association' => [
+                    'target_class' => $targetClass,
+                    'fields' => [
+                        'id' => null
+                    ]
+                ]
+            ]
+        ]);
+
+        $this->configProvider->expects(self::exactly(2))
+            ->method('getConfig')
+            ->willReturnCallback(function (string $className) use ($targetClass, $baseTargetClass) {
+                if ($className === $targetClass) {
+                    return $this->createRelationConfigObject([
+                        'identifier_field_names' => ['id'],
+                        'fields' => [
+                            'id' => [
+                                'data_type' => 'string'
+                            ]
+                        ]
+                    ]);
+                }
+                if ($className === $baseTargetClass) {
+                    return $this->createRelationConfigObject([
+                        'identifier_field_names' => ['id'],
+                        'fields' => [
+                            'id' => [
+                                'data_type' => 'string'
+                            ]
+                        ]
+                    ]);
+                }
+                throw new \BadMethodCallException($className);
+            });
+
+        $this->completeAssociationHelper->completeAssociation(
+            $config->getField('association'),
+            $baseTargetClass,
+            self::TEST_VERSION,
+            new RequestType([self::TEST_REQUEST_TYPE])
+        );
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'association' => [
+                        'fields' => [
+                            'id' => [
+                                'data_type' => 'string'
+                            ]
+                        ],
+                        'exclusion_policy' => 'all',
+                        'target_class' => $targetClass,
+                        'identifier_field_names' => ['id'],
+                        'collapse' => true
+                    ]
+                ]
+            ],
+            $config
+        );
+    }
+
+    public function testCompleteAssociationWithTargetClassForModelThatExtendsEntity()
+    {
+        $targetClass = 'Test\TargetEntity';
+        $baseTargetClass = 'Test\BaseTargetEntity';
+        $config = $this->createConfigObject([
+            'fields' => [
+                'association' => [
+                    'target_class' => $targetClass,
+                    'fields' => [
+                        'id' => null
+                    ]
+                ]
+            ]
+        ]);
+
+        $this->configProvider->expects(self::exactly(2))
+            ->method('getConfig')
+            ->willReturnCallback(function (string $className) use ($targetClass, $baseTargetClass) {
+                if ($className === $targetClass) {
+                    return $this->createRelationConfigObject([
+                        'identifier_field_names' => ['id'],
+                        'parent_resource_class' => $baseTargetClass,
+                        'fields' => [
+                            'id' => [
+                                'data_type' => 'string'
+                            ]
+                        ]
+                    ]);
+                }
+                if ($className === $baseTargetClass) {
+                    return $this->createRelationConfigObject([
+                        'identifier_field_names' => ['id'],
+                        'fields' => [
+                            'id' => [
+                                'data_type' => 'string'
+                            ]
+                        ]
+                    ]);
+                }
+                throw new \BadMethodCallException($className);
+            });
+
+        $this->completeAssociationHelper->completeAssociation(
+            $config->getField('association'),
+            $baseTargetClass,
+            self::TEST_VERSION,
+            new RequestType([self::TEST_REQUEST_TYPE])
+        );
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'association' => [
+                        'fields' => [
+                            'id' => [
+                                'data_type' => 'string'
+                            ]
+                        ],
+                        'exclusion_policy' => 'all',
+                        'target_class' => $targetClass,
+                        'parent_resource_class' => $baseTargetClass,
+                        'identifier_field_names' => ['id'],
+                        'collapse' => true
+                    ]
+                ]
+            ],
+            $config
+        );
     }
 
     public function testCompleteNestedObject()
