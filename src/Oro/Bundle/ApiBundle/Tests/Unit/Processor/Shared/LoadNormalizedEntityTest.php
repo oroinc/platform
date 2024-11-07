@@ -17,17 +17,13 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigSection;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Component\ChainProcessor\ParameterBag;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class LoadNormalizedEntityTest extends CreateProcessorTestCase
 {
-    /** @var ActionProcessorBagInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $processorBag;
-
-    /** @var ParameterBag */
-    private $sharedData;
-
-    /** @var LoadNormalizedEntity */
-    private $processor;
+    private ActionProcessorBagInterface&MockObject $processorBag;
+    private ParameterBag $sharedData;
+    private LoadNormalizedEntity $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -229,6 +225,33 @@ class LoadNormalizedEntityTest extends CreateProcessorTestCase
         $expectedContext->setProcessed(LoadNormalizedEntity::OPERATION_NAME);
 
         self::assertEquals($expectedContext, $this->context);
+    }
+
+    public function testProcessValidateOperation(): void
+    {
+        $getContext = new GetContext($this->configProvider, $this->metadataProvider);
+        $getProcessor = $this->createMock(ActionProcessorInterface::class);
+        $config = new EntityDefinitionConfig();
+        $config->enableValidation();
+
+        $this->processorBag->expects(self::once())
+            ->method('getProcessor')
+            ->with('get')
+            ->willReturn($getProcessor);
+        $getProcessor->expects(self::once())
+            ->method('createContext')
+            ->willReturn($getContext);
+
+        $this->context->setId(123);
+        $this->context->setClassName('Test\Entity');
+        $this->context->setResult(['key' => 'value']);
+
+        $this->context->setConfig($config);
+
+        $this->processor->process($this->context);
+
+        self::assertEquals(['key' => 'value'], $getContext->getResult());
+        self::assertTrue($this->context->isProcessed(LoadNormalizedEntity::OPERATION_NAME));
     }
 
     public function testProcessWhenGetActionHasErrors(): void

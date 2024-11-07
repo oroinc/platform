@@ -205,6 +205,36 @@ class UrlUtilTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @dataProvider getSchemeAndHttpHostDataProvider
+     */
+    public function testGetSchemeAndHttpHost(string $url, string $expected): void
+    {
+        self::assertEquals($expected, UrlUtil::getSchemeAndHttpHost($url));
+    }
+
+    public function getSchemeAndHttpHostDataProvider(): \Generator
+    {
+        yield 'empty url' => ['url' => '', 'expected' => ''];
+        yield 'absolute path' => ['url' => '/absolute/page/path', 'expected' => ''];
+        yield 'relative path' => ['url' => 'relative/page/path', 'expected' => ''];
+        yield 'absolute https url' => ['url' => 'https://example.com/page/path', 'expected' => 'https://example.com'];
+        yield 'absolute https url with port' => [
+            'url' => 'https://example.com:4343/page/path',
+            'expected' => 'https://example.com:4343'
+        ];
+        yield 'absolute http url' => ['url' => 'http://example.com/page/path', 'expected' => 'http://example.com'];
+        yield 'absolute http url with port' => [
+            'url' => 'http://example.com:8080/page/path',
+            'expected' => 'http://example.com:8080'
+        ];
+        yield 'absolute protocol-less url' => ['url' => '//example.com/page/path', 'expected' => '//example.com'];
+        yield 'absolute protocol-less url with port' => [
+            'url' => '//example.com:8080/page/path',
+            'expected' => '//example.com:8080',
+        ];
+    }
+
+    /**
      * @dataProvider addQueryParametersDataProvider
      */
     public function testAddQueryParameters(string $url, array $extraParameters, bool $override, string $expected): void

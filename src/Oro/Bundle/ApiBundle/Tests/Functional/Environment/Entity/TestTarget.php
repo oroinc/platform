@@ -37,6 +37,11 @@ class TestTarget implements TestFrameworkEntityInterface
         $this->owners = new ArrayCollection();
     }
 
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
     /**
      * @return Collection|TestOwner[]
      */

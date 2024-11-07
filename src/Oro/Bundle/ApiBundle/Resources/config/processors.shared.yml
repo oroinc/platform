@@ -487,6 +487,12 @@ services:
             - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api&!batch, priority: 47 }
             - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api&!batch, priority: 47 }
 
+    oro_api.json_api.disable_validate_operation:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\DisableValidateOperation
+        tags:
+            - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api&!batch, priority: 47 }
+            - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api&!batch, priority: 47 }
+
     oro_api.json_api.validate_included_data_dependencies:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateIncludedDataDependencies
         tags:
@@ -615,7 +621,7 @@ services:
     # VIEW permissions are required to create or update an entity because the newly created or updated entity
     # should be returned in the response
     # the "security_check" group is disabled for the "get" action is executed by
-    # the "oro_api.create.load_normalized_entity" and "oro_api.update.load_normalized_entity" processors
+    # the "oro_api.load_normalized_entity" processor
     # so, if you add own security processor for the "get" action, add it for "create" and "update" actions as well
     oro_api.validate_entity_type_access.view:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityTypeAccess
@@ -1260,6 +1266,12 @@ services:
             - { name: oro.api.processor, action: add_relationship, group: save_data, priority: -10 }
             - { name: oro.api.processor, action: update_relationship, group: save_data, priority: -10 }
 
+    oro_api.set_entity_id_to_context:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetEntityIdToContext
+        tags:
+            - { name: oro.api.processor, action: create, group: save_data, priority: -20 }
+            - { name: oro.api.processor, action: update, group: save_data, priority: -20 }
+
     #
     # delete_data
     #
@@ -1273,6 +1285,14 @@ services:
     #
     # normalize_data
     #
+
+    oro_api.load_normalized_entity:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedEntity
+        arguments:
+            - '@oro_api.action_processor_bag'
+        tags:
+            - { name: oro.api.processor, action: create, group: normalize_data, priority: -10 }
+            - { name: oro.api.processor, action: update, group: normalize_data, priority: -10 }
 
     oro_api.load_normalized_included_entities:
         class: Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedIncludedEntities

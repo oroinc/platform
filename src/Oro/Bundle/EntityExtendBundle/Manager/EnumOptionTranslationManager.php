@@ -61,19 +61,15 @@ class EnumOptionTranslationManager
         ];
     }
 
-    public function flushEnumTranslations(bool $force = false): void
+    public function flushEnumTranslations(): void
     {
-        if ($force) {
-            $this->doctrine->getManager()->flush();
-        } else {
-            $entities = array_merge(
-                $this->removedEnumTranslations,
-                $this->updatedEnumTranslations
-            );
+        $entities = array_merge(
+            $this->removedEnumTranslations,
+            $this->updatedEnumTranslations
+        );
 
-            if ($entities) {
-                $this->doctrine->getManager()->flush($entities);
-            }
+        if ($entities) {
+            $this->doctrine->getManager()->flush();
         }
     }
 

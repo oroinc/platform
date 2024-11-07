@@ -20,7 +20,8 @@ Feature: Crud notification rule
       | Groups      | Administrators      |
     And I save and close form
     Then I should see "Email notification rule saved" flash message
-    And I should see following grid containing rows:
+    When I check "User" in "Entity Name" filter
+    Then I should see following grid containing rows:
       | Entity Name | Event Name    | Template            | Recipient email  |
       | User        | Entity create | authentication_code | test@example.com |
 

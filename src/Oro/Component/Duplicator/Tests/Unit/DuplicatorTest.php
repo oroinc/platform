@@ -2,29 +2,17 @@
 
 namespace Oro\Component\Duplicator\Tests\Unit;
 
-use DeepCopy\Filter\Doctrine\DoctrineCollectionFilter;
-use DeepCopy\Filter\Doctrine\DoctrineEmptyCollectionFilter;
-use DeepCopy\Filter\KeepFilter;
-use DeepCopy\Filter\SetNullFilter;
-use DeepCopy\Matcher\PropertyMatcher;
-use DeepCopy\Matcher\PropertyNameMatcher;
-use DeepCopy\Matcher\PropertyTypeMatcher;
 use Doctrine\Common\Collections\Collection;
 use Oro\Component\Duplicator\Duplicator;
-use Oro\Component\Duplicator\Filter\FilterFactory;
-use Oro\Component\Duplicator\Filter\ReplaceValueFilter;
-use Oro\Component\Duplicator\Filter\ShallowCopyFilter;
-use Oro\Component\Duplicator\Matcher\MatcherFactory;
-use Oro\Component\Duplicator\ObjectType;
 use Oro\Component\Duplicator\Tests\Unit\Stub\Entity1;
 use Oro\Component\Duplicator\Tests\Unit\Stub\Entity2;
 use Oro\Component\Duplicator\Tests\Unit\Stub\Entity3;
 use Oro\Component\Duplicator\Tests\Unit\Stub\EntityItem1;
 use Oro\Component\Duplicator\Tests\Unit\Stub\EntityItem2;
 
-class DuplicatorTest extends \PHPUnit\Framework\TestCase
+class DuplicatorTest extends DuplicatorTestCase
 {
-    public function testDuplicate()
+    public function testDuplicate(): void
     {
         $now = new \DateTime();
         $now = $now->modify('+1 day');
@@ -81,10 +69,7 @@ class DuplicatorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($item2->getChildEntity()->getValue(), $item2Copy->getChildEntity()->getValue());
     }
 
-    /**
-     * @return Entity1
-     */
-    protected function getEntity()
+    private function getEntity(): Entity1
     {
         $entity2 = new Entity2();
         $entity2->setTitle('open');
@@ -99,10 +84,7 @@ class DuplicatorTest extends \PHPUnit\Framework\TestCase
         return $entity;
     }
 
-    /**
-     * @return EntityItem1
-     */
-    protected function getEntityItem()
+    private function getEntityItem(): EntityItem1
     {
         $entity3 = new Entity3();
         $entity3->setValue('Value');
@@ -118,44 +100,12 @@ class DuplicatorTest extends \PHPUnit\Framework\TestCase
         return $entityItem1;
     }
 
-    /**
-     * @return Duplicator
-     */
-    protected function createDuplicator()
+    private function createDuplicator(): Duplicator
     {
         $duplicator = new Duplicator();
         $duplicator->setFilterFactory($this->createFilterFactory());
         $duplicator->setMatcherFactory($this->createMatcherFactory());
 
         return $duplicator;
-    }
-
-    /**
-     * @return FilterFactory
-     */
-    protected function createFilterFactory()
-    {
-        $factory = new FilterFactory();
-        $factory->addObjectType(new ObjectType('setNull', SetNullFilter::class))
-            ->addObjectType(new ObjectType('keep', KeepFilter::class))
-            ->addObjectType(new ObjectType('collection', DoctrineCollectionFilter::class))
-            ->addObjectType(new ObjectType('emptyCollection', DoctrineEmptyCollectionFilter::class))
-            ->addObjectType(new ObjectType('replaceValue', ReplaceValueFilter::class))
-            ->addObjectType(new ObjectType('shallowCopy', ShallowCopyFilter::class));
-
-        return $factory;
-    }
-
-    /**
-     * @return MatcherFactory
-     */
-    protected function createMatcherFactory()
-    {
-        $factory = new MatcherFactory();
-        $factory->addObjectType(new ObjectType('property', PropertyMatcher::class))
-            ->addObjectType(new ObjectType('propertyName', PropertyNameMatcher::class))
-            ->addObjectType(new ObjectType('propertyType', PropertyTypeMatcher::class));
-
-        return $factory;
     }
 }

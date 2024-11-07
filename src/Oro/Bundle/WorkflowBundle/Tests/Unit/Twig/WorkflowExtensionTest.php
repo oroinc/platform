@@ -6,7 +6,6 @@ use Oro\Bundle\WorkflowBundle\Formatter\WorkflowVariableFormatter;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
-use Oro\Bundle\WorkflowBundle\Tests\Unit\Stub\StubEntity;
 use Oro\Bundle\WorkflowBundle\Twig\WorkflowExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
 
@@ -45,19 +44,19 @@ class WorkflowExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testHasApplicableWorkflows()
     {
-        $entity = new StubEntity();
+        $entity = new \stdClass();
         $this->workflowManager->expects($this->once())
             ->method('hasApplicableWorkflows')
-            ->with($entity);
+            ->with(self::identicalTo($entity));
         $this->callTwigFunction($this->extension, 'has_workflows', [$entity]);
     }
 
     public function testHasWorkflowItemsByEntity()
     {
-        $entity = new StubEntity();
+        $entity = new \stdClass();
         $this->workflowManager->expects($this->once())
             ->method('hasWorkflowItemsByEntity')
-            ->with($entity);
+            ->with(self::identicalTo($entity));
         $this->callTwigFunction($this->extension, 'has_workflow_items', [$entity]);
     }
 

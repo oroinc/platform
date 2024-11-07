@@ -6,6 +6,14 @@ services:
         tags:
             - { name: oro_action.condition, alias: workflow_available_by_record_group }
 
+    oro_workflow.expression.has_running_workflow_from_record_group:
+        class: 'Oro\Bundle\WorkflowBundle\Model\Condition\HasRunningWorkflowFromRecordGroup'
+        arguments:
+            - '@oro_workflow.manager.system'
+            - '@oro_workflow.running_workflow_provider'
+        tags:
+            - { name: oro_action.condition, alias: has_running_workflow_from_record_group }
+
     oro_workflow.condition.is_granted_workflow_transition:
         class: 'Oro\Bundle\WorkflowBundle\Model\Condition\IsGrantedWorkflowTransition'
         arguments:

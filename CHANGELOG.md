@@ -6,6 +6,16 @@ The current file describes significant changes in the code that may affect the u
 
 ### Added
 
+#### DistributionBundle
+* Added the ability to run post-install and post-update composer scripts defined in the composer.json of a dependency. Script that should be run during post-install must be put into section `extra.oro-post-install-cmd`, during post-update - into section `extra.oro-post-update-cmd`.
+* Added new event `oro_distribution.route_collection.all` dispatched when routes are loaded from all route loaders. Implemented via `\Oro\Bundle\DistributionBundle\Routing\DelegatingLoader` decorating the `routing.loader` service.
+* Added `\Oro\Bundle\DistributionBundle\EventListener\RoutePrioritizingListener` as a general solution to alter route priorities.
+* Added `oro_distribution.event_listener.route_prioritizing.web_debug_toolbar` to increase the priorities of web debug toolbar routes (_wdt, _profiler*, _preview_error).
+* Added the ability to override controller template attribute with `_template_override` request attribute. Useful for overriding the template of a forwarded request. Implemented in `\Oro\Bundle\DistributionBundle\EventListener\ControllerTemplateListener`. 
+
+#### FormBundle
+* Added the ability to use nested constraints (e.g. `When`) in `\Oro\Bundle\FormBundle\Validator\ConstraintFactory` that creates constraints from an array definition (e.g. fetched from `system_configuration.yml`).
+
 #### ThemeBundle
 * Added theme configuration feature that provides theme developers a way to make a storefront theme configurable by a store owner.
 * Added new `\Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration` entity that contains theme configuration options.
@@ -26,11 +36,19 @@ The current file describes significant changes in the code that may affect the u
 
 #### SecurityBundle
 * Added new `\Oro\Bundle\SecurityBundle\DoctrineExtension\Dbal\Types\CryptedTextType` doctrine type that stores text data in crypted format.
+* Decomposed `\Oro\Bundle\SecurityBundle\Request\SessionHttpKernelDecorator` into `\Oro\Bundle\SecurityBundle\Request\SessionStorageOptionsManipulator`.
+* Added `oro_security.session.storage.options` container parameters that holds original session storage options.
 
 #### ApiBundle
 * Added new `crypted_text` doctrine type as a data type to `api_doc_data_types` and `open_api` sections of ORO API configuration.
+* Added an "Add filter" button to each resource for API sandbox.
+* Added a new meta `validate` flag to create and update operations, making API requests with transaction rollback instead of commit.
+* Added a new `rollback_validated_request` event for `customize_form_data` action.
 
 ### Changed
+
+#### ThemeBundle
+* Changed a field value of the `type` field on a string instead of the removed `\Oro\Bundle\ThemeBundle\Entity\Enum\ThemeConfigurationType` enum for `\Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration` entity.
 
 #### ApiBundle
 * Changed `\Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface` to be able to use filters by same field but with different operators, e.g. `?filter[id][gt]=1&filter[id][lt]=10`:
@@ -43,8 +61,20 @@ The current file describes significant changes in the code that may affect the u
 #### EntityBundle
 * Changed `\Oro\Bundle\EntityBundle\Provider\EntityNameProvider` to make it work with enum fields.
 
+#### EmailBundle
+* Fixed `\Oro\Bundle\EmailBundle\Sync\NotificationAlertManager` fails to update an existing alert if user is null.
+
+#### UserBundle
+* Changed `\Oro\Bundle\UserBundle\Controller\ResetController::sendEmailAction` so it redirects to the `_return_route` route request attribute in case of error.
+* Changed `\Oro\Bundle\UserBundle\Controller\ResetController::sendEmailAction` so it redirects to the `_target_route` request attribute in case of success.
+* Changed `@OroUser/Reset` templates to enable the ability to override form action path, return path and target path.
+* Changed `@OroUser/Security/login.html.twig` template to enable the ability to override form action path, return path and target path.
+
 #### SanitizeBundle
 * Updated sanitize logic, it takes into account a new `crypted_text` doctrine type now.
+
+#### ActionBundle
+* Disabled key normalization for `data` attributes of the `button_options` section for operations. Now, using the dash symbol for data attribute naming is possible.
 
 # Oro Enum Changes
 

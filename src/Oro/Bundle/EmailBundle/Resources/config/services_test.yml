@@ -34,3 +34,12 @@ services:
             - '@.inner'
             - '@oro_email.email.entity.builder'
             - '@translator'
+
+    oro_email.tests.api.skipped_entity_provider:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\SkippedEntityProvider
+        decorates: oro_api.tests.skipped_entity_provider
+        arguments:
+            - '@.inner'
+        calls:
+            - [addSkippedEntity, ['Oro\Bundle\EmailBundle\Api\Model\EmailContextItem', ['get_list']]]
+            - [addSkippedEntity, ['Oro\Bundle\EmailBundle\Api\Model\EmailThreadContextItem', ['get_list']]]

@@ -66,9 +66,9 @@ class SortersByFieldsTest extends RestJsonApiTestCase
             ['id' => '<toString(@EmptyItem->id)>']
         ];
         $expectedRowsSortedByDateTime = [
-            ['id' => '<toString(@AnotherItem->id)>'],
             ['id' => '<toString(@TestItem3->id)>'],
             ['id' => '<toString(@TestItem2->id)>'],
+            ['id' => '<toString(@AnotherItem->id)>'],
             ['id' => '<toString(@TestItem1->id)>'],
             ['id' => '<toString(@EmptyItem->id)>']
         ];

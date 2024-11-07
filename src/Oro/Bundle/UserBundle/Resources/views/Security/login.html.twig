@@ -26,7 +26,7 @@
             {% set passwordLabel = 'Password'|trans %}
             {% set showLabels = (usernameLabel|length <= 9) and (passwordLabel|length <= 9) %}
             {% set layoutName = showLabels ? 'form-row-layout' : 'form-column-layout' %}
-            <form id="login-form" action="{{ path('oro_user_security_check') }}" method="post" class="form-signin form-signin--login {{ layoutName }}">
+            <form id="login-form" action="{{ loginFormActionPath|default(path('oro_user_security_check')) }}" method="post" class="form-signin form-signin--login {{ layoutName }}">
                 <div class="form-description">
                     {% if oro_theme_logo() %}
                         <div class="form-description__logo">
@@ -69,13 +69,13 @@
                     </div>
                     <div class="form-signin__footer">
                         <button type="submit" class="btn extra-submit btn-uppercase btn-primary" id="_submit" name="_submit">{{ 'Log in'|trans }}</button>
-                        <a href="{{ path('oro_user_reset_request') }}">{{ 'Forgot your password?'|trans }}</a>
+                        <a href="{{ loginFormResetPath|default(path('oro_user_reset_request')) }}">{{ 'Forgot your password?'|trans }}</a>
                     </div>
                     <div class="form-signin__oauth">
                         {% placeholder oro_user_login_form %}
                     </div>
                 </fieldset>
-                <input type="hidden" name="_target_path" value="">
+                <input type="hidden" name="_target_path" value="{{ loginFormTargetPath|default('') }}">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
             </form>
         </div>

@@ -15,51 +15,74 @@ class NotificationAlertCleanupCommandTest extends WebTestCase
         $this->loadFixtures([LoadNotificationAlertData::class]);
     }
 
-    /**
-     * @dataProvider paramProvider
-     */
-    public function testCommandOutput(string $expectedContent, array $params, int $rowsCount)
+    public function testHelp(): void
     {
-        $result = $this->runCommand('oro:notification:alerts:cleanup', $params);
+        $result = self::runCommand('oro:notification:alerts:cleanup', ['--help']);
 
-        self::assertStringContainsString($expectedContent, $result);
-
-        $totalRows = self::getContainer()->get('oro_entity.doctrine_helper')
-            ->getEntityRepository(NotificationAlert::class)
-            ->findAll();
-        $this->assertCount($rowsCount, $totalRows);
+        self::assertStringContainsString(
+            'Help: The oro:notification:alerts:cleanup command deletes notification alert',
+            $result
+        );
     }
 
-    public function paramProvider(): array
+    public function testExecuteWhenUserNotFound(): void
     {
-        return [
-            'should show help' => [
-                '$expectedContent' => 'Help: The oro:notification:alerts:cleanup command deletes notification alert',
-                '$params'          => ['--help'],
-                '$rowsCount'       => 4
-            ],
-            'should warn if given user is not found'       => [
-                '$expectedContent' => "In ConsoleContextGlobalOptionsProvider.php line 84: Can't find user with "
-                    . 'identifier 999 oro:notification:alerts:cleanup',
-                '$params'          => [
-                    '--current-user'         => '999',
-                    '--current-organization' => '1'
-                ],
-                '$rowsCount'       => 4
-            ],
-            'should show success deleted message'           => [
-                '$expectedContent' => '4 notification alert(s) was successfully deleted.',
-                '$params'          => [],
-                '$rowsCount'       => 0
-            ],
-            'should notify there is no notification alerts' => [
-                '$expectedContent' => 'There are no notification alerts.',
-                '$params'          => [
-                    '--current-user'         => 'simple_user',
-                    '--current-organization' => '1'
-                ],
-                '$rowsCount'       => 0
-            ],
-        ];
+        $totalRowsBefore = self::getTotalRows();
+
+        $result = self::runCommand('oro:notification:alerts:cleanup', [
+            '--current-user' => '999',
+            '--current-organization' => '1',
+        ]);
+
+        self::assertStringContainsString(
+            "In ConsoleContextGlobalOptionsProvider.php line 84: Can't find user with "
+            . 'identifier 999 oro:notification:alerts:cleanup',
+            $result
+        );
+
+        $totalRowsAfter = self::getTotalRows();
+
+        self::assertEquals($totalRowsBefore, $totalRowsAfter);
+    }
+
+    public function testExecuteWhenSuccessfullyDeleted(): void
+    {
+        $totalRowsBefore = self::getTotalRows();
+
+        $result = self::runCommand('oro:notification:alerts:cleanup');
+
+        self::assertStringContainsString(
+            $totalRowsBefore . ' notification alert(s) was successfully deleted.',
+            $result
+        );
+
+        $totalRowsAfter = self::getTotalRows();
+
+        self::assertEquals(0, $totalRowsAfter);
+    }
+
+    public function testExecuteWhenNothingToDelete(): void
+    {
+        $totalRowsBefore = self::getTotalRows();
+
+        $result = self::runCommand('oro:notification:alerts:cleanup', [
+            '--current-user' => 'simple_user',
+            '--current-organization' => '1',
+        ]);
+
+        self::assertStringContainsString('There are no notification alerts.', $result);
+
+        $totalRowsAfter = self::getTotalRows();
+
+        self::assertEquals($totalRowsBefore, $totalRowsAfter);
+    }
+
+    private static function getTotalRows(): ?int
+    {
+        return count(
+            self::getContainer()->get('oro_entity.doctrine_helper')
+                ->getEntityRepository(NotificationAlert::class)
+                ->findAll()
+        );
     }
 }

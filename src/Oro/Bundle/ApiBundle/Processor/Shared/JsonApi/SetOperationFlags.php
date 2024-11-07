@@ -13,8 +13,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class SetOperationFlags implements ProcessorInterface
 {
-    public const UPDATE_FLAG = '_meta_update';
-    public const UPSERT_FLAG = '_meta_upsert';
+    public const string UPDATE_FLAG = '_meta_update';
+    public const string UPSERT_FLAG = '_meta_upsert';
+    public const string VALIDATE_FLAG = '_meta_validate';
 
     #[\Override]
     public function process(ContextInterface $context): void
@@ -29,16 +30,20 @@ class SetOperationFlags implements ProcessorInterface
                     $data[JsonApiDoc::META],
                     JsonApiDoc::META_UPDATE,
                     JsonApiDoc::META_UPSERT,
+                    JsonApiDoc::META_VALIDATE,
                     '/' . JsonApiDoc::META,
                     $context
                 );
                 if (null !== $operationFlags) {
-                    [$updateFlag, $upsertFlag] = $operationFlags;
+                    [$updateFlag, $upsertFlag, $validateFlag] = $operationFlags;
                     if (null !== $updateFlag) {
                         $context->set(self::UPDATE_FLAG, $updateFlag);
                     }
                     if (null !== $upsertFlag) {
                         $context->set(self::UPSERT_FLAG, $upsertFlag);
+                    }
+                    if (null !== $validateFlag) {
+                        $context->set(self::VALIDATE_FLAG, $validateFlag);
                     }
                 }
             }

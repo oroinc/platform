@@ -5,28 +5,10 @@ namespace Oro\Bundle\EntityExtendBundle\Entity;
 use Oro\Bundle\LocaleBundle\Entity\AbstractTranslation;
 
 /**
- * EnumValueTranslation class to host translated entity enum value properties
+ * EnumValueTranslation class is needed only for migration of outdated enum`s during a platform update.
  *
  * @deprecated
  */
 class EnumValueTranslation extends AbstractTranslation
 {
-    /**
-     * @var string|null
-     */
-    protected $foreignKey;
-
-    /**
-     * @var string|null
-     */
-    protected $field;
-
-    /**
-     * @return string
-     */
-    #[\Override]
-    public function __toString()
-    {
-        return (string)$this->getId();
-    }
 }

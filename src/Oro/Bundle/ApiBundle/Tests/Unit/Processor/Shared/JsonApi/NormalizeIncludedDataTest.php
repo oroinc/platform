@@ -317,6 +317,55 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         );
     }
 
+    public function testProcessForValidateFlagThatNotAffectNormalization(): void
+    {
+        $type = 'testType';
+        $id = 'testId';
+        $requestData = [
+            'included' => [
+                ['type' => $type, 'id' => $id, 'meta' => ['validate' => true]]
+            ]
+        ];
+        $normalizedType = 'Test\Class';
+        $includedEntity = new \stdClass();
+
+        $config = new EntityDefinitionConfig();
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('resolveManageableEntityClass')
+            ->with($normalizedType)
+            ->willReturn($normalizedType);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                $normalizedType,
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [new EntityDefinitionConfigExtra(ApiAction::CREATE), new FilterIdentifierFieldsConfigExtra()]
+            )
+            ->willReturn($this->getConfig($config));
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with($type, DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->willReturn($normalizedType);
+
+        $this->context->setClassName('Test\PrimaryClass');
+        $this->context->setId('primaryId');
+        $this->context->setRequestData($requestData);
+        $this->processor->process($this->context);
+
+        self::assertFalse($this->context->hasErrors());
+        self::assertNotNull($this->context->getIncludedEntities());
+        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, $id);
+        self::assertEquals($includedEntity, $addedIncludedEntity);
+        self::assertEquals(
+            new IncludedEntityData('/included/0', 0, false, ApiAction::CREATE),
+            $this->context->getIncludedEntities()->getData($addedIncludedEntity)
+        );
+    }
+
     public function testProcessForInvalidUpdateFlag(): void
     {
         $type = 'testType';

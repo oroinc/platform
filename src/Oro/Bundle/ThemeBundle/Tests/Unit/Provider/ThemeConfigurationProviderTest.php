@@ -14,7 +14,7 @@ use Oro\Bundle\ThemeBundle\Provider\ThemeConfigurationProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class ThemeConfigurationProviderTest extends TestCase
+final class ThemeConfigurationProviderTest extends TestCase
 {
     private ConfigManager|MockObject $configManager;
     private EntityManagerInterface|MockObject $em;

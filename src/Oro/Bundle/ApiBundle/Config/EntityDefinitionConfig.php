@@ -92,6 +92,9 @@ class EntityDefinitionConfig extends EntityConfig
         if (isset($result[ConfigUtil::DISABLE_SORTING]) && false === $result[ConfigUtil::DISABLE_SORTING]) {
             unset($result[ConfigUtil::DISABLE_SORTING]);
         }
+        if (isset($result[ConfigUtil::ENABLE_VALIDATION]) && false === $result[ConfigUtil::ENABLE_VALIDATION]) {
+            unset($result[ConfigUtil::ENABLE_VALIDATION]);
+        }
         if (isset($result[ConfigUtil::COLLAPSE]) && false === $result[ConfigUtil::COLLAPSE]) {
             unset($result[ConfigUtil::COLLAPSE]);
         }
@@ -730,6 +733,38 @@ class EntityDefinitionConfig extends EntityConfig
     public function disableSorting(): void
     {
         $this->items[ConfigUtil::DISABLE_SORTING] = true;
+    }
+
+    /**
+     * Indicates whether the "enable_validation" option is set explicitly.
+     */
+    public function hasEnableValidation(): bool
+    {
+        return $this->has(ConfigUtil::ENABLE_VALIDATION);
+    }
+
+    /**
+     * Indicates whether a validation is enabled.
+     */
+    public function isValidationEnabled(): bool
+    {
+        return $this->get(ConfigUtil::ENABLE_VALIDATION, false);
+    }
+
+    /**
+     * Enables a validation.
+     */
+    public function enableValidation(): void
+    {
+        $this->items[ConfigUtil::ENABLE_VALIDATION] = true;
+    }
+
+    /**
+     * Disables a validation.
+     */
+    public function disableValidation(): void
+    {
+        $this->items[ConfigUtil::ENABLE_VALIDATION] = false;
     }
 
     /**

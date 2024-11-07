@@ -5,6 +5,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Validator;
 use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\When;
 
 class ConstraintFactoryTest extends \PHPUnit\Framework\TestCase
 {
@@ -83,6 +84,21 @@ class ConstraintFactoryTest extends \PHPUnit\Framework\TestCase
                 'expected'    => [
                     new Length(['min' => 1, 'max' => 2])
                 ]
+            ],
+            'with nested constraints' => [
+                'constraints' => [
+                    [
+                        'When' => [
+                            'expression' => 'true',
+                            'constraints' => [
+                                ['NotBlank' => null],
+                            ],
+                        ],
+                    ],
+                ],
+                'expected' => [
+                    new When(['expression' => 'true', 'constraints' => [new NotBlank()]]),
+                ],
             ],
         ];
     }

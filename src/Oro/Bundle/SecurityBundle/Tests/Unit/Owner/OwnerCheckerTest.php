@@ -16,7 +16,7 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerChecker;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface;
-use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
@@ -47,7 +47,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
     /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $tokenAccessor;
 
-    /** @var OwnerTreeProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var OwnerTreeProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $treeProvider;
 
     /** @var Entity */
@@ -72,7 +72,7 @@ class OwnerCheckerTest extends \PHPUnit\Framework\TestCase
         $this->aclVoter = $this->createMock(AclVoter::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-        $this->treeProvider = $this->createMock(OwnerTreeProvider::class);
+        $this->treeProvider = $this->createMock(OwnerTreeProviderInterface::class);
 
         $this->testEntity = new Entity();
         $this->currentUser = new User();

@@ -32,7 +32,7 @@ class CreateAndUpdateWithResponseFiltersTest extends RestJsonApiTestCase
         $response = $this->post(
             ['entity' => $entityType],
             [
-                'meta' => 'meta=title',
+                'filters' => 'meta=title',
                 'data' => [
                     'type' => $entityType,
                     'attributes' => [
@@ -77,7 +77,7 @@ class CreateAndUpdateWithResponseFiltersTest extends RestJsonApiTestCase
         $response = $this->post(
             ['entity' => $entityType],
             [
-                'fields' => 'fields[' . $entityType . ']=name',
+                'filters' => 'fields[' . $entityType . ']=name',
                 'data' => [
                     'type' => $entityType,
                     'attributes' => [
@@ -116,7 +116,7 @@ class CreateAndUpdateWithResponseFiltersTest extends RestJsonApiTestCase
         $response = $this->post(
             ['entity' => $entityType],
             [
-                'include' => 'include=productType',
+                'filters' => 'include=productType',
                 'data' => [
                     'type' => $entityType,
                     'attributes' => [
@@ -168,8 +168,7 @@ class CreateAndUpdateWithResponseFiltersTest extends RestJsonApiTestCase
         $response = $this->post(
             ['entity' => $entityType],
             [
-                'fields' => 'fields[' . $entityType . ']=name',
-                'include' => 'include=productType',
+                'filters' => 'fields[' . $entityType . ']=name&include=productType',
                 'data' => [
                     'type' => $entityType,
                     'attributes' => [
@@ -210,7 +209,7 @@ class CreateAndUpdateWithResponseFiltersTest extends RestJsonApiTestCase
         $response = $this->post(
             ['entity' => $orderEntityType],
             [
-                'include' => 'include=items,items.product.productType',
+                'filters' => 'include=items,items.product.productType',
                 'data' => [
                     'type' => $orderEntityType,
                     'attributes' => [
@@ -239,7 +238,6 @@ class CreateAndUpdateWithResponseFiltersTest extends RestJsonApiTestCase
             ]
         );
 
-        $this->dumpYmlTemplate(null, $response);
         $responseContent = $this->updateResponseContent(
             [
                 'data' => [
@@ -308,7 +306,7 @@ class CreateAndUpdateWithResponseFiltersTest extends RestJsonApiTestCase
         $response = $this->patch(
             ['entity' => $entityType, 'id' => '<toString(@product_1->id)>'],
             [
-                'meta' => 'meta=title',
+                'filters' => 'meta=title',
                 'data' => [
                     'type' => $entityType,
                     'id' => '<toString(@product_1->id)>',
@@ -350,7 +348,7 @@ class CreateAndUpdateWithResponseFiltersTest extends RestJsonApiTestCase
         $response = $this->patch(
             ['entity' => $entityType, 'id' => '<toString(@product_1->id)>'],
             [
-                'fields' => 'fields[' . $entityType . ']=name',
+                'filters' => 'fields[' . $entityType . ']=name',
                 'data' => [
                     'type' => $entityType,
                     'id' => '<toString(@product_1->id)>',
@@ -391,7 +389,7 @@ class CreateAndUpdateWithResponseFiltersTest extends RestJsonApiTestCase
         $response = $this->patch(
             ['entity' => $entityType, 'id' => '<toString(@product_1->id)>'],
             [
-                'include' => 'include=productType',
+                'filters' => 'include=productType',
                 'data' => [
                     'type' => $entityType,
                     'id' => '<toString(@product_1->id)>',
@@ -445,8 +443,7 @@ class CreateAndUpdateWithResponseFiltersTest extends RestJsonApiTestCase
         $response = $this->patch(
             ['entity' => $entityType, 'id' => '<toString(@product_1->id)>'],
             [
-                'fields' => 'fields[' . $entityType . ']=name',
-                'include' => 'include=productType',
+                'filters' => 'fields[' . $entityType . ']=name&include=productType',
                 'data' => [
                     'type' => $entityType,
                     'id' => '<toString(@product_1->id)>',
@@ -487,7 +484,7 @@ class CreateAndUpdateWithResponseFiltersTest extends RestJsonApiTestCase
         $response = $this->post(
             ['entity' => $entityType],
             [
-                'fields' => 'fields[' . $entityType . ']=title',
+                'filters' => 'fields[' . $entityType . ']=title',
                 'data' => [
                     'type' => $entityType,
                     'attributes' => [
@@ -521,7 +518,7 @@ class CreateAndUpdateWithResponseFiltersTest extends RestJsonApiTestCase
         $response = $this->post(
             ['entity' => $entityType],
             [
-                'include' => 'include=staff',
+                'filters' => 'include=staff',
                 'data' => [
                     'type' => $entityType,
                     'attributes' => [
@@ -555,7 +552,7 @@ class CreateAndUpdateWithResponseFiltersTest extends RestJsonApiTestCase
         $response = $this->patch(
             ['entity' => $entityType, 'id' => '<toString(@department_1->id)>'],
             [
-                'fields' => 'fields[' . $entityType . ']=title',
+                'filters' => 'fields[' . $entityType . ']=title',
                 'data' => [
                     'type' => $entityType,
                     'id' => '<toString(@department_1->id)>',
@@ -596,7 +593,7 @@ class CreateAndUpdateWithResponseFiltersTest extends RestJsonApiTestCase
         $response = $this->patch(
             ['entity' => $entityType, 'id' => '<toString(@department_1->id)>'],
             [
-                'include' => 'include=staff',
+                'filters' => 'include=staff',
                 'data' => [
                     'type' => $entityType,
                     'id' => '<toString(@department_1->id)>',

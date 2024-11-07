@@ -35,7 +35,8 @@ class SetTargetAction implements ProcessorInterface
         $operationFlags = MetaOperationParser::getOperationFlags(
             $meta,
             JsonApiDoc::META_UPDATE,
-            JsonApiDoc::META_UPSERT
+            JsonApiDoc::META_UPSERT,
+            JsonApiDoc::META_VALIDATE
         );
 
         if (null === $operationFlags) {

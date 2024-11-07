@@ -237,6 +237,7 @@ class ProcessorBagCompilerPass implements CompilerPassInterface
             CustomizeFormDataContext::EVENT_POST_VALIDATE,
             CustomizeFormDataContext::EVENT_PRE_FLUSH_DATA,
             CustomizeFormDataContext::EVENT_POST_FLUSH_DATA,
+            CustomizeFormDataContext::EVENT_ROLLBACK_VALIDATED_REQUEST,
             CustomizeFormDataContext::EVENT_POST_SAVE_DATA
         ];
         $groupedProcessors = [];

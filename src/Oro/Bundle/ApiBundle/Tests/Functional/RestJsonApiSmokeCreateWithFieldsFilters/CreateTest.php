@@ -32,7 +32,7 @@ class CreateTest extends RestJsonApiTestCase
 
             $response = $this->post(
                 ['entity' => $entityType],
-                ['fields' => sprintf('fields[%s]=id', $entityType), 'data' => ['type' => $entityType]],
+                ['filters' => sprintf('fields[%s]=id', $entityType), 'data' => ['type' => $entityType]],
                 [],
                 false
             );

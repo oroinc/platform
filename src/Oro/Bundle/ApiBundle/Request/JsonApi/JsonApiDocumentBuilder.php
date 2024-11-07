@@ -31,6 +31,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     public const HREF = 'href';
     public const META_UPDATE = 'update';
     public const META_UPSERT = 'upsert';
+    public const META_VALIDATE = 'validate';
 
     private const ERROR_STATUS = 'status';
     private const ERROR_CODE = 'code';
@@ -111,10 +112,9 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
                 $objectClass = $metadata->getClassName();
             }
             $objectAlias = $this->getEntityAlias($objectClass, $requestType);
-            $objectId = null;
-            if ($hasIdentifierFields) {
-                $objectId = $this->getEntityId($object, $requestType, $metadata);
-            }
+            $objectId = $hasIdentifierFields
+                ? $this->getEntityId($object, $requestType, $metadata)
+                : null;
 
             $entityData = $data;
             $entityData[DataAccessorInterface::ENTITY_CLASS] = $objectClass;

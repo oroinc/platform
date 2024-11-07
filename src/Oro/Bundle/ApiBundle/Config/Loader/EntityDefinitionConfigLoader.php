@@ -26,7 +26,8 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements Confi
         ConfigUtil::DISABLE_INCLUSION       => ['disableInclusion', 'enableInclusion'],
         ConfigUtil::DISABLE_FIELDSET        => ['disableFieldset', 'enableFieldset'],
         ConfigUtil::DISABLE_PARTIAL_LOAD    => ['disablePartialLoad', 'enablePartialLoad'],
-        ConfigUtil::FORM_EVENT_SUBSCRIBER   => 'setFormEventSubscribers'
+        ConfigUtil::FORM_EVENT_SUBSCRIBER   => 'setFormEventSubscribers',
+        ConfigUtil::ENABLE_VALIDATION       => ['enableValidation', 'disableValidation'],
     ];
 
     private ConfigLoaderFactory $factory;

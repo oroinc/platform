@@ -137,7 +137,8 @@ class EmailTest extends RestJsonApiTestCase
         );
         $this->assertResponseContains('get_email.yml', $response);
 
-        // the "emailThreadContextItemId" meta property should be added to "activityTargets" for "create" action only
+        // the "emailThreadContextItemId" meta property should be added to "activityTargets"
+        // for "create" and "create" actions only
         $responseContent = self::jsonToArray($response->getContent());
         self::assertTrue(isset($responseContent['data']['relationships']['activityTargets']['data'][0]));
         self::assertFalse(isset($responseContent['data']['relationships']['activityTargets']['data'][0]['meta']));
@@ -415,6 +416,7 @@ class EmailTest extends RestJsonApiTestCase
         $department = new TestDepartment();
         $department->setName('Test Department');
         $department->setOwner($this->getReference(LoadBusinessUnit::BUSINESS_UNIT));
+        $department->setOrganization($this->getReference(LoadOrganization::ORGANIZATION));
         $em->persist($department);
         $em->flush();
 
@@ -441,6 +443,8 @@ class EmailTest extends RestJsonApiTestCase
             ]
         ];
         $this->assertResponseContains($expectedData, $response);
+
+        self::assertEquals([$department->getId()], $this->getActivityTargetIds($createdEmail));
 
         /** @var EmailAttachment $emailAttachment */
         $emailAttachment = $createdEmail->getEmailBody()->getAttachments()->first();
@@ -702,6 +706,7 @@ class EmailTest extends RestJsonApiTestCase
         $department = new TestDepartment();
         $department->setName('Test Department');
         $department->setOwner($this->getReference(LoadBusinessUnit::BUSINESS_UNIT));
+        $department->setOrganization($this->getReference(LoadOrganization::ORGANIZATION));
         $em->persist($department);
         /** @var ActivityManager $activityManager */
         $activityManager = self::getContainer()->get('oro_activity.manager');
@@ -1081,7 +1086,7 @@ class EmailTest extends RestJsonApiTestCase
     public function testUpdateActivityTargets(): void
     {
         $emailId = $this->getReference('email_1')->getId();
-        $data = [
+        $data = $this->getRequestData([
             'data' => [
                 'type'          => 'emails',
                 'id'            => (string)$emailId,
@@ -1094,16 +1099,17 @@ class EmailTest extends RestJsonApiTestCase
                     ]
                 ]
             ]
-        ];
+        ]);
         $response = $this->patch(['entity' => 'emails', 'id' => (string)$emailId], $data);
-        $this->assertResponseContains($data, $response);
+        $expectedData = $data;
+        foreach ($expectedData['data']['relationships']['activityTargets']['data'] as $key => $val) {
+            $expectedData['data']['relationships']['activityTargets']['data'][$key]['meta'] = [
+                'emailThreadContextItemId' => sprintf('%s-%d-%d', $val['type'], $val['id'], $emailId)
+            ];
+        }
+        $this->assertResponseContains($expectedData, $response);
         $email = $this->getEntityManager()->find(Email::class, $emailId);
         self::assertCount(2, $email->getActivityTargets());
-
-        // the "emailThreadContextItemId" meta property should be added to "activityTargets" for "create" action only
-        $responseContent = self::jsonToArray($response->getContent());
-        self::assertTrue(isset($responseContent['data']['relationships']['activityTargets']['data'][0]));
-        self::assertFalse(isset($responseContent['data']['relationships']['activityTargets']['data'][0]['meta']));
     }
 
     public function testGetSubresourceForActivityTargets(): void
@@ -1178,13 +1184,27 @@ class EmailTest extends RestJsonApiTestCase
     {
         $emailId = $this->getReference('email_1')->getId();
         $targetEntityId = $this->getReference('user1')->getId();
-        $this->patchRelationship(
+        $response = $this->patchRelationship(
             ['entity' => 'emails', 'id' => (string)$emailId, 'association' => 'activityTargets'],
             [
                 'data' => [
                     ['type' => 'users', 'id' => (string)$targetEntityId]
                 ]
             ]
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type' => 'users',
+                        'id'   => (string)$targetEntityId,
+                        'meta' => [
+                            'emailThreadContextItemId' => 'users-' . $targetEntityId . '-' . $emailId
+                        ]
+                    ]
+                ]
+            ],
+            $response
         );
         /** @var Email $email */
         $email = $this->getEntityManager()->find(Email::class, $emailId);
@@ -1232,17 +1252,33 @@ class EmailTest extends RestJsonApiTestCase
 
     public function testDeleteRelationshipForActivityTargets(): void
     {
-        $emailId = $this->getReference('email_1')->getId();
-        $this->deleteRelationship(
+        $emailId = $this->getReference('email_6')->getId();
+        $targetEntity1Id = $this->getReference('user')->getId();
+        $targetEntity2Id = $this->getReference('user2')->getId();
+        $response = $this->deleteRelationship(
             ['entity' => 'emails', 'id' => (string)$emailId, 'association' => 'activityTargets'],
             [
                 'data' => [
-                    ['type' => 'users', 'id' => '<toString(@user->id)>']
+                    ['type' => 'users', 'id' => (string)$targetEntity1Id]
                 ]
             ]
         );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type' => 'users',
+                        'id'   => (string)$targetEntity2Id,
+                        'meta' => [
+                            'emailThreadContextItemId' => 'users-' . $targetEntity2Id . '-' . $emailId
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
         /** @var Email $email */
         $email = $this->getEntityManager()->find(Email::class, $emailId);
-        self::assertEquals([], $this->getActivityTargetIds($email));
+        self::assertEquals([$targetEntity2Id], $this->getActivityTargetIds($email));
     }
 }

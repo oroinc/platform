@@ -17,12 +17,6 @@ class AddressTypeTranslationRepository extends AbstractTranslationRepository
     }
 
     #[\Override]
-    public function getAllIdentities(): array
-    {
-        return $this->doGetAllIdentities(AddressType::class, 'name');
-    }
-
-    #[\Override]
     public function updateDefaultTranslations(array $data): void
     {
         $this->doUpdateDefaultTranslations(

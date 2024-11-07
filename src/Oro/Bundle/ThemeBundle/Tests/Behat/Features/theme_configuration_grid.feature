@@ -1,5 +1,5 @@
 @regression
-@fixture-OroThemeBundle:theme_configuration_grid.yml
+@fixture-OroThemeBundle:theme_configuration.yml
 
 Feature: Theme Configuration Grid
 
@@ -28,16 +28,6 @@ Feature: Theme Configuration Grid
       | default |
     And records in grid should be 2
     And I reset Theme filter
-
-  Scenario: Enable & Check Type filter
-    Given records in grid should be 3
-    When I show filter "Type" in "Theme Configurations Grid" grid
-    And I check "Storefront" in "Type: All" filter strictly
-    Then I should see following grid:
-      | Name            |
-      | Refreshing Teal |
-    And records in grid should be 3
-    And I reset "Type: Storefront" filter
 
   Scenario: Sort by Name
     Given I should see following grid:
@@ -90,23 +80,4 @@ Feature: Theme Configuration Grid
       | default |
       | default |
       | custom  |
-    And I reset "Theme Configurations Grid" grid
-
-  Scenario: Enable column "Type" and Sort by it
-    Given I should see following grid:
-      | Name            |
-      | Refreshing Teal |
-    And I show column Type in grid
-    When I sort grid by "Type"
-    Then I should see following grid:
-      | Name            | Type       |
-      | Refreshing Teal | Storefront |
-      | Default         | Storefront |
-      | Custom          | Storefront |
-    When I sort grid by "Type" again
-    Then I should see following grid:
-      | Name            | Type       |
-      | Custom          | Storefront |
-      | Default         | Storefront |
-      | Refreshing Teal | Storefront |
     And I reset "Theme Configurations Grid" grid

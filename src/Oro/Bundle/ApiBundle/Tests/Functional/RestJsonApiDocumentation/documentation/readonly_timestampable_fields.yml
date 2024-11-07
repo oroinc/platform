@@ -1,0 +1,14 @@
+parameters:
+    createdAt:
+        dataType: 'datetime'
+        description: '<p>The date and time of resource record creation.</p><p><strong>The read-only field. A passed value will be ignored.</strong></p>'
+    updatedAt:
+        dataType: 'datetime'
+        description: '<p>The date and time of the last update of the resource record.</p><p><strong>The read-only field. A passed value will be ignored.</strong></p>'
+response:
+    createdAt:
+        dataType: 'datetime'
+        description: 'The date and time of resource record creation.'
+    updatedAt:
+        dataType: 'datetime'
+        description: 'The date and time of the last update of the resource record.'

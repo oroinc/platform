@@ -10,17 +10,14 @@ use Oro\Component\ChainProcessor\ParameterBagInterface;
  */
 class FlushDataHandlerContext
 {
-    private array $entityContexts;
-    private ParameterBagInterface $sharedData;
-
     /**
-     * @param FormContext[]         $entityContexts
-     * @param ParameterBagInterface $sharedData
+     * @param FormContext[] $entityContexts
      */
-    public function __construct(array $entityContexts, ParameterBagInterface $sharedData)
-    {
-        $this->entityContexts = $entityContexts;
-        $this->sharedData = $sharedData;
+    public function __construct(
+        private array $entityContexts,
+        private ParameterBagInterface $sharedData,
+        private bool $isBatchOperation = false
+    ) {
     }
 
     /**
@@ -37,5 +34,10 @@ class FlushDataHandlerContext
     public function getSharedData(): ParameterBagInterface
     {
         return $this->sharedData;
+    }
+
+    public function isBatchOperation(): bool
+    {
+        return $this->isBatchOperation;
     }
 }

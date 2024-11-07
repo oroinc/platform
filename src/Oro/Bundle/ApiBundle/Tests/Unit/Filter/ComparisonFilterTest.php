@@ -11,15 +11,32 @@ use Oro\Bundle\ApiBundle\Exception\InvalidFilterOperatorException;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
+use Oro\Bundle\ApiBundle\Model\NormalizedDateTime;
 use Oro\Bundle\ApiBundle\Model\Range;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
 {
+    private function getDateTime(string $datetime): \DateTime
+    {
+        return new \DateTime($datetime, new \DateTimeZone('UTC'));
+    }
+
+    private function getNormalizedDateTime(
+        string $datetime,
+        int $precision = NormalizedDateTime::PRECISION_SECOND
+    ): NormalizedDateTime {
+        $result = new NormalizedDateTime($datetime, new \DateTimeZone('UTC'));
+        $result->setPrecision($precision);
+
+        return $result;
+    }
+
     public function testSetAndGetField(): void
     {
         $comparisonFilter = new ComparisonFilter(DataType::INTEGER);
@@ -153,7 +170,7 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
     public function filterDataProvider(): array
     {
         return [
-            'empty filter'                 => [
+            'empty filter' => [
                 'fieldName', //fieldName
                 true, // isArrayAllowed
                 true, // isRangeAllowed
@@ -167,63 +184,511 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
                 new FilterValue('path', 'value'),
                 new Comparison('fieldName', Comparison::EQ, new Value('value'))
             ],
-            'EQ filter'                    => [
+            'EQ filter' => [
                 'fieldName',
                 true,
                 true,
                 new FilterValue('path', 'value', FilterOperator::EQ),
                 new Comparison('fieldName', Comparison::EQ, new Value('value'))
             ],
-            'NEQ filter'                   => [
+            'NEQ filter' => [
                 'fieldName',
                 true,
                 true,
                 new FilterValue('path', 'value', FilterOperator::NEQ),
                 new Comparison('fieldName', Comparison::NEQ, new Value('value'))
             ],
-            'LT filter'                    => [
+            'EQ filter, DateTime' => [
+                'fieldName',
+                true,
+                true,
+                new FilterValue('path', $this->getDateTime('2010-01-28'), FilterOperator::EQ),
+                new Comparison('fieldName', Comparison::EQ, new Value($this->getDateTime('2010-01-28')))
+            ],
+            'NEQ filter, DateTime' => [
+                'fieldName',
+                true,
+                true,
+                new FilterValue('path', $this->getDateTime('2010-01-28'), FilterOperator::NEQ),
+                new Comparison('fieldName', Comparison::NEQ, new Value($this->getDateTime('2010-01-28')))
+            ],
+            'EQ filter, NormalizedDateTime:second' => [
+                'fieldName',
+                true,
+                true,
+                new FilterValue('path', $this->getNormalizedDateTime('2010-01-28T15:10:05'), FilterOperator::EQ),
+                new Comparison(
+                    'fieldName',
+                    Comparison::EQ,
+                    new Value($this->getNormalizedDateTime('2010-01-28T15:10:05'))
+                )
+            ],
+            'NEQ filter, NormalizedDateTime:second' => [
+                'fieldName',
+                true,
+                true,
+                new FilterValue('path', $this->getNormalizedDateTime('2010-01-28T15:10:05'), FilterOperator::NEQ),
+                new Comparison(
+                    'fieldName',
+                    Comparison::NEQ,
+                    new Value($this->getNormalizedDateTime('2010-01-28T15:10:05'))
+                )
+            ],
+            'EQ filter, NormalizedDateTime:minute' => [
+                'fieldName',
+                true,
+                true,
+                new FilterValue(
+                    'path',
+                    $this->getNormalizedDateTime('2010-01-28T15:10', NormalizedDateTime::PRECISION_MINUTE),
+                    FilterOperator::EQ
+                ),
+                new CompositeExpression(
+                    CompositeExpression::TYPE_AND,
+                    [
+                        new Comparison(
+                            'fieldName',
+                            Comparison::GTE,
+                            new Value(
+                                $this->getNormalizedDateTime('2010-01-28T15:10', NormalizedDateTime::PRECISION_MINUTE)
+                            )
+                        ),
+                        new Comparison(
+                            'fieldName',
+                            Comparison::LT,
+                            new Value($this->getDateTime('2010-01-28T15:11'))
+                        )
+                    ]
+                )
+            ],
+            'NEQ filter, NormalizedDateTime:minute' => [
+                'fieldName',
+                true,
+                true,
+                new FilterValue(
+                    'path',
+                    $this->getNormalizedDateTime('2010-01-28T15:10', NormalizedDateTime::PRECISION_MINUTE),
+                    FilterOperator::NEQ
+                ),
+                new CompositeExpression(
+                    CompositeExpression::TYPE_OR,
+                    [
+                        new Comparison(
+                            'fieldName',
+                            Comparison::LT,
+                            new Value(
+                                $this->getNormalizedDateTime('2010-01-28T15:10', NormalizedDateTime::PRECISION_MINUTE)
+                            )
+                        ),
+                        new Comparison(
+                            'fieldName',
+                            Comparison::GTE,
+                            new Value($this->getDateTime('2010-01-28T15:11'))
+                        )
+                    ]
+                )
+            ],
+            'EQ filter, NormalizedDateTime:hour' => [
+                'fieldName',
+                true,
+                true,
+                new FilterValue(
+                    'path',
+                    $this->getNormalizedDateTime('2010-01-28T15', NormalizedDateTime::PRECISION_HOUR),
+                    FilterOperator::EQ
+                ),
+                new CompositeExpression(
+                    CompositeExpression::TYPE_AND,
+                    [
+                        new Comparison(
+                            'fieldName',
+                            Comparison::GTE,
+                            new Value(
+                                $this->getNormalizedDateTime('2010-01-28T15', NormalizedDateTime::PRECISION_HOUR)
+                            )
+                        ),
+                        new Comparison(
+                            'fieldName',
+                            Comparison::LT,
+                            new Value($this->getDateTime('2010-01-28T16'))
+                        )
+                    ]
+                )
+            ],
+            'NEQ filter, NormalizedDateTime:hour' => [
+                'fieldName',
+                true,
+                true,
+                new FilterValue(
+                    'path',
+                    $this->getNormalizedDateTime('2010-01-28T15', NormalizedDateTime::PRECISION_HOUR),
+                    FilterOperator::NEQ
+                ),
+                new CompositeExpression(
+                    CompositeExpression::TYPE_OR,
+                    [
+                        new Comparison(
+                            'fieldName',
+                            Comparison::LT,
+                            new Value(
+                                $this->getNormalizedDateTime('2010-01-28T15', NormalizedDateTime::PRECISION_HOUR)
+                            )
+                        ),
+                        new Comparison(
+                            'fieldName',
+                            Comparison::GTE,
+                            new Value($this->getDateTime('2010-01-28T16'))
+                        )
+                    ]
+                )
+            ],
+            'EQ filter, NormalizedDateTime:day' => [
+                'fieldName',
+                true,
+                true,
+                new FilterValue(
+                    'path',
+                    $this->getNormalizedDateTime('2010-01-28', NormalizedDateTime::PRECISION_DAY),
+                    FilterOperator::EQ
+                ),
+                new CompositeExpression(
+                    CompositeExpression::TYPE_AND,
+                    [
+                        new Comparison(
+                            'fieldName',
+                            Comparison::GTE,
+                            new Value($this->getNormalizedDateTime('2010-01-28', NormalizedDateTime::PRECISION_DAY))
+                        ),
+                        new Comparison(
+                            'fieldName',
+                            Comparison::LT,
+                            new Value($this->getDateTime('2010-01-29'))
+                        )
+                    ]
+                )
+            ],
+            'NEQ filter, NormalizedDateTime:day' => [
+                'fieldName',
+                true,
+                true,
+                new FilterValue(
+                    'path',
+                    $this->getNormalizedDateTime('2010-01-28', NormalizedDateTime::PRECISION_DAY),
+                    FilterOperator::NEQ
+                ),
+                new CompositeExpression(
+                    CompositeExpression::TYPE_OR,
+                    [
+                        new Comparison(
+                            'fieldName',
+                            Comparison::LT,
+                            new Value($this->getNormalizedDateTime('2010-01-28', NormalizedDateTime::PRECISION_DAY))
+                        ),
+                        new Comparison(
+                            'fieldName',
+                            Comparison::GTE,
+                            new Value($this->getDateTime('2010-01-29'))
+                        )
+                    ]
+                )
+            ],
+            'EQ filter, NormalizedDateTime:month' => [
+                'fieldName',
+                true,
+                true,
+                new FilterValue(
+                    'path',
+                    $this->getNormalizedDateTime('2010-12-01', NormalizedDateTime::PRECISION_MONTH),
+                    FilterOperator::EQ
+                ),
+                new CompositeExpression(
+                    CompositeExpression::TYPE_AND,
+                    [
+                        new Comparison(
+                            'fieldName',
+                            Comparison::GTE,
+                            new Value($this->getNormalizedDateTime('2010-12-01', NormalizedDateTime::PRECISION_MONTH))
+                        ),
+                        new Comparison(
+                            'fieldName',
+                            Comparison::LT,
+                            new Value($this->getDateTime('2011-01-01'))
+                        )
+                    ]
+                )
+            ],
+            'NEQ filter, NormalizedDateTime:month' => [
+                'fieldName',
+                true,
+                true,
+                new FilterValue(
+                    'path',
+                    $this->getNormalizedDateTime('2010-12-01', NormalizedDateTime::PRECISION_MONTH),
+                    FilterOperator::NEQ
+                ),
+                new CompositeExpression(
+                    CompositeExpression::TYPE_OR,
+                    [
+                        new Comparison(
+                            'fieldName',
+                            Comparison::LT,
+                            new Value($this->getNormalizedDateTime('2010-12-01', NormalizedDateTime::PRECISION_MONTH))
+                        ),
+                        new Comparison(
+                            'fieldName',
+                            Comparison::GTE,
+                            new Value($this->getDateTime('2011-01-01'))
+                        )
+                    ]
+                )
+            ],
+            'EQ filter, NormalizedDateTime:year' => [
+                'fieldName',
+                true,
+                true,
+                new FilterValue(
+                    'path',
+                    $this->getNormalizedDateTime('2010-01-01', NormalizedDateTime::PRECISION_YEAR),
+                    FilterOperator::EQ
+                ),
+                new CompositeExpression(
+                    CompositeExpression::TYPE_AND,
+                    [
+                        new Comparison(
+                            'fieldName',
+                            Comparison::GTE,
+                            new Value($this->getNormalizedDateTime('2010-01-01', NormalizedDateTime::PRECISION_YEAR))
+                        ),
+                        new Comparison(
+                            'fieldName',
+                            Comparison::LT,
+                            new Value($this->getDateTime('2011-01-01'))
+                        )
+                    ]
+                )
+            ],
+            'NEQ filter, NormalizedDateTime:year' => [
+                'fieldName',
+                true,
+                true,
+                new FilterValue(
+                    'path',
+                    $this->getNormalizedDateTime('2010-01-01', NormalizedDateTime::PRECISION_YEAR),
+                    FilterOperator::NEQ
+                ),
+                new CompositeExpression(
+                    CompositeExpression::TYPE_OR,
+                    [
+                        new Comparison(
+                            'fieldName',
+                            Comparison::LT,
+                            new Value($this->getNormalizedDateTime('2010-01-01', NormalizedDateTime::PRECISION_YEAR))
+                        ),
+                        new Comparison(
+                            'fieldName',
+                            Comparison::GTE,
+                            new Value($this->getDateTime('2011-01-01'))
+                        )
+                    ]
+                )
+            ],
+            'LT filter' => [
                 'fieldName',
                 false,
                 false,
                 new FilterValue('path', 'value', FilterOperator::LT),
                 new Comparison('fieldName', Comparison::LT, new Value('value'))
             ],
-            'LTE filter'                   => [
+            'LTE filter' => [
                 'fieldName',
                 false,
                 false,
                 new FilterValue('path', 'value', FilterOperator::LTE),
                 new Comparison('fieldName', Comparison::LTE, new Value('value'))
             ],
-            'GT filter'                    => [
+            'GT filter' => [
                 'fieldName',
                 false,
                 false,
                 new FilterValue('path', 'value', FilterOperator::GT),
                 new Comparison('fieldName', Comparison::GT, new Value('value'))
             ],
-            'GTE filter'                   => [
+            'GTE filter' => [
                 'fieldName',
                 false,
                 false,
                 new FilterValue('path', 'value', FilterOperator::GTE),
                 new Comparison('fieldName', Comparison::GTE, new Value('value'))
             ],
-            'EQ filter for array'          => [
+            'EQ filter for array' => [
                 'fieldName',
                 true,
                 true,
                 new FilterValue('path', ['value1', 'value2'], FilterOperator::EQ),
                 new Comparison('fieldName', Comparison::IN, new Value(['value1', 'value2']))
             ],
-            'NEQ filter for array'         => [
+            'NEQ filter for array' => [
                 'fieldName',
                 true,
                 true,
                 new FilterValue('path', ['value1', 'value2'], FilterOperator::NEQ),
                 new Comparison('fieldName', Comparison::NIN, new Value(['value1', 'value2']))
             ],
-            'EQ filter for range'          => [
+            'EQ filter for array, DateTime' => [
+                'fieldName',
+                true,
+                true,
+                new FilterValue(
+                    'path',
+                    [$this->getDateTime('2010-01-28'), $this->getDateTime('2010-10-15')],
+                    FilterOperator::EQ
+                ),
+                new CompositeExpression(
+                    CompositeExpression::TYPE_OR,
+                    [
+                        new Comparison(
+                            'fieldName',
+                            Comparison::EQ,
+                            new Value($this->getDateTime('2010-01-28'))
+                        ),
+                        new Comparison(
+                            'fieldName',
+                            Comparison::EQ,
+                            new Value($this->getDateTime('2010-10-15'))
+                        )
+                    ]
+                )
+            ],
+            'NEQ filter for array, DateTime' => [
+                'fieldName',
+                true,
+                true,
+                new FilterValue(
+                    'path',
+                    [$this->getDateTime('2010-01-28'), $this->getDateTime('2010-10-15')],
+                    FilterOperator::NEQ
+                ),
+                new CompositeExpression(
+                    CompositeExpression::TYPE_AND,
+                    [
+                        new Comparison(
+                            'fieldName',
+                            Comparison::NEQ,
+                            new Value($this->getDateTime('2010-01-28'))
+                        ),
+                        new Comparison(
+                            'fieldName',
+                            Comparison::NEQ,
+                            new Value($this->getDateTime('2010-10-15'))
+                        )
+                    ]
+                )
+            ],
+            'EQ filter for array, NormalizedDateTime' => [
+                'fieldName',
+                true,
+                true,
+                new FilterValue(
+                    'path',
+                    [
+                        $this->getNormalizedDateTime('2010-01-28', NormalizedDateTime::PRECISION_DAY),
+                        $this->getNormalizedDateTime('2010-12-01', NormalizedDateTime::PRECISION_MONTH)
+                    ],
+                    FilterOperator::EQ
+                ),
+                new CompositeExpression(
+                    CompositeExpression::TYPE_OR,
+                    [
+                        new CompositeExpression(
+                            CompositeExpression::TYPE_AND,
+                            [
+                                new Comparison(
+                                    'fieldName',
+                                    Comparison::GTE,
+                                    new Value(
+                                        $this->getNormalizedDateTime('2010-01-28', NormalizedDateTime::PRECISION_DAY)
+                                    )
+                                ),
+                                new Comparison(
+                                    'fieldName',
+                                    Comparison::LT,
+                                    new Value($this->getDateTime('2010-01-29'))
+                                )
+                            ]
+                        ),
+                        new CompositeExpression(
+                            CompositeExpression::TYPE_AND,
+                            [
+                                new Comparison(
+                                    'fieldName',
+                                    Comparison::GTE,
+                                    new Value(
+                                        $this->getNormalizedDateTime('2010-12-01', NormalizedDateTime::PRECISION_MONTH)
+                                    )
+                                ),
+                                new Comparison(
+                                    'fieldName',
+                                    Comparison::LT,
+                                    new Value($this->getDateTime('2011-01-01'))
+                                )
+                            ]
+                        )
+                    ]
+                )
+            ],
+            'NEQ filter for array, NormalizedDateTime' => [
+                'fieldName',
+                true,
+                true,
+                new FilterValue(
+                    'path',
+                    [
+                        $this->getNormalizedDateTime('2010-01-28', NormalizedDateTime::PRECISION_DAY),
+                        $this->getNormalizedDateTime('2010-12-01', NormalizedDateTime::PRECISION_MONTH)
+                    ],
+                    FilterOperator::NEQ
+                ),
+                new CompositeExpression(
+                    CompositeExpression::TYPE_AND,
+                    [
+                        new CompositeExpression(
+                            CompositeExpression::TYPE_OR,
+                            [
+                                new Comparison(
+                                    'fieldName',
+                                    Comparison::LT,
+                                    new Value(
+                                        $this->getNormalizedDateTime('2010-01-28', NormalizedDateTime::PRECISION_DAY)
+                                    )
+                                ),
+                                new Comparison(
+                                    'fieldName',
+                                    Comparison::GTE,
+                                    new Value($this->getDateTime('2010-01-29'))
+                                )
+                            ]
+                        ),
+                        new CompositeExpression(
+                            CompositeExpression::TYPE_OR,
+                            [
+                                new Comparison(
+                                    'fieldName',
+                                    Comparison::LT,
+                                    new Value(
+                                        $this->getNormalizedDateTime('2010-12-01', NormalizedDateTime::PRECISION_MONTH)
+                                    )
+                                ),
+                                new Comparison(
+                                    'fieldName',
+                                    Comparison::GTE,
+                                    new Value($this->getDateTime('2011-01-01'))
+                                )
+                            ]
+                        )
+                    ]
+                )
+            ],
+            'EQ filter for range' => [
                 'fieldName',
                 true,
                 true,
@@ -236,7 +701,7 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
                     ]
                 )
             ],
-            'NEQ filter for range'         => [
+            'NEQ filter for range' => [
                 'fieldName',
                 true,
                 true,
@@ -249,77 +714,77 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
                     ]
                 )
             ],
-            'EXISTS filter'                => [
+            'EXISTS filter' => [
                 'fieldName',
                 false,
                 false,
                 new FilterValue('path', true, FilterOperator::EXISTS),
                 new Comparison('fieldName', 'EXISTS', new Value(true))
             ],
-            'NOT EXISTS filter'            => [
+            'NOT EXISTS filter' => [
                 'fieldName',
                 false,
                 false,
                 new FilterValue('path', false, FilterOperator::EXISTS),
                 new Comparison('fieldName', 'EXISTS', new Value(false))
             ],
-            'NEQ_OR_NULL filter'           => [
+            'NEQ_OR_NULL filter' => [
                 'fieldName',
                 true,
                 true,
                 new FilterValue('path', 'value', FilterOperator::NEQ_OR_NULL),
                 new Comparison('fieldName', 'NEQ_OR_NULL', new Value('value'))
             ],
-            'CONTAINS filter'              => [
+            'CONTAINS filter' => [
                 'fieldName',
                 false,
                 false,
                 new FilterValue('path', 'value', FilterOperator::CONTAINS),
                 new Comparison('fieldName', 'CONTAINS', new Value('value'))
             ],
-            'NOT_CONTAINS filter'          => [
+            'NOT_CONTAINS filter' => [
                 'fieldName',
                 false,
                 false,
                 new FilterValue('path', 'value', FilterOperator::NOT_CONTAINS),
                 new Comparison('fieldName', 'NOT_CONTAINS', new Value('value'))
             ],
-            'STARTS_WITH filter'           => [
+            'STARTS_WITH filter' => [
                 'fieldName',
                 false,
                 false,
                 new FilterValue('path', 'value', FilterOperator::STARTS_WITH),
                 new Comparison('fieldName', 'STARTS_WITH', new Value('value'))
             ],
-            'NOT_STARTS_WITH filter'       => [
+            'NOT_STARTS_WITH filter' => [
                 'fieldName',
                 false,
                 false,
                 new FilterValue('path', 'value', FilterOperator::NOT_STARTS_WITH),
                 new Comparison('fieldName', 'NOT_STARTS_WITH', new Value('value'))
             ],
-            'ENDS_WITH filter'             => [
+            'ENDS_WITH filter' => [
                 'fieldName',
                 false,
                 false,
                 new FilterValue('path', 'value', FilterOperator::ENDS_WITH),
                 new Comparison('fieldName', 'ENDS_WITH', new Value('value'))
             ],
-            'NOT_ENDS_WITH filter'         => [
+            'NOT_ENDS_WITH filter' => [
                 'fieldName',
                 false,
                 false,
                 new FilterValue('path', 'value', FilterOperator::NOT_ENDS_WITH),
                 new Comparison('fieldName', 'NOT_ENDS_WITH', new Value('value'))
             ],
-            'EMPTY_VALUE filter'           => [
+            'EMPTY_VALUE filter' => [
                 'fieldName',
                 false,
                 false,
                 new FilterValue('path', true, FilterOperator::EMPTY_VALUE),
                 new Comparison('fieldName', 'EMPTY_VALUE/:integer', new Value(true))
             ],
-            'NOT EMPTY_VALUE filter'       => [
+            'NOT EMPTY_VALUE filter' => [
                 'fieldName',
                 false,
                 false,
@@ -363,42 +828,42 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
     public function caseInsensitiveFilterDataProvider(): array
     {
         return [
-            'EQ filter'              => [
+            'EQ filter' => [
                 'fieldName',
                 new FilterValue('path', 'Value', FilterOperator::EQ),
                 new Comparison('fieldName', Comparison::EQ . '/i', new Value('Value'))
             ],
-            'NEQ filter'             => [
+            'NEQ filter' => [
                 'fieldName',
                 new FilterValue('path', 'Value', FilterOperator::NEQ),
                 new Comparison('fieldName', Comparison::NEQ . '/i', new Value('Value'))
             ],
-            'EQ filter for array'    => [
+            'EQ filter for array' => [
                 'fieldName',
                 new FilterValue('path', ['Value1', 'Value2'], FilterOperator::EQ),
                 new Comparison('fieldName', Comparison::IN . '/i', new Value(['Value1', 'Value2']))
             ],
-            'NEQ filter for array'   => [
+            'NEQ filter for array' => [
                 'fieldName',
                 new FilterValue('path', ['Value1', 'Value2'], FilterOperator::NEQ),
                 new Comparison('fieldName', Comparison::NIN . '/i', new Value(['Value1', 'Value2']))
             ],
-            'NEQ_OR_NULL filter'     => [
+            'NEQ_OR_NULL filter' => [
                 'fieldName',
                 new FilterValue('path', 'Value', FilterOperator::NEQ_OR_NULL),
                 new Comparison('fieldName', 'NEQ_OR_NULL/i', new Value('Value'))
             ],
-            'CONTAINS filter'        => [
+            'CONTAINS filter' => [
                 'fieldName',
                 new FilterValue('path', 'Value', FilterOperator::CONTAINS),
                 new Comparison('fieldName', 'CONTAINS/i', new Value('Value'))
             ],
-            'NOT_CONTAINS filter'    => [
+            'NOT_CONTAINS filter' => [
                 'fieldName',
                 new FilterValue('path', 'Value', FilterOperator::NOT_CONTAINS),
                 new Comparison('fieldName', 'NOT_CONTAINS/i', new Value('Value'))
             ],
-            'STARTS_WITH filter'     => [
+            'STARTS_WITH filter' => [
                 'fieldName',
                 new FilterValue('path', 'Value', FilterOperator::STARTS_WITH),
                 new Comparison('fieldName', 'STARTS_WITH/i', new Value('Value'))
@@ -408,12 +873,12 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
                 new FilterValue('path', 'Value', FilterOperator::NOT_STARTS_WITH),
                 new Comparison('fieldName', 'NOT_STARTS_WITH/i', new Value('Value'))
             ],
-            'ENDS_WITH filter'       => [
+            'ENDS_WITH filter' => [
                 'fieldName',
                 new FilterValue('path', 'Value', FilterOperator::ENDS_WITH),
                 new Comparison('fieldName', 'ENDS_WITH/i', new Value('Value'))
             ],
-            'NOT_ENDS_WITH filter'   => [
+            'NOT_ENDS_WITH filter' => [
                 'fieldName',
                 new FilterValue('path', 'Value', FilterOperator::NOT_ENDS_WITH),
                 new Comparison('fieldName', 'NOT_ENDS_WITH/i', new Value('Value'))
@@ -464,7 +929,7 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
     public function collectionFilterDataProvider(): array
     {
         return [
-            'empty filter'                 => [
+            'empty filter' => [
                 'fieldName', //fieldName
                 true, // isArrayAllowed
                 true, // isRangeAllowed
@@ -478,14 +943,14 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
                 new FilterValue('path', 'value'),
                 new Comparison('fieldName', Comparison::MEMBER_OF, new Value('value'))
             ],
-            'EQ filter'                    => [
+            'EQ filter' => [
                 'fieldName',
                 true,
                 true,
                 new FilterValue('path', 'value', FilterOperator::EQ),
                 new Comparison('fieldName', Comparison::MEMBER_OF, new Value('value'))
             ],
-            'NEQ filter'                   => [
+            'NEQ filter' => [
                 'fieldName',
                 true,
                 true,
@@ -497,14 +962,14 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
                     ]
                 )
             ],
-            'EQ filter for array'          => [
+            'EQ filter for array' => [
                 'fieldName',
                 true,
                 true,
                 new FilterValue('path', ['value1', 'value2'], FilterOperator::EQ),
                 new Comparison('fieldName', Comparison::MEMBER_OF, new Value(['value1', 'value2']))
             ],
-            'NEQ filter for array'         => [
+            'NEQ filter for array' => [
                 'fieldName',
                 true,
                 true,
@@ -516,14 +981,14 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
                     ]
                 )
             ],
-            'EQ filter for range'          => [
+            'EQ filter for range' => [
                 'fieldName',
                 true,
                 true,
                 new FilterValue('path', new Range('value1', 'value2'), FilterOperator::EQ),
                 new Comparison('fieldName', Comparison::MEMBER_OF, new Value(new Range('value1', 'value2')))
             ],
-            'NEQ filter for range'         => [
+            'NEQ filter for range' => [
                 'fieldName',
                 true,
                 true,
@@ -535,35 +1000,35 @@ class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
                     ]
                 )
             ],
-            'EXISTS filter'                => [
+            'EXISTS filter' => [
                 'fieldName',
                 false,
                 false,
                 new FilterValue('path', true, FilterOperator::EXISTS),
                 new Comparison('fieldName', 'EMPTY', new Value(false))
             ],
-            'NOT EXISTS filter'            => [
+            'NOT EXISTS filter' => [
                 'fieldName',
                 false,
                 false,
                 new FilterValue('path', false, FilterOperator::EXISTS),
                 new Comparison('fieldName', 'EMPTY', new Value(true))
             ],
-            'NEQ_OR_NULL filter'           => [
+            'NEQ_OR_NULL filter' => [
                 'fieldName',
                 true,
                 true,
                 new FilterValue('path', 'value', FilterOperator::NEQ_OR_NULL),
                 new Comparison('fieldName', 'NEQ_OR_EMPTY', new Value('value'))
             ],
-            'CONTAINS filter'              => [
+            'CONTAINS filter' => [
                 'fieldName',
                 true,
                 false,
                 new FilterValue('path', 'value', FilterOperator::CONTAINS),
                 new Comparison('fieldName', 'ALL_MEMBER_OF', new Value('value'))
             ],
-            'NOT_CONTAINS filter'          => [
+            'NOT_CONTAINS filter' => [
                 'fieldName',
                 true,
                 false,

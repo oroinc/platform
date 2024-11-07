@@ -893,6 +893,12 @@ class GetWithFiltersTest extends RestJsonApiTestCase
 
     public function testDisabledPagination()
     {
+        $response = $this->cget(['entity' => 'testapienum2']);
+        self::assertResponseCount(11, $response);
+    }
+
+    public function testDisabledPaginationAndPaginationFilters()
+    {
         $this->appendEntityConfig(
             TestDepartment::class,
             [

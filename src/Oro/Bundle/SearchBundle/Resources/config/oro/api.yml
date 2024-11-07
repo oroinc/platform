@@ -30,7 +30,7 @@ api:
                         property_path: _
             actions:
                 get_list:
-                    page_size: -1 # disable paging
+                    disable_paging: true
                     disable_sorting: true
                 get: false
                 create: false

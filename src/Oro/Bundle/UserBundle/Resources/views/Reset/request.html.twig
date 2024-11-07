@@ -13,7 +13,7 @@
             {% set returnToLoginLabel = 'Return to Login'|trans %}
             {% set showLabels = (requestLabel|length <= 9) and (returnToLoginLabel|length <= 15) %}
             {% set layoutName = showLabels ? 'form-row-layout' : 'form-column-layout' %}
-            <form action="{{ path('oro_user_reset_send_email') }}" method="post" class="form-signin form-signin--forgot {{ layoutName }}">
+            <form action="{{ resetFormActionPath|default(path('oro_user_reset_send_email')) }}" method="post" class="form-signin form-signin--forgot {{ layoutName }}">
                 <div class="title-box">
                     <h2 class="title">{{ 'Forgot Password'|trans }}</h2>
                 </div>
@@ -23,7 +23,7 @@
                     <input type="hidden" name="frontend" value="1" />
                     <div class="form-row form-signin__footer form-signin__footer">
                         <button type="submit" class="btn extra-submit btn-uppercase btn-primary">{{ requestLabel }}</button>
-                        <a href="{{ path('oro_user_security_login') }}">&laquo; {{ returnToLoginLabel }}</a>
+                        <a href="{{ resetFormReturnPath|default(path('oro_user_security_login')) }}">&laquo; {{ returnToLoginLabel }}</a>
                     </div>
                 </fieldset>
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('oro-user-password-reset-request') }}"/>
