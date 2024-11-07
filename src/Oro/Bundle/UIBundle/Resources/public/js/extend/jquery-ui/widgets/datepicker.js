@@ -361,6 +361,7 @@ $.extend($.datepicker.constructor.prototype, {
         const inst = $.datepicker._getInst(input);
 
         // set bigger zIndex difference between dropdown and input, to have place for dropdown mask
+        console.log(inst.dpDiv);
         inst.dpDiv.css('z-index', Number(inst.dpDiv.css('z-index')) + 2);
         inst.dpDiv.attr({
             'role': 'dialog',
