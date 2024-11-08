@@ -34,6 +34,7 @@ class CompleteAssociationHelper
      * @param RequestType                 $requestType
      * @param ConfigExtraInterface[]      $extras
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function completeAssociation(
         EntityDefinitionFieldConfig $field,
@@ -69,6 +70,20 @@ class CompleteAssociationHelper
                 $targetEntity->setExcludeAll();
                 if (!$field->hasCollapsed()) {
                     $field->setCollapsed();
+                }
+            }
+            if (!$targetEntity->getParentResourceClass() && $field->getTargetClass() !== $targetClass) {
+                $fieldTargetDefinition = $this->loadDefinition(
+                    $field->getTargetClass(),
+                    $version,
+                    $requestType,
+                    [new FilterIdentifierFieldsConfigExtra()]
+                );
+                if (null !== $fieldTargetDefinition) {
+                    $parentResourceClass = $fieldTargetDefinition->getParentResourceClass();
+                    if ($parentResourceClass) {
+                        $targetEntity->setParentResourceClass($parentResourceClass);
+                    }
                 }
             }
         }

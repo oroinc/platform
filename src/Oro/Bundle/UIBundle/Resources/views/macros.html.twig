@@ -685,7 +685,14 @@
             {%- endif -%}
             {{- UIMacro.clientControlAttrs(parameters) -}}>
             {{- UIMacro.clientControlIcon(parameters) -}}
-            {{- parameters.label is defined ? parameters.label : '' -}}
+            {% set renderLinkLabel %}
+                {{- parameters.label is defined ? parameters.label : '' -}}
+            {% endset %}
+            {% if parameters.labelClass is defined %}
+                <span class="{{ parameters.labelClass }}">{{ renderLinkLabel }}</span>
+            {% else %}
+                {{ renderLinkLabel }}
+            {% endif %}
         </a>
     {% endapply %}
 {% endmacro %}
@@ -835,7 +842,14 @@
         {%- endif -%}
         >
             {{- UIMacro.clientControlIcon(parameters) -}}
-            {{- parameters.label is defined ? parameters.label : '' -}}
+            {% set renderLinkLabel %}
+                {{- parameters.label is defined ? parameters.label : '' -}}
+            {% endset %}
+            {% if parameters.labelClass is defined %}
+                <span class="{{ parameters.labelClass }}">{{ renderLinkLabel }}</span>
+            {% else %}
+                {{ renderLinkLabel }}
+            {% endif %}
         </button>
     {% endapply %}
 {% endmacro %}
