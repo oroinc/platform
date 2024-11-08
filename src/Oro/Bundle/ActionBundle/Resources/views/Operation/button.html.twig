@@ -48,7 +48,14 @@
                 }) }}
             {% endif %}
             {% if not params.frontendOptions.options.noLinkLabel|default(false) %}
-                {{- linkLabel|trim -}}
+                {% set renderLinkLabel %}
+                    {{- linkLabel|trim -}}
+                {% endset %}
+                {% if params.frontendOptions.options.labelClass is defined %}
+                    <span class="{{ params.frontendOptions.options.labelClass }}">{{ renderLinkLabel }}</span>
+                {% else %}
+                    {{ renderLinkLabel }}
+                {% endif %}
             {% endif %}
         </{% if 'link' == linkType|default(null) %}a{% else %}button{% endif %}>
     {% endblock %}
