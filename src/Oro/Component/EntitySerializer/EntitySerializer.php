@@ -2,7 +2,6 @@
 
 namespace Oro\Component\EntitySerializer;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\Query;
@@ -378,13 +377,10 @@ class EntitySerializer
             return false;
         }
 
-        if ($this->isAssociation($property, $entityMetadata, $fieldConfig)) {
+        if (ConfigUtil::IGNORE_PROPERTY_PATH !== $property && $entityMetadata->isAssociation($property)) {
             if (\is_object($value)) {
                 $targetConfig = $this->configAccessor->getTargetEntity($config, $field);
-                $targetEntityClass = $entityMetadata->isAssociation($property)
-                    ? $entityMetadata->getAssociationTargetClass($property)
-                    : ClassUtils::getClass($value);
-
+                $targetEntityClass = $entityMetadata->getAssociationTargetClass($property);
                 $value = $this->serializeItem($value, $targetEntityClass, $targetConfig, $context);
                 if (null === $this->getIdFieldNameIfIdOnlyRequested($targetConfig, $targetEntityClass)) {
                     $targetEntityId = $this->dataAccessor->getValue(

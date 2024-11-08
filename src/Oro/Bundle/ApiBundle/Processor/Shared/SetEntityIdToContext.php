@@ -1,7 +1,9 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Update;
+namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
+use Oro\Bundle\ApiBundle\Processor\Update\UpdateContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
@@ -15,7 +17,7 @@ class SetEntityIdToContext implements ProcessorInterface
     #[\Override]
     public function process(ContextInterface $context): void
     {
-        /** @var UpdateContext $context */
+        /** @var CreateContext|UpdateContext $context */
 
         if ($context->isProcessed(self::OPERATION_NAME)) {
             // the entity identifier was already set

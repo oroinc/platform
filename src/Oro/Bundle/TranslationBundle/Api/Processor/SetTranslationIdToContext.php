@@ -3,7 +3,7 @@
 namespace Oro\Bundle\TranslationBundle\Api\Processor;
 
 use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
-use Oro\Bundle\ApiBundle\Processor\Create\SetEntityIdToContext;
+use Oro\Bundle\ApiBundle\Processor\Shared\SetEntityIdToContext;
 use Oro\Bundle\TranslationBundle\Api\TranslationIdUtil;
 use Oro\Bundle\TranslationBundle\Entity\TranslationKey;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -18,6 +18,16 @@ class SetTranslationIdToContext implements ProcessorInterface
     public function process(ContextInterface $context): void
     {
         /** @var CreateContext $context */
+
+        if ($context->isProcessed(SetEntityIdToContext::OPERATION_NAME)) {
+            // the entity identifier was already set
+            return;
+        }
+
+        if ($context->isExisting()) {
+            // the setting of an entity identifier to the context is needed only for a new entity
+            return;
+        }
 
         $entity = $context->getResult();
         if (!$entity instanceof TranslationKey) {

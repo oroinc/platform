@@ -4,6 +4,8 @@ namespace Oro\Bundle\ApiBundle\Processor\Get;
 
 use Oro\Bundle\ApiBundle\Metadata\Extra\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
+use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
+use Oro\Bundle\ApiBundle\Util\AclProtectedQueryResolver;
 
 /**
  * The execution context for processors for "get" action.
@@ -45,6 +47,11 @@ class GetContext extends SingleItemContext
         $parentAction = $this->getParentAction();
         if ($parentAction) {
             $normalizationContext[self::PARENT_ACTION] = $parentAction;
+        }
+        if ($this->hasSkippedGroups()
+            && \in_array(ApiActionGroup::DATA_SECURITY_CHECK, $this->getSkippedGroups(), true)
+        ) {
+            $normalizationContext[AclProtectedQueryResolver::SKIP_ACL_FOR_ROOT_ENTITY] = true;
         }
 
         return $normalizationContext;
