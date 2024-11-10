@@ -7,6 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 /**
  * The interface for classes that need to make a modification of a query builder object
  * in order to protect data that can be retrieved via this query builder.
+ * Also see {@see QueryModifierOptionsAwareInterface}.
  */
 interface QueryModifierInterface
 {

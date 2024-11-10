@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\AclProtectedQueryFactory;
 use Oro\Bundle\ApiBundle\Util\AclProtectedQueryResolver;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\QueryModifierRegistry;
 use Oro\Component\EntitySerializer\DoctrineHelper;
 use Oro\Component\EntitySerializer\EntityConfig;
@@ -71,6 +72,7 @@ class AclProtectedQueryFactoryTest extends OrmRelatedTestCase
         $query = new Query($this->em);
 
         $config = new EntityConfig();
+        $config->set(ConfigUtil::RESOURCE_CLASS, 'Test\Class');
         $config->set('option_1', 'option_1_initial_val');
 
         $qb->expects(self::once())
@@ -80,7 +82,7 @@ class AclProtectedQueryFactoryTest extends OrmRelatedTestCase
             ->willReturn($query);
         $this->queryModifier->expects(self::once())
             ->method('modifyQuery')
-            ->with(self::identicalTo($qb), false, $requestType);
+            ->with(self::identicalTo($qb), false, $requestType, ['resourceClass' => 'Test\Class']);
 
         $this->queryResolver->expects(self::once())
             ->method('resolveQuery')
@@ -99,6 +101,34 @@ class AclProtectedQueryFactoryTest extends OrmRelatedTestCase
         self::assertTrue($config->has('option_1'));
         self::assertEquals('option_1_initial_val', $config->get('option_1'));
         self::assertFalse($config->has('option_2'));
+    }
+
+    public function testGetQueryWhenNoResourceClassInConfig(): void
+    {
+        $requestType = new RequestType(['rest']);
+        $qb = $this->createMock(QueryBuilder::class);
+        $query = new Query($this->em);
+
+        $config = new EntityConfig();
+
+        $qb->expects(self::once())
+            ->method('getRootAliases');
+        $qb->expects(self::once())
+            ->method('getQuery')
+            ->willReturn($query);
+        $this->queryModifier->expects(self::once())
+            ->method('modifyQuery')
+            ->with(self::identicalTo($qb), false, $requestType, []);
+
+        $this->queryResolver->expects(self::once())
+            ->method('resolveQuery')
+            ->with(self::identicalTo($query), self::identicalTo($config));
+
+        $this->queryFactory->setRequestType($requestType);
+        self::assertSame(
+            $query,
+            $this->queryFactory->getQuery($qb, $config)
+        );
     }
 
     public function testGetQueryWhenRequestTypeIsNotSet(): void
@@ -128,7 +158,7 @@ class AclProtectedQueryFactoryTest extends OrmRelatedTestCase
             ->willReturn($query);
         $this->queryModifier->expects(self::once())
             ->method('modifyQuery')
-            ->with(self::identicalTo($qb), true, $requestType);
+            ->with(self::identicalTo($qb), true, $requestType, []);
 
         $this->queryResolver->expects(self::once())
             ->method('resolveQuery')
@@ -156,7 +186,7 @@ class AclProtectedQueryFactoryTest extends OrmRelatedTestCase
             ->willReturn($query);
         $this->queryModifier->expects(self::once())
             ->method('modifyQuery')
-            ->with(self::identicalTo($qb), true, $requestType);
+            ->with(self::identicalTo($qb), true, $requestType, []);
 
         $this->queryResolver->expects(self::once())
             ->method('resolveQuery')
