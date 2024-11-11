@@ -4,8 +4,13 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer;
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\ServiceContainer\ContextExtension;
+use Behat\Behat\Definition\ServiceContainer\DefinitionExtension;
+use Behat\Behat\Output\ServiceContainer\Formatter\PrettyFormatterFactory;
 use Behat\Behat\Tester\ServiceContainer\TesterExtension;
+use Behat\Gherkin\Cache\FileCache;
 use Behat\MinkExtension\ServiceContainer\MinkExtension;
+use Behat\Testwork\Call\ServiceContainer\CallExtension;
+use Behat\Testwork\Exception\ServiceContainer\ExceptionExtension;
 use Behat\Testwork\ServiceContainer\Extension as TestworkExtension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
 use FriendsOfBehat\SymfonyExtension\ServiceContainer\SymfonyExtension;
@@ -15,6 +20,10 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\ArtifactsHandlerInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Factory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Listener\SessionsListener;
+use Oro\Bundle\TestFrameworkBundle\Behat\Printer\PrettyStepPrinter;
+use Oro\Bundle\TestFrameworkBundle\Behat\RuntimeTester\RuntimeStepTester;
+use Oro\Bundle\TestFrameworkBundle\Behat\RuntimeTester\RuntimeSuiteTester;
+use Oro\Bundle\TestFrameworkBundle\Behat\Session\Mink\MinkSessionManager;
 use Oro\Bundle\TestFrameworkBundle\Behat\Suite\SymfonyBundleSuite;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\NullCumulativeFileLoader;
@@ -126,6 +135,8 @@ class OroTestFrameworkExtension implements TestworkExtension
         $loader->load('kernel_services.yml');
 
         $this->loadSkipOnFailureStepTester($container);
+        $this->loadRunTimeTesterServices($container);
+        $this->loadPrettyStepPrinter($container);
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts'] ?? []);
         $container->setParameter('oro_test.artifacts.handler_configs', $config['artifacts']['handlers'] ?? []);
         $container->setParameter('oro_test.feature_topics', $config['feature_topics'] ?? []);
@@ -152,8 +163,16 @@ class OroTestFrameworkExtension implements TestworkExtension
         $this->processHealthCheckers($container);
         $this->replaceSessionListener($container);
         $this->processContextInitializers($container);
+        $this->replaceMinkSessionManager($container);
 
         $container->get(SymfonyExtension::KERNEL_ID)->shutdown();
+    }
+
+    private function replaceMinkSessionManager(ContainerBuilder $container): void
+    {
+        $container->getDefinition('mink')
+            ->setClass(MinkSessionManager::class)
+            ->addMethodCall('setSessionHolder', [new Reference('oro_test.behat.watch_mode.session_holder')]);
     }
 
     private function loadBootstrap(ContainerBuilder $container)
@@ -178,6 +197,49 @@ class OroTestFrameworkExtension implements TestworkExtension
         foreach ($container->findTaggedServiceIds(ContextExtension::INITIALIZER_TAG) as $serviceId => $tags) {
             $definition->addMethodCall('registerContextInitializer', [new Reference($serviceId)]);
         }
+    }
+
+    private function loadRunTimeTesterServices(ContainerBuilder $container): void
+    {
+        $definition = new Definition(RuntimeStepTester::class, [
+            new Reference(DefinitionExtension::FINDER_ID),
+            new Reference(CallExtension::CALL_CENTER_ID)
+        ]);
+        $definition->addMethodCall(
+            'setStepTester',
+            [new Reference(TesterExtension::STEP_TESTER_WRAPPER_TAG . '.event_dispatching')]
+        );
+        $definition->addMethodCall(
+            'setSessionHolder',
+            [new Reference('oro_test.behat.watch_mode.session_holder')]
+        );
+        $definition->addMethodCall(
+            'setQuestionProvider',
+            [new Reference('oro_test.behat.watch_mode.question_provider')]
+        );
+        $container->setDefinition(TesterExtension::STEP_TESTER_ID, $definition);
+
+        // runtime watch suite tester
+        $definition = new Definition(RuntimeSuiteTester::class, [
+            new Reference(TesterExtension::SPECIFICATION_TESTER_ID)
+        ]);
+        $container->setDefinition(TesterExtension::SUITE_TESTER_ID, $definition);
+
+        // feature files loader decorator
+        $definition = $container->getDefinition('oro_test.behat.feature_files_loader_decorator');
+        $definition->addMethodCall('setFileCache', [new FileCache(sys_get_temp_dir())]);
+    }
+
+    private function loadPrettyStepPrinter(ContainerBuilder $container): void
+    {
+        $definition = new Definition(PrettyStepPrinter::class, [
+            new Reference('output.node.printer.pretty.step_text_painter'),
+            new Reference(PrettyFormatterFactory::RESULT_TO_STRING_CONVERTER_ID),
+            new Reference('output.node.printer.pretty.path'),
+            new Reference(ExceptionExtension::PRESENTER_ID),
+            new Reference('oro_test.behat.watch_mode.session_holder')
+        ]);
+        $container->setDefinition('output.node.printer.pretty.step', $definition);
     }
 
     private function loadSkipOnFailureStepTester(ContainerBuilder $container): void

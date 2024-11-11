@@ -4,6 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\ServiceContainer;
 
 use Behat\Behat\Context\Initializer\ContextInitializer;
 use Behat\Behat\Context\ServiceContainer\ContextExtension;
+use Behat\Mink\Mink;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\AppKernelInitializer;
@@ -309,6 +310,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
         $containerBuilder->set('oro_behat_extension.suite.oro_suite_generator', new OroSuiteGenerator($kernel));
         $containerBuilder->setDefinition('mink.listener.sessions', new Definition());
         $containerBuilder->setDefinition('fob_symfony.kernel_orchestrator', new Definition());
+        $containerBuilder->setDefinition('mink', new Definition());
 
         return $containerBuilder;
     }

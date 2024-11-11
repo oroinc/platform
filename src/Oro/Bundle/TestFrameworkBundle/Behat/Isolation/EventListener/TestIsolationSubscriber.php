@@ -6,8 +6,10 @@ use Behat\Behat\EventDispatcher\Event\AfterFeatureTested;
 use Behat\Behat\EventDispatcher\Event\AfterScenarioTested;
 use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
 use Behat\Behat\EventDispatcher\Event\BeforeScenarioTested;
+use Behat\Testwork\EventDispatcher\Event\AfterExerciseAborted;
 use Behat\Testwork\EventDispatcher\Event\ExerciseCompleted;
 use Doctrine\DBAL\Exception\TableNotFoundException;
+use Oro\Bundle\TestFrameworkBundle\Behat\Exception\SkippTestExecutionException;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
@@ -85,7 +87,7 @@ class TestIsolationSubscriber implements EventSubscriberInterface
 
     public function getIsolatorsTags(): array
     {
-        return array_unique(array_map(fn ($isolator) => $isolator->getTag(), $this->isolators));
+        return array_unique(array_map(fn($isolator) => $isolator->getTag(), $this->isolators));
     }
 
     /**
@@ -106,9 +108,9 @@ class TestIsolationSubscriber implements EventSubscriberInterface
                 $helper = new QuestionHelper();
                 $question = new ConfirmationQuestion(
                     sprintf(
-                        '<question>"%s" isolator discover that last time '.
-                        'environment was not restored properly.'.PHP_EOL
-                        .'Do you what to restore the state?(Y/n)</question>',
+                        '<question>"%s" isolator discover that last time ' .
+                        'environment was not restored properly.' . PHP_EOL
+                        . 'Do you what to restore the state?(Y/n)</question>',
                         $isolator->getName()
                     ),
                     true,
@@ -129,13 +131,13 @@ class TestIsolationSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $this->stopwatch->start($isolator->getTag().'::start');
+            $this->stopwatch->start($isolator->getTag() . '::start');
             try {
                 $isolator->start($event);
             } catch (TableNotFoundException $e) {
                 break;
             } finally {
-                $eventResult = $this->stopwatch->stop($isolator->getTag().'::start');
+                $eventResult = $this->stopwatch->stop($isolator->getTag() . '::start');
                 if ($eventResult->getDuration() >= self::ISOLATOR_THRESHOLD) {
                     $this->output->writeln(sprintf('time: %s ms', $eventResult->getDuration()));
                 }
@@ -163,13 +165,18 @@ class TestIsolationSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $this->stopwatch->start($isolator->getTag().'::beforeTest');
+            $this->stopwatch->start($isolator->getTag() . '::beforeTest');
             try {
                 $isolator->beforeTest($event);
-            } catch (TableNotFoundException $e) {
+            } catch (TableNotFoundException $exception) {
                 break;
+            } catch (\Exception $exception) {
+                $this->output->writeln("<fg=white;bg=red>" . $exception->getMessage() . "</>");
+                $this->afterExercise(new AfterExerciseAborted());
+
+                throw $exception;
             } finally {
-                $eventResult = $this->stopwatch->stop($isolator->getTag().'::beforeTest');
+                $eventResult = $this->stopwatch->stop($isolator->getTag() . '::beforeTest');
                 if ($eventResult->getDuration() >= self::ISOLATOR_THRESHOLD) {
                     $this->output->writeln(sprintf('time: %s ms', $eventResult->getDuration()));
                 }
@@ -204,13 +211,13 @@ class TestIsolationSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $this->stopwatch->start($isolator->getTag().'::afterTest');
+            $this->stopwatch->start($isolator->getTag() . '::afterTest');
             try {
                 $isolator->afterTest($event);
             } catch (TableNotFoundException $e) {
                 break;
             } finally {
-                $eventResult = $this->stopwatch->stop($isolator->getTag().'::afterTest');
+                $eventResult = $this->stopwatch->stop($isolator->getTag() . '::afterTest');
                 if ($eventResult->getDuration() >= self::ISOLATOR_THRESHOLD) {
                     $this->output->writeln(sprintf('time: %s ms', $eventResult->getDuration()));
                 }
@@ -224,6 +231,10 @@ class TestIsolationSubscriber implements EventSubscriberInterface
             return;
         }
 
+        if ($event instanceof AfterExerciseAborted) {
+            $this->afterFeature();
+        }
+
         $event = new AfterFinishTestsEvent($this->output);
 
         $this->output->writeln('<comment>Begin clean up isolation environment</comment>');
@@ -232,13 +243,13 @@ class TestIsolationSubscriber implements EventSubscriberInterface
                 continue;
             }
 
-            $this->stopwatch->start($isolator->getTag().'::terminate');
+            $this->stopwatch->start($isolator->getTag() . '::terminate');
             try {
                 $isolator->terminate($event);
             } catch (TableNotFoundException $e) {
                 break;
             } finally {
-                $eventResult = $this->stopwatch->stop($isolator->getTag().'::terminate');
+                $eventResult = $this->stopwatch->stop($isolator->getTag() . '::terminate');
                 if ($eventResult->getDuration() >= self::ISOLATOR_THRESHOLD) {
                     $this->output->writeln(sprintf('time: %s ms', $eventResult->getDuration()));
                 }
