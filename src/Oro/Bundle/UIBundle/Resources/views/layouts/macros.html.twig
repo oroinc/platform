@@ -45,8 +45,9 @@ Parameters - array:
                     extraClass: parameters.iconExtraClass|default(null),
                 }) -}}
             {%- endif -%}
+            {% set labelClasses = 'action-label' ~ ' ' ~ parameters.labelClass|default('')|trim|split(' ')|array_unique|join(' ') %}
             {%- if parameters.label is defined or parameters.entityName is defined -%}
-                <span class="action-label">
+                <span class="{{ labelClasses }}">
                     {% set label = parameters.label is defined ? parameters.label|trim : ''  %}
                     {{- label -}}
                     {# Do not render entityName if it is already present in translation. It is used like this in 5.1LTS. #}
@@ -104,7 +105,14 @@ Parameters - array:
                 extraClass: parameters.iconExtraClass|default(null),
             }) -}}
         {%- endif -%}
-            {{- parameters.label is defined ? parameters.label : '' -}}
+            {% set renderLinkLabel %}
+                {{- parameters.label is defined ? parameters.label : '' -}}
+            {% endset %}
+            {% if parameters.labelClass is defined %}
+                <span class="{{ parameters.labelClass }}">{{ renderLinkLabel }}</span>
+            {% else %}
+                {{ renderLinkLabel }}
+            {% endif %}
         </a>
     {% endapply %}
 {% endmacro %}
@@ -133,7 +141,7 @@ Parameters - array:
                 {% endif %}
                 {% if parameters.data is defined %}
                     {% for dataItemName,dataItemValue in parameters.data %}
-                        data-{{ dataItemName }}="{{ dataItemValue|e('html_attr')|raw }}"
+                        data-{{ dataItemName }}="{{ dataItemValue is iterable ? dataItemValue|json_encode|e('html_attr')|raw : dataItemValue|e('html_attr')|raw }}"
                     {% endfor %}
                 {% endif %}
                 {% set classes = '' %}
@@ -157,7 +165,14 @@ Parameters - array:
                 extraClass: parameters.iconExtraClass|default(null),
             }) -}}
         {%- endif -%}
-            {{- parameters.label|trim }}
+            {% set renderLinkLabel %}
+                {{- parameters.label|trim -}}
+            {% endset %}
+            {% if parameters.labelClass is defined %}
+                <span class="{{ parameters.labelClass }}">{{ renderLinkLabel }}</span>
+            {% else %}
+                {{ renderLinkLabel }}
+            {% endif %}
         </a>
     {% endapply %}
 {% endmacro %}
