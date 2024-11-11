@@ -72,10 +72,16 @@ class AclProtectedQueryFactory extends QueryFactory
 
     private function modifyQuery(QueryBuilder $qb, EntityConfig $config): void
     {
+        $options = [];
+        $resourceClass = $config->get(ConfigUtil::RESOURCE_CLASS);
+        if ($resourceClass) {
+            $options['resourceClass'] = $resourceClass;
+        }
         $this->queryModifier->modifyQuery(
             $qb,
             (bool)$config->get(AclProtectedQueryResolver::SKIP_ACL_FOR_ROOT_ENTITY),
-            $this->requestType
+            $this->requestType,
+            $options
         );
     }
 

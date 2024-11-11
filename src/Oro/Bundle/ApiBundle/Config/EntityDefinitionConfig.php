@@ -196,6 +196,26 @@ class EntityDefinitionConfig extends EntityConfig
     }
 
     /**
+     * Gets the class name of an API resource.
+     */
+    public function getResourceClass(): ?string
+    {
+        return $this->get(ConfigUtil::RESOURCE_CLASS);
+    }
+
+    /**
+     * Sets the class name of an API resource.
+     */
+    public function setResourceClass(?string $resourceClass): void
+    {
+        if ($resourceClass) {
+            $this->items[ConfigUtil::RESOURCE_CLASS] = $resourceClass;
+        } else {
+            unset($this->items[ConfigUtil::RESOURCE_CLASS]);
+        }
+    }
+
+    /**
      * Gets the class name of a parent API resource.
      */
     public function getParentResourceClass(): ?string

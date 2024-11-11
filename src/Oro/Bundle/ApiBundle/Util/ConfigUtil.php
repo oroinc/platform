@@ -56,6 +56,9 @@ class ConfigUtil extends BaseConfigUtil
     /** the names of identifier fields of the entity */
     public const IDENTIFIER_FIELD_NAMES = 'identifier_field_names';
 
+    /** the class name of an API resource */
+    public const RESOURCE_CLASS = 'resource_class';
+
     /** the class name of a parent API resource */
     public const PARENT_RESOURCE_CLASS = 'parent_resource_class';
 

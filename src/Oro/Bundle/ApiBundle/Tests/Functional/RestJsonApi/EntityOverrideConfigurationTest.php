@@ -93,9 +93,14 @@ class EntityOverrideConfigurationTest extends RestJsonApiTestCase
         $overrideModelConfig = $this->getConfig(TestOverrideClassOwnerModel::class, $action);
 
         // the only difference between configuration of the model and its parent entity
-        // is ParentResourceClass property
+        // is ResourceClass and ParentResourceClass properties
+        self::assertEquals(TestOverrideClassOwnerModel::class, $overrideModelConfig->getResourceClass());
         self::assertEquals(TestOverrideClassOwner::class, $overrideModelConfig->getParentResourceClass());
+        $overrideModelConfig->setResourceClass(null);
         $overrideModelConfig->setParentResourceClass(null);
+        self::assertEquals(TestOverrideClassOwner::class, $overriddenEntityConfig->getResourceClass());
+        self::assertNull($overriddenEntityConfig->getParentResourceClass());
+        $overriddenEntityConfig->setResourceClass(null);
         self::assertEquals($overriddenEntityConfig->toArray(), $overrideModelConfig->toArray());
     }
 
@@ -148,9 +153,14 @@ class EntityOverrideConfigurationTest extends RestJsonApiTestCase
         $modelConfig = $this->getConfig(TestCurrentDepartment::class, $action);
 
         // the only difference between configuration of the model and its parent entity
-        // is ParentResourceClass property
+        // is ResourceClass and ParentResourceClass properties
+        self::assertEquals(TestCurrentDepartment::class, $modelConfig->getResourceClass());
         self::assertEquals(TestDepartment::class, $modelConfig->getParentResourceClass());
+        $modelConfig->setResourceClass(null);
         $modelConfig->setParentResourceClass(null);
+        self::assertEquals(TestDepartment::class, $parentEntityConfig->getResourceClass());
+        self::assertNull($parentEntityConfig->getParentResourceClass());
+        $parentEntityConfig->setResourceClass(null);
         self::assertEquals($parentEntityConfig->toArray(), $modelConfig->toArray());
     }
 
