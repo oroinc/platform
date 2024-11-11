@@ -37,6 +37,15 @@ services:
         tags:
             - { name: 'event_dispatcher.subscriber' }
 
+    oro_test.listener.elements_dump_subscriber:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\ElementsDumpSubscriber
+        arguments:
+            - '@mink'
+            - '%oro_test.elements%'
+            - '%kernel.project_dir%'
+        tags:
+            - { name: 'event_dispatcher.subscriber' }
+
     oro_element_factory:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory'
         arguments:

@@ -424,6 +424,7 @@ class OroTestFrameworkExtension implements TestworkExtension
             ->addMethodCall('setRequiredListeners', [array_unique($requiredOptionalListeners)]);
         $suites = array_merge($suites, $container->getParameter('suite.configurations'));
         $container->setParameter('suite.configurations', $suites);
+        $container->setParameter('oro_test.elements', $elements);
     }
 
     private function getConfigPathsPrefixes(ContainerBuilder $container): array
