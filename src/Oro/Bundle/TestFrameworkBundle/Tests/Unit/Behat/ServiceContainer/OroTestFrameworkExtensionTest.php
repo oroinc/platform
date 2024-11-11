@@ -4,7 +4,6 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Behat\ServiceContainer;
 
 use Behat\Behat\Context\Initializer\ContextInitializer;
 use Behat\Behat\Context\ServiceContainer\ContextExtension;
-use Behat\Mink\Mink;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\AppKernelInitializer;

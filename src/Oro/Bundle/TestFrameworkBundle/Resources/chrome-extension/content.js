@@ -1,3 +1,4 @@
+/* global chrome */
 const STYLES = `
 .page-overlay {
     position: fixed;
@@ -85,7 +86,7 @@ class ElementHighlighter {
         });
 
         if (!visibleElementFound) {
-            this.showWarning("Element is not visible or out of the viewport!");
+            this.showWarning('Element is not visible or out of the viewport!');
         }
 
         this.container.className = 'page-overlay';

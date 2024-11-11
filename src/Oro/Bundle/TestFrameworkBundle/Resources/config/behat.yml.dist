@@ -13,7 +13,7 @@ default: &default
                             extra_capabilities:
                                 chromeOptions:
                                     args:
-                                        - "--load-extension=./vendor/oro/platform/src/Oro/Bundle/TestFrameworkBundle/Resources/chrome-extension"
+                                        - "--load-extension=%paths.base%/vendor/oro/platform/src/Oro/Bundle/TestFrameworkBundle/Resources/chrome-extension"
                 first_session:
                     oroSelenium2:
                         wd_host: 'http://localhost:4444/wd/hub'
@@ -21,7 +21,7 @@ default: &default
                             extra_capabilities:
                                 chromeOptions:
                                     args:
-                                        - "--load-extension=./vendor/oro/platform/src/Oro/Bundle/TestFrameworkBundle/Resources/chrome-extension"
+                                        - "--load-extension=%paths.base%/vendor/oro/platform/src/Oro/Bundle/TestFrameworkBundle/Resources/chrome-extension"
                 system_session:
                     oroSelenium2:
                         wd_host: 'http://localhost:4444/wd/hub'
@@ -29,7 +29,7 @@ default: &default
                             extra_capabilities:
                                 chromeOptions:
                                     args:
-                                        - "--load-extension=./vendor/oro/platform/src/Oro/Bundle/TestFrameworkBundle/Resources/chrome-extension"
+                                        - "--load-extension=%paths.base%/vendor/oro/platform/src/Oro/Bundle/TestFrameworkBundle/Resources/chrome-extension"
                 375_session:
                     oroSelenium2:
                         wd_host: 'http://localhost:4444/wd/hub'
@@ -37,7 +37,7 @@ default: &default
                             extra_capabilities:
                                 chromeOptions:
                                     args:
-                                        - "--load-extension=./vendor/oro/platform/src/Oro/Bundle/TestFrameworkBundle/Resources/chrome-extension"
+                                        - "--load-extension=%paths.base%/vendor/oro/platform/src/Oro/Bundle/TestFrameworkBundle/Resources/chrome-extension"
                 640_session:
                     oroSelenium2:
                         wd_host: 'http://localhost:4444/wd/hub'
@@ -45,7 +45,7 @@ default: &default
                             extra_capabilities:
                                 chromeOptions:
                                     args:
-                                        - "--load-extension=./vendor/oro/platform/src/Oro/Bundle/TestFrameworkBundle/Resources/chrome-extension"
+                                        - "--load-extension=%paths.base%/vendor/oro/platform/src/Oro/Bundle/TestFrameworkBundle/Resources/chrome-extension"
                 mobile_session:
                     oroSelenium2:
                         wd_host: 'http://localhost:4444/wd/hub'
@@ -53,7 +53,7 @@ default: &default
                             extra_capabilities:
                                 chromeOptions:
                                     args:
-                                        - "--load-extension=./vendor/oro/platform/src/Oro/Bundle/TestFrameworkBundle/Resources/chrome-extension"
+                                        - "--load-extension=%paths.base%/vendor/oro/platform/src/Oro/Bundle/TestFrameworkBundle/Resources/chrome-extension"
                                     mobileEmulation:
                                         deviceName: "iPhone 12 Pro"
         FriendsOfBehat\SymfonyExtension:

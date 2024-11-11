@@ -14,7 +14,7 @@ use Behat\Testwork\Tester\Setup\SuccessfulTeardown;
 use Behat\Testwork\Tester\Setup\Teardown;
 use Behat\Testwork\Tester\SpecificationTester;
 use Behat\Testwork\Tester\SuiteTester;
-use Oro\Bundle\TestFrameworkBundle\Behat\Exception\SkippTestExecutionException;
+use Oro\Bundle\TestFrameworkBundle\Behat\Exception\SkipTestExecutionException;
 
 /**
  * A copy of {@see \Behat\Testwork\Tester\Runtime\RuntimeSuiteTester} that provides skipping sub-process execution.
@@ -36,15 +36,17 @@ class RuntimeSuiteTester implements SuiteTester
         foreach ($iterator as $specification) {
             $setup = $this->specTester->setUp($env, $specification, $skip);
             $localSkip = !$setup->isSuccessful() || $skip;
+            /** Customization start */
             try {
                 $testResult = $this->specTester->test($env, $specification, $localSkip);
-            } catch (SkippTestExecutionException $exception) {
+            } catch (SkipTestExecutionException $exception) {
                 if ($exception->getCode() > 0) {
                     throw $exception;
                 }
                 // return empty success test result
                 $testResult = new TestResults([new IntegerTestResult(TestResult::PASSED)]);
             }
+            /** Customization end */
             $teardown = $this->specTester->tearDown($env, $specification, $localSkip, $testResult);
 
             $integerResult = new IntegerTestResult($testResult->getResultCode());

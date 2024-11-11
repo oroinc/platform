@@ -1,3 +1,4 @@
+/* global chrome */
 class PopupManager {
     constructor() {
         this.loadingIndicator = document.getElementById('loadingIndicator');
@@ -12,7 +13,7 @@ class PopupManager {
             this.showLoading();
             this.initializeElementList();
             this.initializeSearch();
-            chrome.runtime.connect({name: "popup"});
+            chrome.runtime.connect({name: 'popup'});
         });
     }
 
@@ -102,7 +103,7 @@ class PopupManager {
     updateElementList() {
         chrome.storage.local.get(
             ['elements', 'elementsWithBadSelector'],
-            (data) => {
+            data => {
                 this.elementList.innerHTML = '';
 
                 if (!data.elements && !data.elementsWithBadSelector) {

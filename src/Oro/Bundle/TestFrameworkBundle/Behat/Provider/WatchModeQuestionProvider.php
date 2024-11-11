@@ -4,7 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Provider;
 
 use Behat\Gherkin\Loader\AbstractFileLoader;
 use Behat\Gherkin\Node\FeatureNode;
-use Oro\Bundle\TestFrameworkBundle\Behat\Exception\SkippTestExecutionException;
+use Oro\Bundle\TestFrameworkBundle\Behat\Exception\SkipTestExecutionException;
 use Oro\Bundle\TestFrameworkBundle\Behat\Session\Mink\WatchModeSessionHolder;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -16,6 +16,8 @@ use Symfony\Component\Console\Question\Question;
  */
 readonly class WatchModeQuestionProvider
 {
+    protected const int STEP_LIMIT = 10;
+
     public function __construct(
         private WatchModeSessionHolder $sessionHolder,
         private AbstractFileLoader $fileLoader,
@@ -24,7 +26,7 @@ readonly class WatchModeQuestionProvider
 
     public function askInputStepLine(FeatureNode $feature): int
     {
-        $lastStepLine = $this->sessionHolder->getLastProcessedStep();
+        $lastStepLine = $this->sessionHolder->getLastLineNumber();
         $question = new Question(
             sprintf(
                 'Press ENTER to continue from the current line #%d, or enter the line number to continue '
@@ -67,6 +69,8 @@ readonly class WatchModeQuestionProvider
         $question->setValidator(function () {
             return 1;
         });
+        // increase last step number
+        $this->sessionHolder->setLastProcessedStep($this->sessionHolder->getLastLineNumber() + 1);
 
         return $this->askQuestion($question);
     }
@@ -86,7 +90,7 @@ readonly class WatchModeQuestionProvider
         } catch (\RuntimeException $exception) {
             $output->writeln('<error>' . $exception->getMessage() . '</error>');
 
-            throw new SkippTestExecutionException();
+            throw new SkipTestExecutionException();
         }
     }
 
@@ -97,10 +101,11 @@ readonly class WatchModeQuestionProvider
         if (!$actualFeature[0] instanceof FeatureNode) {
             return $result;
         }
+        $stepLimit = $lastStepLine + self::STEP_LIMIT;
         foreach ($actualFeature[0]->getScenarios() as $scenario) {
             foreach ($scenario->getSteps() as $step) {
                 // all steps before failed
-                if ($step->getLine() > $lastStepLine) {
+                if ($step->getLine() > $stepLimit) {
                     return $result;
                 }
                 $result[$step->getLine()] = $step->getLine() . ' ' . $step->getKeyword() . ' ' . $step->getText();

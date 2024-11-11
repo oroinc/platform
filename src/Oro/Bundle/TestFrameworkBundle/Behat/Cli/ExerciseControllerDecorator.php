@@ -5,13 +5,13 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Cli;
 use Behat\Testwork\Cli\Command;
 use Behat\Testwork\Cli\Controller;
 use Behat\Testwork\Tester\Cli\ExerciseController;
-use Oro\Bundle\TestFrameworkBundle\Behat\Exception\SkippTestExecutionException;
+use Oro\Bundle\TestFrameworkBundle\Behat\Exception\SkipTestExecutionException;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Exercise behat test controller decorator.
+ * Decorate exercise controller to catch SkipTestExecutionException and to prevent restoring.
  */
 class ExerciseControllerDecorator implements Controller
 {
@@ -28,7 +28,7 @@ class ExerciseControllerDecorator implements Controller
     {
         try {
             $result = $this->exerciseController->execute($input, $output);
-        } catch (SkippTestExecutionException $exception) {
+        } catch (SkipTestExecutionException $exception) {
             return $exception->getCode() !== Command::FAILURE ? Command::SUCCESS : Command::FAILURE;
         }
 

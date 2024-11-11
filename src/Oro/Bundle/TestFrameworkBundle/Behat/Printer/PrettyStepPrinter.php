@@ -48,6 +48,7 @@ class PrettyStepPrinter implements StepPrinter
      */
     public function printStep(Formatter $formatter, Scenario $scenario, StepNode $step, StepResult $result): void
     {
+        /** Customization start */
         $this->printText(
             $formatter->getOutputPrinter(),
             $step->getLine(),
@@ -55,6 +56,7 @@ class PrettyStepPrinter implements StepPrinter
             $step->getText(),
             $result
         );
+        /** Customization end */
         $this->pathPrinter->printStepPath($formatter, $scenario, $step, $result, mb_strlen($this->indentText, 'utf8'));
         $this->printArguments($formatter, $step->getArguments(), $result);
         $this->printStdOut($formatter->getOutputPrinter(), $result);
@@ -74,10 +76,12 @@ class PrettyStepPrinter implements StepPrinter
         }
 
         $style = $this->resultConverter->convertResultToString($result);
+        /** Customization start */
         if ($this->sessionHolder->isWatchFrom() || $this->sessionHolder->isWatchMode()) {
             // print test step line before text while --watch mode is enabled
             $printer->write(
-                sprintf('%s{+%s}%s %s %s{-%s}',
+                sprintf(
+                    '%s{+%s}%s %s %s{-%s}',
                     $this->indentText,
                     $style,
                     $stepLine,
@@ -88,7 +92,8 @@ class PrettyStepPrinter implements StepPrinter
             );
         } else {
             $printer->write(
-                sprintf('%s{+%s}%s %s{-%s}',
+                sprintf(
+                    '%s{+%s}%s %s{-%s}',
                     $this->indentText,
                     $style,
                     $stepType,
@@ -97,6 +102,7 @@ class PrettyStepPrinter implements StepPrinter
                 )
             );
         }
+        /** Customization end */
     }
 
     /**
@@ -128,7 +134,9 @@ class PrettyStepPrinter implements StepPrinter
 
         $pad = function ($line) use ($indentedText) {
             return sprintf(
-                '%s│ {+stdout}%s{-stdout}', $indentedText, $line
+                '%s│ {+stdout}%s{-stdout}',
+                $indentedText,
+                $line
             );
         };
 

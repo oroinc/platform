@@ -47,7 +47,7 @@ class WatchModeSessionHolder
         }
     }
 
-    public function getLastProcessedStep(): ?int
+    public function getLastLineNumber(): ?int
     {
         $this->actualizeState();
 
@@ -155,11 +155,16 @@ class WatchModeSessionHolder
                     'default_session' => $this->defaultSessionName,
                     'session_aliases' => $this->sessionAliases,
                     'last_processed_step' => $this->lastProcessedStep,
+                    'additional_options' => $this->additionalOptions,
                 ]
             )
         );
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
     public function actualizeState(bool $force = false): void
     {
         if (!$force && ($this->isActualized === true || !$this->isWatchFrom())) {
@@ -182,6 +187,9 @@ class WatchModeSessionHolder
         }
         if (isset($data['last_processed_step'])) {
             $this->lastProcessedStep = $data['last_processed_step'];
+        }
+        if (isset($data['additional_options'])) {
+            $this->additionalOptions = $data['additional_options'];
         }
         $this->isActualized = true;
     }

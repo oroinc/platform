@@ -4,7 +4,6 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Isolation;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
-use Oro\Bundle\TestFrameworkBundle\Behat\Exception\SkippTestExecutionException;
 use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoader;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;

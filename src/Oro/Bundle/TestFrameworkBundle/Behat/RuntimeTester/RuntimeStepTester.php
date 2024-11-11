@@ -24,7 +24,7 @@ use Behat\Testwork\Tester\Setup\SuccessfulSetup;
 use Behat\Testwork\Tester\Setup\SuccessfulTeardown;
 use Behat\Testwork\Tester\Setup\Teardown;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
-use Oro\Bundle\TestFrameworkBundle\Behat\Exception\SkippTestExecutionException;
+use Oro\Bundle\TestFrameworkBundle\Behat\Exception\SkipTestExecutionException;
 use Oro\Bundle\TestFrameworkBundle\Behat\Provider\WatchModeQuestionProvider;
 use Oro\Bundle\TestFrameworkBundle\Behat\Session\Mink\WatchModeSessionHolder;
 use Symfony\Component\Process\Process;
@@ -91,6 +91,10 @@ class RuntimeStepTester implements StepTester
         return $this->definitionFinder->findDefinition($env, $feature, $step);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     private function testDefinition(
         Environment $env,
         FeatureNode $feature,
@@ -98,6 +102,7 @@ class RuntimeStepTester implements StepTester
         SearchResult $search,
         bool $skip
     ): StepResult {
+        /** Customization start */
         if (!$search->hasMatch()) {
             if (!($this->sessionHolder->isWatchMode() || $this->sessionHolder->isWatchFrom())) {
                 return new UndefinedStepResult();
@@ -115,18 +120,26 @@ class RuntimeStepTester implements StepTester
             }
             // override call result to prevent fatal error in --watch mode
             $result = new CallResult(
-                new DefinitionCall($env, $feature, $step, new Given('', fn() => '', null), []),
+                new DefinitionCall($env, $feature, $step, new Given('', fn () => '', null), []),
                 null,
-                new \Exception($exception->getMessage(), $exception->getCode(), $exception)
+                new \LogicException(
+                    sprintf(
+                        'Invalid test step or context. Failed to process test step: `%s`',
+                        $step->getText()
+                    ),
+                    $exception->getCode(),
+                    $exception
+                )
             );
         }
-        $this->sessionHolder->setLastProcessedStep($step->getLine());
+        if ($this->sessionHolder->isWatchMode() || $this->sessionHolder->isWatchFrom()) {
+            $this->sessionHolder->setLastProcessedStep($step->getLine());
+        }
         $this->testSubProcessDefinition($result, $search, $env, $feature, $step);
 
         if ($this->sessionHolder->isWatchMode()
             && !$this->sessionHolder->isWatchFrom()
-            && $this->isLastStep($feature, $step))
-        {
+            && $this->isLastStep($feature, $step)) {
             $this->stepTester->tearDown($env, $feature, $step, false, new ExecutedStepResult($search, $result));
             $endTestStatus = $this->questionProvider->askBeforeTestEnd();
             if ($endTestStatus === 1) {
@@ -136,12 +149,16 @@ class RuntimeStepTester implements StepTester
         if ($this->isLastStep($feature, $step) && $this->sessionHolder->isWatchFrom()) {
             $this->stepTester->tearDown($env, $feature, $step, false, new ExecutedStepResult($search, $result));
 
-            throw new SkippTestExecutionException(2);
+            throw new SkipTestExecutionException(2);
         }
+        /** Customization end */
 
         return new ExecutedStepResult($search, $result);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     protected function testSubProcessDefinition(
         CallResult $result,
         SearchResult $search,
@@ -152,14 +169,13 @@ class RuntimeStepTester implements StepTester
     ): void {
         if ($this->sessionHolder->isWatchMode()
             && !$this->sessionHolder->isWatchFrom()
-            && (null !== $result->getException() || $skipException))
-        {
+            && (null !== $result->getException() || $skipException)) {
             // tear down failed step
             if (!$skipException) {
                 $this->stepTester->tearDown($env, $feature, $step, false, new ExecutedStepResult($search, $result));
             }
-            // run behat sub process for --watch mode
             do {
+                // run behat sub process for --watch mode
                 do {
                     $this->sessionHolder->actualizeState(true);
                     $this->sessionHolder->setLastProcessedStep($step->getLine());
@@ -167,23 +183,23 @@ class RuntimeStepTester implements StepTester
 
                     $statusCode = $this->runChildProcess($feature, $line);
                 } while ($statusCode > 0);
-                // ask
+                // ask Question after the last test step was passed
                 $endTestStatus = $this->questionProvider->askBeforeTestEnd();
             } while ($endTestStatus > 0);
             // skip main process when child process is already successfully done
-            throw new SkippTestExecutionException();
+            throw new SkipTestExecutionException();
         } elseif (null !== $result->getException() && $this->sessionHolder->isWatchFrom()) {
             $this->sessionHolder->setLastProcessedStep($step->getLine());
             $this->stepTester->tearDown($env, $feature, $step, false, new ExecutedStepResult($search, $result));
-            // skipp failed child process execution
-            throw new SkippTestExecutionException(1);
+            // skip failed child process execution
+            throw new SkipTestExecutionException(1);
         }
     }
 
     protected function runChildProcess(FeatureNode $feature, int $line): int
     {
         $process = $this->prepareNewProcess($feature, $line);
-        $tags = array_map(fn($item) => '@' . $item, $feature->getTags());
+        $tags = array_map(fn ($item) => '@' . $item, $feature->getTags());
         $tags = implode(' ', $tags);
         $skip = true;
 

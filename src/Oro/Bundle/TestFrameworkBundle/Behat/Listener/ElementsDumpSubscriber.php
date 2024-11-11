@@ -13,7 +13,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  */
 class ElementsDumpSubscriber implements EventSubscriberInterface
 {
-    const string ELEMENTS_FILE_PATH = '/public/media/behat_tests_elements.json';
+    private const string ELEMENTS_FILE_PATH = '/public/media/behat_tests_elements.json';
     private CssSelector $cssSelector;
 
     public function __construct(private Mink $mink, private array $elements, private string $projectDir)
@@ -21,14 +21,17 @@ class ElementsDumpSubscriber implements EventSubscriberInterface
         $this->cssSelector = new CssSelector();
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             BeforeFeatureTested::BEFORE => 'beforeFeature',
         ];
     }
 
-    public function beforeFeature(BeforeFeatureTested $event)
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    public function beforeFeature(BeforeFeatureTested $event): void
     {
         // if Chrome browser is in headless mode - do nothing
         $driver = $this->mink->getSession()->getDriver();

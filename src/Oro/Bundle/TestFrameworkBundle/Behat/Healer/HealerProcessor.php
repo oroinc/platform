@@ -30,6 +30,9 @@ class HealerProcessor
 
     public function handleCall(Call $call, CallResult $failedResult, array|callable $callCallback): CallResult
     {
+        if (!$this->isSupports($call)) {
+            return $failedResult;
+        }
         $this->writeOutput(sprintf('Step: %s is failed', $call->getStep()->getText()), 'failed');
         $this->writeOutput('Trying to heal the step');
         foreach ($this->healers as $healer) {
@@ -57,6 +60,17 @@ class HealerProcessor
         $this->writeOutput('Step failed', 'failed');
 
         return $failedResult;
+    }
+
+    protected function isSupports(Call $call): bool
+    {
+        foreach ($this->healers as $healer) {
+            if ($healer->supports($call)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     protected function writeOutput(string $text, string $style = self::FORMATTER_STYLE): void

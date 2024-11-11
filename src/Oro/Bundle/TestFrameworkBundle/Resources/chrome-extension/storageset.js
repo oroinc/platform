@@ -1,3 +1,4 @@
+/* global chrome */
 async function initializeSelectors() {
     try {
         const response = await fetch(`${window.location.origin}/media/behat_tests_elements.json`);

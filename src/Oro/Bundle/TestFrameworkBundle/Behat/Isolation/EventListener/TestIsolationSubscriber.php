@@ -9,7 +9,6 @@ use Behat\Behat\EventDispatcher\Event\BeforeScenarioTested;
 use Behat\Testwork\EventDispatcher\Event\AfterExerciseAborted;
 use Behat\Testwork\EventDispatcher\Event\ExerciseCompleted;
 use Doctrine\DBAL\Exception\TableNotFoundException;
-use Oro\Bundle\TestFrameworkBundle\Behat\Exception\SkippTestExecutionException;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterFinishTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
@@ -87,7 +86,7 @@ class TestIsolationSubscriber implements EventSubscriberInterface
 
     public function getIsolatorsTags(): array
     {
-        return array_unique(array_map(fn($isolator) => $isolator->getTag(), $this->isolators));
+        return array_unique(array_map(fn ($isolator) => $isolator->getTag(), $this->isolators));
     }
 
     /**

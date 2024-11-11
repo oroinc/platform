@@ -67,8 +67,7 @@ class SessionAliasProvider implements MultiSessionAwareInterface
     public function getSessionName($alias): string
     {
         if (($this->sessionHolder->isWatchMode() || $this->sessionHolder->isWatchFrom())
-            && $this->sessionHolder->hasSessionAlias($alias))
-        {
+            && $this->sessionHolder->hasSessionAlias($alias)) {
             return $this->sessionHolder->getSessionNameByAlias($alias);
         }
         if (isset($this->aliases[$alias])) {
