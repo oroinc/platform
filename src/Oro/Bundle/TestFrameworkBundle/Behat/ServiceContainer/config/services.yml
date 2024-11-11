@@ -215,3 +215,19 @@ services:
         arguments:
             - '@.inner'
             - '@oro_test.behat.watch_mode.session_holder'
+
+    oro_test.healer.reload_page.extension:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Healer\Extension\ReloadPageHealer
+        arguments:
+            - '@oro_element_factory'
+        tags:
+            - { name: oro_test.behat.healer, priority: 50 }
+
+    oro_test.healer.processor:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Healer\HealerProcessor
+        public: true
+        arguments:
+            - '@output.formatter.pretty'
+            - !tagged_iterator oro_test.behat.healer
+        calls:
+            - [ setHealers, [ !tagged_iterator oro_test.behat.healer ] ]

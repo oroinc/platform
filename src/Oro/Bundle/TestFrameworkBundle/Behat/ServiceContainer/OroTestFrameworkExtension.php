@@ -18,6 +18,7 @@ use Nelmio\Alice\Bridge\Symfony\DependencyInjection\NelmioAliceExtension;
 use Nelmio\Alice\Bridge\Symfony\NelmioAliceBundle;
 use Oro\Bundle\TestFrameworkBundle\Behat\Artifacts\ArtifactsHandlerInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Driver\OroSelenium2Factory;
+use Oro\Bundle\TestFrameworkBundle\Behat\Healer\Handler\RuntimeCallHealerHandler;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\IsolatorInterface;
 use Oro\Bundle\TestFrameworkBundle\Behat\Listener\SessionsListener;
 use Oro\Bundle\TestFrameworkBundle\Behat\Printer\PrettyStepPrinter;
@@ -119,6 +120,7 @@ class OroTestFrameworkExtension implements TestworkExtension
     public function load(ContainerBuilder $container, array $config)
     {
         $this->loadBootstrap($container);
+        $this->loadHealerHandlers($container, $config['error_reporting'] ?? null);
 
         $extension = new NelmioAliceExtension();
         $extension->load([], $container);
@@ -163,6 +165,7 @@ class OroTestFrameworkExtension implements TestworkExtension
         $this->processHealthCheckers($container);
         $this->replaceSessionListener($container);
         $this->processContextInitializers($container);
+        $this->processHealerInitializers($container);
         $this->replaceMinkSessionManager($container);
 
         $container->get(SymfonyExtension::KERNEL_ID)->shutdown();
@@ -183,6 +186,23 @@ class OroTestFrameworkExtension implements TestworkExtension
         if (file_exists($bootstrapFile)) {
             require_once $bootstrapFile;
         }
+    }
+
+    protected function processHealerInitializers(ContainerBuilder $container): void
+    {
+        $runtimeCallHealer = $container->getDefinition(CallExtension::CALL_HANDLER_TAG . '.runtime');
+        $runtimeCallHealer->addMethodCall(
+            'setHealerProcessor',
+            [$container->getDefinition('oro_test.healer.processor')]
+        );
+    }
+
+    protected function loadHealerHandlers(ContainerBuilder $container, $errorReporting): void
+    {
+        // load runtime call healer handler
+        $definition = new Definition(RuntimeCallHealerHandler::class, [$errorReporting]);
+        $definition->addTag(CallExtension::CALL_HANDLER_TAG, ['priority' => 60]);
+        $container->setDefinition(CallExtension::CALL_HANDLER_TAG . '.runtime', $definition);
     }
 
     private function resolveClassPass(ContainerBuilder $container): void
