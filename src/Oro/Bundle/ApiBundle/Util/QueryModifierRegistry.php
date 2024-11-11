@@ -12,16 +12,11 @@ use Psr\Container\ContainerInterface;
  */
 class QueryModifierRegistry
 {
-    /** @var array [[query modifier service id, request type expression], ...] */
+    /** @var array [[query modifier service id, request type expression, options], ...] */
     private array $queryModifiers;
     private ContainerInterface $container;
     private RequestExpressionMatcher $matcher;
 
-    /**
-     * @param array                    $queryModifiers [[query modifier service id, request type expression], ...]
-     * @param ContainerInterface       $container
-     * @param RequestExpressionMatcher $matcher
-     */
     public function __construct(
         array $queryModifiers,
         ContainerInterface $container,
@@ -38,14 +33,28 @@ class QueryModifierRegistry
      * @param QueryBuilder $qb             The query builder to modify
      * @param bool         $skipRootEntity Whether the root entity should be protected or not
      * @param RequestType  $requestType    The request type, for example "rest", "soap", etc.
+     * @param array        $options        Additional options. [option name => option value, ...]
      */
-    public function modifyQuery(QueryBuilder $qb, bool $skipRootEntity, RequestType $requestType): void
-    {
+    public function modifyQuery(
+        QueryBuilder $qb,
+        bool $skipRootEntity,
+        RequestType $requestType,
+        array $options = []
+    ): void {
         foreach ($this->queryModifiers as [$serviceId, $expression]) {
             if (!$expression || $this->matcher->matchValue($expression, $requestType)) {
                 /** @var QueryModifierInterface $queryModifier */
                 $queryModifier = $this->container->get($serviceId);
-                $queryModifier->modify($qb, $skipRootEntity);
+                if ($options && $queryModifier instanceof QueryModifierOptionsAwareInterface) {
+                    $queryModifier->setOptions($options);
+                    try {
+                        $queryModifier->modify($qb, $skipRootEntity);
+                    } finally {
+                        $queryModifier->setOptions(null);
+                    }
+                } else {
+                    $queryModifier->modify($qb, $skipRootEntity);
+                }
             }
         }
     }

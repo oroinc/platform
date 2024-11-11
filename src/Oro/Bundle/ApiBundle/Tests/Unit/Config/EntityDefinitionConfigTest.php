@@ -86,6 +86,25 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertSame([], $config->keys());
     }
 
+    public function testResourceClass()
+    {
+        $config = new EntityDefinitionConfig();
+        self::assertNull($config->getResourceClass());
+
+        $config->setResourceClass('Test\Class');
+        self::assertEquals('Test\Class', $config->getResourceClass());
+        self::assertEquals(['resource_class' => 'Test\Class'], $config->toArray());
+
+        $config->setResourceClass(null);
+        self::assertNull($config->getResourceClass());
+        self::assertEquals([], $config->toArray());
+
+        $config->setResourceClass('Test\Class');
+        $config->setResourceClass('');
+        self::assertNull($config->getResourceClass());
+        self::assertEquals([], $config->toArray());
+    }
+
     public function testParentResourceClass()
     {
         $config = new EntityDefinitionConfig();
@@ -100,7 +119,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertEquals([], $config->toArray());
 
         $config->setParentResourceClass('Test\Class');
-        $config->setParentResourceClass(null);
+        $config->setParentResourceClass('');
         self::assertNull($config->getParentResourceClass());
         self::assertEquals([], $config->toArray());
     }

@@ -6,7 +6,7 @@
     "authors": [
         {
             "name": "Oro, Inc",
-            "homepage": "http://www.orocrm.com"
+            "homepage": "https://oroinc.com/"
         }
     ],
     "require": {
@@ -169,7 +169,7 @@
     "repositories": {
         "oro": {
             "type": "composer",
-            "url": "https://packagist.orocrm.com"
+            "url": "https://packagist.oroinc.com"
         }
     },
     "minimum-stability": "dev",

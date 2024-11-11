@@ -50,17 +50,31 @@ class ConfigConverterTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($convertedConfig->get('skip_acl_for_root_entity'));
     }
 
+    public function testConvertConfigWithResourceClass(): void
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'resource_class' => 'Test\Model'
+        ];
+
+        $convertedConfig = $this->configConverter->convertConfig($config);
+
+        self::assertTrue($convertedConfig->has('resource_class'));
+        self::assertEquals('Test\Model', $convertedConfig->get('resource_class'));
+        self::assertFalse($convertedConfig->has('skip_acl_for_root_entity'));
+    }
+
     public function testConvertConfigWithParentResourceClass(): void
     {
         $config = [
-            'exclusion_policy'      => 'all',
+            'exclusion_policy' => 'all',
             'parent_resource_class' => 'Test\Entity'
         ];
 
         $convertedConfig = $this->configConverter->convertConfig($config);
 
-        self::assertTrue($convertedConfig->has('skip_acl_for_root_entity'));
-        self::assertTrue($convertedConfig->get('skip_acl_for_root_entity'));
+        self::assertFalse($convertedConfig->has('parent_resource_class'));
+        self::assertFalse($convertedConfig->has('skip_acl_for_root_entity'));
     }
 
     /**
