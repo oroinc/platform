@@ -10,6 +10,13 @@ services:
         arguments:
             - '@.inner'
 
+    oro_test.cli.command_decorator:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\CommandDecorator
+        public: true
+        decorates: cli.command
+        arguments:
+            - '@.inner'
+
     oro_test.listener.interactive_execution_subscriber:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Listener\InteractiveExecutionSubscriber'
 
