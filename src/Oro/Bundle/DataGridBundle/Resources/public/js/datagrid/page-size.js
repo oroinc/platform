@@ -149,8 +149,10 @@ define([
                 showLabels: this.showLabels
             })));
 
-            if (this.hidden) {
-                this.$el.hide();
+            if (this.hidden || this.$el.is(':empty')) {
+                this.$el.addClass('hide');
+            } else {
+                this.$el.removeClass('hide');
             }
 
             this.initControls();
