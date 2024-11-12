@@ -870,9 +870,9 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * Example: When I click on first "Help Icon"
+     * Example: When I click on the first "Help Icon"
      *
-     * @When /^(?:|I )click on (?P<rowNumber>[^"]*) "(?P<element>(?:[^"]|\\")*)"$/
+     * @When /^(?:|I )click on the (?P<rowNumber>[^"]*) "(?P<element>(?:[^"]|\\")*)"$/
      */
     public function iClickOnPositionElement(string $elementName, string $rowNumber)
     {
