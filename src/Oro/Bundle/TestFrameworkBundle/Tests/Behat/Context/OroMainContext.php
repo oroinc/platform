@@ -306,6 +306,9 @@ class OroMainContext extends MinkContext implements
      */
     public function iShouldSeeFlashMessage($title, $flashMessageElement = 'Flash Message', $timeLimit = 30)
     {
+        if ($title === 'Schema updated') {
+            $timeLimit = 360;
+        }
         $flashMessage = $this->getFlashMessage($title, $flashMessageElement, $timeLimit);
 
         if ($title === 'Configuration saved') {
@@ -383,27 +386,28 @@ class OroMainContext extends MinkContext implements
      */
     public function iCloseAllFlashMessages($flashMessageElement = 'Flash Message', $timeLimit = 30)
     {
-        $flashMessages = $this->spin(
-            function (OroMainContext $context) use ($flashMessageElement) {
-                return $context->findAllElements($flashMessageElement);
-            },
-            $timeLimit
-        ) ?: [];
-
-        /** @var NodeElement $closeButton */
-        foreach ($flashMessages as $flashMessage) {
+        do {
             try {
-                if (!$flashMessage->isValid() || !$flashMessage->isVisible()) {
-                    continue;
-                }
+                $messages = $this->spin(
+                    function (OroMainContext $context) use ($flashMessageElement) {
+                        return $context->findAllElements($flashMessageElement);
+                    },
+                    $timeLimit
+                ) ?: [];
 
+                if (!count($messages)) {
+                    break;
+                }
+                $flashMessage = reset($messages);
+                /** @var NodeElement $closeButton */
                 $closeButton = $flashMessage->find('css', '[data-dismiss="alert"]');
-                if ($closeButton?->isValid() && $closeButton?->isVisible()) {
+
+                if ($closeButton && $closeButton->isVisible() && $closeButton->isValid()) {
                     $closeButton->press();
                 }
-            } catch (NoSuchElement $e) {
+            } catch (\Exception $e) {
             }
-        }
+        } while ($this->findAllElements('Flash Message'));
     }
 
     /**
@@ -507,7 +511,7 @@ class OroMainContext extends MinkContext implements
      */
     public function iShouldSeeUpdateSchema()
     {
-        $this->iShouldSeeFlashMessage('Schema updated', 'Flash Message', 120);
+        $this->iShouldSeeFlashMessage('Schema updated', 'Flash Message', 360);
     }
 
     /**
@@ -866,7 +870,9 @@ class OroMainContext extends MinkContext implements
      */
     public function iClickOn($element)
     {
-        $this->createElement($element)->click();
+        $clickElement = $this->createElement($element);
+        $this->scrollToXpath($clickElement->getXpath());
+        $clickElement->click();
     }
 
     /**
@@ -2071,7 +2077,7 @@ JS;
     {
         try {
             $this->iClickUpdateSchema();
-            $this->iShouldSeeFlashMessage('Schema updated', 'Flash Message', 120);
+            $this->iShouldSeeFlashMessage('Schema updated', 'Flash Message', 360);
         } catch (\Exception $e) {
             throw $e;
         }

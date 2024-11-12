@@ -52,7 +52,16 @@
                 {% set iconSizeClass = iconSize is defined ? iconSize : 'theme-icon--medium' %}
                 {{ renderIcon.icon({name: icon, extraClass: iconSizeClass }) }}
             {%- endif -%}
-            {%- if text is defined %}{{ text|block_text(translation_domain) }}{% endif -%}
+            {%- if text is defined %}
+                {% set renderLinkLabel %}
+                    {{- text|block_text(translation_domain) -}}
+                {% endset %}
+                {% if labelClass is defined %}
+                    <span class="{{ labelClass }}">{{ renderLinkLabel }}</span>
+                {% else %}
+                    {{ renderLinkLabel }}
+                {% endif %}
+            {% endif -%}
         </a>
     {% endapply %}
 {%- endblock %}

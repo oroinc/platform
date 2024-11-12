@@ -36,6 +36,7 @@ define(function(require) {
             this.options = options || {};
 
             this.$button = $(this.options._sourceElement);
+            this.$button.trigger('operation-button:init');
 
             this._processButton();
         },
@@ -100,6 +101,7 @@ define(function(require) {
                 return;
             }
 
+            this.$button.trigger('operation-button:dispose');
             this.$button.off();
             this.$button.data('disposed', true);
 

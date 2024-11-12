@@ -32,6 +32,7 @@ class EnsureInitialized implements ProcessorInterface
             );
         }
         $definition = $context->getResult();
+        $definition->setResourceClass($context->getClassName());
         $context->setRequestedExclusionPolicy($definition->getExclusionPolicy());
         $context->setExplicitlyConfiguredFieldNames(array_keys($definition->getFields()));
 

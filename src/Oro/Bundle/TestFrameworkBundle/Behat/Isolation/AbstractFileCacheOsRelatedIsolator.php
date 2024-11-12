@@ -38,13 +38,15 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
     /** @var Process */
     protected $copyDumpToTempDirProcess;
 
-    public function __construct(KernelInterface $kernel, array $cacheDirectories, array $cacheFiles = [])
-    {
+    public function __construct(
+        KernelInterface $kernel,
+        array $cacheDirectories,
+        array $cacheFiles = []
+    ) {
         $this->cacheDir     = realpath($kernel->getCacheDir());
         $this->cacheTempDir = $this->cacheDir.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'Temp';
         $this->cacheDumpDir = $this->cacheDir.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'Dump_'.
             TokenGenerator::generateToken('cache');
-
         $this->cacheDirectories = $cacheDirectories;
         $this->cacheFiles = $cacheFiles;
     }
@@ -109,7 +111,6 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
     public function restoreState(RestoreStateEvent $event)
     {
         $event->writeln('<info>Begin to restore the state Cache...</info>');
-
         if (false === is_dir($this->cacheDumpDir)) {
             throw new RuntimeException('Can\'t restore cache without dump');
         }
