@@ -1906,8 +1906,8 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * Example: And I click on "Delete" in "Product Kit Row 1 In Shopping List"
      * Example: And I click on "Delete" in second "Product Kit Row In Shopping List"
      * @Then /^(?:|I )click on "(?P<action>[^"]*)" in "(?P<elementName>[^"]*)"$/
-     * @Then /^(?:|I )click on "(?P<action>[^"]*)" in (?P<rowNumber>[^"]*) "(?P<elementName>[^"]*)"$/
-     * @Then /^(?:|I )click on "(?P<action>[^"]*)" in (?P<rowNumber>[^"]*) "(?P<elementName>[^"]*)" in grid "(?P<gridName>[^"]+)"$/
+     * @Then /^(?:|I )click on "(?P<action>[^"]*)" in the (?P<rowNumber>[^"]*) "(?P<elementName>[^"]*)"$/
+     * @Then /^(?:|I )click on "(?P<action>[^"]*)" in the (?P<rowNumber>[^"]*) "(?P<elementName>[^"]*)" in grid "(?P<gridName>[^"]+)"$/
      */
     //@codingStandardsIgnoreEnd
     public function clickOnActionForTheGridRowElementOnThePosition(
