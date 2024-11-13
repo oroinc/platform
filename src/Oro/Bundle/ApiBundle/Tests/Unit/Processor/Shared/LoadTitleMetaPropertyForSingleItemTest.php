@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Shared\LoadTitleMetaProperty;
 use Oro\Bundle\ApiBundle\Processor\Shared\LoadTitleMetaPropertyForCollection;
 use Oro\Bundle\ApiBundle\Processor\Shared\LoadTitleMetaPropertyForSingleItem;
-use Oro\Bundle\ApiBundle\Provider\EntityTitleProvider;
+use Oro\Bundle\ApiBundle\Provider\EntityTitleProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
@@ -19,7 +19,7 @@ use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
  */
 class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
 {
-    /** @var EntityTitleProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityTitleProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $entityTitleProvider;
 
     /** @var ExpandedAssociationExtractor|\PHPUnit\Framework\MockObject\MockObject */
@@ -33,7 +33,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
     {
         parent::setUp();
 
-        $this->entityTitleProvider = $this->createMock(EntityTitleProvider::class);
+        $this->entityTitleProvider = $this->createMock(EntityTitleProviderInterface::class);
         $this->expandedAssociationExtractor = $this->createMock(ExpandedAssociationExtractor::class);
 
         $this->processor = new LoadTitleMetaPropertyForSingleItem(
@@ -64,18 +64,21 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
     public function testProcessForNullData()
     {
         $this->processor->process($this->context);
+        self::assertFalse($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
     public function testProcessForEmptyData()
     {
         $this->context->setResult([]);
         $this->processor->process($this->context);
+        self::assertFalse($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
     public function testProcessForNotArrayData()
     {
         $this->context->setResult(123);
         $this->processor->process($this->context);
+        self::assertFalse($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
     public function testProcessWhenTitleMetaPropertyWasNotRequested()
@@ -86,6 +89,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
         $this->context->setConfig($config);
         $this->context->setResult(['id' => 123]);
         $this->processor->process($this->context);
+        self::assertFalse($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
     public function testProcessWhenTitlesAreAlreadyProcessed()
@@ -98,6 +102,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
         $this->context->setConfig($config);
         $this->context->setResult(['id' => 123]);
         $this->processor->process($this->context);
+        self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
     public function testProcessForPrimaryEntityOnly()
@@ -131,6 +136,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
             ['id' => 123, '__title__' => 'title 123'],
             $this->context->getResult()
         );
+        self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
     public function testProcessForExpandedEntities()
@@ -204,6 +210,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
             ],
             $this->context->getResult()
         );
+        self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
     public function testProcessForExpandedEntitiesWithDisabledTitleMetaProperty()
@@ -268,6 +275,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
             ],
             $this->context->getResult()
         );
+        self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
     public function testProcessForExpandedEnumEntities()
@@ -341,6 +349,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
             ],
             $this->context->getResult()
         );
+        self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
     public function testProcessForResourceBasedOnAnotherResource()
@@ -384,6 +393,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
             ['id' => 123, '__title__' => 'title 123'],
             $this->context->getResult()
         );
+        self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
     public function testProcessForEntitiesWithRenamedIdentifierFields()
@@ -460,6 +470,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
             ],
             $this->context->getResult()
         );
+        self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
     public function testProcessForAssociationWithoutConfiguredIdentifierField()
@@ -531,6 +542,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
             ],
             $this->context->getResult()
         );
+        self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
     public function testProcessForAssociationWithoutConfiguredIdentifierFieldNames()
@@ -593,6 +605,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
             ],
             $this->context->getResult()
         );
+        self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
     public function testProcessForEntitiesWithCompositeIdentifier()
@@ -683,6 +696,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
             ],
             $this->context->getResult()
         );
+        self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
     /**
@@ -785,5 +799,6 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
             ],
             $this->context->getResult()
         );
+        self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 }

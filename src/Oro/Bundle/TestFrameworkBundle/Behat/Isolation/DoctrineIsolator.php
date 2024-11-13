@@ -40,17 +40,17 @@ class DoctrineIsolator implements IsolatorInterface
     ) {
     }
 
-    public function addInitializer(ReferenceRepositoryInitializerInterface $initializer)
+    public function addInitializer(ReferenceRepositoryInitializerInterface $initializer): void
     {
         $this->initializers[] = $initializer;
     }
 
-    public function setRequiredListeners(array $requiredListeners)
+    public function setRequiredListeners(array $requiredListeners): void
     {
         $this->requiredListeners = $requiredListeners;
     }
 
-    public function initReferences()
+    public function initReferences(): void
     {
         $doctrine = $this->kernel->getContainer()->get('doctrine');
 
@@ -73,12 +73,12 @@ class DoctrineIsolator implements IsolatorInterface
     }
 
     #[\Override]
-    public function start(BeforeStartTestsEvent $event)
+    public function start(BeforeStartTestsEvent $event): void
     {
     }
 
     #[\Override]
-    public function beforeTest(BeforeIsolatedTestEvent $event)
+    public function beforeTest(BeforeIsolatedTestEvent $event): void
     {
         $manager = $this->kernel->getContainer()->get('oro_platform.optional_listeners.manager');
         $listenersToDisable = array_filter($manager->getListeners(), function ($listener) {
@@ -92,9 +92,7 @@ class DoctrineIsolator implements IsolatorInterface
                 $event->writeln(sprintf('<comment>  => %s</comment>', $listener));
             }
         }
-
         $event->writeln('<info>Load fixtures</info>');
-
         $this->initReferences();
         $this->loadFixtures($event);
 
@@ -105,7 +103,7 @@ class DoctrineIsolator implements IsolatorInterface
     }
 
     #[\Override]
-    public function afterTest(AfterIsolatedTestEvent $event)
+    public function afterTest(AfterIsolatedTestEvent $event): void
     {
         $this->kernel->getContainer()->get('doctrine')->getManager()->clear();
         $this->kernel->getContainer()->get('doctrine')->resetManager();
@@ -113,35 +111,35 @@ class DoctrineIsolator implements IsolatorInterface
     }
 
     #[\Override]
-    public function terminate(AfterFinishTestsEvent $event)
+    public function terminate(AfterFinishTestsEvent $event): void
     {
     }
 
     #[\Override]
-    public function isApplicable(ContainerInterface $container)
+    public function isApplicable(ContainerInterface $container): bool
     {
         return true;
     }
 
     #[\Override]
-    public function restoreState(RestoreStateEvent $event)
+    public function restoreState(RestoreStateEvent $event): void
     {
     }
 
     #[\Override]
-    public function isOutdatedState()
+    public function isOutdatedState(): bool
     {
         return false;
     }
 
     #[\Override]
-    public function getName()
+    public function getName(): string
     {
         return 'Doctrine';
     }
 
     #[\Override]
-    public function getTag()
+    public function getTag(): string
     {
         return 'doctrine';
     }
@@ -184,7 +182,7 @@ class DoctrineIsolator implements IsolatorInterface
         usleep(300000);
     }
 
-    private function clearAliceIncompleteObjectsState()
+    private function clearAliceIncompleteObjectsState(): void
     {
         $this->fixtureReferenceResolver->clear();
         foreach ($this->fixtureReferenceResolver->getInstances() as $resolver) {

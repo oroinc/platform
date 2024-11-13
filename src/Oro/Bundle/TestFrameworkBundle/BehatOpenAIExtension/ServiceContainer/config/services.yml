@@ -1,0 +1,15 @@
+services:
+    oro_behat.open_ai.client:
+        class: OpenAI\Client
+        factory: [ 'OpenAI', client ]
+        arguments: [ '%behat_open_ai.api_key%', '%behat_open_ai.organization%' ]
+
+    oro_behat.healer.open_ai_clickable_step.extension:
+        class: Oro\Bundle\TestFrameworkBundle\BehatOpenAIExtension\Healer\Extension\OpenAIClickableStepHealer
+        public: true
+        arguments:
+            - '@oro_element_factory'
+            - '@output.formatter.pretty'
+            - '@oro_behat.open_ai.client'
+        tags:
+            - { name: oro_test.behat.healer, priority: 40 }

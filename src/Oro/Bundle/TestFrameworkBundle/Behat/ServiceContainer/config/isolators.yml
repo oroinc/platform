@@ -7,6 +7,13 @@ services:
     tags:
       - { name: 'event_dispatcher.subscriber', priority: 100 }
 
+  oro_behat_extension.isolation.watch_mode_isolation_subscriber:
+    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\EventListener\WatchModeIsolationSubscriber'
+    arguments:
+      - '@oro_test.behat.watch_mode.session_holder'
+    tags:
+      - { name: 'event_dispatcher.subscriber', priority: 120 }
+
   oro_behat_extension.isolation.enable_maintenance_mode_isolator:
     class: Oro\Bundle\TestFrameworkBundle\Behat\Isolation\EnableMaintenanceModeIsolator
     arguments:

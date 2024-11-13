@@ -55,6 +55,13 @@ services:
         tags:
             - { name: 'cli.controller', priority: 200 }
 
+    cli.controller.watch_mode:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\WatchModeController
+        arguments:
+            - '@oro_test.behat.watch_mode.session_holder'
+        tags:
+            - { name: 'cli.controller', priority: 250 }
+
     cli.controller.health_check_controller:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\HealthCheckController
         arguments:
@@ -72,3 +79,9 @@ services:
             - '@oro_behat_extension.isolation.test_isolation_subscriber'
         tags:
             - { name: 'cli.controller', priority: 100 }
+
+    cli.controller.behat.exercise_controller_decorator:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\ExerciseControllerDecorator
+        decorates: cli.controller.exercise
+        arguments:
+            - '@.inner'
