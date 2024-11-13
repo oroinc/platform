@@ -33,6 +33,7 @@ services:
         arguments:
             - '@fob_symfony.kernel'
             - '@oro_test.filesystem'
+            - '@oro_test.behat.watch_mode.session_holder'
         tags:
             - { name: 'event_dispatcher.subscriber' }
 
@@ -40,6 +41,15 @@ services:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\SuiteAwareSubscriber
         arguments:
             - ~
+        tags:
+            - { name: 'event_dispatcher.subscriber' }
+
+    oro_test.listener.elements_dump_subscriber:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Listener\ElementsDumpSubscriber
+        arguments:
+            - '@mink'
+            - '%oro_test.elements%'
+            - '%kernel.project_dir%'
         tags:
             - { name: 'event_dispatcher.subscriber' }
 
@@ -68,6 +78,8 @@ services:
 
     oro_behat_session_alias_provider:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Context\SessionAliasProvider
+        arguments:
+            - '@oro_test.behat.watch_mode.session_holder'
 
     oro_behat_session_alias_initializer:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\SessionAliasAwareInitializer'
@@ -201,3 +213,37 @@ services:
 
     nelmio_alice.generator.resolver.value.chainable.fixture_reference_resolver:
         class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Resolver\AliceFixtureReferenceResolver
+
+    oro_test.behat.watch_mode.session_holder:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Session\Mink\WatchModeSessionHolder
+        arguments:
+            - '%kernel.project_dir%/var/cache/prod'
+
+    oro_test.behat.watch_mode.question_provider:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Provider\WatchModeQuestionProvider
+        arguments:
+            - '@oro_test.behat.watch_mode.session_holder'
+            - '@oro_test.behat.feature_files_loader_decorator'
+
+    oro_test.behat.feature_files_loader_decorator:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\RuntimeTester\FeatureFilesLoaderDecorator
+        decorates: gherkin.loader.gherkin_file
+        arguments:
+            - '@.inner'
+            - '@oro_test.behat.watch_mode.session_holder'
+
+    oro_test.healer.reload_page.extension:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Healer\Extension\ReloadPageHealer
+        arguments:
+            - '@oro_element_factory'
+        tags:
+            - { name: oro_test.behat.healer, priority: 50 }
+
+    oro_test.healer.processor:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Healer\HealerProcessor
+        public: true
+        arguments:
+            - '@output.formatter.pretty'
+            - !tagged_iterator oro_test.behat.healer
+        calls:
+            - [ setHealers, [ !tagged_iterator oro_test.behat.healer ] ]

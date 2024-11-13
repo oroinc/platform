@@ -324,6 +324,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
         $containerBuilder->set('oro_behat_extension.suite.oro_suite_generator', new OroSuiteGenerator($kernel));
         $containerBuilder->setDefinition('mink.listener.sessions', new Definition());
         $containerBuilder->setDefinition('fob_symfony.kernel_orchestrator', new Definition());
+        $containerBuilder->setDefinition('mink', new Definition());
 
         return $containerBuilder;
     }
