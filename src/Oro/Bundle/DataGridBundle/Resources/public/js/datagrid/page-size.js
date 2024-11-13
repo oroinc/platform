@@ -149,13 +149,20 @@ define([
                 showLabels: this.showLabels
             })));
 
+            this.toggleView();
+            this.initControls();
+
+            return this;
+        },
+
+        toggleView() {
+            this.$el.removeClass('hide');
+
             if (this.hidden || this.$el.is(':empty')) {
                 this.$el.addClass('hide');
             } else {
                 this.$el.removeClass('hide');
             }
-
-            this.initControls();
 
             return this;
         }

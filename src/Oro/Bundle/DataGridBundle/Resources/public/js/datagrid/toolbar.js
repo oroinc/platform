@@ -241,11 +241,17 @@ define([
                 this.$(this.selector.massActionsPanel).replaceWith(this.subviews.massActionsPanel.render().$el);
             }
 
+
+            return this;
+        },
+
+        toggleView() {
             const noVisibleChildren = Object.values(this.subviews)
                 .filter(view => document.contains(view.el))
                 .every(view => view.$el.hasClass('hide'));
 
             this.$el.toggleClass('no-visible-children', noVisibleChildren);
+
             return this;
         }
     });
