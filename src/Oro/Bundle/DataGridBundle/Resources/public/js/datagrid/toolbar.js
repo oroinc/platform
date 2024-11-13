@@ -246,6 +246,8 @@ define([
         },
 
         toggleView() {
+            this.$el.removeClass('no-visible-children');
+
             const noVisibleChildren = Object.values(this.subviews)
                 .filter(view => document.contains(view.el))
                 .every(view => view.$el.hasClass('hide'));
