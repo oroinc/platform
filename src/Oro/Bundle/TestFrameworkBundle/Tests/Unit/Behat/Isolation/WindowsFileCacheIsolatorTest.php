@@ -10,12 +10,21 @@ class WindowsFileCacheIsolatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider onlyFileHandlerIsApplicableProvider
      */
-    public function testOnlyFileHandlerIsApplicable(string $sessionHandlerParameter, bool $expectedResult)
+    public function testFileHandlerIsApplicable(bool $multihost, bool $expectedResult)
     {
         $containerMock = $this->createMock(ContainerInterface::class);
         $containerMock->expects($this->any())
+            ->method('hasParameter')
+            ->willReturnMap([
+                ['oro_multi_host.enabled', true],
+                ['kernel.debug', true],
+            ]);
+        $containerMock->expects($this->any())
             ->method('getParameter')
-            ->willReturn($sessionHandlerParameter);
+            ->willReturnMap([
+                ['oro_multi_host.enabled', $multihost],
+                ['kernel.debug', false],
+            ]);
         $isolatorMock = $this->getMockBuilder(WindowsFileCacheIsolator::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['isApplicableOS'])
@@ -31,11 +40,11 @@ class WindowsFileCacheIsolatorTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [
-                'session_handler' => 'session.handler.native_file',
+                'miltihost' => true,
                 'expected result' => true,
             ],
             [
-                'session_handler' => 'snc_redis.session.handler',
+                'miltihost' => false,
                 'expected result' => true,
             ],
         ];

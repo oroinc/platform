@@ -10,6 +10,7 @@ use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Gaufrette\File;
 use GuzzleHttp\Client;
 use Oro\Bundle\EmailBundle\Tests\Behat\Context\EmailContext;
+use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Tests\Behat\Services\PreExportMessageProcessor;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\OroFeatureContext;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\Element as OroElement;
@@ -233,14 +234,17 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
     /**
      * This method strictly compares data from the downloaded file
      *
-     * @Given /^Exported file for "(?P<entity>([\w\s]+))" contains the following data:$/
+     * @Given /^The last exported file contains the following data:$/
      *
      * @param string $entity
      * @param TableNode $expectedEntities
      */
-    public function exportedFileForEntityContainsFollowingData($entity, TableNode $expectedEntities)
+    public function exportedFileForEntityContainsFollowingData(TableNode $expectedEntities)
     {
-        $this->exportedFileForEntityWithProcessorContainsFollowingData($entity, $expectedEntities, null);
+        $fileManager = $this->getAppContainer()->get('oro_importexport.file.file_manager');
+        $exportFile = $this->findTheMostRecentExportFile($fileManager);
+        $filePath = $fileManager->writeToTmpLocalStorage($exportFile->getName());
+        $this->exportedFileContainsFollowingData($filePath, $expectedEntities);
     }
 
     //@codingStandardsIgnoreStart
@@ -261,31 +265,7 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
     ) {
         $filePath = $this->performExportForEntity($entity, $processorName);
 
-        try {
-            $handler = fopen($filePath, 'rb');
-            $headers = fgetcsv($handler, 1000, ',');
-            $expectedHeaders = $expectedEntities->getRow(0);
-
-            foreach ($expectedHeaders as $key => $expectedHeader) {
-                static::assertEquals($expectedHeader, $headers[$key]);
-            }
-
-            $i = 1;
-            while (($data = fgetcsv($handler, 1000, ',')) !== false) {
-                $expectedEntityData = array_combine($headers, array_values($expectedEntities->getRow($i)));
-                $entityDataFromCsv = array_combine($headers, array_values($data));
-
-                foreach ($expectedEntityData as $property => $value) {
-                    static::assertEquals($value, $entityDataFromCsv[$property]);
-                }
-
-                $i++;
-            }
-        } finally {
-            fclose($handler);
-        }
-
-        static::assertCount($i, $expectedEntities->getRows());
+        $this->exportedFileContainsFollowingData($filePath, $expectedEntities);
     }
 
     /**
@@ -822,21 +802,9 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
         sleep(2);
 
         // BAP-17638: Replace sleep to appropriate logic
-        // temporary solution: find the most recent file created in import_export dir
         $fileManager = $this->getAppContainer()->get('oro_importexport.file.file_manager');
-        $files = $fileManager->getFilesByPeriod();
 
-        $exportFiles = array_filter($files, function (File $file) {
-            return preg_match('/export_\d{4}.*.csv/', $file->getName());
-        });
-
-        // sort by modification date
-        usort($exportFiles, function (File $a, File $b) {
-            return $b->getMtime() <=> $a->getMtime();
-        });
-
-        /** @var File $exportFile */
-        $exportFile = reset($exportFiles);
+        $exportFile = $this->findTheMostRecentExportFile($fileManager);
         $this->importFile = $fileManager->writeToTmpLocalStorage($exportFile->getName());
         $this->tryImportFile();
     }
@@ -1034,5 +1002,51 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
             } catch (\Exception $e) {
             }
         } while ($this->findAllElements('Flash Message'));
+    }
+
+    private function findTheMostRecentExportFile(FileManager $fileManager): File
+    {
+        // temporary solution: find the most recent file created in import_export dir
+        $files = $fileManager->getFilesByPeriod();
+
+        $exportFiles = array_filter($files, function (File $file) {
+            return preg_match('/export_\d{4}.*.csv/', $file->getName());
+        });
+
+        // sort by modification date
+        usort($exportFiles, function (File $a, File $b) {
+            return $b->getMtime() <=> $a->getMtime();
+        });
+
+        return reset($exportFiles);
+    }
+
+    private function exportedFileContainsFollowingData(string $filePath, TableNode $expectedEntities): void
+    {
+        try {
+            $handler = fopen($filePath, 'rb');
+            $headers = fgetcsv($handler, 1000, ',');
+            $expectedHeaders = $expectedEntities->getRow(0);
+
+            foreach ($expectedHeaders as $key => $expectedHeader) {
+                static::assertEquals($expectedHeader, $headers[$key]);
+            }
+
+            $i = 1;
+            while (($data = fgetcsv($handler, 1000, ',')) !== false) {
+                $expectedEntityData = array_combine($headers, array_values($expectedEntities->getRow($i)));
+                $entityDataFromCsv = array_combine($headers, array_values($data));
+
+                foreach ($expectedEntityData as $property => $value) {
+                    static::assertEquals($value, $entityDataFromCsv[$property]);
+                }
+
+                $i++;
+            }
+        } finally {
+            fclose($handler);
+        }
+
+        static::assertCount($i, $expectedEntities->getRows());
     }
 }
