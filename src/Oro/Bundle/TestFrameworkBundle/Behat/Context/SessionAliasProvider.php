@@ -3,28 +3,21 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Context;
 
 use Behat\Mink\Mink;
+use Oro\Bundle\TestFrameworkBundle\Behat\Session\Mink\WatchModeSessionHolder;
 
 /**
  * Provides possibility to work with multiple sessions in one behat feature.
  */
 class SessionAliasProvider implements MultiSessionAwareInterface
 {
-    /**
-     * @var array|string[]
-     */
-    private $aliases = [];
+    private array $aliases = [];
+    private array $data = [];
 
-    /**
-     * @var array
-     */
-    private $data = [];
+    public function __construct(private readonly WatchModeSessionHolder $sessionHolder)
+    {
+    }
 
-    /**
-     * @param Mink $mink
-     * @param string $sessionName
-     * @param string $alias
-     */
-    public function setSessionAlias(Mink $mink, $sessionName, $alias)
+    public function setSessionAlias(Mink $mink, string $sessionName, string $alias): void
     {
         if (!$mink->hasSession($sessionName)) {
             throw new \RuntimeException(
@@ -35,35 +28,28 @@ class SessionAliasProvider implements MultiSessionAwareInterface
                 )
             );
         }
+        $this->sessionHolder->setSessionAlias($alias, $sessionName);
         $this->aliases[$alias] = $sessionName;
     }
 
-    /**
-     * @param Mink $mink
-     * @param string $alias
-     */
-    public function switchSessionByAlias(Mink $mink, $alias)
+    public function switchSessionByAlias(Mink $mink, string $alias): void
     {
         if ($this->hasRegisteredAlias($alias)) {
             $sessionName = $this->getSessionName($alias);
 
             $this->switchSession($mink, $sessionName);
         } else {
-            throw new \RuntimeException(
-                sprintf('Alias `%s` for session is not defined', $alias)
-            );
+            throw new \RuntimeException(sprintf('Alias `%s` for session is not defined', $alias));
         }
     }
 
-    /**
-     * @param Mink $mink
-     * @param string $sessionName
-     */
-    public function switchSession(Mink $mink, $sessionName)
+    public function switchSession(Mink $mink, string $sessionName): void
     {
+        $this->sessionHolder->setDefaultSessionName($sessionName);
         $mink->setDefaultSessionName($sessionName);
 
         $session = $mink->getSession($sessionName);
+
         // start session if needed
         if (!$session->isStarted()) {
             $session->start();
@@ -78,8 +64,12 @@ class SessionAliasProvider implements MultiSessionAwareInterface
      * @throws \OutOfBoundsException
      */
     #[\Override]
-    public function getSessionName($alias)
+    public function getSessionName($alias): string
     {
+        if (($this->sessionHolder->isWatchMode() || $this->sessionHolder->isWatchFrom())
+            && $this->sessionHolder->hasSessionAlias($alias)) {
+            return $this->sessionHolder->getSessionNameByAlias($alias);
+        }
         if (isset($this->aliases[$alias])) {
             return $this->aliases[$alias];
         }
@@ -91,19 +81,15 @@ class SessionAliasProvider implements MultiSessionAwareInterface
 
     /**
      * @param string $alias
-     * @return bool
      */
     #[\Override]
-    public function hasRegisteredAlias($alias)
+    public function hasRegisteredAlias($alias): bool
     {
-        return isset($this->aliases[$alias]);
+        return isset($this->aliases[$alias]) || $this->sessionHolder->hasSessionAlias($alias);
     }
 
-    /**
-     * @return array|string[]
-     */
     #[\Override]
-    public function getAliases()
+    public function getAliases(): array
     {
         return $this->aliases;
     }

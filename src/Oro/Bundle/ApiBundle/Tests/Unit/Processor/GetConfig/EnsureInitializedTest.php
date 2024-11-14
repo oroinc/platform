@@ -20,7 +20,7 @@ class EnsureInitializedTest extends ConfigProcessorTestCase
         $this->processor = new EnsureInitialized($this->configLoaderFactory);
     }
 
-    public function testProcessForNotInitializedConfigs()
+    public function testProcessForNotInitializedConfigs(): void
     {
         $this->context->setExtras([
             new TestConfigSection('test_section'),
@@ -29,7 +29,7 @@ class EnsureInitializedTest extends ConfigProcessorTestCase
         $this->processor->process($this->context);
 
         $this->assertConfig(
-            [],
+            ['resource_class' => 'Test\Class'],
             $this->context->getResult()
         );
         $this->assertConfig(
@@ -43,16 +43,16 @@ class EnsureInitializedTest extends ConfigProcessorTestCase
         self::assertSame([], $this->context->getExplicitlyConfiguredFieldNames());
     }
 
-    public function testProcessForAlreadyInitializedConfigs()
+    public function testProcessForAlreadyInitializedConfigs(): void
     {
-        $config = [
+        $definition = [
             'exclusion_policy' => 'all',
             'fields'           => [
                 'field1' => null,
                 'field2' => ['exclude' => true]
             ]
         ];
-        $this->context->setResult($this->createConfigObject($config));
+        $this->context->setResult($this->createConfigObject($definition));
         $this->context->setConfigSection('test_section', $this->createConfigObject(['attr' => 'val']));
         $this->context->setExtras([
             new TestConfigSection('test_section'),
@@ -60,8 +60,10 @@ class EnsureInitializedTest extends ConfigProcessorTestCase
         ]);
         $this->processor->process($this->context);
 
+        $resultDefinition = $definition;
+        $resultDefinition['resource_class'] = 'Test\Class';
         $this->assertConfig(
-            $config,
+            $resultDefinition,
             $this->context->getResult()
         );
         $this->assertConfig(
@@ -77,7 +79,7 @@ class EnsureInitializedTest extends ConfigProcessorTestCase
         self::assertSame(['field1', 'field2'], $this->context->getExplicitlyConfiguredFieldNames());
     }
 
-    public function testProcessForDisabledSorting()
+    public function testProcessForDisabledSorting(): void
     {
         $definition = [
             'disable_sorting' => true
@@ -89,8 +91,10 @@ class EnsureInitializedTest extends ConfigProcessorTestCase
         ]);
         $this->processor->process($this->context);
 
+        $resultDefinition = $definition;
+        $resultDefinition['resource_class'] = 'Test\Class';
         $this->assertConfig(
-            $definition,
+            $resultDefinition,
             $this->context->getResult()
         );
         self::assertFalse($this->context->hasExtra(SortersConfigExtra::NAME));
@@ -103,7 +107,7 @@ class EnsureInitializedTest extends ConfigProcessorTestCase
         self::assertSame([], $this->context->getExplicitlyConfiguredFieldNames());
     }
 
-    public function testProcessForEnabledSorting()
+    public function testProcessForEnabledSorting(): void
     {
         $definition = [];
         $this->context->setResult($this->createConfigObject($definition));
@@ -113,8 +117,10 @@ class EnsureInitializedTest extends ConfigProcessorTestCase
         ]);
         $this->processor->process($this->context);
 
+        $resultDefinition = $definition;
+        $resultDefinition['resource_class'] = 'Test\Class';
         $this->assertConfig(
-            $definition,
+            $resultDefinition,
             $this->context->getResult()
         );
         self::assertTrue($this->context->hasExtra(SortersConfigExtra::NAME));

@@ -33,5 +33,5 @@ Feature: Language codes longer than 8 symbols can be used
       | Enabled Localizations | [English, Azerbaijani] |
       | Default Localization  | Azerbaijani            |
     And I submit form
-    Then I should not see "500. Internal Server Error"
-    And I should see "Configuration saved" flash message
+    Then I should see "Configuration saved" flash message
+    And I should not see "500. Internal Server Error"

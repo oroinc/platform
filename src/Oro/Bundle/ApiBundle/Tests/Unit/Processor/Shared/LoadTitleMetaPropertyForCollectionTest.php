@@ -3,14 +3,15 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Processor\Shared\LoadTitleMetaProperty;
 use Oro\Bundle\ApiBundle\Processor\Shared\LoadTitleMetaPropertyForCollection;
-use Oro\Bundle\ApiBundle\Provider\EntityTitleProvider;
+use Oro\Bundle\ApiBundle\Provider\EntityTitleProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
 class LoadTitleMetaPropertyForCollectionTest extends GetListProcessorTestCase
 {
-    /** @var EntityTitleProvider|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EntityTitleProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $entityTitleProvider;
 
     /** @var ExpandedAssociationExtractor|\PHPUnit\Framework\MockObject\MockObject */
@@ -24,7 +25,7 @@ class LoadTitleMetaPropertyForCollectionTest extends GetListProcessorTestCase
     {
         parent::setUp();
 
-        $this->entityTitleProvider = $this->createMock(EntityTitleProvider::class);
+        $this->entityTitleProvider = $this->createMock(EntityTitleProviderInterface::class);
         $this->expandedAssociationExtractor = $this->createMock(ExpandedAssociationExtractor::class);
 
         $this->processor = new LoadTitleMetaPropertyForCollection(
@@ -76,5 +77,6 @@ class LoadTitleMetaPropertyForCollectionTest extends GetListProcessorTestCase
             ],
             $this->context->getResult()
         );
+        self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 }
