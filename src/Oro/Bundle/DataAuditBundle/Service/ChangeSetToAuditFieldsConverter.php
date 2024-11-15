@@ -9,11 +9,13 @@ use Oro\Bundle\DataAuditBundle\Provider\AuditConfigProvider;
 use Oro\Bundle\DataAuditBundle\Provider\AuditFieldTypeProvider;
 use Oro\Bundle\DataAuditBundle\Provider\EntityNameProvider;
 use Oro\Bundle\EntityBundle\Helper\UnidirectionalFieldHelper;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Psr\Log\LoggerAwareTrait;
 
 /**
  * This converter is a part of EntityChangesToAuditEntryConverter and it is intended to process field changes.
  * @see \Oro\Bundle\DataAuditBundle\Service\EntityChangesToAuditEntryConverter
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class ChangeSetToAuditFieldsConverter implements ChangeSetToAuditFieldsConverterInterface
 {
@@ -89,7 +91,9 @@ class ChangeSetToAuditFieldsConverter implements ChangeSetToAuditFieldsConverter
         }
 
         list($old, $new) = $this->clearData($change);
-
+        if (!$this->isChangeSetAvailable($new, $old)) {
+            return;
+        }
         if ($entityMetadata->hasField($fieldName)) {
             $old = $this->processField($old, $fieldType);
             $new = $this->processField($new, $fieldType);
@@ -128,6 +132,19 @@ class ChangeSetToAuditFieldsConverter implements ChangeSetToAuditFieldsConverter
                 (string)$old
             );
         }
+    }
+
+    private function isChangeSetAvailable(mixed $old, mixed $new): bool
+    {
+        // enumerable fields changes is processed by EnumerableChangeSetToAuditFieldsConverter
+        if (is_array($old) && isset($old['entity_class']) && $old['entity_class'] === EnumOption::class) {
+            return false;
+        }
+        if (is_array($new) && isset($new['entity_class']) && $new['entity_class'] === EnumOption::class) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

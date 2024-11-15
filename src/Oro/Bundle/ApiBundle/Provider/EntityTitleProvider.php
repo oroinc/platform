@@ -13,7 +13,7 @@ use Oro\Component\DoctrineUtils\ORM\UnionQueryBuilder;
 /**
  * Provides a functionality to load a text representation of manageable (ORM) entities.
  */
-class EntityTitleProvider
+class EntityTitleProvider implements EntityTitleProviderInterface
 {
     private DoctrineHelper $doctrineHelper;
     private EntityNameResolver $entityNameResolver;
@@ -26,16 +26,7 @@ class EntityTitleProvider
         $this->entityNameResolver = $entityNameResolver;
     }
 
-    /**
-     * Returns a text representation of entities.
-     *
-     * @param array $targets [entity class => [entity id field name, [entity id, ...]], ...]
-     *                       The entity id field name can be:
-     *                       a string for entities with single field identifier
-     *                       an array of strings for entities with composite identifier
-     *
-     * @return array [['id' => entity id, 'entity' => entity class, 'title' => entity title], ...]
-     */
+    #[\Override]
     public function getTitles(array $targets): array
     {
         $result = [];

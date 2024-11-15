@@ -8,32 +8,36 @@ use Behat\Mink\Selector\Xpath\Escaper;
 use Behat\Mink\Selector\Xpath\Manipulator;
 use Oro\Bundle\TestFrameworkBundle\Behat\Context\AssertTrait;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\ElementValueInterface;
+use Oro\Bundle\TestFrameworkBundle\Behat\Session\Mink\WatchModeSessionHolder;
 use WebDriver\Element;
 use WebDriver\Key;
 
 /**
  * Contains overrides of some Selenium2Driver methods as well as new methods related to selenium driver functionality
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class OroSelenium2Driver extends Selenium2Driver
 {
     use AssertTrait;
 
-    /**
-     * @var Manipulator
-     */
-    private $xpathManipulator;
-
-    /**
-     * @var Escaper
-     */
-    private $xpathEscaper;
+    private Manipulator $xpathManipulator;
+    private Escaper $xpathEscaper;
+    private OroWebDriver $oroWebDriver;
 
     public function __construct($browserName, $desiredCapabilities, $wdHost)
     {
         $this->xpathManipulator = new Manipulator();
         $this->xpathEscaper = new Escaper();
+        $this->oroWebDriver = new OroWebDriver($wdHost);
 
         parent::__construct($browserName, $desiredCapabilities, $wdHost);
+        // override base web driver
+        $this->setWebDriver($this->oroWebDriver);
+    }
+
+    public function setSessionHolder(WatchModeSessionHolder $watchSessionHolder): void
+    {
+        $this->oroWebDriver->setSessionHolder($watchSessionHolder);
     }
 
     /**

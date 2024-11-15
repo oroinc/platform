@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Oro Behat Tests Elements Highlighter</title>
+    <style>
+        #elementList, #loadingIndicator {
+            max-height: 200px;
+            width: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 5px;
+            position: relative;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            padding: 10px;
+            margin: 0;
+        }
+        #elementList li span {
+            color: #cccccc;
+            font-size: 70%;
+        }
+        #elementList li b {
+            font-weight: normal;
+        }
+        .selectable {
+            user-select: all;
+        }
+    </style>
+</head>
+<body>
+<h4>Oro Behat Tests Elements</h4>
+<input type="text" id="searchBar" placeholder="Search elements..." />
+<div id="loadingIndicator">Loading...</div>
+<ul id="elementList"></ul>
+<script src="popup.js"></script>
+</body>
+</html>

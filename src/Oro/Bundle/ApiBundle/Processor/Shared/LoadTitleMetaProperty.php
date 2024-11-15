@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Config\TargetConfigExtraBuilder;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
-use Oro\Bundle\ApiBundle\Provider\EntityTitleProvider;
+use Oro\Bundle\ApiBundle\Provider\EntityTitleProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
@@ -31,7 +31,7 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
     /** Used for composite keys comparison */
     private const COMPOSITE_KEYS = 'composite_keys';
 
-    private EntityTitleProvider $entityTitleProvider;
+    private EntityTitleProviderInterface $entityTitleProvider;
     private ExpandedAssociationExtractor $expandedAssociationExtractor;
     private ConfigProvider $configProvider;
     private ?string $titleFieldName = null;
@@ -39,7 +39,7 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
     private ?Context $context = null;
 
     public function __construct(
-        EntityTitleProvider $entityTitleProvider,
+        EntityTitleProviderInterface $entityTitleProvider,
         ExpandedAssociationExtractor $expandedAssociationExtractor,
         ConfigProvider $configProvider
     ) {
@@ -92,6 +92,7 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
             $this->expandConfigExtra = null;
             $this->context = null;
         }
+        $context->setProcessed(self::OPERATION_NAME);
     }
 
     abstract protected function updateData(array $data, string $entityClass, EntityDefinitionConfig $config): array;

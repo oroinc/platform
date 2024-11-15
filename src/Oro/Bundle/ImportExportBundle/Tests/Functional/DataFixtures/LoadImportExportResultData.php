@@ -3,14 +3,14 @@
 namespace Oro\Bundle\ImportExportBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\ImportExportBundle\Entity\ImportExportResult;
-use Oro\Bundle\UserBundle\DataFixtures\UserUtilityTrait;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
+use Oro\Bundle\UserBundle\Entity\User;
 
-class LoadImportExportResultData extends AbstractFixture
+class LoadImportExportResultData extends AbstractFixture implements DependentFixtureInterface
 {
-    use UserUtilityTrait;
-
     public const EXPIRED_IMPORT_EXPORT_RESULT = 'expiredImportExportResult';
     public const NOT_EXPIRED_IMPORT_EXPORT_RESULT = 'notExpiredImportExportResult';
 
@@ -31,10 +31,18 @@ class LoadImportExportResultData extends AbstractFixture
     ];
 
     #[\Override]
+    public function getDependencies(): array
+    {
+        return [
+            LoadUser::class
+        ];
+    }
+
+    #[\Override]
     public function load(ObjectManager $manager)
     {
-        $user = $this->getFirstUser($manager);
-
+        /** @var User $user */
+        $user = $this->getReference(LoadUser::USER);
         foreach ($this->importExportResults as $reference => $data) {
             $entity = new ImportExportResult();
             $entity->setJobId($data['jobId']);

@@ -30,12 +30,12 @@ class LoadPermissionConfigurationCommandTest extends WebTestCase
 
         $this->provider = $this->getContainer()
             ->get('oro_security.configuration.provider.permission_configuration');
+        $this->provider->warmUpCache();
     }
 
     #[\Override]
     protected function tearDown(): void
     {
-        $this->provider->warmUpCache();
         $this->getContainer()->get('oro_security.cache.provider.permission')->clear();
 
         parent::tearDown();

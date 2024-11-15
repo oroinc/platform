@@ -10,6 +10,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
+use Oro\Bundle\TestFrameworkBundle\Behat\Session\Mink\WatchModeSessionHolder;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -33,7 +34,8 @@ class JobStatusSubscriber implements EventSubscriberInterface
 
     public function __construct(
         private KernelInterface $kernel,
-        private Filesystem $filesystem
+        private Filesystem $filesystem,
+        private WatchModeSessionHolder $sessionHolder,
     ) {
         $this->startDateTime = new \DateTime('now', new \DateTimeZone('UTC'));
         $this->phpExecutablePath = (new PhpExecutableFinder())->find();
@@ -120,7 +122,7 @@ class JobStatusSubscriber implements EventSubscriberInterface
 
     private function startConsumerIfNotRunning(): void
     {
-        if ($this->shouldNotRunConsumer) {
+        if ($this->shouldNotRunConsumer && !$this->sessionHolder->isWatchFrom()) {
             return;
         }
 
