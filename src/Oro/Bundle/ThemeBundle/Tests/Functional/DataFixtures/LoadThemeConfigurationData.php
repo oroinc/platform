@@ -3,15 +3,14 @@
 namespace Oro\Bundle\ThemeBundle\Tests\Functional\DataFixtures;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
 use Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration;
-use Oro\Bundle\UserBundle\DataFixtures\UserUtilityTrait;
+use Oro\Bundle\UserBundle\Entity\User;
 
-class LoadThemeConfigurationData extends AbstractFixture
+class LoadThemeConfigurationData extends AbstractFixture implements DependentFixtureInterface
 {
-    use UserUtilityTrait;
-
     public const string THEME_CONFIGURATION_1 = 'Theme 1';
 
     protected array $themeConfigurationsData = [
@@ -23,10 +22,18 @@ class LoadThemeConfigurationData extends AbstractFixture
     ];
 
     #[\Override]
+    public function getDependencies(): array
+    {
+        return [
+            LoadUser::class
+        ];
+    }
+
+    #[\Override]
     public function load(ObjectManager $manager): void
     {
-        /** @var EntityManager $manager */
-        $user = $this->getFirstUser($manager);
+        /** @var User $user */
+        $user = $this->getReference(LoadUser::USER);
         $businessUnit = $user->getOwner();
         $organization = $user->getOrganization();
 

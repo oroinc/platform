@@ -22,6 +22,9 @@ class ReloadPageHealer implements HealerInterface
 
     public function supports(Call $call): bool
     {
+        // This healer is temporarily disabled, should be enabled after entering healing statistics
+        return false;
+
         if (!isset($call->getBoundCallable()[1])) {
             return false;
         }

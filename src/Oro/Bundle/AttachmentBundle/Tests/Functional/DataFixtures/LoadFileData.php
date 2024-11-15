@@ -5,13 +5,10 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Functional\DataFixtures;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AbstractFixture;
-use Oro\Bundle\UserBundle\DataFixtures\UserUtilityTrait;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 
 class LoadFileData extends AbstractFixture
 {
-    use UserUtilityTrait;
-
     public const FILE_1 = 'file_1';
     public const FILE_2 = 'file_2';
     public const FILE_3 = 'file_3';
