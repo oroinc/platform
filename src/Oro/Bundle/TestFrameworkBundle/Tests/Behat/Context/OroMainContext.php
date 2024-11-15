@@ -2911,7 +2911,7 @@ JS;
     document
         .evaluate("{$xpath}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null)
         .singleNodeValue
-        .scrollIntoView(false);
+        ?.scrollIntoView(false);
 })()
 JS;
         $this->getSession()->getDriver()->evaluateScript($javascipt);
