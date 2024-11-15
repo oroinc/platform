@@ -10,12 +10,7 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 trait UserUtilityTrait
 {
-    /**
-     * @param ObjectManager $manager
-     * @return User
-     * @throws \LogicException
-     */
-    protected function getFirstUser(ObjectManager $manager)
+    protected function getFirstUser(ObjectManager $manager): User
     {
         $users = $manager->getRepository(User::class)->findBy([], ['id' => 'ASC'], 1);
         if (!$users) {

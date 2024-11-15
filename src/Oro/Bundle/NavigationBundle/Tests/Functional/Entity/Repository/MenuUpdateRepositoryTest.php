@@ -8,7 +8,6 @@ use Oro\Bundle\NavigationBundle\Tests\Functional\DataFixtures\MenuUpdateData;
 use Oro\Bundle\ScopeBundle\Entity\Scope;
 use Oro\Bundle\ScopeBundle\Tests\Functional\DataFixtures\LoadScopeData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\UserBundle\DataFixtures\UserUtilityTrait;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadScopeUserData;
 
 /**
@@ -16,8 +15,6 @@ use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadScopeUserData;
  */
 class MenuUpdateRepositoryTest extends WebTestCase
 {
-    use UserUtilityTrait;
-
     #[\Override]
     protected function setUp(): void
     {

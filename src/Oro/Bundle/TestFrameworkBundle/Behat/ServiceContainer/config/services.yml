@@ -217,7 +217,7 @@ services:
     oro_test.behat.watch_mode.session_holder:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Session\Mink\WatchModeSessionHolder
         arguments:
-            - '%kernel.project_dir%/var/cache/prod'
+            - '%kernel.project_dir%/var/cache'
 
     oro_test.behat.watch_mode.question_provider:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Provider\WatchModeQuestionProvider

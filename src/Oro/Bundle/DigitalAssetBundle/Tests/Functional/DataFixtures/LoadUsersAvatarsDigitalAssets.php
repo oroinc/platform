@@ -8,17 +8,17 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AbstractFixture;
-use Oro\Bundle\UserBundle\DataFixtures\UserUtilityTrait;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUsersWithAvatars;
 
 class LoadUsersAvatarsDigitalAssets extends AbstractFixture implements DependentFixtureInterface
 {
-    use UserUtilityTrait;
-
     #[\Override]
     public function getDependencies(): array
     {
         return [
+            LoadUser::class,
             LoadUsersWithAvatars::class,
         ];
     }
@@ -52,8 +52,8 @@ class LoadUsersAvatarsDigitalAssets extends AbstractFixture implements Dependent
 
     private function createDigitalAsset(ObjectManager $manager, File $sourceFile, string $name): DigitalAsset
     {
-        $user = $this->getFirstUser($manager);
-
+        /** @var User $user */
+        $user = $this->getReference(LoadUser::USER);
         /** @var OrganizationInterface $organization */
         $organization = $this->getReference('organization');
 
