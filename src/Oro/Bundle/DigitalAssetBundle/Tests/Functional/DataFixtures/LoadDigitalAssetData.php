@@ -9,12 +9,11 @@ use Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AbstractFixture;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
-use Oro\Bundle\UserBundle\DataFixtures\UserUtilityTrait;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class LoadDigitalAssetData extends AbstractFixture implements DependentFixtureInterface
 {
-    use UserUtilityTrait;
-
     public const DIGITAL_ASSET_1 = 'digital_asset_1';
     public const DIGITAL_ASSET_1_SOURCE = 'digital_asset_1_source';
     public const DIGITAL_ASSET_1_CHILD_1 = 'digital_asset_1_child_1';
@@ -70,14 +69,15 @@ class LoadDigitalAssetData extends AbstractFixture implements DependentFixtureIn
     {
         return [
             LoadOrganization::class,
+            LoadUser::class
         ];
     }
 
     #[\Override]
     public function load(ObjectManager $manager): void
     {
-        $user = $this->getFirstUser($manager);
-
+        /** @var User $user */
+        $user = $this->getReference(LoadUser::USER);
         /** @var OrganizationInterface $organization */
         $organization = $this->getReference('organization');
 

@@ -6,13 +6,10 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\NavigationBundle\Entity\PageState;
-use Oro\Bundle\UserBundle\DataFixtures\UserUtilityTrait;
 use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
 
 class PageStateData extends AbstractFixture implements DependentFixtureInterface
 {
-    use UserUtilityTrait;
-
     public const PAGE_STATE_1 = 'item_1';
 
     /** @var array */

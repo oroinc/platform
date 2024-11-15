@@ -31,6 +31,7 @@ class DurationToStringTransformer implements DataTransformerInterface
                                 (?:[\s]*|$))?(?:(?:(\d+(?:[\.,]\d{0,2})?)?)m
                                 (?:[\s]*|$))?(?:(?:(\d+(?:[\.,]\d{0,2})?)?)s)?
                                 $/ix';
+
     #[\Override]
     public function transform($value)
     {
