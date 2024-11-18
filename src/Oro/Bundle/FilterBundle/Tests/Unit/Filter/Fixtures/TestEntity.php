@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Filter\Fixtures;
 
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 
 #[ORM\Entity]
 class TestEntity

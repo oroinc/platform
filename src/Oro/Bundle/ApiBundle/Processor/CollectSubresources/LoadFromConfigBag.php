@@ -172,8 +172,12 @@ class LoadFromConfigBag extends LoadSubresources
         );
         $actions = $subresourceConfig->getActions();
         foreach ($actions as $actionName => $action) {
-            if (!$action->isExcluded() && $subresource->isExcludedAction($actionName)) {
-                $subresource->removeExcludedAction($actionName);
+            if ($subresource->isExcludedAction($actionName)) {
+                if (!$action->isExcluded()) {
+                    $subresource->removeExcludedAction($actionName);
+                }
+            } elseif ($action->isExcluded()) {
+                $subresource->addExcludedAction($actionName);
             }
         }
 
