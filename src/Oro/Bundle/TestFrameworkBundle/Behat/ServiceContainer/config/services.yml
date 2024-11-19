@@ -58,7 +58,7 @@ services:
         arguments:
             - '@mink'
             - '@mink.selectors_handler'
-            - []
+            - '%oro_test.elements%'
         tags:
             - { name: 'suite_aware' }
 
@@ -66,7 +66,7 @@ services:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Element\OroPageFactory'
         arguments:
             - '@oro_element_factory'
-            - []
+            - '%oro_test.pages%'
 
     oro_behat_page_object_initializer:
         class: 'Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\OroPageObjectInitializer'
