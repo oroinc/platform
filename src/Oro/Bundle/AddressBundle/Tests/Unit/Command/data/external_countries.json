@@ -1,0 +1,39 @@
+{
+  "3166-1": [
+    {
+      "alpha_2": "FR",
+      "alpha_3": "FRA",
+      "name": "France",
+      "numeric": "250",
+      "official_name": "French Republic"
+    },
+    {
+      "alpha_2": "IT",
+      "alpha_3": "ITA",
+      "name": "Italy",
+      "numeric": "380",
+      "official_name": "Italian Republic"
+    },
+    {
+      "alpha_2": "ES",
+      "alpha_3": "ESP",
+      "name": "Spain",
+      "numeric": "724",
+      "official_name": "Kingdom of Spain"
+    },
+    {
+      "alpha_2": "XX",
+      "alpha_3": "XXX",
+      "name": "Unnamed",
+      "numeric": "999",
+      "official_name": "Unnamed"
+    },
+    {
+      "alpha_2": "FI",
+      "alpha_3": "FIN",
+      "name": "Finland",
+      "numeric": "246",
+      "official_name": "Republic of Finland"
+    }
+  ]
+}

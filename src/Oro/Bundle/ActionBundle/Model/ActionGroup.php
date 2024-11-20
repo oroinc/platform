@@ -3,6 +3,10 @@
 namespace Oro\Bundle\ActionBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
+use Oro\Bundle\ActionBundle\Event\ActionGroupEventDispatcher;
+use Oro\Bundle\ActionBundle\Event\ActionGroupExecuteEvent;
+use Oro\Bundle\ActionBundle\Event\ActionGroupGuardEvent;
+use Oro\Bundle\ActionBundle\Event\ActionGroupPreExecuteEvent;
 use Oro\Bundle\ActionBundle\Exception\ForbiddenActionGroupException;
 use Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver;
 use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
@@ -21,6 +25,7 @@ class ActionGroup implements ActionGroupInterface
     private ConditionFactory $conditionFactory;
     private ParameterAssembler $parameterAssembler;
     private ParametersResolver $parametersResolver;
+    private ActionGroupEventDispatcher $eventDispatcher;
     private ActionGroupDefinition $definition;
 
     /** @var array<string,Parameter>|null */
@@ -31,6 +36,7 @@ class ActionGroup implements ActionGroupInterface
         ConditionFactory $conditionFactory,
         ParameterAssembler $parameterAssembler,
         ParametersResolver $parametersResolver,
+        ActionGroupEventDispatcher $eventDispatcher,
         ActionGroupDefinition $definition
     ) {
         $this->actionFactory = $actionFactory;
@@ -38,6 +44,7 @@ class ActionGroup implements ActionGroupInterface
         $this->parameterAssembler = $parameterAssembler;
         $this->definition = $definition;
         $this->parametersResolver = $parametersResolver;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     #[\Override]
@@ -50,7 +57,14 @@ class ActionGroup implements ActionGroupInterface
                 sprintf('ActionGroup "%s" is not allowed', $this->definition->getName())
             );
         }
+
+        $preExecuteEvent = new ActionGroupPreExecuteEvent($data, $this->getDefinition(), $errors);
+        $this->eventDispatcher->dispatch($preExecuteEvent);
+
         $this->executeActions($data);
+
+        $executeEvent = new ActionGroupExecuteEvent($data, $this->getDefinition(), $errors);
+        $this->eventDispatcher->dispatch($executeEvent);
 
         return $data;
     }
@@ -64,6 +78,13 @@ class ActionGroup implements ActionGroupInterface
     #[\Override]
     public function isAllowed(ActionData $data, Collection $errors = null): bool
     {
+        $guardEvent = new ActionGroupGuardEvent($data, $this->getDefinition(), $errors);
+        $this->eventDispatcher->dispatch($guardEvent);
+
+        if (!$guardEvent->isAllowed()) {
+            return false;
+        }
+
         if ($config = $this->definition->getConditions()) {
             $conditions = $this->conditionFactory->create(ConfigurableCondition::ALIAS, $config);
             if ($conditions instanceof ConfigurableCondition) {

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
+use Oro\Bundle\ActionBundle\Event\ActionGroupEventDispatcher;
 use Oro\Bundle\ActionBundle\Exception\ActionGroupNotFoundException;
 use Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
@@ -32,6 +33,7 @@ class ActionGroupRegistryTest extends \PHPUnit\Framework\TestCase
             $this->createMock(ExpressionFactory::class),
             new ParameterAssembler(),
             $this->createMock(ParametersResolver::class),
+            $this->createMock(ActionGroupEventDispatcher::class),
             $this->actionGroupServiceLocator
         );
 
