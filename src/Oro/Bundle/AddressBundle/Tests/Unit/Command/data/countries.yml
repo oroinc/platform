@@ -1,0 +1,57 @@
+FR:
+  iso2Code: FR
+  iso3Code: FRA
+  regions: {
+    FR-01: {
+      combinedCode: FR-01,
+      code: '01'
+    },
+    FR-02: {
+      combinedCode: FR-02,
+      code: '02'
+    },
+    FR-03:
+      {
+        combinedCode: FR-03,
+        code: '03'
+      }
+  }
+IT:
+  iso2Code: IT
+  iso3Code: ITA
+  regions: {
+    IT-21:
+      {
+        combinedCode: IT-21,
+        code: '21'
+      },
+    IT-25:
+      {
+        combinedCode: IT-25,
+        code: '25'
+      }
+  }
+ES:
+  iso2Code: ES
+  iso3Code: ESP
+  regions: {
+    ES-A:
+      {
+        combinedCode: ES-A,
+        code: A
+      },
+    ES-AB:
+      {
+        combinedCode: ES-AB,
+        code: AB
+      },
+    ES-AL: {
+      combinedCode: ES-AL,
+      code: AL
+    },
+    ES-TEST:
+      {
+        combinedCode: ES-TEST,
+        code: TEST
+      }
+  }
