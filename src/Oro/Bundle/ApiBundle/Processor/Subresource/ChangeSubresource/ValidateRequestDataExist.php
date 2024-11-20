@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Shared;
+namespace Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource;
 
 use Oro\Bundle\ApiBundle\Model\Error;
-use Oro\Bundle\ApiBundle\Processor\FormContext;
+use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresourceContext;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -16,10 +16,10 @@ class ValidateRequestDataExist implements ProcessorInterface
     #[\Override]
     public function process(ContextInterface $context): void
     {
-        /** @var FormContext $context */
+        /** @var ChangeSubresourceContext $context */
 
         $requestData = $context->getRequestData();
-        if (empty($requestData) && $context->hasIdentifierFields()) {
+        if (empty($requestData) && $context->getRequestMetadata()?->hasIdentifierFields()) {
             $context->addError(
                 Error::createValidationError(
                     Constraint::REQUEST_DATA,

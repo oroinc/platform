@@ -439,9 +439,6 @@ services:
         tags:
             - { name: oro.api.processor, action: create, group: normalize_input, priority: 100 }
             - { name: oro.api.processor, action: update, group: normalize_input, priority: 100 }
-            - { name: oro.api.processor, action: delete_subresource, group: normalize_input, priority: 100 }
-            - { name: oro.api.processor, action: add_subresource, group: normalize_input, priority: 100 }
-            - { name: oro.api.processor, action: update_subresource, group: normalize_input, priority: 100 }
             - { name: oro.api.processor, action: delete_relationship, group: normalize_input, priority: 100 }
             - { name: oro.api.processor, action: add_relationship, group: normalize_input, priority: 100 }
             - { name: oro.api.processor, action: update_relationship, group: normalize_input, priority: 100 }

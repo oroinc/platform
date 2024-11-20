@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\JsonApi;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeSubresource\JsonApi;
 
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
@@ -11,17 +11,17 @@ use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Model\NotResolvedIdentifier;
-use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeRequestData;
+use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource\JsonApi\NormalizeRequestData;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
-use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeSubresourceProcessorTestCase;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class NormalizeRequestDataTest extends FormProcessorTestCase
+class NormalizeRequestDataTest extends ChangeSubresourceProcessorTestCase
 {
     /** @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject */
     private $valueNormalizer;
@@ -65,18 +65,22 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         return $associationMetadata;
     }
 
-    public function testProcessForAlreadyNormalizedData()
+    public function testProcessForAlreadyNormalizedData(): void
     {
         $inputData = ['foo' => 'bar'];
 
+        $metadata = new EntityMetadata('Test\Entity');
+        $metadata->setIdentifierFieldNames(['id']);
+
         $this->context->setRequestData($inputData);
+        $this->context->setRequestMetadata($metadata);
         $this->processor->process($this->context);
 
         self::assertSame($inputData, $this->context->getRequestData());
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessWithoutMetadata()
+    public function testProcessWithoutMetadata(): void
     {
         $inputData = [
             'data' => [
@@ -100,7 +104,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             ->method('reverseTransform');
 
         $this->context->setRequestData($inputData);
-        $this->context->setMetadata(null);
+        $this->context->setRequestMetadata(null);
         $this->processor->process($this->context);
 
         self::assertEquals($inputData, $this->context->getRequestData());
@@ -110,7 +114,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessWithMetadata()
+    public function testProcessWithMetadata(): void
     {
         $inputData = [
             'data' => [
@@ -175,7 +179,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             });
 
         $this->context->setRequestData($inputData);
-        $this->context->setMetadata($metadata);
+        $this->context->setRequestMetadata($metadata);
         $this->processor->process($this->context);
 
         $expectedData = [
@@ -208,7 +212,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessNoAttributes()
+    public function testProcessNoAttributes(): void
     {
         $inputData = [
             'data' => [
@@ -242,7 +246,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             });
 
         $this->context->setRequestData($inputData);
-        $this->context->setMetadata($metadata);
+        $this->context->setRequestMetadata($metadata);
         $this->processor->process($this->context);
 
         $expectedData = [
@@ -256,7 +260,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessWithInvalidEntityTypes()
+    public function testProcessWithInvalidEntityTypes(): void
     {
         $inputData = [
             'data' => [
@@ -293,7 +297,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             ->method('reverseTransform');
 
         $this->context->setRequestData($inputData);
-        $this->context->setMetadata($metadata);
+        $this->context->setRequestMetadata($metadata);
         $this->processor->process($this->context);
 
         $expectedData = [
@@ -328,7 +332,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessWithNotAcceptableEntityTypes()
+    public function testProcessWithNotAcceptableEntityTypes(): void
     {
         $inputData = [
             'data' => [
@@ -374,7 +378,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             ->method('reverseTransform');
 
         $this->context->setRequestData($inputData);
-        $this->context->setMetadata($metadata);
+        $this->context->setRequestMetadata($metadata);
         $this->processor->process($this->context);
 
         $expectedData = [
@@ -409,7 +413,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessWithEmptyAcceptableEntityTypes()
+    public function testProcessWithEmptyAcceptableEntityTypes(): void
     {
         $inputData = [
             'data' => [
@@ -460,7 +464,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             });
 
         $this->context->setRequestData($inputData);
-        $this->context->setMetadata($metadata);
+        $this->context->setRequestMetadata($metadata);
         $this->processor->process($this->context);
 
         $expectedData = [
@@ -485,7 +489,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessWithEmptyAcceptableEntityTypesShouldBeRejected()
+    public function testProcessWithEmptyAcceptableEntityTypesShouldBeRejected(): void
     {
         $inputData = [
             'data' => [
@@ -538,7 +542,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             });
 
         $this->context->setRequestData($inputData);
-        $this->context->setMetadata($metadata);
+        $this->context->setRequestMetadata($metadata);
         $this->processor->process($this->context);
 
         $expectedData = [
@@ -573,7 +577,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessWithInvalidIdentifiers()
+    public function testProcessWithInvalidIdentifiers(): void
     {
         $inputData = [
             'data' => [
@@ -620,7 +624,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             ->willThrowException(new \Exception('cannot normalize id'));
 
         $this->context->setRequestData($inputData);
-        $this->context->setMetadata($metadata);
+        $this->context->setRequestMetadata($metadata);
         $this->processor->process($this->context);
 
         $expectedData = [
@@ -658,7 +662,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessWithNotResolvedIdentifiers()
+    public function testProcessWithNotResolvedIdentifiers(): void
     {
         $inputData = [
             'data' => [
@@ -711,7 +715,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             });
 
         $this->context->setRequestData($inputData);
-        $this->context->setMetadata($metadata);
+        $this->context->setRequestMetadata($metadata);
         $this->processor->process($this->context);
 
         $expectedData = [
@@ -742,7 +746,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         );
     }
 
-    public function testProcessShouldNotNormalizeIdOfIncludedEntity()
+    public function testProcessShouldNotNormalizeIdOfIncludedEntity(): void
     {
         $inputData = [
             'data' => [
@@ -774,7 +778,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             ->method('reverseTransform');
 
         $this->context->setRequestData($inputData);
-        $this->context->setMetadata($metadata);
+        $this->context->setRequestMetadata($metadata);
         $this->context->setIncludedEntities($includedEntities);
         $this->processor->process($this->context);
 
@@ -789,7 +793,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessShouldNotNormalizeIdOfIncludedPrimaryEntity()
+    public function testProcessShouldNotNormalizeIdOfIncludedPrimaryEntity(): void
     {
         $inputData = [
             'data' => [
@@ -821,7 +825,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             ->method('reverseTransform');
 
         $this->context->setRequestData($inputData);
-        $this->context->setMetadata($metadata);
+        $this->context->setRequestMetadata($metadata);
         $this->context->setIncludedEntities($includedEntities);
         $this->processor->process($this->context);
 
@@ -836,24 +840,24 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessForEntityThatDoesNotHaveIdentifierFields()
+    public function testProcessForEntityThatDoesNotHaveIdentifierFields(): void
     {
         $requestData = ['meta' => ['foo' => 'bar']];
 
         $this->context->setRequestData($requestData);
-        $this->context->setMetadata(new EntityMetadata('Test\Entity'));
+        $this->context->setRequestMetadata(new EntityMetadata('Test\Entity'));
         $this->processor->process($this->context);
 
         self::assertSame($requestData['meta'], $this->context->getRequestData());
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessForEntityThatDoesNotHaveIdentifierFieldsAndNoMetaSectionInRequestData()
+    public function testProcessForEntityThatDoesNotHaveIdentifierFieldsAndNoMetaSectionInRequestData(): void
     {
         $requestData = ['another' => ['foo' => 'bar']];
 
         $this->context->setRequestData($requestData);
-        $this->context->setMetadata(new EntityMetadata('Test\Entity'));
+        $this->context->setRequestMetadata(new EntityMetadata('Test\Entity'));
         $this->processor->process($this->context);
 
         self::assertSame($requestData, $this->context->getRequestData());
