@@ -36,14 +36,10 @@ class SubresourceContext extends Context
     /** a flag indicates if an association represents "to-many" or "to-one" relationship */
     private const COLLECTION = 'collection';
 
-    /** a configuration of the parent entity */
-    private const PARENT_CONFIG = 'parentConfig';
-
-    /** metadata of the parent entity */
-    private const PARENT_METADATA = 'parentMetadata';
-
     private mixed $parentId = null;
+    private EntityDefinitionConfig|null|false $parentConfig = false;
     private ?ConfigExtraCollection $parentConfigExtras = null;
+    private EntityMetadata|null|false $parentMetadata = false;
     private ?MetadataExtraCollection $parentMetadataExtras = null;
 
     /**
@@ -278,7 +274,7 @@ class SubresourceContext extends Context
      */
     public function hasParentConfig(): bool
     {
-        return $this->has(self::PARENT_CONFIG);
+        return false !== $this->parentConfig;
     }
 
     /**
@@ -286,11 +282,11 @@ class SubresourceContext extends Context
      */
     public function getParentConfig(): ?EntityDefinitionConfig
     {
-        if (!$this->has(self::PARENT_CONFIG)) {
+        if (false === $this->parentConfig) {
             $this->loadParentConfig();
         }
 
-        return $this->get(self::PARENT_CONFIG);
+        return $this->parentConfig;
     }
 
     /**
@@ -298,11 +294,7 @@ class SubresourceContext extends Context
      */
     public function setParentConfig(?EntityDefinitionConfig $definition): void
     {
-        if ($definition) {
-            $this->set(self::PARENT_CONFIG, $definition);
-        } else {
-            $this->remove(self::PARENT_CONFIG);
-        }
+        $this->parentConfig = $definition;
     }
 
     /**
@@ -344,23 +336,15 @@ class SubresourceContext extends Context
      */
     protected function loadParentConfig(): void
     {
-        $parentEntityClass = $this->get(self::PARENT_CLASS_NAME);
+        $this->parentConfig = null;
+        $parentEntityClass = $this->getParentClassName();
         if (!$parentEntityClass) {
-            $this->set(self::PARENT_CONFIG, null);
-
             throw new RuntimeException(
                 'The parent entity class name must be set in the context before a configuration is loaded.'
             );
         }
-
-        try {
-            $config = $this->loadEntityConfig($parentEntityClass, $this->getParentConfigExtras());
-            $this->set(self::PARENT_CONFIG, $config->getDefinition());
-        } catch (\Exception $e) {
-            $this->set(self::PARENT_CONFIG, null);
-
-            throw $e;
-        }
+        $this->parentConfig = $this->loadEntityConfig($parentEntityClass, $this->getParentConfigExtras())
+            ->getDefinition();
     }
 
     /**
@@ -404,7 +388,7 @@ class SubresourceContext extends Context
      */
     public function hasParentMetadata(): bool
     {
-        return $this->has(self::PARENT_METADATA);
+        return false !== $this->parentMetadata;
     }
 
     /**
@@ -412,11 +396,11 @@ class SubresourceContext extends Context
      */
     public function getParentMetadata(): ?EntityMetadata
     {
-        if (!$this->has(self::PARENT_METADATA)) {
+        if (false === $this->parentMetadata) {
             $this->loadParentMetadata();
         }
 
-        return $this->get(self::PARENT_METADATA);
+        return $this->parentMetadata;
     }
 
     /**
@@ -424,11 +408,7 @@ class SubresourceContext extends Context
      */
     public function setParentMetadata(?EntityMetadata $metadata): void
     {
-        if ($metadata) {
-            $this->set(self::PARENT_METADATA, $metadata);
-        } else {
-            $this->remove(self::PARENT_METADATA);
-        }
+        $this->parentMetadata = $metadata;
     }
 
     /**
@@ -466,26 +446,19 @@ class SubresourceContext extends Context
      */
     protected function loadParentMetadata(): void
     {
-        $parentEntityClass = $this->get(self::PARENT_CLASS_NAME);
-        if (!$parentEntityClass) {
-            $this->set(self::PARENT_METADATA, null);
-
-            return;
-        }
-
-        try {
-            $metadata = $this->metadataProvider->getMetadata(
-                $parentEntityClass,
-                $this->getVersion(),
-                $this->getRequestType(),
-                $this->getParentConfig(),
-                $this->getParentMetadataExtras()
-            );
-            $this->set(self::PARENT_METADATA, $metadata);
-        } catch (\Exception $e) {
-            $this->set(self::PARENT_METADATA, null);
-
-            throw $e;
+        $this->parentMetadata = null;
+        $parentEntityClass = $this->getParentClassName();
+        if ($parentEntityClass) {
+            $parentConfig = $this->getParentConfig();
+            if (null !== $parentConfig) {
+                $this->parentMetadata = $this->metadataProvider->getMetadata(
+                    $parentEntityClass,
+                    $this->getVersion(),
+                    $this->getRequestType(),
+                    $parentConfig,
+                    $this->getParentMetadataExtras()
+                );
+            }
         }
     }
 }

@@ -661,6 +661,38 @@ delete_status_codes_full_syntax:
                             '417':
                                 exclude: true
 
+request_target_class_for_not_allowed_action:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    get_subresource:
+                        request_target_class: Test\Entity
+    expected: []
+    error: 'Invalid configuration for path "entity.subresources.testSubresource.actions": The "request_target_class" option is not allowed for the "get_subresource" action. This option is allowed for the following actions: "update_subresource", "add_subresource", "delete_subresource".'
+
+request_target_class:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    update_subresource:
+                        request_target_class: Test\Entity1
+                    add_subresource:
+                        request_target_class: Test\Entity2
+                    delete_subresource:
+                        request_target_class: Test\Entity3
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    update_subresource:
+                        request_target_class: Test\Entity1
+                    add_subresource:
+                        request_target_class: Test\Entity2
+                    delete_subresource:
+                        request_target_class: Test\Entity3
+
 actions:
     config:
         subresources:

@@ -21,7 +21,7 @@ class NormalizeRequestData extends AbstractNormalizeRequestData
         /** @var ChangeSubresourceContext $context */
 
         $requestData = $context->getRequestData();
-        if ($context->hasIdentifierFields()) {
+        if ($context->getRequestMetadata()?->hasIdentifierFields()) {
             if (\array_key_exists(JsonApiDoc::DATA, $requestData)) {
                 $data = $requestData[JsonApiDoc::DATA];
                 if (!\is_array($data)) {
@@ -31,7 +31,7 @@ class NormalizeRequestData extends AbstractNormalizeRequestData
                         JsonApiDoc::DATA
                     ));
                 }
-                $metadata = $context->getMetadata();
+                $metadata = $context->getRequestMetadata();
                 $this->context = $context;
                 try {
                     $path = '';

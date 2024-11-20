@@ -58,10 +58,10 @@ class BuildFormBuilder implements ProcessorInterface
 
     protected function getFormBuilder(ChangeSubresourceContext $context): ?FormBuilderInterface
     {
-        if (null === $context->getConfig()) {
+        if (null === $context->getRequestConfig()) {
             return null;
         }
-        if (null === $context->getMetadata()) {
+        if (null === $context->getRequestMetadata()) {
             return null;
         }
 
@@ -84,7 +84,7 @@ class BuildFormBuilder implements ProcessorInterface
     {
         $entryFormOptions = $this->getEntryFormOptions($context);
         if (!\array_key_exists('data_class', $entryFormOptions)) {
-            $entryFormOptions['data_class'] = $context->getClassName();
+            $entryFormOptions['data_class'] = $context->getRequestClassName();
         }
         $formBuilder->add(
             $context->getAssociationName(),
@@ -96,7 +96,7 @@ class BuildFormBuilder implements ProcessorInterface
     protected function getFormOptions(ChangeSubresourceContext $context): array
     {
         $formOptions = [];
-        $options = $context->getConfig()->getFormOptions();
+        $options = $context->getRequestConfig()->getFormOptions();
         if (!empty($options) && isset($options['validation_groups'])) {
             $formOptions['validation_groups'] = $options['validation_groups'];
         }
@@ -107,10 +107,10 @@ class BuildFormBuilder implements ProcessorInterface
 
     protected function getEntryFormOptions(ChangeSubresourceContext $context): array
     {
-        $config = $context->getConfig();
+        $config = $context->getRequestConfig();
 
         $entryFormOptions = [
-            'metadata' => $context->getMetadata(),
+            'metadata' => $context->getRequestMetadata(),
             'config'   => $config
         ];
         $options = $config->getFormOptions();

@@ -128,6 +128,12 @@ class ConfigUtil extends BaseConfigUtil
     /** the type that represents a collection valued association */
     public const TO_MANY = 'to-many';
 
+    /**
+     * the class name of a target entity for a custom subresource request;
+     * it is applicable for "update_subresource", "add_subresource" and "delete_subresource" actions
+     */
+    public const REQUEST_TARGET_CLASS = 'request_target_class';
+
     /** a list of properties on which this field depends on */
     public const DEPENDS_ON = 'depends_on';
 

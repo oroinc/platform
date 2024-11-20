@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Definition;
 
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
@@ -73,6 +74,9 @@ class ActionsConfiguration extends AbstractConfigurationSection
         return 'entities.entity' === $section;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     private function configureActionNode(NodeBuilder $node): void
     {
         $sectionName = $this->sectionName;
@@ -137,7 +141,31 @@ class ActionsConfiguration extends AbstractConfigurationSection
                         throw new \InvalidArgumentException('The value must be a string or an array.');
                     })
                 ->end()
-            ->end();
+            ->end()
+            ->scalarNode(ConfigUtil::REQUEST_TARGET_CLASS)->end();
+
+        $parentNode->end()->validate()
+            ->always(function ($v) {
+                foreach ($v as $action => $actionConfig) {
+                    if (\array_key_exists(ConfigUtil::REQUEST_TARGET_CLASS, $actionConfig)
+                        && ApiAction::UPDATE_SUBRESOURCE !== $action
+                        && ApiAction::ADD_SUBRESOURCE !== $action
+                        && ApiAction::DELETE_SUBRESOURCE !== $action
+                    ) {
+                        throw new \InvalidArgumentException(sprintf(
+                            'The "%s" option is not allowed for the "%s" action.'
+                            . ' This option is allowed for the following actions: "%s", "%s", "%s".',
+                            ConfigUtil::REQUEST_TARGET_CLASS,
+                            $action,
+                            ApiAction::UPDATE_SUBRESOURCE,
+                            ApiAction::ADD_SUBRESOURCE,
+                            ApiAction::DELETE_SUBRESOURCE
+                        ));
+                    }
+                }
+
+                return $v;
+            });
 
         $this->addStatusCodesNode($node);
 

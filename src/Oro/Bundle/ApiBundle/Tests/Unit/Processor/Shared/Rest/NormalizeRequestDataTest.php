@@ -15,7 +15,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
 class NormalizeRequestDataTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerInterface */
+    /** @var EntityIdTransformerInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $entityIdTransformer;
 
     /** @var NormalizeRequestData */
@@ -58,7 +58,23 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         return $associationMetadata;
     }
 
-    public function testProcess()
+    public function testProcessWhenNoMetadata(): void
+    {
+        $inputData = [
+            'firstName' => 'John'
+        ];
+
+        $this->entityIdTransformer->expects(self::never())
+            ->method('reverseTransform');
+
+        $this->context->setRequestData($inputData);
+        $this->context->setMetadata(null);
+        $this->processor->process($this->context);
+
+        self::assertEquals($inputData, $this->context->getRequestData());
+    }
+
+    public function testProcess(): void
     {
         $inputData = [
             'firstName'           => 'John',
@@ -124,7 +140,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessWithInvalidIdentifiers()
+    public function testProcessWithInvalidIdentifiers(): void
     {
         $inputData = [
             'toOneRelation'  => 'val1',
@@ -182,7 +198,7 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessWithNotResolvedIdentifiers()
+    public function testProcessWithNotResolvedIdentifiers(): void
     {
         $inputData = [
             'toOneRelation'  => 'val1',

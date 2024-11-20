@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresourceContext;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
@@ -20,6 +21,7 @@ use Symfony\Component\Routing\Route;
 
 /**
  * Fills ApiDoc annotation based on the configuration of API resource.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class RestDocHandler implements HandlerInterface
 {
@@ -81,44 +83,55 @@ class RestDocHandler implements HandlerInterface
             $this->setDescription($annotation, $config);
             $this->setDocumentation($annotation, $config);
             $this->setStatusCodes($annotation, $config);
-
-            if (ApiAction::UPDATE_LIST === $action) {
-                $context = $this->contextProvider->getContext($action, AsyncOperation::class, null, $route);
-                $this->setOutput(
-                    $annotation,
-                    $action,
-                    $this->contextProvider->getConfig($context),
-                    $this->contextProvider->getMetadata($context)
-                );
-            } else {
-                $metadata = $context->getMetadata();
-                if (null !== $metadata) {
-                    if ($this->hasAttribute($route, self::ID_PLACEHOLDER)) {
-                        $this->handleIdentifier($annotation, $route, $context, $config, $metadata, $associationName);
-                    }
-                    $this->filtersHandler->handle($annotation, $context->getFilters(), $metadata);
-                    $this->setInputMetadata($annotation, $action, $config, $metadata);
-                    $this->setOutputMetadata($annotation, $entityClass, $action, $config, $metadata, $associationName);
-                }
-            }
+            $this->handleBody(
+                $annotation,
+                $entityClass,
+                $action,
+                $route,
+                $context,
+                $config,
+                $associationName
+            );
         }
     }
 
-    /**
-     * Checks if a route has the given placeholder in a path.
-     */
-    private function hasAttribute(Route $route, string $placeholder): bool
-    {
-        return str_contains($route->getPath(), $placeholder);
-    }
-
-    private function getEntityClass(string $entityType): string
-    {
-        return ValueNormalizerUtil::convertToEntityClass(
-            $this->valueNormalizer,
-            $entityType,
-            $this->docViewDetector->getRequestType()
-        );
+    private function handleBody(
+        ApiDoc $annotation,
+        string $entityClass,
+        string $action,
+        Route $route,
+        Context $context,
+        EntityDefinitionConfig $config,
+        ?string $associationName
+    ): void {
+        if (ApiAction::UPDATE_LIST === $action) {
+            $context = $this->contextProvider->getContext($action, AsyncOperation::class, null, $route);
+            $this->setOutput(
+                $annotation,
+                $action,
+                $this->contextProvider->getConfig($context),
+                $this->contextProvider->getMetadata($context)
+            );
+        } else {
+            $metadata = $context->getMetadata();
+            if (null !== $metadata) {
+                if ($this->hasAttribute($route, self::ID_PLACEHOLDER)) {
+                    $this->handleIdentifier($annotation, $route, $context, $config, $metadata, $associationName);
+                }
+                $this->filtersHandler->handle($annotation, $context->getFilters(), $metadata);
+                if ($context instanceof ChangeSubresourceContext) {
+                    $this->setInputMetadata(
+                        $annotation,
+                        $action,
+                        $context->getRequestConfig(),
+                        $context->getRequestMetadata()
+                    );
+                } else {
+                    $this->setInputMetadata($annotation, $action, $config, $metadata);
+                }
+                $this->setOutputMetadata($annotation, $entityClass, $action, $config, $metadata, $associationName);
+            }
+        }
     }
 
     private function handleIdentifier(
@@ -143,6 +156,23 @@ class RestDocHandler implements HandlerInterface
                 $entityConfig->getIdentifierDescription()
             );
         }
+    }
+
+    private function getEntityClass(string $entityType): string
+    {
+        return ValueNormalizerUtil::convertToEntityClass(
+            $this->valueNormalizer,
+            $entityType,
+            $this->docViewDetector->getRequestType()
+        );
+    }
+
+    /**
+     * Checks if a route has the given placeholder in a path.
+     */
+    private function hasAttribute(Route $route, string $placeholder): bool
+    {
+        return str_contains($route->getPath(), $placeholder);
     }
 
     private function setDescription(ApiDoc $annotation, EntityDefinitionConfig $config): void

@@ -29,7 +29,7 @@ class BuildCollectionFormBuilder extends BuildFormBuilder
      */
     protected function addFormFields(FormBuilderInterface $formBuilder, ChangeSubresourceContext $context): void
     {
-        $entryDataClass = $context->getClassName();
+        $entryDataClass = $context->getRequestClassName();
         $entryFormOptions = $this->getEntryFormOptions($context);
         if (\array_key_exists('data_class', $entryFormOptions)) {
             $entryDataClass = $entryFormOptions['data_class'];

@@ -13,7 +13,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Create\CreateProcessorTestCase;
 
 class ValidateRequestDataTest extends CreateProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
+    /** @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject */
     private $valueNormalizer;
 
     /** @var ValidateRequestData */
@@ -28,7 +28,7 @@ class ValidateRequestDataTest extends CreateProcessorTestCase
         $this->processor = new ValidateRequestData($this->valueNormalizer);
     }
 
-    public function testProcessWhenRequestDataAlreadyValidated()
+    public function testProcessWhenRequestDataAlreadyValidated(): void
     {
         $this->context->setRequestData([]);
         $this->context->setProcessed(ValidateRequestData::OPERATION_NAME);
@@ -36,7 +36,7 @@ class ValidateRequestDataTest extends CreateProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWithValidRequestDataForResourceWithoutIdentifier()
+    public function testProcessWithValidRequestDataForResourceWithoutIdentifier(): void
     {
         $requestData = [
             'meta' => ['foo' => 'bar']
@@ -52,7 +52,31 @@ class ValidateRequestDataTest extends CreateProcessorTestCase
         self::assertTrue($this->context->isProcessed(ValidateRequestData::OPERATION_NAME));
     }
 
-    public function testProcessWithInvalidRequestDataForResourceWithoutIdentifier()
+    public function testProcessWithEmptyRequestDataForResourceWithIdentifier(): void
+    {
+        $requestData = [];
+
+        $metadata = new EntityMetadata('Test\Entity');
+        $metadata->setIdentifierFieldNames(['id']);
+
+        $this->context->setClassName(Product::class);
+        $this->context->setRequestData($requestData);
+        $this->context->setMetadata($metadata);
+        $this->processor->process($this->context);
+
+        $error = Error::createValidationError(
+            Constraint::REQUEST_DATA,
+            'The primary data object should exist'
+        );
+        $error->setSource(ErrorSource::createByPointer('/data'));
+        self::assertEquals(
+            [$error],
+            $this->context->getErrors()
+        );
+        self::assertTrue($this->context->isProcessed(ValidateRequestData::OPERATION_NAME));
+    }
+
+    public function testProcessWithEmptyRequestDataForResourceWithoutIdentifier(): void
     {
         $requestData = [];
 
@@ -62,19 +86,11 @@ class ValidateRequestDataTest extends CreateProcessorTestCase
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        $error = Error::createValidationError(
-            Constraint::REQUEST_DATA,
-            'The primary meta object should exist'
-        );
-        $error->setSource(ErrorSource::createByPointer('/meta'));
-        self::assertEquals(
-            [$error],
-            $this->context->getErrors()
-        );
+        self::assertEquals([], $this->context->getErrors());
         self::assertTrue($this->context->isProcessed(ValidateRequestData::OPERATION_NAME));
     }
 
-    public function testProcessWithValidRequestData()
+    public function testProcessWithValidRequestData(): void
     {
         $requestData = [
             'data' => ['type' => 'products', 'attributes' => ['foo' => 'bar']]
@@ -89,15 +105,15 @@ class ValidateRequestDataTest extends CreateProcessorTestCase
             ->willReturn(Product::class);
 
         $this->context->setClassName(Product::class);
-        $this->context->setMetadata($metadata);
         $this->context->setRequestData($requestData);
+        $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
         self::assertFalse($this->context->hasErrors());
         self::assertTrue($this->context->isProcessed(ValidateRequestData::OPERATION_NAME));
     }
 
-    public function testProcessWithInvalidRequestData()
+    public function testProcessWithInvalidRequestData(): void
     {
         $requestData = [
             'data' => ['type' => 'test', 'attributes' => ['foo' => 'bar']]
@@ -112,8 +128,8 @@ class ValidateRequestDataTest extends CreateProcessorTestCase
             ->willReturn('Test\Entity');
 
         $this->context->setClassName(Product::class);
-        $this->context->setMetadata($metadata);
         $this->context->setRequestData($requestData);
+        $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
         $error = Error::createConflictValidationError(

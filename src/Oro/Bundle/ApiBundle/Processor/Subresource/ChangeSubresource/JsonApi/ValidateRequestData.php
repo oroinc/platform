@@ -53,24 +53,32 @@ class ValidateRequestData implements ProcessorInterface
      */
     protected function validateRequestData(ChangeSubresourceContext $context): array
     {
-        $validator = new RequestDataValidator();
+        $metadata = $context->getRequestMetadata();
+        if (null === $metadata) {
+            return [];
+        }
 
-        if (!$context->hasIdentifierFields()) {
-            return $validator->validateMetaObject($context->getRequestData());
+        if (!$metadata->hasIdentifierFields()) {
+            return $this->getValidator()->validateMetaObject($context->getRequestData());
         }
 
         if ($context->isCollection()) {
-            return $validator->validateResourceObjectCollection(
+            return $this->getValidator()->validateResourceObjectCollection(
                 $context->getRequestData(),
                 $this->allowIncludedResources,
                 $this->requirePrimaryResourceId
             );
         }
 
-        return $validator->validateResourceObject(
+        return $this->getValidator()->validateResourceObject(
             $context->getRequestData(),
             $this->allowIncludedResources,
             $this->requirePrimaryResourceId
         );
+    }
+
+    private function getValidator(): RequestDataValidator
+    {
+        return new RequestDataValidator();
     }
 }

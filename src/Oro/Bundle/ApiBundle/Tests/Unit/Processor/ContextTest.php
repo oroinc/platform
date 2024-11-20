@@ -1140,7 +1140,8 @@ class ContextTest extends \PHPUnit\Framework\TestCase
 
         // test remove metadata
         $this->context->setMetadata(null);
-        self::assertFalse($this->context->hasMetadata());
+        self::assertTrue($this->context->hasMetadata());
+        self::assertNull($this->context->getMetadata());
     }
 
     public function testMetadataExtras()

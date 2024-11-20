@@ -42,6 +42,13 @@ services:
     # normalize_input
     #
 
+    oro_api.change_subresource.validate_request_data_exist:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource\ValidateRequestDataExist
+        tags:
+            - { name: oro.api.processor, action: delete_subresource, group: normalize_input, priority: 100 }
+            - { name: oro.api.processor, action: add_subresource, group: normalize_input, priority: 100 }
+            - { name: oro.api.processor, action: update_subresource, group: normalize_input, priority: 100 }
+
     oro_api.change_subresource.json_api.validate_request_data:
         class: Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource\JsonApi\ValidateRequestData
         tags:

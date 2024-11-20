@@ -273,8 +273,6 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals($config, $this->context->getParentConfig()); // load config
         self::assertTrue($this->context->hasParentConfig());
-        self::assertTrue($this->context->has('parentConfig'));
-        self::assertEquals($config, $this->context->get('parentConfig'));
 
         // test that a config is loaded only once
         self::assertEquals($config, $this->context->getParentConfig());
@@ -322,8 +320,6 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
             self::assertSame($exception, $e);
         }
         self::assertTrue($this->context->hasParentConfig());
-        self::assertTrue($this->context->has('parentConfig'));
-        self::assertNull($this->context->get('parentConfig'));
 
         // test that a config is loaded only once
         self::assertNull($this->context->getParentConfig());
@@ -344,9 +340,6 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         $config = new EntityDefinitionConfig();
         $config->setExcludeAll();
 
-        $this->context->setParentClassName('Test\Class');
-        $this->context->setAssociationName('test');
-
         $this->configProvider->expects(self::never())
             ->method('getConfig');
 
@@ -354,12 +347,11 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
 
         self::assertTrue($this->context->hasParentConfig());
         self::assertEquals($config, $this->context->getParentConfig());
-        self::assertTrue($this->context->has('parentConfig'));
-        self::assertEquals($config, $this->context->get('parentConfig'));
 
         // test remove config
         $this->context->setParentConfig(null);
-        self::assertFalse($this->context->hasParentConfig());
+        self::assertTrue($this->context->hasParentConfig());
+        self::assertNull($this->context->getParentConfig());
     }
 
     public function testGetParentMetadataExtras()
@@ -489,8 +481,6 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
 
         self::assertSame($metadata, $this->context->getParentMetadata()); // load metadata
         self::assertTrue($this->context->hasParentMetadata());
-        self::assertTrue($this->context->has('parentMetadata'));
-        self::assertSame($metadata, $this->context->get('parentMetadata'));
 
         self::assertEquals($config, $this->context->getParentConfig());
 
@@ -549,8 +539,6 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
 
         self::assertSame($metadata, $this->context->getParentMetadata()); // load metadata
         self::assertTrue($this->context->hasParentMetadata());
-        self::assertTrue($this->context->has('parentMetadata'));
-        self::assertSame($metadata, $this->context->get('parentMetadata'));
 
         self::assertEquals($config, $this->context->getParentConfig());
 
@@ -620,8 +608,6 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
             self::assertSame($exception, $e);
         }
         self::assertTrue($this->context->hasParentMetadata());
-        self::assertTrue($this->context->has('parentMetadata'));
-        self::assertNull($this->context->get('parentMetadata'));
 
         self::assertEquals($config, $this->context->getParentConfig());
 
@@ -629,11 +615,9 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getParentMetadata());
     }
 
-    public function testMetadataWhenItIsSetExplicitly()
+    public function testParentMetadataWhenItIsSetExplicitly()
     {
         $metadata = new EntityMetadata('Test\Entity');
-
-        $this->context->setClassName('Test\Class');
 
         $this->configProvider->expects(self::never())
             ->method('getConfig');
@@ -644,12 +628,11 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
 
         self::assertTrue($this->context->hasParentMetadata());
         self::assertSame($metadata, $this->context->getParentMetadata());
-        self::assertTrue($this->context->has('parentMetadata'));
-        self::assertSame($metadata, $this->context->get('parentMetadata'));
 
         // test remove metadata
         $this->context->setParentMetadata(null);
-        self::assertFalse($this->context->hasParentMetadata());
+        self::assertTrue($this->context->hasParentMetadata());
+        self::assertNull($this->context->getParentMetadata());
     }
 
     public function testHateoas()

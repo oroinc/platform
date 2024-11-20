@@ -17,11 +17,14 @@ class NormalizeRequestData extends AbstractNormalizeRequestData
     {
         /** @var FormContext $context */
 
+        $metadata = $context->getMetadata();
+        if (null === $metadata) {
+            return;
+        }
+
         $this->context = $context;
         try {
-            $context->setRequestData(
-                $this->normalizeData($context->getRequestData(), $context->getMetadata())
-            );
+            $context->setRequestData($this->normalizeData($context->getRequestData(), $metadata));
         } finally {
             $this->context = null;
         }

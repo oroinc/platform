@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource\Rest;
 
-use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\Shared\Rest\AbstractNormalizeRequestData;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresourceContext;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -19,19 +18,27 @@ class NormalizeRequestData extends AbstractNormalizeRequestData
     {
         /** @var ChangeSubresourceContext $context */
 
-        $data = $context->getRequestData();
-        if (!\is_array($data)) {
-            // the request data were not validated
-            throw new RuntimeException('The request data should be an array.');
+        $metadata = $context->getRequestMetadata();
+        if (null === $metadata) {
+            return;
         }
 
-        $metadata = $context->getMetadata();
+        $data = $context->getRequestData();
         $this->context = $context;
         try {
             if ($context->isCollection()) {
                 $normalizedData = [];
                 foreach ($data as $key => $value) {
-                    $normalizedData[$key] = $this->normalizeData($data, $metadata);
+                    if (\is_array($value)) {
+                        $this->requestDataItemKey = (string)$key;
+                        try {
+                            $normalizedData[$key] = $this->normalizeData($value, $metadata);
+                        } finally {
+                            $this->requestDataItemKey = null;
+                        }
+                    } else {
+                        $normalizedData[$key] = $this->normalizeData($value, $metadata);
+                    }
                 }
             } else {
                 $normalizedData = $this->normalizeData($data, $metadata);

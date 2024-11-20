@@ -34,33 +34,20 @@ class PrepareFormData implements ProcessorInterface
         }
 
         $associationName = $context->getAssociationName();
-
-        $data = $context->getResult();
-        if (\is_array($data) && \array_key_exists($associationName, $data) && \count($data) !== 1) {
-            // the form data are already prepared
-            return;
-        }
-
-        $associationData = null;
-        if ($this->tryGetAssociationData($context, $associationData)) {
-            $context->setRequestData([$associationName => $context->getRequestData()]);
-            $context->setResult([$associationName => $associationData]);
-        }
+        $context->setRequestData([$associationName => $context->getRequestData()]);
+        $context->setResult([$associationName => $this->getAssociationData($context)]);
     }
 
-    private function tryGetAssociationData(ChangeSubresourceContext $context, mixed &$associationData): bool
+    private function getAssociationData(ChangeSubresourceContext $context): mixed
     {
         try {
-            $associationData = $this->propertyAccessor->getValue(
+            return $this->propertyAccessor->getValue(
                 $context->getParentEntity(),
                 $this->getEntityFieldName($context->getAssociationName(), $context->getParentConfig())
             );
-        } catch (AccessException $e) {
-            // this processor should do nothing if an association does not exist
-            return false;
+        } catch (AccessException) {
+            return $this->createObject($context->getRequestClassName());
         }
-
-        return true;
     }
 
     private function getEntityFieldName(string $fieldName, ?EntityDefinitionConfig $config): string
@@ -69,11 +56,16 @@ class PrepareFormData implements ProcessorInterface
             return $fieldName;
         }
 
-        $name = $config->findFieldNameByPropertyPath($fieldName);
-        if (!$name) {
-            $name = $fieldName;
+        $field = $config->getField($fieldName);
+        if (null === $field) {
+            return $fieldName;
         }
 
-        return $name;
+        return $field->getPropertyPath($fieldName);
+    }
+
+    private function createObject(string $className): object
+    {
+        return new $className();
     }
 }
