@@ -1,0 +1,71 @@
+{
+  "3166-2": [
+    {
+      "code": "FR-01",
+      "name": "Ain",
+      "parent": "FR-ARA",
+      "type": "Metropolitan department"
+    },
+    {
+      "code": "FR-02",
+      "name": "Aisne",
+      "parent": "FR-HDF",
+      "type": "Metropolitan department"
+    },
+    {
+      "code": "FR-03",
+      "name": "Allier",
+      "parent": "FR-ARA",
+      "type": "Metropolitan department"
+    },
+    {
+      "code": "FR-04",
+      "name": "Alpes-de-Haute-Provence",
+      "parent": "FR-ARA",
+      "type": "Metropolitan department"
+    },
+    {
+      "code": "IT-21",
+      "name": "Piemonte",
+      "type": "Region"
+    },
+    {
+      "code": "IT-25",
+      "name": "Lombardia",
+      "type": "Region"
+    },
+    {
+      "code": "IT-999",
+      "name": "Some new Place",
+      "type": "Region"
+    },
+    {
+      "code": "ES-A",
+      "name": "Alacant*",
+      "parent": "ES-VC",
+      "type": "Province"
+    },
+    {
+      "code": "ES-AB",
+      "name": "Albacete",
+      "parent": "ES-CM",
+      "type": "Province"
+    },
+    {
+      "code": "ES-AL",
+      "name": "Almería",
+      "parent": "ES-AN",
+      "type": "Province"
+    },
+    {
+      "code": "FI-05",
+      "name": "Kainuu",
+      "type": "Region"
+    },
+    {
+      "code": "FI-08",
+      "name": "Keski-Suomi",
+      "type": "Region"
+    }
+  ]
+}
