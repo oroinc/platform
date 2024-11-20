@@ -404,6 +404,7 @@ class ExtendConfigDumper
         $relationProperties = isset($schema['relation']) && null !== $filter ? $schema['relation'] : [];
         $defaultProperties  = isset($schema['default']) && null !== $filter ? $schema['default'] : [];
         $addRemoveMethods   = isset($schema['addremove']) && null !== $filter ? $schema['addremove'] : [];
+        $attribute          = $schema['attribute'] ?? null;
 
         $fieldConfigs = null === $filter
             ? $configProvider->getConfigs($className, true)
@@ -472,6 +473,9 @@ class ExtendConfigDumper
             'addremove' => $addRemoveMethods,
             'doctrine'  => $doctrine,
         ];
+        if (null !== $attribute) {
+            $schema['attribute'] = $attribute;
+        }
 
         if ($type === 'Extend') {
             $parentClassName = class_exists($className) ? get_parent_class($className) : false;
