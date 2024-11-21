@@ -3,6 +3,11 @@
 namespace Oro\Bundle\ActionBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
+use Oro\Bundle\ActionBundle\Event\ActionGroupEventDispatcher;
+use Oro\Bundle\ActionBundle\Event\ActionGroupExecuteEvent;
+use Oro\Bundle\ActionBundle\Event\ActionGroupGuardEvent;
+use Oro\Bundle\ActionBundle\Event\ActionGroupPreExecuteEvent;
+use Oro\Bundle\ActionBundle\Exception\ForbiddenActionGroupException;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 /**
@@ -16,41 +21,36 @@ class ActionGroupServiceAdapter implements ActionGroupInterface
     private ?array $parameters = null;
     private array $parameterNameToArgumentName = [];
     private array $argumentNameToParameterName = [];
-    private ?ActionGroupDefinition $definition = null;
 
     public function __construct(
         private ActionGroup\ParametersResolver $parametersResolver,
         private object $service,
+        private ActionGroupEventDispatcher $eventDispatcher,
         private string $method,
         private ?string $returnValueName,
-        private ?array $parametersConfig
+        private ?array $parametersConfig,
+        private ActionGroupDefinition $definition
     ) {
     }
 
     #[\Override]
     public function execute(ActionData $data, Collection $errors = null): ActionData
     {
-        try {
-            $this->parametersResolver->resolve($data, $this, $errors, true);
+        $this->parametersResolver->resolve($data, $this, $errors, true);
 
-            // call_user_func_array allows to use named arguments
-            $result = call_user_func_array(
-                [$this->service, $this->method],
-                $this->getMethodArguments($data)
+        if (!$this->isAllowed($data, $errors)) {
+            throw new ForbiddenActionGroupException(
+                sprintf('ActionGroup "%s" is not allowed', $this->definition->getName())
             );
-
-            if ($this->returnValueName) {
-                $result = [$this->returnValueName => $result];
-            } elseif (!$result instanceof ActionData && !is_array($result)) {
-                $result = [self::RESULT_VALUE_KEY => $result];
-            }
-
-            if (is_array($result)) {
-                $this->mapResultToContext($data, $result);
-            }
-        } catch (ActionGroup\Exception $e) {
-            $this->processException($errors, $e);
         }
+
+        $preExecuteEvent = new ActionGroupPreExecuteEvent($data, $this->getDefinition(), $errors);
+        $this->eventDispatcher->dispatch($preExecuteEvent);
+
+        $this->executeService($data, $errors);
+
+        $executeEvent = new ActionGroupExecuteEvent($data, $this->getDefinition(), $errors);
+        $this->eventDispatcher->dispatch($executeEvent);
 
         return $data;
     }
@@ -58,17 +58,19 @@ class ActionGroupServiceAdapter implements ActionGroupInterface
     #[\Override]
     public function getDefinition(): ActionGroupDefinition
     {
-        if (!$this->definition) {
-            $this->definition = new ActionGroupDefinition();
-            $this->definition->setName('service:' . get_class($this->service) . '::' . $this->method);
-        }
-
         return $this->definition;
     }
 
     #[\Override]
     public function isAllowed(ActionData $data, Collection $errors = null): bool
     {
+        $guardEvent = new ActionGroupGuardEvent($data, $this->getDefinition(), $errors);
+        $this->eventDispatcher->dispatch($guardEvent);
+
+        if (!$guardEvent->isAllowed()) {
+            return false;
+        }
+
         return true;
     }
 
@@ -164,6 +166,29 @@ class ActionGroupServiceAdapter implements ActionGroupInterface
                 $this->parameterNameToArgumentName[$name] = $argName;
                 $this->argumentNameToParameterName[$argName] = $name;
             }
+        }
+    }
+
+    private function executeService(ActionData $data, ?Collection $errors = null): void
+    {
+        try {
+            // call_user_func_array allows to use named arguments
+            $result = call_user_func_array(
+                [$this->service, $this->method],
+                $this->getMethodArguments($data)
+            );
+
+            if ($this->returnValueName) {
+                $result = [$this->returnValueName => $result];
+            } elseif (!$result instanceof ActionData && !is_array($result)) {
+                $result = [self::RESULT_VALUE_KEY => $result];
+            }
+
+            if (is_array($result)) {
+                $this->mapResultToContext($data, $result);
+            }
+        } catch (ActionGroup\Exception $e) {
+            $this->processException($errors, $e);
         }
     }
 }

@@ -19,7 +19,7 @@ class ValidateRequestDataExist implements ProcessorInterface
         /** @var FormContext $context */
 
         $requestData = $context->getRequestData();
-        if (empty($requestData)) {
+        if (empty($requestData) && $context->hasIdentifierFields()) {
             $context->addError(
                 Error::createValidationError(
                     Constraint::REQUEST_DATA,

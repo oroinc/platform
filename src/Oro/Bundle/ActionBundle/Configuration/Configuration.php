@@ -28,6 +28,9 @@ class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     protected function appendActionGroups(NodeBuilder $builder)
     {
         $builder->arrayNode('action_groups')
@@ -58,6 +61,13 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->validate()
                     ->always(function ($config) {
+                        if (!empty($value['service']) && (!empty($value['actions']) || !empty($value['conditions']))) {
+                            throw new \Exception(
+                                'Conditions and actions are not allowed to be used when "service" is configured ' .
+                                'for action_group'
+                            );
+                        }
+
                         if (!empty($config['return_value_name']) && empty($config['service'])) {
                             throw new \Exception(
                                 '"return_value_name" can be used only with "service" parameter'
@@ -81,6 +91,9 @@ class Configuration implements ConfigurationInterface
         ->end();
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     protected function appendOperations(NodeBuilder $builder)
     {
         $children = $builder
@@ -90,6 +103,7 @@ class Configuration implements ConfigurationInterface
                     ->children();
 
         $children
+            ->scalarNode('service')->end()
             ->arrayNode('replace')
                 ->beforeNormalization()
                     ->always(
@@ -147,6 +161,36 @@ class Configuration implements ConfigurationInterface
             ->append($this->getFrontendOptionsNode())
             ->append($this->getDatagridOptionsNode())
             ->append($this->getFormOptionsNode())
+            ->end()
+            ->validate()
+                ->always(function ($value) {
+                    if (!empty($value['service'])
+                        && (
+                            !empty($value[OperationDefinition::PRECONDITIONS])
+                            || !empty($value[OperationDefinition::PREACTIONS])
+                            || !empty($value[OperationDefinition::CONDITIONS])
+                            || !empty($value[OperationDefinition::ACTIONS])
+                        )
+                    ) {
+                        throw new \Exception(
+                            sprintf(
+                                'Individual logical sections %s are not allowed when "service" is configured',
+                                implode(
+                                    ', ',
+                                    [
+                                        OperationDefinition::PRECONDITIONS,
+                                        OperationDefinition::PREACTIONS,
+                                        OperationDefinition::CONDITIONS,
+                                        OperationDefinition::ACTIONS,
+                                    ]
+                                )
+                            )
+                        );
+                    }
+
+                    return $value;
+                })
+            ->end()
         ->end();
 
         $this->appendActionsNodes($children);

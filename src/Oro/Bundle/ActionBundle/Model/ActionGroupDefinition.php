@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Model;
 
+/**
+ * Storage for Action Group Definition.
+ */
 class ActionGroupDefinition
 {
     /** @var string */
@@ -15,6 +18,9 @@ class ActionGroupDefinition
 
     /** @var array */
     private $parameters = [];
+
+    /** @var string|array|null */
+    private $aclResource = null;
 
     /**
      * @return string
@@ -88,6 +94,18 @@ class ActionGroupDefinition
     public function setParameters(array $parameters)
     {
         $this->parameters = $parameters;
+
+        return $this;
+    }
+
+    public function getAclResource(): string|array|null
+    {
+        return $this->aclResource;
+    }
+
+    public function setAclResource(string|array|null $aclResource): self
+    {
+        $this->aclResource = $aclResource;
 
         return $this;
     }

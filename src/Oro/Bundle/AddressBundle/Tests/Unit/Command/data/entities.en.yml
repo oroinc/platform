@@ -1,0 +1,14 @@
+country:
+  FR: France
+  IT: Italy
+  ES: Spain
+  QQ: QQLand
+region:
+  FR-01: Ain
+  FR-02: Aisne
+  FR-03: Allier
+  IT-21: Piemonte
+  IT-25: Lombardia
+  ES-A: Alicante
+  ES-AB: Albacete
+  ES-AL: Barcelona

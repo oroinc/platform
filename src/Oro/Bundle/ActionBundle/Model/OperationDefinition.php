@@ -4,6 +4,8 @@ namespace Oro\Bundle\ActionBundle\Model;
 
 /**
  * Contains operation properties from operation config
+ *
+ * @SuppressWarnings(PHPMD.TooManyFields)
  */
 class OperationDefinition
 {
@@ -61,6 +63,9 @@ class OperationDefinition
 
     /** @var array */
     private $actionGroups = [];
+
+    /** @var string|array|null */
+    private $aclResource = null;
 
     /**
      * @return array
@@ -364,6 +369,18 @@ class OperationDefinition
     public function setSubstituteOperation($substituteOperation)
     {
         $this->substituteOperation = $substituteOperation;
+
+        return $this;
+    }
+
+    public function getAclResource(): string|array|null
+    {
+        return $this->aclResource;
+    }
+
+    public function setAclResource(string|array|null $aclResource): self
+    {
+        $this->aclResource = $aclResource;
 
         return $this;
     }

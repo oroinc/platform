@@ -95,12 +95,6 @@ class NormalizeRequestData implements ProcessorInterface
     }
 
     /**
-     * @param string         $path
-     * @param string         $pointer
-     * @param string         $entityType
-     * @param mixed          $entityId
-     * @param EntityMetadata $metadata
-     *
      * @return array ['class' => entity class, 'id' => entity id]
      */
     private function normalizeRelationId(

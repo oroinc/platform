@@ -279,8 +279,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit\Framework\TestCase
 
         $extension->process($containerBuilder);
 
-        $elementFactoryDefinition = $containerBuilder->getDefinition('oro_element_factory');
-        $elements = $elementFactoryDefinition->getArgument(2);
+        $elements = $containerBuilder->getParameter('oro_test.elements');
 
         self::assertCount(2, $elements);
         self::assertArrayHasKey('MyElement1', $elements);

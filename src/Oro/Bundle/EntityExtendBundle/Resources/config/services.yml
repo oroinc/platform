@@ -911,3 +911,11 @@ services:
         class: Oro\Bundle\EntityExtendBundle\Manager\EnumOptionTranslationManager
         arguments:
             - '@doctrine'
+
+    oro_entity_extend.voter.custom_entity_creation_feature_voter:
+        class: Oro\Bundle\EntityExtendBundle\Voter\CustomEntityCreationFeatureVoter
+        public: true
+        arguments:
+            - '%kernel.debug%'
+        tags:
+            - { name: oro_featuretogle.voter }

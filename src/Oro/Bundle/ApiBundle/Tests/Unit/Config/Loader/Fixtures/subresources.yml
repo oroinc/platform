@@ -212,6 +212,20 @@ action_form:
                     form_options:
                         option1: value1
 
+request_target_class:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    add_subresource:
+                        request_target_class: Test\Entity2
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    add_subresource:
+                        request_target_class: Test\Entity2
+
 action_field_exclude:
     config:
         testSubresource:

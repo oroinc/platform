@@ -12,7 +12,7 @@ use Oro\Component\PhpUtils\ArrayUtil;
 abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValidator
 {
     /**
-     * Validates that the given request data contains "meta" section
+     * Validates that the given request data contains optional "meta" section
      * and does not contains the "data" and "included" sections.
      *
      * @param array $requestData
@@ -24,7 +24,15 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
         return $this->doValidation(function () use ($requestData) {
             $this->validateJsonApiSection($requestData);
             $this->validateLinksSection($requestData);
-            if ($this->validateRequestData($requestData, JsonApiDoc::META)) {
+            $isValid = true;
+            if (\array_key_exists(JsonApiDoc::META, $requestData) && null === $requestData[JsonApiDoc::META]) {
+                $this->addError(
+                    $this->buildPointer(self::ROOT_POINTER, JsonApiDoc::META),
+                    sprintf('The primary %s object should not be empty', JsonApiDoc::META)
+                );
+                $isValid = false;
+            }
+            if ($isValid) {
                 $this->validateSectionNotExist($requestData, JsonApiDoc::DATA);
                 $this->validateSectionNotExist($requestData, JsonApiDoc::INCLUDED);
             }
@@ -37,13 +45,13 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
         if (!\array_key_exists($rootSection, $data)) {
             $this->addError(
                 $this->buildPointer(self::ROOT_POINTER, $rootSection),
-                sprintf('The primary %s object should exist', strtolower($rootSection))
+                sprintf('The primary %s object should exist', $rootSection)
             );
             $isValid = false;
         } elseif (empty($data[$rootSection])) {
             $this->addError(
                 $this->buildPointer(self::ROOT_POINTER, $rootSection),
-                sprintf('The primary %s object should not be empty', strtolower($rootSection))
+                sprintf('The primary %s object should not be empty', $rootSection)
             );
             $isValid = false;
         }
@@ -97,13 +105,13 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
         if (!\array_key_exists($rootSection, $data)) {
             $this->addError(
                 $this->buildPointer(self::ROOT_POINTER, $rootSection),
-                sprintf('The primary %s object collection should exist', strtolower($rootSection))
+                sprintf('The primary %s object collection should exist', $rootSection)
             );
             $isValid = false;
         } elseif (empty($data[$rootSection])) {
             $this->addError(
                 $this->buildPointer(self::ROOT_POINTER, $rootSection),
-                sprintf('The primary %s object collection should not be empty', strtolower($rootSection))
+                sprintf('The primary %s object collection should not be empty', $rootSection)
             );
             $isValid = false;
         }
