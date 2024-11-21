@@ -1,0 +1,5 @@
+features:
+    custom_entity_creation:
+        label: 'Create Custom Entity'
+        routes:
+            - oro_entityextend_entity_create

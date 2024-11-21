@@ -21,6 +21,7 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
 {
     protected EntityIdTransformerRegistry $entityIdTransformerRegistry;
     protected ?FormContext $context = null;
+    protected ?string $requestDataItemKey = null;
 
     public function __construct(EntityIdTransformerRegistry $entityIdTransformerRegistry)
     {
@@ -87,7 +88,10 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
                 ->reverseTransform($entityId, $metadata);
             if (null === $normalizedId) {
                 $this->context->addNotResolvedIdentifier(
-                    'requestData' . ConfigUtil::PATH_DELIMITER . $propertyPath,
+                    'requestData'
+                    . (null !== $this->requestDataItemKey ? '.' . $this->requestDataItemKey : '')
+                    . ConfigUtil::PATH_DELIMITER
+                    . $propertyPath,
                     new NotResolvedIdentifier($entityId, $metadata->getClassName())
                 );
             }
@@ -110,7 +114,9 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
     {
         $error = Error::createValidationError($title);
         if (null !== $propertyPath) {
-            $error->setSource(ErrorSource::createByPropertyPath($propertyPath));
+            $error->setSource(ErrorSource::createByPropertyPath(
+                (null !== $this->requestDataItemKey ? $this->requestDataItemKey . '.' : '') . $propertyPath
+            ));
         }
         $this->context->addError($error);
 

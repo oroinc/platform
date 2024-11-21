@@ -3,6 +3,12 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\ActionBundle\Event\OperationAllowanceEvent;
+use Oro\Bundle\ActionBundle\Event\OperationAnnounceEvent;
+use Oro\Bundle\ActionBundle\Event\OperationEventDispatcher;
+use Oro\Bundle\ActionBundle\Event\OperationExecuteEvent;
+use Oro\Bundle\ActionBundle\Event\OperationGuardEvent;
+use Oro\Bundle\ActionBundle\Event\OperationPreExecuteEvent;
 use Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
@@ -11,41 +17,34 @@ use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeManager;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
+use Oro\Bundle\ActionBundle\Model\OperationServiceInterface;
 use Oro\Bundle\ActionBundle\Resolver\OptionsResolver;
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\ConfigExpression\ExpressionFactory;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Rule\InvocationOrder;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class OperationTest extends \PHPUnit\Framework\TestCase
+class OperationTest extends TestCase
 {
-    /** @var OperationDefinition|\PHPUnit\Framework\MockObject\MockObject */
-    private $definition;
-
-    /** @var ActionFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $actionFactory;
-
-    /** @var ExpressionFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $conditionFactory;
-
-    /** @var AttributeAssembler|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeAssembler;
-
-    /** @var FormOptionsAssembler|\PHPUnit\Framework\MockObject\MockObject */
-    private $formOptionsAssembler;
-
-    /** @var ActionData */
-    private $data;
+    private OperationDefinition|MockObject $definition;
+    private ActionFactory|MockObject $actionFactory;
+    private ExpressionFactory|MockObject $conditionFactory;
+    private AttributeAssembler|MockObject $attributeAssembler;
+    private FormOptionsAssembler|MockObject $formOptionsAssembler;
+    private OptionsResolver|MockObject $optionsResolver;
+    private OperationEventDispatcher|MockObject $eventDispatcher;
+    private ActionData $data;
 
     /** @var Operation */
     private $operation;
-
-    private OptionsResolver $optionsResolver;
 
     #[\Override]
     protected function setUp(): void
@@ -56,6 +55,8 @@ class OperationTest extends \PHPUnit\Framework\TestCase
         $this->attributeAssembler = $this->createMock(AttributeAssembler::class);
         $this->formOptionsAssembler = $this->createMock(FormOptionsAssembler::class);
         $this->optionsResolver = $this->createMock(OptionsResolver::class);
+        $this->eventDispatcher = $this->createMock(OperationEventDispatcher::class);
+
         $this->data = new ActionData();
 
         $this->operation = new Operation(
@@ -64,6 +65,7 @@ class OperationTest extends \PHPUnit\Framework\TestCase
             $this->attributeAssembler,
             $this->formOptionsAssembler,
             $this->optionsResolver,
+            $this->eventDispatcher,
             $this->definition
         );
     }
@@ -116,6 +118,7 @@ class OperationTest extends \PHPUnit\Framework\TestCase
 
     /**
      * @dataProvider executeProvider
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function testExecute(
         ActionData $data,
@@ -123,7 +126,8 @@ class OperationTest extends \PHPUnit\Framework\TestCase
         array $actions,
         array $conditions,
         string $operationName,
-        string $exceptionMessage = ''
+        string $exceptionMessage = '',
+        array $expectedEvents = []
     ) {
         $this->definition->expects($this->any())
             ->method('getName')
@@ -174,17 +178,10 @@ class OperationTest extends \PHPUnit\Framework\TestCase
             ->with($this->equalTo(true))
             ->willReturnSelf();
 
-        if (!$exceptionMessage) {
-            $this->definition
-                ->expects($this->exactly(2))
-                ->method('getEnabled')
-                ->willReturn(true);
-        } else {
-            $this->definition
-                ->expects($this->exactly(1))
-                ->method('getEnabled')
-                ->willReturn(true);
-        }
+        $this->definition
+            ->expects($this->any())
+            ->method('getEnabled')
+            ->willReturn(true);
 
         $this->actionFactory->expects($this->any())
             ->method('create')
@@ -206,6 +203,22 @@ class OperationTest extends \PHPUnit\Framework\TestCase
         $errors = new ArrayCollection();
 
         $this->assertArrayNotHasKey('errors', $data);
+
+        $eventArgs = [];
+        foreach ($expectedEvents as $expectedEvent) {
+            if ($expectedEvent === 'announce') {
+                $eventArgs[] = [new OperationAnnounceEvent($data, $this->definition, $errors)];
+            } elseif ($expectedEvent === 'guard') {
+                $eventArgs[] = [new OperationGuardEvent($data, $this->definition, $errors)];
+            } elseif ($expectedEvent === 'pre_execute') {
+                $eventArgs[] = [new OperationPreExecuteEvent($data, $this->definition, $errors)];
+            } elseif ($expectedEvent === 'execute') {
+                $eventArgs[] = [new OperationExecuteEvent($data, $this->definition, $errors)];
+            }
+        }
+        $this->eventDispatcher->expects($this->exactly(count($expectedEvents)))
+            ->method('dispatch')
+            ->withConsecutive(...$eventArgs);
 
         $this->operation->execute($data, $errors);
 
@@ -241,7 +254,8 @@ class OperationTest extends \PHPUnit\Framework\TestCase
                     'conditions' => $this->createCondition($this->never(), $data, true),
                 ],
                 'operationName' => 'TestName1',
-                'exception' => 'Operation "TestName1" is not allowed.'
+                'exception' => 'Operation "TestName1" is not allowed.',
+                'expectedEvents' => ['announce']
             ],
             '!isConditionAllowed' => [
                 'data' => $data,
@@ -255,7 +269,8 @@ class OperationTest extends \PHPUnit\Framework\TestCase
                     'conditions' => $this->createCondition($this->once(), $data, false),
                 ],
                 'operationName' => 'TestName2',
-                'exception' => 'Operation "TestName2" is not allowed.'
+                'exception' => 'Operation "TestName2" is not allowed.',
+                'expectedEvents' => ['announce', 'guard']
             ],
             'isAllowed' => [
                 'data' => $data,
@@ -269,8 +284,97 @@ class OperationTest extends \PHPUnit\Framework\TestCase
                     'conditions' => $this->createCondition($this->once(), $data, true),
                 ],
                 'operationName' => 'TestName3',
+                '',
+                'expectedEvents' => ['announce', 'guard', 'pre_execute', 'execute']
             ],
         ];
+    }
+
+    public function testExecuteService()
+    {
+        $data = new ActionData();
+        $errors = new ArrayCollection();
+
+        $this->definition->expects($this->any())
+            ->method('getName')
+            ->willReturn('operation_name');
+        $this->definition->expects($this->never())
+            ->method('getConditions');
+
+        $this->definition->expects($this->never())
+            ->method('getActions');
+        $this->definition->expects($this->once())
+            ->method('getFrontendOptions')
+            ->willReturn([]);
+        $this->definition->expects($this->once())
+            ->method('getButtonOptions')
+            ->willReturn([]);
+
+        $this->optionsResolver
+            ->expects($this->exactly(3))
+            ->method('resolveOptions')
+            ->willReturnOnConsecutiveCalls(
+                ['enabled' => true],
+                [],
+                []
+            );
+
+        $this->definition->expects($this->once())
+            ->method('setFrontendOptions')
+            ->with($this->equalTo([]))
+            ->willReturnSelf();
+
+        $this->definition->expects($this->once())
+            ->method('setButtonOptions')
+            ->with($this->equalTo([]))
+            ->willReturnSelf();
+
+        $this->definition->expects($this->once())
+            ->method('setEnabled')
+            ->with($this->equalTo(true))
+            ->willReturnSelf();
+
+        $this->definition->expects($this->any())
+            ->method('getEnabled')
+            ->willReturn(true);
+
+        $this->actionFactory->expects($this->never())
+            ->method('create');
+
+        $this->conditionFactory->expects($this->never())
+            ->method('create');
+
+        $this->assertArrayNotHasKey('errors', $data);
+
+        $announceEvent = new OperationAnnounceEvent($data, $this->definition, $errors);
+        $guardEvent = new OperationGuardEvent($data, $this->definition, $errors);
+        $preExecuteEvent = new OperationPreExecuteEvent($data, $this->definition, $errors);
+        $executeEvent = new OperationExecuteEvent($data, $this->definition, $errors);
+        $this->eventDispatcher->expects($this->exactly(4))
+            ->method('dispatch')
+            ->withConsecutive(
+                [$announceEvent],
+                [$guardEvent],
+                [$preExecuteEvent],
+                [$executeEvent],
+            );
+
+        $service = $this->createMock(OperationServiceInterface::class);
+        $service->expects($this->once())
+            ->method('isPreConditionAllowed')
+            ->with($data, $errors)
+            ->willReturn(true);
+        $service->expects($this->once())
+            ->method('isConditionAllowed')
+            ->with($data, $errors)
+            ->willReturn(true);
+        $service->expects($this->once())
+            ->method('execute')
+            ->with($data);
+
+        $this->operation->setOperationService($service);
+
+        $this->operation->execute($data, $errors);
     }
 
     /**
@@ -491,6 +595,101 @@ class OperationTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
+    public function testIsAvailableBlockedByEvent()
+    {
+        $data = new ActionData();
+
+        $event = new OperationAnnounceEvent($data, $this->definition);
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with($event)
+            ->willReturnCallback(function (OperationAnnounceEvent $event) {
+                $event->setAllowed(false);
+            });
+
+        $this->assertFalse($this->operation->isAvailable($data));
+    }
+
+    public function testIsAllowedBlockedByEventAnnounce()
+    {
+        $data = new ActionData();
+        $errors = new ArrayCollection();
+
+        $this->definition->expects($this->any())
+            ->method('getEnabled')
+            ->willReturn(true);
+
+        $event = new OperationAnnounceEvent($data, $this->definition, $errors);
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with($event)
+            ->willReturnCallback(function (OperationAnnounceEvent $event) {
+                $event->setAllowed(false);
+            });
+
+        // For simplicity service is used here
+        $service = $this->createMock(OperationServiceInterface::class);
+        $service->expects($this->any())
+            ->method('isPreConditionAllowed')
+            ->with($data, $errors)
+            ->willReturn(true);
+        $service->expects($this->any())
+            ->method('isConditionAllowed')
+            ->with($data, $errors)
+            ->willReturn(true);
+        $this->operation->setOperationService($service);
+
+        $this->assertFalse($this->operation->isAllowed($data, $errors));
+    }
+
+    public function testIsAllowedBlockedByEventGuard()
+    {
+        $data = new ActionData();
+        $errors = new ArrayCollection();
+
+        $this->definition->expects($this->any())
+            ->method('getEnabled')
+            ->willReturn(true);
+        $this->definition->expects($this->any())
+            ->method('getFrontendOptions')
+            ->willReturn([]);
+        $this->definition->expects($this->any())
+            ->method('getButtonOptions')
+            ->willReturn([]);
+        $this->definition->expects($this->any())
+            ->method('setFrontendOptions')
+            ->willReturnSelf();
+        $this->definition->expects($this->any())
+            ->method('setButtonOptions')
+            ->willReturnSelf();
+
+        $this->eventDispatcher->expects($this->exactly(2))
+            ->method('dispatch')
+            ->willReturnCallback(function (OperationAllowanceEvent $event) {
+                if ($event instanceof OperationGuardEvent) {
+                    $event->setAllowed(false);
+                }
+            });
+
+        $this->optionsResolver->expects($this->any())
+            ->method('resolveOptions')
+            ->willReturn(['enabled' => true]);
+
+        // For simplicity service is used here
+        $service = $this->createMock(OperationServiceInterface::class);
+        $service->expects($this->any())
+            ->method('isPreConditionAllowed')
+            ->with($data, $errors)
+            ->willReturn(true);
+        $service->expects($this->any())
+            ->method('isConditionAllowed')
+            ->with($data, $errors)
+            ->willReturn(true);
+        $this->operation->setOperationService($service);
+
+        $this->assertFalse($this->operation->isAllowed($data, $errors));
+    }
+
     /**
      * @dataProvider getFormOptionsDataProvider
      */
@@ -568,7 +767,7 @@ class OperationTest extends \PHPUnit\Framework\TestCase
     }
 
     private function createAction(
-        \PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects,
+        InvocationOrder $expects,
         ActionData $data
     ): ActionInterface {
         $action = $this->createMock(ActionInterface::class);
@@ -580,7 +779,7 @@ class OperationTest extends \PHPUnit\Framework\TestCase
     }
 
     private function createCondition(
-        \PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects,
+        InvocationOrder $expects,
         ActionData $data,
         bool $returnValue
     ): ConfigurableCondition {
@@ -662,6 +861,7 @@ class OperationTest extends \PHPUnit\Framework\TestCase
             $this->attributeAssembler,
             $this->formOptionsAssembler,
             $this->optionsResolver,
+            $this->eventDispatcher,
             $definition
         );
 

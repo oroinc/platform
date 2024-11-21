@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\Assembler;
 
+use Oro\Bundle\ActionBundle\Event\ActionGroupEventDispatcher;
 use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver;
 use Oro\Bundle\ActionBundle\Model\ActionGroupDefinition;
@@ -19,6 +20,7 @@ class ActionGroupAssemblerTest extends TestCase
 {
     private ServiceProviderInterface|MockObject $actionGroupServiceLocator;
     private ParametersResolver|MockObject $parametersResolver;
+    private ActionGroupEventDispatcher|MockObject $eventDispatcher;
 
     private ActionGroupAssembler $assembler;
 
@@ -27,12 +29,14 @@ class ActionGroupAssemblerTest extends TestCase
     {
         $this->actionGroupServiceLocator = $this->createMock(ServiceProviderInterface::class);
         $this->parametersResolver = $this->createMock(ParametersResolver::class);
+        $this->eventDispatcher = $this->createMock(ActionGroupEventDispatcher::class);
 
         $this->assembler = new ActionGroupAssembler(
             $this->createMock(ActionFactoryInterface::class),
             $this->createMock(ConditionFactory::class),
             new ParameterAssembler(),
             $this->parametersResolver,
+            $this->eventDispatcher,
             $this->actionGroupServiceLocator
         );
     }
@@ -57,9 +61,11 @@ class ActionGroupAssemblerTest extends TestCase
             'minimum_name' => new ActionGroupServiceAdapter(
                 $this->parametersResolver,
                 $service,
+                $this->eventDispatcher,
                 'execute',
                 null,
-                null
+                null,
+                (new ActionGroupDefinition())->setName('minimum_name')
             )
         ];
         $this->assertEquals($expected, $definitions);
@@ -88,9 +94,11 @@ class ActionGroupAssemblerTest extends TestCase
             'minimum_name' => new ActionGroupServiceAdapter(
                 $this->parametersResolver,
                 $service,
+                $this->eventDispatcher,
                 'test_method',
                 'test_return_value',
-                ['arg1' => []]
+                ['arg1' => []],
+                (new ActionGroupDefinition())->setName('minimum_name')
             )
         ];
         $this->assertEquals($expected, $definitions);
@@ -137,9 +145,7 @@ class ActionGroupAssemblerTest extends TestCase
                 ],
             ])
             ->setConditions([
-                '@and' => [
-                    ['@condition' => 'config_conditions'],
-                ]
+                '@condition' => 'config_conditions'
             ])
             ->setActions(['config_actions']);
 
@@ -147,12 +153,10 @@ class ActionGroupAssemblerTest extends TestCase
         $definition3
             ->setName('maximum_name_and_acl')
             ->setConditions([
-                '@and' => [
-                    ['@acl_granted' => 'test_acl'],
-                    ['@condition' => 'config_conditions']
-                ]
+                '@condition' => 'config_conditions'
             ])
-            ->setActions(['config_actions']);
+            ->setActions(['config_actions'])
+            ->setAclResource('test_acl');
 
         return [
             'no data' => [
@@ -175,6 +179,7 @@ class ActionGroupAssemblerTest extends TestCase
                         $conditionFactory,
                         $parameterAssembler,
                         $parametersResolver,
+                        $this->createMock(ActionGroupEventDispatcher::class),
                         $definition1
                     )
                 ],
@@ -205,6 +210,7 @@ class ActionGroupAssemblerTest extends TestCase
                         $conditionFactory,
                         $parameterAssembler,
                         $parametersResolver,
+                        $this->createMock(ActionGroupEventDispatcher::class),
                         $definition2
                     )
                 ],
@@ -234,6 +240,7 @@ class ActionGroupAssemblerTest extends TestCase
                         $conditionFactory,
                         $parameterAssembler,
                         $parametersResolver,
+                        $this->createMock(ActionGroupEventDispatcher::class),
                         $definition3
                     )
                 ],

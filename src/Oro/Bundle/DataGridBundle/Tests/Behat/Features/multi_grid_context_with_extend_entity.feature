@@ -1,18 +1,15 @@
 @regression
 @ticket-BAP-16169
 
-Feature: Multi grid context with custom entity
+Feature: Multi grid context with extend entity
   As Administrator user
-  I need to have ability to create Custom entity and use its records in Context for e.g. Tasks, Emails, etc.
+  I need to have ability to get extend entity and use its records in Context for e.g. Tasks, Emails, etc.
 
-  Scenario: Create Custom entity
+  Scenario: Configure extend entity
     Given I login as administrator
     And I go to System/Entities/Entity Management
-    And I click "Create Entity"
-    When I fill form with:
-      | Name         | testEntity    |
-      | Label        | Test Entity   |
-      | Plural Label | Test Entities |
+    And filter Name as is equal to "User"
+    When click Edit User in grid
     And I check "Tasks"
     And I check "Emails"
     And I save and close form
@@ -28,15 +25,7 @@ Feature: Multi grid context with custom entity
     When I click update schema
     And I should see Schema updated flash message
 
-  Scenario: Create a record for Custom entity
-    When I go to System/Entities/Test Entity
-    And I click "Create Test Entity"
-    When I fill form with:
-      | Name | Test Record |
-    And I save and close form
-    Then I should see "Entity saved" flash message
-
-  Scenario: Check if Custom entity is available in Task context and context switcher is operational
+  Scenario: Check if Extend entity is available in Task context and context switcher is operational
     When I go to Activities/Tasks
     And I click "Create Task"
     When I fill form with:
@@ -44,14 +33,13 @@ Feature: Multi grid context with custom entity
     And I save and close form
     Then I should see "Task saved" flash message
     And I click "Add Context"
-    Then I should see "Test Record"
     When I select "Account" context
     Then I should see "There are no accounts"
-    When I select "Test Entity" context
-    Then I should see "Test Record"
+    When I select "User" context
+    Then I should see "There are no users"
     And close ui dialog
 
-  Scenario: Check if Custom entity is available in Email context and context switcher is operational
+  Scenario: Check if Extend entity is available in Email context and context switcher is operational
     When I click My Emails in user menu
     And I click "Compose"
     When I fill form with:
@@ -61,9 +49,7 @@ Feature: Multi grid context with custom entity
     Then I should see "The email was sent" flash message
     And I click "view" on first row in grid
     And I click "Add Context"
-    Then I should see "Test Record"
     When I select "Account" context
     Then I should see "There are no accounts"
-    When I select "Test Entity" context
-    Then I should see "Test Record"
+    And I select "User" context
     And close ui dialog

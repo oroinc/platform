@@ -271,6 +271,36 @@ services:
     Oro\Bundle\ActionBundle\Provider\OriginalUrlProvider:
         alias: oro_action.provider.original_url_provider
 
+    oro_action.operation.event_dispatcher:
+        class: Oro\Bundle\ActionBundle\Event\OperationEventDispatcher
+        arguments:
+            - '@event_dispatcher'
+
+    Oro\Bundle\ActionBundle\EventListener\ActionGroupAclResourceGuardListener:
+        arguments:
+            - '@oro_action.action_executor'
+            - '@oro_action.resolver.options_resolver'
+        tags:
+            - { name: kernel.event_listener, event: oro_action_group.guard, method: checkAcl }
+
+    Oro\Bundle\ActionBundle\EventListener\OperationAclResourceGuardListener:
+        arguments:
+            - '@oro_action.action_executor'
+            - '@oro_action.resolver.options_resolver'
+        tags:
+            - { name: kernel.event_listener, event: oro_operation.announce, method: checkAcl }
+
+    Oro\Bundle\ActionBundle\EventListener\OperationFeatureGuardListener:
+        arguments:
+            - '@oro_featuretoggle.checker.feature_checker'
+        tags:
+            - { name: kernel.event_listener, event: oro_operation.announce, method: checkFeature }
+
+    oro_action.action_group.event_dispatcher:
+        class: Oro\Bundle\ActionBundle\Event\ActionGroupEventDispatcher
+        arguments:
+            - '@event_dispatcher'
+
     oro_action.grouped_actions_widget_provider:
         class: Oro\Bundle\ActionBundle\Provider\GroupedActionsWidgetProvider
         arguments:

@@ -40,12 +40,13 @@ class ValidateRequestData implements ProcessorInterface
      */
     private function validateRequestData(ChangeRelationshipContext $context): array
     {
-        $validator = new RelationshipRequestDataValidator();
+        return $context->isCollection()
+            ? $this->getValidator()->validateResourceIdentifierObjectCollection($context->getRequestData())
+            : $this->getValidator()->validateResourceIdentifierObject($context->getRequestData());
+    }
 
-        if ($context->isCollection()) {
-            return $validator->validateResourceIdentifierObjectCollection($context->getRequestData());
-        }
-
-        return $validator->validateResourceIdentifierObject($context->getRequestData());
+    private function getValidator(): RelationshipRequestDataValidator
+    {
+        return new RelationshipRequestDataValidator();
     }
 }
