@@ -163,7 +163,9 @@ class LoadNormalizedRelationshipTest extends ChangeRelationshipProcessorTestCase
         $expectedContext->setIsCollection($this->context->isCollection());
         $expectedContext->setNormalizedEntityConfigExtras($normalizedEntityConfigExtras);
         $expectedContext->setConfig($getConfig->getField($associationName)->getTargetEntity());
+        $expectedContext->setNormalizedConfig($expectedContext->getConfig());
         $expectedContext->setMetadata($getMetadata->getAssociation($associationName)->getTargetMetadata());
+        $expectedContext->setNormalizedMetadata($expectedContext->getMetadata());
         $expectedContext->setResult($normalizedAssociationData);
 
         self::assertEquals($expectedContext, $this->context);

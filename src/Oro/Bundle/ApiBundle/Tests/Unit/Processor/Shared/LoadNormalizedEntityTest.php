@@ -216,10 +216,12 @@ class LoadNormalizedEntityTest extends CreateProcessorTestCase
             $expectedContext->addConfigExtra($extra);
         }
         $expectedContext->setConfig($getConfig);
+        $expectedContext->setNormalizedConfig($expectedContext->getConfig());
         foreach ($getConfigSections as $key => $value) {
             $expectedContext->setConfigOf($key, $value);
         }
         $expectedContext->setMetadata($getMetadata);
+        $expectedContext->setNormalizedMetadata($expectedContext->getMetadata());
         foreach ($getResponseHeaders as $key => $value) {
             $expectedContext->getResponseHeaders()->set($key, $value);
         }

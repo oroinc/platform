@@ -4,8 +4,8 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
+use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
-use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Processor\Update\UpdateContext;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
@@ -93,7 +93,7 @@ class LoadNormalizedEntity implements ProcessorInterface
         return $getContext;
     }
 
-    private function processGetResult(GetContext $getContext, SingleItemContext $context): void
+    private function processGetResult(GetContext $getContext, FormContext $context): void
     {
         if ($getContext->hasErrors()) {
             $errors = $getContext->getErrors();
@@ -105,6 +105,7 @@ class LoadNormalizedEntity implements ProcessorInterface
             $getConfig = $getContext->getConfig();
             if (null !== $getConfig) {
                 $context->setConfig($getConfig);
+                $context->setNormalizedConfig($getConfig);
             }
             $getConfigSections = $getContext->getConfigSections();
             foreach ($getConfigSections as $configSection) {
@@ -116,6 +117,7 @@ class LoadNormalizedEntity implements ProcessorInterface
             $getMetadata = $getContext->getMetadata();
             if (null !== $getMetadata) {
                 $context->setMetadata($getMetadata);
+                $context->setNormalizedMetadata($getMetadata);
             }
 
             $responseHeaders = $context->getResponseHeaders();

@@ -93,10 +93,12 @@ class LoadNormalizedRelationship implements ProcessorInterface
             $getConfig = $getContext->getConfig()?->getField($associationName)?->getTargetEntity();
             if (null !== $getConfig) {
                 $context->setConfig($getConfig);
+                $context->setNormalizedConfig($getConfig);
             }
             $getMetadata = $getContext->getMetadata()?->getAssociation($associationName)?->getTargetMetadata();
             if (null !== $getMetadata) {
                 $context->setMetadata($getMetadata);
+                $context->setNormalizedMetadata($getMetadata);
             }
 
             $data = $getContext->getResult();

@@ -4,7 +4,9 @@ namespace Oro\Bundle\ApiBundle\Processor;
 
 use Oro\Bundle\ApiBundle\Collection\AdditionalEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Util\EntityMapper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -161,4 +163,28 @@ interface FormContext extends ContextInterface, ChangeContextInterface
      * @param ConfigExtraInterface[] $extras
      */
     public function setNormalizedEntityConfigExtras(array $extras): void;
+
+    /**
+     * Gets a configuration of an entity that should be used to converts an entity to a result array
+     * when it is done not by "get" API action, e.g. for subresources.
+     */
+    public function getNormalizedConfig(): ?EntityDefinitionConfig;
+
+    /**
+     * Sets a configuration of an entity that should be used to converts an entity to a result array
+     * when it is done not by "get" API action, e.g. for subresources.
+     */
+    public function setNormalizedConfig(?EntityDefinitionConfig $definition): void;
+
+    /**
+     * Gets a metadata of an entity that should be used to build a result document
+     * when it is done not by "get" API action, e.g. for subresources.
+     */
+    public function getNormalizedMetadata(): ?EntityMetadata;
+
+    /**
+     * Sets metadata of an entity that should be used to build a result document
+     * when it is done not by "get" API action, e.g. for subresources.
+     */
+    public function setNormalizedMetadata(?EntityMetadata $metadata): void;
 }
