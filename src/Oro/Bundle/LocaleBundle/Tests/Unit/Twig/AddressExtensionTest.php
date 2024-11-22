@@ -93,11 +93,10 @@ class AddressExtensionTest extends \PHPUnit\Framework\TestCase
             ->willReturnCallback(function (string $blockName) {
                 return $blockName === 'address_part' || $blockName === 'address_part_phone';
             });
-
-        $template->expects(self::any())
-            ->method('displayBlock')
-            ->willReturnCallback(function (string $blockName, array $context) {
-                echo  implode(
+        $template->expects($this->any())
+            ->method('renderBlock')
+            ->willReturnCallback(function ($blockName, $context) {
+                return implode(
                     '_',
                     [$blockName, implode('_', [...array_keys($context), ...array_values($context)])]
                 );

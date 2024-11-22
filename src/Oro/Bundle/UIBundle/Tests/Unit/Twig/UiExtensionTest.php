@@ -110,10 +110,10 @@ class UiExtensionTest extends \PHPUnit\Framework\TestCase
             ->willReturn(['key' => 'value', 'extraKey' => 'value']);
 
         $template->expects(self::once())
-            ->method('displayBlock')
+            ->method('renderBlock')
             ->with('block', ['key' => 'value', 'extraKey' => 'value'])
             ->willReturnCallback(function () use ($expected) {
-                echo $expected;
+                return $expected;
             });
 
         self::assertEquals(

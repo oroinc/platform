@@ -40,7 +40,7 @@ class TestTemplateStub extends Template
      */
     protected function doDisplay(array $context, array $blocks = [])
     {
-        echo $this->template;
+        yield $this->template;
     }
 
     /**
