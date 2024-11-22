@@ -4,12 +4,17 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
+use Oro\Bundle\ApiBundle\Config\Config;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\MetaPropertiesConfigExtra;
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\EntityMapper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -19,15 +24,27 @@ use Symfony\Component\Form\FormInterface;
  */
 class FormContextTest extends \PHPUnit\Framework\TestCase
 {
+    private ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $configProvider;
+    private MetadataProvider|\PHPUnit\Framework\MockObject\MockObject $metadataProvider;
     private FormContext $context;
 
     #[\Override]
     protected function setUp(): void
     {
-        $configProvider = $this->createMock(ConfigProvider::class);
-        $metadataProvider = $this->createMock(MetadataProvider::class);
+        $this->configProvider = $this->createMock(ConfigProvider::class);
+        $this->metadataProvider = $this->createMock(MetadataProvider::class);
 
-        $this->context = new FormContextStub($configProvider, $metadataProvider);
+        $this->context = new FormContextStub($this->configProvider, $this->metadataProvider);
+    }
+
+    private function getConfig(array $data = []): Config
+    {
+        $result = new Config();
+        foreach ($data as $sectionName => $config) {
+            $result->set($sectionName, $config);
+        }
+
+        return $result;
     }
 
     public function testRequestId()
@@ -292,6 +309,286 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         $configExtra = new TestConfigExtra('extra1');
         $this->context->setNormalizedEntityConfigExtras([$configExtra]);
         self::assertSame([$configExtra], $this->context->getNormalizedEntityConfigExtras());
+    }
+
+    public function testGetNormalizedConfigWhenNoNormalizedConfigExtras()
+    {
+        $version = '1.1';
+        $requestType = 'rest';
+        $entityClass = 'Test\Class';
+        $configExtras = [
+            new TestConfigExtra('extra1')
+        ];
+
+        $config = new EntityDefinitionConfig();
+        $config->setExcludeAll();
+
+        $this->context->setVersion($version);
+        $this->context->getRequestType()->add($requestType);
+        $this->context->setConfigExtras($configExtras);
+        $this->context->setClassName($entityClass);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with($entityClass, $version, new RequestType([$requestType]), $configExtras)
+            ->willReturn($this->getConfig([ConfigUtil::DEFINITION => $config]));
+
+        self::assertEquals($config, $this->context->getNormalizedConfig()); // load config
+
+        // test that a config is loaded only once
+        self::assertEquals($config, $this->context->getNormalizedConfig());
+    }
+
+    public function testGetNormalizedConfigWhenNormalizedConfigExtrasExist()
+    {
+        $version = '1.1';
+        $requestType = 'rest';
+        $entityClass = 'Test\Class';
+        $configExtras = [
+            new TestConfigExtra('extra1'),
+            new ExpandRelatedEntitiesConfigExtra(['association'])
+        ];
+
+        $config = new EntityDefinitionConfig();
+        $config->setExcludeAll();
+
+        $this->context->setVersion($version);
+        $this->context->getRequestType()->add($requestType);
+        $this->context->setConfigExtras($configExtras);
+        $this->context->setClassName($entityClass);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with($entityClass, $version, new RequestType([$requestType]), $configExtras)
+            ->willReturn($this->getConfig([ConfigUtil::DEFINITION => $config]));
+
+        self::assertEquals($config, $this->context->getNormalizedConfig()); // load config
+
+        // test that a config is loaded only once
+        self::assertEquals($config, $this->context->getNormalizedConfig());
+    }
+
+    public function testGetNormalizedConfigWhenNormalizedConfigExtrasExistAndNoNormalizedConfig()
+    {
+        $version = '1.1';
+        $requestType = 'rest';
+        $entityClass = 'Test\Class';
+        $configExtras = [
+            new TestConfigExtra('extra1'),
+            new ExpandRelatedEntitiesConfigExtra(['association'])
+        ];
+
+        $this->context->setVersion($version);
+        $this->context->getRequestType()->add($requestType);
+        $this->context->setConfigExtras($configExtras);
+        $this->context->setClassName($entityClass);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with($entityClass, $version, new RequestType([$requestType]), $configExtras)
+            ->willReturn($this->getConfig([ConfigUtil::DEFINITION => null]));
+
+        self::assertNull($this->context->getNormalizedConfig()); // load config
+
+        // test that a config is loaded only once
+        self::assertNull($this->context->getNormalizedConfig());
+    }
+
+    public function testGetNormalizedConfigWhenNormalizedConfigExtrasExistAndNoEntityClass()
+    {
+        $this->context->setVersion('1.1');
+        $this->context->getRequestType()->add('rest');
+        $this->context->setConfigExtras([
+            new TestConfigExtra('extra1'),
+            new ExpandRelatedEntitiesConfigExtra(['association'])
+        ]);
+
+        $this->configProvider->expects(self::never())
+            ->method('getConfig');
+
+        self::assertNull($this->context->getNormalizedConfig()); // load config
+
+        // test that a config is loaded only once
+        self::assertNull($this->context->getNormalizedConfig());
+    }
+
+    public function testGetNormalizedConfigWhenItIsSetExplicitly()
+    {
+        $config = new EntityDefinitionConfig();
+
+        $this->context->setClassName('Test\Class');
+
+        $this->configProvider->expects(self::never())
+            ->method('getConfig');
+
+        $this->context->setNormalizedConfig($config);
+
+        self::assertSame($config, $this->context->getNormalizedConfig());
+
+        // test remove config
+        $this->context->setNormalizedConfig(null);
+        self::assertNull($this->context->getNormalizedConfig());
+    }
+
+    public function testGetNormalizedMetadataWhenNoNormalizedConfigExtras()
+    {
+        $version = '1.1';
+        $requestType = 'rest';
+        $entityClass = 'Test\Class';
+        $configExtras = [
+            new TestConfigExtra('extra1')
+        ];
+
+        $config = new EntityDefinitionConfig();
+        $metadata = new EntityMetadata('Test\Entity');
+        $metadataExtras = [new TestMetadataExtra('extra1')];
+
+        $this->context->setVersion($version);
+        $this->context->getRequestType()->add($requestType);
+        $this->context->setConfigExtras($configExtras);
+        $this->context->setMetadataExtras($metadataExtras);
+        $this->context->setClassName($entityClass);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with($entityClass, $version, new RequestType([$requestType]), $configExtras)
+            ->willReturn($this->getConfig([ConfigUtil::DEFINITION => $config]));
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(
+                $entityClass,
+                $version,
+                new RequestType([$requestType]),
+                $config,
+                $metadataExtras
+            )
+            ->willReturn($metadata);
+
+        self::assertSame($metadata, $this->context->getNormalizedMetadata()); // load metadata
+
+        // test that metadata are loaded only once
+        self::assertSame($metadata, $this->context->getNormalizedMetadata());
+    }
+
+    public function testGetNormalizedMetadataWhenNormalizedConfigExtrasExist()
+    {
+        $version = '1.1';
+        $requestType = 'rest';
+        $entityClass = 'Test\Class';
+        $configExtras = [
+            new TestConfigExtra('extra1'),
+            new ExpandRelatedEntitiesConfigExtra(['association'])
+        ];
+
+        $config = new EntityDefinitionConfig();
+        $metadata = new EntityMetadata('Test\Entity');
+        $metadataExtras = [new TestMetadataExtra('extra1')];
+
+        $this->context->setVersion($version);
+        $this->context->getRequestType()->add($requestType);
+        $this->context->setConfigExtras($configExtras);
+        $this->context->setMetadataExtras($metadataExtras);
+        $this->context->setClassName($entityClass);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with($entityClass, $version, new RequestType([$requestType]), $configExtras)
+            ->willReturn($this->getConfig([ConfigUtil::DEFINITION => $config]));
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(
+                $entityClass,
+                $version,
+                new RequestType([$requestType]),
+                $config,
+                $metadataExtras
+            )
+            ->willReturn($metadata);
+
+        self::assertSame($metadata, $this->context->getNormalizedMetadata()); // load metadata
+
+        // test that metadata are loaded only once
+        self::assertSame($metadata, $this->context->getNormalizedMetadata());
+    }
+
+    public function testGetNormalizedMetadataWhenNormalizedConfigExtrasExistAndNoNormalizedMetadata()
+    {
+        $version = '1.1';
+        $requestType = 'rest';
+        $entityClass = 'Test\Class';
+        $configExtras = [
+            new TestConfigExtra('extra1'),
+            new ExpandRelatedEntitiesConfigExtra(['association'])
+        ];
+
+        $config = new EntityDefinitionConfig();
+        $metadataExtras = [new TestMetadataExtra('extra1')];
+
+        $this->context->setVersion($version);
+        $this->context->getRequestType()->add($requestType);
+        $this->context->setConfigExtras($configExtras);
+        $this->context->setMetadataExtras($metadataExtras);
+        $this->context->setClassName($entityClass);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with($entityClass, $version, new RequestType([$requestType]), $configExtras)
+            ->willReturn($this->getConfig([ConfigUtil::DEFINITION => $config]));
+        $this->metadataProvider->expects(self::once())
+            ->method('getMetadata')
+            ->with(
+                $entityClass,
+                $version,
+                new RequestType([$requestType]),
+                $config,
+                $metadataExtras
+            )
+            ->willReturn(null);
+
+        self::assertNull($this->context->getNormalizedMetadata()); // load metadata
+
+        // test that metadata are loaded only once
+        self::assertNull($this->context->getNormalizedMetadata());
+    }
+
+    public function testGetNormalizedMetadataWhenNormalizedConfigExtrasExistAndNoEntityClass()
+    {
+        $this->context->setVersion('1.1');
+        $this->context->getRequestType()->add('rest');
+        $this->context->setConfigExtras([
+            new TestConfigExtra('extra1'),
+            new ExpandRelatedEntitiesConfigExtra(['association'])
+        ]);
+
+        $this->configProvider->expects(self::never())
+            ->method('getConfig');
+        $this->metadataProvider->expects(self::never())
+            ->method('getMetadata');
+
+        self::assertNull($this->context->getNormalizedMetadata()); // load metadata
+
+        // test that metadata are loaded only once
+        self::assertNull($this->context->getNormalizedMetadata());
+    }
+
+    public function testGetNormalizedMetadataWhenItIsSetExplicitly()
+    {
+        $metadata = new EntityMetadata('Test\Entity');
+
+        $this->context->setClassName('Test\Class');
+
+        $this->configProvider->expects(self::never())
+            ->method('getConfig');
+        $this->metadataProvider->expects(self::never())
+            ->method('getMetadata');
+
+        $this->context->setNormalizedMetadata($metadata);
+
+        self::assertSame($metadata, $this->context->getNormalizedMetadata());
+
+        // test remove metadata
+        $this->context->setNormalizedMetadata(null);
+        self::assertNull($this->context->getNormalizedMetadata());
     }
 
     public function testGetAllEntities()
