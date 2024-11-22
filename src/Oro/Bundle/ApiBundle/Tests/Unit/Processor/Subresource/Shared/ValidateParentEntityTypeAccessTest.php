@@ -48,6 +48,18 @@ class ValidateParentEntityTypeAccessTest extends GetSubresourceProcessorTestCase
         );
     }
 
+    public function testProcessWhenOperationAlreadyProcessed(): void
+    {
+        $this->authorizationChecker->expects(self::never())
+            ->method('isGranted');
+
+        $this->context->setProcessed(ValidateParentEntityTypeAccess::getOperationName('VIEW'));
+        $this->context->setParentClassName(Product::class);
+        $this->context->setParentConfig(new EntityDefinitionConfig());
+        $this->getProcessor()->process($this->context);
+        self::assertTrue($this->context->isProcessed(ValidateParentEntityTypeAccess::getOperationName('VIEW')));
+    }
+
     public function testProcessWhenAccessGrantedForManageableParentEntityWithoutConfigOfAclResource(): void
     {
         $parentClassName = Product::class;
@@ -61,6 +73,7 @@ class ValidateParentEntityTypeAccessTest extends GetSubresourceProcessorTestCase
         $this->context->setParentClassName($parentClassName);
         $this->context->setParentConfig($parentConfig);
         $this->getProcessor()->process($this->context);
+        self::assertTrue($this->context->isProcessed(ValidateParentEntityTypeAccess::getOperationName('VIEW')));
     }
 
     public function testProcessWhenAccessDeniedForManageableParentEntityWithoutConfigOfAclResource(): void
@@ -94,6 +107,7 @@ class ValidateParentEntityTypeAccessTest extends GetSubresourceProcessorTestCase
         $this->context->setParentClassName($parentClassName);
         $this->context->setParentConfig($parentConfig);
         $this->getProcessor()->process($this->context);
+        self::assertTrue($this->context->isProcessed(ValidateParentEntityTypeAccess::getOperationName('VIEW')));
     }
 
     public function testProcessWhenAccessDeniedForParentEntityWithConfigOfAclResource(): void
@@ -112,6 +126,7 @@ class ValidateParentEntityTypeAccessTest extends GetSubresourceProcessorTestCase
         $this->context->setParentClassName($parentClassName);
         $this->context->setParentConfig($parentConfig);
         $this->getProcessor()->process($this->context);
+        self::assertTrue($this->context->isProcessed(ValidateParentEntityTypeAccess::getOperationName('VIEW')));
     }
 
     public function testForcePermissionUsage(): void
@@ -128,6 +143,7 @@ class ValidateParentEntityTypeAccessTest extends GetSubresourceProcessorTestCase
         $this->context->setParentClassName($parentClassName);
         $this->context->setParentConfig($parentConfig);
         $this->getProcessor(true)->process($this->context);
+        self::assertTrue($this->context->isProcessed(ValidateParentEntityTypeAccess::getOperationName('VIEW')));
     }
 
     public function testForcePermissionUsageWhenAclCheckIsDisabled(): void
@@ -142,5 +158,6 @@ class ValidateParentEntityTypeAccessTest extends GetSubresourceProcessorTestCase
         $this->context->setParentClassName($parentClassName);
         $this->context->setParentConfig($parentConfig);
         $this->getProcessor(true)->process($this->context);
+        self::assertTrue($this->context->isProcessed(ValidateParentEntityTypeAccess::getOperationName('VIEW')));
     }
 }

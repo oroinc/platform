@@ -30,12 +30,26 @@ class ValidateParentEntityObjectAccessTest extends ChangeRelationshipProcessorTe
         );
     }
 
+    public function testProcessWhenOperationAlreadyProcessed(): void
+    {
+        $this->authorizationChecker->expects(self::never())
+            ->method('isGranted');
+
+        $this->context->setProcessed(ValidateParentEntityObjectAccess::getOperationName('VIEW'));
+        $this->context->setParentClassName(Product::class);
+        $this->context->setParentConfig(new EntityDefinitionConfig());
+        $this->context->setParentEntity(new Product());
+        $this->processor->process($this->context);
+        self::assertTrue($this->context->isProcessed(ValidateParentEntityObjectAccess::getOperationName('VIEW')));
+    }
+
     public function testProcessWhenNoParentEntity(): void
     {
         $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
 
         $this->processor->process($this->context);
+        self::assertTrue($this->context->isProcessed(ValidateParentEntityObjectAccess::getOperationName('VIEW')));
     }
 
     public function testProcessWhenAccessGranted(): void
@@ -52,6 +66,7 @@ class ValidateParentEntityObjectAccessTest extends ChangeRelationshipProcessorTe
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentEntity($parentEntity);
         $this->processor->process($this->context);
+        self::assertTrue($this->context->isProcessed(ValidateParentEntityObjectAccess::getOperationName('VIEW')));
     }
 
     public function testProcessWhenAccessDenied(): void
@@ -88,6 +103,7 @@ class ValidateParentEntityObjectAccessTest extends ChangeRelationshipProcessorTe
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentEntity($parentEntity);
         $this->processor->process($this->context);
+        self::assertTrue($this->context->isProcessed(ValidateParentEntityObjectAccess::getOperationName('VIEW')));
     }
 
     public function testProcessWhenAccessDeniedByAclResource(): void
@@ -108,6 +124,7 @@ class ValidateParentEntityObjectAccessTest extends ChangeRelationshipProcessorTe
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentEntity($parentEntity);
         $this->processor->process($this->context);
+        self::assertTrue($this->context->isProcessed(ValidateParentEntityObjectAccess::getOperationName('VIEW')));
     }
 
     public function testProcessWhenAccessCheckDisabledBySettingEmptyAclResource(): void
@@ -123,6 +140,7 @@ class ValidateParentEntityObjectAccessTest extends ChangeRelationshipProcessorTe
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentEntity($parentEntity);
         $this->processor->process($this->context);
+        self::assertTrue($this->context->isProcessed(ValidateParentEntityObjectAccess::getOperationName('VIEW')));
     }
 
     public function testProcessWhenAccessGrantedForEntityHolderModel(): void
@@ -143,6 +161,7 @@ class ValidateParentEntityObjectAccessTest extends ChangeRelationshipProcessorTe
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentEntity($parentModel);
         $this->processor->process($this->context);
+        self::assertTrue($this->context->isProcessed(ValidateParentEntityObjectAccess::getOperationName('VIEW')));
     }
 
     public function testProcessWhenAccessDeniedForEntityHolderModel(): void
@@ -166,6 +185,7 @@ class ValidateParentEntityObjectAccessTest extends ChangeRelationshipProcessorTe
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentEntity($parentModel);
         $this->processor->process($this->context);
+        self::assertTrue($this->context->isProcessed(ValidateParentEntityObjectAccess::getOperationName('VIEW')));
     }
 
     public function testProcessWhenEntityHolderModelDoesNotHaveEntity(): void
@@ -183,5 +203,6 @@ class ValidateParentEntityObjectAccessTest extends ChangeRelationshipProcessorTe
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentEntity($parentModel);
         $this->processor->process($this->context);
+        self::assertTrue($this->context->isProcessed(ValidateParentEntityObjectAccess::getOperationName('VIEW')));
     }
 }
