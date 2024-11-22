@@ -240,6 +240,11 @@ services:
             - '@oro_workflow.registry'
             - '@oro_entity.doctrine_helper'
 
+    oro_workflow.event_dispatcher:
+        class: Oro\Bundle\WorkflowBundle\Event\EventDispatcher
+        arguments:
+            - '@event_dispatcher'
+
     oro_workflow.changes.event.dispatcher:
         class: 'Symfony\Component\EventDispatcher\EventDispatcher'
 

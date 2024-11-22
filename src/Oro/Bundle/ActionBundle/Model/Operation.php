@@ -3,6 +3,11 @@
 namespace Oro\Bundle\ActionBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
+use Oro\Bundle\ActionBundle\Event\OperationAnnounceEvent;
+use Oro\Bundle\ActionBundle\Event\OperationEventDispatcher;
+use Oro\Bundle\ActionBundle\Event\OperationExecuteEvent;
+use Oro\Bundle\ActionBundle\Event\OperationGuardEvent;
+use Oro\Bundle\ActionBundle\Event\OperationPreExecuteEvent;
 use Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
@@ -48,6 +53,12 @@ class Operation
 
     private OptionsResolver $optionsResolver;
 
+    /** @var OperationEventDispatcher */
+    protected $eventDispatcher;
+
+    /** @var OperationServiceInterface|null */
+    protected $operationService;
+
     public function __construct(
         ActionFactoryInterface $actionFactory,
         ConditionFactory $conditionFactory,
@@ -62,6 +73,18 @@ class Operation
         $this->formOptionsAssembler = $formOptionsAssembler;
         $this->optionsResolver = $optionsResolver;
         $this->definition = $definition;
+    }
+
+    public function setEventDispatcher(OperationEventDispatcher $eventDispatcher): void
+    {
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
+    public function setOperationService(?OperationServiceInterface $operationService): self
+    {
+        $this->operationService = $operationService;
+
+        return $this;
     }
 
     public function isEnabled(): bool
@@ -103,7 +126,15 @@ class Operation
 
         $data['errors'] = $errors;
 
-        $this->executeActions($data, OperationDefinition::ACTIONS);
+        $preExecuteEvent = new OperationPreExecuteEvent($data, $this->getDefinition(), $errors);
+        $this->eventDispatcher->dispatch($preExecuteEvent);
+        if ($this->operationService) {
+            $this->operationService->execute($data);
+        } else {
+            $this->executeActions($data, OperationDefinition::ACTIONS);
+        }
+        $executeEvent = new OperationExecuteEvent($data, $this->getDefinition(), $errors);
+        $this->eventDispatcher->dispatch($executeEvent);
     }
 
     /**
@@ -126,9 +157,24 @@ class Operation
      */
     public function isAllowed(ActionData $data, Collection $errors = null)
     {
-        return $this->isPreConditionAllowed($data, $errors) &&
-            $this->evaluateConditions($data, OperationDefinition::CONDITIONS, $errors) &&
-            $this->getDefinition()->getEnabled();
+        return $this->isPreConditionAllowed($data, $errors)
+            && $this->getDefinition()->getEnabled()
+            && $this->isConditionAllowed($data, $errors);
+    }
+
+    private function isConditionAllowed(ActionData $data, Collection $errors = null): bool
+    {
+        $guardEvent = new OperationGuardEvent($data, $this->getDefinition(), $errors);
+        $this->eventDispatcher->dispatch($guardEvent);
+        if (!$guardEvent->isAllowed()) {
+            return false;
+        }
+
+        if ($this->operationService) {
+            return $this->operationService->isConditionAllowed($data, $errors);
+        }
+
+        return $this->evaluateConditions($data, OperationDefinition::CONDITIONS, $errors);
     }
 
     /**
@@ -138,6 +184,19 @@ class Operation
      */
     protected function isPreConditionAllowed(ActionData $data, Collection $errors = null)
     {
+        $announceEvent = new OperationAnnounceEvent($data, $this->getDefinition(), $errors);
+        $this->eventDispatcher->dispatch($announceEvent);
+        if (!$announceEvent->isAllowed()) {
+            return false;
+        }
+
+        if ($this->operationService) {
+            $isAllowed = $this->operationService->isPreConditionAllowed($data, $errors);
+            $this->resolveDefinitionVariableProperties($data);
+
+            return $isAllowed;
+        }
+
         $this->executeActions($data, OperationDefinition::PREACTIONS);
 
         $this->resolveDefinitionVariableProperties($data);

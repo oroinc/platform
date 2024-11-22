@@ -5,8 +5,12 @@ namespace Oro\Bundle\WorkflowBundle\Form\EventListener;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Component\Action\Action\ActionInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Form\FormEvents;
 
+/**
+ * Workflow attribute form initialize service.
+ *
+ * @deprecated replaced with WorkflowAttributeFormInitListener
+ */
 class FormInitListener implements EventSubscriberInterface
 {
     /**
@@ -41,6 +45,6 @@ class FormInitListener implements EventSubscriberInterface
      */
     public static function getSubscribedEvents(): array
     {
-        return array(FormEvents::PRE_SET_DATA => 'executeInitAction');
+        return [];
     }
 }

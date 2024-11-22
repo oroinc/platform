@@ -50,6 +50,7 @@ transitions:
                 attribute2:
                     options:
                         label: oro.workflow.%WORKFLOW%.transition.transition1.attribute.attribute2.label
+        conditional_steps_to: { }
         is_start: false
         is_hidden: false
         is_unavailable_hidden: false
@@ -81,6 +82,7 @@ transitions:
                 attribute2:
                     options:
                         label: oro.workflow.%WORKFLOW%.transition.transition2.attribute.attribute2.label
+        conditional_steps_to: { }
         is_start: false
         is_hidden: false
         is_unavailable_hidden: false

@@ -10,6 +10,9 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowDefinitionClonerHelper as WDCHelper;
 
+/**
+ * Service for cloning and merging WorkflowDefinitions.
+ */
 class WorkflowDefinitionCloner
 {
     public static function mergeDefinition(WorkflowDefinition $definition, WorkflowDefinition $source)
@@ -60,7 +63,8 @@ class WorkflowDefinitionCloner
             ->setPriority($source->getPriority())
             ->setExclusiveActiveGroups($source->getExclusiveActiveGroups())
             ->setExclusiveRecordGroups($source->getExclusiveRecordGroups())
-            ->setApplications($source->getApplications());
+            ->setApplications($source->getApplications())
+            ->setMetadata($source->getMetadata());
 
         return $definition;
     }

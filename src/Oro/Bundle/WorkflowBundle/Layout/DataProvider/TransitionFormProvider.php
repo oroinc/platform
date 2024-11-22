@@ -9,6 +9,10 @@ use Oro\Component\Action\Action\ActionInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
+/**
+ * Provides transition form
+ * @deprecated Unused class
+ */
 class TransitionFormProvider extends AbstractFormProvider
 {
     /** @var WorkflowManager */

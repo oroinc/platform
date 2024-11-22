@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\WorkflowBundle\Configuration\ConfigFinderFactory;
+use Oro\Bundle\WorkflowBundle\Configuration\Import\ImportConditionFilter;
 use Oro\Bundle\WorkflowBundle\Configuration\Import\ResourceFileImportProcessorFactory;
 use Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowFileImportProcessorFactory;
 use Oro\Bundle\WorkflowBundle\Configuration\Import\WorkflowImportProcessorSupervisorFactory;
@@ -53,6 +54,7 @@ class WorkflowConfigurationProviderTest extends \PHPUnit\Framework\TestCase
         $importsProcessor->addImportProcessorFactory(
             new WorkflowImportProcessorSupervisorFactory($fileReader, $workflowFinderBuilder)
         );
+        $importsProcessor->addImportFilter(new ImportConditionFilter($this->kernel->getContainer()));
 
         return new WorkflowConfigurationProvider(
             $this->configuration,

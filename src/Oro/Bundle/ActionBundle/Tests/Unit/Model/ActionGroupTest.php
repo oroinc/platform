@@ -3,6 +3,10 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\ActionBundle\Event\ActionGroupEventDispatcher;
+use Oro\Bundle\ActionBundle\Event\ActionGroupExecuteEvent;
+use Oro\Bundle\ActionBundle\Event\ActionGroupGuardEvent;
+use Oro\Bundle\ActionBundle\Event\ActionGroupPreExecuteEvent;
 use Oro\Bundle\ActionBundle\Exception\ForbiddenActionGroupException;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroup;
@@ -16,45 +20,71 @@ use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\Configurable as ConfigurableAction;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\ConfigExpression\ExpressionFactory;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Rule\InvocationOrder;
+use PHPUnit\Framework\TestCase;
 
-class ActionGroupTest extends \PHPUnit\Framework\TestCase
+class ActionGroupTest extends TestCase
 {
-    /** @var ActionFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $actionFactory;
+    private ActionFactory|MockObject $actionFactory;
+    private ExpressionFactory|MockObject $conditionFactory;
+    private ActionGroupEventDispatcher|MockObject $eventDispatcher;
+    private ActionGroupDefinition $definition;
 
-    /** @var ExpressionFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $conditionFactory;
-
-    /** @var ActionGroup */
-    private $actionGroup;
+    private ActionGroup $actionGroup;
 
     protected function setUp(): void
     {
         $this->actionFactory = $this->createMock(ActionFactoryInterface::class);
         $this->conditionFactory = $this->createMock(ExpressionFactory::class);
+        $this->eventDispatcher = $this->createMock(ActionGroupEventDispatcher::class);
+        $this->definition = new ActionGroupDefinition();
 
         $this->actionGroup = new ActionGroup(
             $this->actionFactory,
             $this->conditionFactory,
             new ParameterAssembler(),
             $this->createMock(ParametersResolver::class),
-            new ActionGroupDefinition()
+            $this->definition
         );
+        $this->actionGroup->setEventDispatcher($this->eventDispatcher);
     }
 
-    /**
-     * @dataProvider executeProvider
-     */
-    public function testExecute(
-        ActionData $data,
-        ActionInterface $action,
-        ConfigurableCondition $condition,
-        string $actionGroupName,
-        string $exceptionMessage = ''
-    ) {
-        $this->actionGroup->getDefinition()->setName($actionGroupName);
-        $this->actionGroup->getDefinition()->setActions(['action1']);
-        $this->actionGroup->getDefinition()->setConditions(['condition1']);
+    public function testExecute()
+    {
+        $data = new ActionData(['data' => new \stdClass()]);
+        $action = $this->createActionGroup($this->once(), $data);
+        $condition = $this->createCondition($this->exactly(1), $data, true);
+
+        $this->definition->setName('test');
+        $this->definition->setActions(['action1']);
+        $this->definition->setConditions(['condition1']);
+
+        $this->actionFactory->expects($this->any())
+            ->method('create')
+            ->with(ConfigurableAction::ALIAS)
+            ->willReturn($action);
+
+        $this->conditionFactory->expects($this->any())
+            ->method('create')
+            ->with(ConfigurableCondition::ALIAS)
+            ->willReturn($condition);
+
+        $errors = new ArrayCollection();
+        $this->assertEventDispatchForExecute($data, $errors);
+
+        $this->actionGroup->execute($data, $errors);
+    }
+
+    public function testExecuteNotAllowedByCondition()
+    {
+        $data = new ActionData(['data' => new \stdClass()]);
+        $action = $this->createActionGroup($this->never(), $data);
+        $condition = $this->createCondition($this->exactly(1), $data, false);
+
+        $this->definition->setName('TestName2');
+        $this->definition->setActions(['action1']);
+        $this->definition->setConditions(['condition1']);
 
         $this->actionFactory->expects($this->any())
             ->method('create')
@@ -68,35 +98,47 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
 
         $errors = new ArrayCollection();
 
-        if ($exceptionMessage) {
-            $this->expectException(ForbiddenActionGroupException::class);
-            $this->expectExceptionMessage($exceptionMessage);
-        }
+        $event = new ActionGroupGuardEvent($data, $this->definition, $errors);
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with($event);
+
+        $this->expectException(ForbiddenActionGroupException::class);
+        $this->expectExceptionMessage('ActionGroup "TestName2" is not allowed');
 
         $this->assertSame($data, $this->actionGroup->execute($data, $errors));
 
         $this->assertEmpty($errors->toArray());
     }
 
-    public function executeProvider(): array
+    public function testExecuteNotAllowedByEvent()
     {
         $data = new ActionData(['data' => new \stdClass()]);
 
-        return [
-            '!isConditionAllowed' => [
-                'data' => $data,
-                'action' => $this->createActionGroup($this->never(), $data),
-                'condition' => $this->createCondition($this->exactly(1), $data, false),
-                'actionGroupName' => 'TestName2',
-                'exception' => 'ActionGroup "TestName2" is not allowed'
-            ],
-            'isAllowed' => [
-                'data' => $data,
-                'action' => $this->createActionGroup($this->once(), $data),
-                'condition' => $this->createCondition($this->exactly(1), $data, true),
-                'actionGroupName' => 'TestName3',
-            ],
-        ];
+        $this->definition->setName('TestName2');
+        $this->definition->setActions(['action1']);
+        $this->definition->setConditions(['condition1']);
+
+        $this->actionFactory->expects($this->never())
+            ->method('create');
+
+        $this->conditionFactory->expects($this->never())
+            ->method('create');
+
+        $errors = new ArrayCollection();
+
+        $event = new ActionGroupGuardEvent($data, $this->definition, $errors);
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with($event)
+            ->willReturnCallback(function (ActionGroupGuardEvent $event) {
+                $event->setAllowed(false);
+            });
+
+        $this->expectException(ForbiddenActionGroupException::class);
+        $this->expectExceptionMessage('ActionGroup "TestName2" is not allowed');
+
+        $this->actionGroup->execute($data, $errors);
     }
 
     /**
@@ -105,14 +147,40 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
     public function testIsAllowed(ActionData $data, ?ConfigurableCondition $condition, bool $allowed)
     {
         if ($condition) {
-            $this->actionGroup->getDefinition()->setConditions(['condition1']);
+            $this->definition->setConditions(['condition1']);
         }
+
+        $errors = new ArrayCollection();
+        $event = new ActionGroupGuardEvent($data, $this->definition, $errors);
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with($event);
 
         $this->conditionFactory->expects($condition ? $this->once() : $this->never())
             ->method('create')
             ->willReturn($condition);
 
-        $this->assertEquals($allowed, $this->actionGroup->isAllowed($data));
+        $this->assertEquals($allowed, $this->actionGroup->isAllowed($data, $errors));
+    }
+
+    public function testIsAllowedDisallowedByEvent(): void
+    {
+        $data = new ActionData();
+        $errors = new ArrayCollection();
+
+        $this->definition->setConditions(['condition1']);
+        $this->conditionFactory->expects($this->never())
+            ->method('create');
+
+        $event = new ActionGroupGuardEvent($data, $this->definition, $errors);
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with($event)
+            ->willReturnCallback(function (ActionGroupGuardEvent $event) {
+                $event->setAllowed(false);
+            });
+
+        $this->assertFalse($this->actionGroup->isAllowed($data, $errors));
     }
 
     public function isAllowedProvider(): array
@@ -144,7 +212,7 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
     public function testGetParameters(array $config, array $expected)
     {
         if ($config) {
-            $this->actionGroup->getDefinition()->setParameters($config);
+            $this->definition->setParameters($config);
         }
 
         $this->assertEquals($expected, $this->actionGroup->getParameters());
@@ -167,7 +235,7 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
     }
 
     private function createActionGroup(
-        \PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects,
+        InvocationOrder $expects,
         ActionData $data
     ): ActionInterface {
         $action = $this->createMock(ActionInterface::class);
@@ -179,7 +247,7 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
     }
 
     private function createCondition(
-        \PHPUnit\Framework\MockObject\Rule\InvocationOrder $expects,
+        InvocationOrder $expects,
         ActionData $data,
         bool $returnValue
     ): ConfigurableCondition {
@@ -190,5 +258,19 @@ class ActionGroupTest extends \PHPUnit\Framework\TestCase
             ->willReturn($returnValue);
 
         return $condition;
+    }
+
+    private function assertEventDispatchForExecute(ActionData $data, ArrayCollection $errors): void
+    {
+        $preExecuteEvent = new ActionGroupPreExecuteEvent($data, $this->definition, $errors);
+        $executeEvent = new ActionGroupExecuteEvent($data, $this->definition, $errors);
+        $guardEvent = new ActionGroupGuardEvent($data, $this->definition, $errors);
+        $this->eventDispatcher->expects($this->exactly(3))
+            ->method('dispatch')
+            ->withConsecutive(
+                [$guardEvent],
+                [$preExecuteEvent],
+                [$executeEvent],
+            );
     }
 }

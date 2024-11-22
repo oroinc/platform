@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
+use Oro\Bundle\ActionBundle\Event\ActionGroupEventDispatcher;
 use Oro\Bundle\ActionBundle\Exception\ActionGroupNotFoundException;
 use Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
@@ -10,11 +11,13 @@ use Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
 use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\ConfigExpression\ExpressionFactory;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 
 class ActionGroupRegistryTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var ConfigurationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $configurationProvider;
+    private ConfigurationProviderInterface|MockObject $configurationProvider;
+    private ServiceProviderInterface|MockObject $actionGroupServiceLocator;
 
     /** @var ActionGroupRegistry */
     private $registry;
@@ -22,6 +25,7 @@ class ActionGroupRegistryTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->configurationProvider = $this->createMock(ConfigurationProviderInterface::class);
+        $this->actionGroupServiceLocator = $this->createMock(ServiceProviderInterface::class);
 
         $assembler = new ActionGroupAssembler(
             $this->createMock(ActionFactoryInterface::class),
@@ -29,6 +33,8 @@ class ActionGroupRegistryTest extends \PHPUnit\Framework\TestCase
             new ParameterAssembler(),
             $this->createMock(ParametersResolver::class)
         );
+        $assembler->setEventDispatcher($this->createMock(ActionGroupEventDispatcher::class));
+        $assembler->setActionGroupServiceLocator($this->actionGroupServiceLocator);
 
         $this->registry = new ActionGroupRegistry(
             $this->configurationProvider,

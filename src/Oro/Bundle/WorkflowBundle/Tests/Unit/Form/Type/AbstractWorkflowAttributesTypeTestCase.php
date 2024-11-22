@@ -11,8 +11,8 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
-use Oro\Bundle\WorkflowBundle\Form\EventListener\FormInitListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\RequiredAttributesListener;
+use Oro\Bundle\WorkflowBundle\Form\EventListener\WorkflowAttributeFormInitListener;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowAttributesType;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
@@ -101,7 +101,7 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
         WorkflowRegistry $workflowRegistry = null,
         AttributeGuesser $attributeGuesser = null,
         DefaultValuesListener $defaultValuesListener = null,
-        FormInitListener $formInitListener = null,
+        WorkflowAttributeFormInitListener $formInitListener = null,
         RequiredAttributesListener $requiredAttributesListener = null,
         EventDispatcherInterface $dispatcher = null,
         PropertyPathSecurityHelper $propertyPathSecurityHelper = null,
@@ -120,7 +120,7 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
                 ->getMock();
         }
         if (!$formInitListener) {
-            $formInitListener = $this->getMockBuilder(FormInitListener::class)
+            $formInitListener = $this->getMockBuilder(WorkflowAttributeFormInitListener::class)
                 ->disableOriginalConstructor()
                 ->onlyMethods(['initialize', 'executeInitAction'])
                 ->getMock();

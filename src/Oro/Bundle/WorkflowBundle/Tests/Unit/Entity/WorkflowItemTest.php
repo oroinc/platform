@@ -75,6 +75,14 @@ class WorkflowItemTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($value, $this->workflowItem->getCurrentStep());
     }
 
+    public function testSetCurrentStepForLockedWorkflowItem()
+    {
+        $this->workflowItem->lock();
+        $value = $this->createMock(WorkflowStep::class);
+        $this->workflowItem->setCurrentStep($value);
+        self::assertEquals($value, $this->workflowItem->getCurrentStep());
+    }
+
     public function testData()
     {
         $this->assertInstanceOf(WorkflowData::class, $this->workflowItem->getData());

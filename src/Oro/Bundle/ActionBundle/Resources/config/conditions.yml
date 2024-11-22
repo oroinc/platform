@@ -37,12 +37,20 @@ services:
         tags:
             - { name: oro_action.condition, alias: configurable }
 
+    oro_action.extendable_condition_event_errors_processor:
+        class: Oro\Component\Action\Model\ExtendableConditionEventErrorsProcessor
+        arguments:
+            - '@translator'
+            - '@request_stack'
+
     oro_action.condition.extendable:
         class: Oro\Component\Action\Condition\ExtendableCondition
         arguments:
             - '@event_dispatcher'
             - '@request_stack'
             - '@translator'
+        calls:
+            - ['setErrorsProcessor', ['@oro_action.extendable_condition_event_errors_processor']]
         tags:
             - { name: oro_action.condition, alias: extendable }
 

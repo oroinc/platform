@@ -3,6 +3,7 @@
 return [
     'first' => [
         'entity' => 'Entity1',
+        'metadata' => [],
         'steps' => [
             'step_one' => [
                 'order' => 0,
@@ -33,6 +34,7 @@ return [
             'transition_one' => [
                 'is_start' => true,
                 'step_to' => 'step_one',
+                'conditional_steps_to' => [],
                 'is_hidden' => false,
                 'is_unavailable_hidden' => false,
                 'acl_message' => null,
@@ -53,6 +55,7 @@ return [
             'transition_three' => [
                 'is_start' => true,
                 'step_to' => 'step_three',
+                'conditional_steps_to' => [],
                 'is_hidden' => false,
                 'is_unavailable_hidden' => false,
                 'acl_message' => null,
@@ -73,6 +76,7 @@ return [
             'transition_two' => [
                 'is_start' => true,
                 'step_to' => 'step_two',
+                'conditional_steps_to' => [],
                 'is_hidden' => false,
                 'is_unavailable_hidden' => false,
                 'acl_message' => null,
@@ -110,6 +114,7 @@ return [
     ],
     'second' => [
         'entity' => 'Entity2',
+        'metadata' => [],
         'steps' => [
             'step_one' => [
                 'order' => 0,
@@ -140,6 +145,7 @@ return [
             'transition_one' => [
                 'is_start' => true,
                 'step_to' => 'step_one',
+                'conditional_steps_to' => [],
                 'is_hidden' => false,
                 'is_unavailable_hidden' => false,
                 'acl_message' => null,
@@ -160,6 +166,7 @@ return [
             'transition_three' => [
                 'is_start' => true,
                 'step_to' => 'step_three',
+                'conditional_steps_to' => [],
                 'is_hidden' => false,
                 'is_unavailable_hidden' => false,
                 'acl_message' => null,
@@ -180,6 +187,7 @@ return [
             'transition_two' => [
                 'is_start' => true,
                 'step_to' => 'step_two',
+                'conditional_steps_to' => [],
                 'is_hidden' => false,
                 'is_unavailable_hidden' => false,
                 'acl_message' => null,
@@ -217,6 +225,7 @@ return [
     ],
     'third' => [
         'entity' => 'Entity3',
+        'metadata' => [],
         'steps' => [
             'step_one' => [
                 'order' => 0,
@@ -239,6 +248,7 @@ return [
             'transition_one' => [
                 'is_start' => true,
                 'step_to' => 'step_one',
+                'conditional_steps_to' => [],
                 'is_hidden' => false,
                 'is_unavailable_hidden' => false,
                 'acl_message' => null,
@@ -259,6 +269,7 @@ return [
             'transition_three' => [
                 'is_start' => true,
                 'step_to' => 'step_three',
+                'conditional_steps_to' => [],
                 'is_hidden' => false,
                 'is_unavailable_hidden' => false,
                 'acl_message' => null,

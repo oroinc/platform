@@ -99,6 +99,21 @@ class CallMethodTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['object' => $this], $context->getData());
     }
 
+    public function testExecuteNullObject()
+    {
+        $context = new ItemStub(['object' => null]);
+        $options = [
+            'method' => 'assertCall',
+            'object' => new PropertyPath('object'),
+            'method_parameters' => ['test']
+        ];
+
+        $this->action->initialize($options);
+        $this->action->execute($context);
+
+        self::assertEquals(['object' => null], $context->getData());
+    }
+
     public function assertCall(mixed $a): string
     {
         self::assertEquals('test', $a);

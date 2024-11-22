@@ -5,12 +5,14 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
+use Oro\Bundle\WorkflowBundle\Event\EventDispatcher;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 use Oro\Bundle\WorkflowBundle\Model\FormOptionsAssembler;
 use Oro\Bundle\WorkflowBundle\Model\FormOptionsConfigurationAssembler;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionAssembler;
+use Oro\Bundle\WorkflowBundle\Model\TransitionServiceInterface;
 use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\Action\Action\ActionInterface;
@@ -19,6 +21,8 @@ use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\Action\Exception\AssemblerException;
 use Oro\Component\ConfigExpression\ExpressionFactory;
 use Oro\Component\ConfigExpression\ExpressionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -26,14 +30,20 @@ use Oro\Component\ConfigExpression\ExpressionInterface;
  */
 class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var FormOptionsAssembler|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var FormOptionsAssembler|MockObject */
     private $formOptionsAssembler;
 
-    /** @var ExpressionFactory|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ExpressionFactory|MockObject */
     private $conditionFactory;
 
-    /** @var ActionFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ActionFactoryInterface|MockObject */
     private $actionFactory;
+
+    /** @var EventDispatcher|MockObject */
+    private $eventDispatcher;
+
+    /** @var ServiceProviderInterface|MockObject */
+    private $serviceLocator;
 
     /** @var TransitionAssembler */
     private $assembler;
@@ -74,6 +84,8 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->formOptionsAssembler = $this->createMock(FormOptionsAssembler::class);
         $this->conditionFactory = $this->createMock(ExpressionFactory::class);
         $this->actionFactory = $this->createMock(ActionFactoryInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcher::class);
+        $this->serviceLocator = $this->createMock(ServiceProviderInterface::class);
 
         $this->assembler = new TransitionAssembler(
             $this->formOptionsAssembler,
@@ -82,6 +94,8 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
             $this->createMock(FormOptionsConfigurationAssembler::class),
             $this->createMock(TransitionOptionsResolver::class)
         );
+        $this->assembler->setEventDispatcher($this->eventDispatcher);
+        $this->assembler->setTransitionServiceLocator($this->serviceLocator);
     }
 
     /**
@@ -199,39 +213,18 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
 
         $expectedPreAction = null;
         $expectedCondition = null;
-        $expectedPreCondition = $this->createMock(ExpressionInterface::class);
+        $expectedPreCondition = null;
         $expectedPostAction = null;
-        $defaultAclPrecondition = [];
         $preConditions = [];
 
         $fullConfiguration = $configuration;
         $configuration = reset($configuration['transitions']);
-        if (isset($configuration['acl_resource'])) {
-            $defaultAclPrecondition = [
-                '@acl_granted' => [
-                    'parameters' => [$configuration['acl_resource']]
-                ]
-            ];
-
-            if (isset($configuration['acl_message'])) {
-                $defaultAclPrecondition['@acl_granted']['message'] = $configuration['acl_message'];
-            }
-        }
-
         $transitionDefinition = $fullConfiguration['transition_definitions'] ?? [];
         $transitionDefinition = $transitionDefinition[$configuration['transition_definition']] ?? [];
 
         if (isset($transitionDefinition['preconditions'])) {
-            if ($defaultAclPrecondition) {
-                $preConditions = [
-                    '@and' => [
-                        $defaultAclPrecondition,
-                        $transitionDefinition['preconditions']
-                    ]
-                ];
-            } else {
-                $preConditions = $transitionDefinition['preconditions'];
-            }
+            $preConditions = $transitionDefinition['preconditions'];
+            $expectedPreCondition = $this->createMock(ExpressionInterface::class);
         }
 
         $createConditionExpectations = [];
@@ -240,11 +233,6 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
             $createConditionExpectations[] = [ConfigurableCondition::ALIAS, $preConditions];
             $createConditionExpectationResults[] = $expectedPreCondition;
         }
-        $createConditionExpectations[] = [
-            ConfigurableCondition::ALIAS,
-            ['@is_granted_workflow_transition' => ['parameters' => ['test_transition', 'target_step']]]
-        ];
-        $createConditionExpectationResults[] = $expectedPreCondition;
         if (array_key_exists('conditions', $transitionDefinition)) {
             $expectedCondition = $this->createMock(ExpressionInterface::class);
             $createConditionExpectations[] = [ConfigurableCondition::ALIAS, $transitionDefinition['conditions']];
@@ -325,7 +313,11 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->assertTemplate('page', $configuration, $actualTransition);
         $this->assertTemplate('dialog', $configuration, $actualTransition);
 
-        $this->assertNotNull($actualTransition->getPreCondition(), 'Incorrect Precondition');
+        $this->assertEquals(
+            $configuration['acl_resource'] ?? null,
+            $actualTransition->getAclResource(),
+            'Incorrect Acl Resource'
+        );
         $this->assertEquals($expectedPreCondition, $actualTransition->getPreCondition(), 'Incorrect Precondition');
 
         if (array_key_exists('schedule', $configuration)) {
@@ -353,12 +345,17 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
             ->method('assemble')
             ->willReturn([]);
 
-        $this->actionFactory->expects($this->any())
-            ->method('create')
-            ->with(ConfigurableAction::ALIAS, $this->isType('array'))
-            ->willReturnCallback(function ($type, $config) use ($expectedActionConfig) {
-                $this->assertEquals($expectedActionConfig, $config);
-            });
+        if ($expectedActionConfig) {
+            $this->actionFactory->expects($this->once())
+                ->method('create')
+                ->with(ConfigurableAction::ALIAS, $this->isType('array'))
+                ->willReturnCallback(function ($type, $config) use ($expectedActionConfig) {
+                    $this->assertEquals($expectedActionConfig, $config);
+                });
+        } else {
+            $this->actionFactory->expects($this->never())
+                ->method('create');
+        }
 
         $assemblerConfig = [
             'transitions' => [
@@ -387,9 +384,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
                     'display_type' => 'page',
                     'destination_page' => 'dest',
                 ],
-                'actionConfig' => [
-                    ['@resolve_destination_page' => 'dest'],
-                ],
+                'actionConfig' => [],
             ],
             'with actions and destination' => [
                 'configuration' => [
@@ -399,7 +394,6 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
                     'destination_page' => 'dest',
                 ],
                 'actionConfig' => [
-                    ['@resolve_destination_page' => 'dest'],
                     ['@assign_value' => ['parameters' => ['$attribute', 'action_value']]],
                 ],
             ],
@@ -537,26 +531,12 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
 
         $steps = ['target_step' => $this->createMock(Step::class)];
         $attributes = ['attribute' => $this->createMock(Attribute::class)];
-
-        $expectedPreCondition = $this->createMock(ExpressionInterface::class);
         $expectedCondition = $this->createMock(ExpressionInterface::class);
 
-        $this->conditionFactory->expects($this->exactly(2))
+        $this->conditionFactory->expects($this->once())
             ->method('create')
-            ->withConsecutive(
-                [
-                    ConfigurableCondition::ALIAS,
-                    ['@is_granted_workflow_transition' => ['parameters' => ['test_transition', 'target_step']]]
-                ],
-                [
-                    ConfigurableCondition::ALIAS,
-                    $transitionDefinition['conditions']
-                ]
-            )
-            ->willReturnOnConsecutiveCalls(
-                $expectedPreCondition,
-                $expectedCondition
-            );
+            ->with(ConfigurableCondition::ALIAS, $transitionDefinition['conditions'])
+            ->willReturn($expectedCondition);
 
         $this->formOptionsAssembler->expects($this->once())
             ->method('assemble')
@@ -608,9 +588,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->assertNotNull($actualTransition->getCondition());
         $this->assertSame($expectedCondition, $actualTransition->getCondition(), 'Incorrect condition');
 
-        $this->assertNotNull($actualTransition->getPreCondition());
-        $this->assertEquals($expectedPreCondition, $actualTransition->getPreCondition(), 'Incorrect Precondition');
-
+        $this->assertNull($actualTransition->getPreCondition());
         $this->assertNull($actualTransition->getPreAction());
         $this->assertNull($actualTransition->getAction());
     }
@@ -639,15 +617,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
         $expectedCondition = $this->createMock(ExpressionInterface::class);
 
         $preConditions = [
-            '@and' => [
-                ['@is_granted_workflow_transition' => ['parameters' => ['test_transition', 'target_step']]],
-                ['@and' => [
-                    ['@acl_granted' => [
-                        'parameters' => $configuration['acl_resource'], 'message' => $configuration['acl_message']
-                    ]],
-                    ['@true' => null]
-                ]]
-            ]
+            '@true' => null
         ];
         $this->conditionFactory->expects($this->exactly(2))
             ->method('create')
@@ -790,21 +760,8 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
         $steps = ['target_step' => $this->createMock(Step::class)];
         $attributes = ['attribute' => $this->createMock(Attribute::class)];
 
-        $expectedPreCondition = $this->createMock(ExpressionInterface::class);
-
-        $preConditions = [
-            '@and' => [
-                ['@is_granted_workflow_transition' => ['parameters' => ['test_transition', 'target_step']]],
-                ['@acl_granted' => [
-                    'parameters' => $configuration['acl_resource'],
-                    'message' => $configuration['acl_message']
-                ]]
-            ]
-        ];
-        $this->conditionFactory->expects($this->once())
-            ->method('create')
-            ->with(ConfigurableCondition::ALIAS, $preConditions)
-            ->willReturn($expectedPreCondition);
+        $this->conditionFactory->expects($this->never())
+            ->method('create');
 
         $this->actionFactory->expects($this->never())
             ->method('create');
@@ -852,9 +809,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->assertTemplate('page', $configuration, $actualTransition);
         $this->assertTemplate('dialog', $configuration, $actualTransition);
 
-        $this->assertNotNull($actualTransition->getPreCondition(), 'Incorrect Precondition');
-        $this->assertEquals($expectedPreCondition, $actualTransition->getPreCondition(), 'Incorrect Precondition');
-
+        $this->assertNull($actualTransition->getPreCondition(), 'Incorrect Precondition');
         $this->assertNull($actualTransition->getCondition(), 'Incorrect condition');
         $this->assertNull($actualTransition->getPreAction(), 'Incorrect preaction');
         $this->assertNull($actualTransition->getAction(), 'Incorrect action');
@@ -946,5 +901,79 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
                 ],
             ],
         ];
+    }
+
+    public function testAssembleWithTransitionService()
+    {
+        $configuration = [
+            'transition_service' => 'some_service_id',
+            'acl_resource' => 'test_acl',
+            'acl_message' => 'test acl message',
+            'step_to' => 'target_step',
+            'is_start' => true,
+        ];
+
+        $steps = ['target_step' => $this->createMock(Step::class)];
+        $attributes = ['attribute' => $this->createMock(Attribute::class)];
+
+        $transitionService = $this->createMock(TransitionServiceInterface::class);
+        $this->serviceLocator->expects($this->once())
+            ->method('get')
+            ->with('some_service_id')
+            ->willReturn($transitionService);
+
+        $this->conditionFactory->expects($this->never())
+            ->method('create');
+
+        $this->actionFactory->expects($this->never())
+            ->method('create');
+
+        $this->formOptionsAssembler->expects($this->once())
+            ->method('assemble')
+            ->with([], $attributes, 'transition', 'test_transition')
+            ->willReturnArgument(0);
+
+        $transitions = $this->assembler->assemble(
+            [
+                'transitions' => [
+                    'test_transition' => $configuration,
+                ],
+                'transition_definitions' => self::$transitionDefinitions,
+                'variable_definitions' => [
+                    'variables' => []
+                ],
+            ],
+            $steps,
+            $attributes
+        );
+
+        $this->assertInstanceOf(ArrayCollection::class, $transitions);
+        $this->assertCount(1, $transitions);
+        $this->assertTrue($transitions->containsKey('test_transition'));
+
+        /** @var Transition $actualTransition */
+        $actualTransition = $transitions->get('test_transition');
+
+        $this->assertEquals('test_transition', $actualTransition->getName(), 'Incorrect name');
+        $this->assertEquals($steps['target_step'], $actualTransition->getStepTo(), 'Incorrect step_to');
+        $this->assertEquals(
+            WorkflowConfiguration::DEFAULT_TRANSITION_DISPLAY_TYPE,
+            $actualTransition->getDisplayType(),
+            'Incorrect display type'
+        );
+
+        $this->assertEquals([], $actualTransition->getFrontendOptions(), 'Incorrect frontend_options');
+        $this->assertTrue($actualTransition->isStart(), 'Incorrect is_start');
+
+        $this->assertEquals(WorkflowTransitionType::class, $actualTransition->getFormType(), 'Incorrect form_type');
+        $this->assertEmpty($actualTransition->getFormOptions(), 'Incorrect form_options');
+
+        $this->assertTemplate('page', $configuration, $actualTransition);
+        $this->assertTemplate('dialog', $configuration, $actualTransition);
+
+        $this->assertNull($actualTransition->getPreCondition(), 'Incorrect Precondition');
+        $this->assertNull($actualTransition->getCondition(), 'Incorrect condition');
+        $this->assertNull($actualTransition->getPreAction(), 'Incorrect preaction');
+        $this->assertNull($actualTransition->getAction(), 'Incorrect action');
     }
 }

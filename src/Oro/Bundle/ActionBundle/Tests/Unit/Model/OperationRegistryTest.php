@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
+use Oro\Bundle\ActionBundle\Event\OperationEventDispatcher;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\OperationAssembler;
@@ -20,34 +21,22 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 
-class OperationRegistryTest extends \PHPUnit\Framework\TestCase
+class OperationRegistryTest extends TestCase
 {
-    /** @var ConfigurationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $configurationProvider;
-
-    /** @var CurrentApplicationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $applicationProvider;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var ActionFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $actionFactory;
-
-    /** @var ConditionFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $conditionFactory;
-
-    /** @var AttributeAssembler|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeAssembler;
-
-    /** @var FormOptionsAssembler|\PHPUnit\Framework\MockObject\MockObject */
-    private $formOptionsAssembler;
-
-    /** @var OperationAssembler */
-    private $assembler;
-
+    private ConfigurationProviderInterface|MockObject $configurationProvider;
+    private CurrentApplicationProviderInterface|MockObject $applicationProvider;
+    private DoctrineHelper|MockObject $doctrineHelper;
+    private ActionFactory|MockObject $actionFactory;
+    private ConditionFactory|MockObject $conditionFactory;
+    private AttributeAssembler|MockObject $attributeAssembler;
+    private FormOptionsAssembler|MockObject $formOptionsAssembler;
     private OptionsResolver $optionsResolver;
+    private OperationEventDispatcher|MockObject $eventDispatcher;
+    private OperationAssembler $assembler;
 
     protected function setUp(): void
     {
@@ -59,7 +48,8 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
         $this->applicationProvider = $this->createMock(CurrentApplicationProviderInterface::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->optionsResolver = $this->createMock(OptionsResolver::class);
-
+        $this->eventDispatcher = $this->createMock(OperationEventDispatcher::class);
+        $this->operationServiceLocator = $this->createMock(ServiceProviderInterface::class);
 
         $this->applicationProvider->expects($this->any())
             ->method('isApplicationsValid')
@@ -84,6 +74,8 @@ class OperationRegistryTest extends \PHPUnit\Framework\TestCase
             $this->formOptionsAssembler,
             $this->optionsResolver
         );
+        $this->assembler->setEventDispatcher($this->eventDispatcher);
+        $this->assembler->setOperationServiceLocator($this->operationServiceLocator);
     }
 
     /**

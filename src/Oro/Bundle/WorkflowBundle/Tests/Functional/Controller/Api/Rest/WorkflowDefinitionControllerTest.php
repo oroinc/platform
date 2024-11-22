@@ -124,6 +124,7 @@ class WorkflowDefinitionControllerTest extends WebTestCase
             'exclusive_active_groups' => [],
             'exclusive_record_groups' => [],
             'applications' => $workflowDefinition->getApplications(),
+            'metadata' => []
         ];
 
         $this->assertArrayHasKey('created_at', $result);

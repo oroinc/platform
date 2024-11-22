@@ -2,28 +2,105 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\Assembler;
 
+use Oro\Bundle\ActionBundle\Event\ActionGroupEventDispatcher;
 use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver;
 use Oro\Bundle\ActionBundle\Model\ActionGroupDefinition;
+use Oro\Bundle\ActionBundle\Model\ActionGroupServiceAdapter;
 use Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1;
 use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 
-class ActionGroupAssemblerTest extends \PHPUnit\Framework\TestCase
+class ActionGroupAssemblerTest extends TestCase
 {
-    /** @var ActionGroupAssembler */
-    private $assembler;
+    private ServiceProviderInterface|MockObject $actionGroupServiceLocator;
+    private ParametersResolver|MockObject $parametersResolver;
+    private ActionGroupEventDispatcher|MockObject $eventDispatcher;
+
+    private ActionGroupAssembler $assembler;
 
     protected function setUp(): void
     {
+        $this->actionGroupServiceLocator = $this->createMock(ServiceProviderInterface::class);
+        $this->parametersResolver = $this->createMock(ParametersResolver::class);
+        $this->eventDispatcher = $this->createMock(ActionGroupEventDispatcher::class);
+
         $this->assembler = new ActionGroupAssembler(
             $this->createMock(ActionFactoryInterface::class),
             $this->createMock(ConditionFactory::class),
             new ParameterAssembler(),
-            $this->createMock(ParametersResolver::class)
+            $this->parametersResolver
         );
+        $this->assembler->setEventDispatcher($this->eventDispatcher);
+        $this->assembler->setActionGroupServiceLocator($this->actionGroupServiceLocator);
+    }
+
+    public function testAssembleWithServiceMinimal()
+    {
+        $service = new \stdClass();
+        $this->actionGroupServiceLocator->expects($this->once())
+            ->method('get')
+            ->with('test_service')
+            ->willReturn($service);
+
+        $configuration = [
+            'minimum_name' => [
+                'service' => 'test_service'
+            ]
+        ];
+
+        $definitions = $this->assembler->assemble($configuration);
+
+        $expected = [
+            'minimum_name' => new ActionGroupServiceAdapter(
+                $this->parametersResolver,
+                $service,
+                $this->eventDispatcher,
+                'execute',
+                null,
+                null,
+                (new ActionGroupDefinition())->setName('minimum_name')
+            )
+        ];
+        $this->assertEquals($expected, $definitions);
+    }
+
+    public function testAssembleWithServiceAllParameters()
+    {
+        $service = new \stdClass();
+        $this->actionGroupServiceLocator->expects($this->once())
+            ->method('get')
+            ->with('test_service')
+            ->willReturn($service);
+
+        $configuration = [
+            'minimum_name' => [
+                'service' => 'test_service',
+                'method' => 'test_method',
+                'return_value_name' => 'test_return_value',
+                'parameters' => ['arg1' => []]
+            ]
+        ];
+
+        $definitions = $this->assembler->assemble($configuration);
+
+        $expected = [
+            'minimum_name' => new ActionGroupServiceAdapter(
+                $this->parametersResolver,
+                $service,
+                $this->eventDispatcher,
+                'test_method',
+                'test_return_value',
+                ['arg1' => []],
+                (new ActionGroupDefinition())->setName('minimum_name')
+            )
+        ];
+        $this->assertEquals($expected, $definitions);
     }
 
     /**
@@ -67,9 +144,7 @@ class ActionGroupAssemblerTest extends \PHPUnit\Framework\TestCase
                 ],
             ])
             ->setConditions([
-                '@and' => [
-                    ['@condition' => 'config_conditions'],
-                ]
+                '@condition' => 'config_conditions'
             ])
             ->setActions(['config_actions']);
 
@@ -77,12 +152,37 @@ class ActionGroupAssemblerTest extends \PHPUnit\Framework\TestCase
         $definition3
             ->setName('maximum_name_and_acl')
             ->setConditions([
-                '@and' => [
-                    ['@acl_granted' => 'test_acl'],
-                    ['@condition' => 'config_conditions']
-                ]
-             ])
-            ->setActions(['config_actions']);
+                '@condition' => 'config_conditions'
+            ])
+            ->setActions(['config_actions'])
+            ->setAclResource('test_acl');
+
+        $minimumActionGroup = new ActionGroup(
+            $actionFactory,
+            $conditionFactory,
+            $parameterAssembler,
+            $parametersResolver,
+            $definition1
+        );
+        $minimumActionGroup->setEventDispatcher($this->createMock(ActionGroupEventDispatcher::class));
+
+        $maximumActionGroup = new ActionGroup(
+            $actionFactory,
+            $conditionFactory,
+            $parameterAssembler,
+            $parametersResolver,
+            $definition2
+        );
+        $maximumActionGroup->setEventDispatcher($this->createMock(ActionGroupEventDispatcher::class));
+
+        $maximumWithAclActionGroup = new ActionGroup(
+            $actionFactory,
+            $conditionFactory,
+            $parameterAssembler,
+            $parametersResolver,
+            $definition3
+        );
+        $maximumWithAclActionGroup->setEventDispatcher($this->createMock(ActionGroupEventDispatcher::class));
 
         return [
             'no data' => [
@@ -100,13 +200,7 @@ class ActionGroupAssemblerTest extends \PHPUnit\Framework\TestCase
                 ]
                 ,
                 'expected' => [
-                    'minimum_name' => new ActionGroup(
-                        $actionFactory,
-                        $conditionFactory,
-                        $parameterAssembler,
-                        $parametersResolver,
-                        $definition1
-                    )
+                    'minimum_name' => $minimumActionGroup
                 ],
             ],
             'maximum data' => [
@@ -130,13 +224,7 @@ class ActionGroupAssemblerTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'expected' => [
-                    'maximum_name' => new ActionGroup(
-                        $actionFactory,
-                        $conditionFactory,
-                        $parameterAssembler,
-                        $parametersResolver,
-                        $definition2
-                    )
+                    'maximum_name' => $maximumActionGroup
                 ],
             ],
             'maximum data and acl_resource' => [
@@ -159,13 +247,7 @@ class ActionGroupAssemblerTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'expected' => [
-                    'maximum_name_and_acl' => new ActionGroup(
-                        $actionFactory,
-                        $conditionFactory,
-                        $parameterAssembler,
-                        $parametersResolver,
-                        $definition3
-                    )
+                    'maximum_name_and_acl' => $maximumWithAclActionGroup
                 ],
             ],
         ];

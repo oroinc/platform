@@ -100,7 +100,6 @@ class FormOptionsAssembler extends BaseAbstractAssembler
 
     /**
      * @param Attribute[]|Collection $attributes
-     * @return array
      */
     protected function setAttributes($attributes)
     {

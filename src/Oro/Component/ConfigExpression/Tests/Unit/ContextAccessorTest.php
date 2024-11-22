@@ -59,6 +59,45 @@ class ContextAccessorTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @dataProvider getPropertyValueDataProvider
+     */
+    public function testGetPropertyValue(object|array $context, string|PropertyPath $value, ?string $expectedValue)
+    {
+        $this->assertEquals($expectedValue, $this->contextAccessor->getPropertyValue($context, $value));
+    }
+
+    public function getPropertyValueDataProvider(): array
+    {
+        return [
+            'get_simple_value' => [
+                'context' => ['foo' => 'bar'],
+                'value' => 'test',
+                'expectedValue' => null
+            ],
+            'get_property_from_array' => [
+                'context' => ['foo' => 'bar'],
+                'value' => new PropertyPath('[foo]'),
+                'expectedValue' => 'bar'
+            ],
+            'get_property_from_object' => [
+                'context' => new ItemStub(['foo' => 'bar']),
+                'value' => new PropertyPath('foo'),
+                'expectedValue' => 'bar'
+            ],
+            'get_nested_property_from_object' => [
+                'context' => new ItemStub(['foo' => new ItemStub(['bar' => 'baz'])]),
+                'value' => new PropertyPath('foo.bar'),
+                'expectedValue' => 'baz'
+            ],
+            'get_unknown_property' => [
+                'context' => new ItemStub(['foo' => 'bar']),
+                'value' => new PropertyPath('baz'),
+                'expectedValue' => null
+            ],
+        ];
+    }
+
+    /**
      * @dataProvider setValueDataProvider
      * @depends      testGetValue
      */

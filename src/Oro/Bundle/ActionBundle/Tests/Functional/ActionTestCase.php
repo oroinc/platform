@@ -5,7 +5,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Functional;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
+use Oro\Bundle\ActionBundle\Model\ActionExecutor;
 use Oro\Bundle\ActionBundle\Provider\ButtonProvider;
 use Oro\Bundle\ActionBundle\Provider\ButtonSearchContextProvider;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -19,21 +19,21 @@ abstract class ActionTestCase extends WebTestCase
 {
     use OperationAwareTestTrait;
 
-    /** @var ActionGroupRegistry */
-    private $actionGroupRegistry;
+    /** @var ActionExecutor */
+    private $actionExecutor;
 
-    protected function getActionGroupRegistry(): ActionGroupRegistry
+    protected function getActionExecutor(): ActionExecutor
     {
-        if (null === $this->actionGroupRegistry) {
-            $this->actionGroupRegistry = $this->getContainer()->get(ActionGroupRegistry::class);
+        if (null === $this->actionExecutor) {
+            $this->actionExecutor = $this->getContainer()->get('oro_action.action_executor');
         }
 
-        return $this->actionGroupRegistry;
+        return $this->actionExecutor;
     }
 
     protected function executeActionGroup(string $name, array $data = []): ActionData
     {
-        return $this->getActionGroupRegistry()->get($name)->execute(new ActionData($data));
+        return $this->getActionExecutor()->executeActionGroup($name, $data);
     }
 
     protected function getOperationExecutionRoute(): string

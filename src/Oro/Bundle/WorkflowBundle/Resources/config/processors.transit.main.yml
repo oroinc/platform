@@ -54,6 +54,8 @@ services:
     # form_init for custom form
     oro_workflow.transit.configure.custom_form.options.processor:
         class: Oro\Bundle\WorkflowBundle\Processor\Transition\CustomFormOptionsProcessor
+        arguments:
+            - '@oro_workflow.form.event_listener.workflow_attribute_form_init_listener'
         tags:
             - { name: oro_workflow.processor, action: transit, group: configure, customForm: true }
 

@@ -73,8 +73,14 @@ class WorkflowDefinition implements DomainObjectInterface
     /**
      * @var array
      */
-    #[ORM\Column(name: 'configuration', type: Types::ARRAY)]
+    #[ORM\Column(name: 'configuration', type: Types::JSON)]
     protected $configuration = [];
+
+    /**
+     * @var array
+     */
+    #[ORM\Column(name: 'metadata', type: Types::JSON)]
+    protected $metadata = [];
 
     /**
      * @var Collection<int, Scope>
@@ -881,6 +887,25 @@ class WorkflowDefinition implements DomainObjectInterface
     public function setApplications(array $applications)
     {
         $this->applications = array_map('strtolower', $applications);
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getMetadata()
+    {
+        return $this->metadata;
+    }
+
+    /**
+     * @param array $metadata
+     * @return $this
+     */
+    public function setMetadata(array $metadata)
+    {
+        $this->metadata = $metadata;
 
         return $this;
     }

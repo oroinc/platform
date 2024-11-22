@@ -71,6 +71,7 @@ class WorkflowDefinitionConfigurationBuilder
         $recordGroups = $configuration[WorkflowConfiguration::NODE_EXCLUSIVE_RECORD_GROUPS] ?? [];
         $applications = $configuration[WorkflowConfiguration::NODE_APPLICATIONS]
             ?? [CurrentApplicationProviderInterface::DEFAULT_APPLICATION];
+        $metadata = $configuration[WorkflowConfiguration::METADATA] ?? [];
 
         $workflowDefinition = new WorkflowDefinition();
         $workflowDefinition
@@ -85,7 +86,8 @@ class WorkflowDefinitionConfigurationBuilder
             ->setExclusiveActiveGroups($activeGroups)
             ->setExclusiveRecordGroups($recordGroups)
             ->setApplications($applications)
-            ->setConfiguration($this->filterConfiguration($configuration));
+            ->setConfiguration($this->filterConfiguration($configuration))
+            ->setMetadata($metadata);
 
         $workflow = $this->workflowAssembler->assemble($workflowDefinition, false);
 

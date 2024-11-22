@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\Assembler;
 
+use Oro\Bundle\ActionBundle\Event\OperationEventDispatcher;
 use Oro\Bundle\ActionBundle\Exception\MissedRequiredOptionException;
 use Oro\Bundle\ActionBundle\Form\Type\OperationType;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
@@ -9,19 +10,27 @@ use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\OperationAssembler;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
+use Oro\Bundle\ActionBundle\Model\OperationServiceInterface;
 use Oro\Bundle\ActionBundle\Resolver\OptionsResolver;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2;
 use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 
-class OperationAssemblerTest extends \PHPUnit\Framework\TestCase
+class OperationAssemblerTest extends TestCase
 {
+    private ServiceProviderInterface|MockObject $serviceProvider;
+
     /** @var OperationAssembler */
     private $assembler;
 
     protected function setUp(): void
     {
+        $this->serviceProvider = $this->createMock(ServiceProviderInterface::class);
+
         $this->assembler = new OperationAssembler(
             $this->createMock(ActionFactoryInterface::class),
             $this->createMock(ConditionFactory::class),
@@ -29,6 +38,8 @@ class OperationAssemblerTest extends \PHPUnit\Framework\TestCase
             $this->createMock(FormOptionsAssembler::class),
             $this->createMock(OptionsResolver::class)
         );
+        $this->assembler->setEventDispatcher($this->createMock(OperationEventDispatcher::class));
+        $this->assembler->setOperationServiceLocator($this->serviceProvider);
     }
 
     /**
@@ -65,15 +76,7 @@ class OperationAssemblerTest extends \PHPUnit\Framework\TestCase
             ->setActions(OperationDefinition::PREACTIONS, [])
             ->setActions(OperationDefinition::ACTIONS, [])
             ->setActions(OperationDefinition::FORM_INIT, [])
-            ->setFormType(OperationType::class)
-            ->setConditions(
-                OperationDefinition::PRECONDITIONS,
-                [
-                    '@and' => [
-                        ['@feature_resource_enabled' => ['resource' => 'minimum_name', 'resource_type' => 'operations']]
-                    ]
-                ]
-            );
+            ->setFormType(OperationType::class);
 
         $definition2 = clone $definition1;
         $definition2
@@ -81,15 +84,7 @@ class OperationAssemblerTest extends \PHPUnit\Framework\TestCase
             ->setSubstituteOperation('test_operation_to_substitute')
             ->setEnabled(false)
             ->setAttributes(['config_attr'])
-            ->setConditions(
-                OperationDefinition::PRECONDITIONS,
-                [
-                    '@and' => [
-                        ['config_pre_cond'],
-                        ['@feature_resource_enabled' => ['resource' => 'maximum_name', 'resource_type' => 'operations']]
-                    ]
-                ]
-            )
+            ->setConditions(OperationDefinition::PRECONDITIONS, ['config_pre_cond'])
             ->setConditions(OperationDefinition::CONDITIONS, ['config_cond'])
             ->setActions(OperationDefinition::PREACTIONS, ['config_pre_func'])
             ->setActions(OperationDefinition::ACTIONS, ['@action' => 'action_config'])
@@ -105,25 +100,8 @@ class OperationAssemblerTest extends \PHPUnit\Framework\TestCase
             ->setEnabled(false)
             ->setPageReload(false)
             ->setAttributes(['config_attr'])
-            ->setConditions(
-                OperationDefinition::PRECONDITIONS,
-                [
-                    '@and' => [
-                        [
-                            '@and' => [
-                                ['config_pre_cond'],
-                                [
-                                    '@feature_resource_enabled' => [
-                                        'resource' => 'maximum_name_and_acl',
-                                        'resource_type' => 'operations'
-                                    ]
-                                ]
-                            ]
-                        ],
-                        ['@acl_granted' => 'test_acl']
-                    ]
-                ]
-            )
+            ->setAclResource('test_acl')
+            ->setConditions(OperationDefinition::PRECONDITIONS, ['config_pre_cond'])
             ->setActions(OperationDefinition::PREACTIONS, ['config_pre_func'])
             ->setActions(OperationDefinition::ACTIONS, ['@action' => 'action_config'])
             ->setActions(OperationDefinition::FORM_INIT, ['config_form_init_func'])
@@ -131,6 +109,36 @@ class OperationAssemblerTest extends \PHPUnit\Framework\TestCase
             ->setFrontendOptions(['config_frontend_options'])
             ->setOrder(77)
             ->setFormType(OperationType::class);
+
+        $minimumOperation = new Operation(
+            $this->createMock(ActionFactoryInterface::class),
+            $this->createMock(ConditionFactory::class),
+            $this->createMock(AttributeAssembler::class),
+            $this->createMock(FormOptionsAssembler::class),
+            $this->createMock(OptionsResolver::class),
+            $definition1
+        );
+        $minimumOperation->setEventDispatcher($this->createMock(OperationEventDispatcher::class));
+
+        $maximumOperation = new Operation(
+            $this->createMock(ActionFactoryInterface::class),
+            $this->createMock(ConditionFactory::class),
+            $this->createMock(AttributeAssembler::class),
+            $this->createMock(FormOptionsAssembler::class),
+            $this->createMock(OptionsResolver::class),
+            $definition2
+        );
+        $maximumOperation->setEventDispatcher($this->createMock(OperationEventDispatcher::class));
+
+        $maximumNameAndAclOperation = new Operation(
+            $this->createMock(ActionFactoryInterface::class),
+            $this->createMock(ConditionFactory::class),
+            $this->createMock(AttributeAssembler::class),
+            $this->createMock(FormOptionsAssembler::class),
+            $this->createMock(OptionsResolver::class),
+            $definition3
+        );
+        $maximumNameAndAclOperation->setEventDispatcher($this->createMock(OperationEventDispatcher::class));
 
         return [
             'minimum data' => [
@@ -144,14 +152,7 @@ class OperationAssemblerTest extends \PHPUnit\Framework\TestCase
                 ]
                 ,
                 'expected' => [
-                    'minimum_name' => new Operation(
-                        $this->createMock(ActionFactoryInterface::class),
-                        $this->createMock(ConditionFactory::class),
-                        $this->createMock(AttributeAssembler::class),
-                        $this->createMock(FormOptionsAssembler::class),
-                        $this->createMock(OptionsResolver::class),
-                        $definition1
-                    )
+                    'minimum_name' => $minimumOperation
                 ],
             ],
             'maximum data' => [
@@ -176,14 +177,7 @@ class OperationAssemblerTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'expected' => [
-                    'maximum_name' => new Operation(
-                        $this->createMock(ActionFactoryInterface::class),
-                        $this->createMock(ConditionFactory::class),
-                        $this->createMock(AttributeAssembler::class),
-                        $this->createMock(FormOptionsAssembler::class),
-                        $this->createMock(OptionsResolver::class),
-                        $definition2
-                    )
+                    'maximum_name' => $maximumOperation
                 ],
             ],
             'maximum data and acl_resource' => [
@@ -212,16 +206,49 @@ class OperationAssemblerTest extends \PHPUnit\Framework\TestCase
                     ]
                 ],
                 'expected' => [
-                    'maximum_name_and_acl' => new Operation(
-                        $this->createMock(ActionFactoryInterface::class),
-                        $this->createMock(ConditionFactory::class),
-                        $this->createMock(AttributeAssembler::class),
-                        $this->createMock(FormOptionsAssembler::class),
-                        $this->createMock(OptionsResolver::class),
-                        $definition3
-                    )
+                    'maximum_name_and_acl' => $maximumNameAndAclOperation
                 ],
             ],
         ];
+    }
+
+    public function testCreateOperationWithService()
+    {
+        $service = $this->createMock(OperationServiceInterface::class);
+        $this->serviceProvider->expects($this->once())
+            ->method('get')
+            ->with('test_service')
+            ->willReturn($service);
+
+        $operation = $this->assembler->createOperation(
+            'test_operation',
+            [
+                'label' => 'My Label',
+                'entities' => [
+                    TestEntity1::class
+                ],
+                'service' => 'test_service'
+            ]
+        );
+
+        $definitionWithService = new OperationDefinition();
+        $definitionWithService
+            ->setName('test_operation')
+            ->setLabel('My Label')
+            ->setFormType(OperationType::class)
+            ->setActions(OperationDefinition::FORM_INIT, []);
+
+        $expectedOperation = new Operation(
+            $this->createMock(ActionFactoryInterface::class),
+            $this->createMock(ConditionFactory::class),
+            $this->createMock(AttributeAssembler::class),
+            $this->createMock(FormOptionsAssembler::class),
+            $this->createMock(OptionsResolver::class),
+            $definitionWithService
+        );
+        $expectedOperation->setEventDispatcher($this->createMock(OperationEventDispatcher::class));
+        $expectedOperation->setOperationService($service);
+
+        $this->assertEquals($expectedOperation, $operation);
     }
 }

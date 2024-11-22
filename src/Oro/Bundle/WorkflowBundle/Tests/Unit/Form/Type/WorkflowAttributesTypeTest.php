@@ -6,13 +6,14 @@ use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 use Oro\Bundle\SecurityBundle\Util\PropertyPathSecurityHelper;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
-use Oro\Bundle\WorkflowBundle\Form\EventListener\FormInitListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\RequiredAttributesListener;
+use Oro\Bundle\WorkflowBundle\Form\EventListener\WorkflowAttributeFormInitListener;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowAttributesType;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -24,28 +25,28 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 {
-    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var WorkflowRegistry|MockObject */
     private $workflowRegistry;
 
-    /** @var AttributeGuesser|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var AttributeGuesser|MockObject */
     private $attributeGuesser;
 
-    /** @var DefaultValuesListener|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var DefaultValuesListener|MockObject */
     private $defaultValuesListener;
 
-    /** @var FormInitListener|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var WorkflowAttributeFormInitListener|MockObject */
     private $formInitListener;
 
-    /** @var RequiredAttributesListener|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var RequiredAttributesListener|MockObject */
     private $requiredAttributesListener;
 
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var EventDispatcherInterface|MockObject */
     private $dispatcher;
 
-    /** @var PropertyPathSecurityHelper|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var PropertyPathSecurityHelper|MockObject */
     private $propertyPathSecurityHelper;
 
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var TranslatorInterface|MockObject */
     private $translator;
 
     /** @var WorkflowAttributesType */
@@ -59,9 +60,9 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ->disableOriginalConstructor()
             ->onlyMethods(['initialize', 'setDefaultValues'])
             ->getMock();
-        $this->formInitListener = $this->getMockBuilder(FormInitListener::class)
+        $this->formInitListener = $this->getMockBuilder(WorkflowAttributeFormInitListener::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['initialize', 'executeInitAction'])
+            ->onlyMethods(['dispatchFormInitEvents', 'executeInitAction'])
             ->getMock();
         $this->requiredAttributesListener = $this->getMockBuilder(RequiredAttributesListener::class)
             ->disableOriginalConstructor()
@@ -240,16 +241,6 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                 );
         } else {
             $this->defaultValuesListener->expects($this->never())
-                ->method($this->anything());
-        }
-
-        // Check init action listener is subscribed or not subscribed
-        if (!empty($formOptions['form_init'])) {
-            $this->formInitListener->expects($this->once())
-                ->method('initialize')
-                ->with($formOptions['workflow_item'], $formOptions['form_init']);
-        } else {
-            $this->formInitListener->expects($this->never())
                 ->method($this->anything());
         }
 

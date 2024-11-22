@@ -9,7 +9,7 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 /**
- * Provides schema for configuration that is loaded from "Resources/config/oro/actions.yml" files.
+ * Provides a schema for configuration that is loaded from "Resources/config/oro/actions.yml" files.
  */
 class Configuration implements ConfigurationInterface
 {
@@ -30,35 +30,72 @@ class Configuration implements ConfigurationInterface
         return $treeBuilder;
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
     protected function appendActionGroups(NodeBuilder $builder)
     {
-        $children = $builder
-            ->arrayNode('action_groups')
-                ->useAttributeAsKey('name')
-                ->prototype('array')
-                    ->children();
-
-        $children
-            ->variableNode('acl_resource')->end()
-            ->arrayNode('parameters')
-                ->useAttributeAsKey('name')
-                ->prototype('array')
-                    ->children()
-                        ->scalarNode('type')->end()
-                        ->scalarNode('message')->end()
-                        ->variableNode('default')->end()
+        $builder->arrayNode('action_groups')
+            ->useAttributeAsKey('name')
+            ->prototype('array')
+                ->children()
+                    ->variableNode('acl_resource')->end()
+                    ->variableNode('service')->end()
+                    ->variableNode('method')->end()
+                    ->variableNode('return_value_name')->end()
+                    ->arrayNode('parameters')
+                        ->useAttributeAsKey('name')
+                        ->prototype('array')
+                            ->children()
+                                ->scalarNode('type')->end()
+                                ->scalarNode('message')->end()
+                                ->scalarNode('service_argument_name')->end()
+                                ->variableNode('default')->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                    ->arrayNode('conditions')
+                        ->prototype('variable')->end()
+                    ->end()
+                    ->arrayNode('actions')
+                        ->prototype('variable')->end()
                     ->end()
                 ->end()
-            ->end()
-            ->arrayNode('conditions')
-                ->prototype('variable')->end()
-            ->end()
-            ->arrayNode('actions')
-                ->prototype('variable')->end()
+                ->validate()
+                    ->always(function ($config) {
+                        if (!empty($value['service']) && (!empty($value['actions']) || !empty($value['conditions']))) {
+                            throw new \Exception(
+                                'Conditions and actions are not allowed to be used when "service" is configured ' .
+                                'for action_group'
+                            );
+                        }
+
+                        if (!empty($config['return_value_name']) && empty($config['service'])) {
+                            throw new \Exception(
+                                '"return_value_name" can be used only with "service" parameter'
+                            );
+                        }
+
+                        if (!empty($config['parameters'])) {
+                            foreach ((array)$config['parameters'] as $parameter) {
+                                if (!empty($parameter['service_argument_name']) && empty($config['service'])) {
+                                    throw new \Exception(
+                                        '"service_argument_name" can be used only with "service" parameter'
+                                    );
+                                }
+                            }
+                        }
+
+                        return $config;
+                    })
+                ->end()
             ->end()
         ->end();
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     protected function appendOperations(NodeBuilder $builder)
     {
         $children = $builder
@@ -68,6 +105,7 @@ class Configuration implements ConfigurationInterface
                     ->children();
 
         $children
+            ->scalarNode('service')->end()
             ->arrayNode('replace')
                 ->beforeNormalization()
                     ->always(
@@ -125,6 +163,36 @@ class Configuration implements ConfigurationInterface
             ->append($this->getFrontendOptionsNode())
             ->append($this->getDatagridOptionsNode())
             ->append($this->getFormOptionsNode())
+            ->end()
+            ->validate()
+                ->always(function ($value) {
+                    if (!empty($value['service'])
+                        && (
+                            !empty($value[OperationDefinition::PRECONDITIONS])
+                            || !empty($value[OperationDefinition::PREACTIONS])
+                            || !empty($value[OperationDefinition::CONDITIONS])
+                            || !empty($value[OperationDefinition::ACTIONS])
+                        )
+                    ) {
+                        throw new \Exception(
+                            sprintf(
+                                'Individual logical sections %s are not allowed when "service" is configured',
+                                implode(
+                                    ', ',
+                                    [
+                                        OperationDefinition::PRECONDITIONS,
+                                        OperationDefinition::PREACTIONS,
+                                        OperationDefinition::CONDITIONS,
+                                        OperationDefinition::ACTIONS,
+                                    ]
+                                )
+                            )
+                        );
+                    }
+
+                    return $value;
+                })
+            ->end()
         ->end();
 
         $this->appendActionsNodes($children);

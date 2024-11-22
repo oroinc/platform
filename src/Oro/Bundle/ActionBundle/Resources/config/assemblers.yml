@@ -7,6 +7,9 @@ services:
             - '@oro_action.assembler.attribute'
             - '@oro_action.assembler.form_options'
             - '@oro_action.resolver.options_resolver'
+        calls:
+            - ['setEventDispatcher', ['@oro_action.operation.event_dispatcher']]
+            - ['setOperationServiceLocator', [!tagged_locator { tag: 'oro_operation_service' }]]
 
     oro_action.assembler.action_group:
         class: Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler
@@ -15,6 +18,9 @@ services:
             - '@oro_action.expression.factory'
             - '@oro_action.assembler.parameter'
             - '@oro_action.parameters_resolver'
+        calls:
+            - ['setEventDispatcher', ['@oro_action.action_group.event_dispatcher']]
+            - ['setActionGroupServiceLocator', [!tagged_locator { tag: 'oro_action_group_service' }]]
 
     oro_action.assembler.parameter:
         class: Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler

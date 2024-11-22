@@ -19,12 +19,16 @@ use Oro\Bundle\WorkflowBundle\Model\EntityAwareInterface;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowResult;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
+use Oro\Component\Action\Model\AbstractStorage;
+use Oro\Component\Action\Model\ActionDataStorageAwareInterface;
 
 /**
  * Workflow item
  *
  *
  * @SuppressWarnings(PHPMD.TooManyFields)
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @mixin OroWorkflowBundle_Entity_WorkflowItem
  */
@@ -41,7 +45,7 @@ use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
         'attachment' => ['immutable' => true]
     ]
 )]
-class WorkflowItem implements EntityAwareInterface, ExtendEntityInterface
+class WorkflowItem implements EntityAwareInterface, ExtendEntityInterface, ActionDataStorageAwareInterface
 {
     use ExtendEntityTrait;
 
@@ -150,6 +154,8 @@ class WorkflowItem implements EntityAwareInterface, ExtendEntityInterface
      */
     protected $serializeFormat;
 
+    protected bool $locked = false;
+
     /**
      * {@inheritdoc}
      */
@@ -162,6 +168,21 @@ class WorkflowItem implements EntityAwareInterface, ExtendEntityInterface
         $this->result = new WorkflowResult();
     }
 
+    public function lock(): void
+    {
+        $this->locked = true;
+    }
+
+    public function unlock(): void
+    {
+        $this->locked = false;
+    }
+
+    public function isLocked(): bool
+    {
+        return $this->locked;
+    }
+
     /**
      * @param WorkflowItem $source
      * @return $this
@@ -170,6 +191,16 @@ class WorkflowItem implements EntityAwareInterface, ExtendEntityInterface
     {
         $this->getData()->add($source->getData()->toArray());
         $this->getResult()->add($source->getResult()->toArray());
+
+        // Fill stub workflow item with actual data
+        if (!$this->id && !$this->getEntityId()) {
+            $this->id = $source->getId();
+            $this->entity = $source->getEntity();
+            $this->entityId = $source->getEntityId();
+            $this->currentStep = $source->getCurrentStep();
+            $this->updated = $source->getUpdated();
+            $this->created = $source->getCreated();
+        }
 
         return $this;
     }
@@ -226,6 +257,14 @@ class WorkflowItem implements EntityAwareInterface, ExtendEntityInterface
      */
     public function setCurrentStep($currentStep)
     {
+        if ($this->isLocked()) {
+            trigger_deprecation(
+                'oro/platform',
+                '6.0.4',
+                'Changing the step of a locked workflow item will be prohibited in the next major release.'
+            );
+        }
+
         $this->currentStep = $currentStep;
 
         return $this;
@@ -654,6 +693,11 @@ class WorkflowItem implements EntityAwareInterface, ExtendEntityInterface
         $this->getResult()->set('redirectUrl', $url);
 
         return $this;
+    }
+
+    public function getActionDataStorage(): AbstractStorage
+    {
+        return $this->getData();
     }
 
     /**

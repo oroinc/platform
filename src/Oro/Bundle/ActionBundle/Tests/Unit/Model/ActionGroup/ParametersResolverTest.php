@@ -26,13 +26,29 @@ class ParametersResolverTest extends \PHPUnit\Framework\TestCase
         $this->resolver = new ParametersResolver();
     }
 
+    public function testResolveAllSupportedWithSnakeCase()
+    {
+        $actionData = new ActionData(['test_parameter' => 'value']);
+        $parameter = new Parameter('testParameter');
+        $parameter->setType('string');
+
+        $actionGroup = $this->createMock(ActionGroup::class);
+        $actionGroup->expects($this->atLeastOnce())
+            ->method('getParameters')
+            ->willReturn([$parameter]);
+
+        $this->resolver->resolveAllSupported($actionData, $actionGroup, null, true);
+
+        $this->assertEquals(['test_parameter' => 'value'], $actionData->toArray());
+    }
+
     /**
      * @dataProvider resolveDataProvider
      */
     public function testResolveOk(ActionData $data, array $parameters, ActionData $expected)
     {
         $actionGroup = $this->createMock(ActionGroup::class);
-        $actionGroup->expects($this->once())
+        $actionGroup->expects($this->atLeastOnce())
             ->method('getParameters')
             ->willReturn($parameters);
 
@@ -106,7 +122,7 @@ class ParametersResolverTest extends \PHPUnit\Framework\TestCase
             ->willReturn('testActionGroup');
 
         $actionGroup = $this->createMock(ActionGroup::class);
-        $actionGroup->expects($this->once())
+        $actionGroup->expects($this->atLeastOnce())
             ->method('getParameters')
             ->willReturn($parameters);
         $actionGroup->expects($this->once())

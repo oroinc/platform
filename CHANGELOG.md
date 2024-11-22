@@ -35,6 +35,99 @@ The current file describes significant changes in the code that may affect the u
 
 ### Changed
 
+#### ActionBundle
+
+##### Operations
+
+- added ability to define operation logic as a service instead of having it in YAML
+- Added `OperationServiceInterface` and `OperationServiceAbstract` for operation services
+- added new tag `oro_operation_service` to gather operation services in a separate service locator
+- updated OperationAssembler and Operation to work with services
+- Moved acl_resource check to the announce event listener instead of constantly adding it to pre-conditions
+- Moved operation feature availability check to the announce event listener instead of constantly adding it to pre-conditions
+
+###### Operation Events
+
+Operation execution events added for better extensibility and control of operation execution flow
+
+- `announce` event is triggered during checking pre-conditions
+- `guard` event is triggered during checking conditions
+- `pre_execute` and `execute` events are triggered before and after operation logic execution
+
+For all event types 2 events are triggered: `oro_operation.<event_name>` and `oro_operation.<operation_name>.<event_name>`.
+
+##### Action Group Changes
+
+* Added `ActionExecutor` to be able to run actions and action groups from PHP code without a need to work with ActionData, context, PropertyPaths, etc.
+* Added `ActionGroupWrapper` to be able to call a service method as an action group. All such services should be added to service locator with tag `oro_action_group_service`. If service needs to add/change some context variables it has to return an array with an appropriate keys. Note that argument names are used to map data from context to method arguments and must be named same to call parameters.
+* Moved logic from action groups YAML definitions to PHP services for checkout-related action_groups
+* Added ability to define action group as a service + method config parameters
+* added `return_value_name` for `action_group` to map value to action group result correctly for action group services
+* added `method_argument_name` to parameter config to map action group parameter to service method argument
+* Moved `acl_resource` check to the guard event listener instead of constantly adding it to pre-conditions (this check was lost for service-based action_groups)
+* Action group execution events added for better extensibility and control of execution flow
+
+    * `guard` event is triggered during checking conditions
+      *`pre_execute` and `execute` events are triggered before and after operation logic execution
+
+For all event types 2 events are triggered. `oro_action_group.<event_name>` and `oro_action_group.<operation_name>.<event_name>`
+
+#### WorkflowBundle
+
+* added `conditional_steps_to` to allow to transit workflow to different steps with single transition based on condition per-step
+* `conditional_steps_to` are shown in workflow UI
+* Improved workflow config importing, allowed to reference files in bundles with `@BundleName/path/to/configs/workflow.yml` syntax
+
+##### Transition services
+
+* added ability to define transition logic as a transition service instead of having it in YAML transition_definition
+* Added `TransitionServiceInterface` and `TransitionServiceAbstract` for transition services
+* added new tag `oro_workflow.transition_service` to gather transition services in a separate service locator
+* updated `TransitionAssembler`, Transition and Workflow configuration to work with transition services
+* implemented `ContinueToShippingAddress` for b2b checkout workflow as a transition service example
+* added evaluateExpression to ActionExecutor service to cover whole transition needs: run an action, action group, evaluate condition expression
+* Improved QuoteAcceptable condition to support default as a property path
+
+##### Workflow Events
+
+Added workflow events
+* `pre_announce`, `announce`. These events are triggered during checking pre-conditions
+* `pre_guard`, `guard`. These events are triggered during checking conditions
+
+Next event are triggered during transition execution:
+* `start` (workflow)
+* `leave` (step)
+* `enter` (step)
+* `entered` (step)
+* `transition` (transition)
+* `completed` (transition)
+
+For all events except start 3 events are triggered. `oro_workflow.<event_name>`, `oro_workflow.<workflow_name>.<event_name>` and `oro_workflow.<workflow_name>.<event_name>.<step_name|transition_name>`
+
+##### Workflow ACL checks
+
+* Moved `acl_resource` check to pre_announce event listener instead of constantly adding it to pre-conditions
+* Moved `is_granted_workflow_transition` check for steps to pre_announce event listener
+* Moved `resolve_destination_page` from actions to oro_workflow.transition listener for all workflows to support usage of this option with transition_service
+* ResolveDestinationPage was updated to support destination as variable in workflows
+* `aclResource` and `aclMessages` were added to Transition model
+
+##### Workflow Definition Load CLI command
+
+* Added `--watch` and `--watch-interval` options to `oro:workflow:definition:load` command to periodically reload the workflow definition(s). Can be used during development to not bother the developer who might forget to reload the definition.
+
+##### ExtendableCondition and ExtendableAction changes
+
+* removed dependency on WorkflowItem/ActionData in listeners which limited those listeners to a place from which event is triggered (workflow definition or action group)
+* extracted extendable condition errors processing to a separate service to not depend on the translator and request stack directly
+* added ability to trigger checkout events directly using event dispatcher without a need to use extendable action|condition
+* introduced determined set of data available in listeners, access to current execution context was limited in order to remove untraceable dependencies on the inner workflow implementations and improve listeners re-usability
+
+##### Configuration import directive filters
+
+* Added `import_condition` (Expression Language syntax same to on used in DI) option for workflow import
+* Added import filters that may be registered via `WorkflowConfigurationImportsProcessor::addImportFilter` and should implement the `ImportFilterInterface`
+
 #### EntityBundle
 * Changed `\Oro\Bundle\EntityBundle\Provider\EntityNameProvider` to make it work with enum fields.
 

@@ -5,7 +5,6 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\EventListener;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\FormInitListener;
 use Oro\Component\Action\Action\ActionInterface;
-use Symfony\Component\Form\FormEvents;
 
 class FormInitListenerTest extends \PHPUnit\Framework\TestCase
 {
@@ -20,8 +19,7 @@ class FormInitListenerTest extends \PHPUnit\Framework\TestCase
     public function testGetSubscribedEvents()
     {
         $events = $this->listener->getSubscribedEvents();
-        $this->assertCount(1, $events);
-        $this->assertArrayHasKey(FormEvents::PRE_SET_DATA, $events);
+        $this->assertCount(0, $events);
     }
 
     public function testExecuteInitAction()

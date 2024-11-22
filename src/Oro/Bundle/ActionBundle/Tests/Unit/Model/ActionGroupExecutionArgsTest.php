@@ -54,12 +54,13 @@ class ActionGroupExecutionArgsTest extends \PHPUnit\Framework\TestCase
 
         $errorsCollection = new ArrayCollection();
 
+        $data = new ActionData(['arg1' => 'val1']);
         $actionGroup->expects($this->once())
             ->method('execute')
-            ->with(new ActionData(['arg1' => 'val1']), $errorsCollection)
-            ->willReturn('ok');
+            ->with($data, $errorsCollection)
+            ->willReturn($data);
 
-        $this->assertEquals('ok', $instance->execute($registry, $errorsCollection));
+        $this->assertEquals($data, $instance->execute($registry, $errorsCollection));
     }
 
     public function provideParameters(): array

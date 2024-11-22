@@ -386,8 +386,17 @@ class OroMainContext extends MinkContext implements
 
         /** @var NodeElement $closeButton */
         foreach ($flashMessages as $flashMessage) {
-            $closeButton = $flashMessage->find('css', '[data-dismiss="alert"]');
-            $closeButton->press();
+            try {
+                if (!$flashMessage->isValid() || !$flashMessage->isVisible()) {
+                    continue;
+                }
+
+                $closeButton = $flashMessage->find('css', '[data-dismiss="alert"]');
+                if ($closeButton?->isValid() && $closeButton?->isVisible()) {
+                    $closeButton->press();
+                }
+            } catch (NoSuchElement $e) {
+            }
         }
     }
 
@@ -1163,6 +1172,8 @@ class OroMainContext extends MinkContext implements
      *
      * @When /^(?:|I )click "(?P<button>(?:[^"]|\\")*)"$/
      * @When /^(?:|I )click '(?P<button>(?:[^']|\\')*)'$/
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function pressButton($button)
     {
@@ -1176,6 +1187,11 @@ class OroMainContext extends MinkContext implements
                 if ($btnNodeElement) {
                     $this->scrollToXpath($btnNodeElement->getXpath());
                 }
+                $btnNodeElement = $this->getSession()->getPage()->findButton($button);
+                if ($btnNodeElement) {
+                    $this->scrollToXpath($btnNodeElement->getXpath());
+                }
+
                 parent::pressButton($button);
                 break;
             } catch (ElementNotFoundException $e) {
@@ -2715,7 +2731,7 @@ JS;
         self::assertTrue(
             $childElement->isIsset(),
             sprintf(
-                'Element "%s" not found inside iframe',
+                'Element "%s" not found inside iframe %s',
                 $childElementName,
                 $iframeName
             )
@@ -2723,7 +2739,7 @@ JS;
         self::assertTrue(
             $childElement->isVisible(),
             sprintf(
-                'Element "%s" found inside iframe, but it\'s not visible',
+                'Element "%s" found inside iframe %s, but it\'s not visible',
                 $childElementName,
                 $iframeName
             )

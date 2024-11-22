@@ -13,6 +13,7 @@ define(function(require) {
             display_type: 'dialog',
             destination_page: '',
             step_to: null,
+            conditional_steps_to: null,
             is_start: false,
             form_options: null,
             message: null,

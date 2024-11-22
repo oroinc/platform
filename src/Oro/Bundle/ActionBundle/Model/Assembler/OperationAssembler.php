@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\ActionBundle\Model\Assembler;
 
+use Oro\Bundle\ActionBundle\Event\OperationEventDispatcher;
 use Oro\Bundle\ActionBundle\Form\Type\OperationType;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Resolver\OptionsResolver;
 use Oro\Component\Action\Action\ActionFactoryInterface;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
+use Symfony\Contracts\Service\ResetInterface;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
  * Factory for Operation class
@@ -27,6 +30,8 @@ class OperationAssembler extends AbstractAssembler
     private $formOptionsAssembler;
 
     private OptionsResolver $optionsResolver;
+    private OperationEventDispatcher $eventDispatcher;
+    private ServiceProviderInterface $operationServiceLocator;
 
     public function __construct(
         ActionFactoryInterface $actionFactory,
@@ -42,6 +47,16 @@ class OperationAssembler extends AbstractAssembler
         $this->optionsResolver = $optionsResolver;
     }
 
+    public function setEventDispatcher(OperationEventDispatcher $eventDispatcher): void
+    {
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
+    public function setOperationServiceLocator(ServiceProviderInterface $serviceLocator): void
+    {
+        $this->operationServiceLocator = $serviceLocator;
+    }
+
     /**
      * @param string $name
      * @param array $configuration
@@ -49,7 +64,7 @@ class OperationAssembler extends AbstractAssembler
      */
     public function createOperation($name, array $configuration)
     {
-        return new Operation(
+        $operation = new Operation(
             $this->actionFactory,
             $this->conditionFactory,
             $this->attributeAssembler,
@@ -57,6 +72,18 @@ class OperationAssembler extends AbstractAssembler
             $this->optionsResolver,
             $this->assembleDefinition($name, $configuration)
         );
+        $operation->setEventDispatcher($this->eventDispatcher);
+
+        $operationServiceName = $this->getOption($configuration, 'service', null);
+        if ($operationServiceName) {
+            $operationService = $this->operationServiceLocator->get($operationServiceName);
+            if ($operationService instanceof ResetInterface) {
+                $operationService->reset();
+            }
+            $operation->setOperationService($operationService);
+        }
+
+        return $operation;
     }
 
     /**
@@ -82,7 +109,24 @@ class OperationAssembler extends AbstractAssembler
             ->setDatagridOptions($this->getOption($options, 'datagrid_options', []))
             ->setAttributes($this->getOption($options, 'attributes', []))
             ->setFormOptions($this->getOption($options, 'form_options', []))
-            ->setActionGroups($this->getOption($options, 'action_groups', []));
+            ->setActionGroups($this->getOption($options, 'action_groups', []))
+            ->setAclResource($this->getOption($options, 'acl_resource'));
+
+        $this->initializeLogicComponents($options, $operationDefinition);
+
+        return $operationDefinition;
+    }
+
+    private function initializeLogicComponents(array $options, OperationDefinition $operationDefinition): void
+    {
+        if ($this->getOption($options, 'service')) {
+            $operationDefinition->setActions(
+                OperationDefinition::FORM_INIT,
+                $this->getOption($options, OperationDefinition::FORM_INIT, [])
+            );
+
+            return;
+        }
 
         foreach (OperationDefinition::getAllowedConditions() as $name) {
             $operationDefinition->setConditions($name, $this->getOption($options, $name, []));
@@ -91,11 +135,6 @@ class OperationAssembler extends AbstractAssembler
         foreach (OperationDefinition::getAllowedActions() as $name) {
             $operationDefinition->setActions($name, $this->getOption($options, $name, []));
         }
-
-        $this->addFeaturePrecondition($operationDefinition);
-        $this->addAclPrecondition($operationDefinition, $this->getOption($options, 'acl_resource'));
-
-        return $operationDefinition;
     }
 
     /**

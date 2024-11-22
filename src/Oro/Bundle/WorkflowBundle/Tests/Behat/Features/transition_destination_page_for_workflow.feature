@@ -78,10 +78,8 @@ Feature: Transition Destination Page for Workflow
     And I click "Activate"
     And I click "Activate" in modal window
     Then I should see "Deactivate"
-    And I click Logout in user menu
 
   Scenario: Verify Transition of Entity View Page
-    Given I login as administrator
     When I go to System/User Management/Users
     And I click view Peter in grid
     And I click "Transition Entity View Page"
@@ -89,10 +87,8 @@ Feature: Transition Destination Page for Workflow
     And I fill in "Change A Name" with "Peter 01"
     When click "Submit"
     Then I should see "Step Entity View Page"
-    And I click Logout in user menu
 
   Scenario: Verify Transition of Entity Index Page
-    Given I login as administrator
     When I go to System/User Management/Users
     And I click view Peter 01 in grid
     And I click "Transition Entity Index Page"
@@ -101,11 +97,9 @@ Feature: Transition Destination Page for Workflow
     When click "Submit"
     Then I should see Peter 02 in grid with following data:
       | Step | Step Entity Index Page |
-    And I click Logout in user menu
 
   Scenario: Verify Transition of Original Page
-    Given I login as administrator
-    And I go to System/User Management/Users
+    When I go to System/User Management/Users
     And I click view Peter in grid
     When I click "Transition Original Page"
     Then I should see "Test Original Page"
@@ -113,4 +107,3 @@ Feature: Transition Destination Page for Workflow
     When click "Submit"
     Then I should see "Step Original Page"
     And I should see "Peter 03"
-    And I click Logout in user menu
