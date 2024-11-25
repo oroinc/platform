@@ -22,14 +22,14 @@ class ExtendableConditionEvent extends Event
      * @param null|mixed $context
      */
     public function __construct(
-        protected ?AbstractStorage $context = null
+        protected ?AbstractStorage $data = null
     ) {
         $this->errors = new ArrayCollection();
     }
 
-    public function getContext(): ?AbstractStorage
+    public function getData(): ?AbstractStorage
     {
-        return $this->context;
+        return $this->data;
     }
 
     public function addError(string $errorMessage, mixed $errorContext = null): self

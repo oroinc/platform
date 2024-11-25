@@ -11,7 +11,7 @@ class WorkflowItemAwareEventTest extends TestCase
     public function testGetWorkflowItem(): void
     {
         $workflowItem = $this->createMock(WorkflowItem::class);
-        $event = new WorkflowItemAwareEvent($workflowItem);
+        $event = $this->getMockForAbstractClass(WorkflowItemAwareEvent::class, [$workflowItem]);
 
         $this->assertSame($workflowItem, $event->getWorkflowItem());
     }
@@ -19,7 +19,7 @@ class WorkflowItemAwareEventTest extends TestCase
     public function testSetWorkflowItem(): void
     {
         $workflowItem = $this->createMock(WorkflowItem::class);
-        $event = new WorkflowItemAwareEvent($workflowItem);
+        $event = $this->getMockForAbstractClass(WorkflowItemAwareEvent::class, [$workflowItem]);
 
         $newWorkflowItem = $this->createMock(WorkflowItem::class);
         $event->setWorkflowItem($newWorkflowItem);

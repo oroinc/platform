@@ -3,7 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener\Workflow;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Event\Transition\GuardEvent;
+use Oro\Bundle\WorkflowBundle\Event\Transition\PreAnnounceEvent;
 use Oro\Bundle\WorkflowBundle\EventListener\Workflow\TransitionAvailableStepsListener;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
@@ -27,7 +27,7 @@ class TransitionAvailableStepsListenerTest extends TestCase
     public function testOnPreAnnounceWhenNotAllowed(): void
     {
         $transition = $this->createMock(Transition::class);
-        $event = new GuardEvent($this->createMock(WorkflowItem::class), $transition, false);
+        $event = new PreAnnounceEvent($this->createMock(WorkflowItem::class), $transition, false);
 
         $this->expressionFactory->expects($this->never())
             ->method('create');
@@ -46,7 +46,7 @@ class TransitionAvailableStepsListenerTest extends TestCase
         $transition->method('getName')->willReturn('transition_name');
 
         $workflowItem = $this->createMock(WorkflowItem::class);
-        $event = new GuardEvent($workflowItem, $transition, true);
+        $event = new PreAnnounceEvent($workflowItem, $transition, true);
 
         $expression = $this->createMock(ExpressionInterface::class);
         $expression->expects($this->once())
@@ -75,7 +75,7 @@ class TransitionAvailableStepsListenerTest extends TestCase
         $transition->method('getName')->willReturn('transition_name');
 
         $workflowItem = $this->createMock(WorkflowItem::class);
-        $event = new GuardEvent($workflowItem, $transition, true);
+        $event = new PreAnnounceEvent($workflowItem, $transition, true);
 
         $expression = $this->createMock(ExpressionInterface::class);
         $expression->expects($this->exactly(2))
@@ -107,7 +107,7 @@ class TransitionAvailableStepsListenerTest extends TestCase
         $transition->method('getName')->willReturn('transition_name');
 
         $workflowItem = $this->createMock(WorkflowItem::class);
-        $event = new GuardEvent($workflowItem, $transition, true);
+        $event = new PreAnnounceEvent($workflowItem, $transition, true);
 
         $expression = $this->createMock(ExpressionInterface::class);
         $expression->expects($this->exactly(2))

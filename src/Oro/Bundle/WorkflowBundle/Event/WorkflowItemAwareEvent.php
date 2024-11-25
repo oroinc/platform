@@ -8,12 +8,14 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * Workflow event containing WorkflowItem entity.
  */
-class WorkflowItemAwareEvent extends Event
+abstract class WorkflowItemAwareEvent extends Event
 {
     public function __construct(
         private WorkflowItem $workflowItem
     ) {
     }
+
+    abstract public function getName(): string;
 
     public function setWorkflowItem(WorkflowItem $workflowItem): void
     {

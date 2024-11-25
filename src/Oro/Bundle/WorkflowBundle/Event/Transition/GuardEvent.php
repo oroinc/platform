@@ -2,36 +2,14 @@
 
 namespace Oro\Bundle\WorkflowBundle\Event\Transition;
 
-use Doctrine\Common\Collections\Collection;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Model\Transition;
-
 /**
- * Transition guard event used to disallow transition availability/execution.
+ * Triggered to validate whether the transition execution is allowed
  */
-class GuardEvent extends TransitionEvent
+final class GuardEvent extends AllowanceEvent
 {
-    public function __construct(
-        WorkflowItem $workflowItem,
-        Transition $transition,
-        private bool $allowed,
-        private ?Collection $errors = null
-    ) {
-        parent::__construct($workflowItem, $transition);
-    }
-
-    public function isAllowed(): bool
+    #[\Override]
+    public function getName(): string
     {
-        return $this->allowed;
-    }
-
-    public function setAllowed(bool $isAllowed): void
-    {
-        $this->allowed = $isAllowed;
-    }
-
-    public function getErrors(): ?Collection
-    {
-        return $this->errors;
+        return 'guard';
     }
 }
