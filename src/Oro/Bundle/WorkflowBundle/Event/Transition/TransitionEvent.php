@@ -2,24 +2,14 @@
 
 namespace Oro\Bundle\WorkflowBundle\Event\Transition;
 
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Bundle\WorkflowBundle\Event\WorkflowItemAwareEvent;
-use Oro\Bundle\WorkflowBundle\Model\Transition;
-
 /**
- * Transition-related workflow event.
+ * Workflow event that is triggered before the transition execution.
  */
-class TransitionEvent extends WorkflowItemAwareEvent
+final class TransitionEvent extends TransitionAwareEvent
 {
-    public function __construct(
-        WorkflowItem $workflowItem,
-        private Transition $transition
-    ) {
-        parent::__construct($workflowItem);
-    }
-
-    public function getTransition(): Transition
+    #[\Override]
+    public function getName(): string
     {
-        return $this->transition;
+        return 'transition';
     }
 }

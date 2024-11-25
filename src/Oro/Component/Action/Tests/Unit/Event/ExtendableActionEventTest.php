@@ -12,7 +12,7 @@ class ExtendableActionEventTest extends TestCase
     {
         $event = new ExtendableActionEvent();
 
-        $this->assertNull($event->getContext());
+        $this->assertNull($event->getData());
     }
 
     public function testGetContextWithNonNullValue(): void
@@ -20,6 +20,6 @@ class ExtendableActionEventTest extends TestCase
         $context = $this->createMock(AbstractStorage::class);
         $event = new ExtendableActionEvent($context);
 
-        $this->assertSame($context, $event->getContext());
+        $this->assertSame($context, $event->getData());
     }
 }

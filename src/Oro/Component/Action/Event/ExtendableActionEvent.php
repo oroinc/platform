@@ -13,12 +13,12 @@ class ExtendableActionEvent extends Event
     public const NAME = 'extendable_action';
 
     public function __construct(
-        protected ?AbstractStorage $context = null
+        protected ?AbstractStorage $data = null
     ) {
     }
 
-    public function getContext(): ?AbstractStorage
+    public function getData(): ?AbstractStorage
     {
-        return $this->context;
+        return $this->data;
     }
 }
