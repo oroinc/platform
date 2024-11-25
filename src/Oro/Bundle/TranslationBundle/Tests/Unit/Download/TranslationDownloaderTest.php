@@ -318,7 +318,7 @@ YAML
 
         $this->databasePersister->expects(self::once())
             ->method('persist')
-            ->with($langCode, $expectedTranslations, Translation::SCOPE_INSTALLED);
+            ->with($langCode, $expectedTranslations);
         $this->jsTranslationDumper->expects(self::once())
             ->method('dumpTranslations')
             ->with([$langCode]);
