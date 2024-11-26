@@ -25,6 +25,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class FormHelper
 {
+    public const VALIDATION_GROUPS = ['Default', 'api'];
     public const EXTRA_FIELDS_MESSAGE = 'oro.api.form.extra_fields';
 
     private FormFactoryInterface $formFactory;
@@ -159,9 +160,9 @@ class FormHelper
     private function getFormDefaultOptions(): array
     {
         return [
-            'validation_groups'    => ['Default', 'api'],
+            'validation_groups' => self::VALIDATION_GROUPS,
             'extra_fields_message' => self::EXTRA_FIELDS_MESSAGE,
-            'enable_validation'    => false
+            'enable_validation' => false
         ];
     }
 

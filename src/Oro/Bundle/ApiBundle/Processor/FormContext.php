@@ -149,6 +149,16 @@ interface FormContext extends ContextInterface, ChangeContextInterface
     public function skipFormValidation(bool $skipFormValidation): void;
 
     /**
+     * Gets form options that should override the options from the entity configuration.
+     */
+    public function getFormOptions(): ?array;
+
+    /**
+     * Sets form options that should override the options from the entity configuration.
+     */
+    public function setFormOptions(?array $formOptions): void;
+
+    /**
      * Gets config extras that should be used by {@see \Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedEntity}
      * and {@see \Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedIncludedEntities} processors.
      *

@@ -132,6 +132,47 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
+    public function testProcessWithFormOptionsInContext()
+    {
+        $parentEntity = new \stdClass();
+        $formBuilder = $this->createMock(FormBuilderInterface::class);
+
+        $parentConfig = new EntityDefinitionConfig();
+        $parentConfig->addField(self::TEST_ASSOCIATION_NAME);
+
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentMetadata->addAssociation(new AssociationMetadata(self::TEST_ASSOCIATION_NAME));
+
+        $this->formFactory->expects(self::once())
+            ->method('createNamedBuilder')
+            ->with(
+                null,
+                FormType::class,
+                $parentEntity,
+                [
+                    'data_class' => self::TEST_PARENT_CLASS_NAME,
+                    'validation_groups' => ['Default', 'api'],
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation' => true,
+                    'api_context' => $this->context,
+                    'another_option' => 'val'
+                ]
+            )
+            ->willReturn($formBuilder);
+
+        $formBuilder->expects(self::once())
+            ->method('add')
+            ->with(self::TEST_ASSOCIATION_NAME, null, [])
+            ->willReturn($this->createMock(FormBuilderInterface::class));
+
+        $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
+        $this->context->setParentEntity($parentEntity);
+        $this->context->setFormOptions(['enable_validation' => true, 'another_option' => 'val']);
+        $this->processor->process($this->context);
+        self::assertSame($formBuilder, $this->context->getFormBuilder());
+    }
+
     public function testProcessForParentApiResourceBasedOnManageableEntity()
     {
         $parentEntityClass = UserProfile::class;

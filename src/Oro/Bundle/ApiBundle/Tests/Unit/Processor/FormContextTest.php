@@ -181,6 +181,20 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->context->isFormValidationSkipped());
     }
 
+    public function testFormOptions()
+    {
+        self::assertNull($this->context->getFormOptions());
+
+        $this->context->setFormOptions(['option' => 'value']);
+        self::assertEquals(['option' => 'value'], $this->context->getFormOptions());
+
+        $this->context->setFormOptions([]);
+        self::assertNull($this->context->getFormOptions());
+
+        $this->context->setFormOptions(null);
+        self::assertNull($this->context->getFormOptions());
+    }
+
     public function testSetConfigExtras()
     {
         $normalizedExpandRelatedEntitiesConfigExtra = new ExpandRelatedEntitiesConfigExtra(['association1']);
