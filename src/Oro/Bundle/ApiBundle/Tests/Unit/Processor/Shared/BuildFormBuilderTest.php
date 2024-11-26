@@ -240,6 +240,55 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
+    public function testProcessWithFormOptionsInContext()
+    {
+        $entityClass = 'Test\Entity';
+        $data = new \stdClass();
+        $formBuilder = $this->createMock(FormBuilderInterface::class);
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('field1');
+
+        $metadata = new EntityMetadata('Test\Entity');
+        $metadata->addField($this->createFieldMetadata('field1'));
+
+        $this->formFactory->expects(self::once())
+            ->method('createNamedBuilder')
+            ->with(
+                null,
+                FormType::class,
+                $data,
+                [
+                    'data_class' => $entityClass,
+                    'validation_groups' => ['Default', 'api'],
+                    'extra_fields_message' => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation' => false,
+                    'enable_full_validation' => true,
+                    'api_context' => $this->context,
+                    'another_option' => 'val'
+                ]
+            )
+            ->willReturn($formBuilder);
+
+        $formBuilder->expects(self::once())
+            ->method('setDataMapper')
+            ->with(self::isInstanceOf(DataMapper::class));
+        $formBuilder->expects(self::once())
+            ->method('add')
+            ->withConsecutive(
+                ['field1', null, []],
+            )
+            ->willReturn($this->createMock(FormBuilderInterface::class));
+
+        $this->context->setClassName($entityClass);
+        $this->context->setConfig($config);
+        $this->context->setMetadata($metadata);
+        $this->context->setResult($data);
+        $this->context->setFormOptions(['enable_full_validation' => true, 'another_option' => 'val']);
+        $this->processor->process($this->context);
+        self::assertSame($formBuilder, $this->context->getFormBuilder());
+    }
+
     public function testProcessForClassNameMetaProperty()
     {
         $formBuilder = $this->createMock(FormBuilderInterface::class);

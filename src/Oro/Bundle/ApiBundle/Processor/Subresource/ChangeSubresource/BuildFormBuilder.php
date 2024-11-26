@@ -93,14 +93,14 @@ class BuildFormBuilder implements ProcessorInterface
 
     protected function getFormOptions(ChangeSubresourceContext $context): array
     {
-        $formOptions = [];
-        $options = $context->getRequestConfig()->getFormOptions();
-        if (!empty($options) && isset($options['validation_groups'])) {
-            $formOptions['validation_groups'] = $options['validation_groups'];
+        $options = [];
+        $optionsFromConfig = $context->getRequestConfig()->getFormOptions();
+        if (!empty($optionsFromConfig) && isset($optionsFromConfig['validation_groups'])) {
+            $options['validation_groups'] = $optionsFromConfig['validation_groups'];
         }
-        $formOptions[ValidationExtension::ENABLE_FULL_VALIDATION] = $this->enableFullValidation;
+        $options[ValidationExtension::ENABLE_FULL_VALIDATION] = $this->enableFullValidation;
 
-        return $formOptions;
+        return array_merge($options, $context->getFormOptions() ?? []);
     }
 
     protected function getEntryFormOptions(ChangeSubresourceContext $context): array

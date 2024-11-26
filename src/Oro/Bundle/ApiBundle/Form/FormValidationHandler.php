@@ -66,7 +66,7 @@ class FormValidationHandler
          * @see  \Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener
          * @see  \Oro\Bundle\ApiBundle\Form\Extension\ValidationExtension
          */
-        if ($form->getConfig()->getOption(ValidationExtension::ENABLE_FULL_VALIDATION)) {
+        if ($this->isFullValidationEnabled($form)) {
             ReflectionUtil::markFormChildrenAsSubmitted($form, $this->propertyAccessor);
         }
         $this->getValidationListener()->validateForm(new FormEvent($form, $form->getViewData()));
@@ -80,6 +80,16 @@ class FormValidationHandler
     public function postValidate(FormInterface $form): void
     {
         $this->customizeFormDataEventDispatcher->dispatch(CustomizeFormDataContext::EVENT_POST_VALIDATE, $form);
+    }
+
+    private function isFullValidationEnabled(FormInterface $form): bool
+    {
+        $enabled = $form->getConfig()->getOption(ValidationExtension::ENABLE_FULL_VALIDATION);
+        if (\is_callable($enabled)) {
+            $enabled = $enabled($form);
+        }
+
+        return $enabled;
     }
 
     private function getValidationListener(): ValidationListener

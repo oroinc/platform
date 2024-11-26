@@ -37,6 +37,8 @@ class ValidationExtension extends FormTypeValidatorExtension
 
         $resolver
             ->setDefault(self::ENABLE_VALIDATION, true)
-            ->setDefault(self::ENABLE_FULL_VALIDATION, false);
+            ->setDefault(self::ENABLE_FULL_VALIDATION, false)
+            ->setAllowedTypes(self::ENABLE_VALIDATION, 'bool')
+            ->setAllowedTypes(self::ENABLE_FULL_VALIDATION, ['bool', 'callable']);
     }
 }

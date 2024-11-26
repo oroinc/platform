@@ -324,3 +324,10 @@ services:
             - [setLogger, ["@oro_integration.logger.strategy"]]
         tags:
            - { name: kernel.event_listener, event: oro_integration.client_created_after, method: onClientCreated }
+
+    oro_integration.access_rule.frontend_channel_access_rule:
+        class: Oro\Bundle\IntegrationBundle\Acl\AccessRule\ChannelOrganizationAwareAccessRule
+        arguments:
+            - '@oro_security.token_accessor'
+        tags:
+            - { name: oro_security.access_rule, entityClass: Oro\Bundle\IntegrationBundle\Entity\Channel, frontend: true}
