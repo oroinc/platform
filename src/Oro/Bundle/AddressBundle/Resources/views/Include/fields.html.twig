@@ -32,6 +32,7 @@
                 target: '#' ~ id ,
                 simpleEl: '#' ~ region_text_field.vars.id,
                 collectionRoute: form.parent.vars.region_route|default('oro_api_country_get_regions'),
+                collectionRouteCountryCode: country_field.vars.value|default(null),
                 showSelect: showSelect,
                 regionRequired: required
             }
