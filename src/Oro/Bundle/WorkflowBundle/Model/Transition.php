@@ -6,8 +6,17 @@ use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Event\EventDispatcher;
+use Oro\Bundle\WorkflowBundle\Event\Transition\AnnounceEvent;
 use Oro\Bundle\WorkflowBundle\Event\Transition\GuardEvent;
+use Oro\Bundle\WorkflowBundle\Event\Transition\PreAnnounceEvent;
+use Oro\Bundle\WorkflowBundle\Event\Transition\PreGuardEvent;
+use Oro\Bundle\WorkflowBundle\Event\Transition\StepEnteredEvent;
+use Oro\Bundle\WorkflowBundle\Event\Transition\StepEnterEvent;
+use Oro\Bundle\WorkflowBundle\Event\Transition\StepLeaveEvent;
+use Oro\Bundle\WorkflowBundle\Event\Transition\TransitionCompletedEvent;
 use Oro\Bundle\WorkflowBundle\Event\Transition\TransitionEvent;
+use Oro\Bundle\WorkflowBundle\Event\Transition\WorkflowFinishEvent;
+use Oro\Bundle\WorkflowBundle\Event\Transition\WorkflowStartEvent;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
@@ -399,8 +408,8 @@ class Transition
     {
         // Pre-guard transition to be able to block transition on early stages
         // without a need to execute conditions.
-        $event = new GuardEvent($workflowItem, $this, true, $errors);
-        $this->eventDispatcher->dispatch($event, 'pre_guard', $this->getName());
+        $event = new PreGuardEvent($workflowItem, $this, true, $errors);
+        $this->eventDispatcher->dispatch($event, $this->getName());
 
         if (!$event->isAllowed()) {
             return false;
@@ -416,8 +425,8 @@ class Transition
         }
         $workflowItem->unlock();
 
-        $event->setAllowed($isAllowed);
-        $this->eventDispatcher->dispatch($event, 'guard', $this->getName());
+        $event = new GuardEvent($workflowItem, $this, $isAllowed, $errors);
+        $this->eventDispatcher->dispatch($event, $this->getName());
 
         return $event->isAllowed();
     }
@@ -433,10 +442,10 @@ class Transition
     {
         // Pre-announce transition to be able to block transition availability on early stages
         // without a need to execute pre-actions and pre-conditions.
-        $event = new GuardEvent($workflowItem, $this, true, $errors);
-        $this->eventDispatcher->dispatch($event, 'pre_announce', $this->getName());
+        $preAnnounceEvent = new PreAnnounceEvent($workflowItem, $this, true, $errors);
+        $this->eventDispatcher->dispatch($preAnnounceEvent, $this->getName());
 
-        if (!$event->isAllowed()) {
+        if (!$preAnnounceEvent->isAllowed()) {
             return false;
         }
 
@@ -452,10 +461,10 @@ class Transition
         }
         $workflowItem->unlock();
 
-        $event->setAllowed($isAllowed);
-        $this->eventDispatcher->dispatch($event, 'announce', $this->getName());
+        $announceEvent = new AnnounceEvent($workflowItem, $this, $isAllowed, $errors);
+        $this->eventDispatcher->dispatch($announceEvent, $this->getName());
 
-        return $event->isAllowed();
+        return $announceEvent->isAllowed();
     }
 
     /**
@@ -516,22 +525,25 @@ class Transition
     {
         $transitionEvent = new TransitionEvent($workflowItem, $this);
 
-        $stepTo = $this->changeCurrentStep($workflowItem, $transitionEvent);
+        $stepTo = $this->changeCurrentStep($workflowItem);
 
-        $this->eventDispatcher->dispatch($transitionEvent, 'transition', $this->getName());
+        $this->eventDispatcher->dispatch($transitionEvent, $this->getName());
         if ($this->transitionService) {
             $this->transitionService->execute($workflowItem);
         } elseif ($this->action) {
             $this->action->execute($workflowItem);
         }
-        $this->eventDispatcher->dispatch($transitionEvent, 'completed', $this->getName());
+
+        $completedEvent = new TransitionCompletedEvent($workflowItem, $this);
+        $this->eventDispatcher->dispatch($completedEvent, $this->getName());
 
         if ($stepTo?->isFinal()) {
-            $this->eventDispatcher->dispatch($transitionEvent, 'finish');
+            $finishEvent = new WorkflowFinishEvent($workflowItem, $this);
+            $this->eventDispatcher->dispatch($finishEvent);
         }
     }
 
-    private function changeCurrentStep(WorkflowItem $workflowItem, TransitionEvent $transitionEvent): ?Step
+    private function changeCurrentStep(WorkflowItem $workflowItem): ?Step
     {
         // Do not change current step if workflow entity does not exist.
         if (!$workflowItem->getEntityId()) {
@@ -540,17 +552,23 @@ class Transition
 
         $currentStep = $workflowItem->getCurrentStep();
         if ($currentStep) {
-            $this->eventDispatcher->dispatch($transitionEvent, 'leave', $currentStep->getName());
+            $leaveEvent = new StepLeaveEvent($workflowItem, $this);
+            $this->eventDispatcher->dispatch($leaveEvent, $currentStep->getName());
         } else {
-            $this->eventDispatcher->dispatch($transitionEvent, 'start');
+            $startEvent = new WorkflowStartEvent($workflowItem, $this);
+            $this->eventDispatcher->dispatch($startEvent);
         }
 
         $stepTo = $this->getResolvedStepTo($workflowItem);
         // Do not enter the same step again
         if ($workflowItem->getCurrentStep()?->getName() !== $stepTo->getName()) {
-            $this->eventDispatcher->dispatch($transitionEvent, 'enter', $stepTo->getName());
+            $enterEvent = new StepEnterEvent($workflowItem, $this);
+            $this->eventDispatcher->dispatch($enterEvent, $stepTo->getName());
+
             $workflowItem->setCurrentStep($workflowItem->getDefinition()->getStepByName($stepTo->getName()));
-            $this->eventDispatcher->dispatch($transitionEvent, 'entered', $stepTo->getName());
+
+            $enteredEvent = new StepEnteredEvent($workflowItem, $this);
+            $this->eventDispatcher->dispatch($enteredEvent, $stepTo->getName());
         }
 
         return $stepTo;

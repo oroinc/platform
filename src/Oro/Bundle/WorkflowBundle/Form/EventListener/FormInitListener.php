@@ -4,8 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Form\EventListener;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Event\EventDispatcher;
-use Oro\Bundle\WorkflowBundle\Event\Transition\TransitionEvent;
-use Oro\Bundle\WorkflowBundle\Event\WorkflowItemAwareEvent;
+use Oro\Bundle\WorkflowBundle\Event\Transition\AttributeFormInitEvent;
+use Oro\Bundle\WorkflowBundle\Event\Transition\TransitionFormInitEvent;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Component\Action\Action\ActionInterface;
@@ -36,17 +36,13 @@ class FormInitListener implements EventSubscriberInterface
 
     public function dispatchFormInitEvents(WorkflowItem $workflowItem, Transition $transition = null): void
     {
-        $contextName = null;
         if ($transition) {
-            $event = new TransitionEvent($workflowItem, $transition);
-            $eventName = 'transition_form_init';
-            $contextName = $transition->getName();
+            $transitionFormInitEvent = new TransitionFormInitEvent($workflowItem, $transition);
+            $this->eventDispatcher->dispatch($transitionFormInitEvent, $transition->getName());
         } else {
-            $event = new WorkflowItemAwareEvent($workflowItem);
-            $eventName = 'attribute_form_init';
+            $attributeFormInitEvent = new AttributeFormInitEvent($workflowItem);
+            $this->eventDispatcher->dispatch($attributeFormInitEvent);
         }
-
-        $this->eventDispatcher->dispatch($event, $eventName, $contextName);
     }
 
     public function onPreSetData(PreSetDataEvent $event): void

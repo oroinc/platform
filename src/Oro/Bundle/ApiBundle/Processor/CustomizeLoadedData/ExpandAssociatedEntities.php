@@ -71,8 +71,12 @@ class ExpandAssociatedEntities implements ProcessorInterface
             if (null === $targetConfig || $field->isCollectionValuedAssociation()) {
                 continue;
             }
-            if (!$this->doctrineHelper->isManageableEntityClass($field->getTargetClass())
-                && !ExtendHelper::isOutdatedEnumOptionEntity($field->getTargetClass())
+            $targetClass = $field->getTargetClass();
+            if (!$targetClass) {
+                continue;
+            }
+            if (!$this->doctrineHelper->isManageableEntityClass($targetClass)
+                && !ExtendHelper::isOutdatedEnumOptionEntity($targetClass)
             ) {
                 continue;
             }

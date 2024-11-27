@@ -4,10 +4,12 @@ namespace Oro\Bundle\ApiBundle\Processor;
 
 use Oro\Bundle\ApiBundle\Collection\AdditionalEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\MetaPropertiesConfigExtra;
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Util\EntityMapper;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
@@ -27,10 +29,13 @@ trait FormContextTrait
     private ?FormBuilderInterface $formBuilder = null;
     private ?FormInterface $form = null;
     private bool $skipFormValidation = false;
+    private ?array $formOptions = null;
     /** @var ConfigExtraInterface[]|null $normalizedEntityConfigExtras */
     private ?array $normalizedEntityConfigExtras = null;
     /** @var ConfigExtraInterface[]|null $responseConfigExtras [name => extra, ...] */
     private ?array $responseConfigExtras = null;
+    private EntityDefinitionConfig|null|false $normalizedConfig = false;
+    private EntityMetadata|null|false $normalizedMetadata = false;
 
     /**
      * Gets an identifier of an entity that was sent in the request.
@@ -243,6 +248,22 @@ trait FormContextTrait
     }
 
     /**
+     * Gets form options that should override the options from the entity configuration.
+     */
+    public function getFormOptions(): ?array
+    {
+        return $this->formOptions;
+    }
+
+    /**
+     * Sets form options that should override the options from the entity configuration.
+     */
+    public function setFormOptions(?array $formOptions): void
+    {
+        $this->formOptions = $formOptions ?: null;
+    }
+
+    /**
      * Sets a list of requests for configuration data.
      *
      * @param ConfigExtraInterface[] $extras
@@ -320,6 +341,80 @@ trait FormContextTrait
     }
 
     /**
+     * Gets a configuration of an entity that should be used to converts an entity to a result array
+     * when it is done not by "get" API action, e.g. for subresources.
+     */
+    public function getNormalizedConfig(): ?EntityDefinitionConfig
+    {
+        if (false !== $this->normalizedConfig) {
+            return $this->normalizedConfig;
+        }
+
+        if (!$this->responseConfigExtras) {
+            return $this->getConfig();
+        }
+
+        $this->normalizedConfig = null;
+        $entityClass = $this->getClassName();
+        if ($entityClass) {
+            $this->normalizedConfig = $this->loadEntityConfig($entityClass, $this->getNormalizedConfigExtras())
+                ->getDefinition();
+        }
+
+        return $this->normalizedConfig;
+    }
+
+    /**
+     * Sets a configuration of an entity that should be used to converts an entity to a result array
+     * when it is done not by "get" API action, e.g. for subresources.
+     */
+    public function setNormalizedConfig(?EntityDefinitionConfig $definition): void
+    {
+        $this->normalizedConfig = $definition;
+    }
+
+    /**
+     * Gets a metadata of an entity that should be used to build a result document
+     * when it is done not by "get" API action, e.g. for subresources.
+     */
+    public function getNormalizedMetadata(): ?EntityMetadata
+    {
+        if (false !== $this->normalizedMetadata) {
+            return $this->normalizedMetadata;
+        }
+
+        if (!$this->responseConfigExtras) {
+            return $this->getMetadata();
+        }
+
+        $this->normalizedMetadata = null;
+        $entityClass = $this->getClassName();
+        if ($entityClass) {
+            $config = $this->getNormalizedConfig();
+            if (null !== $config) {
+                $this->normalizedMetadata = $this->metadataProvider->getMetadata(
+                    $entityClass,
+                    $this->getVersion(),
+                    $this->getRequestType(),
+                    $config,
+                    $this->getMetadataExtras()
+                );
+            }
+        }
+
+        return $this->normalizedMetadata;
+    }
+
+    /**
+     * Sets metadata of an entity that should be used to build a result document
+     * when it is done not by "get" API action, e.g. for subresources.
+     */
+    public function setNormalizedMetadata(?EntityMetadata $metadata): void
+    {
+        $this->normalizedMetadata = $metadata;
+    }
+
+    /**
      * Gets all entities, primary and included ones, that are processing by an action.
      *
      * @param bool $mainOnly Whether only main entity(ies) for this request
@@ -362,5 +457,22 @@ trait FormContextTrait
         }
 
         return $extra;
+    }
+
+    /**
+     * @return ConfigExtraInterface[]
+     */
+    private function getNormalizedConfigExtras(): array
+    {
+        $normalizedConfigExtras = [];
+        $configExtras = $this->getConfigExtras();
+        foreach ($configExtras as $configExtra) {
+            $normalizedConfigExtras[$configExtra->getName()] = $configExtra;
+        }
+        foreach ($this->responseConfigExtras as $configExtra) {
+            $normalizedConfigExtras[$configExtra->getName()] = $configExtra;
+        }
+
+        return array_values($normalizedConfigExtras);
     }
 }

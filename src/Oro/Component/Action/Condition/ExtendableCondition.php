@@ -163,6 +163,6 @@ class ExtendableCondition extends AbstractCondition implements ContextAccessorAw
             $this->errors,
             (string)$this->contextAccessor->getValue($context, $this->messageType)
         );
-        $event->getContext()?->offsetSet('errors', $translatedErrors);
+        $event->getData()?->offsetSet('errors', $translatedErrors);
     }
 }

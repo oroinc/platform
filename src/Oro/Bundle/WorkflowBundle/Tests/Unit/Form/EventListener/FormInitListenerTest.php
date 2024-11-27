@@ -4,8 +4,8 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Event\EventDispatcher;
-use Oro\Bundle\WorkflowBundle\Event\Transition\TransitionEvent;
-use Oro\Bundle\WorkflowBundle\Event\WorkflowItemAwareEvent;
+use Oro\Bundle\WorkflowBundle\Event\Transition\AttributeFormInitEvent;
+use Oro\Bundle\WorkflowBundle\Event\Transition\TransitionFormInitEvent;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\FormInitListener;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
@@ -62,8 +62,7 @@ class FormInitListenerTest extends TestCase
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->isInstanceOf(TransitionEvent::class),
-                'transition_form_init',
+                $this->isInstanceOf(TransitionFormInitEvent::class),
                 'transition_name'
             );
 
@@ -77,9 +76,7 @@ class FormInitListenerTest extends TestCase
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->isInstanceOf(WorkflowItemAwareEvent::class),
-                'attribute_form_init',
-                null
+                $this->isInstanceOf(AttributeFormInitEvent::class)
             );
 
         $this->listener->dispatchFormInitEvents($workflowItem);
@@ -130,8 +127,7 @@ class FormInitListenerTest extends TestCase
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->isInstanceOf(TransitionEvent::class),
-                'transition_form_init',
+                $this->isInstanceOf(TransitionFormInitEvent::class),
                 'transition_name'
             );
 
@@ -166,9 +162,7 @@ class FormInitListenerTest extends TestCase
         $this->eventDispatcher->expects($this->once())
             ->method('dispatch')
             ->with(
-                $this->isInstanceOf(WorkflowItemAwareEvent::class),
-                'attribute_form_init',
-                null
+                $this->isInstanceOf(AttributeFormInitEvent::class)
             );
 
         $this->listener->onPreSetData($event);

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 
 /**
@@ -16,7 +17,7 @@ class BuildListResultDocument extends BuildResultDocument
         $documentBuilder->setDataCollection(
             $context->getResult(),
             $context->getRequestType(),
-            $context->getMetadata()
+            $context instanceof FormContext ? $context->getNormalizedMetadata() : $context->getMetadata()
         );
     }
 }
