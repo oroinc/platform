@@ -66,6 +66,11 @@ define(function(require, exports, module) {
                 this.collection = new RegionCollection([], {
                     route: options.collectionRoute
                 });
+
+                if (options.collectionRouteCountryCode) {
+                    this.collection.setCountryId(options.collectionRouteCountryCode);
+                    this.collection.fetch({reset: false});
+                }
             }
 
             this.listenTo(this.collection, 'reset', this.render);
