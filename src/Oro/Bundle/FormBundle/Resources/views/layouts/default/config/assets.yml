@@ -37,6 +37,7 @@ styles:
         - 'bundles/oroform/default/scss/components/select2/select2-container.scss'
         - 'bundles/oroform/default/scss/components/select2/select2-container-multi.scss'
         - 'bundles/oroform/default/scss/components/select2/select2-plain.scss'
+        - 'bundles/oroform/default/scss/components/select-multiline.scss'
 
 stylebook_styles:
     inputs:
