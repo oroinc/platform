@@ -26,10 +26,20 @@ class ValidateParentEntityObjectAccess implements ProcessorInterface
         $this->permission = $permission;
     }
 
+    public static function getOperationName(string $permission): string
+    {
+        return 'validate_parent_entity_object_access_' . $permission;
+    }
+
     #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var ChangeRelationshipContext $context */
+
+        $operationName = self::getOperationName($this->permission);
+        if ($context->isProcessed($operationName)) {
+            return;
+        }
 
         $isGranted = true;
         $parentEntity = $this->getParentEntity($context);
@@ -44,6 +54,7 @@ class ValidateParentEntityObjectAccess implements ProcessorInterface
                 $isGranted = $this->authorizationChecker->isGranted($this->permission, $parentEntity);
             }
         }
+        $context->setProcessed($operationName);
 
         if (!$isGranted) {
             throw new AccessDeniedException(sprintf(

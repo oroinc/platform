@@ -39,10 +39,20 @@ class ValidateParentEntityTypeAccess implements ProcessorInterface
         $this->forcePermissionUsage = $forcePermissionUsage;
     }
 
+    public static function getOperationName(string $permission): string
+    {
+        return 'validate_parent_entity_type_access_' . $permission;
+    }
+
     #[\Override]
     public function process(ContextInterface $context): void
     {
         /** @var SubresourceContext $context */
+
+        $operationName = self::getOperationName($this->permission);
+        if ($context->isProcessed($operationName)) {
+            return;
+        }
 
         $isGranted = true;
         $parentConfig = $context->getParentConfig();
@@ -58,6 +68,7 @@ class ValidateParentEntityTypeAccess implements ProcessorInterface
         } else {
             $isGranted = $this->isGrantedForClass($context);
         }
+        $context->setProcessed($operationName);
 
         if (!$isGranted) {
             throw new AccessDeniedException('No access to this type of parent entities.');

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\EventListener\Workflow;
 
-use Oro\Bundle\WorkflowBundle\Event\Transition\GuardEvent;
+use Oro\Bundle\WorkflowBundle\Event\Transition\PreAnnounceEvent;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\ConfigExpression\ExpressionFactory;
 
@@ -16,7 +16,7 @@ class TransitionAclResourceListener
     ) {
     }
 
-    public function onPreAnnounce(GuardEvent $event): void
+    public function onPreAnnounce(PreAnnounceEvent $event): void
     {
         if (!$event->isAllowed()) {
             return;
