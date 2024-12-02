@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Validator\Constraints;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Tests\Unit\Fixtures\Entity\Contact as TestTargetEntity;
@@ -451,5 +453,93 @@ class UnchangeableFieldValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate($newValue, $constraint);
 
         $this->assertNoViolation();
+    }
+
+    public function testViolationShouldNotBeRaisedInCaseCollectionFieldValueWasNotChanged()
+    {
+        $newValue = new PersistentCollection(
+            $this->em,
+            $this->getClassMetadata(TestEntity::class),
+            new ArrayCollection([new TestEntity(), new TestEntity()])
+        );
+        $newValue->takeSnapshot();
+
+        $object = new TestTargetEntity();
+        $object->setId(12);
+        $fieldName = 'emails';
+        $metadata = $this->getClassMetadata(TestTargetEntity::class);
+
+        $metadata->expects(self::once())
+            ->method('getIdentifierValues')
+            ->willReturnCallback(function ($entity) {
+                return [$entity->getId()];
+            });
+        $metadata->expects(self::once())
+            ->method('hasAssociation')
+            ->with($fieldName)
+            ->willReturn(true);
+        $metadata->expects(self::once())
+            ->method('getAssociationMapping')
+            ->with($fieldName)
+            ->willReturn(['type' => ClassMetadata::ONE_TO_MANY]);
+
+        $this->em->expects(self::once())
+            ->method('getClassMetadata')
+            ->with(TestTargetEntity::class)
+            ->willReturn($metadata);
+
+        $constraint = new UnchangeableField();
+        $this->setProperty($object, $fieldName);
+        $this->validator->validate($newValue, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testViolationShouldBeRaisedInCaseCollectionFieldValueWasChanged()
+    {
+        $uow = $this->createMock(UnitOfWork::class);
+        $this->em->expects(self::once())
+            ->method('getUnitOfWork')
+            ->willReturn($uow);
+
+        $newValue = new PersistentCollection(
+            $this->em,
+            $this->getClassMetadata(TestEntity::class),
+            new ArrayCollection([new TestEntity(), new TestEntity()])
+        );
+        $newValue->takeSnapshot();
+        $newValue->add(new TestEntity());
+
+        $object = new TestTargetEntity();
+        $object->setId(12);
+        $fieldName = 'emails';
+        $metadata = $this->getClassMetadata(TestTargetEntity::class);
+
+        $metadata->expects(self::once())
+            ->method('getIdentifierValues')
+            ->willReturnCallback(function ($entity) {
+                return [$entity->getId()];
+            });
+        $metadata->expects(self::once())
+            ->method('hasAssociation')
+            ->with($fieldName)
+            ->willReturn(true);
+        $metadata->expects(self::once())
+            ->method('getAssociationMapping')
+            ->with($fieldName)
+            ->willReturn(['type' => ClassMetadata::ONE_TO_MANY]);
+
+        $this->em->expects(self::once())
+            ->method('getClassMetadata')
+            ->with(TestTargetEntity::class)
+            ->willReturn($metadata);
+
+        $constraint = new UnchangeableField();
+        $this->setProperty($object, $fieldName);
+        $this->validator->validate($newValue, $constraint);
+
+        $this->buildViolation($constraint->message)
+            ->atPath('property.path')
+            ->assertRaised();
     }
 }

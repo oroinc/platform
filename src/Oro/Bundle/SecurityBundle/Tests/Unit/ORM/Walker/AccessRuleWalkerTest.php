@@ -596,7 +596,27 @@ class AccessRuleWalkerTest extends OrmTestCase
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(
-            "Parameter of Association expression should be to-one association. Given name: 'articles'."
+            "Parameter of Association expression should be to-one or many-to-many association. Given name: 'articles'."
+        );
+
+        $this->rule->setRule(function (Criteria $criteria) {
+            if ($criteria->getEntityClass() === CmsUser::class) {
+                $criteria->andExpression(new Association('articles'));
+            }
+        });
+
+        $context = new AccessRuleWalkerContext($this->accessRuleExecutor, 'VIEW', CmsUser::class, 1);
+        $query = $this->em->getRepository(CmsUser::class)->createQueryBuilder('u')->getQuery();
+        $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, [AccessRuleWalker::class]);
+        $query->setHint(AccessRuleWalker::CONTEXT, $context);
+        $query->getSQL();
+    }
+
+    public function testWalkerWithAssociationRuleExpressionWithManyToManyParameter()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage(
+            "Parameter of Association expression should be to-one or many-to-many association. Given name: 'articles'."
         );
 
         $this->rule->setRule(function (Criteria $criteria) {
@@ -944,7 +964,7 @@ class AccessRuleWalkerTest extends OrmTestCase
     public function testWalkerWithContainsExpressionForJsonArrayFieldWhenRightOperandIsNotValue()
     {
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('The left operand for CONTAINS comparison must be a value.');
+        $this->expectExceptionMessage('The right operand for CONTAINS comparison must be a value.');
 
         $this->rule->setRule(function (Criteria $criteria) {
             $criteria->andExpression(new Comparison(new Path('types'), Comparison::CONTAINS, new Path('types')));

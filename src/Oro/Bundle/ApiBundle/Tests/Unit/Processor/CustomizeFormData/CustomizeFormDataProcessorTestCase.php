@@ -6,6 +6,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Validator\Constraints\AccessGrantedValidator;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
@@ -61,9 +62,13 @@ class CustomizeFormDataProcessorTestCase extends \PHPUnit\Framework\TestCase
         $authorizationChecker->expects(self::any())
             ->method('isGranted')
             ->willReturn(true);
+        $doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $doctrineHelper->expects(self::any())
+            ->method('getSingleEntityIdentifier')
+            ->willReturn(1);
 
         $constraintValidatorFactoryContainer = TestContainerBuilder::create()
-            ->add(AccessGrantedValidator::class, new AccessGrantedValidator($authorizationChecker))
+            ->add(AccessGrantedValidator::class, new AccessGrantedValidator($authorizationChecker, $doctrineHelper))
             ->getContainer($this);
 
         $validator = Validation::createValidatorBuilder()
