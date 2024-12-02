@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\FormBundle\Validator\Constraints;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -59,11 +61,19 @@ class UnchangeableFieldValidator extends ConstraintValidator
      *
      * @return bool
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     private function isAssociationValueChanged($value, EntityManagerInterface $em, ClassMetadata $metadata): bool
     {
+        if ($value instanceof Collection
+            && null !== $this->getSingleIdentifierValue($this->context->getObject(), $metadata)
+            && $metadata->getAssociationMapping($this->context->getPropertyName())['type'] & ClassMetadata::TO_MANY
+        ) {
+            return count($value->getDeleteDiff()) || count($value->getInsertDiff());
+        }
+
         $targetEntityClass = $metadata->getAssociationTargetClass($this->context->getPropertyName());
-        if (is_object($value) && !is_a($value, $targetEntityClass)) {
+        if (is_object($value) && (!is_a($value, $targetEntityClass) && !($value instanceof PersistentCollection))) {
             return false;
         }
 
