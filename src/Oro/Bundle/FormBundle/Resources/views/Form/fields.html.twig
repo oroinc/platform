@@ -63,10 +63,7 @@
         {% set component_options = component_options|merge({'excluded': excluded }) %}
     {% endif %}
     {% set selectElementClass = (attr.class|default('') ~ ' select2')|trim %}
-    {% if configs.selectElementClass is defined %}
-        {% set selectElementClass = selectElementClass ~ ' ' ~ configs.selectElementClass %}
-    {% endif %}
-r    {{ form_widget(form, { 'attr': {
+    {{ form_widget(form, { 'attr': {
         'class': selectElementClass,
         'data-page-component-module': component,
         'data-page-component-options': component_options|json_encode|raw
