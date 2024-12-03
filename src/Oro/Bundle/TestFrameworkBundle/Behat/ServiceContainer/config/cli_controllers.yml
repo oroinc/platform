@@ -80,6 +80,20 @@ services:
         tags:
             - { name: 'cli.controller', priority: 100 }
 
+    cli.controller.available_contexts_controller:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableContextsController
+        arguments:
+            - '%oro_test.contexts%'
+        tags:
+            - { name: 'cli.controller', priority: 100 }
+
+    cli.controller.available_elements_controller:
+        class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\AvailableElementsController
+        arguments:
+            - '%oro_test.elements%'
+        tags:
+            - { name: 'cli.controller', priority: 100 }
+
     cli.controller.behat.exercise_controller_decorator:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Cli\ExerciseControllerDecorator
         decorates: cli.controller.exercise

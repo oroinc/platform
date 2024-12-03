@@ -1,0 +1,11 @@
+services:
+    _defaults:
+        public: false
+
+    Oro\Bundle\AddressBundle\Command\ActualizeCountriesRegionsCommand:
+        arguments:
+            - '@file_locator'
+            - '@oro_attachment.tools.external_file_factory'
+            - '@logger'
+        tags:
+            - { name: console.command }

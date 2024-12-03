@@ -157,6 +157,7 @@ services:
         class: Oro\Bundle\ApiBundle\Validator\Constraints\AccessGrantedValidator
         arguments:
             - '@security.authorization_checker'
+            - '@oro_entity.doctrine_helper'
         tags:
             - { name: validator.constraint_validator }
 

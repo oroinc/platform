@@ -9,17 +9,11 @@ Feature: Create notification rule for entity with biderectional extend relation
   Scenario: Create Extend Entity with one-to-many relation to User entity
     Given I login as administrator
     And I go to System/Entities/Entity Management
-    And I click "Create Entity"
-    When I fill form with:
-      | Name           | testEntity    |
-      | Label          | Test Entity   |
-      | Plural Label   | Test Entities |
-      | Ownership Type | User          |
-    And I save and close form
-    Then I should see "Entity saved" flash message
+    And filter Name as is equal to "Group"
+    Then click View Group in grid
     When I click "Create Field"
     And I fill form with:
-      | Field name | Name   |
+      | Field name | TestName   |
       | Type       | String |
     And I click "Continue"
     And I save and close form

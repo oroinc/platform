@@ -20,45 +20,6 @@ class EventDispatcherTest extends TestCase
         $this->dispatcher = new EventDispatcher($this->innerDispatcher);
     }
 
-    public function testDisableEvent(): void
-    {
-        $eventName = 'some_event';
-        $workflowItem = $this->createMock(WorkflowItem::class);
-        $workflowItem->method('getWorkflowName')->willReturn('workflow_name');
-
-        $event = new WorkflowItemAwareEvent($workflowItem);
-
-        $this->dispatcher->disableEvent($eventName);
-
-        $this->innerDispatcher
-            ->expects($this->never())
-            ->method('dispatch');
-
-        $this->dispatcher->dispatch($event, $eventName);
-    }
-
-    public function testRestoreDisabledEvent(): void
-    {
-        $eventName = 'some_event';
-        $workflowItem = $this->createMock(WorkflowItem::class);
-        $workflowItem->method('getWorkflowName')->willReturn('workflow_name');
-
-        $event = new WorkflowItemAwareEvent($workflowItem);
-
-        $this->dispatcher->disableEvent($eventName);
-        $this->dispatcher->restoreDisabledEvent($eventName);
-
-        $this->innerDispatcher
-            ->expects($this->exactly(2))
-            ->method('dispatch')
-            ->withConsecutive(
-                [$event, 'oro_workflow.some_event'],
-                [$event, 'oro_workflow.workflow_name.some_event']
-            );
-
-        $this->dispatcher->dispatch($event, $eventName);
-    }
-
     public function testDispatch(): void
     {
         $eventName = 'some_event';
@@ -68,7 +29,13 @@ class EventDispatcherTest extends TestCase
         $workflowItem = $this->createMock(WorkflowItem::class);
         $workflowItem->method('getWorkflowName')->willReturn($workflowName);
 
-        $event = new WorkflowItemAwareEvent($workflowItem);
+        $event = $this->createConfiguredMock(
+            WorkflowItemAwareEvent::class,
+            [
+                'getWorkflowItem' => $workflowItem,
+                'getName' => $eventName
+            ]
+        );
 
         $this->innerDispatcher
             ->expects($this->exactly(3))
@@ -79,6 +46,6 @@ class EventDispatcherTest extends TestCase
                 [$event, 'oro_workflow.workflow_name.some_event.context']
             );
 
-        $this->dispatcher->dispatch($event, $eventName, $contextName);
+        $this->dispatcher->dispatch($event, $contextName);
     }
 }

@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Functional\EntityExtend;
 
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Entity\EnumOptionInterface;
 use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
-use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestExtendedEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -62,12 +62,12 @@ class EntityPropertyInfoTest extends WebTestCase
             ],
             'method exists with broken register' => [
                 'name' => 'isDeFaUlt',
-                'class' => TestEnumValue::class,
+                'class' => EnumOption::class,
                 'expectedResult' => true
             ],
             'method exists for object' => [
                 'name' => 'isDefault',
-                'class' => fn () => new TestEnumValue('test.1', 'test', 'test', 1),
+                'class' => fn () => new EnumOption('test.1', 'test', 'test', 1),
                 'expectedResult' => true
             ],
             'serialized attribute get method not exists' => [
@@ -105,8 +105,8 @@ class EntityPropertyInfoTest extends WebTestCase
                 'expectedResult' => false
             ],
             'real protected property exists' => [
-                'name' => 'enumName',
-                'class' => TestEnumValue::class,
+                'name' => 'locale',
+                'class' => EnumOption::class,
                 'expectedResult' => true
             ],
             'extend property exists for object' => [
@@ -126,7 +126,7 @@ class EntityPropertyInfoTest extends WebTestCase
             ],
             'protected property exists with object' => [
                 'name' => 'locale',
-                'class' => fn () => new TestEnumValue('test.1', 'test', 'test', 1),
+                'class' => fn () => new EnumOption('test.1', 'test', 'test', 1),
                 'expectedResult' => true
             ],
         ];

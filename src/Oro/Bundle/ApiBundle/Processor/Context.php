@@ -689,11 +689,7 @@ class Context extends NormalizeResultContext implements ContextInterface
     #[\Override]
     public function setMetadata(?EntityMetadata $metadata): void
     {
-        if ($metadata) {
-            $this->metadata = $metadata;
-        } else {
-            $this->metadata = false;
-        }
+        $this->metadata = $metadata;
     }
 
     /**
@@ -736,7 +732,6 @@ class Context extends NormalizeResultContext implements ContextInterface
         }
 
         try {
-            $metadata = null;
             $config = $this->getConfig();
             if (null !== $config) {
                 $metadata = $this->metadataProvider->getMetadata(
@@ -746,9 +741,13 @@ class Context extends NormalizeResultContext implements ContextInterface
                     $config,
                     $this->getMetadataExtras()
                 );
-                $this->initializeMetadata($metadata);
+                if (null !== $metadata) {
+                    $this->initializeMetadata($metadata);
+                }
+                $this->processLoadedMetadata($metadata);
+            } else {
+                $this->processLoadedMetadata(null);
             }
-            $this->processLoadedMetadata($metadata);
         } catch (\Exception $e) {
             $this->processLoadedMetadata(null);
 
@@ -762,7 +761,7 @@ class Context extends NormalizeResultContext implements ContextInterface
         $this->metadata = $metadata;
     }
 
-    private function initializeMetadata(
+    protected function initializeMetadata(
         EntityMetadata $metadata,
         string $path = null,
         TargetMetadataAccessor $targetMetadataAccessor = null

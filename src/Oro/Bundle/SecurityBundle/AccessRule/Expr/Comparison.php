@@ -25,6 +25,7 @@ class Comparison implements ExpressionInterface
      * in the list from the right operand.
      */
     public const CONTAINS = 'CONTAINS';
+    public const MEMBEROF = 'MEMBEROF';
 
     /** @var Path|Value */
     private $leftOperand;

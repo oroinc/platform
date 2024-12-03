@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Button;
 use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\OperationButton;
+use Oro\Bundle\ActionBundle\Event\OperationEventDispatcher;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
@@ -188,6 +189,7 @@ class OperationButtonTest extends \PHPUnit\Framework\TestCase
             $this->createMock(AttributeAssembler::class),
             $this->createMock(FormOptionsAssembler::class),
             $this->createMock(OptionsResolver::class),
+            $this->createMock(OperationEventDispatcher::class),
             $definition
         );
     }

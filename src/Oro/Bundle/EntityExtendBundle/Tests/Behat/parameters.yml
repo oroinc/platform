@@ -1,0 +1,7 @@
+services:
+    oro_entity_extend.voter.custom_entity_creation_feature_voter_test:
+        class: Oro\Bundle\EntityExtendBundle\Tests\Behat\Mock\Voter\EnableCustomEntityCreationVoterDecorator
+        decorates: oro_entity_extend.voter.custom_entity_creation_feature_voter
+        public: true
+        arguments:
+            - '@.inner'

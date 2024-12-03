@@ -16,6 +16,7 @@ use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigProviderHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\Attribute\Acl;
@@ -48,11 +49,20 @@ class ConfigController extends AbstractController
         $actions = [];
         $jsModules = [];
         $providers = $this->getConfigManager()->getProviders();
+        /** @var FeatureChecker $featureChecker */
+        $featureChecker = $this->container->get('oro_featuretoggle.checker.feature_checker');
+        $isCustomEntityCreationFeatureEnabled = $featureChecker->isFeatureEnabled('custom_entity_creation');
         foreach ($providers as $provider) {
             $propertyConfig = $provider->getPropertyConfig();
             $providerActions = $propertyConfig->getLayoutActions();
             foreach ($providerActions as $action) {
-                $actions[] = $action;
+                if (array_key_exists('route', $action) && 'oro_entityextend_entity_create' === $action['route']) {
+                    if ($isCustomEntityCreationFeatureEnabled) {
+                        $actions[] = $action;
+                    }
+                } else {
+                    $actions[] = $action;
+                }
             }
             $providerModules = $propertyConfig->getJsModules();
             foreach ($providerModules as $module) {
@@ -410,6 +420,7 @@ class ConfigController extends AbstractController
         return array_merge(
             parent::getSubscribedServices(),
             [
+                'oro_featuretoggle.checker.feature_checker' => FeatureChecker::class,
                 'oro_entity.entity_field_provider' => EntityFieldProvider::class,
                 ConfigManager::class,
                 EntityRoutingHelper::class,

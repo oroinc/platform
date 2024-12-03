@@ -42,6 +42,7 @@ class DumpWorkflowTranslationsCommand extends Command
     {
         $this
             ->addArgument('workflow', InputArgument::REQUIRED, 'Workflow name')
+            ->addOption('parent-workflow', null, InputOption::VALUE_OPTIONAL, 'Parent workflow name')
             ->addOption('locale', null, InputOption::VALUE_OPTIONAL, 'Locale', Translator::DEFAULT_LOCALE)
             ->setDescription('Dumps workflow translations.')
             ->setHelp(
@@ -55,11 +56,15 @@ button title and warning messages) of a specified workflow.
 The <info>--locale</info> option can be used to specify a different target locale.
 
   <info>php %command.full_name% --locale=<locale> <workflow></info>
+  
+The <info>--parent-workflow</info> option can be used to specify a parent workflow from which translations are inherited
+  <info>php %command.full_name% --locale=<locale> --parent-workflow=<parent_workflow> <workflow></info>
 
 HELP
             )
             ->addUsage('--locale=<locale> <workflow>')
-        ;
+            ->addUsage('--parent-workflow=<parent_workflow> <workflow>')
+            ->addUsage('--parent-workflow=<parent_workflow> --locale=<locale> <workflow>');
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
@@ -68,14 +73,65 @@ HELP
     {
         $locale = $input->getOption('locale');
         $workflowName = $input->getArgument('workflow');
+        $parentWorkflowName = $input->getOption('parent-workflow');
 
-        $keys = $this->workflowTranslationHelper->generateDefinitionTranslationKeys(
-            $this->workflowManager->getWorkflow($workflowName)->getDefinition()
+        $translations = $this->getWorkflowTranslations($workflowName, $locale);
+        $parentWorkflowTranslations = $this->getParentWorkflowTranslations(
+            $workflowName,
+            $parentWorkflowName,
+            $locale,
+            $translations
         );
-        $translations = $this->workflowTranslationHelper->generateDefinitionTranslations($keys, $locale);
+        $translations = array_merge($translations, $parentWorkflowTranslations);
 
         $output->write(Yaml::dump(ArrayConverter::expandToTree($translations), self::INLINE_LEVEL));
 
         return Command::SUCCESS;
+    }
+
+    private function getWorkflowTranslations(string $workflowName, string $locale, array $skipKeys = []): array
+    {
+        $keys = $this->workflowTranslationHelper->generateDefinitionTranslationKeys(
+            $this->workflowManager->getWorkflow($workflowName)->getDefinition()
+        );
+        if ($skipKeys) {
+            $keys = array_values(array_diff($keys, $skipKeys));
+        }
+
+        return $this->workflowTranslationHelper->generateDefinitionTranslations($keys, $locale);
+    }
+
+    private function getParentWorkflowTranslations(
+        string $workflowName,
+        ?string $parentWorkflowName,
+        string $locale,
+        array $existingWorkflowTranslations = []
+    ): array {
+        if (!$parentWorkflowName) {
+            return [];
+        }
+        $nonEmptyTranslations = array_filter($existingWorkflowTranslations);
+        $workflowExistingKeys = array_keys($nonEmptyTranslations);
+
+        $skipKeys = array_map(function (string $key) use ($workflowName, $parentWorkflowName) {
+            return str_replace(
+                '.' . $workflowName . '.',
+                '.' . $parentWorkflowName . '.',
+                $key
+            );
+        }, $workflowExistingKeys);
+
+        $parentTranslations = $this->getWorkflowTranslations($parentWorkflowName, $locale, $skipKeys);
+        $translations = [];
+        foreach ($parentTranslations as $key => $translation) {
+            $newKey = str_replace(
+                '.' . $parentWorkflowName . '.',
+                '.' . $workflowName . '.',
+                $key
+            );
+            $translations[$newKey] = $translation;
+        }
+
+        return $translations;
     }
 }

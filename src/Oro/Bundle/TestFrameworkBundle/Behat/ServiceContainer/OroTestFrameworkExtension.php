@@ -386,6 +386,7 @@ class OroTestFrameworkExtension implements TestworkExtension
         $suites = [$container->getParameter('suite.configurations')];
         $pages = [];
         $elements = [];
+        $contexts = $container->getParameter('oro_test.shared_contexts');
         $requiredOptionalListeners = [];
 
         foreach ($this->getConfigPathsPrefixes($container) as $pathPrefix) {
@@ -397,6 +398,9 @@ class OroTestFrameworkExtension implements TestworkExtension
             $config = Yaml::parse(file_get_contents($configFile));
             $processedConfiguration = $processor->processConfiguration($configuration, $config);
 
+            foreach ($processedConfiguration[self::SUITES_CONFIG_ROOT] as $suite) {
+                $contexts = array_unique(array_merge($contexts, $suite['settings']['contexts'] ?? []));
+            }
             $this->appendConfiguration($pages, $processedConfiguration[self::PAGES_CONFIG_ROOT]);
             $this->appendConfiguration($elements, $processedConfiguration[self::ELEMENTS_CONFIG_ROOT]);
 
@@ -418,13 +422,13 @@ class OroTestFrameworkExtension implements TestworkExtension
         }
         $this->loadAppBehatServices($container);
 
-        $container->getDefinition('oro_element_factory')->replaceArgument(2, $elements);
-        $container->getDefinition('oro_page_factory')->replaceArgument(1, $pages);
         $container->getDefinition('oro_behat_extension.isolation.doctrine_isolator')
             ->addMethodCall('setRequiredListeners', [array_unique($requiredOptionalListeners)]);
         $suites = array_merge($suites, $container->getParameter('suite.configurations'));
         $container->setParameter('suite.configurations', $suites);
+        $container->setParameter('oro_test.pages', $pages);
         $container->setParameter('oro_test.elements', $elements);
+        $container->setParameter('oro_test.contexts', $contexts);
     }
 
     private function getConfigPathsPrefixes(ContainerBuilder $container): array
