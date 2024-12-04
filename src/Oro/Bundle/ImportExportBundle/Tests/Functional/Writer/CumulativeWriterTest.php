@@ -141,7 +141,7 @@ class CumulativeWriterTest extends WebTestCase
                     'context' => [
                         'ScheduledEntityDeletions' => [
                             LocalizedFallbackValue::class => 2,
-                            AttributeGroupRelation::class => 2,
+                            AttributeGroupRelation::class => 3,
                             AttributeGroup::class => 2,
                         ],
                     ],

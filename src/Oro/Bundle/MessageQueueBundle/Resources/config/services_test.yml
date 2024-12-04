@@ -11,6 +11,10 @@ services:
         decorates: oro_message_queue.client.driver
         arguments:
             - '@.inner'
+            - '@oro_message_queue.test.sent_messages_storage'
+
+    oro_message_queue.test.sent_messages_storage:
+        class: Oro\Bundle\MessageQueueBundle\Test\Functional\SentMessagesStorage
 
     oro_message_queue.async.basic_message_processor:
         class: Oro\Component\MessageQueue\Test\Async\BasicMessageProcessor

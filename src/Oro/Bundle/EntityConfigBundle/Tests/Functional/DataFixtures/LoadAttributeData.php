@@ -23,6 +23,7 @@ class LoadAttributeData extends AbstractFixture implements ContainerAwareInterfa
     const SYSTEM_ATTRIBUTE_2  = AddAttributesToTestActivityTargetMigration::SYSTEM_ATTRIBUTE_2;
     const REGULAR_ATTRIBUTE_1 = AddAttributesToTestActivityTargetMigration::REGULAR_ATTRIBUTE_1;
     const REGULAR_ATTRIBUTE_2 = AddAttributesToTestActivityTargetMigration::REGULAR_ATTRIBUTE_2;
+    const BOOL_ATTRIBUTE_1 = AddAttributesToTestActivityTargetMigration::BOOL_ATTRIBUTE_1;
 
     /** @var array */
     private static $attributesData = [];
@@ -37,7 +38,8 @@ class LoadAttributeData extends AbstractFixture implements ContainerAwareInterfa
             self::SYSTEM_ATTRIBUTE_1,
             self::SYSTEM_ATTRIBUTE_2,
             self::REGULAR_ATTRIBUTE_1,
-            self::REGULAR_ATTRIBUTE_2
+            self::REGULAR_ATTRIBUTE_2,
+            self::BOOL_ATTRIBUTE_1,
         ];
 
         $configManager = $this->container->get('oro_entity_config.config_manager');

@@ -35,6 +35,7 @@ class LoadAttributeGroupData extends AbstractFixture implements DependentFixture
         'regular' => [
             self::REGULAR_ATTRIBUTE_GROUP_1 => [
                 LoadAttributeData::REGULAR_ATTRIBUTE_1,
+                LoadAttributeData::BOOL_ATTRIBUTE_1,
             ],
             self::REGULAR_ATTRIBUTE_GROUP_2 => [
                 LoadAttributeData::REGULAR_ATTRIBUTE_2,

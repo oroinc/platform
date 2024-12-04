@@ -99,7 +99,7 @@ abstract class AbstractImportExportTestCase extends WebTestCase
 
     protected function assertImportWorks(
         ImportExportConfigurationInterface $configuration,
-        string                             $importFilePath,
+        string                             $importFilePath
     ): void {
         $this->assertPreImportActionExecuted($configuration, $importFilePath);
         $preImportMessageData = $this->getOneSentMessageWithTopic(PreImportTopic::getName());

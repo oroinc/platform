@@ -34,7 +34,7 @@ define(function(require) {
             const title = __('Schema update confirmation');
             const content = `
                 <p>${__('Your config changes will be applied to schema.')}
-                <br>${__('It may take few minutes...')}</p>
+                <br>${__('It may take a few minutes...')}</p>
             `;
 
             $(el).on('click', e => {
