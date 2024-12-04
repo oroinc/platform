@@ -33,6 +33,7 @@ define(function(require, exports, module) {
             timezone: 'UTC',
             timezone_offset: '+00:00',
             format_address_by_address_country: true,
+            do_not_lowercase_noun_locales: false,
             apiKey: null,
             unit: {
                 temperature: 'fahrenheit',
@@ -422,6 +423,10 @@ define(function(require, exports, module) {
             }
 
             return possibleLocales;
+        },
+
+        isNotLowercaseNounLocales: function() {
+            return this.settings.do_not_lowercase_noun_locales;
         }
     };
 

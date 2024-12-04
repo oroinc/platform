@@ -21,10 +21,14 @@ use Twig\TwigFunction;
  *   - oro_timezone
  *   - oro_timezone_offset
  *   - oro_format_address_by_address_country
+ *   - oro_entity_do_not_lowercase_noun_locales
  */
 class LocaleExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
     private ContainerInterface $container;
+
+    private ?array $localesNotInLowercase;
+
     private ?LocaleSettings $localeSettings = null;
 
     public function __construct(ContainerInterface $container)
@@ -50,6 +54,10 @@ class LocaleExtension extends AbstractExtension implements ServiceSubscriberInte
             new TwigFunction(
                 'oro_format_address_by_address_country',
                 [$this, 'isFormatAddressByAddressCountry']
+            ),
+            new TwigFunction(
+                'oro_entity_do_not_lowercase_noun_locales',
+                [$this, 'isNotNeedToLowerCaseNounLocale']
             ),
         ];
     }
@@ -104,6 +112,15 @@ class LocaleExtension extends AbstractExtension implements ServiceSubscriberInte
         return $this->getLocaleSettings()->getCurrencySymbolByCurrency($currencyCode);
     }
 
+    public function isNotNeedToLowerCaseNounLocale(): bool
+    {
+        if (in_array($this->getLocale(), $this->localesNotInLowercase, true)) {
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * @return string
      */
@@ -155,5 +172,10 @@ class LocaleExtension extends AbstractExtension implements ServiceSubscriberInte
         }
 
         return $this->localeSettings;
+    }
+
+    public function setNotLowerCaseLocale(?array $localesNotInLowercase): void
+    {
+        $this->localesNotInLowercase = $localesNotInLowercase;
     }
 }

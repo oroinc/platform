@@ -27,6 +27,7 @@ class OroEntityExtensionTest extends \PHPUnit\Framework\TestCase
             $container->getDefinition('oro_entity.entity_name_provider.configurable')->getArgument('$fields')
         );
         self::assertNull($container->getParameter('oro_entity.default_query_cache_lifetime'));
+        self::assertEmpty($container->getParameter('oro_entity.do_not_lowercase_noun_locales'));
         self::assertEquals([], $container->getParameter('oro_entity.hidden_fields'));
     }
 
@@ -37,7 +38,8 @@ class OroEntityExtensionTest extends \PHPUnit\Framework\TestCase
 
         $config = [
             'entity_name_representation' => ['Test\Entity' => ['full' => ['name']]],
-            'default_query_cache_lifetime' => 123
+            'default_query_cache_lifetime' => 123,
+            'do_not_lowercase_noun_locales' => ['de_DE', 'lu_LU']
         ];
 
         $bundle1 = new TestBundle1();
@@ -59,6 +61,10 @@ class OroEntityExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertSame(
             $config['default_query_cache_lifetime'],
             $container->getParameter('oro_entity.default_query_cache_lifetime')
+        );
+        self::assertSame(
+            $config['do_not_lowercase_noun_locales'],
+            $container->getParameter('oro_entity.do_not_lowercase_noun_locales')
         );
         self::assertEquals(
             [
