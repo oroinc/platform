@@ -226,6 +226,9 @@ services:
         class: Oro\Bundle\LocaleBundle\Twig\LocaleExtension
         arguments:
             - '@oro_platform.twig.service_locator'
+        calls:
+            - [ setNotLowerCaseLocale, [ '%oro_entity.do_not_lowercase_noun_locales%' ] ]
+
         tags:
             - { name: twig.extension }
 
