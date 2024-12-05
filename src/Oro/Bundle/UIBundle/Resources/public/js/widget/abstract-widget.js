@@ -303,22 +303,24 @@ define(function(require) {
                 _.each(actions, function(action, idx) {
                     const $action = $(action);
                     let actionId = $action.data('action-name') || 'adopted_action_' + idx;
-                    switch (action.type && action.type.toLowerCase()) {
-                        case 'submit':
-                            const submitReplacement = $('<input type="submit" tabindex="-1" aria-hidden="true"/>');
-                            submitReplacement.css({
-                                position: 'absolute',
-                                [_.isRTL() ? 'right' : 'left']: '-9999px',
-                                top: '-9999px',
-                                width: '1px',
-                                height: '1px'
-                            });
-                            form.prepend(submitReplacement);
-                            actionId = 'form_submit';
-                            break;
-                        case 'reset':
-                            actionId = 'form_reset';
-                            break;
+                    if (actionId !== 'delete') {
+                        switch (action.type && action.type.toLowerCase()) {
+                            case 'submit':
+                                const submitReplacement = $('<input type="submit" tabindex="-1" aria-hidden="true"/>');
+                                submitReplacement.css({
+                                    position: 'absolute',
+                                    [_.isRTL() ? 'right' : 'left']: '-9999px',
+                                    top: '-9999px',
+                                    width: '1px',
+                                    height: '1px'
+                                });
+                                form.prepend(submitReplacement);
+                                actionId = 'form_submit';
+                                break;
+                            case 'reset':
+                                actionId = 'form_reset';
+                                break;
+                        }
                     }
                     self.actions.adopted[actionId] = $action;
                 });

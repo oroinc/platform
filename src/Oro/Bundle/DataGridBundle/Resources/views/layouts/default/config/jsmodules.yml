@@ -126,3 +126,4 @@ map:
         orodatagrid/templates/datagrid/action-launcher.html: orodatagrid/default/templates/datagrid/action-launcher.html
         orodatagrid/templates/datagrid/grid.html: orodatagrid/default/templates/datagrid/grid.html
         orodatagrid/templates/datagrid/no-data.html: orodatagrid/default/templates/datagrid/no-data.html
+        orodatagrid/templates/datagrid/toggle-group.html: orodatagrid/default/templates/datagrid/toggle-group.html
