@@ -23,12 +23,13 @@ class LocaleExtensionTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $this->localeSettings = $this->createMock(LocaleSettings::class);
+        $localesNotInLowercase = ['de-DE', 'lu_LU'];
 
         $container = self::getContainerBuilder()
             ->add(LocaleSettings::class, $this->localeSettings)
             ->getContainer($this);
 
-        $this->extension = new LocaleExtension($container);
+        $this->extension = new LocaleExtension($container, $localesNotInLowercase);
     }
 
     public function testGetTimeZoneOffset(): void
@@ -53,5 +54,34 @@ class LocaleExtensionTest extends \PHPUnit\Framework\TestCase
             ->willReturn(true);
 
         self::assertTrue(self::callTwigFunction($this->extension, 'oro_is_rtl_mode', []));
+    }
+
+    /**
+     * @dataProvider currentLocaleProvider
+     */
+    public function testIsNotNeedToLowerCaseNounLocale(string $locale, bool $expectedResult): void
+    {
+        $this->localeSettings->expects(self::any())
+            ->method('getLocale')
+            ->willReturn($locale);
+
+        self::assertSame(
+            $expectedResult,
+            self::callTwigFunction($this->extension, 'oro_entity_do_not_lowercase_noun_locales', [])
+        );
+    }
+
+    public function currentLocaleProvider(): array
+    {
+        return [
+            [
+                'locale' => 'de-DE',
+                'expectedResult' => true,
+            ],
+            [
+                'locale' => 'en-US',
+                'expectedResult' => false,
+            ]
+        ];
     }
 }

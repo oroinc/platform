@@ -10,6 +10,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\VarExporter\LazyObjectInterface;
 
 /**
  * The command aims to get the list of registered JS constraint converters
@@ -17,7 +18,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 class DebugJsConstraintConvertersCommand extends Command
 {
     protected static $defaultName = 'oro:debug:form:js-constraint-converters';
-
     protected static $defaultDescription =
         'Returns the list of registered JS constraint converters in order to priority';
 
@@ -34,15 +34,9 @@ class DebugJsConstraintConvertersCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $table = new Table($output);
-        $table->setHeaders([
-            'Order',
-            'Converter',
-        ]);
+        $table->setHeaders(['Order','Converter']);
         foreach ($this->converters as $order => $converter) {
-            $table->addRow([
-                $order,
-                $this->getRealClass($converter),
-            ]);
+            $table->addRow([$order, $this->getRealClass($converter)]);
         }
         $table->render();
 
@@ -51,10 +45,10 @@ class DebugJsConstraintConvertersCommand extends Command
 
     private function getRealClass(ConstraintConverterInterface $converter): string
     {
-        if ($converter instanceof LazyLoadingInterface) {
+        if ($converter instanceof LazyLoadingInterface || $converter instanceof LazyObjectInterface) {
             return get_parent_class($converter);
         }
 
-        return get_class($converter);
+        return \get_class($converter);
     }
 }

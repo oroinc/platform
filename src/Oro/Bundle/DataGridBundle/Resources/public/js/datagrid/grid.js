@@ -27,6 +27,7 @@ define(function(require) {
     const GridRowsCounter = require('./grid-rows-counter').default;
     const util = require('./util');
     const tools = require('oroui/js/tools');
+    const localeSettings = require('orolocale/js/locale-settings');
 
     /**
      * Basic grid class.
@@ -1205,8 +1206,12 @@ define(function(require) {
          */
         _defineNoDataBlock: function() {
             let messageHTML;
+            let noDataEntityHint = (this.entityHint || __(this.noDataTranslations.entityHint));
+            noDataEntityHint = localeSettings.isNotLowercaseNounLocales()
+                ? noDataEntityHint
+                : noDataEntityHint.toLowerCase();
             const placeholders = {
-                entityHint: (this.entityHint || __(this.noDataTranslations.entityHint)).toLowerCase()
+                entityHint: noDataEntityHint
             };
 
             if (this.noColumnsFlag || _.isEmpty(this.collection.state.filters)) {
@@ -1318,7 +1323,9 @@ define(function(require) {
                  * @event grid_load:complete
                  */
                 mediator.trigger('grid_load:complete', this.collection, this.$el);
-                this.initLayout();
+                this.initLayout({
+                    datagrid: this
+                });
                 this.trigger('content:update');
             }
         },

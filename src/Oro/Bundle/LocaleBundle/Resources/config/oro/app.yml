@@ -10,3 +10,6 @@ oro_entity:
         Oro\Bundle\LocaleBundle\Entity\Localization:
             full: [ name ]
             short: [ name ]
+    do_not_lowercase_noun_locales:
+        - 'de_DE'
+        - 'lb_LU'

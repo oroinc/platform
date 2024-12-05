@@ -7,6 +7,7 @@ use Oro\Bundle\MessageQueueBundle\Client\BufferedMessageProducer;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\DriverMessageCollector;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageCollector;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
+use Oro\Bundle\MessageQueueBundle\Test\Functional\SentMessagesStorage;
 use Oro\Component\MessageQueue\Client\Config;
 use Oro\Component\MessageQueue\Client\DriverInterface;
 use Oro\Component\MessageQueue\Client\Message;
@@ -54,7 +55,10 @@ class MessageQueueExtensionTest extends \PHPUnit\Framework\TestCase
     {
         if (null === self::$container) {
             self::$container = new Container();
-            $driverMessageCollector = new DriverMessageCollector($this->createMock(DriverInterface::class));
+            $driverMessageCollector = new DriverMessageCollector(
+                $this->createMock(DriverInterface::class),
+                new SentMessagesStorage()
+            );
             $messageProducer = $this->createMock(MessageProducerInterface::class);
             $messageProducer
                 ->expects(self::any())

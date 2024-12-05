@@ -19,4 +19,14 @@ class Contact
      */
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: ContactEmail::class, cascade: ['all'], orphanRemoval: true)]
     protected ?Collection $emails = null;
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 }
