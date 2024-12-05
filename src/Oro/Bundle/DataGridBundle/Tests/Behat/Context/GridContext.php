@@ -1901,6 +1901,45 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         }
     }
 
+    //@codingStandardsIgnoreStart
+    /**
+     * Example: And I click on "Delete" in "Product Kit Row 1 In Shopping List"
+     * Example: And I click on "Delete" in second "Product Kit Row In Shopping List"
+     * @Then /^(?:|I )click on "(?P<action>[^"]*)" in "(?P<elementName>[^"]*)"$/
+     * @Then /^(?:|I )click on "(?P<action>[^"]*)" in the (?P<rowNumber>[^"]*) "(?P<elementName>[^"]*)"$/
+     * @Then /^(?:|I )click on "(?P<action>[^"]*)" in the (?P<rowNumber>[^"]*) "(?P<elementName>[^"]*)" in grid "(?P<gridName>[^"]+)"$/
+     */
+    //@codingStandardsIgnoreEnd
+    public function clickOnActionForTheGridRowElementOnThePosition(
+        string $action,
+        string $elementName,
+        string $rowNumber = 'first',
+        string $gridName = null
+    ) {
+        $grid = $this->getGrid($gridName);
+        $rowElements = $grid->getRowElements($elementName);
+
+        static::assertContainsOnlyInstancesOf(
+            GridRow::class,
+            $rowElements,
+            sprintf('Element should be of type %s', GridRow::class)
+        );
+
+        $position = $this->oroMainContext->getPosition($rowNumber);
+        if ($position === null) {
+            self::fail(sprintf('Invalid line number search key %s', $rowNumber));
+        }
+        if (!array_key_exists($position, $rowElements)) {
+            self::fail(sprintf('"%s" not available at position %s', $elementName, $rowNumber));
+        }
+
+        /** @var GridRow $row */
+        $row = $rowElements[$position];
+
+        $link = $row->getActionLink($action);
+        $link?->click();
+    }
+
     /**
      * Expand grid view options.
      * Example: I click Options in grid view

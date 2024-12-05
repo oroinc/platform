@@ -51,5 +51,13 @@ macros('oroui', {
      * @param {Object|string} data.fill optional
      * @param {string?} data.ariaHidden optional
      */
-    renderIcon: require('tpl-loader!oroui/templates/macros/svg-icon.html')
+    renderIcon: require('tpl-loader!oroui/templates/macros/svg-icon.html'),
+
+    /**
+     * Renders a status label
+     * @param {string} data.label
+     * @param {string} data.current
+     * @param {Object} data.map
+     */
+    renderStatus: require('tpl-loader!oroui/templates/macros/status.html')
 });
