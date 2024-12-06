@@ -3,7 +3,6 @@
 namespace Oro\Bundle\FormBundle\Form\Extension\JsValidation;
 
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Range;
@@ -13,12 +12,9 @@ use Symfony\Component\Validator\Constraints\Range;
  */
 class RangeConstraintConverter implements ConstraintConverterInterface
 {
-    private ?PropertyAccessorInterface $propertyAccessor = null;
-
     public function __construct(
-        ?PropertyAccessorInterface $propertyAccessor = null
+        private readonly PropertyAccessorInterface $propertyAccessor
     ) {
-        $this->propertyAccessor = $propertyAccessor;
     }
 
     #[\Override]
@@ -27,18 +23,16 @@ class RangeConstraintConverter implements ConstraintConverterInterface
         return $constraint instanceof Range && !isset($constraint->payload['jsValidation']);
     }
 
-    /**
-     *
-     * @param Range $constraint
-     */
     #[\Override]
     public function convertConstraint(Constraint $constraint, ?FormInterface $form = null): ?Constraint
     {
+        /** @var Range $constraint */
+
         $convertedConstraint = clone $constraint;
-        if ($convertedConstraint->maxPropertyPath !== null || $convertedConstraint->minPropertyPath !== null) {
+        if (null !== $convertedConstraint->maxPropertyPath || null !== $convertedConstraint->minPropertyPath) {
             // Get the parent, because the current data is the numeric value
             $formData = $form?->getParent()?->getData();
-            if (is_object($formData)) {
+            if (\is_object($formData)) {
                 $this->setMaxValue($convertedConstraint, $formData);
                 $this->setMinValue($convertedConstraint, $formData);
             }
@@ -47,38 +41,25 @@ class RangeConstraintConverter implements ConstraintConverterInterface
         return $convertedConstraint;
     }
 
-    private function setMaxValue($convertedConstraint, $formData): void
+    private function setMaxValue(Range $constraint, object $formData): void
     {
-        if ($convertedConstraint->maxPropertyPath !== null && $convertedConstraint->max === null) {
-            if ($this->getPropertyAccessor()->isReadable($formData, $convertedConstraint->maxPropertyPath)) {
-                $convertedConstraint->max = $this->getPropertyAccessor()->getValue(
-                    $formData,
-                    $convertedConstraint->maxPropertyPath
-                );
-                $convertedConstraint->maxPropertyPath = null;
-            }
+        if (null !== $constraint->maxPropertyPath
+            && null === $constraint->max
+            && $this->propertyAccessor->isReadable($formData, $constraint->maxPropertyPath)
+        ) {
+            $constraint->max = $this->propertyAccessor->getValue($formData, $constraint->maxPropertyPath);
+            $constraint->maxPropertyPath = null;
         }
     }
 
-    private function setMinValue($convertedConstraint, $formData): void
+    private function setMinValue(Range $constraint, object $formData): void
     {
-        if ($convertedConstraint->minPropertyPath !== null && $convertedConstraint->min === null) {
-            if ($this->getPropertyAccessor()->isReadable($formData, $convertedConstraint->minPropertyPath)) {
-                $convertedConstraint->min = $this->getPropertyAccessor()->getValue(
-                    $formData,
-                    $convertedConstraint->minPropertyPath
-                );
-                $convertedConstraint->minPropertyPath = null;
-            }
+        if (null !== $constraint->minPropertyPath
+            && null === $constraint->min
+            && $this->propertyAccessor->isReadable($formData, $constraint->minPropertyPath)
+        ) {
+            $constraint->min = $this->propertyAccessor->getValue($formData, $constraint->minPropertyPath);
+            $constraint->minPropertyPath = null;
         }
-    }
-
-    private function getPropertyAccessor(): PropertyAccessorInterface
-    {
-        if (null === $this->propertyAccessor) {
-            $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
-        }
-
-        return $this->propertyAccessor;
     }
 }

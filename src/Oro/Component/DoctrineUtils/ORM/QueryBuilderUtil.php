@@ -282,13 +282,27 @@ class QueryBuilderUtil
         return $result;
     }
 
-    /**
-     * @param string $prefix
-     *
-     * @return string
-     */
-    public static function generateParameterName($prefix)
+    public static function generateParameterName(string $prefix, ?QueryBuilder $qb = null): string
     {
+        if (null !== $qb) {
+            if (!$prefix) {
+                throw new \InvalidArgumentException('Empty value passed');
+            }
+            self::checkField($prefix);
+
+            if (null === $qb->getParameter($prefix)) {
+                return $prefix;
+            }
+
+            $i = 0;
+            do {
+                $i++;
+                $parameterName = $prefix . $i;
+            } while (null !== $qb->getParameter($parameterName));
+
+            return $parameterName;
+        }
+
         self::checkField($prefix);
         static $n = 0;
         $n++;

@@ -7,8 +7,6 @@ use Symfony\Component\Validator\Constraint;
 
 /**
  * Represents a service to convert a validation constraint to a form suitable for JS validation.
- *
- * Interface that all ConstraintConverters (tag oro_form.extension.js_validation.constraint_converter) should implement
  */
 interface ConstraintConverterInterface
 {
