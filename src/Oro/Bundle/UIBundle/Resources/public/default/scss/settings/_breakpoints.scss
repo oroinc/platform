@@ -6,6 +6,8 @@
 $oro-breakpoints: (
     'desktop':
         '(min-width: #{$breakpoint-desktop})',
+    'desktop-big':
+        '(min-width: #{$breakpoint-desktop-big})',
     'desktop-small':
         '(min-width: #{$breakpoint-desktop-small})',
     'tablet-big':

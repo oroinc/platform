@@ -2,8 +2,15 @@
 
 @import 'theme-configuration-preview';
 
-.theme-configuration-options [type=radio] + label {
-    display: inline;
+.theme-configuration-options {
+    [type=radio] + label {
+        display: inline;
+    }
+
+    .simplecolorpicker {
+        padding-right: 0;
+        padding-left: 0;
+    }
 }
 
 .control-group-preview {

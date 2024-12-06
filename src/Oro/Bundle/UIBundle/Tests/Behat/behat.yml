@@ -103,6 +103,12 @@ oro_behat_extension:
     UiWindow ActionPanel:
       selector: 'div.modal .modal-footer'
 
+    UiPopover:
+      selector: 'div.popover'
+
+    UiPopover Submit Button:
+      selector: 'div.popover .btn[type="submit"]'
+
     ContextSelector:
       selector:
         type: xpath

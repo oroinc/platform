@@ -50,6 +50,9 @@ class AstVisitor extends Visitor
             case Expr\Comparison::CONTAINS:
                 $resultExpression = $this->walkContainsComparison($comparison);
                 break;
+            case Expr\Comparison::MEMBEROF:
+                $resultExpression = $this->walkMemberOfComparison($comparison);
+                break;
             default:
                 $resultExpression = new AST\ComparisonExpression(
                     $this->walkOperand($comparison->getLeftOperand()),
@@ -146,38 +149,46 @@ class AstVisitor extends Visitor
             ));
         }
         $associationMapping = $sourceMetadata->associationMappings[$associationName];
-        if (!($associationMapping['type'] & ClassMetadataInfo::TO_ONE)) {
-            throw new \RuntimeException(\sprintf(
-                'Parameter of Association expression should be to-one association. Given name: \'%s\'.',
-                $associationName
-            ));
-        }
+
         $targetEntityAlias = \sprintf('_%s__%s_', $alias, $associationName);
         $targetEntityClass = $associationMapping['targetEntity'];
-
         /** @var ClassMetadataInfo $targetEntityMetadata */
         $targetMetadata = $this->em->getClassMetadata($targetEntityClass);
 
         $queryComponentRelation = $associationMapping;
-        if ($associationMapping['isOwningSide']) {
-            $leftPathExpression = new Expr\Path($targetMetadata->getSingleIdentifierFieldName(), $targetEntityAlias);
-            $rightPathExpression = new Expr\Path($associationName, $alias);
+        if (($associationMapping['type'] & ClassMetadataInfo::TO_ONE)) {
+            if ($associationMapping['isOwningSide']) {
+                $leftPathExpression = new Expr\Path(
+                    $targetMetadata->getSingleIdentifierFieldName(),
+                    $targetEntityAlias
+                );
+                $rightPathExpression = new Expr\Path($associationName, $alias);
+            } else {
+                $mappedBy = $associationMapping['mappedBy'];
+                $queryComponentRelation = $targetMetadata->associationMappings[$mappedBy];
+                $leftPathExpression = new Expr\Path($targetMetadata->getSingleIdentifierFieldName(), $alias);
+                $rightPathExpression = new Expr\Path($mappedBy, $targetEntityAlias);
+            }
+
+            $expression = new Expr\Comparison($leftPathExpression, Expr\Comparison::EQ, $rightPathExpression);
+        } elseif (($associationMapping['type'] & ClassMetadataInfo::MANY_TO_MANY)) {
+            $sourceMetadata = $this->em->getClassMetadata($associationMapping['sourceEntity']);
+            $leftExpression = new Expr\Path($sourceMetadata->getSingleIdentifierFieldName(), $alias);
+
+            $queryComponentRelation = $targetMetadata->associationMappings[$associationMapping['inversedBy']];
+            $rightPathExpression = new Expr\Path($associationMapping['inversedBy'], $targetEntityAlias);
+
+            $expression = new Expr\Comparison($leftExpression, Expr\Comparison::MEMBEROF, $rightPathExpression);
         } else {
-            $mappedBy = $associationMapping['mappedBy'];
-            $queryComponentRelation = $targetMetadata->associationMappings[$mappedBy];
-            $leftPathExpression = new Expr\Path($targetMetadata->getSingleIdentifierFieldName(), $alias);
-            $rightPathExpression = new Expr\Path($mappedBy, $targetEntityAlias);
+            throw new \RuntimeException(\sprintf(
+                'Parameter of Association expression should be to-one or many-to-many association. Given name: \'%s\'.',
+                $associationName
+            ));
         }
 
-        $this->queryComponents->add(
-            $targetEntityAlias,
-            new QueryComponent($targetMetadata, $queryComponentRelation)
-        );
-
+        $this->queryComponents->add($targetEntityAlias, new QueryComponent($targetMetadata, $queryComponentRelation));
         $subqueryCriteria = new Criteria(AccessRuleWalker::ORM_RULES_TYPE, $targetEntityClass, $targetEntityAlias);
-        $subqueryCriteria->andExpression(
-            new Expr\Comparison($leftPathExpression, Expr\Comparison::EQ, $rightPathExpression)
-        );
+        $subqueryCriteria->andExpression($expression);
 
         $existExpression = new Expr\Exists(
             new Expr\Subquery(
@@ -286,7 +297,7 @@ class AstVisitor extends Visitor
         }
         $rightOperand = $comparison->getRightOperand();
         if (!$rightOperand instanceof Expr\Value) {
-            throw new \RuntimeException('The left operand for CONTAINS comparison must be a value.');
+            throw new \RuntimeException('The right operand for CONTAINS comparison must be a value.');
         }
 
         $fieldType = $this->getMetadata($leftOperand->getAlias() ?: $this->alias)
@@ -304,6 +315,20 @@ class AstVisitor extends Visitor
             $this->walkOperand($leftOperand),
             self::LIKE,
             $this->getValueLiteral('%' . $rightOperand->getValue() . '%')
+        );
+    }
+
+    private function walkMemberOfComparison(Expr\Comparison $comparison): AST\Node
+    {
+        $leftOperand = $comparison->getLeftOperand();
+        $rightOperand = $comparison->getRightOperand();
+        if (!$rightOperand instanceof Expr\Path) {
+            throw new \RuntimeException('The right operand for CONTAINS comparison must be a path.');
+        }
+
+        return new AST\CollectionMemberExpression(
+            $leftOperand->visit($this),
+            $this->walkPath($rightOperand)
         );
     }
 

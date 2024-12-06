@@ -26,6 +26,7 @@ define(function(require) {
     const BaseCollectionView = require('oroui/js/app/views/base/collection-view');
     const LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
     const scrollHelper = require('oroui/js/tools/scroll-helper');
+    const localeSettings = require('orolocale/js/locale-settings');
 
     const BoardView = BaseView.extend({
         /**
@@ -168,9 +169,14 @@ define(function(require) {
             let messageHTML;
             const grid = this.boardPlugin.main.grid;
             const noDataVisible = this.serverCollection.models.length <= 0;
+            let noDataEntityHint = (grid.entityHint || __(grid.noDataTranslations.entityHint));
+            noDataEntityHint = localeSettings.isNotLowercaseNounLocales()
+                ? noDataEntityHint
+                : noDataEntityHint.toLowerCase();
+
             if (noDataVisible) {
                 const placeholders = {
-                    entityHint: (grid.entityHint || __(grid.noDataTranslations.entityHint)).toLowerCase()
+                    entityHint: noDataEntityHint
                 };
 
                 if (_.isEmpty(this.serverCollection.state.filters)) {

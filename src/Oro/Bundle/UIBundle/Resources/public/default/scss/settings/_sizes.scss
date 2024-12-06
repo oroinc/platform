@@ -4,6 +4,7 @@ $site-width: 1920px !default;
 
 // @Notice! Named Breakpoints have been chosen due to its names are used in configuration for menu, GrapesJS, Viewport manager, etc.
 $breakpoint-desktop: 1366px !default;
+$breakpoint-desktop-big: 1600px !default;
 $breakpoint-desktop-small: 1280px !default;
 $breakpoint-tablet: $breakpoint-desktop-small - 1px !default;
 $breakpoint-tablet-small: 992px !default;
