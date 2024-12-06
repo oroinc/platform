@@ -634,22 +634,7 @@ define(function(require) {
             } else {
                 this._checkCurrentState();
 
-                const title = this.renderTitle();
-                const actions = this._getViewActions();
-
-                content = this.template({
-                    title: title,
-                    titleLabel: this.title,
-                    disabled: !this.enabled,
-                    choices: this.getViewChoices(),
-                    current: this.collection.state.gridView,
-                    dirty: this.viewDirty,
-                    editedLabel: __('oro.datagrid.gridView.data_edited'),
-                    actionsLabel: __('oro.datagrid.gridView.actions'),
-                    actions: actions,
-                    showActions: this.showActions(actions),
-                    gridViewId: this.cid
-                });
+                content = this.template(this.getTemplateData());
             }
 
             this.$el.html(content);
@@ -657,6 +642,25 @@ define(function(require) {
             mediator.trigger('layout:reposition');
 
             return this;
+        },
+
+        getTemplateData() {
+            const title = this.renderTitle();
+            const actions = this._getViewActions();
+
+            return {
+                title: title,
+                titleLabel: this.title,
+                disabled: !this.enabled,
+                choices: this.getViewChoices(),
+                current: this.collection.state.gridView,
+                dirty: this.viewDirty,
+                editedLabel: __('oro.datagrid.gridView.data_edited'),
+                actionsLabel: __('oro.datagrid.gridView.actions'),
+                actions: actions,
+                showActions: this.showActions(actions),
+                gridViewId: this.cid
+            };
         },
 
         /**
