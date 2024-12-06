@@ -14,16 +14,10 @@ use Symfony\Component\Validator\Constraint;
  */
 class GenericConstraintConverter implements ConstraintConverterInterface
 {
-    private ConstraintFactory $constraintFactory;
-
-    private ConstraintConverterInterface $constraintConverter;
-
     public function __construct(
-        ConstraintFactory $constraintFactory,
-        ConstraintConverterInterface $constraintConverter,
+        private readonly ConstraintFactory $constraintFactory,
+        private readonly ConstraintConverterInterface $constraintConverter,
     ) {
-        $this->constraintFactory = $constraintFactory;
-        $this->constraintConverter = $constraintConverter;
     }
 
     #[\Override]

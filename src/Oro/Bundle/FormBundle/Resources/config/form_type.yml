@@ -211,12 +211,6 @@ services:
         arguments:
             - !tagged_iterator oro_form.extension.js_validation.constraint_converter
 
-    Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintConverter:
-        alias: oro_form.extension.js_validation.constraint_converter
-
-    Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintConverterInterface:
-        alias: oro_form.extension.js_validation.constraint_converter
-
     oro_form.extension.js_validation.constraint_converter.generic:
         class: Oro\Bundle\FormBundle\Form\Extension\JsValidation\GenericConstraintConverter
         arguments:
