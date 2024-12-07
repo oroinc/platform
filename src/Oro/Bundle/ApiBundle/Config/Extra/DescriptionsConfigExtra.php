@@ -12,6 +12,24 @@ class DescriptionsConfigExtra implements ConfigExtraInterface
 {
     public const NAME = 'descriptions';
 
+    private ?string $documentationAction = null;
+
+    /**
+     * Gets an action name for which fields' descriptions are requested.
+     */
+    public function getDocumentationAction(): ?string
+    {
+        return $this->documentationAction;
+    }
+
+    /**
+     * Sets an action name for which fields' descriptions are requested.
+     */
+    public function setDocumentationAction(?string $documentationAction): void
+    {
+        $this->documentationAction = $documentationAction;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -41,6 +59,11 @@ class DescriptionsConfigExtra implements ConfigExtraInterface
      */
     public function getCacheKeyPart(): ?string
     {
-        return self::NAME;
+        $result = self::NAME;
+        if ($this->documentationAction) {
+            $result .= ':' . $this->documentationAction;
+        }
+
+        return $result;
     }
 }

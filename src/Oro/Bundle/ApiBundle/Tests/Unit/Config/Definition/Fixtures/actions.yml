@@ -549,6 +549,14 @@ request_target_class_for_not_allowed_action:
     expected: []
     error: 'Invalid configuration for path "entity.actions": The "request_target_class" option is not allowed for the "create" action. This option is allowed for the following actions: "update_subresource", "add_subresource", "delete_subresource".'
 
+request_documentation_action_for_not_allowed_action:
+    config:
+        actions:
+            create:
+                request_documentation_action: some_action
+    expected: []
+    error: 'Invalid configuration for path "entity.actions": The "request_documentation_action" option is not allowed for the "create" action. This option is allowed for the following actions: "update_subresource", "add_subresource", "delete_subresource".'
+
 actions_collections:
     config:
         actions:

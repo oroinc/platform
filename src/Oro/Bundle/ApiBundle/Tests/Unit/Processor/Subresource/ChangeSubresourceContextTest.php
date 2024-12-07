@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource;
 
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\Extra\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\HateoasConfigExtra;
@@ -133,7 +134,109 @@ class ChangeSubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getRequestClassName());
     }
 
-    public function testLoadRequestConfig(): void
+    public function testSetRequestClassName(): void
+    {
+        $requestEntityClass = 'Test\RequestClass';
+
+        $this->configProvider->expects(self::never())
+            ->method('getConfig');
+
+        $this->context->setRequestClassName($requestEntityClass);
+
+        self::assertEquals($requestEntityClass, $this->context->getRequestClassName());
+    }
+
+    public function testGetRequestDocumentationAction(): void
+    {
+        $version = '1.1';
+        $requestType = 'rest';
+        $action = 'update_subresource';
+        $isCollection = true;
+        $parentEntityClass = 'Test\ParentClass';
+        $associationName = 'test';
+        $requestDocumentationAction = 'request_action';
+
+        $parentEntityConfig = new EntityDefinitionConfig();
+        $parentEntityConfig->setExcludeAll();
+        $parentEntityConfig->set(ConfigUtil::REQUEST_DOCUMENTATION_ACTION, $requestDocumentationAction);
+
+        $this->context->setVersion($version);
+        $this->context->getRequestType()->add($requestType);
+        $this->context->setAction($action);
+        $this->context->setIsCollection($isCollection);
+        $this->context->setParentClassName($parentEntityClass);
+        $this->context->setAssociationName($associationName);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                $parentEntityClass,
+                $version,
+                new RequestType([$requestType]),
+                [
+                    new EntityDefinitionConfigExtra($action, $isCollection, $parentEntityClass, $associationName),
+                    new FilterFieldsConfigExtra([$parentEntityClass => [$associationName]])
+                ]
+            )
+            ->willReturn($this->getConfig([ConfigUtil::DEFINITION => $parentEntityConfig]));
+
+        self::assertEquals($requestDocumentationAction, $this->context->getRequestDocumentationAction());
+
+        // test that the parent config is loaded only once
+        self::assertEquals($requestDocumentationAction, $this->context->getRequestDocumentationAction());
+    }
+
+    public function testGetRequestDocumentationActionWhenItIsNotConfigured(): void
+    {
+        $version = '1.1';
+        $requestType = 'rest';
+        $action = 'update_subresource';
+        $isCollection = true;
+        $parentEntityClass = 'Test\ParentClass';
+        $associationName = 'test';
+
+        $parentEntityConfig = new EntityDefinitionConfig();
+        $parentEntityConfig->setExcludeAll();
+
+        $this->context->setVersion($version);
+        $this->context->getRequestType()->add($requestType);
+        $this->context->setAction($action);
+        $this->context->setIsCollection($isCollection);
+        $this->context->setParentClassName($parentEntityClass);
+        $this->context->setAssociationName($associationName);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                $parentEntityClass,
+                $version,
+                new RequestType([$requestType]),
+                [
+                    new EntityDefinitionConfigExtra($action, $isCollection, $parentEntityClass, $associationName),
+                    new FilterFieldsConfigExtra([$parentEntityClass => [$associationName]])
+                ]
+            )
+            ->willReturn($this->getConfig([ConfigUtil::DEFINITION => $parentEntityConfig]));
+
+        self::assertNull($this->context->getRequestDocumentationAction());
+
+        // test that the parent config is loaded only once
+        self::assertNull($this->context->getRequestDocumentationAction());
+    }
+
+    public function testSetRequestDocumentationAction(): void
+    {
+        $requestDocumentationAction = 'request_action';
+
+        $this->configProvider->expects(self::never())
+            ->method('getConfig');
+
+        $this->context->setRequestDocumentationAction($requestDocumentationAction);
+
+        self::assertEquals($requestDocumentationAction, $this->context->getRequestDocumentationAction());
+    }
+
+    public function testLoadRequestConfigWithRequestClassName(): void
     {
         $version = '1.1';
         $requestType = 'rest';
@@ -161,6 +264,134 @@ class ChangeSubresourceContextTest extends \PHPUnit\Framework\TestCase
             ->method('getConfig')
             ->with(
                 $requestEntityClass,
+                $version,
+                new RequestType([$requestType]),
+                $entityConfigExtras
+            )
+            ->willReturn($this->getConfig([ConfigUtil::DEFINITION => $requestEntityConfig]));
+
+        self::assertSame($requestEntityConfig, $this->context->getRequestConfig()); // load config
+
+        // test that a config is loaded only once
+        self::assertSame($requestEntityConfig, $this->context->getRequestConfig());
+    }
+
+    public function testLoadRequestConfigWithRequestClassNameAndRequestDocumentationAction(): void
+    {
+        $version = '1.1';
+        $requestType = 'rest';
+        $action = 'update_subresource';
+        $requestEntityClass = 'Test\RequestClass';
+        $requestDocumentationAction = 'request_action';
+
+        $parentEntityConfig = new EntityDefinitionConfig();
+        $parentEntityConfig->setExcludeAll();
+        $parentEntityConfig->set(ConfigUtil::REQUEST_TARGET_CLASS, $requestEntityClass);
+        $parentEntityConfig->set(ConfigUtil::REQUEST_DOCUMENTATION_ACTION, $requestDocumentationAction);
+
+        $requestEntityConfig = new EntityDefinitionConfig();
+        $requestEntityConfig->setExcludeAll();
+        $entityConfigExtras = [new EntityDefinitionConfigExtra($action), new DescriptionsConfigExtra()];
+        $requestEntityDescriptionsConfigExtra = new DescriptionsConfigExtra();
+        $requestEntityDescriptionsConfigExtra->setDocumentationAction($requestDocumentationAction);
+        $requestEntityConfigExtras = [$entityConfigExtras[0], $requestEntityDescriptionsConfigExtra];
+
+        $this->context->setVersion($version);
+        $this->context->getRequestType()->add($requestType);
+        $this->context->setAction($action);
+        $this->context->setParentClassName('Test\ParentClass');
+        $this->context->setAssociationName('test');
+        $this->context->setClassName('Test\Class');
+        $this->context->setConfigExtras($entityConfigExtras);
+        $this->context->setParentConfig($parentEntityConfig);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                $requestEntityClass,
+                $version,
+                new RequestType([$requestType]),
+                $requestEntityConfigExtras
+            )
+            ->willReturn($this->getConfig([ConfigUtil::DEFINITION => $requestEntityConfig]));
+
+        self::assertSame($requestEntityConfig, $this->context->getRequestConfig()); // load config
+
+        // test that a config is loaded only once
+        self::assertSame($requestEntityConfig, $this->context->getRequestConfig());
+    }
+
+    public function testLoadRequestConfigWithoutRequestClassNameAndWithRequestDocumentationAction(): void
+    {
+        $version = '1.1';
+        $requestType = 'rest';
+        $action = 'update_subresource';
+        $requestDocumentationAction = 'request_action';
+
+        $parentEntityConfig = new EntityDefinitionConfig();
+        $parentEntityConfig->setExcludeAll();
+        $parentEntityConfig->set(ConfigUtil::REQUEST_DOCUMENTATION_ACTION, $requestDocumentationAction);
+
+        $requestEntityConfig = new EntityDefinitionConfig();
+        $requestEntityConfig->setExcludeAll();
+        $entityConfigExtras = [new EntityDefinitionConfigExtra($action), new DescriptionsConfigExtra()];
+        $requestEntityDescriptionsConfigExtra = new DescriptionsConfigExtra();
+        $requestEntityDescriptionsConfigExtra->setDocumentationAction($requestDocumentationAction);
+        $requestEntityConfigExtras = [$entityConfigExtras[0], $requestEntityDescriptionsConfigExtra];
+
+        $this->context->setVersion($version);
+        $this->context->getRequestType()->add($requestType);
+        $this->context->setAction($action);
+        $this->context->setParentClassName('Test\ParentClass');
+        $this->context->setAssociationName('test');
+        $this->context->setClassName('Test\Class');
+        $this->context->setConfigExtras($entityConfigExtras);
+        $this->context->setParentConfig($parentEntityConfig);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                'Test\Class',
+                $version,
+                new RequestType([$requestType]),
+                $requestEntityConfigExtras
+            )
+            ->willReturn($this->getConfig([ConfigUtil::DEFINITION => $requestEntityConfig]));
+
+        self::assertSame($requestEntityConfig, $this->context->getRequestConfig()); // load config
+
+        // test that a config is loaded only once
+        self::assertSame($requestEntityConfig, $this->context->getRequestConfig());
+    }
+
+    public function testLoadRequestConfigWithRequestDocumentationActionAndWithoutDescriptionsConfigExtra(): void
+    {
+        $version = '1.1';
+        $requestType = 'rest';
+        $action = 'update_subresource';
+        $requestDocumentationAction = 'request_action';
+
+        $parentEntityConfig = new EntityDefinitionConfig();
+        $parentEntityConfig->setExcludeAll();
+        $parentEntityConfig->set(ConfigUtil::REQUEST_DOCUMENTATION_ACTION, $requestDocumentationAction);
+
+        $requestEntityConfig = new EntityDefinitionConfig();
+        $requestEntityConfig->setExcludeAll();
+        $entityConfigExtras = [new EntityDefinitionConfigExtra($action)];
+
+        $this->context->setVersion($version);
+        $this->context->getRequestType()->add($requestType);
+        $this->context->setAction($action);
+        $this->context->setParentClassName('Test\ParentClass');
+        $this->context->setAssociationName('test');
+        $this->context->setClassName('Test\Class');
+        $this->context->setConfigExtras($entityConfigExtras);
+        $this->context->setParentConfig($parentEntityConfig);
+
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with(
+                'Test\Class',
                 $version,
                 new RequestType([$requestType]),
                 $entityConfigExtras
