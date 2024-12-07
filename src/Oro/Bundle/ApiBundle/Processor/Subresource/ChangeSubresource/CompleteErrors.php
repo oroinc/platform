@@ -1,9 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Shared;
+namespace Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource;
 
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Processor\Shared\CompleteErrorsTrait;
+use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresourceContext;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -30,7 +31,7 @@ class CompleteErrors implements ProcessorInterface
     #[\Override]
     public function process(ContextInterface $context): void
     {
-        /** @var Context $context */
+        /** @var ChangeSubresourceContext $context */
 
         if (!$context->hasErrors()) {
             // no errors
@@ -42,19 +43,22 @@ class CompleteErrors implements ProcessorInterface
             $context->getErrors(),
             $this->errorCompleterRegistry->getErrorCompleter($requestType),
             $requestType,
-            $this->getMetadata($context)
+            $this->getRequestMetadata($context)
         );
         $this->removeDuplicates($context);
     }
 
-    private function getMetadata(Context $context): ?EntityMetadata
+    private function getRequestMetadata(ChangeSubresourceContext $context): ?EntityMetadata
     {
-        if (!$this->isEntityClass($context->getClassName())) {
+        if (!$this->isEntityClass($context->getParentClassName())) {
+            return null;
+        }
+        if (!$this->isEntityClass($context->getRequestClassName())) {
             return null;
         }
 
         try {
-            return $context->getMetadata();
+            return $context->getRequestMetadata();
         } catch (\Exception $e) {
             return null;
         }

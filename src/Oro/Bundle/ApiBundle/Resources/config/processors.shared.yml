@@ -1361,9 +1361,6 @@ services:
             - { name: oro.api.processor, action: update, group: normalize_result, priority: -10 }
             - { name: oro.api.processor, action: update_list, group: normalize_result, priority: -10 }
             - { name: oro.api.processor, action: get_subresource, group: normalize_result, priority: -10 }
-            - { name: oro.api.processor, action: delete_subresource, group: normalize_result, priority: -10 }
-            - { name: oro.api.processor, action: add_subresource, group: normalize_result, priority: -10 }
-            - { name: oro.api.processor, action: update_subresource, group: normalize_result, priority: -10 }
             - { name: oro.api.processor, action: get_relationship, group: normalize_result, priority: -10 }
             - { name: oro.api.processor, action: delete_relationship, group: normalize_result, priority: -10 }
             - { name: oro.api.processor, action: add_relationship, group: normalize_result, priority: -10 }
