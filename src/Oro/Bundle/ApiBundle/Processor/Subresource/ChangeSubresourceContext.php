@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\Subresource;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\Extra\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
@@ -13,6 +14,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 class ChangeSubresourceContext extends ChangeRelationshipContext
 {
     private string|null|false $requestClassName = false;
+    private string|null|false $requestDocumentationAction = false;
     private EntityDefinitionConfig|null|bool $requestConfig = false;
     private EntityMetadata|null|bool $requestMetadata = false;
 
@@ -37,15 +39,53 @@ class ChangeSubresourceContext extends ChangeRelationshipContext
     }
 
     /**
+     * Gets an action that should be used to get the request entity documentation.
+     */
+    public function getRequestDocumentationAction(): ?string
+    {
+        if (false === $this->requestDocumentationAction) {
+            $this->requestDocumentationAction = $this->getParentConfig()
+                ?->get(ConfigUtil::REQUEST_DOCUMENTATION_ACTION);
+        }
+
+        return $this->requestDocumentationAction;
+    }
+
+    /**
+     * Sets an action that should be used to get the request entity documentation.
+     */
+    public function setRequestDocumentationAction(?string $action): void
+    {
+        $this->requestDocumentationAction = $action;
+    }
+
+    /**
      * Gets a configuration of the request entity.
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getRequestConfig(): ?EntityDefinitionConfig
     {
         if (false === $this->requestConfig) {
             $this->requestConfig = true;
+            $isLoadEntityConfigRequired = false;
+            $configExtras = $this->getConfigExtras();
+            $documentationAction = $this->getRequestDocumentationAction();
+            if ($documentationAction) {
+                $descriptionsConfigExtraKey = $this->findDescriptionsConfigExtraKey($configExtras);
+                if (null !== $descriptionsConfigExtraKey) {
+                    $configExtras[$descriptionsConfigExtraKey] = new DescriptionsConfigExtra($documentationAction);
+                    $isLoadEntityConfigRequired = true;
+                }
+            }
             $entityClass = $this->getRequestClassName();
             if ($entityClass && $entityClass !== $this->getClassName()) {
-                $requestConfig = $this->loadEntityConfig($entityClass, $this->getConfigExtras())->getDefinition();
+                $isLoadEntityConfigRequired = true;
+            }
+            if ($isLoadEntityConfigRequired) {
+                if (!$entityClass) {
+                    $entityClass = $this->getClassName();
+                }
+                $requestConfig = $this->loadEntityConfig($entityClass, $configExtras)->getDefinition();
                 if (null !== $requestConfig) {
                     $this->requestConfig = $requestConfig;
                 }
@@ -118,5 +158,16 @@ class ChangeSubresourceContext extends ChangeRelationshipContext
     public function setRequestMetadata(?EntityMetadata $metadata): void
     {
         $this->requestMetadata = $metadata;
+    }
+
+    private function findDescriptionsConfigExtraKey(array $configExtras): ?int
+    {
+        foreach ($configExtras as $key => $extra) {
+            if ($extra instanceof DescriptionsConfigExtra) {
+                return $key;
+            }
+        }
+
+        return null;
     }
 }

@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserRegistry;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProvider;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\Extra\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions;
@@ -2597,6 +2598,107 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
                 'exclusion_policy'       => 'all',
                 'identifier_description' => self::ID_DESCRIPTION,
                 'documentation'          => $subresourceDocumentation
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testChangeSubresourceDocumentationWithoutCustomRequestDocumentationAction()
+    {
+        $parentEntityClass = TestEntity::class;
+        $associationName = 'testAssociation';
+        $targetAction = 'add_subresource';
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'testField' => null
+            ]
+        ];
+        $associationDescription = 'test association';
+        $subresourceDocumentation = 'Change test association';
+        $fieldDocumentation = 'field documentation';
+
+        $this->entityDescriptionProvider->expects(self::once())
+            ->method('humanizeAssociationName')
+            ->with($associationName)
+            ->willReturn($associationDescription);
+        $this->resourceDocProvider->expects(self::once())
+            ->method('getSubresourceDocumentation')
+            ->with($targetAction, $associationDescription, false)
+            ->willReturn($subresourceDocumentation);
+        $this->resourceDocParser->expects(self::once())
+            ->method('getFieldDocumentation')
+            ->with($parentEntityClass, 'testField', $targetAction)
+            ->willReturn($fieldDocumentation);
+
+        $this->context->setParentClassName($parentEntityClass);
+        $this->context->setAssociationName($associationName);
+        $this->context->setTargetAction($targetAction);
+        $this->context->setExtra(new DescriptionsConfigExtra());
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => self::ID_DESCRIPTION,
+                'documentation'          => $subresourceDocumentation,
+                'fields'                 => [
+                    'testField' => [
+                        'description' => $fieldDocumentation
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testChangeSubresourceDocumentationWithCustomRequestDocumentationAction()
+    {
+        $parentEntityClass = TestEntity::class;
+        $associationName = 'testAssociation';
+        $targetAction = 'add_subresource';
+        $requestDocumentationAction = 'some_action';
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'testField' => null
+            ]
+        ];
+        $associationDescription = 'test association';
+        $subresourceDocumentation = 'Change test association';
+        $fieldDocumentation = 'field documentation';
+
+        $this->entityDescriptionProvider->expects(self::once())
+            ->method('humanizeAssociationName')
+            ->with($associationName)
+            ->willReturn($associationDescription);
+        $this->resourceDocProvider->expects(self::once())
+            ->method('getSubresourceDocumentation')
+            ->with($targetAction, $associationDescription, false)
+            ->willReturn($subresourceDocumentation);
+        $this->resourceDocParser->expects(self::once())
+            ->method('getFieldDocumentation')
+            ->with($parentEntityClass, 'testField', $requestDocumentationAction)
+            ->willReturn($fieldDocumentation);
+
+        $this->context->setParentClassName($parentEntityClass);
+        $this->context->setAssociationName($associationName);
+        $this->context->setTargetAction($targetAction);
+        $this->context->setExtra(new DescriptionsConfigExtra($requestDocumentationAction));
+        $this->context->setResult($this->createConfigObject($config));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy'       => 'all',
+                'identifier_description' => self::ID_DESCRIPTION,
+                'documentation'          => $subresourceDocumentation,
+                'fields'                 => [
+                    'testField' => [
+                        'description' => $fieldDocumentation
+                    ]
+                ]
             ],
             $this->context->getResult()
         );
