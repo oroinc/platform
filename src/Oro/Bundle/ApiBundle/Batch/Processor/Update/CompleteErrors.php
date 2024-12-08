@@ -3,9 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Batch\Processor\Update;
 
 use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateItem;
-use Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\BatchUpdateItemContext;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Processor\Shared\CompleteErrorsTrait;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -20,6 +19,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class CompleteErrors implements ProcessorInterface
 {
+    use CompleteErrorsTrait;
+
     private ErrorCompleterRegistry $errorCompleterRegistry;
 
     public function __construct(ErrorCompleterRegistry $errorCompleterRegistry)
@@ -36,63 +37,22 @@ class CompleteErrors implements ProcessorInterface
 
         $requestType = $context->getRequestType();
         $errorCompleter = $this->errorCompleterRegistry->getErrorCompleter($requestType);
-        $errors = $context->getErrors();
-        foreach ($errors as $error) {
-            $errorCompleter->complete($error, $requestType);
-        }
+        $this->completeErrors($context->getErrors(), $errorCompleter, $requestType, null);
         $items = $context->getBatchItems();
         if ($items) {
             foreach ($items as $item) {
                 $itemContext = $item->getContext();
-                $errors = $itemContext->getErrors();
-                if (!empty($errors)) {
-                    $metadata = $this->getItemMetadata($item);
-                    foreach ($errors as $error) {
-                        $errorCompleter->complete($error, $requestType, $metadata);
-                    }
-                    if (\count($errors) > 1) {
-                        $this->removeDuplicates($errors, $itemContext);
-                    }
+                if ($itemContext->hasErrors()) {
+                    $this->completeErrors(
+                        $itemContext->getErrors(),
+                        $errorCompleter,
+                        $requestType,
+                        $this->getItemMetadata($item)
+                    );
+                    $this->removeDuplicates($itemContext);
                 }
             }
         }
-    }
-
-    /**
-     * @param Error[]                $errors
-     * @param BatchUpdateItemContext $context
-     */
-    private function removeDuplicates(array $errors, BatchUpdateItemContext $context): void
-    {
-        $context->resetErrors();
-        $map = [];
-        foreach ($errors as $error) {
-            $key = $this->getErrorHash($error);
-            if (!isset($map[$key])) {
-                $map[$key] = true;
-                $context->addError($error);
-            }
-        }
-    }
-
-    private function getErrorHash(Error $error): string
-    {
-        $result = serialize([
-            $error->getStatusCode(),
-            $error->getCode(),
-            $error->getTitle(),
-            $error->getDetail()
-        ]);
-        $source = $error->getSource();
-        if (null !== $source) {
-            $result .= serialize([
-                $source->getPropertyPath(),
-                $source->getPointer(),
-                $source->getParameter()
-            ]);
-        }
-
-        return $result;
     }
 
     private function getItemMetadata(BatchUpdateItem $item): ?EntityMetadata
@@ -101,9 +61,7 @@ class CompleteErrors implements ProcessorInterface
         if (null === $targetContext) {
             return null;
         }
-
-        $entityClass = $targetContext->getClassName();
-        if (!$entityClass || !str_contains($entityClass, '\\')) {
+        if (!$this->isEntityClass($targetContext->getClassName())) {
             return null;
         }
 

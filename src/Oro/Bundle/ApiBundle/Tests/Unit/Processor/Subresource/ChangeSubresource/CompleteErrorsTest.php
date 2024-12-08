@@ -1,17 +1,17 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeSubresource;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
-use Oro\Bundle\ApiBundle\Processor\Shared\CompleteErrors;
+use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource\CompleteErrors;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
-use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeSubresourceProcessorTestCase;
 
-class CompleteErrorsTest extends GetProcessorTestCase
+class CompleteErrorsTest extends ChangeSubresourceProcessorTestCase
 {
     /** @var ErrorCompleterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $errorCompleter;
@@ -19,6 +19,7 @@ class CompleteErrorsTest extends GetProcessorTestCase
     /** @var CompleteErrors */
     private $processor;
 
+    #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
@@ -41,7 +42,7 @@ class CompleteErrorsTest extends GetProcessorTestCase
         $this->errorCompleter->expects(self::never())
             ->method('complete');
 
-        $this->context->setMetadata($metadata);
+        $this->context->setRequestMetadata($metadata);
         $this->processor->process($this->context);
     }
 
@@ -63,8 +64,56 @@ class CompleteErrorsTest extends GetProcessorTestCase
             });
 
         $this->context->addError($error);
-        $this->context->setClassName('Test\Entity');
-        $this->context->setMetadata($metadata);
+        $this->context->setParentClassName('Test\ParentEntity');
+        $this->context->setRequestClassName('Test\Entity');
+        $this->context->setRequestDocumentationAction(null);
+        $this->context->setRequestMetadata($metadata);
+        $this->processor->process($this->context);
+
+        $expectedError = Error::createByException(new \Exception('some exception'))
+            ->setDetail('some exception');
+
+        self::assertEquals([$expectedError], $this->context->getErrors());
+    }
+
+    public function testProcessWhenNoParentEntityClass()
+    {
+        $error = Error::createByException(new \Exception('some exception'));
+
+        $this->errorCompleter->expects(self::once())
+            ->method('complete')
+            ->with(self::identicalTo($error), self::identicalTo($this->context->getRequestType()), null)
+            ->willReturnCallback(function (Error $error) {
+                $error->setDetail($error->getInnerException()->getMessage());
+            });
+
+        $this->context->addError($error);
+        $this->context->setParentClassName(null);
+        $this->context->setRequestClassName('Test\Entity');
+        $this->context->setRequestDocumentationAction(null);
+        $this->processor->process($this->context);
+
+        $expectedError = Error::createByException(new \Exception('some exception'))
+            ->setDetail('some exception');
+
+        self::assertEquals([$expectedError], $this->context->getErrors());
+    }
+
+    public function testProcessWhenParentEntityTypeWasNotConvertedToEntityClass()
+    {
+        $error = Error::createByException(new \Exception('some exception'));
+
+        $this->errorCompleter->expects(self::once())
+            ->method('complete')
+            ->with(self::identicalTo($error), self::identicalTo($this->context->getRequestType()), null)
+            ->willReturnCallback(function (Error $error) {
+                $error->setDetail($error->getInnerException()->getMessage());
+            });
+
+        $this->context->addError($error);
+        $this->context->setParentClassName('testParent');
+        $this->context->setRequestClassName('Test\Entity');
+        $this->context->setRequestDocumentationAction(null);
         $this->processor->process($this->context);
 
         $expectedError = Error::createByException(new \Exception('some exception'))
@@ -85,6 +134,9 @@ class CompleteErrorsTest extends GetProcessorTestCase
             });
 
         $this->context->addError($error);
+        $this->context->setParentClassName('Test\ParentEntity');
+        $this->context->setRequestClassName(null);
+        $this->context->setRequestDocumentationAction(null);
         $this->processor->process($this->context);
 
         $expectedError = Error::createByException(new \Exception('some exception'))
@@ -105,7 +157,9 @@ class CompleteErrorsTest extends GetProcessorTestCase
             });
 
         $this->context->addError($error);
-        $this->context->setClassName('test');
+        $this->context->setParentClassName('Test\ParentEntity');
+        $this->context->setRequestClassName('test');
+        $this->context->setRequestDocumentationAction(null);
         $this->processor->process($this->context);
 
         $expectedError = Error::createByException(new \Exception('some exception'))
@@ -129,7 +183,9 @@ class CompleteErrorsTest extends GetProcessorTestCase
             });
 
         $this->context->addError($error);
-        $this->context->setClassName('Test\Entity');
+        $this->context->setParentClassName('Test\ParentEntity');
+        $this->context->setRequestClassName('Test\Entity');
+        $this->context->setRequestDocumentationAction(null);
         $this->processor->process($this->context);
 
         $expectedError = Error::createByException(new \Exception('some exception'))
@@ -153,8 +209,10 @@ class CompleteErrorsTest extends GetProcessorTestCase
             });
 
         $this->context->addError($error);
-        $this->context->setClassName('Test\Entity');
-        $this->context->setConfig(new EntityDefinitionConfig());
+        $this->context->setParentClassName('Test\ParentEntity');
+        $this->context->setRequestClassName('Test\Entity');
+        $this->context->setRequestDocumentationAction(null);
+        $this->context->setRequestConfig(new EntityDefinitionConfig());
         $this->processor->process($this->context);
 
         $expectedError = Error::createByException(new \Exception('some exception'))
@@ -218,6 +276,9 @@ class CompleteErrorsTest extends GetProcessorTestCase
             $this->context->addError($newError);
         }
 
+        $this->context->setParentClassName('Test\ParentEntity');
+        $this->context->setRequestClassName('Test\Entity');
+        $this->context->setRequestDocumentationAction(null);
         $this->processor->process($this->context);
         self::assertSame($expectedErrors, $this->context->getErrors());
     }

@@ -131,3 +131,12 @@ services:
     #
     # normalize_result
     #
+
+    oro_api.change_subresource.complete_errors:
+        class: Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource\CompleteErrors
+        arguments:
+            - '@oro_api.error_completer_registry'
+        tags:
+            - { name: oro.api.processor, action: delete_subresource, group: normalize_result, priority: -10 }
+            - { name: oro.api.processor, action: add_subresource, group: normalize_result, priority: -10 }
+            - { name: oro.api.processor, action: update_subresource, group: normalize_result, priority: -10 }
