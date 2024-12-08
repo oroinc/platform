@@ -19,6 +19,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 abstract class AbstractNormalizeRequestData implements ProcessorInterface
 {
+    protected const CLASS_FIELD_NAME = 'class';
+    protected const ID_FIELD_NAME = 'id';
+
     protected EntityIdTransformerRegistry $entityIdTransformerRegistry;
     protected ?FormContext $context = null;
     protected ?string $requestDataItemKey = null;
@@ -76,8 +79,8 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
         EntityMetadata $metadata
     ): array {
         return [
-            'class' => $entityClass,
-            'id'    => $this->normalizeEntityId($propertyPath, $entityId, $metadata)
+            self::CLASS_FIELD_NAME => $entityClass,
+            self::ID_FIELD_NAME => $this->normalizeEntityId($propertyPath, $entityId, $metadata)
         ];
     }
 

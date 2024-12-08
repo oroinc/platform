@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresourceContext;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\PropertyAccess\Exception\AccessException;
@@ -40,14 +42,23 @@ class PrepareFormData implements ProcessorInterface
 
     private function getAssociationData(ChangeSubresourceContext $context): mixed
     {
-        try {
-            return $this->propertyAccessor->getValue(
-                $context->getParentEntity(),
-                $this->getEntityFieldName($context->getAssociationName(), $context->getParentConfig())
-            );
-        } catch (AccessException) {
-            return $this->createObject($context->getRequestClassName());
+        $entityFieldName = $this->getEntityFieldName($context->getAssociationName(), $context->getParentConfig());
+        if (ConfigUtil::IGNORE_PROPERTY_PATH === $entityFieldName) {
+            return $this->createEmptyAssociationData($context);
         }
+
+        try {
+            return $this->propertyAccessor->getValue($context->getParentEntity(), $entityFieldName);
+        } catch (AccessException) {
+            return $this->createEmptyAssociationData($context);
+        }
+    }
+
+    private function createEmptyAssociationData(ChangeSubresourceContext $context): object
+    {
+        return $context->isCollection()
+            ? new ArrayCollection()
+            : $this->createObject($context->getRequestClassName());
     }
 
     private function getEntityFieldName(string $fieldName, ?EntityDefinitionConfig $config): string

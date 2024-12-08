@@ -65,6 +65,21 @@ class NormalizeRequestDataTest extends ChangeSubresourceProcessorTestCase
         return $associationMetadata;
     }
 
+    public function testProcessWhenRequestDataAlreadyNormalized(): void
+    {
+        $inputData = ['foo' => 'bar'];
+
+        $this->entityIdTransformer->expects(self::never())
+            ->method('reverseTransform');
+
+        $this->context->setRequestData($inputData);
+        $this->context->setProcessed(NormalizeRequestData::OPERATION_NAME);
+        $this->processor->process($this->context);
+
+        self::assertEquals($inputData, $this->context->getRequestData());
+        self::assertTrue($this->context->isProcessed(NormalizeRequestData::OPERATION_NAME));
+    }
+
     public function testProcessForAlreadyNormalizedData(): void
     {
         $inputData = ['foo' => 'bar'];
@@ -78,6 +93,7 @@ class NormalizeRequestDataTest extends ChangeSubresourceProcessorTestCase
 
         self::assertSame($inputData, $this->context->getRequestData());
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
+        self::assertTrue($this->context->isProcessed(NormalizeRequestData::OPERATION_NAME));
     }
 
     public function testProcessWithoutMetadata(): void
@@ -109,6 +125,7 @@ class NormalizeRequestDataTest extends ChangeSubresourceProcessorTestCase
 
         self::assertEquals($inputData, $this->context->getRequestData());
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
+        self::assertTrue($this->context->isProcessed(NormalizeRequestData::OPERATION_NAME));
     }
 
     /**
@@ -210,6 +227,7 @@ class NormalizeRequestDataTest extends ChangeSubresourceProcessorTestCase
 
         self::assertEquals($expectedData, $this->context->getRequestData());
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
+        self::assertTrue($this->context->isProcessed(NormalizeRequestData::OPERATION_NAME));
     }
 
     public function testProcessNoAttributes(): void
@@ -258,6 +276,7 @@ class NormalizeRequestDataTest extends ChangeSubresourceProcessorTestCase
 
         self::assertEquals($expectedData, $this->context->getRequestData());
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
+        self::assertTrue($this->context->isProcessed(NormalizeRequestData::OPERATION_NAME));
     }
 
     public function testProcessWithInvalidEntityTypes(): void
@@ -330,6 +349,7 @@ class NormalizeRequestDataTest extends ChangeSubresourceProcessorTestCase
             $this->context->getErrors()
         );
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
+        self::assertTrue($this->context->isProcessed(NormalizeRequestData::OPERATION_NAME));
     }
 
     public function testProcessWithNotAcceptableEntityTypes(): void
@@ -411,6 +431,7 @@ class NormalizeRequestDataTest extends ChangeSubresourceProcessorTestCase
             $this->context->getErrors()
         );
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
+        self::assertTrue($this->context->isProcessed(NormalizeRequestData::OPERATION_NAME));
     }
 
     public function testProcessWithEmptyAcceptableEntityTypes(): void
@@ -487,6 +508,7 @@ class NormalizeRequestDataTest extends ChangeSubresourceProcessorTestCase
         self::assertFalse($this->context->hasErrors());
         self::assertEquals($expectedData, $this->context->getRequestData());
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
+        self::assertTrue($this->context->isProcessed(NormalizeRequestData::OPERATION_NAME));
     }
 
     public function testProcessWithEmptyAcceptableEntityTypesShouldBeRejected(): void
@@ -575,6 +597,7 @@ class NormalizeRequestDataTest extends ChangeSubresourceProcessorTestCase
             $this->context->getErrors()
         );
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
+        self::assertTrue($this->context->isProcessed(NormalizeRequestData::OPERATION_NAME));
     }
 
     public function testProcessWithInvalidIdentifiers(): void
@@ -660,6 +683,7 @@ class NormalizeRequestDataTest extends ChangeSubresourceProcessorTestCase
             $this->context->getErrors()
         );
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
+        self::assertTrue($this->context->isProcessed(NormalizeRequestData::OPERATION_NAME));
     }
 
     public function testProcessWithNotResolvedIdentifiers(): void
@@ -744,6 +768,7 @@ class NormalizeRequestDataTest extends ChangeSubresourceProcessorTestCase
             ],
             $this->context->getNotResolvedIdentifiers()
         );
+        self::assertTrue($this->context->isProcessed(NormalizeRequestData::OPERATION_NAME));
     }
 
     public function testProcessShouldNotNormalizeIdOfIncludedEntity(): void
@@ -791,6 +816,7 @@ class NormalizeRequestDataTest extends ChangeSubresourceProcessorTestCase
 
         self::assertEquals($expectedData, $this->context->getRequestData());
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
+        self::assertTrue($this->context->isProcessed(NormalizeRequestData::OPERATION_NAME));
     }
 
     public function testProcessShouldNotNormalizeIdOfIncludedPrimaryEntity(): void
@@ -838,6 +864,7 @@ class NormalizeRequestDataTest extends ChangeSubresourceProcessorTestCase
 
         self::assertEquals($expectedData, $this->context->getRequestData());
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
+        self::assertTrue($this->context->isProcessed(NormalizeRequestData::OPERATION_NAME));
     }
 
     public function testProcessForEntityThatDoesNotHaveIdentifierFields(): void
@@ -850,6 +877,7 @@ class NormalizeRequestDataTest extends ChangeSubresourceProcessorTestCase
 
         self::assertSame($requestData['meta'], $this->context->getRequestData());
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
+        self::assertTrue($this->context->isProcessed(NormalizeRequestData::OPERATION_NAME));
     }
 
     public function testProcessForEntityThatDoesNotHaveIdentifierFieldsAndNoMetaSectionInRequestData(): void
@@ -862,5 +890,6 @@ class NormalizeRequestDataTest extends ChangeSubresourceProcessorTestCase
 
         self::assertSame($requestData, $this->context->getRequestData());
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
+        self::assertTrue($this->context->isProcessed(NormalizeRequestData::OPERATION_NAME));
     }
 }

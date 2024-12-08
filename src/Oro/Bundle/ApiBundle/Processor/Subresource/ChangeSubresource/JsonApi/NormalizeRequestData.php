@@ -13,6 +13,8 @@ use Oro\Component\ChainProcessor\ContextInterface;
  */
 class NormalizeRequestData extends AbstractNormalizeRequestData
 {
+    public const OPERATION_NAME = 'normalize_request_data';
+
     /**
      * {@inheritdoc}
      */
@@ -20,13 +22,18 @@ class NormalizeRequestData extends AbstractNormalizeRequestData
     {
         /** @var ChangeSubresourceContext $context */
 
+        if ($context->isProcessed(self::OPERATION_NAME)) {
+            // the request data are already normalized
+            return;
+        }
+
         $requestData = $context->getRequestData();
         if ($context->getRequestMetadata()?->hasIdentifierFields()) {
             if (\array_key_exists(JsonApiDoc::DATA, $requestData)) {
                 $data = $requestData[JsonApiDoc::DATA];
                 if (!\is_array($data)) {
                     // the request data were not validated
-                    throw new RuntimeException(sprintf(
+                    throw new RuntimeException(\sprintf(
                         'The "%s" top-section of the request data should be an array.',
                         JsonApiDoc::DATA
                     ));
@@ -57,5 +64,6 @@ class NormalizeRequestData extends AbstractNormalizeRequestData
         } elseif (\array_key_exists(JsonApiDoc::META, $requestData)) {
             $context->setRequestData($requestData[JsonApiDoc::META]);
         }
+        $context->setProcessed(self::OPERATION_NAME);
     }
 }

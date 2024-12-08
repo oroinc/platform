@@ -11,6 +11,8 @@ use Oro\Component\ChainProcessor\ContextInterface;
  */
 class NormalizeRequestData extends AbstractNormalizeRequestData
 {
+    public const OPERATION_NAME = 'normalize_request_data';
+
     /**
      * {@inheritdoc}
      */
@@ -18,8 +20,15 @@ class NormalizeRequestData extends AbstractNormalizeRequestData
     {
         /** @var ChangeSubresourceContext $context */
 
+        if ($context->isProcessed(self::OPERATION_NAME)) {
+            // the request data are already normalized
+            return;
+        }
+
         $metadata = $context->getRequestMetadata();
         if (null === $metadata) {
+            $context->setProcessed(self::OPERATION_NAME);
+
             return;
         }
 
@@ -47,5 +56,6 @@ class NormalizeRequestData extends AbstractNormalizeRequestData
         } finally {
             $this->context = null;
         }
+        $context->setProcessed(self::OPERATION_NAME);
     }
 }
