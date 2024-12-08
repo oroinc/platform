@@ -176,6 +176,7 @@ services:
             - { name: oro.api.processor, action: create, group: initialize, priority: 10 }
             - { name: oro.api.processor, action: update, group: initialize, priority: 10 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, priority: 10 }
+            - { name: oro.api.processor, action: delete_subresource, group: initialize, priority: 10 }
             - { name: oro.api.processor, action: add_subresource, group: initialize, priority: 10 }
             - { name: oro.api.processor, action: update_subresource, group: initialize, priority: 10 }
 
@@ -200,6 +201,7 @@ services:
             - { name: oro.api.processor, action: create, group: initialize, priority: -20 }
             - { name: oro.api.processor, action: update, group: initialize, priority: -20 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, priority: -20 }
+            - { name: oro.api.processor, action: delete_subresource, group: initialize, priority: -20 }
             - { name: oro.api.processor, action: add_subresource, group: initialize, priority: -20 }
             - { name: oro.api.processor, action: update_subresource, group: initialize, priority: -20 }
 
@@ -214,6 +216,7 @@ services:
             - { name: oro.api.processor, action: create, group: initialize, priority: -20 }
             - { name: oro.api.processor, action: update, group: initialize, priority: -20 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, priority: -20 }
+            - { name: oro.api.processor, action: delete_subresource, group: initialize, priority: -20 }
             - { name: oro.api.processor, action: add_subresource, group: initialize, priority: -20 }
             - { name: oro.api.processor, action: update_subresource, group: initialize, priority: -20 }
 
@@ -228,6 +231,7 @@ services:
             - { name: oro.api.processor, action: create, group: initialize, priority: -20 }
             - { name: oro.api.processor, action: update, group: initialize, priority: -20 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, priority: -20 }
+            - { name: oro.api.processor, action: delete_subresource, group: initialize, priority: -20 }
             - { name: oro.api.processor, action: add_subresource, group: initialize, priority: -20 }
             - { name: oro.api.processor, action: update_subresource, group: initialize, priority: -20 }
 
@@ -299,6 +303,7 @@ services:
             - { name: oro.api.processor, action: create, group: initialize, priority: -200 }
             - { name: oro.api.processor, action: update, group: initialize, priority: -200 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, priority: -200 }
+            - { name: oro.api.processor, action: delete_subresource, group: initialize, priority: -200 }
             - { name: oro.api.processor, action: add_subresource, group: initialize, priority: -200 }
             - { name: oro.api.processor, action: update_subresource, group: initialize, priority: -200 }
 
@@ -313,6 +318,7 @@ services:
             - { name: oro.api.processor, action: create, group: initialize, priority: -200 }
             - { name: oro.api.processor, action: update, group: initialize, priority: -200 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, priority: -200 }
+            - { name: oro.api.processor, action: delete_subresource, group: initialize, priority: -200 }
             - { name: oro.api.processor, action: add_subresource, group: initialize, priority: -200 }
             - { name: oro.api.processor, action: update_subresource, group: initialize, priority: -200 }
 
@@ -326,6 +332,7 @@ services:
             - { name: oro.api.processor, action: create, group: initialize, priority: -200 }
             - { name: oro.api.processor, action: update, group: initialize, priority: -200 }
             - { name: oro.api.processor, action: get_subresource, group: initialize, priority: -200 }
+            - { name: oro.api.processor, action: delete_subresource, group: initialize, priority: -200 }
             - { name: oro.api.processor, action: add_subresource, group: initialize, priority: -200 }
             - { name: oro.api.processor, action: update_subresource, group: initialize, priority: -200 }
 
@@ -405,6 +412,7 @@ services:
             - { name: oro.api.processor, action: create, group: normalize_input, priority: 250 }
             - { name: oro.api.processor, action: update, group: normalize_input, priority: 250 }
             - { name: oro.api.processor, action: get_subresource, group: normalize_input, priority: 250 }
+            - { name: oro.api.processor, action: delete_subresource, group: normalize_input, priority: 250 }
             - { name: oro.api.processor, action: add_subresource, group: normalize_input, priority: 250 }
             - { name: oro.api.processor, action: update_subresource, group: normalize_input, priority: 250 }
 
@@ -495,6 +503,7 @@ services:
         tags:
             - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api, priority: -25 }
             - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: -25 }
+            - { name: oro.api.processor, action: delete_subresource, group: normalize_input, requestType: json_api, priority: -25 }
             - { name: oro.api.processor, action: add_subresource, group: normalize_input, requestType: json_api, priority: -25 }
             - { name: oro.api.processor, action: update_subresource, group: normalize_input, requestType: json_api, priority: -25 }
 
@@ -512,6 +521,7 @@ services:
         tags:
             - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api, priority: -45 }
             - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: -45 }
+            - { name: oro.api.processor, action: delete_subresource, group: normalize_input, requestType: json_api, priority: -45 }
             - { name: oro.api.processor, action: add_subresource, group: normalize_input, requestType: json_api, priority: -45 }
             - { name: oro.api.processor, action: update_subresource, group: normalize_input, requestType: json_api, priority: -45 }
 
@@ -1042,6 +1052,7 @@ services:
         tags:
             - { name: oro.api.processor, action: create, group: transform_data, requestType: json_api, priority: 200 }
             - { name: oro.api.processor, action: update, group: transform_data, requestType: json_api, priority: 200 }
+            - { name: oro.api.processor, action: delete_subresource, group: transform_data, requestType: json_api, priority: 200 }
             - { name: oro.api.processor, action: add_subresource, group: transform_data, requestType: json_api, priority: 200 }
             - { name: oro.api.processor, action: update_subresource, group: transform_data, requestType: json_api, priority: 200 }
 
@@ -1093,6 +1104,7 @@ services:
         tags:
             - { name: oro.api.processor, action: create, group: transform_data, priority: -58 }
             - { name: oro.api.processor, action: update, group: transform_data, priority: -58 }
+            - { name: oro.api.processor, action: delete_subresource, group: transform_data, priority: -58 }
             - { name: oro.api.processor, action: add_subresource, group: transform_data, priority: -58 }
             - { name: oro.api.processor, action: update_subresource, group: transform_data, priority: -58 }
 
@@ -1117,6 +1129,7 @@ services:
         tags:
             - { name: oro.api.processor, action: create, group: transform_data, priority: -68 }
             - { name: oro.api.processor, action: update, group: transform_data, priority: -68 }
+            - { name: oro.api.processor, action: delete_subresource, group: transform_data, priority: -68 }
             - { name: oro.api.processor, action: add_subresource, group: transform_data, priority: -68 }
             - { name: oro.api.processor, action: update_subresource, group: transform_data, priority: -68 }
 
@@ -1141,6 +1154,7 @@ services:
         tags:
             - { name: oro.api.processor, action: create, group: transform_data, priority: -78 }
             - { name: oro.api.processor, action: update, group: transform_data, priority: -78 }
+            - { name: oro.api.processor, action: delete_subresource, group: transform_data, priority: -78 }
             - { name: oro.api.processor, action: add_subresource, group: transform_data, priority: -78 }
             - { name: oro.api.processor, action: update_subresource, group: transform_data, priority: -78 }
 
@@ -1247,6 +1261,7 @@ services:
         tags:
             - { name: oro.api.processor, action: create, group: save_data, priority: 10 }
             - { name: oro.api.processor, action: update, group: save_data, priority: 10 }
+            - { name: oro.api.processor, action: delete_subresource, group: save_data, priority: 10 }
             - { name: oro.api.processor, action: add_subresource, group: save_data, priority: 10 }
             - { name: oro.api.processor, action: update_subresource, group: save_data, priority: 10 }
 
@@ -1298,6 +1313,7 @@ services:
         tags:
             - { name: oro.api.processor, action: create, group: normalize_data, priority: -50 }
             - { name: oro.api.processor, action: update, group: normalize_data, priority: -50 }
+            - { name: oro.api.processor, action: delete_subresource, group: normalize_data, priority: -50 }
             - { name: oro.api.processor, action: add_subresource, group: normalize_data, priority: -50 }
             - { name: oro.api.processor, action: update_subresource, group: normalize_data, priority: -50 }
 
@@ -1398,6 +1414,7 @@ services:
         tags:
             - { name: oro.api.processor, action: create, group: normalize_result, requestType: rest, priority: -29 }
             - { name: oro.api.processor, action: update, group: normalize_result, requestType: rest, priority: -29 }
+            - { name: oro.api.processor, action: delete_subresource, group: normalize_result, requestType: rest, priority: -29 }
             - { name: oro.api.processor, action: add_subresource, group: normalize_result, requestType: rest, priority: -29 }
             - { name: oro.api.processor, action: update_subresource, group: normalize_result, requestType: rest, priority: -29 }
 
@@ -1634,6 +1651,7 @@ services:
         tags:
             - { name: oro.api.processor, action: create, group: normalize_result, priority: -100 }
             - { name: oro.api.processor, action: update, group: normalize_result, priority: -100 }
+            - { name: oro.api.processor, action: delete_subresource, group: normalize_result, priority: -100 }
             - { name: oro.api.processor, action: add_subresource, group: normalize_result, priority: -100 }
             - { name: oro.api.processor, action: update_subresource, group: normalize_result, priority: -100 }
 
