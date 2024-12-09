@@ -104,6 +104,9 @@ class FilterFieldsByExtra implements ProcessorInterface
                     $entity = $entityClass;
                 }
             }
+            if (isset($result[$entity])) {
+                $fields = array_unique(array_merge($result[$entity], $fields ?? []));
+            }
             $result[$entity] = $fields;
         }
 
@@ -172,7 +175,7 @@ class FilterFieldsByExtra implements ProcessorInterface
         string $entityClass,
         array $fieldFilters
     ): void {
-        if (!isset($fieldFilters[$entityClass])) {
+        if (!\array_key_exists($entityClass, $fieldFilters)) {
             return;
         }
 
