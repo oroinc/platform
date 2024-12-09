@@ -120,6 +120,22 @@ trait DocumentationTestTrait
         return reset($item);
     }
 
+    private function getSubresourceData(array $data, string $subresourcePath): array
+    {
+        if (!$data) {
+            self::fail('The formatted documentation data must be not empty.');
+        }
+        foreach ($data as $path => $item) {
+            if (str_ends_with($path, $subresourcePath)) {
+                return reset($item);
+            }
+        }
+        self::fail(sprintf(
+            'The formatted documentation data does not contain data for the "%s" subresource.',
+            $subresourcePath
+        ));
+    }
+
     private function warmUpDocumentationCache(): void
     {
         $apiDocExtractor = $this->getExtractor();

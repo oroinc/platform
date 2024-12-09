@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -19,6 +18,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
  */
 class CompleteErrors implements ProcessorInterface
 {
+    use CompleteErrorsTrait;
+
     private ErrorCompleterRegistry $errorCompleterRegistry;
 
     public function __construct(ErrorCompleterRegistry $errorCompleterRegistry)
@@ -37,58 +38,18 @@ class CompleteErrors implements ProcessorInterface
         }
 
         $requestType = $context->getRequestType();
-        $errorCompleter = $this->errorCompleterRegistry->getErrorCompleter($requestType);
-        $metadata = $this->getMetadata($context);
-        $errors = $context->getErrors();
-        foreach ($errors as $error) {
-            $errorCompleter->complete($error, $requestType, $metadata);
-        }
-        if (\count($errors) > 1) {
-            $this->removeDuplicates($errors, $context);
-        }
-    }
-
-    /**
-     * @param Error[] $errors
-     * @param Context $context
-     */
-    private function removeDuplicates(array $errors, Context $context): void
-    {
-        $context->resetErrors();
-        $map = [];
-        foreach ($errors as $error) {
-            $key = $this->getErrorHash($error);
-            if (!isset($map[$key])) {
-                $map[$key] = true;
-                $context->addError($error);
-            }
-        }
-    }
-
-    private function getErrorHash(Error $error): string
-    {
-        $result = serialize([
-            $error->getStatusCode(),
-            $error->getCode(),
-            $error->getTitle(),
-            $error->getDetail()
-        ]);
-        $source = $error->getSource();
-        if (null !== $source) {
-            $result .= serialize([
-                $source->getPropertyPath(),
-                $source->getPointer(),
-                $source->getParameter()
-            ]);
-        }
-
-        return $result;
+        $this->completeErrors(
+            $context->getErrors(),
+            $this->errorCompleterRegistry->getErrorCompleter($requestType),
+            $requestType,
+            $this->getMetadata($context)
+        );
+        $this->removeDuplicates($context);
     }
 
     private function getMetadata(Context $context): ?EntityMetadata
     {
-        $entityClass = $context->getClassName();
-        if (!$entityClass || !str_contains($entityClass, '\\')) {
+        if (!$this->isEntityClass($context->getClassName())) {
             return null;
         }
 

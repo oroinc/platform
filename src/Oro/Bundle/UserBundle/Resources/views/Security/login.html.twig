@@ -67,6 +67,11 @@
                             {{- 'Remember me on this computer'|trans -}}
                         </label>
                     </div>
+                    {% if is_form_protected_with_captcha("oro_user_form_login") %}
+                        <div class="form-signin__footer">
+                            {{ form_row(get_captcha_form_element()) }}
+                        </div>
+                    {% endif %}
                     <div class="form-signin__footer">
                         <button type="submit" class="btn extra-submit btn-uppercase btn-primary" id="_submit" name="_submit">{{ 'Log in'|trans }}</button>
                         <a href="{{ loginFormResetPath|default(path('oro_user_reset_request')) }}">{{ 'Forgot your password?'|trans }}</a>

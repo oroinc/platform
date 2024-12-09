@@ -9,7 +9,29 @@
         <link rel="shortcut icon" href="{{ asset(oro_theme_icon()) }}">
     {% endif %}
     {% placeholder head_style %}
-    {% placeholder head_script %}
+
+    {% block script %}
+        {% placeholder head_script %}
+        {% placeholder user_login_js_modules_config %}
+
+        {% import '@OroAsset/Asset.html.twig' as Asset %}
+        {{ Asset.js_modules_config({
+            'controllers/page-controller': {
+                fullRedirect: true
+            },
+            'oroui/js/app': {
+                routeLinks: ''
+            },
+            'oroui/js/extend/scriptjs': {
+                bundlesPath: asset('bundles/')|split('?', 2)[0],
+            },
+            'oroui/js/app/views/page-layout-view': {
+                defaultSubmit: true
+            }
+        }) }}
+        {{ Asset.js('build/admin/app.js') }}
+    {% endblock script %}
+
     {% endblock %}
 </head>
 <body class="{% if isMobileVersion() %}mobile{% else %}desktop{% endif %}-version {% block bodyClass %}{% endblock %}">

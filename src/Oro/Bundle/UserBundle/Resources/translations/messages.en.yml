@@ -470,3 +470,6 @@ oro:
 
     scope:
         user.label: User
+
+oro_form.captcha.protected_form_name.oro_user_password_request: User Reset Password Form
+oro_form.captcha.protected_form_name.oro_user_form_login: User Login Form

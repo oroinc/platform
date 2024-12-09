@@ -13,7 +13,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 
 class CompleteErrorsTest extends GetProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ErrorCompleterInterface */
+    /** @var ErrorCompleterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $errorCompleter;
 
     /** @var CompleteErrors */

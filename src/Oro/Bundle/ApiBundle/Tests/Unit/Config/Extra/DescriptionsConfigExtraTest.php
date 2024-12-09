@@ -6,27 +6,37 @@ use Oro\Bundle\ApiBundle\Config\Extra\DescriptionsConfigExtra;
 
 class DescriptionsConfigExtraTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var DescriptionsConfigExtra */
-    private $extra;
-
-    #[\Override]
-    protected function setUp(): void
+    public function testDocumentationAction(): void
     {
-        $this->extra = new DescriptionsConfigExtra();
+        $extra = new DescriptionsConfigExtra();
+        self::assertNull($extra->getDocumentationAction());
+
+        $documentationAction = 'some_action';
+        $extra = new DescriptionsConfigExtra($documentationAction);
+        self::assertEquals($documentationAction, $extra->getDocumentationAction());
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
-        self::assertEquals(DescriptionsConfigExtra::NAME, $this->extra->getName());
+        $extra = new DescriptionsConfigExtra();
+        self::assertEquals(DescriptionsConfigExtra::NAME, $extra->getName());
     }
 
-    public function testIsPropagable()
+    public function testIsPropagable(): void
     {
-        self::assertFalse($this->extra->isPropagable());
+        $extra = new DescriptionsConfigExtra();
+        self::assertFalse($extra->isPropagable());
     }
 
-    public function testCacheKeyPart()
+    public function testCacheKeyPart(): void
     {
-        self::assertEquals(DescriptionsConfigExtra::NAME, $this->extra->getCacheKeyPart());
+        $extra = new DescriptionsConfigExtra();
+        self::assertEquals(DescriptionsConfigExtra::NAME, $extra->getCacheKeyPart());
+    }
+
+    public function testCacheKeyPartWithDocumentationAction(): void
+    {
+        $extra = new DescriptionsConfigExtra('some_action');
+        self::assertEquals(DescriptionsConfigExtra::NAME . ':some_action', $extra->getCacheKeyPart());
     }
 }

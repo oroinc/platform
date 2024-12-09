@@ -199,16 +199,7 @@ abstract class RequestActionHandler
      */
     public function handleUpdateSubresource(Request $request): Response
     {
-        $processor = $this->getProcessor(ApiAction::UPDATE_SUBRESOURCE);
-        /** @var ChangeSubresourceContext $context */
-        $context = $processor->createContext();
-        $this->prepareSubresourceContext($context, $request);
-        $context->setFilterValues($this->getRequestFilters($request, $context->getAction()));
-        $context->setRequestData($this->getRequestData($request));
-
-        $processor->process($context);
-
-        return $this->buildResponse($context, $request);
+        return $this->handleChangeSubresource($request, ApiAction::UPDATE_SUBRESOURCE);
     }
 
     /**
@@ -220,16 +211,7 @@ abstract class RequestActionHandler
      */
     public function handleAddSubresource(Request $request): Response
     {
-        $processor = $this->getProcessor(ApiAction::ADD_SUBRESOURCE);
-        /** @var ChangeSubresourceContext $context */
-        $context = $processor->createContext();
-        $this->prepareSubresourceContext($context, $request);
-        $context->setFilterValues($this->getRequestFilters($request, $context->getAction()));
-        $context->setRequestData($this->getRequestData($request));
-
-        $processor->process($context);
-
-        return $this->buildResponse($context, $request);
+        return $this->handleChangeSubresource($request, ApiAction::ADD_SUBRESOURCE);
     }
 
     /**
@@ -241,15 +223,7 @@ abstract class RequestActionHandler
      */
     public function handleDeleteSubresource(Request $request): Response
     {
-        $processor = $this->getProcessor(ApiAction::DELETE_SUBRESOURCE);
-        /** @var ChangeSubresourceContext $context */
-        $context = $processor->createContext();
-        $this->prepareSubresourceContext($context, $request);
-        $context->setRequestData($this->getRequestData($request));
-
-        $processor->process($context);
-
-        return $this->buildResponse($context, $request);
+        return $this->handleChangeSubresource($request, ApiAction::DELETE_SUBRESOURCE);
     }
 
     /**
@@ -531,4 +505,18 @@ abstract class RequestActionHandler
     abstract protected function getRequestFilters(Request $request, string $action): FilterValueAccessorInterface;
 
     abstract protected function buildResponse(Context $context, Request $request): Response;
+
+    private function handleChangeSubresource(Request $request, string $action): Response
+    {
+        $processor = $this->getProcessor($action);
+        /** @var ChangeSubresourceContext $context */
+        $context = $processor->createContext();
+        $this->prepareSubresourceContext($context, $request);
+        $context->setFilterValues($this->getRequestFilters($request, $context->getAction()));
+        $context->setRequestData($this->getRequestData($request));
+
+        $processor->process($context);
+
+        return $this->buildResponse($context, $request);
+    }
 }

@@ -59,6 +59,23 @@ class NormalizeRequestDataTest extends ChangeSubresourceProcessorTestCase
         return $associationMetadata;
     }
 
+    public function testProcessWhenRequestDataAlreadyNormalized(): void
+    {
+        $inputData = [
+            'firstName' => 'John'
+        ];
+
+        $this->entityIdTransformer->expects(self::never())
+            ->method('reverseTransform');
+
+        $this->context->setRequestData($inputData);
+        $this->context->setProcessed(NormalizeRequestData::OPERATION_NAME);
+        $this->processor->process($this->context);
+
+        self::assertEquals($inputData, $this->context->getRequestData());
+        self::assertTrue($this->context->isProcessed(NormalizeRequestData::OPERATION_NAME));
+    }
+
     public function testProcessWhenNoMetadata(): void
     {
         $inputData = [
@@ -73,6 +90,7 @@ class NormalizeRequestDataTest extends ChangeSubresourceProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertEquals($inputData, $this->context->getRequestData());
+        self::assertTrue($this->context->isProcessed(NormalizeRequestData::OPERATION_NAME));
     }
 
     public function testProcessForNotCollectionValuedAssociation(): void
@@ -139,6 +157,7 @@ class NormalizeRequestDataTest extends ChangeSubresourceProcessorTestCase
 
         self::assertEquals($expectedData, $this->context->getRequestData());
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
+        self::assertTrue($this->context->isProcessed(NormalizeRequestData::OPERATION_NAME));
     }
 
     public function testProcessForCollectionValuedAssociation(): void
@@ -210,6 +229,7 @@ class NormalizeRequestDataTest extends ChangeSubresourceProcessorTestCase
 
         self::assertEquals($expectedData, $this->context->getRequestData());
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
+        self::assertTrue($this->context->isProcessed(NormalizeRequestData::OPERATION_NAME));
     }
 
     public function testProcessForNotCollectionValuedAssociationWithInvalidIdentifiers(): void
@@ -268,6 +288,7 @@ class NormalizeRequestDataTest extends ChangeSubresourceProcessorTestCase
             $this->context->getErrors()
         );
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
+        self::assertTrue($this->context->isProcessed(NormalizeRequestData::OPERATION_NAME));
     }
 
     public function testProcessForCollectionValuedAssociationWithInvalidIdentifiers(): void
@@ -331,6 +352,7 @@ class NormalizeRequestDataTest extends ChangeSubresourceProcessorTestCase
             $this->context->getErrors()
         );
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
+        self::assertTrue($this->context->isProcessed(NormalizeRequestData::OPERATION_NAME));
     }
 
     public function testProcessForNotCollectionValuedAssociationWithNotResolvedIdentifiers(): void
@@ -388,6 +410,7 @@ class NormalizeRequestDataTest extends ChangeSubresourceProcessorTestCase
             ],
             $this->context->getNotResolvedIdentifiers()
         );
+        self::assertTrue($this->context->isProcessed(NormalizeRequestData::OPERATION_NAME));
     }
 
     public function testProcessForCollectionValuedAssociationWithNotResolvedIdentifiers(): void
@@ -450,5 +473,6 @@ class NormalizeRequestDataTest extends ChangeSubresourceProcessorTestCase
             ],
             $this->context->getNotResolvedIdentifiers()
         );
+        self::assertTrue($this->context->isProcessed(NormalizeRequestData::OPERATION_NAME));
     }
 }

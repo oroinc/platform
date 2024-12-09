@@ -25,6 +25,8 @@ use Oro\Component\PhpUtils\ArrayUtil;
 abstract class AbstractNormalizeRequestData implements ProcessorInterface
 {
     protected const ROOT_POINTER = '';
+    protected const CLASS_FIELD_NAME = 'class';
+    protected const ID_FIELD_NAME = 'id';
 
     protected ValueNormalizer $valueNormalizer;
     protected EntityIdTransformerRegistry $entityIdTransformerRegistry;
@@ -126,13 +128,12 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
         $entityId = $data[JsonApiDoc::ID];
         if (str_contains($entityClass, '\\')) {
             if ($this->isAcceptableTargetClass($entityClass, $associationMetadata)) {
-                $targetMetadata = $associationMetadata?->getTargetMetadata();
                 $entityId = $this->normalizeEntityId(
-                    $this->buildPath($path, 'id'),
+                    $this->buildPath($path, self::ID_FIELD_NAME),
                     $this->buildPointer($pointer, JsonApiDoc::ID),
                     $entityClass,
                     $entityId,
-                    $targetMetadata
+                    $associationMetadata?->getTargetMetadata()
                 );
             } else {
                 $this->addValidationError(Constraint::ENTITY_TYPE, $this->buildPointer($pointer, JsonApiDoc::TYPE))
@@ -141,8 +142,8 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
         }
 
         return [
-            'class' => $entityClass,
-            'id'    => $entityId
+            self::CLASS_FIELD_NAME => $entityClass,
+            self::ID_FIELD_NAME => $entityId
         ];
     }
 
