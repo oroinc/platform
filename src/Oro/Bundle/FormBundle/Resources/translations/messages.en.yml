@@ -311,3 +311,4 @@ oro_form:
             recaptcha: Google reCAPTCHA
             hcaptcha: hCaptcha
             turnstile: Cloudflare Turnstile
+            dummy: Dummy

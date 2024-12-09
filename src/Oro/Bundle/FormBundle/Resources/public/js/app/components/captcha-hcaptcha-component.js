@@ -1,5 +1,6 @@
 import BaseComponent from 'oroui/js/app/components/base/component';
 import $ from 'jquery';
+import scriptjs from 'scriptjs';
 
 const CaptchaHCaptchaComponent = BaseComponent.extend({
     apiScript: 'https://js.hcaptcha.com/1/api.js?render=explicit&onload=onloadHCaptchaCallback',
@@ -11,10 +12,26 @@ const CaptchaHCaptchaComponent = BaseComponent.extend({
     initialize: function(options) {
         CaptchaHCaptchaComponent.__super__.initialize.call(this, options);
 
-        window.onloadHCaptchaCallback = this.initializeView.bind(this, options);
-        if (typeof hcaptcha == 'undefined') {
-            $.getScript(this.apiScript);
-        } else {
+        if (typeof window.loadHCaptchaCallbacks == 'undefined') {
+            window.loadHCaptchaCallbacks = [];
+        }
+        window.loadHCaptchaCallbacks.push(this.initializeView.bind(this, options));
+
+        if (typeof window.onloadHCaptchaCallback == 'undefined') {
+            window.onloadHCaptchaCallback = function() {
+                while (window.loadHCaptchaCallbacks.length > 0) {
+                    window.loadHCaptchaCallbacks.pop()();
+                }
+            };
+
+            if (typeof window.hcaptcha == 'undefined') {
+                scriptjs(this.apiScript, function() {
+                    window.onloadHCaptchaCallback();
+                });
+            }
+        }
+
+        if (typeof window.hcaptcha != 'undefined') {
             window.onloadHCaptchaCallback();
         }
     },
@@ -28,7 +45,7 @@ const CaptchaHCaptchaComponent = BaseComponent.extend({
     },
 
     initializeView(options) {
-        const $container = $('<div/>');
+        const $container = $('<div id="' + $(options._sourceElement).attr('id') + '_container"/>');
         $container.insertAfter(options._sourceElement);
 
         window.hcaptcha.render($container[0], {

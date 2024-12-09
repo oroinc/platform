@@ -4,6 +4,10 @@ placeholders:
             items:
                 form_js_modules_config:
                     order: 100
+        user_login_js_modules_config:
+            items:
+                form_js_modules_config:
+                    order: 100
 
     items:
         form_js_modules_config:
