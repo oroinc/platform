@@ -498,6 +498,9 @@ services:
         calls:
             - [setTokenFactory, ['@oro_security.token.factory.username_password_organization']]
             - [setOrganizationGuesser, ['@oro_security.authentication.organization_guesser']]
+            - [setCaptchaSettingsProvider, ['@oro_form.captcha.settings_provider']]
+            - [mapFirewallToLoginForm, ['main', 'oro_user_form_login']]
+            - [mapFirewallToLoginForm, ['frontend', 'oro_customer_form_login']]
         abstract: true
         public: false
 
@@ -509,6 +512,14 @@ services:
             - '@logger'
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest, priority: 7 }
+
+    oro_security.listener.captcha_protection_listener:
+        class: Oro\Bundle\SecurityBundle\Http\Firewall\CaptchaProtectionListener
+        arguments:
+            - '@oro_form.captcha.service_registry'
+            - '@translator'
+        tags:
+            - { name: kernel.event_subscriber }
 
     oro_security.listener.api_listener:
           class: Oro\Bundle\SecurityBundle\EventListener\ApiEventListener

@@ -25,6 +25,12 @@ placeholders:
                     order: 10
                 ui_js_modules_config_public_path:
                     order: 20
+        user_login_js_modules_config:
+            items:
+                ui_js_modules_config:
+                    order: 10
+                ui_js_modules_config_public_path:
+                    order: 20
         application:
             items:
                 assets_js:

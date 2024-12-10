@@ -1,0 +1,12 @@
+{% import '@OroAsset/Asset.html.twig' as Asset %}
+{{ Asset.js_modules_config({
+    'oronavigation/js/routes-loader': {
+        debug: app.debug ? true : false,
+        data: {
+            base_url: app.request.baseUrl,
+            scheme: app.request.scheme,
+            host: app.request.host
+        },
+        routesResource: asset('media/js/' ~ data.js_routing_filename_prefix ~ 'routes.json', 'routing')
+    }
+}) }}

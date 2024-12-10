@@ -14,7 +14,8 @@
                 {{ form_start(form, {
                     'action': path('oro_user_reset_reset', { token: token }),
                     'attr': {
-                        'class': 'form-vertical form-signin form-signin--reset ' ~ layoutName
+                        'class': 'form-vertical form-signin form-signin--reset ' ~ layoutName,
+                        'data-nohash': true
                     }
                 }) }}
                     <div class="title-box">

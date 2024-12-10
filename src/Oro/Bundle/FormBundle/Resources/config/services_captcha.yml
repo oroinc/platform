@@ -101,6 +101,18 @@ services:
         tags:
             - { name: form.type, alias: oro_captcha_service_select }
 
+    oro_form.layout.data_provider.captcha:
+        class: Oro\Bundle\FormBundle\Layout\DataProvider\CaptchaProvider
+        arguments:
+            - '@oro_form.captcha.settings_provider'
+        tags:
+            - { name: layout.data_provider, alias: captcha }
+
+    oro_form.layout.block_type.captcha:
+        class: Oro\Bundle\FormBundle\Layout\Block\Type\CaptchaType
+        tags:
+            - { name: layout.block_type, alias: captcha }
+
     oro_form.validator_constraints.is_captcha_verified:
         class: Oro\Bundle\FormBundle\Validator\Constraints\IsCaptchaVerifiedValidator
         arguments:

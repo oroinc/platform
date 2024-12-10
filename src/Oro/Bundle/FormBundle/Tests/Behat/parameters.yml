@@ -2,3 +2,9 @@ oro_form:
   settings:
     wysiwyg_enabled:
       value: false
+
+services:
+  oro_form.behat.mock.captcha.dummy_service:
+    class: Oro\Bundle\FormBundle\Tests\Behat\Mock\Captcha\DummyCaptchaService
+    tags:
+      - { name: oro_form.captcha_service, alias: 'dummy' }

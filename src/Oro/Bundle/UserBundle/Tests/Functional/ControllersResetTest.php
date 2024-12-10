@@ -62,11 +62,11 @@ class ControllersResetTest extends WebTestCase
         $this->assertResponseStatusCodeEquals($result, 200);
         $content = $result->getContent();
 
-        self::assertStringContainsString('username', $content);
+        self::assertStringContainsString('oro_user_password_request[username]', $content);
         self::assertStringContainsString('_token', $content);
 
         $form = $crawler->selectButton('Request')->form();
-        $form['username'] = LoadUserData::SIMPLE_USER_EMAIL;
+        $form['oro_user_password_request[username]'] = LoadUserData::SIMPLE_USER_EMAIL;
 
         $this->client->submit($form);
         $result = $this->client->getResponse();
@@ -76,57 +76,6 @@ class ControllersResetTest extends WebTestCase
             'If there is a user account associated with simple_user@example.com',
             $result->getContent()
         );
-    }
-
-    public function testSendEmailAction()
-    {
-        $this->client->request(
-            'POST',
-            $this->getUrl('oro_user_reset_send_email'),
-            [
-                'username' => self::USER_NAME,
-                'frontend' => 1,
-                '_csrf_token' => (string) $this->getCsrfToken('oro-user-password-reset-request'),
-            ],
-            [],
-            $this->generateNoHashNavigationHeader()
-        );
-        $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        self::assertStringContainsString('If there is a user account associated with', $result->getContent());
-
-        /** @var User $user */
-        $user = $this->getContainer()->get('doctrine')->getRepository(User::class)->findOneBy(
-            ['username' => self::USER_NAME]
-        );
-        $this->assertNotNull($user->getPasswordRequestedAt());
-    }
-
-    public function testSendEmailWithWrongCsrfToken()
-    {
-        $this->client->request(
-            'POST',
-            $this->getUrl('oro_user_reset_send_email'),
-            [
-                'username' => self::USER_NAME,
-                'frontend' => 1,
-                '_csrf_token' => 'some_wrong_token',
-            ],
-            [],
-            $this->generateNoHashNavigationHeader()
-        );
-        $result = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        self::assertStringContainsString(
-            'The CSRF token is invalid. Please try to resubmit the form.',
-            $result->getContent()
-        );
-
-        /** @var User $user */
-        $user = $this->getContainer()->get('doctrine')->getRepository(User::class)->findOneBy(
-            ['username' => self::USER_NAME]
-        );
-        $this->assertNull($user->getPasswordRequestedAt());
     }
 
     public function testSendForcedResetEmailAction()

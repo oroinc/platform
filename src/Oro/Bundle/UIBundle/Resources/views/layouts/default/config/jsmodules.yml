@@ -67,6 +67,7 @@ configs:
     oroui/js/app/views/page/messages-view: {}
     oroui/js/app/views/tab-collection-view: {}
     oroui/js/app/views/tab-item-view: {}
+    oroui/js/app/views/page-layout-view: {}
     oroui/js/component-shortcuts-manager: {}
     oroui/js/content-processor/dropdown-button: {
         moreButtonIcon: 'chevron-down'

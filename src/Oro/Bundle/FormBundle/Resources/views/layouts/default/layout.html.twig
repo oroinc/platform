@@ -20,6 +20,10 @@
     {% endif %}
 {% endblock %}
 
+{%- block captcha_widget -%}
+    {{- form_row(get_captcha_form_element(name)) -}}
+{%- endblock captcha_widget -%}
+
 {% block button_widget %}
     {% set attr = layout_attr_defaults(attr, {
         '~class': ' btn'
