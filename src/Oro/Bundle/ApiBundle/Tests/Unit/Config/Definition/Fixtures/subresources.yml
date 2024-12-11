@@ -693,6 +693,38 @@ request_target_class:
                     delete_subresource:
                         request_target_class: Test\Entity3
 
+request_documentation_action_for_not_allowed_action:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    get_subresource:
+                        request_documentation_action: some_action
+    expected: []
+    error: 'Invalid configuration for path "entity.subresources.testSubresource.actions": The "request_documentation_action" option is not allowed for the "get_subresource" action. This option is allowed for the following actions: "update_subresource", "add_subresource", "delete_subresource".'
+
+request_documentation_action:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    update_subresource:
+                        request_documentation_action: action1
+                    add_subresource:
+                        request_documentation_action: action2
+                    delete_subresource:
+                        request_documentation_action: action3
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    update_subresource:
+                        request_documentation_action: action1
+                    add_subresource:
+                        request_documentation_action: action2
+                    delete_subresource:
+                        request_documentation_action: action3
+
 actions:
     config:
         subresources:

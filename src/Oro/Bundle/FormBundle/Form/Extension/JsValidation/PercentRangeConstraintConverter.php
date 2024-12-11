@@ -18,13 +18,11 @@ class PercentRangeConstraintConverter implements ConstraintConverterInterface
         return $constraint instanceof PercentRange;
     }
 
-    /**
-     *
-     * @param PercentRange $constraint
-     */
     #[\Override]
     public function convertConstraint(Constraint $constraint, ?FormInterface $form = null): ?Constraint
     {
+        /** @var PercentRange $constraint */
+
         $options = [
             'invalidMessage' => $constraint->invalidMessage,
         ];

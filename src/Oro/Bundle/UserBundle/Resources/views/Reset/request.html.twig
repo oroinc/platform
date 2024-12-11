@@ -13,21 +13,40 @@
             {% set returnToLoginLabel = 'Return to Login'|trans %}
             {% set showLabels = (requestLabel|length <= 9) and (returnToLoginLabel|length <= 15) %}
             {% set layoutName = showLabels ? 'form-row-layout' : 'form-column-layout' %}
-            <form action="{{ resetFormActionPath|default(path('oro_user_reset_send_email')) }}" method="post" class="form-signin form-signin--forgot {{ layoutName }}">
+            {{ form_start(form, {
+                'attr': {
+                    'class': 'form-signin form-signin--forgot ' ~ layoutName,
+                    'data-nohash': true
+                }
+            }) }}
                 <div class="title-box">
                     <h2 class="title">{{ 'Forgot Password'|trans }}</h2>
                 </div>
                 <fieldset class="form-signin__fieldset">
+                    {%- if form.vars.errors|length > 0 -%}
+                        <div class="alert alert-error" role="alert">
+                        {%- for error in form.vars.errors -%}
+                            <div>{{ error.message|trans }}</div>
+                        {%- endfor -%}
+                        </div>
+                    {%- endif -%}
+
                     {{ messagesContent }}
-                    <input type="text" id="prependedInput" name="username" required="required" placeholder="{{ 'Username or Email'|trans }}" autofocus/>
-                    <input type="hidden" name="frontend" value="1" />
+
+                    {{ form_widget(form.username, {
+                        'attr': {
+                            'autofocus': true
+                        }
+                    }) }}
+                    {{ form_row(form.frontend) }}
+                    {{ form_rest(form) }}
+
                     <div class="form-row form-signin__footer form-signin__footer">
                         <button type="submit" class="btn extra-submit btn-uppercase btn-primary">{{ requestLabel }}</button>
                         <a href="{{ resetFormReturnPath|default(path('oro_user_security_login')) }}">&laquo; {{ returnToLoginLabel }}</a>
                     </div>
                 </fieldset>
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token('oro-user-password-reset-request') }}"/>
-            </form>
+            {{ form_end(form) }}
         </div>
         <div class="login-copyright">{{ 'oro.copyright'|trans({ '{{year}}': 'now'|date('Y') }) }}</div>
     </div>

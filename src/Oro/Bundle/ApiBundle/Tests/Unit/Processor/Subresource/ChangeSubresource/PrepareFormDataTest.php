@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeSubresource;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource\PrepareFormData;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeSubresourceProcessorTestCase;
@@ -118,7 +119,7 @@ class PrepareFormDataTest extends ChangeSubresourceProcessorTestCase
         );
     }
 
-    public function testProcessWhenAssociationDataDoesNotExist(): void
+    public function testProcessWhenToOneAssociationDataDoesNotExist(): void
     {
         $parentEntity = new User();
         $associationName = 'notExisting';
@@ -135,9 +136,66 @@ class PrepareFormDataTest extends ChangeSubresourceProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertEquals([$associationName => $requestData], $this->context->getRequestData());
-        self::assertEquals(
-            [$associationName => new \stdClass()],
-            $this->context->getResult()
-        );
+        self::assertEquals([$associationName => new \stdClass()], $this->context->getResult());
+    }
+
+    public function testProcessWhenToManyAssociationDataDoesNotExist(): void
+    {
+        $parentEntity = new User();
+        $associationName = 'notExisting';
+        $requestData = ['key' => 'value'];
+
+        $parentConfig = new EntityDefinitionConfig();
+        $parentConfig->set(ConfigUtil::REQUEST_TARGET_CLASS, \stdClass::class);
+        $parentConfig->addField($associationName);
+
+        $this->context->setParentEntity($parentEntity);
+        $this->context->setAssociationName($associationName);
+        $this->context->setRequestData($requestData);
+        $this->context->setParentConfig($parentConfig);
+        $this->context->setIsCollection(true);
+        $this->processor->process($this->context);
+
+        self::assertEquals([$associationName => $requestData], $this->context->getRequestData());
+        self::assertEquals([$associationName => new ArrayCollection()], $this->context->getResult());
+    }
+
+    public function testProcessForComputedToOneAssociation(): void
+    {
+        $associationName = 'someAssociation';
+        $requestData = ['key' => 'value'];
+
+        $parentConfig = new EntityDefinitionConfig();
+        $parentConfig->set(ConfigUtil::REQUEST_TARGET_CLASS, \stdClass::class);
+        $parentConfig->addField($associationName)->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+
+        $this->context->setParentEntity(new User());
+        $this->context->setAssociationName($associationName);
+        $this->context->setRequestData($requestData);
+        $this->context->setParentConfig($parentConfig);
+        $this->processor->process($this->context);
+
+        self::assertEquals([$associationName => $requestData], $this->context->getRequestData());
+        self::assertEquals([$associationName => new \stdClass()], $this->context->getResult());
+    }
+
+    public function testProcessForComputedToManyAssociation(): void
+    {
+        $associationName = 'someAssociation';
+        $requestData = ['key' => 'value'];
+
+        $parentConfig = new EntityDefinitionConfig();
+        $parentConfig->set(ConfigUtil::REQUEST_TARGET_CLASS, \stdClass::class);
+        $parentConfig->addField($associationName)->setPropertyPath(ConfigUtil::IGNORE_PROPERTY_PATH);
+
+        $this->context->setParentEntity(new User());
+        $this->context->setAssociationName($associationName);
+        $this->context->setRequestData($requestData);
+        $this->context->setParentConfig($parentConfig);
+        $this->context->setIsCollection(true);
+        $this->processor->process($this->context);
+
+        self::assertEquals([$associationName => $requestData], $this->context->getRequestData());
+        self::assertEquals([$associationName => new ArrayCollection()], $this->context->getResult());
     }
 }

@@ -140,6 +140,12 @@ class ConfigUtil extends BaseConfigUtil
      */
     public const REQUEST_TARGET_CLASS = 'request_target_class';
 
+    /**
+     * an action name that should be used to get the documentation for a custom subresource request;
+     * it is applicable for "update_subresource", "add_subresource" and "delete_subresource" actions
+     */
+    public const REQUEST_DOCUMENTATION_ACTION = 'request_documentation_action';
+
     /** a list of properties on which this field depends on */
     public const DEPENDS_ON = 'depends_on';
 

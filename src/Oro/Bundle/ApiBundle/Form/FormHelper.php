@@ -87,14 +87,14 @@ class FormHelper
             if (ConfigUtil::CLASS_NAME === ($metaProperty->getPropertyPath() ?? $name)) {
                 continue;
             }
-            $this->addFormField($formBuilder, $name, $entityConfig->getField($name), $metaProperty);
+            $this->addFormField($formBuilder, $name, $entityConfig->getField($name), $metaProperty, [], true);
         }
         $fields = $entityMetadata->getFields();
         foreach ($fields as $name => $field) {
             if (!$field->isInput()) {
                 continue;
             }
-            $this->addFormField($formBuilder, $name, $entityConfig->getField($name), $field);
+            $this->addFormField($formBuilder, $name, $entityConfig->getField($name), $field, [], true);
         }
         $associations = $entityMetadata->getAssociations();
         foreach ($associations as $name => $association) {

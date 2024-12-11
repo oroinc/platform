@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\FormBundle\Twig;
 
+use Oro\Bundle\FormBundle\Captcha\CaptchaSettingsProviderInterface;
 use Oro\Bundle\FormBundle\Form\Twig\DataBlockRenderer;
 use Psr\Container\ContainerInterface;
 use Symfony\Bridge\Twig\Node\RenderBlockNode;
 use Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormRendererInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
@@ -68,6 +70,14 @@ class FormExtension extends AbstractExtension implements ServiceSubscriberInterf
                 'form_row_collection',
                 null,
                 ['is_safe' => ['html'], 'node_class' => RenderBlockNode::class]
+            ),
+            new TwigFunction(
+                'is_form_protected_with_captcha',
+                [$this, 'isFormProtectedWithCaptcha']
+            ),
+            new TwigFunction(
+                'get_captcha_form_element',
+                [$this, 'getCaptchaFormElement']
             )
         ];
     }
@@ -156,8 +166,31 @@ class FormExtension extends AbstractExtension implements ServiceSubscriberInterf
     public static function getSubscribedServices(): array
     {
         return [
+            'form.factory' => FormFactoryInterface::class,
+            'oro_form.captcha.settings_provider' => CaptchaSettingsProviderInterface::class,
             'twig.form.renderer' => FormRendererInterface::class,
         ];
+    }
+
+    public function isFormProtectedWithCaptcha(string $formName): bool
+    {
+        /** @var CaptchaSettingsProviderInterface $settingsProvider */
+        $settingsProvider = $this->container->get('oro_form.captcha.settings_provider');
+
+        return $settingsProvider->isProtectionAvailable()
+            && $settingsProvider->isFormProtected($formName);
+    }
+
+    public function getCaptchaFormElement(string $name = 'captcha'): FormView
+    {
+        /** @var CaptchaSettingsProviderInterface $settingsProvider */
+        $settingsProvider = $this->container->get('oro_form.captcha.settings_provider');
+        /** @var FormFactoryInterface $formFactory */
+        $formFactory = $this->container->get('form.factory');
+
+        $captchaField = $formFactory->createNamed($name, $settingsProvider->getFormType());
+
+        return $captchaField->createView();
     }
 
     private function getFormRenderer(): FormRendererInterface

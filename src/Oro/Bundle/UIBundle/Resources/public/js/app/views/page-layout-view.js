@@ -2,21 +2,34 @@ define(function(require) {
     'use strict';
 
     const $ = require('jquery');
+    const _ = require('underscore');
     const tools = require('oroui/js/tools');
     const Chaplin = require('chaplin');
     const mediator = require('oroui/js/mediator');
     const formToAjaxOptions = require('oroui/js/tools/form-to-ajax-options');
     const utils = Chaplin.utils;
 
+    let config = require('module-config').default(module.id);
+    config = _.extend({
+        defaultSubmit: false
+    }, config);
+
     const PageLayoutView = Chaplin.Layout.extend({
         _controllerIsReady: false,
+
+        defaultSubmit: config.defaultSubmit,
 
         events() {
             const events = {};
 
             if (this._controllerIsReady) {
+                if (!this.defaultSubmit) {
+                    Object.assign(events, {
+                        'submit form': 'onSubmit'
+                    });
+                }
+
                 Object.assign(events, {
-                    'submit form': 'onSubmit',
                     'click.action.data-api [data-action=page-refresh]': 'onRefreshClick'
                 });
 
