@@ -43,6 +43,20 @@ services:
         factory: ['@form.factory', createNamed]
         arguments: ["oro_user_reset_form", Oro\Bundle\UserBundle\Form\Type\ResetType, null, { validation_groups: [ResetPassword, Default] }]
 
+    oro_user.form.type.user_password_reset_request:
+        class: Oro\Bundle\UserBundle\Form\Type\UserPasswordResetRequestType
+        tags:
+            - { name: form.type, alias: oro_user_password_request }
+            - { name: oro_form.captcha_protected, form_name: oro_user_password_request }
+
+    Oro\Bundle\UserBundle\Form\Handler\UserPasswordResetHandler:
+        arguments:
+            - '@oro_user.manager'
+            - '@translator'
+            - '@logger'
+            - '@oro_user.provider.user_logging_info_provider'
+            - '%oro_user.reset.ttl%'
+
     oro_user.form.emailsettings:
         class: Symfony\Component\Form\Form
         factory: ['@form.factory', createNamed]

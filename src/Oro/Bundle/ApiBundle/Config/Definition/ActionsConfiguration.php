@@ -12,6 +12,16 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
  */
 class ActionsConfiguration extends AbstractConfigurationSection
 {
+    private const CHANGE_SUBRESOURCE_ACTIONS = [
+        ApiAction::UPDATE_SUBRESOURCE,
+        ApiAction::ADD_SUBRESOURCE,
+        ApiAction::DELETE_SUBRESOURCE
+    ];
+    private const OPTIONS_ALLOWED_ONLY_FOR_CHANGE_SUBRESOURCE_ACTIONS = [
+        ConfigUtil::REQUEST_TARGET_CLASS,
+        ConfigUtil::REQUEST_DOCUMENTATION_ACTION
+    ];
+
     /** @var string[] */
     private array $permissibleActions;
     private string $sectionName;
@@ -138,25 +148,24 @@ class ActionsConfiguration extends AbstractConfigurationSection
                     })
                 ->end()
             ->end()
-            ->scalarNode(ConfigUtil::REQUEST_TARGET_CLASS)->end();
+            ->scalarNode(ConfigUtil::REQUEST_TARGET_CLASS)->end()
+            ->scalarNode(ConfigUtil::REQUEST_DOCUMENTATION_ACTION)->end();
 
         $parentNode->end()->validate()
             ->always(function ($v) {
                 foreach ($v as $action => $actionConfig) {
-                    if (\array_key_exists(ConfigUtil::REQUEST_TARGET_CLASS, $actionConfig)
-                        && ApiAction::UPDATE_SUBRESOURCE !== $action
-                        && ApiAction::ADD_SUBRESOURCE !== $action
-                        && ApiAction::DELETE_SUBRESOURCE !== $action
-                    ) {
-                        throw new \InvalidArgumentException(sprintf(
-                            'The "%s" option is not allowed for the "%s" action.'
-                            . ' This option is allowed for the following actions: "%s", "%s", "%s".',
-                            ConfigUtil::REQUEST_TARGET_CLASS,
-                            $action,
-                            ApiAction::UPDATE_SUBRESOURCE,
-                            ApiAction::ADD_SUBRESOURCE,
-                            ApiAction::DELETE_SUBRESOURCE
-                        ));
+                    foreach (self::OPTIONS_ALLOWED_ONLY_FOR_CHANGE_SUBRESOURCE_ACTIONS as $option) {
+                        if (\array_key_exists($option, $actionConfig)
+                            && !\in_array($action, self::CHANGE_SUBRESOURCE_ACTIONS, true)
+                        ) {
+                            throw new \InvalidArgumentException(sprintf(
+                                'The "%s" option is not allowed for the "%s" action.'
+                                . ' This option is allowed for the following actions: "%s".',
+                                $option,
+                                $action,
+                                implode('", "', self::CHANGE_SUBRESOURCE_ACTIONS)
+                            ));
+                        }
                     }
                 }
 

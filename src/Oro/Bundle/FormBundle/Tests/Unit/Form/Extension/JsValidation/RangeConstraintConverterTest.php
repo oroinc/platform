@@ -14,9 +14,7 @@ use Symfony\Component\Validator\Constraints\Range;
 class RangeConstraintConverterTest extends TestCase
 {
     private PropertyAccessorInterface|MockObject $propertyAccessor;
-
     private FormInterface|MockObject $form;
-
     private RangeConstraintConverter $converter;
 
     #[\Override]
@@ -35,47 +33,31 @@ class RangeConstraintConverterTest extends TestCase
         self::assertSame($expected, $this->converter->supports($constraint, $this->form));
     }
 
-    public function supportsDataProvider(): \Generator
+    public function supportsDataProvider(): array
     {
-        yield [
-            'expected' => true,
-            'constraint' => new Range(
-                [
-                    'minPropertyPath' => 'abc',
-                    'maxPropertyPath' => 'cba',
-                ],
-                payload: null
-            ),
-        ];
-
-        yield [
-            'expected' => false,
-            'constraint' => new NotBlank(),
-        ];
-
-        yield [
-            'expected' => false,
-            'constraint' => new Range(
-                [
-                    'minPropertyPath' => 'abc',
-                    'maxPropertyPath' => 'cba',
-                ],
-                payload: ['jsValidation' => []]
-            ),
+        return [
+            [
+                'expected' => true,
+                'constraint' => new Range(['minPropertyPath' => 'abc', 'maxPropertyPath' => 'cba'])
+            ],
+            [
+                'expected' => false,
+                'constraint' => new NotBlank()
+            ],
+            [
+                'expected' => false,
+                'constraint' => new Range(
+                    ['minPropertyPath' => 'abc', 'maxPropertyPath' => 'cba'],
+                    payload: ['jsValidation' => []]
+                )
+            ]
         ];
     }
 
     public function testConvertWithoutPropertyPaths(): void
     {
-        $constraint = new Range(
-            [
-                'min' => 1,
-                'max' => 2,
-            ],
-            payload: ['jsValidation' => []]
-        );
-        $this->propertyAccessor
-            ->expects(self::never())
+        $constraint = new Range(['min' => 1, 'max' => 2], payload: ['jsValidation' => []]);
+        $this->propertyAccessor->expects(self::never())
             ->method(self::anything());
 
         self::assertEquals($constraint, $this->converter->convertConstraint($constraint, $this->form));
@@ -83,12 +65,8 @@ class RangeConstraintConverterTest extends TestCase
 
     public function testConvertWithoutFormData(): void
     {
-        $constraint = new Range([
-            'minPropertyPath' => 'propertyMin',
-            'max' => 100,
-        ]);
-        $this->propertyAccessor
-            ->expects(self::never())
+        $constraint = new Range(['minPropertyPath' => 'propertyMin', 'max' => 100]);
+        $this->propertyAccessor->expects(self::never())
             ->method(self::anything());
 
         self::assertEquals($constraint, $this->converter->convertConstraint($constraint));
@@ -96,32 +74,25 @@ class RangeConstraintConverterTest extends TestCase
 
     public function testConvertWhenPropertyIsNotReadable(): void
     {
-        $constraint = new Range([
-            'minPropertyPath' => 'child.propertyMin',
-            'maxPropertyPath' => 'child.propertyMax',
-        ]);
+        $constraint = new Range(['minPropertyPath' => 'child.propertyMin', 'maxPropertyPath' => 'child.propertyMax']);
 
         $formData = new \stdClass();
         $parentForm = $this->createMock(FormInterface::class);
-        $parentForm
-            ->expects(self::once())
+        $parentForm->expects(self::once())
             ->method('getData')
             ->willReturn($formData);
 
-        $this->form
-            ->expects(self::once())
+        $this->form->expects(self::once())
             ->method('getParent')
             ->willReturn($parentForm);
 
-        $this->propertyAccessor
-            ->expects(self::exactly(2))
+        $this->propertyAccessor->expects(self::exactly(2))
             ->method('isReadable')
             ->willReturnMap([
                 [$formData, 'child.propertyMin', false],
-                [$formData, 'child.propertyMax', false],
+                [$formData, 'child.propertyMax', false]
             ]);
-        $this->propertyAccessor
-            ->expects(self::never())
+        $this->propertyAccessor->expects(self::never())
             ->method('getValue')
             ->withAnyParameters();
 
@@ -130,43 +101,33 @@ class RangeConstraintConverterTest extends TestCase
 
     public function testConvertWithJsValidationPayload(): void
     {
-        $constraint = new Range([
-            'minPropertyPath' => 'propertyMin',
-            'maxPropertyPath' => 'propertyMax',
-        ]);
+        $constraint = new Range(['minPropertyPath' => 'propertyMin', 'maxPropertyPath' => 'propertyMax']);
 
         $formData = new \stdClass();
         $parentForm = $this->createMock(FormInterface::class);
-        $parentForm
-            ->expects(self::once())
+        $parentForm->expects(self::once())
             ->method('getData')
             ->willReturn($formData);
 
-        $this->form
-            ->expects(self::once())
+        $this->form->expects(self::once())
             ->method('getParent')
             ->willReturn($parentForm);
 
-        $this->propertyAccessor
-            ->expects(self::exactly(2))
+        $this->propertyAccessor->expects(self::exactly(2))
             ->method('isReadable')
             ->willReturnMap([
                 [$formData, 'propertyMin', true],
-                [$formData, 'propertyMax', true],
+                [$formData, 'propertyMax', true]
             ]);
-        $this->propertyAccessor
-            ->expects(self::exactly(2))
+        $this->propertyAccessor->expects(self::exactly(2))
             ->method('getValue')
             ->willReturnMap([
                 [$formData, 'propertyMin', 1],
-                [$formData, 'propertyMax', 2],
+                [$formData, 'propertyMax', 2]
             ]);
 
         self::assertEquals(
-            new Range([
-                'min' => 1,
-                'max' => 2,
-            ]),
+            new Range(['min' => 1, 'max' => 2]),
             $this->converter->convertConstraint($constraint, $this->form)
         );
     }

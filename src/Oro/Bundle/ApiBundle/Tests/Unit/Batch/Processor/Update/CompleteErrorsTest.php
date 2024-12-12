@@ -14,7 +14,7 @@ use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 
 class CompleteErrorsTest extends BatchUpdateProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ErrorCompleterInterface */
+    /** @var ErrorCompleterInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $errorCompleter;
 
     /** @var CompleteErrors */
@@ -65,6 +65,9 @@ class CompleteErrorsTest extends BatchUpdateProcessorTestCase
             ->method('getContext')
             ->willReturn($itemContext);
         $itemContext->expects(self::once())
+            ->method('hasErrors')
+            ->willReturn(true);
+        $itemContext->expects(self::atLeastOnce())
             ->method('getErrors')
             ->willReturn([$error]);
         $itemContext->expects(self::once())
@@ -100,6 +103,9 @@ class CompleteErrorsTest extends BatchUpdateProcessorTestCase
             ->method('getContext')
             ->willReturn($itemContext);
         $itemContext->expects(self::once())
+            ->method('hasErrors')
+            ->willReturn(true);
+        $itemContext->expects(self::atLeastOnce())
             ->method('getErrors')
             ->willReturn([$error]);
         $itemContext->expects(self::once())
@@ -130,6 +136,9 @@ class CompleteErrorsTest extends BatchUpdateProcessorTestCase
             ->method('getContext')
             ->willReturn($itemContext);
         $itemContext->expects(self::once())
+            ->method('hasErrors')
+            ->willReturn(true);
+        $itemContext->expects(self::atLeastOnce())
             ->method('getErrors')
             ->willReturn([$error]);
         $itemContext->expects(self::once())
@@ -161,6 +170,9 @@ class CompleteErrorsTest extends BatchUpdateProcessorTestCase
             ->method('getContext')
             ->willReturn($itemContext);
         $itemContext->expects(self::once())
+            ->method('hasErrors')
+            ->willReturn(true);
+        $itemContext->expects(self::atLeastOnce())
             ->method('getErrors')
             ->willReturn([$error]);
         $itemContext->expects(self::once())

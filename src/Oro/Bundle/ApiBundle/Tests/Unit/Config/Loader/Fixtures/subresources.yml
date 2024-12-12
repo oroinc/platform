@@ -226,6 +226,20 @@ request_target_class:
                     add_subresource:
                         request_target_class: Test\Entity2
 
+request_documentation_action:
+    config:
+        subresources:
+            testSubresource:
+                actions:
+                    add_subresource:
+                        request_documentation_action: some_action
+    expected:
+        subresources:
+            testSubresource:
+                actions:
+                    add_subresource:
+                        request_documentation_action: some_action
+
 action_field_exclude:
     config:
         testSubresource:

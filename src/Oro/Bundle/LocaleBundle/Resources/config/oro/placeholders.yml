@@ -4,6 +4,10 @@ placeholders:
             items:
                 locale_js_modules_config:
                     order: 100
+        user_login_js_modules_config:
+            items:
+                locale_js_modules_config:
+                    order: 100
 
     items:
         locale_js_modules_config:

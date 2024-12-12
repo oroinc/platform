@@ -32,11 +32,19 @@ placeholders:
             items:
                 navigation_js_modules_config:
                     order: 100
+        user_login_js_modules_config:
+            items:
+                user_login_navigation_js_modules_config:
+                    order: 100
 
     items:
         navigation_js_modules_config:
             template: '@@OroNavigation/js_modules_config.html.twig'
             applicable: '@oro_user.placeholder.filter->isUserApplicable()'
+            data:
+                js_routing_filename_prefix: '%oro_navigation.js_routing_filename_prefix%'
+        user_login_navigation_js_modules_config:
+            template: '@@OroNavigation/user_login_js_modules_config.html.twig'
             data:
                 js_routing_filename_prefix: '%oro_navigation.js_routing_filename_prefix%'
         shortcuts:
