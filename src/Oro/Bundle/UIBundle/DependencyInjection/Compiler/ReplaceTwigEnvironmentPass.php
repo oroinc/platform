@@ -16,7 +16,16 @@ class ReplaceTwigEnvironmentPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
+        $twigDefinition = $container->getDefinition('twig');
+        $options = $twigDefinition->getArgument(1);
+        /**
+         * This option needed for correct render twig templates and performance optimizations
+         * If the use_yield option set to false - template rendering time up to more than 3 times
+         * @see \Twig\Template::yield
+         */
+        $options['use_yield'] = true;
         $container->getDefinition('twig')
-            ->setClass(Environment::class);
+            ->setClass(Environment::class)
+            ->setArgument('$options', $options);
     }
 }
