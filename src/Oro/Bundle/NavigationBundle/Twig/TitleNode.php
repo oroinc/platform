@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Twig;
 
+use Twig\Attribute\YieldReady;
 use Twig\Compiler;
 use Twig\Error\SyntaxError;
 use Twig\Node\Expression\ArrayExpression;
@@ -10,6 +11,7 @@ use Twig\Node\Node;
 /**
  * Compile title node to template
  */
+#[YieldReady]
 class TitleNode extends Node
 {
     /**
