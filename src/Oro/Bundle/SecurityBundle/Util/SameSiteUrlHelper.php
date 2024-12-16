@@ -29,7 +29,7 @@ class SameSiteUrlHelper
         return $this->isSameSiteUrl($referer, $request) ? $referer : $fallbackUrl;
     }
 
-    private function isSameSiteUrl(string $url, ?Request $request = null): bool
+    public function isSameSiteUrl(string $url, ?Request $request = null): bool
     {
         $request = $request ?? $this->requestStack->getMainRequest();
         $refererParts = parse_url($url);

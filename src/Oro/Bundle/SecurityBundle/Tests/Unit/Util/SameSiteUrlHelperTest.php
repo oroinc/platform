@@ -3,10 +3,11 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Util;
 
 use Oro\Bundle\SecurityBundle\Util\SameSiteUrlHelper;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class SameSiteUrlHelperTest extends \PHPUnit\Framework\TestCase
+final class SameSiteUrlHelperTest extends TestCase
 {
     private RequestStack $requestStack;
 
@@ -35,6 +36,24 @@ class SameSiteUrlHelperTest extends \PHPUnit\Framework\TestCase
         $this->requestStack->push($request);
 
         self::assertEquals($expected, $this->sameSiteUrlHelper->getSameSiteReferer(null, $fallbackUrl));
+    }
+
+    /**
+     * @dataProvider getIsSameSiteUrlDataProvider
+     */
+    public function testIsSameSiteUrl(string $url, ?Request $request, bool $expected): void
+    {
+        self::assertEquals($expected, $this->sameSiteUrlHelper->isSameSiteUrl($url, $request));
+    }
+
+    /**
+     * @dataProvider getIsSameSiteUrlDataProvider
+     */
+    public function testIsSameSiteUrlWhenNoRequest(string $url, ?Request $request, bool $expected): void
+    {
+        $this->requestStack->push($request);
+
+        self::assertEquals($expected, $this->sameSiteUrlHelper->isSameSiteUrl($url, null));
     }
 
     public function getSameSiteRefererDataProvider(): array
@@ -114,6 +133,52 @@ class SameSiteUrlHelperTest extends \PHPUnit\Framework\TestCase
                 ),
                 'fallbackUrl' => 'http://example.org/home',
                 'expected' => 'http://example.org/home',
+            ],
+        ];
+    }
+
+    public function getIsSameSiteUrlDataProvider(): array
+    {
+        return [
+            'empty url' => [
+                'url' => '',
+                'request' => new Request(),
+                'expected' => false,
+            ],
+            'no referer' => [
+                'url' => '',
+                'request' => Request::create('http://example.org'),
+                'expected' => false,
+            ],
+            'no referer with fallback url' => [
+                'url' => 'http://example.org/home',
+                'request' => Request::create('http://example.org'),
+                'expected' => true,
+            ],
+            'different host' => [
+                'url' => 'http://example.org/home',
+                'request' => Request::create('http://example1.org'),
+                'expected' => false,
+            ],
+            'different port' => [
+                'url' => 'http://example.org:4444/home',
+                'request' => Request::create('http://example.org:8080'),
+                'expected' => false,
+            ],
+            'different allowed scheme' => [
+                'url' => 'https://example.org/home',
+                'request' => Request::create('http://example.org'),
+                'expected' => true,
+            ],
+            'not allowed scheme' => [
+                'url' => 'ftp://example.org/home',
+                'request' => Request::create('http://example.org'),
+                'expected' => false,
+            ],
+            'js scheme' => [
+                'url' => 'javascript:alert(1);',
+                'request' => Request::create('https://example.org'),
+                'expected' => false,
             ],
         ];
     }

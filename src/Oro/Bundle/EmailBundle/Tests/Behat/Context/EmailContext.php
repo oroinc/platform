@@ -323,6 +323,7 @@ class EmailContext extends OroFeatureContext
         $messages = [];
         $found = $this->spin(function () use ($searchText, $searchField, $expectedContent, &$messages) {
             $messages = $this->getSentMessages();
+            $found = false;
             foreach ($messages as $message) {
                 if ($searchText !== $this->getMessageData($message, $searchField)) {
                     continue;
