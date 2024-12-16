@@ -2940,7 +2940,7 @@ JS;
     document
         .evaluate("{$xpath}", document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null)
         .singleNodeValue
-        ?.scrollIntoView(false);
+        ?.scrollIntoView({block: 'center'});
 })()
 JS;
         $this->getSession()->getDriver()->evaluateScript($javascipt);

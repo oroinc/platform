@@ -236,10 +236,19 @@ define([
 
             Pagination.__super__.render.call(this);
 
-            if (this.hidden) {
-                this.$el.hide();
-            }
+            this.toggleView();
 
+            return this;
+        },
+
+        toggleView() {
+            this.$el.removeClass('hide');
+
+            if (this.hidden || this.$el.is(':empty')) {
+                this.$el.addClass('hide');
+            } else {
+                this.$el.removeClass('hide');
+            }
             return this;
         }
     });

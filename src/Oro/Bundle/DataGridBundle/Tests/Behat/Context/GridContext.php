@@ -3070,14 +3070,21 @@ TEXT;
         }
 
         $cellValue = $gridRow->getCellValue($columnTitle);
-        if ($metadata && array_key_exists('type', $metadata) && $metadata['type'] === 'array') {
-            $separator = $metadata['separator'] ?? ',';
-            $value = explode($separator, $value);
-            $cellValue = explode($separator, $cellValue);
-            $value = array_map('trim', $value);
-            $cellValue = array_map('trim', $cellValue);
-            sort($value);
-            sort($cellValue);
+        if ($metadata && array_key_exists('type', $metadata)) {
+            if ($metadata['type'] === 'array') {
+                $separator = $metadata['separator'] ?? ',';
+                $value = explode($separator, $value);
+                $cellValue = explode($separator, $cellValue);
+                $value = array_map('trim', $value);
+                $cellValue = array_map('trim', $cellValue);
+                sort($value);
+                sort($cellValue);
+            }
+            if ($metadata['type'] === 'visible_value') {
+                $value = trim($value);
+                $cellValue = trim($cellValue);
+                $cellValue = mb_substr($cellValue, 0, mb_strlen($value));
+            }
         }
 
         if ($cellValue instanceof \DateTime) {
