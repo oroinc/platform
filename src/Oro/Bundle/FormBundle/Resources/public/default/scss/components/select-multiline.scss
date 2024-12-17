@@ -1,0 +1,16 @@
+/* @theme: default; */
+
+.select-multiline {
+    white-space: normal;
+
+    .select2-choice,
+    .select2-choice span {
+        white-space: normal;
+    }
+
+    &__dropdown {
+        .select2-result-label {
+            white-space: normal;
+        }
+    }
+}

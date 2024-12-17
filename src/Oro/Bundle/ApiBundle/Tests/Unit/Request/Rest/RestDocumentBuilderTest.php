@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\Rest;
 use Oro\Bundle\ApiBundle\Metadata\ExternalLinkMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaAttributeMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Model\ErrorMetaProperty;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Rest\RestDocumentBuilder;
@@ -857,21 +858,59 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testSetErrorCollection()
+    public function testSetErrorObjectForErrorWithMetaProperty()
     {
         $error = new Error();
         $error->setStatusCode(500);
         $error->setCode('errCode');
         $error->setTitle('some error');
         $error->setDetail('some error details');
+        $error->addMetaProperty('meta1', new ErrorMetaProperty('val1'));
 
-        $this->documentBuilder->setErrorCollection([$error]);
+        $this->documentBuilder->setErrorObject($error);
+        self::assertEquals(
+            [
+                [
+                    'code' => 'errCode',
+                    'title' => 'some error',
+                    'detail' => 'some error details',
+                    'properties' => [
+                        'meta1' => 'val1'
+                    ]
+                ]
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function testSetErrorCollection()
+    {
+        $error1 = new Error();
+        $error1->setStatusCode(500);
+        $error1->setCode('errCode');
+        $error1->setTitle('some error');
+        $error1->setDetail('some error details');
+
+        $error2 = new Error();
+        $error2->setStatusCode(400);
+        $error2->setTitle('some error with meta properties');
+        $error2->setDetail('some error details with meta properties');
+        $error2->addMetaProperty('meta1', new ErrorMetaProperty('val1'));
+
+        $this->documentBuilder->setErrorCollection([$error1, $error2]);
         self::assertEquals(
             [
                 [
                     'code' => 'errCode',
                     'title' => 'some error',
                     'detail' => 'some error details'
+                ],
+                [
+                    'title' => 'some error with meta properties',
+                    'detail' => 'some error details with meta properties',
+                    'properties' => [
+                        'meta1' => 'val1'
+                    ]
                 ]
             ],
             $this->documentBuilder->getDocument()

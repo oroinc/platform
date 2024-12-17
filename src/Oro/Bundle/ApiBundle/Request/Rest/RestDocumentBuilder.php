@@ -28,6 +28,7 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     private const ERROR_TITLE = 'title';
     private const ERROR_DETAIL = 'detail';
     private const ERROR_SOURCE = 'source';
+    private const ERROR_PROPERTIES = 'properties';
 
     #[\Override]
     public function getDocument(): array
@@ -141,6 +142,10 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
             } elseif ($source->getPropertyPath()) {
                 $result[self::ERROR_SOURCE] = $source->getPropertyPath();
             }
+        }
+        $metaProperties = $error->getMetaProperties();
+        foreach ($metaProperties as $name => $metaProperty) {
+            $result[self::ERROR_PROPERTIES][$name] = $metaProperty->getValue();
         }
 
         return $result;

@@ -172,6 +172,10 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
                 $result[self::ERROR_SOURCE][self::ERROR_PARAMETER] = $source->getParameter();
             }
         }
+        $metaProperties = $error->getMetaProperties();
+        foreach ($metaProperties as $name => $metaProperty) {
+            $result[self::META][$name] = $metaProperty->getValue();
+        }
 
         return $result;
     }

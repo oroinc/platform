@@ -206,7 +206,7 @@ define([
             this.$el.append(this.template({toolbarPosition: this.$el.data('gridToolbar')}));
 
             const $pagination = this.subviews.pagination.render().$el;
-            $pagination.attr('class', this.$(this.selector.pagination).attr('class'));
+            $pagination.addClass(this.$(this.selector.pagination).attr('class'));
 
             this.$(this.selector.pagination).replaceWith($pagination);
             if (this.subviews.pageSize) {
@@ -240,6 +240,19 @@ define([
             if (this.subviews.massActionsPanel.haveActions()) {
                 this.$(this.selector.massActionsPanel).replaceWith(this.subviews.massActionsPanel.render().$el);
             }
+
+
+            return this;
+        },
+
+        toggleView() {
+            this.$el.removeClass('no-visible-children');
+
+            const noVisibleChildren = Object.values(this.subviews)
+                .filter(view => document.contains(view.el))
+                .every(view => view.$el.hasClass('hide'));
+
+            this.$el.toggleClass('no-visible-children', noVisibleChildren);
 
             return this;
         }

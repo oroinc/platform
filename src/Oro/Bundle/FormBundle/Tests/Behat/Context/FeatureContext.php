@@ -80,4 +80,16 @@ class FeatureContext extends OroFeatureContext implements OroPageObjectAware
             "There is no drag-n-drop icon among rows in '$tableContent' table"
         );
     }
+
+    /**
+     * Example: When I select "Flat Rate" value in "Select Element" select2
+     *
+     * @When /^(?:|I )select "(?P<value>(?:[^"]|\\")*)" value in "(?P<field>(?:[^"]|\\")*)" select2$/
+     */
+    public function iSelectValueInSelect2($value, $field)
+    {
+        $select = $this->createElement($field);
+        $select2 = $this->elementFactory->wrapElement('Select2Offscreen', $select);
+        $select2->setValue($value);
+    }
 }
