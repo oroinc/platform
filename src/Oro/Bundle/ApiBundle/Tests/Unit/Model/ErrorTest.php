@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Model\ErrorMetaProperty;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Model\Label;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -102,6 +103,19 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
 
         $error->setInnerException(null);
         self::assertNull($error->getInnerException());
+    }
+
+    public function testMetaProperties()
+    {
+        $error = new Error();
+        self::assertSame([], $error->getMetaProperties());
+
+        $metaProperty = new ErrorMetaProperty('val1');
+        self::assertSame($error, $error->addMetaProperty('meta1', $metaProperty));
+        self::assertSame(['meta1' => $metaProperty], $error->getMetaProperties());
+
+        self::assertSame($error, $error->removeMetaProperty('meta1'));
+        self::assertSame([], $error->getMetaProperties());
     }
 
     public function testTrans()

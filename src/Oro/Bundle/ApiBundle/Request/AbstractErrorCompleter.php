@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Exception\NotSupportedConfigOperationException;
 use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Model\ErrorMetaProperty;
 use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -16,13 +17,16 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
 {
     private ErrorTitleOverrideProvider $errorTitleOverrideProvider;
     private ExceptionTextExtractorInterface $exceptionTextExtractor;
+    protected ValueNormalizer $valueNormalizer;
 
     public function __construct(
         ErrorTitleOverrideProvider $errorTitleOverrideProvider,
-        ExceptionTextExtractorInterface $exceptionTextExtractor
+        ExceptionTextExtractorInterface $exceptionTextExtractor,
+        ValueNormalizer $valueNormalizer
     ) {
         $this->errorTitleOverrideProvider = $errorTitleOverrideProvider;
         $this->exceptionTextExtractor = $exceptionTextExtractor;
+        $this->valueNormalizer = $valueNormalizer;
     }
 
     protected function completeStatusCode(Error $error): void
@@ -86,6 +90,38 @@ abstract class AbstractErrorCompleter implements ErrorCompleterInterface
                 }
             }
         }
+    }
+
+    protected function completeMetaProperties(Error $error, RequestType $requestType): void
+    {
+        $metaProperties = $error->getMetaProperties();
+        if ($metaProperties) {
+            foreach ($metaProperties as $metaProperty) {
+                $this->completeMetaProperty($metaProperty, $requestType);
+            }
+        }
+    }
+
+    protected function completeMetaProperty(ErrorMetaProperty $metaProperty, RequestType $requestType): void
+    {
+        $value = $metaProperty->getValue();
+        if (null === $value) {
+            return;
+        }
+
+        $dataType = $metaProperty->getDataType();
+        $isArrayAllowed = false;
+        if (str_ends_with($dataType, '[]')) {
+            $dataType = substr($dataType, 0, -2);
+            $isArrayAllowed = true;
+        }
+
+        $metaProperty->setValue($this->valueNormalizer->normalizeValue(
+            $value,
+            $dataType,
+            $requestType,
+            $isArrayAllowed
+        ));
     }
 
     protected function isConfigFilterConstraintViolation(Error $error): bool
