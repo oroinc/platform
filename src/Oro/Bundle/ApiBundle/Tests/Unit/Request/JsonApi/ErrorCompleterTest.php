@@ -12,6 +12,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Model\ErrorMetaProperty;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ErrorTitleOverrideProvider;
@@ -776,6 +777,60 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
 
         $this->errorCompleter->complete($error, $this->requestType, new EntityMetadata('Test\Entity'));
         self::assertEquals($expectedError, $error);
+    }
+
+    public function testCompleteErrorWithMetaPropertyWithNullValue()
+    {
+        $error = new Error();
+        $error->setDetail('test detail');
+        $error->addMetaProperty('meta1', new ErrorMetaProperty(null));
+
+        $this->valueNormalizer->expects(self::never())
+            ->method('normalizeValue');
+
+        $expectedError = new Error();
+        $expectedError->setDetail('test detail');
+        $expectedError->addMetaProperty('meta1', new ErrorMetaProperty(null));
+
+        $this->errorCompleter->complete($error, $this->requestType, new EntityMetadata('Test\Entity'));
+        self::assertEquals($expectedError, $error);
+    }
+
+    /**
+     * @dataProvider completeErrorWithMetaPropertiesDataProvider
+     */
+    public function testCompleteErrorWithMetaProperties(
+        string $dataType,
+        string $dataTypeForNormalization,
+        bool $isArrayAllowed,
+        mixed $value,
+        mixed $normalizedValue
+    ) {
+        $error = new Error();
+        $error->setDetail('test detail');
+        $error->addMetaProperty('meta1', new ErrorMetaProperty($value, $dataType));
+
+        $this->valueNormalizer->expects(self::once())
+            ->method('normalizeValue')
+            ->with($value, $dataTypeForNormalization, $this->requestType, $isArrayAllowed)
+            ->willReturn($normalizedValue);
+
+        $expectedError = new Error();
+        $expectedError->setDetail('test detail');
+        $expectedError->addMetaProperty('meta1', new ErrorMetaProperty($normalizedValue, $dataType));
+
+        $this->errorCompleter->complete($error, $this->requestType, new EntityMetadata('Test\Entity'));
+        self::assertEquals($expectedError, $error);
+    }
+
+    public function completeErrorWithMetaPropertiesDataProvider(): array
+    {
+        return [
+            ['string', 'string', false, 'value', 'normalized_value'],
+            ['string[]', 'string', true, ['value'], ['normalized_value']],
+            ['integer', 'integer', false, '123', 123],
+            ['integer[]', 'integer', true, ['123'], [123]]
+        ];
     }
 
     public function testFixIncludedEntityPathForErrorWithPropertyPathToOwnField()

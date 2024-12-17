@@ -17,6 +17,7 @@ class Error
     private string|Label|null $detail = null;
     private ?ErrorSource $source = null;
     private ?\Exception $innerException = null;
+    private ?array $metaProperties = null;
 
     /**
      * Creates an error object.
@@ -188,6 +189,36 @@ class Error
     public function setInnerException(?\Exception $exception): static
     {
         $this->innerException = $exception;
+
+        return $this;
+    }
+
+    /**
+     * Gets all meta properties associated with the error.
+     *
+     * @return ErrorMetaProperty[] [meta property name => meta property, ...]
+     */
+    public function getMetaProperties(): array
+    {
+        return $this->metaProperties ?? [];
+    }
+
+    /**
+     * Adds a meta property to the error.
+     */
+    public function addMetaProperty(string $name, ErrorMetaProperty $value): static
+    {
+        $this->metaProperties[$name] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Removes a meta property from the error.
+     */
+    public function removeMetaProperty(string $name): static
+    {
+        unset($this->metaProperties[$name]);
 
         return $this;
     }

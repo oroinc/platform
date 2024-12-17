@@ -19,6 +19,7 @@ class ErrorCompleter extends AbstractErrorCompleter
         $this->completeCode($error);
         $this->completeTitle($error);
         $this->completeDetail($error);
+        $this->completeMetaProperties($error, $requestType);
     }
 
     #[\Override]

@@ -28,7 +28,6 @@ class ErrorCompleter extends AbstractErrorCompleter
 {
     private const POINTER_DELIMITER = '/';
 
-    private ValueNormalizer $valueNormalizer;
     private FilterNamesRegistry $filterNamesRegistry;
 
     public function __construct(
@@ -37,8 +36,7 @@ class ErrorCompleter extends AbstractErrorCompleter
         ValueNormalizer $valueNormalizer,
         FilterNamesRegistry $filterNamesRegistry
     ) {
-        parent::__construct($errorTitleOverrideProvider, $exceptionTextExtractor);
-        $this->valueNormalizer = $valueNormalizer;
+        parent::__construct($errorTitleOverrideProvider, $exceptionTextExtractor, $valueNormalizer);
         $this->filterNamesRegistry = $filterNamesRegistry;
     }
 
@@ -50,6 +48,7 @@ class ErrorCompleter extends AbstractErrorCompleter
         $this->completeTitle($error);
         $this->completeDetail($error);
         $this->completeSource($error, $requestType, $metadata);
+        $this->completeMetaProperties($error, $requestType);
     }
 
     #[\Override]

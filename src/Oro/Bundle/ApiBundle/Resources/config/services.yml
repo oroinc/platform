@@ -672,6 +672,7 @@ services:
         arguments:
             - '@oro_api.error_title_override_provider'
             - '@oro_api.exception_text_extractor'
+            - '@oro_api.value_normalizer'
         tags:
             - { name: oro.api.error_completer, requestType: rest&!json_api, priority: -10 }
 
