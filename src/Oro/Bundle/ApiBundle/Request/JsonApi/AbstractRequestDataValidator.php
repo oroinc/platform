@@ -25,11 +25,29 @@ abstract class AbstractRequestDataValidator extends AbstractBaseRequestDataValid
             $this->validateJsonApiSection($requestData);
             $this->validateLinksSection($requestData);
             $isValid = true;
-            if (\array_key_exists(JsonApiDoc::META, $requestData) && null === $requestData[JsonApiDoc::META]) {
-                $this->addError(
-                    $this->buildPointer(self::ROOT_POINTER, JsonApiDoc::META),
-                    sprintf('The primary %s object should not be empty', JsonApiDoc::META)
-                );
+            if (\array_key_exists(JsonApiDoc::META, $requestData)) {
+                $meta = $requestData[JsonApiDoc::META];
+                if (null === $meta) {
+                    $this->addError(
+                        $this->buildPointer(self::ROOT_POINTER, JsonApiDoc::META),
+                        sprintf('The primary %s object should not be empty', JsonApiDoc::META)
+                    );
+                    $isValid = false;
+                } elseif (!\is_array($meta)) {
+                    $this->addError(
+                        $this->buildPointer(self::ROOT_POINTER, JsonApiDoc::META),
+                        sprintf('The primary %s object should be an array', JsonApiDoc::META)
+                    );
+                    $isValid = false;
+                } elseif (!empty($meta) && !ArrayUtil::isAssoc($meta)) {
+                    $this->addError(
+                        $this->buildPointer(self::ROOT_POINTER, JsonApiDoc::META),
+                        sprintf('The primary %s object should be an associative array', JsonApiDoc::META)
+                    );
+                    $isValid = false;
+                }
+            } elseif ($requestData) {
+                $this->addError(self::ROOT_POINTER, sprintf('The \'%s\' section should exist', JsonApiDoc::META));
                 $isValid = false;
             }
             if ($isValid) {
