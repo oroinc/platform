@@ -654,10 +654,13 @@ define(function(require) {
             const {
                 nonConfigurableChoices,
                 configurableChoices
-            } = Object.groupBy(
-                choices,
-                ({isEditable}) => isEditable ? 'configurableChoices' : 'nonConfigurableChoices'
-            );
+            } = choices.reduce((accumulator, item) => {
+                const field = item.isEditable ? 'configurableChoices' : 'nonConfigurableChoices';
+                (
+                    accumulator[field] = (accumulator[field] || [])
+                ).push(item);
+                return accumulator;
+            }, {});
 
             return {
                 title: title,
