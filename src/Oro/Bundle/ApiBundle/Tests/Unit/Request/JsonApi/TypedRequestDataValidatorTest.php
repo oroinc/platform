@@ -1315,7 +1315,9 @@ class TypedRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     {
         return [
             [['meta' => null], 'The primary meta object should not be empty', '/meta'],
-            [['data' => ['type' => 'products']], 'The \'data\' section should not exist', '/data'],
+            [['meta' => 'val'], 'The primary meta object should be an array', '/meta'],
+            [['meta' => [1, 2, 3]], 'The primary meta object should be an associative array', '/meta'],
+            [['data' => ['type' => 'products']], 'The \'meta\' section should exist', ''],
             [
                 ['meta' => ['key' => 'value'], 'data' => []],
                 'The \'data\' section should not exist',
