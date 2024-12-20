@@ -519,7 +519,9 @@ define(function(require) {
                 return {
                     label: model.getLabel(),
                     icon: showIcons ? model.get('icon') : false,
-                    value: model.get('name')
+                    value: model.get('name'),
+                    isDefault: model.get('is_default'),
+                    isEditable: model.get('editable')
                 };
             }, this);
 
@@ -634,22 +636,7 @@ define(function(require) {
             } else {
                 this._checkCurrentState();
 
-                const title = this.renderTitle();
-                const actions = this._getViewActions();
-
-                content = this.template({
-                    title: title,
-                    titleLabel: this.title,
-                    disabled: !this.enabled,
-                    choices: this.getViewChoices(),
-                    current: this.collection.state.gridView,
-                    dirty: this.viewDirty,
-                    editedLabel: __('oro.datagrid.gridView.data_edited'),
-                    actionsLabel: __('oro.datagrid.gridView.actions'),
-                    actions: actions,
-                    showActions: this.showActions(actions),
-                    gridViewId: this.cid
-                });
+                content = this.template(this.getTemplateData());
             }
 
             this.$el.html(content);
@@ -657,6 +644,39 @@ define(function(require) {
             mediator.trigger('layout:reposition');
 
             return this;
+        },
+
+        getTemplateData() {
+            const title = this.renderTitle();
+            const actions = this._getViewActions();
+
+            const choices = this.getViewChoices();
+            const {
+                nonConfigurableChoices,
+                configurableChoices
+            } = choices.reduce((accumulator, item) => {
+                const field = item.isEditable ? 'configurableChoices' : 'nonConfigurableChoices';
+                (
+                    accumulator[field] = (accumulator[field] || [])
+                ).push(item);
+                return accumulator;
+            }, {});
+
+            return {
+                title: title,
+                titleLabel: this.title,
+                disabled: !this.enabled,
+                choices: choices,
+                configurableChoices: configurableChoices,
+                nonConfigurableChoices: nonConfigurableChoices,
+                current: this.collection.state.gridView,
+                dirty: this.viewDirty,
+                editedLabel: __('oro.datagrid.gridView.data_edited'),
+                actionsLabel: __('oro.datagrid.gridView.actions'),
+                actions: actions,
+                showActions: this.showActions(actions),
+                gridViewId: this.cid
+            };
         },
 
         /**
