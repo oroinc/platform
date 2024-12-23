@@ -144,12 +144,12 @@
             {{ form_widget(form) }}
 
             {% if isButtonsEnabled %}
-                <button class="add-on btn btn-icon btn-square-default entity-select-btn" type="button" aria-label="{{ 'oro.form.entity_select'|trans({'%name%': label|trans({}, translation_domain) }) }}">
+                <button class="add-on btn btn--neutral entity-select-btn" type="button" aria-label="{{ 'oro.form.entity_select'|trans({'%name%': label|trans({}, translation_domain) }) }}">
                     {{ renderIcon.icon({name: 'hamburger-menu'}) }}
                 </button>
 
                 {% if form.vars.create_enabled %}
-                    <button class="btn btn-icon btn-square-default entity-create-btn" type="button" aria-label="{{ 'oro.form.entity_create'|trans({'%name%': label|trans({}, translation_domain) }) }}">
+                    <button class="btn btn--neutral entity-create-btn" type="button" aria-label="{{ 'oro.form.entity_create'|trans({'%name%': label|trans({}, translation_domain) }) }}">
                         {{ renderIcon.icon({name: 'plus'}) }}
                     </button>
                 {% endif %}
