@@ -350,3 +350,8 @@
         display: none;
     }
 }
+
+.grid-row-attention {
+    background-color: $oro-datagrid-highlight-bg;
+    font-weight: bold;
+}

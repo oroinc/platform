@@ -265,7 +265,7 @@ datagrids:
                 params: { id: id }
             row_class_name:
                 type: callback
-                className: 'email-row-is-read'
+                className: ''
                 callable: "@oro_email.helper.datagrid.emails->getReadedRowClosure"
 
         actions:
