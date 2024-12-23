@@ -10,6 +10,9 @@ use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Sync\EmailSynchronizationManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
+/**
+ * Helper for email related datagrids.
+ */
 class EmailGridHelper
 {
     /** @var DoctrineHelper */
@@ -139,7 +142,7 @@ class EmailGridHelper
             if (!$record->getValue('is_new')) {
                 return $className;
             } else {
-                return '';
+                return $className === null ? $className : 'grid-row-attention';
             }
         };
     }
