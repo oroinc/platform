@@ -135,7 +135,7 @@ class LoadNormalizedEntityTest extends CreateProcessorTestCase
 
         $this->context->setClassName('Test\Entity');
         $this->context->setId(123);
-        $this->context->setMasterRequest(true);
+        $this->context->setMainRequest(true);
         $this->context->setCorsRequest(true);
         $this->context->setHateoas(true);
         $this->context->getRequestHeaders()->set('test-header', 'some value');
@@ -144,7 +144,7 @@ class LoadNormalizedEntityTest extends CreateProcessorTestCase
         $expectedGetContext = new GetContext($this->configProvider, $this->metadataProvider);
         $expectedGetContext->setVersion($this->context->getVersion());
         $expectedGetContext->getRequestType()->set($this->context->getRequestType());
-        $expectedGetContext->setMasterRequest(false);
+        $expectedGetContext->setMainRequest(false);
         $expectedGetContext->setCorsRequest(false);
         $expectedGetContext->setHateoas(true);
         $expectedGetContext->setRequestHeaders($this->context->getRequestHeaders());
@@ -198,7 +198,7 @@ class LoadNormalizedEntityTest extends CreateProcessorTestCase
         $expectedContext->setAction(ApiAction::UPDATE);
         $expectedContext->setVersion($this->context->getVersion());
         $expectedContext->getRequestType()->set($this->context->getRequestType());
-        $expectedContext->setMasterRequest(true);
+        $expectedContext->setMainRequest(true);
         $expectedContext->setCorsRequest(true);
         $expectedContext->setHateoas(true);
         $expectedContext->setRequestHeaders($this->context->getRequestHeaders());

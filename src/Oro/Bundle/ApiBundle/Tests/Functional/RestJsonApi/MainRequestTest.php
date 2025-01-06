@@ -10,18 +10,18 @@ use Oro\Bundle\TestFrameworkBundle\Entity\TestProduct;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestProductType;
 
 /**
- * Tests that "master request" flag is TRUE for master requests and FALSE for sub requests.
+ * Tests that "main request" flag is TRUE for main requests and FALSE for sub requests.
  * @dbIsolationPerTest
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class MasterRequestTest extends RestJsonApiTestCase
+class MainRequestTest extends RestJsonApiTestCase
 {
     #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
         $this->loadFixtures([
-            '@OroApiBundle/Tests/Functional/DataFixtures/master_request.yml'
+            '@OroApiBundle/Tests/Functional/DataFixtures/main_request.yml'
         ]);
     }
 

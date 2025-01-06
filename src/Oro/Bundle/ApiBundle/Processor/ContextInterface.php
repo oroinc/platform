@@ -106,16 +106,16 @@ interface ContextInterface extends SharedDataAwareContextInterface
     public function setFilterValues(FilterValueAccessorInterface $accessor): void;
 
     /**
-     * Indicates whether the current action processes a master API request
+     * Indicates whether the current action processes a main API request
      * or it is executed as part of another action.
      */
     public function isMainRequest(): bool;
 
     /**
-     * Sets a flag indicates whether the current action processes a master API request
+     * Sets a flag indicates whether the current action processes a main API request
      * or it is executed as part of another action.
      */
-    public function setMasterRequest(bool $master): void;
+    public function setMainRequest(bool $main): void;
 
     /**
      * Indicates whether the current request is CORS request.

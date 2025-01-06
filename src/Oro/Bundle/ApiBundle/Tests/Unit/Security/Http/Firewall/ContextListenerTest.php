@@ -51,7 +51,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         return $listener;
     }
 
-    private function createMasterRequestEvent($isXmlHttpRequest = true): RequestEvent
+    private function createMainRequestEvent($isXmlHttpRequest = true): RequestEvent
     {
         $kernel = $this->createMock(HttpKernelInterface::class);
         $request = new Request([], [], ['_route' => 'foo']);
@@ -73,7 +73,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getName')
             ->willReturn(self::SESSION_NAME);
 
-        $event = $this->createMasterRequestEvent();
+        $event = $this->createMainRequestEvent();
         $event->getRequest()->setSession($session);
         $event->getRequest()->cookies->add([self::SESSION_NAME => self::SESSION_ID]);
         $event->getRequest()->setMethod('POST');
@@ -102,7 +102,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         $session->expects(self::never())
             ->method('getName');
 
-        $event = $this->createMasterRequestEvent();
+        $event = $this->createMainRequestEvent();
         $event->getRequest()->setSession($session);
         $event->getRequest()->cookies->add([self::SESSION_NAME => self::SESSION_ID]);
         $event->getRequest()->setMethod('POST');
@@ -127,7 +127,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getName')
             ->willReturn(self::SESSION_NAME);
 
-        $event = $this->createMasterRequestEvent(false);
+        $event = $this->createMainRequestEvent(false);
         $event->getRequest()->setSession($session);
         $event->getRequest()->cookies->add([self::SESSION_NAME => self::SESSION_ID]);
         $event->getRequest()->setMethod('POST');
@@ -152,7 +152,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getName')
             ->willReturn(self::SESSION_NAME);
 
-        $event = $this->createMasterRequestEvent();
+        $event = $this->createMainRequestEvent();
         $event->getRequest()->setSession($session);
         $event->getRequest()->setMethod('POST');
 
@@ -176,7 +176,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getName')
             ->willReturn(self::SESSION_NAME);
 
-        $event = $this->createMasterRequestEvent();
+        $event = $this->createMainRequestEvent();
         $event->getRequest()->setSession($session);
         $event->getRequest()->cookies->add([self::SESSION_NAME => self::SESSION_ID]);
         $event->getRequest()->setMethod('POST');
@@ -210,7 +210,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getName')
             ->willReturn(self::SESSION_NAME);
 
-        $event = $this->createMasterRequestEvent();
+        $event = $this->createMainRequestEvent();
         $event->getRequest()->setSession($session);
         $event->getRequest()->cookies->add([self::SESSION_NAME => self::SESSION_ID]);
         $event->getRequest()->setMethod('POST');
@@ -243,7 +243,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getName')
             ->willReturn(self::SESSION_NAME);
 
-        $event = $this->createMasterRequestEvent();
+        $event = $this->createMainRequestEvent();
         $event->getRequest()->setSession($session);
         $event->getRequest()->cookies->add([self::SESSION_NAME => self::SESSION_ID]);
         $event->getRequest()->setMethod('POST');
@@ -272,7 +272,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getName')
             ->willReturn(self::SESSION_NAME);
 
-        $event = $this->createMasterRequestEvent();
+        $event = $this->createMainRequestEvent();
         $event->getRequest()->setSession($session);
         $event->getRequest()->setMethod('POST');
 

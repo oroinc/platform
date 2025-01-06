@@ -89,7 +89,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $expectedGetContext = new GetContext($this->configProvider, $this->metadataProvider);
         $expectedGetContext->setVersion($this->context->getVersion());
         $expectedGetContext->getRequestType()->set($this->context->getRequestType());
-        $expectedGetContext->setMasterRequest(false);
+        $expectedGetContext->setMainRequest(false);
         $expectedGetContext->setCorsRequest(false);
         $expectedGetContext->setHateoas(true);
         $expectedGetContext->setRequestHeaders($this->context->getRequestHeaders());
@@ -116,7 +116,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $this->context->setIncludedEntities($includedEntities);
         $this->context->setClassName('Test\Entity');
         $this->context->setId(123);
-        $this->context->setMasterRequest(true);
+        $this->context->setMainRequest(true);
         $this->context->setCorsRequest(true);
         $this->context->setHateoas(true);
         $this->context->getRequestHeaders()->set('test-header', 'some value');
@@ -170,7 +170,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $expectedGetContext = new GetContext($this->configProvider, $this->metadataProvider);
         $expectedGetContext->setVersion($this->context->getVersion());
         $expectedGetContext->getRequestType()->set($this->context->getRequestType());
-        $expectedGetContext->setMasterRequest(false);
+        $expectedGetContext->setMainRequest(false);
         $expectedGetContext->setCorsRequest(false);
         $expectedGetContext->setHateoas(true);
         $expectedGetContext->setRequestHeaders($this->context->getRequestHeaders());
@@ -197,7 +197,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $this->context->setIncludedEntities($includedEntities);
         $this->context->setClassName('Test\Entity');
         $this->context->setId(123);
-        $this->context->setMasterRequest(true);
+        $this->context->setMainRequest(true);
         $this->context->setCorsRequest(true);
         $this->context->setHateoas(true);
         $this->context->getRequestHeaders()->set('test-header', 'some value');
@@ -250,7 +250,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $expectedGetContext = new GetContext($this->configProvider, $this->metadataProvider);
         $expectedGetContext->setVersion($this->context->getVersion());
         $expectedGetContext->getRequestType()->set($this->context->getRequestType());
-        $expectedGetContext->setMasterRequest(false);
+        $expectedGetContext->setMainRequest(false);
         $expectedGetContext->setCorsRequest(false);
         $expectedGetContext->setHateoas(true);
         $expectedGetContext->setRequestHeaders($this->context->getRequestHeaders());
@@ -276,7 +276,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $this->context->setIncludedEntities($includedEntities);
         $this->context->setClassName('Test\Entity');
         $this->context->setId(123);
-        $this->context->setMasterRequest(true);
+        $this->context->setMainRequest(true);
         $this->context->setCorsRequest(true);
         $this->context->setHateoas(true);
         $this->context->getRequestHeaders()->set('test-header', 'some value');

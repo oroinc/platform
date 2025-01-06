@@ -75,7 +75,7 @@ class ContextHelper
     {
         $request = $this->requestStack->getMainRequest();
         if (!$request) {
-            throw new \RuntimeException('Master Request is not defined');
+            throw new \RuntimeException('The main request is not defined.');
         }
         $params = [
             self::ROUTE_PARAM => $request->attributes->get('_route'),

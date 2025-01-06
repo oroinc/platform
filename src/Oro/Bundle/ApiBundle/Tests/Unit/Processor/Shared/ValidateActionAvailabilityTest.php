@@ -36,7 +36,7 @@ class ValidateActionAvailabilityTest extends GetListProcessorTestCase
             ->with($entityClass, $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn(['action1', 'action2']);
 
-        $this->context->setMasterRequest(true);
+        $this->context->setMainRequest(true);
         $this->context->setClassName($entityClass);
         $this->context->setAction('action1');
         $this->processor->process($this->context);
@@ -53,7 +53,7 @@ class ValidateActionAvailabilityTest extends GetListProcessorTestCase
             ->with($entityClass, $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn(['action1', 'action2']);
 
-        $this->context->setMasterRequest(false);
+        $this->context->setMainRequest(false);
         $this->context->setClassName($entityClass);
         $this->context->setAction('action1');
         $this->processor->process($this->context);

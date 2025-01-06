@@ -265,7 +265,6 @@ services:
         class: 'Oro\Bundle\ActionBundle\Provider\OriginalUrlProvider'
         arguments:
             - '@request_stack'
-            - '@router'
             - '@oro_datagrid.converter.url_converter'
 
     Oro\Bundle\ActionBundle\Provider\OriginalUrlProvider:
