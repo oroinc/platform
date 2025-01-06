@@ -55,7 +55,9 @@ class EntityMapper
             $model = $this->innerGetModel($entity, $modelClass);
             if ($updateReferences) {
                 $this->processing->removeAll($this->processing);
-                $this->updateReferencesToModel($model, $entity);
+                if ($model !== $entity) {
+                    $this->updateReferencesToModel($model, $entity);
+                }
             }
 
             return $model;
@@ -94,12 +96,9 @@ class EntityMapper
 
     /**
      * Makes sure that the given entity exists in the map.
-     *
-     * @throws \InvalidArgumentException if the entity is not a manageable entity
      */
     public function registerEntity(object $entity): void
     {
-        $this->assertEntity($this->doctrineHelper->getClass($entity));
         if (!$this->entityMap->offsetExists($entity)) {
             $this->entityMap->offsetSet($entity, null);
         }
@@ -150,7 +149,7 @@ class EntityMapper
             }
             $this->entityMap->offsetSet($entity, $model);
             $this->modelMap->offsetSet($model, $entity);
-            if (!$this->processing->offsetExists($entity)) {
+            if ($model !== $entity && !$this->processing->offsetExists($entity)) {
                 $this->processing->offsetSet($entity);
                 $this->updateModelAssociations($model, $entity);
             }
@@ -386,7 +385,6 @@ class EntityMapper
                 $modelClass
             ));
         }
-        $this->assertEntity($entityClass);
     }
 
     private function isValidModelClass(string $modelClass, string $entityClass): bool
@@ -396,21 +394,6 @@ class EntityMapper
         }
 
         return is_subclass_of($modelClass, $entityClass);
-    }
-
-    /**
-     * Checks if the given entity class is a manageable entity.
-     *
-     * @throws \InvalidArgumentException if the entity class is not a manageable entity
-     */
-    private function assertEntity(string $entityClass): void
-    {
-        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            throw new \InvalidArgumentException(sprintf(
-                'The entity class "%s" must represent a manageable entity.',
-                $entityClass
-            ));
-        }
     }
 
     /**

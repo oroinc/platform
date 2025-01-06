@@ -120,6 +120,35 @@ class MergeParentResourceHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testMergeParentDefinitionWithNullAclResource(): void
+    {
+        $parentResourceClass = 'Test\ParentEntity';
+
+        $parentDefinition = new EntityDefinitionConfig();
+        $parentDefinition->setExcludeAll();
+        $parentDefinition->setKey('parent key');
+        $parentDefinition->setAclResource('parent_entity_acl');
+
+        $definition = new EntityDefinitionConfig();
+        $definition->setKey('key');
+        $definition->setAclResource(null);
+
+        $this->context->setResult($definition);
+        $this->loadParentConfig($parentResourceClass, $this->getConfig($parentDefinition));
+        $this->mergeParentResourceHelper->mergeParentResourceConfig($this->context, $parentResourceClass);
+
+        self::assertSame($parentDefinition, $this->context->getResult());
+        self::assertFalse($parentDefinition->getUpsertConfig()->hasEnabled());
+        self::assertEquals('key', $parentDefinition->getKey());
+        self::assertEquals(
+            [
+                'parent_resource_class' => 'Test\ParentEntity',
+                'acl_resource' => null
+            ],
+            $parentDefinition->toArray()
+        );
+    }
+
     public function testMergeParentDefinitionWhenEntityHasAnotherIdentifierField(): void
     {
         $parentResourceClass = 'Test\ParentEntity';
