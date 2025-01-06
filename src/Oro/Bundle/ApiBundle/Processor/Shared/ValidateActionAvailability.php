@@ -32,7 +32,11 @@ class ValidateActionAvailability implements ProcessorInterface
             $context->getRequestType()
         );
         if (\in_array($context->getAction(), $excludeActions, true)) {
-            throw new ActionNotAllowedException();
+            throw new ActionNotAllowedException(
+                $context->isMainRequest()
+                    ? 'The action is not allowed.'
+                    : \sprintf('The "%s" action is not allowed.', $context->getAction())
+            );
         }
     }
 }

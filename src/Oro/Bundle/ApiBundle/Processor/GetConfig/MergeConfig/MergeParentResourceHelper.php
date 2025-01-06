@@ -57,6 +57,9 @@ class MergeParentResourceHelper
         $config->setKey($configToMerge->getKey());
         $this->mergeUpsertConfig($config->getUpsertConfig(), $configToMerge->getUpsertConfig());
         $this->mergeEntityConfigAttributes($config, $configToMerge);
+        if ($configToMerge->hasAclResource() && null === $configToMerge->getAclResource()) {
+            $config->setAclResource(null);
+        }
         if ($configToMerge->getIdentifierFieldNames()) {
             $config->setIdentifierFieldNames($configToMerge->getIdentifierFieldNames());
         }

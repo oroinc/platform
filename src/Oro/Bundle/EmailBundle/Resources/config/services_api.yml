@@ -292,7 +292,7 @@ services:
     oro_email.api.disable_email_attachment_creation:
         class: Oro\Bundle\EmailBundle\Api\Processor\DisableEmailAttachmentCreation
         tags:
-            - { name: oro.api.processor, action: create, group: resource_check, class: Oro\Bundle\EmailBundle\Entity\EmailAttachment, priority: 250 }
+            - { name: oro.api.processor, action: create, group: resource_check, class: Oro\Bundle\EmailBundle\Entity\EmailAttachment }
 
     oro_email.api.compute_email_attachment_email:
         class: Oro\Bundle\EmailBundle\Api\Processor\ComputeEmailAttachmentEmail

@@ -25,9 +25,10 @@ class ValidateActionAvailabilityTest extends GetListProcessorTestCase
         $this->processor = new ValidateActionAvailability($this->resourcesProvider);
     }
 
-    public function testProcessWhenActionIsExcluded()
+    public function testProcessForPrimaryEntityWhenActionIsExcluded()
     {
         $this->expectException(ActionNotAllowedException::class);
+        $this->expectExceptionMessage('The action is not allowed.');
         $entityClass = 'Test\Class';
 
         $this->resourcesProvider->expects(self::once())
@@ -35,6 +36,24 @@ class ValidateActionAvailabilityTest extends GetListProcessorTestCase
             ->with($entityClass, $this->context->getVersion(), $this->context->getRequestType())
             ->willReturn(['action1', 'action2']);
 
+        $this->context->setMasterRequest(true);
+        $this->context->setClassName($entityClass);
+        $this->context->setAction('action1');
+        $this->processor->process($this->context);
+    }
+
+    public function testProcessForIncludedEntityWhenActionIsExcluded()
+    {
+        $this->expectException(ActionNotAllowedException::class);
+        $this->expectExceptionMessage('The "action1" action is not allowed.');
+        $entityClass = 'Test\Class';
+
+        $this->resourcesProvider->expects(self::once())
+            ->method('getResourceExcludeActions')
+            ->with($entityClass, $this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(['action1', 'action2']);
+
+        $this->context->setMasterRequest(false);
         $this->context->setClassName($entityClass);
         $this->context->setAction('action1');
         $this->processor->process($this->context);

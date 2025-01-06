@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Model\SomeModel;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
 use Oro\Bundle\ApiBundle\Util\EntityMapper;
@@ -35,7 +36,7 @@ class EntityMapperTest extends OrmRelatedTestCase
         $this->notManageableClassNames = [UserProfile::class];
     }
 
-    public function testGetModelForEnumOption()
+    public function testGetModelForEnumOption(): void
     {
         $entity = new EnumOption('test.1', 'test', 'Item 1', '1');
         $modelClass = 'Extend\Entity\EV_Test_Enum';
@@ -43,14 +44,14 @@ class EntityMapperTest extends OrmRelatedTestCase
         $this->entityOverrideProvider->expects(self::never())
             ->method('getSubstituteEntityClass');
 
-        /** @var UserProfile $model */
+        /** @var EnumOption $model */
         $model = $this->entityMapper->getModel($entity, $modelClass);
 
         self::assertInstanceOf(EnumOption::class, $model);
         self::assertEquals($entity->getId(), $model->getId());
     }
 
-    public function testGetModelWithEmptyAssociations()
+    public function testGetModelWithEmptyAssociations(): void
     {
         $entity = new User();
         $entity->setId(123);
@@ -66,7 +67,7 @@ class EntityMapperTest extends OrmRelatedTestCase
         self::assertEquals($entity->getId(), $model->getId());
     }
 
-    public function testGetEntityWithEmptyAssociations()
+    public function testGetEntityWithEmptyAssociations(): void
     {
         $model = new UserProfile();
         $model->setId(123);
@@ -83,7 +84,7 @@ class EntityMapperTest extends OrmRelatedTestCase
         self::assertEquals($model->getId(), $entity->getId());
     }
 
-    public function testGetModelWithNotEmptyToOneAssociation()
+    public function testGetModelWithNotEmptyToOneAssociation(): void
     {
         $entity = new User();
         $entity->setCategory(new Category('category1'));
@@ -101,7 +102,7 @@ class EntityMapperTest extends OrmRelatedTestCase
         self::assertSame($entity->getCategory(), $model->getCategory());
     }
 
-    public function testGetEntityWithNotEmptyToOneAssociation()
+    public function testGetEntityWithNotEmptyToOneAssociation(): void
     {
         $model = new UserProfile();
         $model->setCategory(new Category('category1'));
@@ -116,5 +117,55 @@ class EntityMapperTest extends OrmRelatedTestCase
         self::assertInstanceOf($entityClass, $entity);
         self::assertNotInstanceOf(UserProfile::class, $entity);
         self::assertSame($model->getCategory(), $entity->getCategory());
+    }
+
+    public function testGetModelWhenItIsNotManageableEntity(): void
+    {
+        $entity = new SomeModel(123);
+
+        $this->entityOverrideProvider->expects(self::never())
+            ->method('getSubstituteEntityClass');
+
+        $model = $this->entityMapper->getModel($entity, SomeModel::class);
+
+        self::assertSame($entity, $model);
+    }
+
+    public function testGetEntityWhenItIsNotManageableEntity(): void
+    {
+        $model = new SomeModel(123);
+
+        $this->entityOverrideProvider->expects(self::never())
+            ->method('getSubstituteEntityClass');
+
+        $entity = $this->entityMapper->getEntity($model, SomeModel::class);
+
+        self::assertSame($model, $entity);
+    }
+
+    public function testGetModelWhenItIsNotManageableEntityAndPreregisteredEntity(): void
+    {
+        $entity = new SomeModel(123);
+
+        $this->entityOverrideProvider->expects(self::never())
+            ->method('getSubstituteEntityClass');
+
+        $this->entityMapper->registerEntity($entity);
+        $model = $this->entityMapper->getModel($entity, SomeModel::class);
+
+        self::assertSame($entity, $model);
+    }
+
+    public function testGetEntityWhenItIsNotManageableEntityAndPreregisteredEntity(): void
+    {
+        $model = new SomeModel(123);
+
+        $this->entityOverrideProvider->expects(self::never())
+            ->method('getSubstituteEntityClass');
+
+        $this->entityMapper->registerEntity($model);
+        $entity = $this->entityMapper->getEntity($model, SomeModel::class);
+
+        self::assertSame($model, $entity);
     }
 }

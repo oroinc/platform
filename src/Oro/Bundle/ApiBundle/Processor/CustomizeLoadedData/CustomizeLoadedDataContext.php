@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\Extra\HateoasConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\CustomizeDataContext;
@@ -9,6 +10,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * The execution context for processors for "customize_loaded_data" action.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class CustomizeLoadedDataContext extends CustomizeDataContext
 {
@@ -63,9 +65,11 @@ class CustomizeLoadedDataContext extends CustomizeDataContext
     /**
      * Gets the name under which the given field should be represented in response data.
      */
-    public function getResultFieldName(string $propertyPath): ?string
+    public function getResultFieldName(string $propertyPath, ?EntityDefinitionConfig $config = null): ?string
     {
-        $config = $this->getConfig();
+        if (null === $config) {
+            $config = $this->getConfig();
+        }
         if (null === $config) {
             return $propertyPath;
         }
