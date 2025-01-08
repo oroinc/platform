@@ -6,15 +6,14 @@ use Knp\Menu\Matcher\Voter\UriVoter;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Voter based on the master request uri
+ * Voter based on the main request URI.
  */
 class RequestVoter extends UriVoter
 {
     public function __construct(RequestStack $requestStack)
     {
-        // Using master request, as sub-requests routes must not be taken into account when matching the menu items
+        // Use the main request, as sub-requests routes must not be taken into account when matching the menu items
         $request = $requestStack->getMainRequest();
-
         if ($request) {
             parent::__construct($request->getRequestUri());
         }

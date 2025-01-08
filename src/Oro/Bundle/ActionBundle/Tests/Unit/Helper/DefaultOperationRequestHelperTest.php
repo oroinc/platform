@@ -31,13 +31,13 @@ class DefaultOperationRequestHelperTest extends \PHPUnit\Framework\TestCase
      * @dataProvider getRequestRouteProvider
      */
     public function testGetRequestRoute(
-        ?Request $masterRequest,
+        ?Request $mainRequest,
         string $executionRoute,
         ?string $expected
     ): void {
         $this->requestStack->expects($this->once())
             ->method('getMainRequest')
-            ->willReturn($masterRequest);
+            ->willReturn($mainRequest);
 
         $this->routeProvider->expects($executionRoute ? $this->once() : $this->never())
             ->method('getExecutionRoute')
@@ -49,64 +49,52 @@ class DefaultOperationRequestHelperTest extends \PHPUnit\Framework\TestCase
     public function getRequestRouteProvider(): array
     {
         return [
-            'empty master request' => [
-                'masterRequest' => null,
+            'empty main request' => [
+                'mainRequest' => null,
                 'executionRoute' => '',
-                'expected' => null,
+                'expected' => null
             ],
             'empty route name' => [
-                'masterRequest' => new Request(),
+                'mainRequest' => new Request(),
                 'executionRoute' => 'execution_route',
-                'expected' => null,
+                'expected' => null
             ],
             'execution route name' => [
-                'masterRequest' => new Request([
-                    '_route' => 'execution_route',
-                ]),
+                'mainRequest' => new Request(['_route' => 'execution_route']),
                 'executionRoute' => 'execution_route',
-                'expected' => null,
+                'expected' => null
             ],
             'exists route name' => [
-                'masterRequest' => new Request([
-                    '_route' => 'test_route',
-                ]),
+                'mainRequest' => new Request(['_route' => 'test_route']),
                 'executionRoute' => 'execution_route',
-                'expected' => 'test_route',
+                'expected' => 'test_route'
             ],
             'exists route name with datagrid route' => [
-                'masterRequest' => new Request([
+                'mainRequest' => new Request([
                     '_route' => DefaultOperationRequestHelper::DATAGRID_ROUTE,
                     'gridName' => 'test-grid',
-                    'test-grid' => [
-                        'originalRoute' => 'test_original_route'
-                    ]
+                    'test-grid' => ['originalRoute' => 'test_original_route']
                 ]),
                 'executionRoute' => 'test_route',
-                'expected' => 'test_original_route',
+                'expected' => 'test_original_route'
             ],
             'exists route name with mass action route' => [
-                'masterRequest' => new Request([
+                'mainRequest' => new Request([
                     '_route' => DefaultOperationRequestHelper::MASS_ACTION_ROUTE,
                     'gridName' => 'test-grid',
-                    'test-grid' => [
-                        'originalRoute' => 'test_original_route'
-                    ]
+                    'test-grid' => ['originalRoute' => 'test_original_route']
                 ]),
                 'executionRoute' => 'test_route',
-                'expected' => 'test_original_route',
+                'expected' => 'test_original_route'
             ],
             'exists route name with datagrid widget route' => [
-                'masterRequest' => new Request(
-                    [
-                        '_route' => DefaultOperationRequestHelper::DATAGRID_WIDGET_ROUTE,
-                        'gridName' => 'test-grid',
-                        'test-grid' => [
-                            'originalRoute' => 'test_original_route',
-                        ],
-                    ]
-                ),
+                'mainRequest' => new Request([
+                    '_route' => DefaultOperationRequestHelper::DATAGRID_WIDGET_ROUTE,
+                    'gridName' => 'test-grid',
+                    'test-grid' => ['originalRoute' => 'test_original_route']
+                ]),
                 'executionRoute' => 'test_route',
-                'expected' => 'test_original_route',
+                'expected' => 'test_original_route'
             ],
         ];
     }
@@ -115,13 +103,13 @@ class DefaultOperationRequestHelperTest extends \PHPUnit\Framework\TestCase
      * @dataProvider isExecutionRouteRequestProvider
      */
     public function isExecutionRouteRequest(
-        ?Request $masterRequest,
+        ?Request $mainRequest,
         ?string $executionRoute,
         ?bool $expected
     ): void {
         $this->requestStack->expects($this->once())
             ->method('getMainRequest')
-            ->willReturn($masterRequest);
+            ->willReturn($mainRequest);
 
         $this->routeProvider->expects($executionRoute ? $this->once() : $this->never())
             ->method('getExecutionRoute')
@@ -133,29 +121,25 @@ class DefaultOperationRequestHelperTest extends \PHPUnit\Framework\TestCase
     public function isExecutionRouteRequestProvider(): array
     {
         return [
-            'empty master request' => [
-                'masterRequest' => null,
+            'empty main request' => [
+                'mainRequest' => null,
                 'executionRoute' => null,
-                'expected' => false,
+                'expected' => false
             ],
             'empty route name' => [
-                'masterRequest' => new Request(),
+                'mainRequest' => new Request(),
                 'executionRoute' => 'execution_route',
-                'expected' => false,
+                'expected' => false
             ],
             'execution route name' => [
-                'masterRequest' => new Request([
-                    '_route' => 'execution_route',
-                ]),
+                'mainRequest' => new Request(['_route' => 'execution_route']),
                 'executionRoute' => 'execution_route',
-                'expected' => true,
+                'expected' => true
             ],
             'exists route name' => [
-                'masterRequest' => new Request([
-                    '_route' => 'test_route',
-                ]),
+                'mainRequest' => new Request(['_route' => 'test_route']),
                 'executionRoute' => 'execution_route',
-                'expected' => false,
+                'expected' => false
             ]
         ];
     }

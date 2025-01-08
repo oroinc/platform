@@ -7,13 +7,9 @@ use Oro\Bundle\ActionBundle\Provider\OriginalUrlProvider;
 use Oro\Bundle\DataGridBundle\Converter\UrlConverter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\RouterInterface;
 
 class OriginalUrlProviderTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
-
     /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
     private $requestStack;
 
@@ -26,13 +22,11 @@ class OriginalUrlProviderTest extends \PHPUnit\Framework\TestCase
     #[\Override]
     protected function setUp(): void
     {
-        $this->router = $this->createMock(RouterInterface::class);
         $this->requestStack = $this->createMock(RequestStack::class);
         $this->datagridUrlConverter = $this->createMock(UrlConverter::class);
 
         $this->urlProvider = new OriginalUrlProvider(
             $this->requestStack,
-            $this->router,
             $this->datagridUrlConverter
         );
     }

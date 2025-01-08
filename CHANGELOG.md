@@ -145,6 +145,7 @@ For all events except start 3 events are triggered. `oro_workflow.<event_name>`,
 * Changed a field value of the `type` field on a string instead of the removed `\Oro\Bundle\ThemeBundle\Entity\Enum\ThemeConfigurationType` enum for `\Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration` entity.
 
 #### ApiBundle
+* The `masterRequest` attribute in API context was replaced with `mainRequest`. If you have API processors that use the `masterRequest` attribute in the `oro.api.processor` service tag it should be replaces with the `mainRequest` attribute. 
 * Changed `\Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface` to be able to use filters by same field but with different operators, e.g. `?filter[id][gt]=1&filter[id][lt]=10`:
   - added `getOne` method
   - changed return value for `get` method from `?FilterValue` to `FilterValue[]`

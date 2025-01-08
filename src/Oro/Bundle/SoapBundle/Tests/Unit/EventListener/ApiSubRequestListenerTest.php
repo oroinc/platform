@@ -21,7 +21,7 @@ class ApiSubRequestListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->addRule(new RequestMatcher('^/'), ['stop' => true]);
     }
 
-    public function testOnKernelRequestForMasterRequest(): void
+    public function testOnKernelRequestForMainRequest(): void
     {
         $request = $this->createRequest();
         self::assertEquals('xml', $request->getRequestFormat(null));

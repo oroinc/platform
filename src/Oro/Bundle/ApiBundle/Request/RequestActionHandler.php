@@ -460,7 +460,7 @@ abstract class RequestActionHandler
         foreach ($this->requestType as $type) {
             $requestType->add($type);
         }
-        $context->setMasterRequest(true);
+        $context->setMainRequest(true);
         $context->setRequestHeaders($this->getRequestHeaders($request));
         $context->setHateoas(true);
     }

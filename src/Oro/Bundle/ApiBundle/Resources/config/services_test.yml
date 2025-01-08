@@ -248,22 +248,22 @@ services:
     oro_api.tests.initialize_shared_data:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\InitializeSharedData
         tags:
-            - { name: oro.api.processor, action: get, group: initialize, priority: -255 }
-            - { name: oro.api.processor, action: get_list, group: initialize, priority: -255 }
-            - { name: oro.api.processor, action: delete, group: initialize, priority: -255 }
-            - { name: oro.api.processor, action: delete_list, group: initialize, priority: -255 }
-            - { name: oro.api.processor, action: create, group: initialize, priority: -255 }
-            - { name: oro.api.processor, action: update, group: initialize, priority: -255 }
-            - { name: oro.api.processor, action: update_list, group: initialize, priority: -255 }
-            - { name: oro.api.processor, action: get_subresource, group: initialize, priority: -255 }
-            - { name: oro.api.processor, action: delete_subresource, group: initialize, priority: -255 }
-            - { name: oro.api.processor, action: add_subresource, group: initialize, priority: -255 }
-            - { name: oro.api.processor, action: update_subresource, group: initialize, priority: -255 }
-            - { name: oro.api.processor, action: get_relationship, group: initialize, priority: -255 }
-            - { name: oro.api.processor, action: delete_relationship, group: initialize, priority: -255 }
-            - { name: oro.api.processor, action: add_relationship, group: initialize, priority: -255 }
-            - { name: oro.api.processor, action: update_relationship, group: initialize, priority: -255 }
-            - { name: oro.api.processor, action: options, group: initialize, priority: -255 }
+            - { name: oro.api.processor, action: get, group: initialize, mainRequest: true, priority: -255 }
+            - { name: oro.api.processor, action: get_list, group: initialize, mainRequest: true, priority: -255 }
+            - { name: oro.api.processor, action: delete, group: initialize, mainRequest: true, priority: -255 }
+            - { name: oro.api.processor, action: delete_list, group: initialize, mainRequest: true, priority: -255 }
+            - { name: oro.api.processor, action: create, group: initialize, mainRequest: true, priority: -255 }
+            - { name: oro.api.processor, action: update, group: initialize, mainRequest: true, priority: -255 }
+            - { name: oro.api.processor, action: update_list, group: initialize, mainRequest: true, priority: -255 }
+            - { name: oro.api.processor, action: get_subresource, group: initialize, mainRequest: true, priority: -255 }
+            - { name: oro.api.processor, action: delete_subresource, group: initialize, mainRequest: true, priority: -255 }
+            - { name: oro.api.processor, action: add_subresource, group: initialize, mainRequest: true, priority: -255 }
+            - { name: oro.api.processor, action: update_subresource, group: initialize, mainRequest: true, priority: -255 }
+            - { name: oro.api.processor, action: get_relationship, group: initialize, mainRequest: true, priority: -255 }
+            - { name: oro.api.processor, action: delete_relationship, group: initialize, mainRequest: true, priority: -255 }
+            - { name: oro.api.processor, action: add_relationship, group: initialize, mainRequest: true, priority: -255 }
+            - { name: oro.api.processor, action: update_relationship, group: initialize, mainRequest: true, priority: -255 }
+            - { name: oro.api.processor, action: options, group: initialize, mainRequest: true, priority: -255 }
 
     oro_api.tests.initialize_shared_data_for_batch_update:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\InitializeSharedDataForBatchUpdate
@@ -273,21 +273,21 @@ services:
     oro_api.tests.assert_shared_data_exist_in_context:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\AssertSharedDataExistInContext
         tags:
-            - { name: oro.api.processor, action: get, group: initialize, priority: 255 }
-            - { name: oro.api.processor, action: get_list, group: initialize, priority: 255 }
-            - { name: oro.api.processor, action: delete, group: initialize, priority: 255 }
-            - { name: oro.api.processor, action: delete_list, group: initialize, priority: 255 }
-            - { name: oro.api.processor, action: create, group: initialize, priority: 255 }
-            - { name: oro.api.processor, action: update, group: initialize, priority: 255 }
-            - { name: oro.api.processor, action: get_subresource, group: initialize, priority: 255 }
-            - { name: oro.api.processor, action: delete_subresource, group: initialize, priority: 255 }
-            - { name: oro.api.processor, action: add_subresource, group: initialize, priority: 255 }
-            - { name: oro.api.processor, action: update_subresource, group: initialize, priority: 255 }
-            - { name: oro.api.processor, action: get_relationship, group: initialize, priority: 255 }
-            - { name: oro.api.processor, action: delete_relationship, group: initialize, priority: 255 }
-            - { name: oro.api.processor, action: add_relationship, group: initialize, priority: 255 }
-            - { name: oro.api.processor, action: update_relationship, group: initialize, priority: 255 }
-            - { name: oro.api.processor, action: options, group: initialize, priority: 255 }
+            - { name: oro.api.processor, action: get, group: initialize, mainRequest: false, priority: 255 }
+            - { name: oro.api.processor, action: get_list, group: initialize, mainRequest: false, priority: 255 }
+            - { name: oro.api.processor, action: delete, group: initialize, mainRequest: false, priority: 255 }
+            - { name: oro.api.processor, action: delete_list, group: initialize, mainRequest: false, priority: 255 }
+            - { name: oro.api.processor, action: create, group: initialize, mainRequest: false, priority: 255 }
+            - { name: oro.api.processor, action: update, group: initialize, mainRequest: false, priority: 255 }
+            - { name: oro.api.processor, action: get_subresource, group: initialize, mainRequest: false, priority: 255 }
+            - { name: oro.api.processor, action: delete_subresource, group: initialize, mainRequest: false, priority: 255 }
+            - { name: oro.api.processor, action: add_subresource, group: initialize, mainRequest: false, priority: 255 }
+            - { name: oro.api.processor, action: update_subresource, group: initialize, mainRequest: false, priority: 255 }
+            - { name: oro.api.processor, action: get_relationship, group: initialize, mainRequest: false, priority: 255 }
+            - { name: oro.api.processor, action: delete_relationship, group: initialize, mainRequest: false, priority: 255 }
+            - { name: oro.api.processor, action: add_relationship, group: initialize, mainRequest: false, priority: 255 }
+            - { name: oro.api.processor, action: update_relationship, group: initialize, mainRequest: false, priority: 255 }
+            - { name: oro.api.processor, action: options, group: initialize, mainRequest: false, priority: 255 }
 
     oro_api.tests.assert_shared_data_exist_in_customize_data_context:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\AssertSharedDataExistInCustomizeDataContext

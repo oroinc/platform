@@ -57,7 +57,7 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
 
     public function testAuthenticate(): void
     {
-        $event = $this->createMasterRequestEvent(true);
+        $event = $this->createMainRequestEvent(true);
         $request = $event->getRequest();
         $request->cookies->add([self::SESSION_NAME => self::SESSION_ID]);
 
@@ -80,7 +80,7 @@ class RememberMeListenerTest extends \PHPUnit\Framework\TestCase
         return $request;
     }
 
-    private function createMasterRequestEvent(bool $isXmlHttpRequest = false): RequestEvent
+    private function createMainRequestEvent(bool $isXmlHttpRequest = false): RequestEvent
     {
         $kernel = $this->createMock(HttpKernelInterface::class);
         $request = new Request([], [], ['_route' => 'foo']);

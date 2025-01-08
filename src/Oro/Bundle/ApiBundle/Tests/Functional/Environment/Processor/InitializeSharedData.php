@@ -14,10 +14,6 @@ class InitializeSharedData implements ProcessorInterface
     {
         /** @var Context $context */
 
-        if (!$context->isMainRequest()) {
-            return;
-        }
-
         if ($context->getSharedData()->has('test')) {
             throw new RuntimeException(sprintf(
                 'Shared data already initialized. Action: %s. Class: %s.',

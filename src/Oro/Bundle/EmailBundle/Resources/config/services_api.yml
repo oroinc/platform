@@ -290,9 +290,11 @@ services:
             - { name: oro.api.processor, action: get_list, group: build_query, class: Oro\Bundle\EmailBundle\Entity\EmailAttachment, priority: -200}
 
     oro_email.api.disable_email_attachment_creation:
-        class: Oro\Bundle\EmailBundle\Api\Processor\DisableEmailAttachmentCreation
+        class: Oro\Bundle\ApiBundle\Processor\Shared\DisableResourceAccess
+        arguments:
+            - 'Use API resource to create an email. An email attachment can be created only together with an email.'
         tags:
-            - { name: oro.api.processor, action: create, group: resource_check, class: Oro\Bundle\EmailBundle\Entity\EmailAttachment }
+            - { name: oro.api.processor, action: create, group: resource_check, class: Oro\Bundle\EmailBundle\Entity\EmailAttachment, mainRequest: true }
 
     oro_email.api.compute_email_attachment_email:
         class: Oro\Bundle\EmailBundle\Api\Processor\ComputeEmailAttachmentEmail

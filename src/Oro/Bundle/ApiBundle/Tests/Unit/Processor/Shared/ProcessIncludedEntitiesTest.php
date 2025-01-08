@@ -94,7 +94,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext = new CreateContext($this->configProvider, $this->metadataProvider);
         $expectedContext->setVersion($this->context->getVersion());
         $expectedContext->getRequestType()->set($this->context->getRequestType());
-        $expectedContext->setMasterRequest(false);
+        $expectedContext->setMainRequest(false);
         $expectedContext->setCorsRequest(false);
         $expectedContext->setRequestHeaders($this->context->getRequestHeaders());
         $expectedContext->setSharedData($this->sharedData);
@@ -132,7 +132,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
 
         $this->context->setIncludedData($includedData);
         $this->context->setIncludedEntities($includedEntities);
-        $this->context->setMasterRequest(true);
+        $this->context->setMainRequest(true);
         $this->context->setCorsRequest(true);
         $this->context->getRequestHeaders()->set('header1', 'value1');
         $this->processor->process($this->context);
@@ -287,7 +287,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext = new UpdateContext($this->configProvider, $this->metadataProvider);
         $expectedContext->setVersion($this->context->getVersion());
         $expectedContext->getRequestType()->set($this->context->getRequestType());
-        $expectedContext->setMasterRequest(false);
+        $expectedContext->setMainRequest(false);
         $expectedContext->setCorsRequest(false);
         $expectedContext->setRequestHeaders($this->context->getRequestHeaders());
         $expectedContext->setSharedData($this->sharedData);
@@ -325,7 +325,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
 
         $this->context->setIncludedData($includedData);
         $this->context->setIncludedEntities($includedEntities);
-        $this->context->setMasterRequest(true);
+        $this->context->setMainRequest(true);
         $this->context->setCorsRequest(true);
         $this->context->getRequestHeaders()->set('header1', 'value1');
         $this->processor->process($this->context);
@@ -419,7 +419,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
         $expectedContext = new UpdateContext($this->configProvider, $this->metadataProvider);
         $expectedContext->setVersion($this->context->getVersion());
         $expectedContext->getRequestType()->set($this->context->getRequestType());
-        $expectedContext->setMasterRequest(false);
+        $expectedContext->setMainRequest(false);
         $expectedContext->setCorsRequest(false);
         $expectedContext->setRequestHeaders($this->context->getRequestHeaders());
         $expectedContext->setSharedData($this->sharedData);
@@ -457,7 +457,7 @@ class ProcessIncludedEntitiesTest extends FormProcessorTestCase
 
         $this->context->setIncludedData($includedData);
         $this->context->setIncludedEntities($includedEntities);
-        $this->context->setMasterRequest(true);
+        $this->context->setMainRequest(true);
         $this->context->setCorsRequest(true);
         $this->context->getRequestHeaders()->set('header1', 'value1');
         $this->processor->process($this->context);

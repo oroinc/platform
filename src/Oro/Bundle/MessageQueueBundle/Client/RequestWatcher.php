@@ -8,8 +8,8 @@ use Symfony\Component\HttpKernel\Event\TerminateEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Watches HTTP requests in order to enable the buffering mode at the beginning of the master request handling
- * and send all collected messages at the ending of the master request handling.
+ * Watches HTTP requests in order to enable the buffering mode at the beginning of the main request handling
+ * and send all collected messages at the ending of the main request handling.
  */
 class RequestWatcher implements EventSubscriberInterface
 {

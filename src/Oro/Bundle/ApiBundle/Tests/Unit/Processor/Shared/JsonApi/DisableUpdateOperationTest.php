@@ -29,10 +29,10 @@ class DisableUpdateOperationTest extends FormProcessorTestCase
     /**
      * @dataProvider updateFlagDataProvider
      */
-    public function testProcessWhenUpdateOperationRequestedForPrimaryEntity(bool $updateFlag): void
+    public function testProcess(bool $updateFlag): void
     {
         $this->context->set(SetOperationFlags::UPDATE_FLAG, $updateFlag);
-        $this->context->setMasterRequest(true);
+        $this->context->setMainRequest(true);
         $this->processor->process($this->context);
         self::assertEquals(
             [
@@ -41,17 +41,6 @@ class DisableUpdateOperationTest extends FormProcessorTestCase
             ],
             $this->context->getErrors()
         );
-    }
-
-    /**
-     * @dataProvider updateFlagDataProvider
-     */
-    public function testProcessWhenUpdateOperationRequestedForIncludedEntity(bool $updateFlag): void
-    {
-        $this->context->set(SetOperationFlags::UPDATE_FLAG, $updateFlag);
-        $this->context->setMasterRequest(false);
-        $this->processor->process($this->context);
-        self::assertFalse($this->context->hasErrors());
     }
 
     public static function updateFlagDataProvider(): array

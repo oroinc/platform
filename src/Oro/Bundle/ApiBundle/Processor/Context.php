@@ -53,8 +53,8 @@ class Context extends NormalizeResultContext implements ContextInterface
     /** the response status code */
     private const RESPONSE_STATUS_CODE = 'responseStatusCode';
 
-    /** indicates whether the current action processes a master API request */
-    private const MAIN_REQUEST = 'masterRequest';
+    /** indicates whether the current action processes a main API request */
+    private const MAIN_REQUEST = 'mainRequest';
 
     /** indicates whether the current request is CORS request */
     private const CORS = 'cors';
@@ -223,9 +223,9 @@ class Context extends NormalizeResultContext implements ContextInterface
     }
 
     #[\Override]
-    public function setMasterRequest(bool $master): void
+    public function setMainRequest(bool $main): void
     {
-        $this->set(self::MAIN_REQUEST, $master);
+        $this->set(self::MAIN_REQUEST, $main);
     }
 
     #[\Override]
