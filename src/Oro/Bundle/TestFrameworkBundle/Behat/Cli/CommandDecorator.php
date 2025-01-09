@@ -21,7 +21,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class CommandDecorator extends BaseCommand
 {
-    private const BEHAT_ERROR_EXIT_CODE = 5;
+    private const BEHAT_ERROR_EXIT_CODE = 7;
 
     public function __construct(private Command $command)
     {
