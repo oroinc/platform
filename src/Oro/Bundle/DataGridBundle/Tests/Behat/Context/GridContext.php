@@ -2066,6 +2066,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
     {
         $modal = $this->elementFactory->createElement('Modal');
         $modal->clickOrPress($button);
+        $this->waitForAjax();
     }
 
     /**
