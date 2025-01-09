@@ -41,6 +41,7 @@ class TooltipFormExtension extends AbstractTypeExtension
     ) {
         $this->entityConfigProvider = $entityConfigProvider;
         $this->translator = $translator;
+        $this->translator->setDisableResetCatalogues(true);
     }
 
     /**

@@ -251,16 +251,10 @@ class Translator extends BaseTranslator
     public function setFallbackLocales(array $locales): void
     {
         $loadedCatalogues = $this->disableResetCatalogues ? $this->catalogues : [];
-
         parent::setFallbackLocales($locales);
+        $this->catalogues = $loadedCatalogues;
         $this->dynamicTranslationProvider?->setFallbackLocales($locales);
         $this->cacheVary['fallback_locales'] = $locales;
-
-        foreach ($loadedCatalogues as $locale => $catalogue) {
-            if (!isset($this->catalogues[$locale])) {
-                $this->catalogues[$locale] = $catalogue;
-            }
-        }
     }
 
     /**
@@ -306,6 +300,11 @@ class Translator extends BaseTranslator
         }
 
         return [];
+    }
+
+    public function setDisableResetCatalogues(bool $disableResetCatalogues): void
+    {
+        $this->disableResetCatalogues = $disableResetCatalogues;
     }
 
     /**
