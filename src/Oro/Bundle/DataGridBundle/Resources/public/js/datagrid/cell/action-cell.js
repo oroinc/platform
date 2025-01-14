@@ -462,13 +462,17 @@ define(function(require, exports, module) {
          * @protected
          */
         _showDropdown: function(e) {
+            this.showDropdown();
+            e.preventDefault();
+            e.stopPropagation();
+        },
+
+        showDropdown() {
             this.fillLauncherList();
             if (!this.$('[data-toggle="dropdown"]').parent().hasClass('show')) {
                 this.$('[data-toggle="dropdown"]').dropdown('toggle');
             }
             this.model.set('isDropdownActions', this.isDropdownActions);
-            e.preventDefault();
-            e.stopPropagation();
         },
 
         /**
@@ -478,10 +482,14 @@ define(function(require, exports, module) {
          * @protected
          */
         _hideDropdown: function(e) {
+            this.hideDropdown();
+            e.stopPropagation();
+        },
+
+        hideDropdown() {
             if (this.$('[data-toggle="dropdown"]').parent().hasClass('show')) {
                 this.$('[data-toggle="dropdown"]').dropdown('toggle');
             }
-            e.stopPropagation();
         },
 
         onKeydown: function(event) {
