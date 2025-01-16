@@ -46,9 +46,7 @@ class ActualizeCountriesRegionsCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    #[\Override]
     protected function configure(): void
     {
         $this
