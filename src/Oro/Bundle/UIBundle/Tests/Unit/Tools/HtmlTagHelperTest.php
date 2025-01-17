@@ -307,6 +307,14 @@ class HtmlTagHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedString, $this->helper->stripTags($actualString));
     }
 
+    public function testGetStrippedWithLtAndGt(): void
+    {
+        $actualString = '>test1 test2<test3   test4';
+        $expectedString = '>test1 test2<test3 test4';
+
+        $this->assertEquals($expectedString, $this->helper->stripTags($actualString));
+    }
+
     /**
      * @dataProvider shortStringProvider
      */

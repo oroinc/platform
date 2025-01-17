@@ -137,13 +137,21 @@ class HtmlTagHelper implements TranslatorAwareInterface
      */
     public function stripTags($string, $uiAllowedTags = false)
     {
-        $string = str_replace('>', '> ', $string);
+        $string = str_replace(['&#60;', '&#62;'], ['>', '<'], $string);
 
-        if ($uiAllowedTags) {
-            return strip_tags($string, $this->htmlTagProvider->getAllowedTags('default'));
+        if (!preg_match("/<(?:\"[^\"]*\"['\"]*|'[^']*'['\"]*|[^'\">])+>/ims", $string)) {
+            $string = preg_replace(['/(\s\S?!>)*(>)/', '/(<)(\s\S?!>)*/'], ['&#60;', '&#62;'], $string);
+        } else {
+            $string = str_replace('>', '> ', $string);
         }
 
-        $result = trim(strip_tags($string));
+        if ($uiAllowedTags) {
+            $result = strip_tags($string, $this->htmlTagProvider->getAllowedTags('default'));
+        } else {
+            $result = trim(strip_tags($string));
+        }
+
+        $result = str_replace(['&#60;', '&#62;'], ['>', '<'], $result);
 
         return preg_replace('/\s+/u', ' ', $result);
     }
