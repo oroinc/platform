@@ -44,6 +44,11 @@ define(function(require) {
             controls: '[data-toggle=dropdown]'
         },
 
+        /** @property {Number} */
+        minWordsToAbbreviate: 4,
+
+        isLabelAbbreviated: false,
+
         /**
          * @inheritdoc
          */
@@ -108,6 +113,7 @@ define(function(require) {
                 panel.render();
                 panel.$el.children().wrap('<li/>');
             }
+
             return this;
         },
 
