@@ -4,7 +4,7 @@ define(function(require) {
     const _ = require('underscore');
     const Backgrid = require('backgrid');
     const textUtil = require('oroui/js/tools/text-util');
-    const HintView = require('orodatagrid/js/app/views/hint-view');
+    const util = require('../util');
     const template = require('tpl-loader!orodatagrid/templates/datagrid/grid-header-cell.html');
 
     /**
@@ -27,10 +27,6 @@ define(function(require) {
         keepElement: false,
 
         events: {
-            mouseenter: 'onMouseEnter',
-            mouseleave: 'onMouseLeave',
-            focusin: 'onFocusin',
-            focusout: 'onFocusout',
             click: 'onClick'
         },
 
@@ -122,10 +118,6 @@ define(function(require) {
             if (this.column.get('shortenableLabel') !== false) {
                 label = textUtil.abbreviate(label, this.minWordsToAbbreviate);
                 this.isLabelAbbreviated = label !== this.column.get('label');
-                if (!this.isLabelAbbreviated) {
-                    // if abbreviation was not created -- add class to make label shorten over styles
-                    this.$el.addClass('shortenable-label');
-                }
             }
 
             this.$el.append(this.template({
@@ -147,10 +139,10 @@ define(function(require) {
                 this.$el.addClass('align-' + this.column.get('align'));
             }
 
-            if (this.isLabelAbbreviated) {
-                this.$('[data-grid-header-cell-label]').attr('aria-label', this.column.get('label'));
-                this.$('[data-grid-header-cell-text]').attr('aria-hidden', true);
-            }
+            util.headerCellAbbreviateHint(this, {
+                el: this.$('[data-grid-header-cell-label]'),
+                offsetOfEl: this.$el
+            });
 
             return this;
         },
@@ -193,81 +185,6 @@ define(function(require) {
                 } else {
                     cycleSort(this, column);
                 }
-            }
-        },
-
-        /**
-         * Mouse Enter on column name to show hint if label has been abbreviated
-         *
-         * @param {Event} e
-         */
-        onMouseEnter(e) {
-            this.isHovered = true;
-            this.showHint();
-        },
-
-        /**
-         * Mouse Leave from column name to hide hint
-         *
-         * @param {Event} e
-         */
-        onMouseLeave(e) {
-            delete this.isHovered;
-            if (!this.isFocused) {
-                this.hideHint();
-            }
-        },
-
-        /**
-         * Focusin on column name to show hint if label has been abbreviated
-         *
-         * @param {Event} e
-         */
-        onFocusin(e) {
-            this.isFocused = true;
-            this.showHint();
-        },
-
-        /**
-         * Focus from column name to hide hint
-         *
-         * @param {Event} e
-         */
-        onFocusout(e) {
-            delete this.isFocused;
-            if (!this.isHovered) {
-                this.hideHint();
-            }
-        },
-
-        showHint() {
-            if (!this.isLabelAbbreviated || this.hintTimeout || this.subview('hint')) {
-                return;
-            }
-
-            this.subview('hint', new HintView({
-                el: this.$('[data-grid-header-cell-label]'),
-                offsetOfEl: this.$el,
-                autoRender: true,
-                popoverConfig: {
-                    content: this.column.get('label')
-                }
-            }));
-
-            this.hintTimeout = setTimeout(function() {
-                const hint = this.subview('hint');
-
-                if (hint && (this.isLabelAbbreviated || !hint.fullLabelIsVisible())) {
-                    this.subview('hint').show();
-                }
-            }.bind(this), 300);
-        },
-
-        hideHint() {
-            clearTimeout(this.hintTimeout);
-            delete this.hintTimeout;
-            if (this.subview('hint')) {
-                this.removeSubview('hint');
             }
         },
 
