@@ -434,12 +434,9 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * Process and replace all references and functions to values
-     *
-     * @param  array|string $data Can be path to yml template file or array
-     * @return array|string
+     * Processes and replaces all references and functions to values.
      */
-    protected static function processTemplateData($data)
+    protected static function processTemplateData(mixed $data): mixed
     {
         if (!self::$referenceRepository) {
             return $data;
@@ -1254,21 +1251,12 @@ abstract class WebTestCase extends BaseWebTestCase
         }
     }
 
-    /**
-     * @return string
-     */
-    protected function getCurrentDir()
+    protected function getCurrentDir(): string
     {
         return dirname((new \ReflectionClass($this))->getFileName());
     }
 
-    /**
-     * @param string $folderName
-     * @param string $fileName
-     *
-     * @return string
-     */
-    protected function getTestResourcePath($folderName, $fileName)
+    protected function getTestResourcePath(?string $folderName, string $fileName): string
     {
         if (!$folderName) {
             return $this->getCurrentDir() . DIRECTORY_SEPARATOR . $fileName;
@@ -1277,22 +1265,14 @@ abstract class WebTestCase extends BaseWebTestCase
         return $this->getCurrentDir() . DIRECTORY_SEPARATOR .  $folderName . DIRECTORY_SEPARATOR . $fileName;
     }
 
-    /**
-     * @param string $path
-     *
-     * @return bool
-     */
-    protected function isRelativePath($path)
+    protected function isRelativePath(string $path): bool
     {
         return
-            0 !== strpos($path, '/')
-            && 0 !== strpos($path, '@')
-            && false === strpos($path, ':');
+            !str_starts_with($path, '/')
+            && !str_starts_with($path, '@')
+            && !str_contains($path, ':');
     }
 
-    /**
-     * @return Session
-     */
     protected function createSession(): Session
     {
         if (!$this->client) {

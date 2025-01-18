@@ -226,7 +226,10 @@ abstract class ApiTestCase extends WebTestCase
     protected function getRequestData(array|string $request): array
     {
         if (is_string($request) && $this->isRelativePath($request)) {
-            $request = $this->getTestResourcePath($this->getRequestDataFolderName(), $request);
+            $request = $this->getTestResourcePath(
+                !str_starts_with($request, '..') ? $this->getRequestDataFolderName() : null,
+                $request
+            );
         }
 
         return self::processTemplateData($request);
