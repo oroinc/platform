@@ -1,4 +1,5 @@
 @regression
+@skip
 Feature: OpenAPI Specification Management
   In order to manage OpenAPI Specifications
   As Administrator

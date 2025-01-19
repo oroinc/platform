@@ -16,6 +16,7 @@ use Oro\Bundle\EntityExtendBundle\Migration\EntityMetadataHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
 use Oro\Bundle\EntityExtendBundle\Migration\Extension\ExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
+use Oro\Bundle\EntityExtendBundle\Validator\CustomEntityConfigValidatorService;
 
 class ActivityListMigrationQueryTest extends \PHPUnit\Framework\TestCase
 {
@@ -93,7 +94,12 @@ class ActivityListMigrationQueryTest extends \PHPUnit\Framework\TestCase
 
         $extendOptionsManager = new ExtendOptionsManager(ConfigurationHandlerMock::getInstance());
         $entityMetadataHelper = $this->createMock(EntityMetadataHelper::class);
-        $extendExtension = new ExtendExtension($extendOptionsManager, $entityMetadataHelper, new PropertyConfigBag([]));
+        $extendExtension = new ExtendExtension(
+            $extendOptionsManager,
+            $entityMetadataHelper,
+            new PropertyConfigBag([]),
+            $this->createMock(CustomEntityConfigValidatorService::class)
+        );
         $extendExtension->setNameGenerator($this->nameGenerator);
         $this->activityListExtension->setExtendExtension($extendExtension);
 

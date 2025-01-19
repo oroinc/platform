@@ -22,6 +22,7 @@ use Oro\Bundle\EntityExtendBundle\Migration\OroOptions;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendTable;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\EntityExtendBundle\Validator\CustomEntityConfigValidatorService;
 use Oro\Bundle\MigrationBundle\Migration\Extension\NameGeneratorAwareInterface;
 
 /**
@@ -34,22 +35,16 @@ class ExtendExtension implements NameGeneratorAwareInterface
 {
     use ExtendNameGeneratorAwareTrait;
 
-    private const ALLOWED_IDENTITY_FIELDS = ['id', 'name'];
-    private const DEFAULT_IDENTITY_FIELDS = ['id'];
-    private const ENUM_OPTION_TABLE = 'oro_enum_option';
-
-    protected ExtendOptionsManager $extendOptionsManager;
-    protected EntityMetadataHelper $entityMetadataHelper;
-    protected PropertyConfigBag $propertyConfigBag;
+    private const array ALLOWED_IDENTITY_FIELDS = ['id', 'name'];
+    private const array DEFAULT_IDENTITY_FIELDS = ['id'];
+    private const string ENUM_OPTION_TABLE = 'oro_enum_option';
 
     public function __construct(
-        ExtendOptionsManager $extendOptionsManager,
-        EntityMetadataHelper $entityMetadataHelper,
-        PropertyConfigBag $propertyConfigBag
+        protected ExtendOptionsManager $extendOptionsManager,
+        protected EntityMetadataHelper $entityMetadataHelper,
+        protected PropertyConfigBag $propertyConfigBag,
+        protected CustomEntityConfigValidatorService $customEntityValidator,
     ) {
-        $this->extendOptionsManager = $extendOptionsManager;
-        $this->entityMetadataHelper = $entityMetadataHelper;
-        $this->propertyConfigBag = $propertyConfigBag;
     }
 
     public function getNameGenerator(): ExtendDbIdentifierNameGenerator
@@ -70,6 +65,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
         array $options = []
     ): Table {
         $className = ExtendHelper::ENTITY_NAMESPACE . $entityName;
+        // validate custom entity configuration
+        $this->customEntityValidator->checkConfigExists($className);
         $tableName = $this->nameGenerator->generateCustomEntityTableName($className);
         $table = $schema->createTable($tableName);
         $this->entityMetadataHelper->registerEntityClass($tableName, $className);

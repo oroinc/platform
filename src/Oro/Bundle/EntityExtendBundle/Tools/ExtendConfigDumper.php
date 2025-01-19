@@ -114,7 +114,7 @@ class ExtendConfigDumper
      */
     public function updateConfig($filter = null, $updateCustom = false)
     {
-        $this->clear(true);
+        $this->clear();
 
         if ($updateCustom) {
             $this->updatePendingConfigs();
@@ -265,14 +265,12 @@ class ExtendConfigDumper
 
     /**
      * Removes the entity proxies and metadata from the cache
-     *
-     * @param bool $keepEntityProxies Set TRUE if proxies for custom and extend entities should not be deleted
      */
-    public function clear($keepEntityProxies = false)
+    public function clear(): void
     {
         $filesystem = new Filesystem();
 
-        if (!$keepEntityProxies) {
+        if (is_writable($this->cacheDir)) {
             $baseCacheDir = ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir);
             if ($filesystem->exists($baseCacheDir)) {
                 $finder = new Finder();

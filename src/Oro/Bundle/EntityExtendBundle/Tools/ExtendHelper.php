@@ -17,14 +17,14 @@ use Oro\Component\DoctrineUtils\Inflector\InflectorFactory;
  */
 class ExtendHelper
 {
-    public const ENTITY_NAMESPACE = 'Extend\\Entity\\';
-    public const ENUM_CLASS_NAME_PREFIX = self::ENTITY_NAMESPACE . 'EV_';
-    public const ENUM_TRANSLATION_PREFIX = 'oro.entity_extend.enum_option.';
-    public const MAX_ENUM_ID_LENGTH = 100;
-    public const MAX_ENUM_INTERNAL_ID_LENGTH = 32;
-    public const MAX_ENUM_SNAPSHOT_LENGTH = 500;
-    public const ENUM_OPTION_SEPARATOR = '.';
-    public const ENUM_SNAPSHOT_SUFFIX = 'Snapshot'; // Outdated enum snapshot suffix
+    public const string ENTITY_NAMESPACE = 'Extend\\Entity\\';
+    public const string ENUM_CLASS_NAME_PREFIX = self::ENTITY_NAMESPACE . 'EV_';
+    public const string ENUM_TRANSLATION_PREFIX = 'oro.entity_extend.enum_option.';
+    public const int MAX_ENUM_ID_LENGTH = 100;
+    public const int MAX_ENUM_INTERNAL_ID_LENGTH = 32;
+    public const int MAX_ENUM_SNAPSHOT_LENGTH = 500;
+    public const string ENUM_OPTION_SEPARATOR = '.';
+    public const string ENUM_SNAPSHOT_SUFFIX = 'Snapshot'; // Outdated enum snapshot suffix
 
     public static function getReverseRelationType(string $type): string
     {

@@ -12,7 +12,7 @@ class OroEntityExtendExtension extends Extension
     #[\Override]
     public function load(array $configs, ContainerBuilder $container): void
     {
-        $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
+        $config = $this->processConfiguration($this->getConfiguration($configs, $container), $configs);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
@@ -24,6 +24,9 @@ class OroEntityExtendExtension extends Extension
 
         if ('test' === $container->getParameter('kernel.environment')) {
             $loader->load('services_test.yml');
+        }
+        if (isset($config['custom_entities'])) {
+            $container->setParameter('oro_entity_extend.custom_entities', $config['custom_entities']);
         }
     }
 }

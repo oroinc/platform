@@ -7,6 +7,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Provider\ExtendEntityPlatformUpdateChecker;
+use Oro\Bundle\EntityExtendBundle\Validator\CustomEntityConfigValidatorService;
 
 class ExtendEntityPlatformUpdateCheckerTest extends \PHPUnit\Framework\TestCase
 {
@@ -22,7 +23,8 @@ class ExtendEntityPlatformUpdateCheckerTest extends \PHPUnit\Framework\TestCase
         $this->configManager = $this->createMock(ConfigManager::class);
 
         $this->platformUpdateChecker = new ExtendEntityPlatformUpdateChecker(
-            $this->configManager
+            $this->configManager,
+            $this->createMock(CustomEntityConfigValidatorService::class)
         );
     }
 

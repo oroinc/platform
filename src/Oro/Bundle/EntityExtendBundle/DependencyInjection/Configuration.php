@@ -13,7 +13,13 @@ class Configuration implements ConfigurationInterface
         $treeBuilder = new TreeBuilder('oro_entity_extend');
         $treeBuilder->getRootNode()
             ->children()
-                ->scalarNode('backup')->cannotBeEmpty()->defaultValue('%kernel.project_dir%/var/backup')->end()
+                ->scalarNode('backup')
+                    ->cannotBeEmpty()
+                    ->defaultValue('%kernel.project_dir%/var/backup')
+                ->end()
+                ->arrayNode('custom_entities')
+                    ->scalarPrototype()
+                ->end()
             ->end();
 
         return $treeBuilder;

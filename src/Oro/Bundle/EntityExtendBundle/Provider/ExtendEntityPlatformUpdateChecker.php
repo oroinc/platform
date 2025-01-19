@@ -5,18 +5,18 @@ namespace Oro\Bundle\EntityExtendBundle\Provider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Validator\CustomEntityConfigValidatorService;
 use Oro\Bundle\InstallerBundle\PlatformUpdateCheckerInterface;
 
 /**
  * Checks if the entities configuration has not applied schema changes.
  */
-class ExtendEntityPlatformUpdateChecker implements PlatformUpdateCheckerInterface
+readonly class ExtendEntityPlatformUpdateChecker implements PlatformUpdateCheckerInterface
 {
-    private ConfigManager $configManager;
-
-    public function __construct(ConfigManager $configManager)
-    {
-        $this->configManager = $configManager;
+    public function __construct(
+        private ConfigManager $configManager,
+        private CustomEntityConfigValidatorService $configValidator
+    ) {
     }
 
     #[\Override]
@@ -29,11 +29,13 @@ class ExtendEntityPlatformUpdateChecker implements PlatformUpdateCheckerInterfac
                 $entityClasses[] = $config->getId()->getClassName();
             }
         }
-
-        if (!$entityClasses) {
+        $customEntityMessage = $this->configValidator->checkConfigs();
+        if (!$entityClasses && null === $customEntityMessage) {
             return null;
         }
-
+        if (!$entityClasses && null !== $customEntityMessage) {
+            return $customEntityMessage;
+        }
         sort($entityClasses);
 
         return [

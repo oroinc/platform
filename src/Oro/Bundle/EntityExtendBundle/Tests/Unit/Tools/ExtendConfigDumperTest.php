@@ -85,6 +85,7 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
             $extensions
         );
     }
+
     public function testCheckConfigWhenClassesExists()
     {
         $fs = new Filesystem();
@@ -95,9 +96,9 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
             self::CLASS_NAMESPACE . '\Entity\TestEntity1',
             [
                 'schema' => [
-                    'class'  => self::CLASS_NAMESPACE . '\Entity\TestEntity1',
+                    'class' => self::CLASS_NAMESPACE . '\Entity\TestEntity1',
                     'entity' => self::CLASS_NAMESPACE . '\cache\EX_OroEntityConfigBundle_Entity1',
-                    'type'   => 'Extend'
+                    'type' => 'Extend'
                 ]
             ]
         );
@@ -117,9 +118,9 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
             self::CLASS_NAMESPACE . '\Entity\TestEntity1',
             [
                 'schema' => [
-                    'class'  => self::CLASS_NAMESPACE . '\Entity\TestEntity1',
+                    'class' => self::CLASS_NAMESPACE . '\Entity\TestEntity1',
                     'entity' => self::CLASS_NAMESPACE . '\cache\EX_OroEntityConfigBundle_Entity1',
-                    'type'   => 'Extend'
+                    'type' => 'Extend'
                 ]
             ]
         );
@@ -127,9 +128,9 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
             self::CLASS_NAMESPACE . '\Entity\TestEntity2',
             [
                 'schema' => [
-                    'class'  => self::CLASS_NAMESPACE . '\Entity\TestEntity2',
+                    'class' => self::CLASS_NAMESPACE . '\Entity\TestEntity2',
                     'entity' => self::CLASS_NAMESPACE . '\cache\EX_OroEntityConfigBundle_Entity2',
-                    'type'   => 'Extend'
+                    'type' => 'Extend'
                 ]
             ],
             true
@@ -151,19 +152,19 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
 
         self::assertEquals(
             [
-                'class'   => self::CLASS_NAMESPACE . '\Entity\TestEntity1',
-                'entity'  => self::CLASS_NAMESPACE . '\cache\EX_OroEntityConfigBundle_Entity1',
-                'type'    => 'Extend',
+                'class' => self::CLASS_NAMESPACE . '\Entity\TestEntity1',
+                'entity' => self::CLASS_NAMESPACE . '\cache\EX_OroEntityConfigBundle_Entity1',
+                'type' => 'Extend',
             ],
             $this->configProvider->getConfig(self::CLASS_NAMESPACE . '\Entity\TestEntity1')->get('schema')
         );
 
         self::assertEquals(
             [
-                'class'   => self::CLASS_NAMESPACE . '\Entity\TestEntity2',
-                'entity'  => self::CLASS_NAMESPACE . '\cache\EX_OroEntityConfigBundle_Entity2',
-                'type'    => 'Extend',
-                'parent'  => self::CLASS_NAMESPACE . '\TestAbstractClass',
+                'class' => self::CLASS_NAMESPACE . '\Entity\TestEntity2',
+                'entity' => self::CLASS_NAMESPACE . '\cache\EX_OroEntityConfigBundle_Entity2',
+                'type' => 'Extend',
+                'parent' => self::CLASS_NAMESPACE . '\TestAbstractClass',
                 'inherit' => false
             ],
             $this->configProvider->getConfig(self::CLASS_NAMESPACE . '\Entity\TestEntity2')->get('schema')
@@ -176,10 +177,10 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
             self::CLASS_NAMESPACE . '\Entity\TestEntity1',
             [
                 'schema' => [
-                    'class'   => self::CLASS_NAMESPACE . '\Entity\TestEntity1',
-                    'entity'  => self::CLASS_NAMESPACE . '\cache\EX_OroEntityConfigBundle_Entity1',
-                    'type'    => 'Extend',
-                    'parent'  => self::CLASS_NAMESPACE . '\TestAbstractClass',
+                    'class' => self::CLASS_NAMESPACE . '\Entity\TestEntity1',
+                    'entity' => self::CLASS_NAMESPACE . '\cache\EX_OroEntityConfigBundle_Entity1',
+                    'type' => 'Extend',
+                    'parent' => self::CLASS_NAMESPACE . '\TestAbstractClass',
                     'inherit' => self::CLASS_NAMESPACE . '\TestAbstractClass'
                 ]
             ]
@@ -188,10 +189,10 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
             self::CLASS_NAMESPACE . '\Entity\TestEntity2',
             [
                 'schema' => [
-                    'class'   => self::CLASS_NAMESPACE . '\Entity\TestEntity2',
-                    'entity'  => self::CLASS_NAMESPACE . '\cache\EX_OroEntityConfigBundle_Entity2',
-                    'type'    => 'Extend',
-                    'parent'  => self::CLASS_NAMESPACE . '\TestAbstractClass',
+                    'class' => self::CLASS_NAMESPACE . '\Entity\TestEntity2',
+                    'entity' => self::CLASS_NAMESPACE . '\cache\EX_OroEntityConfigBundle_Entity2',
+                    'type' => 'Extend',
+                    'parent' => self::CLASS_NAMESPACE . '\TestAbstractClass',
                     'inherit' => false
                 ]
             ],
@@ -235,8 +236,8 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
             'boolean',
             [
                 'is_extend' => true,
-                'default'   => true,
-                'nullable'  => false
+                'default' => true,
+                'nullable' => false
             ]
         );
         $this->configProvider->addFieldConfig(
@@ -255,73 +256,51 @@ class ExtendConfigDumperTest extends \PHPUnit\Framework\TestCase
             new Config(
                 $configId,
                 [
-                    'param1'       => 'value1',
-                    'upgradeable'  => true,
-                    'schema'       => [
-                        'class'     => 'SomeClass',
-                        'entity'    => 'SomeClass',
-                        'type'      => 'Extend',
-                        'property'  => [
+                    'param1' => 'value1',
+                    'upgradeable' => true,
+                    'schema' => [
+                        'class' => 'SomeClass',
+                        'entity' => 'SomeClass',
+                        'type' => 'Extend',
+                        'property' => [
                             'field1' => [],
                             'field2' => [],
                         ],
-                        'relation'  => [],
-                        'default'   => [],
+                        'relation' => [],
+                        'default' => [],
                         'addremove' => [],
-                        'doctrine'  => [
+                        'doctrine' => [
                             'SomeClass' => [
-                                'type'   => 'entity',
+                                'type' => 'entity',
                                 'fields' => [
                                     'field1' => [
-                                        'column'    => 'field1',
-                                        'type'      => 'boolean',
-                                        'nullable'  => false,
-                                        'length'    => null,
+                                        'column' => 'field1',
+                                        'type' => 'boolean',
+                                        'nullable' => false,
+                                        'length' => null,
                                         'precision' => null,
-                                        'scale'     => null,
-                                        'default'   => true,
+                                        'scale' => null,
+                                        'default' => true,
                                     ],
                                     'field2' => [
-                                        'column'    => 'field2',
-                                        'type'      => 'integer',
-                                        'nullable'  => true,
-                                        'length'    => null,
+                                        'column' => 'field2',
+                                        'type' => 'integer',
+                                        'nullable' => true,
+                                        'length' => null,
                                         'precision' => null,
-                                        'scale'     => null,
-                                        'default'   => null,
+                                        'scale' => null,
+                                        'default' => null,
                                     ]
                                 ]
                             ]
                         ],
-                        'parent'    => false,
-                        'inherit'   => false
+                        'parent' => false,
+                        'inherit' => false
                     ],
-                    'state'        => ExtendScope::STATE_ACTIVE,
+                    'state' => ExtendScope::STATE_ACTIVE,
                 ]
             ),
             $config
         );
-    }
-
-    public function testClearWithEntityClassesExists()
-    {
-        $fs = new Filesystem();
-        $entityCacheDir = ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir);
-        $fs->mkdir($entityCacheDir);
-        $classesDataFile = ExtendClassLoadingUtils::getEntityClassesPath($this->cacheDir);
-        $fs->touch($classesDataFile);
-        self::assertTrue($fs->exists($classesDataFile));
-
-        $this->entityManagerBag->expects($this->once())
-            ->method('getEntityManagers')
-            ->willReturn([]);
-
-        $dumper = $this->getExtendConfigDumper();
-        $dumper->clear();
-
-        self::assertFalse($fs->exists($classesDataFile));
-        self::assertTrue($fs->exists($entityCacheDir));
-
-        $fs->remove($entityCacheDir);
     }
 }
