@@ -8,3 +8,8 @@ oro:
                 message:
                     create: Could not create entity with this value because of workflow restrictions.
                     update: Field could not be edited because of workflow restrictions.
+            transition:
+                unknown: '"Transition {{ transition }}" is not exist in workflow.'
+                not_start: '"{{ transition }}" is not start transition.'
+                step_not_allowed: '"{{ transition }}" transition is not allowed at step "{{ step }}".'
+                some_conditions_not_met: Some transition conditions are not met.
