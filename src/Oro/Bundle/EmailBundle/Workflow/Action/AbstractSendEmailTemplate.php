@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Workflow\Action;
 
 use Oro\Bundle\EmailBundle\Model\Recipient;
 use Oro\Component\Action\Exception\InvalidParameterException;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
  * Workflow action that sends emails based on passed templates
@@ -44,7 +45,10 @@ abstract class AbstractSendEmailTemplate extends AbstractSendEmail
         $recipients = parent::getRecipients($context, $options);
         $recipients = array_map(static fn (string $address) => new Recipient($address), $recipients);
 
-        foreach ($this->options['recipients'] as $recipient) {
+        if ($options['recipients'] instanceof PropertyPathInterface) {
+            $options['recipients'] = $this->contextAccessor->getValue($context, $options['recipients']);
+        }
+        foreach ($options['recipients'] as $recipient) {
             if ($recipient) {
                 $recipients[] = $this->contextAccessor->getValue($context, $recipient);
             }
@@ -60,6 +64,10 @@ abstract class AbstractSendEmailTemplate extends AbstractSendEmail
     {
         if (empty($options['recipients'])) {
             $options['recipients'] = [];
+        }
+
+        if ($options['recipients'] instanceof PropertyPathInterface) {
+            return;
         }
 
         if (!is_array($options['recipients'])) {

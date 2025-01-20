@@ -14,19 +14,21 @@ use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class ScheduleSendEmailTemplateTest extends \PHPUnit\Framework\TestCase
+class ScheduleSendEmailTemplateTest extends TestCase
 {
     use LoggerAwareTraitTestTrait;
 
-    private ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject $validator;
-
-    private MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject $messageProducer;
+    private ValidatorInterface|MockObject $validator;
+    private MessageProducerInterface|MockObject $messageProducer;
 
     private ScheduleSendEmailTemplate $action;
 
@@ -267,6 +269,22 @@ class ScheduleSendEmailTemplateTest extends \PHPUnit\Framework\TestCase
                     'from' => 'test@test.com',
                     'to' => ['test2@test.com'],
                     'recipients' => [new EmailHolderStub()],
+                    'template' => 'test',
+                    'entity' => new \stdClass(),
+                ],
+            ],
+            'with recipients as PropertyPath' => [
+                [
+                    'from' => 'test@test.com',
+                    'to' => 'test2@test.com',
+                    'recipients' => $this->createMock(PropertyPathInterface::class),
+                    'template' => 'test',
+                    'entity' => new \stdClass(),
+                ],
+                [
+                    'from' => 'test@test.com',
+                    'to' => ['test2@test.com'],
+                    'recipients' => $this->createMock(PropertyPathInterface::class),
                     'template' => 'test',
                     'entity' => new \stdClass(),
                 ],
