@@ -31,3 +31,11 @@ oro_layout:
     - default
     - custom
     - custom_standalone
+
+oro_entity_extend:
+  custom_entities:
+    - Extend\Entity\TestEntity1
+    - Extend\Entity\TestEntity2
+    - Extend\Entity\TestEntity3
+    - Extend\Entity\TestEntity4
+    - Extend\Entity\TestEntity5

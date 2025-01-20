@@ -10,53 +10,26 @@ use Symfony\Component\Validator\Constraint;
  */
 class TransitionIsAllowed extends Constraint
 {
-    /**
-     * @var WorkflowItem
-     */
-    protected $workflowItem;
+    public string $unknownTransitionMessage = 'oro.workflow.validator.transition.unknown';
+    public string $notStartTransitionMessage = 'oro.workflow.validator.transition.not_start';
+    public string $stepHasNotAllowedTransitionMessage = 'oro.workflow.validator.transition.step_not_allowed';
+    public string $someConditionsNotMetMessage = 'oro.workflow.validator.transition.some_conditions_not_met';
 
-    /**
-     * @var string
-     */
-    protected $transitionName;
-
-    public $unknownTransitionMessage = '"Transition {{ transition }}" is not exist in workflow.';
-    public $notStartTransitionMessage = '"{{ transition }}" is not start transition.';
-    public $stepHasNotAllowedTransitionMessage = '"{{ transition }}" transition is not allowed at step "{{ step }}".';
-    public $someConditionsNotMetMessage = 'Some transition conditions are not met.';
-
-    /**
-     * @param WorkflowItem $workflowItem
-     * @param string $transitionName
-     */
-    public function __construct(WorkflowItem $workflowItem, $transitionName)
-    {
+    public function __construct(
+        private readonly WorkflowItem $workflowItem,
+        private readonly string $transitionName
+    ) {
         parent::__construct();
-
-        $this->workflowItem = $workflowItem;
-        $this->transitionName = $transitionName;
     }
 
-    /**
-     * @return WorkflowItem
-     */
-    public function getWorkflowItem()
+    public function getWorkflowItem(): WorkflowItem
     {
         return $this->workflowItem;
     }
 
-    /**
-     * @return string
-     */
-    public function getTransitionName()
+    public function getTransitionName(): string
     {
         return $this->transitionName;
-    }
-
-    #[\Override]
-    public function validatedBy(): string
-    {
-        return TransitionIsAllowedValidator::ALIAS;
     }
 
     #[\Override]

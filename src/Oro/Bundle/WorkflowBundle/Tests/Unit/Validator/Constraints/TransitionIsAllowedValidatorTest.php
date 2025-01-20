@@ -11,25 +11,24 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowed;
 use Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowedValidator;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class TransitionIsAllowedValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
+    private WorkflowRegistry|MockObject $workflowRegistry;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->registry = $this->createMock(WorkflowRegistry::class);
-
+        $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
         parent::setUp();
     }
 
     #[\Override]
-    protected function createValidator()
+    protected function createValidator(): TransitionIsAllowedValidator
     {
-        return new TransitionIsAllowedValidator($this->registry);
+        return new TransitionIsAllowedValidator($this->workflowRegistry);
     }
 
     private function getWorkflowStep(string $name): WorkflowStep
@@ -43,10 +42,10 @@ class TransitionIsAllowedValidatorTest extends ConstraintValidatorTestCase
     private function getWorkflowItem(string $workflowName, WorkflowStep $currentStep): WorkflowItem
     {
         $item = $this->createMock(WorkflowItem::class);
-        $item->expects($this->any())
+        $item->expects(self::any())
             ->method('getWorkflowName')
             ->willReturn($workflowName);
-        $item->expects($this->any())
+        $item->expects(self::any())
             ->method('getCurrentStep')
             ->willReturn($currentStep);
 
@@ -62,12 +61,12 @@ class TransitionIsAllowedValidatorTest extends ConstraintValidatorTestCase
         $workflowItem = $this->getWorkflowItem($workflowName, $currentStep);
 
         $workflow = $this->createMock(Workflow::class);
-        $workflow->expects($this->once())
+        $workflow->expects(self::once())
             ->method('isTransitionAllowed')
             ->with($workflowItem, $transitionName, $this->isInstanceOf(Collection::class), true)
             ->willReturn(true);
 
-        $this->registry->expects($this->once())
+        $this->workflowRegistry->expects(self::once())
             ->method('getWorkflow')
             ->with($workflowName)
             ->willReturn($workflow);
@@ -95,12 +94,12 @@ class TransitionIsAllowedValidatorTest extends ConstraintValidatorTestCase
         $workflowItem = $this->getWorkflowItem($workflowName, $currentStep);
 
         $workflow = $this->createMock(Workflow::class);
-        $workflow->expects($this->once())
+        $workflow->expects(self::once())
             ->method('isTransitionAllowed')
-            ->with($workflowItem, $transitionName, $this->isInstanceOf(Collection::class), true)
+            ->with($workflowItem, $transitionName, self::isInstanceOf(Collection::class), true)
             ->willThrowException($workflowException);
 
-        $this->registry->expects($this->once())
+        $this->workflowRegistry->expects(self::once())
             ->method('getWorkflow')
             ->with($workflowName)
             ->willReturn($workflow);

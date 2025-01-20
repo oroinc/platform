@@ -56,6 +56,14 @@ services:
         tags:
             - { name: kernel.cache_warmer, priority: 20 }
 
+    oro_entity_extend.entity.cache.custom_entity_creation_warmer:
+        class: Oro\Bundle\EntityExtendBundle\Cache\CustomEntityCreationWarmer
+        arguments:
+            - "@oro_entity_extend.entity_generator"
+            - '%oro_entity_extend.custom_entities%'
+        tags:
+            - { name: kernel.cache_warmer, priority: 150 }
+
     oro_entity_extend.datagrid.extension.fields_helper:
         class: Oro\Bundle\EntityExtendBundle\Grid\FieldsHelper
         arguments:
@@ -299,6 +307,7 @@ services:
         class: Oro\Bundle\EntityExtendBundle\Provider\ExtendEntityPlatformUpdateChecker
         arguments:
             - '@oro_entity_config.config_manager'
+            - '@oro_entity_extend.validator.custom_entity_config_validator'
         tags:
             - { name: oro.installer.platform_update_checker }
 
@@ -392,7 +401,7 @@ services:
             - "@oro_entity_extend.migration.options_manager"
             - "@oro_entity_extend.migration.entity_metadata_helper"
             - '@oro_entity_config.provider_config_bag'
-            - '@oro_entity_config.configuration_handler'
+            - '@oro_entity_extend.validator.custom_entity_config_validator'
         tags:
             - { name: oro_migration.extension, extension_name: extend }
             
@@ -402,7 +411,7 @@ services:
             - "@oro_entity_extend.migration.options_manager"
             - "@oro_entity_extend.migration.entity_metadata_helper"
             - '@oro_entity_config.provider_config_bag'
-            - '@oro_entity_config.configuration_handler'
+            - '@oro_entity_extend.validator.custom_entity_config_validator'
         tags:
             - { name: oro_migration.extension, extension_name: outdated_extend }
 
@@ -919,3 +928,24 @@ services:
             - '%kernel.debug%'
         tags:
             - { name: oro_featuretogle.voter }
+
+    oro_entity_extend.validator.custom_entity_config_validator:
+        class: Oro\Bundle\EntityExtendBundle\Validator\CustomEntityConfigValidatorService
+        arguments:
+            - '@oro_entity_config.config_manager'
+            - '%oro_entity_extend.custom_entities%'
+
+    oro_entity_extend.cache.validator_mapping:
+        public: false
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'validator_mapping' }
+
+    validator.mapping.cache_warmer:
+        class: Oro\Bundle\EntityExtendBundle\Validator\PersistentValidatorCacheWarmer
+        arguments:
+            - '@oro_entity_extend.cache.validator_mapping'
+            - '@validator.builder'
+            - '%validator.mapping.cache.file%'
+        tags:
+            - { name: kernel.cache_warmer }

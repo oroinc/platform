@@ -21,6 +21,7 @@ use Oro\Bundle\EntityExtendBundle\Migration\Extension\OutdatedExtendExtension;
 use Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\EntityExtendBundle\Validator\CustomEntityConfigValidatorService;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -84,7 +85,8 @@ class ExtendExtensionTest extends \PHPUnit\Framework\TestCase
         $result = new OutdatedExtendExtension(
             $this->extendOptionsManager,
             $this->entityMetadataHelper,
-            new PropertyConfigBag($config)
+            new PropertyConfigBag($config),
+            $this->createMock(CustomEntityConfigValidatorService::class)
         );
         $result->setNameGenerator(new ExtendDbIdentifierNameGenerator());
 

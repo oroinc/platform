@@ -34,7 +34,7 @@ class OroEntityExtendBundle extends Bundle
         $this->kernel = $kernel;
         $this->cacheDir = $kernel->getCacheDir();
 
-        ExtendClassLoadingUtils::registerClassLoader($this->cacheDir);
+        ExtendClassLoadingUtils::registerClassLoader($this->cacheDir, $kernel->getProjectDir());
     }
 
     #[\Override]

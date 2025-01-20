@@ -51,8 +51,6 @@ services:
         arguments:
             - '@kernel'
             - '@validator.mapping.cache_warmer'
-            - '@filesystem'
-            - '%validator.mapping.cache.file%'
         tags:
             - { name: console.command }
 

@@ -55,3 +55,9 @@ oro_api:
             options:
                 scale: 3
                 rounding_mode: 0 # ROUND_CEILING
+
+oro_entity_extend:
+    custom_entities:
+        - Extend\Entity\TestApiE1
+        - Extend\Entity\TestApiE2
+        - Extend\Entity\TestApiE3

@@ -4,15 +4,15 @@ services:
         arguments:
             - '@oro_workflow.registry'
         tags:
-            - { name: validator.constraint_validator, alias: oro_workflow_transition_is_allowed }
+            - { name: validator.constraint_validator }
 
     oro_workflow.validator.workflow_entity:
         class: Oro\Bundle\WorkflowBundle\Validator\Constraints\WorkflowEntityValidator
         arguments:
-            - '@doctrine.orm.entity_manager'
             - '@oro_entity.doctrine_helper'
             - '@oro_workflow.permission_registry'
             - '@oro_workflow.restriction.manager'
             - '@oro_entity.helper.field_helper'
+            - '@property_accessor'
         tags:
-            - { name: validator.constraint_validator, alias: oro_workflow.validator.workflow_entity }
+            - { name: validator.constraint_validator }

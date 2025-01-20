@@ -121,3 +121,10 @@ services:
             - !service
                 class: Oro\Component\ExpressionLanguage\ExpressionLanguage
             - '@property_accessor'
+
+    oro_form.validator_constraints.unique:
+        class: Oro\Bundle\FormBundle\Validator\Constraints\UniqueValidator
+        arguments:
+            - '@property_accessor'
+        tags:
+            - { name: validator.constraint_validator }

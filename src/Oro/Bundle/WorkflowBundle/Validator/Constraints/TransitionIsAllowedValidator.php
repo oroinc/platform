@@ -9,82 +9,83 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * Validate that workflow transition is allowed.
  */
 class TransitionIsAllowedValidator extends ConstraintValidator
 {
-    const ALIAS = 'oro_workflow_transition_is_allowed';
-
-    /**
-     * @var WorkflowRegistry
-     */
-    protected $registry;
-
-    public function __construct(WorkflowRegistry $registry)
-    {
-        $this->registry = $registry;
+    public function __construct(
+        private readonly WorkflowRegistry $workflowRegistry
+    ) {
     }
 
-    /**
-     * Checks if current workflow item allows transition
-     *
-     * @param WorkflowData $value
-     * @param TransitionIsAllowed $constraint
-     */
     #[\Override]
-    public function validate($value, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
-        /** @var WorkflowItem $workflowItem */
-        $workflowItem = $constraint->getWorkflowItem();
-        $transitionName = $constraint->getTransitionName();
-        $workflow = $this->registry->getWorkflow($workflowItem->getWorkflowName());
-
-        $errors = new ArrayCollection();
-
-        $result = false;
-        try {
-            $result = $workflow->isTransitionAllowed($workflowItem, $transitionName, $errors, true);
-        } catch (InvalidTransitionException $e) {
-            switch ($e->getCode()) {
-                case InvalidTransitionException::UNKNOWN_TRANSITION:
-                    $errors->add(
-                        [
-                            'message' => $constraint->unknownTransitionMessage,
-                            'parameters' => ['{{ transition }}' => $transitionName],
-                        ]
-                    );
-                    break;
-                case InvalidTransitionException::NOT_START_TRANSITION:
-                    $errors->add(
-                        [
-                            'message' => $constraint->notStartTransitionMessage,
-                            'parameters' => ['{{ transition }}' => $transitionName],
-                        ]
-                    );
-                    break;
-                case InvalidTransitionException::STEP_HAS_NO_ALLOWED_TRANSITION:
-                    $errors->add(
-                        [
-                            'message' => $constraint->stepHasNotAllowedTransitionMessage,
-                            'parameters' => [
-                                '{{ transition }}' => $transitionName,
-                                '{{ step }}' => $workflowItem->getCurrentStep()->getName(),
-                            ],
-                        ]
-                    );
-                    break;
-            }
+        if (!$constraint instanceof TransitionIsAllowed) {
+            throw new UnexpectedTypeException($constraint, TransitionIsAllowed::class);
         }
 
-        if (!$result) {
+        if (!$value instanceof WorkflowData) {
+            throw new UnexpectedTypeException($value, WorkflowData::class);
+        }
+
+        $workflowItem = $constraint->getWorkflowItem();
+        $transitionName = $constraint->getTransitionName();
+        $workflow = $this->workflowRegistry->getWorkflow($workflowItem->getWorkflowName());
+        if (null === $workflow) {
+            return;
+        }
+
+        $isTransitionAllowed = false;
+        $errors = new ArrayCollection();
+        try {
+            $isTransitionAllowed = $workflow->isTransitionAllowed($workflowItem, $transitionName, $errors, true);
+        } catch (InvalidTransitionException $e) {
+            $this->handleError($e, $errors, $constraint, $workflowItem, $transitionName);
+        }
+
+        if (!$isTransitionAllowed) {
             $this->context->addViolation($constraint->someConditionsNotMetMessage);
             if ($errors->count()) {
                 foreach ($errors as $error) {
                     $this->context->addViolation($error['message'], $error['parameters'] ?? []);
                 }
             }
+        }
+    }
+
+    private function handleError(
+        InvalidTransitionException $e,
+        ArrayCollection $errors,
+        TransitionIsAllowed $constraint,
+        WorkflowItem $workflowItem,
+        string $transitionName
+    ): void {
+        switch ($e->getCode()) {
+            case InvalidTransitionException::UNKNOWN_TRANSITION:
+                $errors->add([
+                    'message' => $constraint->unknownTransitionMessage,
+                    'parameters' => ['{{ transition }}' => $transitionName],
+                ]);
+                break;
+            case InvalidTransitionException::NOT_START_TRANSITION:
+                $errors->add([
+                    'message' => $constraint->notStartTransitionMessage,
+                    'parameters' => ['{{ transition }}' => $transitionName],
+                ]);
+                break;
+            case InvalidTransitionException::STEP_HAS_NO_ALLOWED_TRANSITION:
+                $errors->add([
+                    'message' => $constraint->stepHasNotAllowedTransitionMessage,
+                    'parameters' => [
+                        '{{ transition }}' => $transitionName,
+                        '{{ step }}' => $workflowItem->getCurrentStep()?->getName()
+                    ]
+                ]);
+                break;
         }
     }
 }

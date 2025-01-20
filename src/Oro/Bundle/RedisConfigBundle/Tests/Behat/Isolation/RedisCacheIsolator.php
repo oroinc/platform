@@ -157,13 +157,15 @@ class RedisCacheIsolator implements IsolatorInterface
             $clientLocator = $this->container->get('oro.redis_config.client_locator');
             foreach ($this->knownClients as $serviceName => $type) {
                 if (!$clientLocator->has($serviceName)) {
-                    throw new \RuntimeException(
+                    $this->container->get('logger')->error(
                         \sprintf(
                             'Required redis client "%s" for cache type "%s" not registered',
                             $serviceName,
                             $type
                         )
                     );
+                    // skip unregistered client
+                    continue;
                 }
 
                 $service = $clientLocator->get($serviceName);
