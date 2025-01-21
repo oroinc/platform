@@ -22,24 +22,12 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class UniqueEntityValidator extends ConstraintValidator
 {
-    private ManagerRegistry $doctrine;
-
-    private ContainerInterface $container;
-
-    private ConfigManager $configManager;
-
-    private TranslatorInterface $translator;
-
     public function __construct(
-        ManagerRegistry $doctrine,
-        ContainerInterface $container,
-        ConfigManager $configManager,
-        TranslatorInterface $translator
+        private readonly ManagerRegistry $doctrine,
+        private readonly ContainerInterface $container,
+        private readonly ConfigManager $configManager,
+        private readonly TranslatorInterface $translator
     ) {
-        $this->doctrine = $doctrine;
-        $this->container = $container;
-        $this->configManager = $configManager;
-        $this->translator = $translator;
     }
 
     #[\Override]
@@ -71,8 +59,6 @@ class UniqueEntityValidator extends ConstraintValidator
     }
 
     /**
-     * @param UniqueEntity $constraint
-     *
      * @return string[]
      */
     public function getUniqueFields(UniqueEntity $constraint): array
@@ -81,7 +67,7 @@ class UniqueEntityValidator extends ConstraintValidator
             throw new UnexpectedTypeException($constraint->fields, 'array');
         }
 
-        if (is_string($constraint->fields) && str_starts_with($constraint->fields, '%')) {
+        if (\is_string($constraint->fields) && str_starts_with($constraint->fields, '%')) {
             $fields = (array)$this->container->getParameter(trim($constraint->fields, '%'));
         } else {
             $fields = (array)$constraint->fields;
@@ -115,10 +101,10 @@ class UniqueEntityValidator extends ConstraintValidator
     {
         $fieldLabels = [];
         foreach ($fields as $fieldName) {
-            $fieldLabel = $this->configManager
-                ->getFieldConfig('entity', $entityClass, $fieldName)
-                ->get('label', false, $fieldName);
-            $fieldLabels[] = $this->translator->trans($fieldLabel, []);
+            $fieldLabels[] = $this->translator->trans(
+                $this->configManager->getFieldConfig('entity', $entityClass, $fieldName)
+                    ->get('label', false, $fieldName)
+            );
         }
 
         return $fieldLabels;
@@ -138,12 +124,10 @@ class UniqueEntityValidator extends ConstraintValidator
         if ($constraint->em) {
             $em = $this->doctrine->getManager($constraint->em);
             if (!$em) {
-                throw new ConstraintDefinitionException(
-                    sprintf(
-                        'Object manager "%s" does not exist.',
-                        $constraint->em
-                    )
-                );
+                throw new ConstraintDefinitionException(\sprintf(
+                    'Object manager "%s" does not exist.',
+                    $constraint->em
+                ));
             }
 
             return $em;
@@ -151,12 +135,10 @@ class UniqueEntityValidator extends ConstraintValidator
 
         $em = $this->doctrine->getManagerForClass(ClassUtils::getClass($entity));
         if (!$em) {
-            throw new ConstraintDefinitionException(
-                sprintf(
-                    'Unable to find the object manager associated with an entity of class "%s".',
-                    ClassUtils::getClass($entity)
-                )
-            );
+            throw new ConstraintDefinitionException(\sprintf(
+                'Unable to find the object manager associated with an entity of class "%s".',
+                ClassUtils::getClass($entity)
+            ));
         }
 
         return $em;
@@ -169,12 +151,10 @@ class UniqueEntityValidator extends ConstraintValidator
         $criteria = [];
         foreach ($fields as $fieldName) {
             if (!$class->hasField($fieldName) && !$class->hasAssociation($fieldName)) {
-                throw new ConstraintDefinitionException(
-                    sprintf(
-                        'The field "%s" is not mapped by Doctrine, so it cannot be validated for uniqueness.',
-                        $fieldName
-                    )
-                );
+                throw new ConstraintDefinitionException(\sprintf(
+                    'The field "%s" is not mapped by Doctrine, so it cannot be validated for uniqueness.',
+                    $fieldName
+                ));
             }
 
             $criteria[$fieldName] = $class->reflFields[$fieldName]->getValue($entity);
@@ -191,7 +171,7 @@ class UniqueEntityValidator extends ConstraintValidator
         return $criteria;
     }
 
-    private function getResult(array $criteria, object $entity, Constraint $constraint, ObjectManager $em): mixed
+    private function getResult(array $criteria, object $entity, UniqueEntity $constraint, ObjectManager $em): mixed
     {
         $repository = $em->getRepository(ClassUtils::getClass($entity));
         $result = $repository->{$constraint->repositoryMethod}($criteria);
