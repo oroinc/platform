@@ -122,8 +122,8 @@ services:
                 class: Oro\Component\ExpressionLanguage\ExpressionLanguage
             - '@property_accessor'
 
-    oro_form.validator_constraints.unique:
-        class: Oro\Bundle\FormBundle\Validator\Constraints\UniqueValidator
+    oro_form.validator_constraints.unique_collection_item:
+        class: Oro\Bundle\FormBundle\Validator\Constraints\UniqueCollectionItemValidator
         arguments:
             - '@property_accessor'
         tags:
