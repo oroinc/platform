@@ -1,12 +1,17 @@
 <?php
 
+/*
+ * This file is a copy of {@see Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator}
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ */
+
 namespace Oro\Bundle\FormBundle\Validator\Constraints;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity as DoctrineUniqueEntityConstraint;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -15,7 +20,7 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * This validator is basically a copy of @see \Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator,
+ * This validator is basically a copy of {@see \Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntityValidator},
  * but this validator has an additional option 'buildViolationAtEntityLevel' that allows to not build violations at
  * some property path. This had to be another class, because Doctrine's UniqueEntityValidator was written poorly,
  * without possibility to extend.
@@ -93,7 +98,7 @@ class UniqueEntityValidator extends ConstraintValidator
             ->setInvalidValue($criteria[$errorPath] ?? $criteria[$fields[0]])
             ->setParameter('{{ unique_key }}', $this->formatValues($fields))
             ->setParameter('{{ unique_fields }}', $this->formatValues($this->getFieldLabels($entityClass, $fields)))
-            ->setCode(DoctrineUniqueEntityConstraint::NOT_UNIQUE_ERROR)
+            ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->addViolation();
     }
 
@@ -115,7 +120,7 @@ class UniqueEntityValidator extends ConstraintValidator
         $this->context->buildViolation($constraint->message)
             ->setParameter('{{ unique_key }}', $this->formatValues($fields))
             ->setParameter('{{ unique_fields }}', $this->formatValues($this->getFieldLabels($entityClass, $fields)))
-            ->setCode(DoctrineUniqueEntityConstraint::NOT_UNIQUE_ERROR)
+            ->setCode(UniqueEntity::NOT_UNIQUE_ERROR)
             ->addViolation();
     }
 
