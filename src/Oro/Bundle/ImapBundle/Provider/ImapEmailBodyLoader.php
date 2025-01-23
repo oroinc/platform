@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ImapBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
-use Laminas\Mail\Protocol\Exception\RuntimeException;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Builder\EmailBodyBuilder;
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -13,42 +12,20 @@ use Oro\Bundle\EmailBundle\Exception\EmailBodyNotFoundException;
 use Oro\Bundle\EmailBundle\Exception\SyncWithNotificationAlertException;
 use Oro\Bundle\EmailBundle\Provider\EmailBodyLoaderInterface;
 use Oro\Bundle\EmailBundle\Sync\EmailSyncNotificationAlert;
-use Oro\Bundle\ImapBundle\Connector\ImapConfig;
-use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnselectableFolderException;
-use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
-use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
-use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
+use Oro\Bundle\ImapBundle\Manager\ImapEmailManagerFactory;
 
 /**
  * This class provides ability to load email body
  */
 class ImapEmailBodyLoader implements EmailBodyLoaderInterface
 {
-    /** @var ImapConnectorFactory */
-    protected $connectorFactory;
-
-    /** @var SymmetricCrypterInterface */
-    protected $encryptor;
-
-    /** @var OAuthManagerRegistry */
-    protected $oauthManagerRegistry;
-
-    /** @var ConfigManager */
-    protected $configManager;
-
     public function __construct(
-        ImapConnectorFactory $connectorFactory,
-        SymmetricCrypterInterface $encryptor,
-        OAuthManagerRegistry $oauthManagerRegistry,
-        ConfigManager $configManager
+        private ImapEmailManagerFactory $emailManagerFactory,
+        private ConfigManager $configManager
     ) {
-        $this->connectorFactory = $connectorFactory;
-        $this->encryptor = $encryptor;
-        $this->oauthManagerRegistry = $oauthManagerRegistry;
-        $this->configManager = $configManager;
     }
 
     #[\Override]
@@ -62,35 +39,13 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
     {
         /** @var UserEmailOrigin $origin */
         $origin = $folder->getOrigin();
-        $manager = $this->oauthManagerRegistry->hasManager($origin->getAccountType())
-            ? $this->oauthManagerRegistry->getManager($origin->getAccountType())
-            : null;
-
-        $config = new ImapConfig(
-            $origin->getImapHost(),
-            $origin->getImapPort(),
-            $origin->getImapEncryption(),
-            $origin->getUser(),
-            $this->encryptor->decryptData($origin->getPassword()),
-            $manager ? $manager->getAccessTokenWithCheckingExpiration($origin) : null
-        );
-
+        $manager = $this->emailManagerFactory->getImapEmailManager($origin);
         try {
-            $manager = new ImapEmailManager($this->connectorFactory->createImapConnector($config));
             $manager->selectFolder($folder->getFullName());
         } catch (UnselectableFolderException $e) {
             throw new SyncWithNotificationAlertException(
                 EmailSyncNotificationAlert::createForSwitchFolderFail(
                     sprintf('The folder "%s" cannot be selected.', $folder->getFullName()),
-                ),
-                $e->getMessage(),
-                $e->getCode(),
-                $e
-            );
-        } catch (RuntimeException $e) {
-            throw new SyncWithNotificationAlertException(
-                EmailSyncNotificationAlert::createForSwitchFolderFail(
-                    'Cannot connect to the IMAP server. Exception message:' . $e->getMessage()
                 ),
                 $e->getMessage(),
                 $e->getCode(),

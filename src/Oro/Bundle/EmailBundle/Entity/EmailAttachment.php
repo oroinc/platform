@@ -211,11 +211,14 @@ class EmailAttachment implements FileExtensionInterface
         if ($this->file) {
             $size = $this->file->getFileSize();
         } else {
-            $content = ContentDecoder::decode(
-                $this->attachmentContent->getContent(),
-                $this->attachmentContent->getContentTransferEncoding()
-            );
-            $size = strlen($content);
+            $size = 0;
+            if ($this->attachmentContent?->getContent() !== null) {
+                $content = ContentDecoder::decode(
+                    $this->attachmentContent->getContent(),
+                    $this->attachmentContent->getContentTransferEncoding()
+                );
+                $size = strlen($content);
+            }
         }
 
         return $size;

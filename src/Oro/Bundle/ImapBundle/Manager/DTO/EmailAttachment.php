@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ImapBundle\Manager\DTO;
 
+/**
+ * Represents IMAP email body attachment.
+ */
 class EmailAttachment
 {
     /**
