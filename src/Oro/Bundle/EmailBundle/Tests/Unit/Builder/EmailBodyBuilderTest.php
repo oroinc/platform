@@ -87,7 +87,8 @@ class EmailBodyBuilderTest extends \PHPUnit\Framework\TestCase
         );
 
         $body = $this->emailBodyBuilder->getEmailBody();
-        $this->assertEquals($expected, $body->getHasAttachments());
+        //Attachment metadata will be created in any case, only content dependent on settings
+        $this->assertEquals($expected, !empty($body->getAttachments()[0]->getContent()));
     }
 
     public function addAttachmentProvider(): array
