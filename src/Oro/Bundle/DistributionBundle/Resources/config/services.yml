@@ -90,3 +90,9 @@ services:
         class: Oro\Bundle\DistributionBundle\EventListener\ControllerTemplateListener
         tags:
             - { name: kernel.event_subscriber }
+
+    oro_distribution.provider.public_directory_provider:
+        class: Oro\Bundle\DistributionBundle\Provider\PublicDirectoryProvider
+        arguments:
+            - '%kernel.project_dir%'
+

@@ -27,6 +27,10 @@ layout:
                         visible: '=data["theme"].getIcon(context["theme"])!=null'
                         href: '=data["asset"].getUrl(data["theme"].getIcon(context["theme"]))'
                         rel: shortcut icon
+                critical_css:
+                    blockType: style
+                    options:
+                        content: '=data["theme"].getStylesOutputContent(context["theme"], "critical_css")'
                 styles:
                     blockType: style
                     options:
@@ -73,6 +77,7 @@ layout:
                         meta_charset: ~
                         meta_viewport: ~
                         theme_icon: ~
+                        critical_css: ~
                         service_worker: ~
                         styles: ~
                         print_styles: ~

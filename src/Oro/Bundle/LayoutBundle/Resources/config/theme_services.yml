@@ -141,8 +141,12 @@ services:
         arguments:
             - '@oro_layout.theme_manager'
             - '@oro_locale.provider.current_localization'
+            - '@oro_distribution.provider.public_directory_provider'
+        calls:
+            - ['setLogger', ['@logger']]
         tags:
             - { name: layout.data_provider, alias: theme }
+            - { name: monolog.logger, channel: oro_layout }
 
     oro_layout.expression_language.compiled_cache_warmer:
         class: Oro\Component\Layout\ExpressionLanguage\ExpressionLanguageCacheWarmer

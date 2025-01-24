@@ -1,3 +1,7 @@
+critical_css:
+    inputs:
+        - 'bundles/oroform/default/scss/settings/global-settings.scss'
+
 styles:
     inputs:
         - 'bundles/oroform/default/scss/settings/global-settings.scss'
