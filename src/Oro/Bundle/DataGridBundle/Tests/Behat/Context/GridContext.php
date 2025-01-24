@@ -1061,6 +1061,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
             ->getFilterItem('GridFilterStringItem', $filterName, $strictly === 'strictly');
 
         $filterItem->open();
+        $this->oroMainContext->scrollToXpath($filterItem->getXpath());
         $filterItem->selectType($type);
         // does not need set value if use filter 'is empty' or 'is not empty'
         if (!in_array($type, ['is empty', 'is not empty'])) {

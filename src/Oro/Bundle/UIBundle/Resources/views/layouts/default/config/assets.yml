@@ -1,3 +1,7 @@
+critical_css:
+    inputs:
+        - 'bundles/oroui/default/scss/settings/global-settings.scss'
+
 styles:
     inputs:
         - 'bundles/oroui/default/scss/settings/global-settings.scss'

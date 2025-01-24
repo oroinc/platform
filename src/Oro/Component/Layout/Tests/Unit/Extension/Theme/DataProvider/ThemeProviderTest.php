@@ -2,11 +2,13 @@
 
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\DataProvider;
 
+use Oro\Bundle\DistributionBundle\Provider\PublicDirectoryProvider;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationProviderInterface;
 use Oro\Component\Layout\Extension\Theme\DataProvider\ThemeProvider;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
+use Psr\Log\LoggerInterface;
 
 class ThemeProviderTest extends \PHPUnit\Framework\TestCase
 {
@@ -19,13 +21,44 @@ class ThemeProviderTest extends \PHPUnit\Framework\TestCase
     /** @var ThemeProvider */
     private $provider;
 
+    /** @var PublicDirectoryProvider|\PHPUnit\Framework\MockObject\MockObject */
+    private $publicDirectoryProvider;
+
+    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
+    private $logger;
+
     #[\Override]
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->themeManager = $this->createMock(ThemeManager::class);
         $this->localizationProvider = $this->createMock(LocalizationProviderInterface::class);
+        $this->publicDirectoryProvider = $this->createMock(PublicDirectoryProvider::class);
+        $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->provider = new ThemeProvider($this->themeManager, $this->localizationProvider);
+        $this->provider = new ThemeProvider(
+            $this->themeManager,
+            $this->localizationProvider,
+            $this->publicDirectoryProvider,
+        );
+
+        $this->provider->setLogger($this->logger);
+
+        $this->publicDirectory = sys_get_temp_dir() . '/mocked_public_directory_' . uniqid('', true);
+
+        if (is_dir($this->publicDirectory)) {
+            $this->removeDirectory($this->publicDirectory);
+        }
+
+        mkdir($this->publicDirectory, 0777, true);
+    }
+
+    protected function tearDown(): void
+    {
+        if (is_dir($this->publicDirectory)) {
+            $this->removeDirectory($this->publicDirectory);
+        }
     }
 
     public function testGetIcon(): void
@@ -263,5 +296,114 @@ class ThemeProviderTest extends \PHPUnit\Framework\TestCase
                 'expected' => 'build/test/path/to/output/css/new.rtl.css',
             ],
         ];
+    }
+
+    public function testGetStylesOutputContentWhenFileExists(): void
+    {
+        $themeName = 'test';
+        $sectionName = 'styles';
+        $outputPath = 'css/test.css';
+        $fileContent = 'body { background: #fff; }';
+        $filePath = $this->publicDirectory . '/build/' . $themeName . '/' . $outputPath;
+
+        $this->createFileWithContent($filePath, $fileContent);
+
+        $this->publicDirectoryProvider
+            ->method('getPublicDirectory')
+            ->willReturn($this->publicDirectory);
+
+        $theme = new Theme($themeName);
+        $theme->setConfig(['assets' => ['styles' => ['output' => $outputPath]]]);
+
+        $this->themeManager->expects(self::once())
+            ->method('getTheme')
+            ->with($themeName)
+            ->willReturn($theme);
+
+        $result = $this->provider->getStylesOutputContent($themeName, $sectionName);
+
+        self::assertSame($fileContent, $result, 'The file content does not match the expected content.');
+    }
+
+    public function testGetStylesOutputContentWhenFileDoesNotExist(): void
+    {
+        $themeName = 'test';
+        $sectionName = 'styles';
+        $outputPath = 'css/nonexistent.css';
+
+        $filePath = $this->publicDirectory . '/build/' . $themeName . '/' . $outputPath;
+
+        $this->publicDirectoryProvider
+            ->method('getPublicDirectory')
+            ->willReturn($this->publicDirectory);
+
+        $theme = new Theme($themeName);
+        $theme->setConfig(['assets' => ['styles' => ['output' => $outputPath]]]);
+
+        $this->themeManager->expects(self::once())
+            ->method('getTheme')
+            ->with($themeName)
+            ->willReturn($theme);
+
+        $this->logger->expects(self::once())
+            ->method('error')
+            ->with(
+                self::stringContains('CSS file not found'),
+                self::callback(function ($context) use ($filePath, $themeName, $sectionName) {
+                    return isset($context['filePath'], $context['themeName'], $context['sectionName'])
+                        && $context['filePath'] === $filePath
+                        && $context['themeName'] === $themeName
+                        && $context['sectionName'] === $sectionName;
+                })
+            );
+
+        $result = $this->provider->getStylesOutputContent($themeName, $sectionName);
+        self::assertSame('', $result);
+    }
+
+
+    public function testGetStylesOutputContentWhenOutputPathIsNull(): void
+    {
+        $themeName = 'test';
+        $sectionName = 'styles';
+
+        $this->publicDirectoryProvider
+            ->method('getPublicDirectory')
+            ->willReturn($this->publicDirectory);
+
+        $theme = new Theme($themeName);
+        $theme->setConfig(['assets' => ['styles' => []]]);
+
+        $this->themeManager->expects(self::once())
+            ->method('getTheme')
+            ->with($themeName)
+            ->willReturn($theme);
+
+        $result = $this->provider->getStylesOutputContent($themeName, $sectionName);
+
+        self::assertSame('', $result);
+    }
+
+    private function createFileWithContent(string $filePath, string $content): void
+    {
+        $dir = dirname($filePath);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+        file_put_contents($filePath, $content);
+    }
+
+    private function removeDirectory(string $directory): void
+    {
+        if (!is_dir($directory)) {
+            return;
+        }
+
+        $files = array_diff(scandir($directory), ['.', '..']);
+        foreach ($files as $file) {
+            $filePath = $directory . '/' . $file;
+            is_dir($filePath) ? $this->removeDirectory($filePath) : unlink($filePath);
+        }
+        rmdir($directory);
     }
 }
