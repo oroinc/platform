@@ -4,10 +4,13 @@ namespace Oro\Bundle\EntityBundle\DBAL\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
-use Doctrine\DBAL\Types\JsonArrayType;
+use Doctrine\DBAL\Types\JsonType;
 use Oro\Component\Config\Common\ConfigObject;
 
-class ConfigObjectType extends JsonArrayType
+/**
+ * Type that maps a PHP array to a JSON object in the database
+ */
+class ConfigObjectType extends JsonType
 {
     const TYPE = 'config_object';
 

@@ -16,7 +16,7 @@ class TestTemplate extends Template
     #[\Override]
     protected function doDisplay(array $context, array $blocks = array())
     {
-        echo 'test';
+        yield 'test';
     }
 
     #[\Override]

@@ -36,9 +36,13 @@ class OroElementFactoryTest extends \PHPUnit\Framework\TestCase
      */
     protected function getElementFactory(array $configuration = [])
     {
+        $selectorsHandler = $this->createMock('Behat\Mink\Selector\SelectorsHandler');
+        $selectorsHandler->expects($this->any())
+            ->method('selectorToXpath')
+            ->willReturnArgument(0);
         $session = new Session(
             $this->createMock('Behat\Mink\Driver\DriverInterface'),
-            $this->createMock('Behat\Mink\Selector\SelectorsHandler')
+            $selectorsHandler
         );
         $mink = new Mink(['default' => $session]);
         $mink->setDefaultSessionName('default');

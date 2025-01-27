@@ -23,6 +23,7 @@ class BatchLogHandler extends StreamHandler
         $this->filePermission = null;
         $this->useLocking = false;
         $this->bubble = true;
+        $this->fileOpenMode = 'a';
 
         $this->setupStringChunkSize();
         $this->setLevel(Logger::DEBUG);

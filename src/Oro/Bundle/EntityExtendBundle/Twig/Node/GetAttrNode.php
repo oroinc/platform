@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Twig\Node;
 
+use ArrayAccess;
 use Doctrine\Inflector\Inflector;
 use Oro\Bundle\EntityExtendBundle\Entity\ExtendEntityInterface;
 use Oro\Bundle\EntityExtendBundle\EntityPropertyInfo;
@@ -144,7 +145,7 @@ class GetAttrNode extends GetAttrExpression
             }
         }
 
-        return \twig_get_attribute(
+        return self::twigGetAttribute(
             $env,
             $source,
             $object,
@@ -156,6 +157,217 @@ class GetAttrNode extends GetAttrExpression
             $sandboxed,
             $lineno
         );
+    }
+
+    /**
+     * @copyright twig/twig/src/Extension/CoreExtension.php::twig_get_attribute()
+     */
+    private static function twigGetAttribute(
+        Environment $env,
+        Source $source,
+        $object,
+        $item,
+        array $arguments = [],
+        $type = /* Template::ANY_CALL */ 'any',
+        $isDefinedTest = false,
+        $ignoreStrictCheck = false,
+        $sandboxed = false,
+        int $lineno = -1
+    ) {
+        if (/* Template::METHOD_CALL */ 'method' !== $type) {
+            $arrayItem = \is_bool($item) || \is_float($item) ? (int)$item : $item;
+
+            if (((\is_array($object) || $object instanceof \ArrayObject)
+                    && (isset($object[$arrayItem]) || \array_key_exists($arrayItem, (array)$object)))
+                || ($object instanceof ArrayAccess && isset($object[$arrayItem]))
+            ) {
+                if ($isDefinedTest) {
+                    return true;
+                }
+
+                return $object[$arrayItem];
+            }
+            if (/* Template::ARRAY_CALL */ 'array' === $type || !\is_object($object)) {
+                if ($isDefinedTest) {
+                    return false;
+                }
+                if ($ignoreStrictCheck || !$env->isStrictVariables()) {
+                    return;
+                }
+                if ($object instanceof ArrayAccess) {
+                    $message = sprintf(
+                        'Key "%s" in object with ArrayAccess of class "%s" does not exist.',
+                        $arrayItem,
+                        \get_class($object)
+                    );
+                } elseif (\is_object($object)) {
+                    $format = 'Impossible to access a key "%s" on an object of class "%s" that '
+                        . 'does not implement ArrayAccess interface.';
+                    $message = sprintf($format, $item, \get_class($object));
+                } elseif (\is_array($object)) {
+                    if (empty($object)) {
+                        $message = sprintf('Key "%s" does not exist as the array is empty.', $arrayItem);
+                    } else {
+                        $message = sprintf(
+                            'Key "%s" for array with keys "%s" does not exist.',
+                            $arrayItem,
+                            implode(', ', array_keys($object))
+                        );
+                    }
+                } elseif (/* Template::ARRAY_CALL */ 'array' === $type) {
+                    if (null === $object) {
+                        $message = sprintf('Impossible to access a key ("%s") on a null variable.', $item);
+                    } else {
+                        $message = sprintf(
+                            'Impossible to access a key ("%s") on a %s variable ("%s").',
+                            $item,
+                            \gettype($object),
+                            $object
+                        );
+                    }
+                } elseif (null === $object) {
+                    $message = sprintf(
+                        'Impossible to access an attribute ("%s") on a null variable.',
+                        $item
+                    );
+                } else {
+                    $message = sprintf(
+                        'Impossible to access an attribute ("%s") on a %s variable ("%s").',
+                        $item,
+                        \gettype($object),
+                        $object
+                    );
+                }
+
+                throw new RuntimeError($message, $lineno, $source);
+            }
+        }
+        if (!\is_object($object)) {
+            if ($isDefinedTest) {
+                return false;
+            }
+            if ($ignoreStrictCheck || !$env->isStrictVariables()) {
+                return;
+            }
+            if (null === $object) {
+                $message = sprintf('Impossible to invoke a method ("%s") on a null variable.', $item);
+            } elseif (\is_array($object)) {
+                $message = sprintf('Impossible to invoke a method ("%s") on an array.', $item);
+            } else {
+                $message = sprintf(
+                    'Impossible to invoke a method ("%s") on a %s variable ("%s").',
+                    $item,
+                    \gettype($object),
+                    $object
+                );
+            }
+
+            throw new RuntimeError($message, $lineno, $source);
+        }
+        if ($object instanceof Template) {
+            throw new RuntimeError('Accessing \Twig\Template attributes is forbidden.', $lineno, $source);
+        }
+        // object property
+        if (/* Template::METHOD_CALL */ 'method' !== $type) {
+            if (isset($object->$item) || \array_key_exists((string)$item, (array)$object)) {
+                if ($isDefinedTest) {
+                    return true;
+                }
+
+                if ($sandboxed) {
+                    $env->getExtension(SandboxExtension::class)
+                        ->checkPropertyAllowed($object, $item, $lineno, $source);
+                }
+
+                return $object->$item;
+            }
+        }
+        static $cache = [];
+        $class = \get_class($object);
+
+        // object method
+        // precedence: getXxx() > isXxx() > hasXxx()
+        if (!isset($cache[$class])) {
+            $methods = get_class_methods($object);
+            sort($methods);
+            $lcMethods = array_map(function ($value) {
+                return strtr($value, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz');
+            }, $methods);
+            $classCache = [];
+            foreach ($methods as $i => $method) {
+                $classCache[$method] = $method;
+                $classCache[$lcName = $lcMethods[$i]] = $method;
+
+                if ('g' === $lcName[0] && 0 === strpos($lcName, 'get')) {
+                    $name = substr($method, 3);
+                    $lcName = substr($lcName, 3);
+                } elseif ('i' === $lcName[0] && 0 === strpos($lcName, 'is')) {
+                    $name = substr($method, 2);
+                    $lcName = substr($lcName, 2);
+                } elseif ('h' === $lcName[0] && 0 === strpos($lcName, 'has')) {
+                    $name = substr($method, 3);
+                    $lcName = substr($lcName, 3);
+                    if (\in_array('is' . $lcName, $lcMethods)) {
+                        continue;
+                    }
+                } else {
+                    continue;
+                }
+
+                // skip get() and is() methods (in which case, $name is empty)
+                if ($name) {
+                    if (!isset($classCache[$name])) {
+                        $classCache[$name] = $method;
+                    }
+
+                    if (!isset($classCache[$lcName])) {
+                        $classCache[$lcName] = $method;
+                    }
+                }
+            }
+            $cache[$class] = $classCache;
+        }
+
+        $call = false;
+        $upperChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $lowerChars = 'abcdefghijklmnopqrstuvwxyz';
+        if (isset($cache[$class][$item])) {
+            $method = $cache[$class][$item];
+        } elseif (isset($cache[$class][$lcItem = strtr($item, $upperChars, $lowerChars)])) {
+            $method = $cache[$class][$lcItem];
+        } elseif (isset($cache[$class]['__call'])) {
+            $method = $item;
+            $call = true;
+        } else {
+            if ($isDefinedTest) {
+                return false;
+            }
+            if ($ignoreStrictCheck || !$env->isStrictVariables()) {
+                return;
+            }
+            $format = 'Neither the property "%1$s" nor one of the methods "%1$s()", '
+                . '"get%1$s()"/"is%1$s()"/"has%1$s()" or "__call()" exist and have public access in class "%2$s".';
+
+            throw new RuntimeError(sprintf($format, $item, $class), $lineno, $source);
+        }
+        if ($isDefinedTest) {
+            return true;
+        }
+        if ($sandboxed) {
+            $env->getExtension(SandboxExtension::class)->checkMethodAllowed($object, $method, $lineno, $source);
+        }
+        // Some objects throw exceptions when they have __call, and the method we try
+        // to call is not supported. If ignoreStrictCheck is true, we should return null.
+        try {
+            $ret = $object->$method(...$arguments);
+        } catch (\BadMethodCallException $e) {
+            if ($call && ($ignoreStrictCheck || !$env->isStrictVariables())) {
+                return;
+            }
+            throw $e;
+        }
+
+        return $ret;
     }
 
     private static function isMethodWithPrefixExists(

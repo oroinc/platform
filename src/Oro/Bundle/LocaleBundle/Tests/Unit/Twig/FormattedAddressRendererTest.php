@@ -59,9 +59,9 @@ final class FormattedAddressRendererTest extends TestCase
 
         $template
             ->expects(self::any())
-            ->method('displayBlock')
+            ->method('renderBlock')
             ->willReturnCallback(function (string $blockName, array $context) {
-                echo implode(
+                return implode(
                     '_',
                     [$blockName, implode('_', [...array_keys($context), ...array_values($context)])]
                 );

@@ -352,8 +352,7 @@ abstract class OroKernel extends Kernel
         $cache = new ConfigCache($cacheDir.'/'.$class.'.php', $debug);
         $cachePath = $cache->getPath();
 
-        // Silence E_WARNING to ignore "include" failures - don't use "@" to prevent silencing fatal errors
-        $errorLevel = error_reporting(\E_ALL ^ \E_WARNING);
+        $errorLevel = error_reporting(\E_ALL ^ \E_WARNING ^ \E_DEPRECATED ^ \E_USER_DEPRECATED);
         // @codingStandardsIgnoreStart
         try {
             if (file_exists($cachePath) && \is_object($this->container = include $cachePath)

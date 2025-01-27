@@ -75,7 +75,6 @@ class ConsoleErrorSubscriberTest extends \PHPUnit\Framework\TestCase
                 E_PARSE => [$this->logger, LogLevel::CRITICAL],
                 E_ERROR => [$this->logger, LogLevel::CRITICAL],
                 E_CORE_ERROR => [$this->logger, LogLevel::CRITICAL],
-                E_STRICT => [null, LogLevel::WARNING],
             ],
             $this->handler->setLoggers([])
         );
