@@ -35,8 +35,10 @@ abstract class AbstractOrmQueryConverter extends AbstractQueryConverter
             if ($entityClass) {
                 $fieldName = $this->getFieldName($joinId);
                 $metadata = $this->getClassMetadata($entityClass);
-                $associationMapping = $metadata->getAssociationMapping($fieldName);
                 $nullable = true;
+                $associationMapping = $metadata->hasAssociation($fieldName)
+                    ? $metadata->getAssociationMapping($fieldName)
+                    : null;
                 if (isset($associationMapping['joinColumns'])) {
                     $nullable = false;
                     foreach ($associationMapping['joinColumns'] as $joinColumn) {

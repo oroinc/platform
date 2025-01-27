@@ -79,6 +79,13 @@ class EnumVirtualFieldProvider implements VirtualFieldProviderInterface
         return $this->configManager->getFieldConfig('enum', $className, $fieldName)?->get('enum_code');
     }
 
+    public function getFieldType(string $className, string $fieldName): ?string
+    {
+        return $this->configManager->hasConfig($className, $fieldName)
+            ? $this->configManager->getFieldConfig('enum', $className, $fieldName)?->getId()->getFieldType()
+            : null;
+    }
+
     /**
      * @return array [associationName => targetFieldName for enum and NULL for multiEnum, ...]
      */

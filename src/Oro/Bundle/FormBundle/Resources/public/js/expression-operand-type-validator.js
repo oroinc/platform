@@ -124,11 +124,15 @@ class ExpressionOperandTypeValidator {
                 let fieldName;
                 let level = 1;
                 let field = entity.fields;
+                let isEnumerableField = false;
                 while (node && node.instanceOf(GetAttrNode)) {
                     level++;
                     fieldName = node.child(1).attr('value');
                     field = field[fieldName];
-                    if (!field) {
+                    if (field && field.__field && field.__field['type'] === 'enum') {
+                        isEnumerableField = true;
+                    }
+                    if (!field && !isEnumerableField) {
                         throw new TypeError(
                             __('oro.form.expression_editor.validation.property_path.field_not_present', {
                                 fieldName,
@@ -144,7 +148,7 @@ class ExpressionOperandTypeValidator {
                     node = node.parent;
                     source += '.' + fieldName;
                 }
-                if (!field.__isField) {
+                if (field && !field.__isField) {
                     throw new TypeError(__('oro.form.expression_editor.validation.property_path.not_field', {
                         source
                     }));
