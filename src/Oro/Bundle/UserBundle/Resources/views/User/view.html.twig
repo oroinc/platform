@@ -119,7 +119,7 @@
         }) }}
     {% endset %}
     {% set apiKeyWidget %}
-        {% if isProfileView or app.user.id == entity.id or is_granted('MANAGE_API_KEY', entity) %}
+        {% if app.environment == 'test' and (isProfileView or app.user.id == entity.id or is_granted('MANAGE_API_KEY', entity)) %}
             {{ oro_widget_render({
                 'widgetType': 'block',
                 'url': path('oro_user_apigen', { id: entity.id }),

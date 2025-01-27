@@ -51,6 +51,10 @@ class GenerateWsseHeaderCommand extends Command
     #[\Override]
     public function execute(InputInterface $input, OutputInterface $output): int
     {
+        if ('test' !== $input->getOption('env')) {
+            throw new \BadMethodCallException('WSSE is deprecated and can be used only in test env.');
+        }
+
         $apiKey = $input->getArgument('apiKey');
         /** @var UserApi $userApi */
         $userApi = $this->registry->getRepository($this->getApiKeyEntityClass())->findOneBy(

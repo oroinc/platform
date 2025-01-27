@@ -6,7 +6,6 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\AnonymousToken;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
 use Oro\Bundle\UserBundle\Entity\AbstractUser;
-use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -83,45 +82,6 @@ class SecurityContext implements SecurityContextInterface
         }
 
         return $user->getUserIdentifier();
-    }
-
-    #[\Override]
-    public function getApiKey(): ?string
-    {
-        $token = $this->tokenStorage->getToken();
-        if (null === $token) {
-            return null;
-        }
-
-        $user = $token->getUser();
-        if (!$user instanceof AdvancedApiUserInterface) {
-            return null;
-        }
-
-        $apiKeyKeys = $user->getApiKeys();
-        if ($apiKeyKeys->isEmpty()) {
-            return null;
-        }
-
-        if ($token instanceof OrganizationAwareTokenInterface) {
-            $organization = $token->getOrganization();
-            foreach ($apiKeyKeys as $apiKeyKey) {
-                if ($apiKeyKey->getOrganization()->getId() === $organization->getId()) {
-                    return $apiKeyKey->getApiKey();
-                }
-            }
-        }
-
-        return null;
-    }
-
-    #[\Override]
-    public function getApiKeyGenerationHint(): ?string
-    {
-        return
-            'To use WSSE authentication you need to generate API key for the current logged-in user.'
-            . ' To do this, go to the My User page and click Generate Key near to API Key.'
-            . ' After that reload this page.';
     }
 
     #[\Override]

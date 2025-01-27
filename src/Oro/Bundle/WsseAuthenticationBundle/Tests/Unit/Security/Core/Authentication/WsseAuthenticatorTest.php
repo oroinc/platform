@@ -53,6 +53,7 @@ class WsseAuthenticatorTest extends \PHPUnit\Framework\TestCase
         $cache = new ArrayAdapter();
 
         $this->wsseAuthenticator = new WsseAuthenticator(
+            'test',
             $this->featureDependAuthenticatorChecker,
             $tokenStorage,
             $this->wsseTokenFactory,

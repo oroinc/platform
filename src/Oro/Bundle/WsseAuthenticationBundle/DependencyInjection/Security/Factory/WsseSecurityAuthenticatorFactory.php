@@ -55,12 +55,12 @@ class WsseSecurityAuthenticatorFactory implements AuthenticatorFactoryInterface
         $authenticatorId = self::AUTHENTICATOR . '.' . $firewallName;
         $container
             ->setDefinition($authenticatorId, new ChildDefinition(self::AUTHENTICATOR))
-            ->replaceArgument(3, new Reference($userProviderId))
-            ->replaceArgument(4, new Reference($entryPointId))
-            ->replaceArgument(5, $firewallName)
-            ->replaceArgument(6, new Reference($hasherId))
-            ->replaceArgument(7, new Reference($nonceCacheId))
-            ->replaceArgument(8, $config['lifetime']);
+            ->replaceArgument(4, new Reference($userProviderId))
+            ->replaceArgument(5, new Reference($entryPointId))
+            ->replaceArgument(6, $firewallName)
+            ->replaceArgument(7, new Reference($hasherId))
+            ->replaceArgument(8, new Reference($nonceCacheId))
+            ->replaceArgument(9, $config['lifetime']);
 
         return $authenticatorId;
     }
@@ -144,8 +144,8 @@ class WsseSecurityAuthenticatorFactory implements AuthenticatorFactoryInterface
         $entryPointId = self::ENTRY_POINT . '.' . $firewallName;
         $container
             ->setDefinition($entryPointId, new ChildDefinition(self::ENTRY_POINT))
-            ->replaceArgument(1, $config['realm'])
-            ->replaceArgument(2, $config['profile']);
+            ->replaceArgument(2, $config['realm'])
+            ->replaceArgument(3, $config['profile']);
 
         return $entryPointId;
     }

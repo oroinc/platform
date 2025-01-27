@@ -261,8 +261,11 @@ class UserController extends AbstractController
      */
     private function isUserApiGenAllowed(User $entity)
     {
-        return $this->container->get(TokenAccessorInterface::class)->getUserId() === $entity->getId()
-               || $this->isGranted('MANAGE_API_KEY', $entity);
+        return $this->getParameter('kernel.environment') === 'test'
+            && (
+                $this->container->get(TokenAccessorInterface::class)->getUserId() === $entity->getId()
+                || $this->isGranted('MANAGE_API_KEY', $entity)
+            );
     }
 
     private function saveUserApi(User $user, UserApi $userApi)

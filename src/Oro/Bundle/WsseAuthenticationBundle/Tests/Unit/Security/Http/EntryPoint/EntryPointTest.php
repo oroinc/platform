@@ -27,7 +27,7 @@ class EntryPointTest extends \PHPUnit\Framework\TestCase
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->request = $this->createMock(Request::class);
 
-        $this->entryPoint = new WsseEntryPoint($this->logger, self::REALM, self::PROFILE);
+        $this->entryPoint = new WsseEntryPoint('test', $this->logger, self::REALM, self::PROFILE);
     }
 
     public function testStart(): void
