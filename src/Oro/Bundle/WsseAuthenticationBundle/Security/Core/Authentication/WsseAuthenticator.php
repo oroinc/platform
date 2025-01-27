@@ -39,7 +39,11 @@ class WsseAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
         . '(-?[1-7])?|(00[1-9]|0[1-9]\d|[12]\d{2}|3([0-5]\d|6[1-6])))([T\s]((([01]\d|2[0-3])((:?)[0-5]\d)?|24\:?0'
         . '0)([\.,]\d+(?!:))?)?(\17[0-5]\d([\.,]\d+)?)?([zZ]|([\+-])([01]\d|2[0-3]):?([0-5]\d)?)?)?)?$/';
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     */
     public function __construct(
+        private string $env,
         private FeatureDependAuthenticatorChecker $featureDependAuthenticatorChecker,
         private TokenStorageInterface $tokenStorage,
         private WsseTokenFactoryInterface $wsseTokenFactory,
@@ -55,6 +59,10 @@ class WsseAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
     #[\Override]
     public function supports(Request $request): ?bool
     {
+        if ($this->env !== 'test') {
+            return false;
+        }
+
         if (!$this->featureDependAuthenticatorChecker->isEnabled($this, $this->firewallName)) {
             return false;
         }

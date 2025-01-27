@@ -3,8 +3,11 @@
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\QueryBuilderTools;
+use Oro\Bundle\EntityBundle\Provider\EnumVirtualFieldProvider;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\VirtualRelationProviderInterface;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
@@ -19,12 +22,12 @@ use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
  */
 abstract class AbstractQueryConverter
 {
-    protected const MAX_ITERATIONS = 100;
+    protected const int MAX_ITERATIONS = 100;
 
-    protected const INNER_JOIN = 'inner';
-    protected const LEFT_JOIN  = 'left';
+    protected const string INNER_JOIN = 'inner';
+    protected const string LEFT_JOIN  = 'left';
 
-    protected const JOIN_CONDITION_TYPE_WITH = 'WITH';
+    protected const string JOIN_CONDITION_TYPE_WITH = 'WITH';
 
     /** @var FunctionProviderInterface */
     private $functionProvider;
@@ -43,6 +46,8 @@ abstract class AbstractQueryConverter
 
     /** @var JoinIdentifierHelper|null */
     private $joinIdHelper;
+
+    private ?EnumVirtualFieldProvider $enumVirtualFieldProvider = null;
 
     public function __construct(
         FunctionProviderInterface $functionProvider,
@@ -456,7 +461,9 @@ abstract class AbstractQueryConverter
             if (!empty($joinId)) {
                 $parentJoinId = $this->getParentJoinIdentifier($joinId);
                 $joinTableAlias = $tableAliases[$parentJoinId];
-
+                $entityClass = $this->getEntityClass($joinId);
+                $fieldName = $this->getFieldName($joinId);
+                $fieldType = null !== $entityClass ? $this->getFieldType($entityClass, $fieldName) : null;
                 $virtualRelation = $context->findJoinByVirtualRelationJoin($parentJoinId);
                 if (null !== $virtualRelation) {
                     $joinTableAlias = $context->getAlias($this->virtualRelationProvider->getTargetJoinAlias(
@@ -467,8 +474,6 @@ abstract class AbstractQueryConverter
                 }
 
                 if ($joinIdHelper->isUnidirectionalJoin($joinId)) {
-                    $entityClass = $this->getEntityClass($joinId);
-                    $joinFieldName = $this->getFieldName($joinId);
                     $this->addJoinStatement(
                         $this->getJoinType($joinId),
                         $entityClass,
@@ -476,7 +481,7 @@ abstract class AbstractQueryConverter
                         self::JOIN_CONDITION_TYPE_WITH,
                         $this->getUnidirectionalJoinCondition(
                             $joinTableAlias,
-                            $joinFieldName,
+                            $fieldName,
                             $joinAlias,
                             $entityClass
                         )
@@ -492,11 +497,19 @@ abstract class AbstractQueryConverter
                         $joinIdHelper->getJoinConditionType($joinId),
                         $joinIdHelper->getJoinCondition($joinId)
                     );
+                } elseif (null !== $fieldType && ExtendHelper::isSingleEnumType($fieldType)) {
+                    $this->addJoinStatement(
+                        $this->getJoinType($joinId),
+                        EnumOption::class,
+                        $joinAlias,
+                        self::JOIN_CONDITION_TYPE_WITH,
+                        $joinIdHelper->getEnumJoinCondition($joinTableAlias, $fieldName, $joinAlias)
+                    );
                 } else {
                     // bidirectional
                     $join = null === $this->getEntityClass($joinId)
                         ? $joinIdHelper->getJoin($joinId)
-                        : sprintf('%s.%s', $joinTableAlias, $this->getFieldName($joinId));
+                        : sprintf('%s.%s', $joinTableAlias, $fieldName);
                     $this->addJoinStatement(
                         $this->getJoinType($joinId),
                         $join,
@@ -1408,8 +1421,16 @@ abstract class AbstractQueryConverter
                 $result = $this->context()->getVirtualColumnOption($columnJoinId, 'return_type');
             }
         }
+        if (null === $result && $this->enumVirtualFieldProvider) {
+            $result = $this->enumVirtualFieldProvider->getFieldType($entityClass, $fieldName);
+        }
 
         return $result;
+    }
+
+    public function setEnumVirtualFieldProvider(EnumVirtualFieldProvider $enumVirtualFieldProvider): void
+    {
+        $this->enumVirtualFieldProvider = $enumVirtualFieldProvider;
     }
 
     protected function isVirtualField(string $entityClass, string $fieldName): bool

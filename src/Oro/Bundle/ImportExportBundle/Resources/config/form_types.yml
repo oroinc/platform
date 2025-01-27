@@ -27,3 +27,8 @@ services:
             - '@doctrine'
         tags:
             - { name: form.type, alias: oro_importexport_identity_config_choice }
+
+    oro_importexport.form.data_transformer.datetime_to_import_export_string:
+        class: Oro\Bundle\ImportExportBundle\Form\DataTransformer\DateTimeToImportExportStringTransformer
+        arguments:
+            - '@oro_importexport.serializer'

@@ -12,6 +12,7 @@ use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -62,7 +63,8 @@ class OperationType extends AbstractType
             [
                 'data_class' => 'Oro\Bundle\ActionBundle\Model\ActionData',
                 'attribute_fields' => [],
-                'attribute_default_values' => []
+                'attribute_default_values' => [],
+                'block_prefix' => static fn (Options $options) => $options['operation']->getName()
             ]
         );
 

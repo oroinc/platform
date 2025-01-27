@@ -400,6 +400,16 @@ class JoinIdentifierHelper
         return $this->getLastJoinPart($joinId, $startDelimiter + 1) ?: null;
     }
 
+    public function getEnumJoinCondition(string $joinTableAlias,string $fieldName, string $joinAlias): string
+    {
+        return sprintf(
+            "JSON_EXTRACT(%s.serialized_data, '%s') = %s.id",
+            $joinTableAlias,
+            $fieldName,
+            $joinAlias
+        );
+    }
+
     /**
      * @param string $str
      * @param string $needle

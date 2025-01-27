@@ -36,7 +36,7 @@ class TestTemplateStub extends Template
     #[\Override]
     protected function doDisplay(array $context, array $blocks = [])
     {
-        echo $this->template;
+        yield $this->template;
     }
 
     #[\Override]

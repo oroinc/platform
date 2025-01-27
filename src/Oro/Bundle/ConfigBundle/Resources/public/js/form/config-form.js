@@ -43,7 +43,7 @@ define(function(require) {
             if (!this.options.pageReload) {
                 this.$el.on(
                     'change',
-                    'input[data-needs-page-reload]',
+                    ':input[data-needs-page-reload]',
                     this._onNeedsReloadChange.bind(this)
                 );
             }

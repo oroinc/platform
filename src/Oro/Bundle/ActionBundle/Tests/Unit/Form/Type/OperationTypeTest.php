@@ -276,6 +276,26 @@ class OperationTypeTest extends FormIntegrationTestCase
         ];
     }
 
+    public function testHasOperationNameBlockPrefix(): void
+    {
+        $operation = $this->createOperation([
+            'field1' => [],
+            'field2' => [],
+            'field3' => ['property_path' => 'entity.property1'],
+        ]);
+        $operationData = $this->createOperationData([
+            'field1' => 'data1',
+            'field2' => 'data2',
+            'data' => (object)['property1' => 'data3'],
+        ]);
+
+        $form = $this->factory->create(OperationType::class, $operationData, ['operation' => $operation]);
+        self::assertEquals($operation->getName(), $form->getConfig()->getOption('block_prefix'));
+
+        $formView = $form->createView();
+        self::assertContainsEquals($operation->getName(), $formView->vars['block_prefixes']);
+    }
+
     private function createOperationData(array $data = [], bool $modified = false): ActionData
     {
         $actionData = new ActionData($data);

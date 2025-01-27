@@ -648,7 +648,7 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
                 $this->getCurrencyBuLocale('it_IT')
             ],
             [
-                'ua',
+                'ca',
                 'USD'
             ],
             [

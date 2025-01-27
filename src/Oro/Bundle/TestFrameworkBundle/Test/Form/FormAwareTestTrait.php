@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\TestFrameworkBundle\Test\Form;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 
 /**
@@ -11,6 +13,15 @@ use Symfony\Component\Form\FormInterface;
  */
 trait FormAwareTestTrait
 {
+    protected static function createForm(
+        string $type = FormType::class,
+        mixed $data = null,
+        array $options = []
+    ): FormInterface {
+        return self::getContainer()->get(FormFactoryInterface::class)
+            ->create($type, $data, $options + ['csrf_protection' => false]);
+    }
+
     protected static function assertFormOptions(
         FormInterface $form,
         array $options = []

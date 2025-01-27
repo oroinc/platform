@@ -51,8 +51,8 @@ class WsseSecurityAuthenticatorFactoryTest extends \PHPUnit\Framework\TestCase
         $entriPointDefinition = $container->getDefinition($expectedEntriPointId);
         self::assertEquals(
             [
-                'index_1' => $configuration['realm'],
-                'index_2' => $configuration['profile'],
+                'index_2' => $configuration['realm'],
+                'index_3' => $configuration['profile'],
             ],
             $entriPointDefinition->getArguments()
         );
@@ -64,12 +64,12 @@ class WsseSecurityAuthenticatorFactoryTest extends \PHPUnit\Framework\TestCase
         $authenticatorDefinition = $container->getDefinition($expectedAuthId);
         self::assertEquals(
             [
-                'index_3' => new Reference('user_provider_test'),
-                'index_4' => new Reference($expectedEntriPointId),
-                'index_5' => $firewallName,
-                'index_6' => new Reference($expectedEncoderId),
-                'index_7' => new Reference($expectedNonceCacheId),
-                'index_8' => $configuration['lifetime'],
+                'index_4' => new Reference('user_provider_test'),
+                'index_5' => new Reference($expectedEntriPointId),
+                'index_6' => $firewallName,
+                'index_7' => new Reference($expectedEncoderId),
+                'index_8' => new Reference($expectedNonceCacheId),
+                'index_9' => $configuration['lifetime'],
             ],
             $authenticatorDefinition->getArguments()
         );

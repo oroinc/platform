@@ -3,7 +3,6 @@
 namespace Oro\Bundle\WsseAuthenticationBundle\Security\Http\EntryPoint;
 
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
@@ -14,28 +13,21 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
  */
 class WsseEntryPoint implements AuthenticationEntryPointInterface
 {
-    /** @var LoggerInterface */
-    private $logger;
-
-    /** @var string */
-    private $realmName;
-
-    /** @var string */
-    private $profile;
-
     public function __construct(
-        ?LoggerInterface $logger = null,
-        string $realmName = '',
-        string $profile = 'UsernameToken'
+        private string $env,
+        private ?LoggerInterface $logger = null,
+        private string $realmName = '',
+        private string $profile = 'UsernameToken'
     ) {
-        $this->logger = $logger ?? new NullLogger();
-        $this->realmName = $realmName;
-        $this->profile = $profile;
     }
 
     #[\Override]
     public function start(Request $request, AuthenticationException $authException = null): Response
     {
+        if ($this->env !== 'test') {
+            return new Response('WSSE is deprecated', 401);
+        }
+
         if ($authException instanceof AuthenticationException) {
             $this->logger->warning($authException->getMessage());
         }

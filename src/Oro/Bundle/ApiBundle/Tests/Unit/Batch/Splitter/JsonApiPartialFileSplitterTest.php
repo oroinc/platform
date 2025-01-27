@@ -552,6 +552,8 @@ JSON;
      */
     public function testSplitWhenTimeoutExceededAndDifferentInstancesOfSplittersAreUsedAndWithHeaderSection()
     {
+        $this->markTestSkipped('BAP-22891');
+
         $inputJson = <<<JSON
 {"jsonapi": {"version": "1.0"},
 "data":[

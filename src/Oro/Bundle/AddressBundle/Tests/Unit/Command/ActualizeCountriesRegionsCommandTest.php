@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\SearchBundle\Tests\Unit\Command;
+namespace Oro\Bundle\AddressBundle\Tests\Unit\Command;
 
 use Oro\Bundle\AddressBundle\Command\ActualizeCountriesRegionsCommand;
 use Oro\Bundle\AttachmentBundle\Model\ExternalFile;

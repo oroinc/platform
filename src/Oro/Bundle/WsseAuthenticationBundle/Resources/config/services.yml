@@ -3,6 +3,7 @@ services:
         class:  Oro\Bundle\WsseAuthenticationBundle\Security\Core\Authentication\WsseAuthenticator
         abstract: true
         arguments:
+            - '%kernel.environment%'
             - '@oro_api.security.authenticator.feature_checker'
             - '@security.token_storage'
             - '@oro_wsse_authentication.security.wsse_token_factory'
@@ -19,6 +20,7 @@ services:
         class:  Oro\Bundle\WsseAuthenticationBundle\Security\Http\EntryPoint\WsseEntryPoint
         abstract: true
         arguments:
+            - '%kernel.environment%'
             - '@?logger'
             - ''
             - 'UsernameToken'

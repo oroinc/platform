@@ -30,16 +30,6 @@ interface SecurityContextInterface
     public function getUserName(): ?string;
 
     /**
-     * Gets the API key that is used to identify the origin of an API request.
-     */
-    public function getApiKey(): ?string;
-
-    /**
-     * Gets a hint with instructions how to generate API key.
-     */
-    public function getApiKeyGenerationHint(): ?string;
-
-    /**
      * Gets the name of CSRF cookie.
      */
     public function getCsrfCookieName(): ?string;
