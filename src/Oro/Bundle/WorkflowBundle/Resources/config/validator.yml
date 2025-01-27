@@ -3,6 +3,7 @@ services:
         class: Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowedValidator
         arguments:
             - '@oro_workflow.registry'
+            - '@translator'
         tags:
             - { name: validator.constraint_validator }
 

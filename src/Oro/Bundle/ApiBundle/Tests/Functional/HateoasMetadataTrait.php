@@ -77,6 +77,9 @@ trait HateoasMetadataTrait
                 if (null === $subresource) {
                     continue;
                 }
+                if ($subresource->isExcludedAction(ApiAction::GET_SUBRESOURCE)) {
+                    continue;
+                }
                 self::assertArrayHasKey(
                     'relationship_links',
                     $association,

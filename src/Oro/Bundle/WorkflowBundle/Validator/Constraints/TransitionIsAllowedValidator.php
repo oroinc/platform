@@ -10,6 +10,7 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Validate that workflow transition is allowed.
@@ -17,7 +18,8 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 class TransitionIsAllowedValidator extends ConstraintValidator
 {
     public function __construct(
-        private readonly WorkflowRegistry $workflowRegistry
+        private readonly WorkflowRegistry $workflowRegistry,
+        private readonly TranslatorInterface $translator
     ) {
     }
 
@@ -51,7 +53,11 @@ class TransitionIsAllowedValidator extends ConstraintValidator
             $this->context->addViolation($constraint->someConditionsNotMetMessage);
             if ($errors->count()) {
                 foreach ($errors as $error) {
-                    $this->context->addViolation($error['message'], $error['parameters'] ?? []);
+                    // Translate errors here to use "messages" translation domains, because if we will add raw
+                    // key to the constraint violation object it will be later translated with the "validation" domain
+                    $this->context->addViolation(
+                        $this->translator->trans($error['message'], $error['parameters'] ?? [])
+                    );
                 }
             }
         }
