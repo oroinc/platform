@@ -128,3 +128,8 @@ services:
             - '@property_accessor'
         tags:
             - { name: validator.constraint_validator }
+
+    oro_form.entity_form_resolver:
+        class: Oro\Bundle\FormBundle\Resolver\EntityFormResolver
+        arguments:
+            - '@form.factory'

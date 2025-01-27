@@ -6,62 +6,54 @@ use Oro\Bundle\LocaleBundle\Formatter\AddressFormatter;
 use Oro\Bundle\LocaleBundle\Model\AddressInterface;
 use Psr\Container\ContainerInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
-use Twig\Environment;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
 /**
- * Provides a Twig function for postal address formatting:
+ * Provides the TWIG filters to format the address according to locale settings:
  *   - oro_format_address
  *   - oro_format_address_html
  */
 class AddressExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    private const ADDRESS_TEMPLATE = '@OroLocale/Twig/address.html.twig';
-
-    /** @var ContainerInterface */
-    protected $container;
-
-    public function __construct(ContainerInterface $container)
+    public function __construct(private ContainerInterface $container)
     {
-        $this->container = $container;
     }
 
-    /**
-     * @return AddressFormatter
-     */
-    protected function getAddressFormatter()
+    private function getAddressFormatter(): AddressFormatter
     {
         return $this->container->get('oro_locale.formatter.address');
     }
 
+    private function getFormattedAddressRenderer(): FormattedAddressRenderer
+    {
+        return $this->container->get('oro_locale.twig.formatted_address_renderer');
+    }
+
     #[\Override]
-    public function getFilters()
+    public function getFilters(): array
     {
         return [
             new TwigFilter(
                 'oro_format_address',
-                [$this, 'formatAddress']
+                $this->formatAddress(...)
             ),
             new TwigFilter(
                 'oro_format_address_html',
-                [$this, 'formatAddressHtml'],
-                ['is_safe' => ['html'], 'needs_environment' => true]
+                $this->formatAddressHtml(...),
+                ['is_safe' => ['html']]
             ),
         ];
     }
 
     /**
      * Formats address according to locale settings.
-     *
-     * @param AddressInterface $address
-     * @param string|null      $country
-     * @param string           $newLineSeparator
-     *
-     * @return string
      */
-    public function formatAddress(AddressInterface $address, $country = null, $newLineSeparator = "\n")
-    {
+    public function formatAddress(
+        AddressInterface $address,
+        ?string $country = null,
+        string $newLineSeparator = "\n"
+    ): string {
         return $this->getAddressFormatter()->format($address, $country, $newLineSeparator);
     }
 
@@ -71,7 +63,6 @@ class AddressExtension extends AbstractExtension implements ServiceSubscriberInt
      * @throws \Throwable
      */
     public function formatAddressHtml(
-        Environment $environment,
         AddressInterface $address,
         ?string $country = null,
         string $newLineSeparator = "\n"
@@ -81,33 +72,15 @@ class AddressExtension extends AbstractExtension implements ServiceSubscriberInt
         $addressFormat = $addressFormatter->getAddressFormat($country);
         $parts = $addressFormatter->getAddressParts($address, $addressFormat, $country);
 
-        $template = $environment->load(self::ADDRESS_TEMPLATE);
-        foreach ($parts as $partKey => $partValue) {
-            $partName = strtolower(trim($partKey, '%'));
-            $partBlockName = 'address_part_' . $partName;
-            $blockName = $template->hasBlock($partBlockName, []) ? $partBlockName : 'address_part';
-            $parts[$partKey] = $template->renderBlock(
-                $blockName,
-                ['part_name' => $partName, 'part_value' => $partValue]
-            );
-        }
-
-        $formatted = str_replace(array_keys($parts), array_values($parts), $addressFormat);
-        $formatted = preg_replace(
-            ['/ +/', '/(?:\\\\n)+/', '/ +\n/'],
-            [' ', $newLineSeparator, $newLineSeparator],
-            $formatted
-        );
-        $formatted = nl2br(trim($formatted, ' ' . $newLineSeparator));
-
-        return $template->renderBlock('address', ['formatted' => $formatted]);
+        return $this->getFormattedAddressRenderer()->renderAddress($parts, $addressFormat, $newLineSeparator);
     }
 
     #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_locale.formatter.address' => AddressFormatter::class
+            'oro_locale.formatter.address' => AddressFormatter::class,
+            'oro_locale.twig.formatted_address_renderer' => FormattedAddressRenderer::class,
         ];
     }
 }

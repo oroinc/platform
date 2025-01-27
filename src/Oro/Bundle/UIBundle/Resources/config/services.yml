@@ -383,3 +383,6 @@ services:
             - !abstract 'package name provided by DynamicAssetVersionPass'
             - '@Oro\Bundle\AssetBundle\VersionStrategy\BuildVersionStrategy'
             - '@oro_ui.dynamic_asset_version_manager'
+
+    oro_ui.tools.text_highlighter:
+        class: Oro\Bundle\UIBundle\Tools\TextHighlighter

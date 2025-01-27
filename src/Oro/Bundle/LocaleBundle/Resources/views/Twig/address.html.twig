@@ -4,8 +4,12 @@
 
 {% block address_part %}
     {%- if part_value != '' -%}
-        <span {{- block('_address_part_attributes') -}}>{{- part_value -}}</span>
+        <span {{- block('_address_part_attributes') -}}>{% if is_html_safe|default(false) %}{{ part_value|raw }}{% else %}{{ part_value }}{% endif %}</span>
     {%- endif -%}
+{% endblock %}
+
+{% block address_part_space %}
+    <span class="address-part-space">&nbsp;</span>
 {% endblock %}
 
 {% block address_part_postal_code %}
@@ -19,7 +23,7 @@
 {% block _address_part_ltr %}
     {%- if part_value != '' -%}
         {%- set attr = {'dir': 'ltr'} -%}
-        <bdo {{- block('_address_part_attributes') -}}>{{- part_value -}}</bdo>
+        <bdo {{- block('_address_part_attributes') -}}>{% if is_html_safe|default(false) %}{{ part_value|raw }}{% else %}{{ part_value }}{% endif %}</bdo>
     {%- endif -%}
 {% endblock %}
 

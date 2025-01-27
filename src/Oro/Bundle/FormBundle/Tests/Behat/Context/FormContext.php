@@ -399,10 +399,12 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
      *            | Last Name         | Sheen             |
      *            | Primary Email     | charlie@sheen.com |
      *
+     * @Then /^form must contain values:$/
+     * @Then /^form must contains values:$/
      * @Then /^"(?P<formName>(?:[^"]|\\")*)" must contains values:$/
      * @Then /^"(?P<formName>(?:[^"]|\\")*)" must contain values:$/
      */
-    public function formMustContainsValues($formName, TableNode $table)
+    public function formMustContainsValues(TableNode $table, $formName = "OroForm")
     {
         /** @var Form $form */
         $form = $this->createElement($formName);
