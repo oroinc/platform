@@ -451,6 +451,8 @@ abstract class AbstractQueryConverter
 
     /**
      * Performs conversion of JOIN statements
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function addJoinStatements(): void
     {
