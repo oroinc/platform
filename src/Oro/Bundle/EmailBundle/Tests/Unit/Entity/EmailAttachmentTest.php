@@ -63,7 +63,7 @@ class EmailAttachmentTest extends \PHPUnit\Framework\TestCase
 
         $entity = new EmailAttachment();
         $attachmentContent = $this->createMock(EmailAttachmentContent::class);
-        $attachmentContent->expects($this->once())
+        $attachmentContent->expects($this->exactly(2))
             ->method('getContent')
             ->willReturn(base64_encode('1234'));
         $attachmentContent->expects($this->once())
@@ -71,5 +71,26 @@ class EmailAttachmentTest extends \PHPUnit\Framework\TestCase
             ->willReturn('base64');
         $entity->setContent($attachmentContent);
         $this->assertSame(4, $entity->getSize());
+    }
+
+    public function testGetNotDownloadedFileSize()
+    {
+        $file = $this->createMock(File::class);
+        $file->expects($this->once())
+            ->method('getFileSize')
+            ->willReturn(100);
+        $entity = new EmailAttachment();
+        $entity->setFile($file);
+        $this->assertSame(100, $entity->getSize());
+
+        $entity = new EmailAttachment();
+        $attachmentContent = $this->createMock(EmailAttachmentContent::class);
+        $attachmentContent->expects($this->once())
+            ->method('getContent')
+            ->willReturn(null);
+        $attachmentContent->expects($this->never())
+            ->method('getContentTransferEncoding');
+        $entity->setContent($attachmentContent);
+        $this->assertSame(0, $entity->getSize());
     }
 }

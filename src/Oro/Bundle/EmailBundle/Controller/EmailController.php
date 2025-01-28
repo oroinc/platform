@@ -21,6 +21,8 @@ use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
+use Oro\Bundle\EmailBundle\Exception\EmailAttachmentNotFoundException;
+use Oro\Bundle\EmailBundle\Exception\EmailBodyNotFoundException;
 use Oro\Bundle\EmailBundle\Exception\LoadEmailBodyException;
 use Oro\Bundle\EmailBundle\Form\Handler\EmailHandler;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
@@ -37,6 +39,7 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FilterBundle\Filter\FilterBag;
+use Oro\Bundle\ImapBundle\Provider\ImapEmailAttachmentLoader;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\SecurityBundle\Annotation\CsrfProtection;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
@@ -520,6 +523,17 @@ class EmailController extends AbstractController
      */
     public function attachmentAction(EmailAttachment $entity)
     {
+        if ($entity->getContent() === null) {
+            try {
+                $entity = $this->getImapEmailAttachmentLoader()->loadEmailAttachment(
+                    $entity->getEmailBody(),
+                    $entity->getFileName()
+                );
+            } catch (EmailBodyNotFoundException|EmailAttachmentNotFoundException) {
+                return new Response('', Response::HTTP_NOT_FOUND);
+            }
+        }
+
         $response = new Response();
         $response->headers->set('Content-Type', $entity->getContentType());
         $response->headers->set('Content-Disposition', sprintf('attachment; filename="%s"', $entity->getFileName()));
@@ -583,7 +597,7 @@ class EmailController extends AbstractController
      * @AclAncestor("oro_email_email_body_view")
      *
      * @param EmailBody $entity
-     * @return BinaryFileResponse
+     * @return Response
      */
     public function downloadAttachmentsAction(EmailBody $entity)
     {
@@ -593,6 +607,19 @@ class EmailController extends AbstractController
             $fileManager = $this->get(FileManager::class);
             $zipName = $fileManager->getTemporaryFileName('attachments-' . time() . '.zip');
             $zip->open($zipName, \ZipArchive::CREATE);
+
+            $attachmentWithoutContent = array_filter(iterator_to_array($attachments), function ($attachment) {
+                return $attachment->getContent() === null;
+            });
+
+            if (count($attachmentWithoutContent) > 0) {
+                try {
+                    $attachments = $this->getImapEmailAttachmentLoader()->loadEmailAttachments($entity);
+                } catch (EmailBodyNotFoundException|EmailAttachmentNotFoundException) {
+                    return new Response('', Response::HTTP_NOT_FOUND);
+                }
+            }
+
             foreach ($attachments as $attachment) {
                 $content = ContentDecoder::decode(
                     $attachment->getContent()->getContent(),
@@ -1040,6 +1067,11 @@ class EmailController extends AbstractController
         return $this->get(MessageProducerInterface::class);
     }
 
+    private function getImapEmailAttachmentLoader(): ImapEmailAttachmentLoader
+    {
+        return $this->container->get(ImapEmailAttachmentLoader::class);
+    }
+
     /**
      * @param Request $request
      * @return object|null
@@ -1089,6 +1121,7 @@ class EmailController extends AbstractController
                 EmailRecipientsProvider::class,
                 EmailCacheManager::class,
                 EmailManager::class,
+                ImapEmailAttachmentLoader::class,
                 'oro_config.user' => ConfigManager::class,
                 'oro_entity_config.provider.attachment' => ConfigProvider::class,
             ]

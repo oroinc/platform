@@ -60,7 +60,7 @@ class EmailAttachmentManager
      */
     public function linkEmailAttachmentToTargetEntity(EmailAttachment $emailAttachment, $entity)
     {
-        if (!$emailAttachment->getFile()) {
+        if (!$emailAttachment->getFile() && $emailAttachment->getContent() !== null) {
             $file = $this->saveEmailAttachmentToTemporaryFile($emailAttachment);
             $errors = $this->configFileValidator->validate($file, ClassUtils::getClass($entity));
             if ($errors->count() > 0) {

@@ -30,6 +30,14 @@ services:
         tags:
             - { name: oro_email.email_body_loader }
 
+    oro_imap.email_attachment_loader:
+        class: Oro\Bundle\ImapBundle\Provider\ImapEmailAttachmentLoader
+        arguments:
+            - '@oro_imap.imap_email_manager_factory'
+            - '@doctrine.orm.entity_manager'
+        tags:
+            - { name: oro_email.email_attachment_loader }
+
     oro_imap.email_flag_manager_loader:
         class: Oro\Bundle\ImapBundle\Provider\ImapEmailFlagManagerLoader
         arguments:
@@ -77,6 +85,13 @@ services:
             - '@oro_imap.connector.factory'
             - '@oro_imap.oauth_manager_registry'
 
+    oro_imap.imap_email_manager_factory:
+        class: Oro\Bundle\ImapBundle\Manager\ImapEmailManagerFactory
+        arguments:
+            - '@oro_security.encoder.default'
+            - '@oro_imap.connector.factory'
+            - '@oro_imap.oauth_manager_registry'
+            -
     oro_imap.imap_email_remove_manager:
         class: Oro\Bundle\ImapBundle\Sync\ImapEmailRemoveManager
         arguments:

@@ -41,7 +41,7 @@ class ReplaceEmbeddedAttachmentsListener
     protected function supportsAttachment(EmailAttachment $attachment)
     {
         return
-            $attachment->getContent()->getContentTransferEncoding() === 'base64'
+            $attachment->getContent()?->getContentTransferEncoding() === 'base64'
             && str_starts_with($attachment->getContentType(), 'image/');
     }
 }
