@@ -10,7 +10,7 @@ use Symfony\Component\ErrorHandler\ErrorHandler as BaseErrorHandler;
 class ErrorHandler extends BaseErrorHandler
 {
     #[\Override]
-    public static function register(BaseErrorHandler $handler = null, bool $replace = true): BaseErrorHandler
+    public static function register(?BaseErrorHandler $handler = null, bool $replace = true): BaseErrorHandler
     {
         $errorLevel = error_reporting();
         // Silence all PHP deprecation notices as many of them are triggered all over the ORO and vendor code
