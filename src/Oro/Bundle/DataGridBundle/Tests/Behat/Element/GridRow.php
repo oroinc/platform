@@ -63,11 +63,19 @@ class GridRow extends TableRow
         $cell = $this->startInlineEditing($header);
 
         //Tries to locate element several times to prevent premature ElementNotFoundException
-        $isElementFilled = $this->spin(function () use ($value) {
-            $this->getElement('OroForm')->fillField(
-                'value',
-                new InputValue(InputMethod::TYPE, $value)
-            );
+        $formElement = $this->getElement('OroForm');
+        $isElementFilled = $this->spin(function () use ($value, $formElement) {
+            try {
+                $formElement->fillField(
+                    'value',
+                    new InputValue(InputMethod::TYPE, $value)
+                );
+            } catch (\Throwable $exception) {
+                // to prevent form element lost focus in case when driver can't find field value
+                $formElement->click();
+
+                throw $exception;
+            }
 
             return true;
         });
