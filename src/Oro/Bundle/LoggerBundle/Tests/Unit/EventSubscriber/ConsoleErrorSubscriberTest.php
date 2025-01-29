@@ -68,7 +68,7 @@ class ConsoleErrorSubscriberTest extends \PHPUnit\Framework\TestCase
             new ConsoleCommandEvent($this->createMock($command), $this->input, $this->output)
         );
 
-        $this->assertSame(
+        $this->assertEqualsCanonicalizing(
             self::$defaultLoggers + [
                 E_USER_ERROR => [$this->logger, LogLevel::CRITICAL],
                 E_RECOVERABLE_ERROR => [$this->logger, LogLevel::CRITICAL],

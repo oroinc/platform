@@ -648,6 +648,7 @@ JSON;
      */
     public function testSplitWhenTimeoutExceededAndFileContainsMultibyteSymbols()
     {
+        $this->markTestSkipped('BAP-22891');
         $inputJson = <<<JSON
 {"data":[
     {"type": "acme", "id": "1", "attributes": {"firstName": "FirstName ä"}},

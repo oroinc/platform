@@ -21,6 +21,7 @@ class FilterContext extends OroFeatureContext implements OroPageObjectAware
      */
     public function iAddTheFollowingFilters(TableNode $table)
     {
+        $this->waitForAjax();
         foreach ($table->getRows() as $row) {
             [$filter, $column, $type, $value] = array_pad($row, 4, null);
             $this->addFilter($filter, $column, $type, $value);
