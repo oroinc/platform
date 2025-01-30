@@ -8,7 +8,7 @@ class RegExpUtilsTest extends \PHPUnit\Framework\TestCase
 {
     public function testValidateRegExpWhenInvalid(): void
     {
-        self::assertEquals('preg_match(): Unknown modifier \'r\'', RegExpUtils::validateRegExp('/invalid/regexp/'));
+        self::assertEquals('preg_match(): Unknown modifier \'t\'', RegExpUtils::validateRegExp('/invalid/test/'));
     }
 
     public function testValidateRegExpWhenValid(): void
