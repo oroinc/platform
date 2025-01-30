@@ -16,7 +16,7 @@ use voku\helper\HtmlMin;
  */
 class OpenAIClickableStepHealer implements HealerInterface
 {
-    protected const string OPEN_AI_PROJECT = 'gpt-3.5-turbo-0125';
+    protected const string OPEN_AI_PROJECT = 'gpt-4o-mini-2024-07-18';
     protected const string PROMPT_MASK = "As a test automation engineer I am testing web application using Behat.
         I want to heal a test that fails.
         Propose how to adjust `%s` failed step to fix the test.
