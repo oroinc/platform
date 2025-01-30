@@ -77,7 +77,7 @@ class ImapEmailIterator implements \Iterator, \Countable
      * @param \Closure|null $callback The callback function is called when a batch is loaded
      *                                function (Email[] $batch)
      */
-    public function setBatchCallback(\Closure $callback = null)
+    public function setBatchCallback(?\Closure $callback = null)
     {
         if ($callback === null) {
             // restore default callback
@@ -98,7 +98,7 @@ class ImapEmailIterator implements \Iterator, \Countable
      * @param \Closure|null $callback The callback function.
      *                                function (\Exception)
      */
-    public function setConvertErrorCallback(\Closure $callback = null)
+    public function setConvertErrorCallback(?\Closure $callback = null)
     {
         $this->onConvertError = $callback;
         $this->iterator->setConvertErrorCallback($callback);

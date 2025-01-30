@@ -73,7 +73,7 @@ class EntityManagerMock extends \Doctrine\ORM\EntityManager
      * @return EntityManagerMock
      */
     #[\Override]
-    public static function create($conn, Configuration $config = null, EventManager $eventManager = null)
+    public static function create($conn, ?Configuration $config = null, ?EventManager $eventManager = null)
     {
         if (is_null($config)) {
             $config = new Configuration();

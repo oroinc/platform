@@ -202,7 +202,7 @@ class TargetConfigExtraBuilder
     public static function normalizeParentConfig(
         EntityDefinitionConfig $parentConfig,
         string $associationName,
-        array $parentConfigExtras = null
+        ?array $parentConfigExtras = null
     ): void {
         $isNormalizationRequired = true;
         if (null !== $parentConfigExtras) {

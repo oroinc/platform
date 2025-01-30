@@ -18,7 +18,7 @@ class SmtpSettingsCheckerStub extends SmtpSettingsChecker
     }
 
     #[\Override]
-    public function checkConnection(SmtpSettings $smtpSettings, string &$error = null): bool
+    public function checkConnection(SmtpSettings $smtpSettings, ?string &$error = null): bool
     {
         if ($smtpSettings->getHost() === 'smtp.example.org' &&
             $smtpSettings->getPort() == '2525' &&

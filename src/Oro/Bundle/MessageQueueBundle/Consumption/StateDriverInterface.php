@@ -10,7 +10,7 @@ interface StateDriverInterface
     /**
      * Saves the date when a state was changed.
      */
-    public function setChangeStateDate(\DateTime $date = null);
+    public function setChangeStateDate(?\DateTime $date = null);
 
     /**
      * Returns the last date when a state was changed.

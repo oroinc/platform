@@ -36,7 +36,7 @@ abstract class AbstractDigitalAssetFixture extends AbstractFixture implements Co
     abstract protected function getDataPath(): string;
 
     #[\Override]
-    public function setContainer(ContainerInterface $container = null): void
+    public function setContainer(?ContainerInterface $container = null): void
     {
         $this->container = $container;
 

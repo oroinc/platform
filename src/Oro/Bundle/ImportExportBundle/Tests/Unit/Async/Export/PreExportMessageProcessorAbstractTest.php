@@ -336,7 +336,7 @@ class PreExportMessageProcessorAbstractTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    private function createJob(int $id, Job $rootJob = null): Job
+    private function createJob(int $id, ?Job $rootJob = null): Job
     {
         $job = new Job();
         $job->setId($id);

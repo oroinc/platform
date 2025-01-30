@@ -18,7 +18,7 @@ class FormAccessor extends AbstractFormAccessor
      * @param string|null     $method  The submit method of the form
      * @param string|null     $enctype The encryption type of the form
      */
-    public function __construct(FormInterface $form, FormAction $action = null, $method = null, $enctype = null)
+    public function __construct(FormInterface $form, ?FormAction $action = null, $method = null, $enctype = null)
     {
         $this->form    = $form;
         $this->action  = $action;

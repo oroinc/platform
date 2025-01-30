@@ -48,7 +48,7 @@ class RestDocViewDetector implements ResetInterface
         return $view;
     }
 
-    public function setView(string $view = null): void
+    public function setView(?string $view = null): void
     {
         $this->view = $view;
         $this->requestType = null;
@@ -64,7 +64,7 @@ class RestDocViewDetector implements ResetInterface
         return $this->version;
     }
 
-    public function setVersion(string $version = null): void
+    public function setVersion(?string $version = null): void
     {
         $this->version = $version;
     }

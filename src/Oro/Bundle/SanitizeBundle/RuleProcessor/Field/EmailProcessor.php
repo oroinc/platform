@@ -57,7 +57,7 @@ class EmailProcessor implements ProcessorInterface
         )];
     }
 
-    public function setCustomEmailDomain(string $customEmailDomain = null): void
+    public function setCustomEmailDomain(?string $customEmailDomain = null): void
     {
         $this->customEmailDomain = $customEmailDomain;
     }

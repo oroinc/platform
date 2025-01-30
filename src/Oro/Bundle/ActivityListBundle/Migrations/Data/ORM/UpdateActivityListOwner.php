@@ -37,7 +37,7 @@ class UpdateActivityListOwner extends AbstractFixture implements DependentFixtur
     }
 
     #[\Override]
-    public function setContainer(ContainerInterface $container = null)
+    public function setContainer(?ContainerInterface $container = null)
     {
         $this->container = $container;
     }

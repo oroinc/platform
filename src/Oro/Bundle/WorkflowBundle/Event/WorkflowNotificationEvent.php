@@ -22,7 +22,7 @@ class WorkflowNotificationEvent extends NotificationEvent
     public function __construct(
         $entity,
         WorkflowTransitionRecord $transitionRecord,
-        AbstractUser $transitionUser = null
+        ?AbstractUser $transitionUser = null
     ) {
         parent::__construct($entity);
 

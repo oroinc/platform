@@ -30,7 +30,7 @@ abstract class AbstractContextModeAwareNormalizer implements
      *
      */
     #[\Override]
-    public function normalize($object, string $format = null, array $context = [])
+    public function normalize($object, ?string $format = null, array $context = [])
     {
         $mode = $this->getMode($context);
         $method = 'normalize' . ucfirst($mode);
@@ -45,7 +45,7 @@ abstract class AbstractContextModeAwareNormalizer implements
      *
      */
     #[\Override]
-    public function denormalize($data, string $type, string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = [])
     {
         $mode = $this->getMode($context);
         $method = 'denormalize' . ucfirst($mode);

@@ -28,7 +28,7 @@ class UserAuthenticationFieldsValidatorTest extends ConstraintValidatorTestCase
         return new UserAuthenticationFieldsValidator($this->userManager);
     }
 
-    private function getUser(int $id = null): User
+    private function getUser(?int $id = null): User
     {
         $user = new User();
         if (null !== $id) {

@@ -29,19 +29,19 @@ class FileAttributeType implements AttributeTypeInterface
     }
 
     #[\Override]
-    public function getSearchableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
+    public function getSearchableValue(FieldConfigModel $attribute, $originalValue, ?Localization $localization = null)
     {
         throw new \RuntimeException('Not supported');
     }
 
     #[\Override]
-    public function getFilterableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
+    public function getFilterableValue(FieldConfigModel $attribute, $originalValue, ?Localization $localization = null)
     {
         throw new \RuntimeException('Not supported');
     }
 
     #[\Override]
-    public function getSortableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
+    public function getSortableValue(FieldConfigModel $attribute, $originalValue, ?Localization $localization = null)
     {
         throw new \RuntimeException('Not supported');
     }

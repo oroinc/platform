@@ -18,7 +18,7 @@ class ButtonProviderExtensionStub implements ButtonProviderExtensionInterface
     /** @var callable */
     private $findCallback;
 
-    public function __construct(callable $find = null, callable $isAvailable = null, callable $supports = null)
+    public function __construct(?callable $find = null, ?callable $isAvailable = null, ?callable $supports = null)
     {
         $this->findCallback = $find ?: function () {
             return [new ButtonStub()];
@@ -41,7 +41,7 @@ class ButtonProviderExtensionStub implements ButtonProviderExtensionInterface
     public function isAvailable(
         ButtonInterface $button,
         ButtonSearchContext $buttonSearchContext,
-        Collection $errors = null
+        ?Collection $errors = null
     ) {
         return call_user_func($this->isAvailableCallback, $button, $buttonSearchContext, $errors);
     }

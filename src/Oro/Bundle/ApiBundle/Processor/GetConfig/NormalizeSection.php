@@ -175,7 +175,7 @@ abstract class NormalizeSection implements ProcessorInterface
     private function getPropertyPath(
         FieldConfigInterface $sectionField,
         string $fieldName,
-        EntityDefinitionFieldConfig $field = null
+        ?EntityDefinitionFieldConfig $field = null
     ): string {
         $propertyPath = $fieldName;
         if ($sectionField->hasPropertyPath()) {

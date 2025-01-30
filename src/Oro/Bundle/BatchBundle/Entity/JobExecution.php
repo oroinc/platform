@@ -406,7 +406,7 @@ class JobExecution
      *
      * @return string
      */
-    private function formatDate(\DateTimeInterface $date = null, $format = \DateTime::ATOM): string
+    private function formatDate(?\DateTimeInterface $date = null, $format = \DateTime::ATOM): string
     {
         return $date !== null ? $date->format($format) : '';
     }

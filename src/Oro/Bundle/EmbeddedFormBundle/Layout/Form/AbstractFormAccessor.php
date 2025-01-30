@@ -138,7 +138,7 @@ abstract class AbstractFormAccessor implements FormAccessorInterface
      *
      * @return string
      */
-    protected function buildHash($prefix, FormAction $action = null, $method = null, $enctype = null)
+    protected function buildHash($prefix, ?FormAction $action = null, $method = null, $enctype = null)
     {
         $result = $prefix;
         if (null !== $action && !$action->isEmpty()) {

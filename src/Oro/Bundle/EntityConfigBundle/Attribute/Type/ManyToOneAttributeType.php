@@ -43,13 +43,13 @@ class ManyToOneAttributeType implements AttributeTypeInterface
     }
 
     #[\Override]
-    public function getSearchableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
+    public function getSearchableValue(FieldConfigModel $attribute, $originalValue, ?Localization $localization = null)
     {
         return $this->entityNameResolver->getName($originalValue, null, $localization);
     }
 
     #[\Override]
-    public function getFilterableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
+    public function getFilterableValue(FieldConfigModel $attribute, $originalValue, ?Localization $localization = null)
     {
         return is_object($originalValue)
             ? $this->doctrineHelper->getSingleEntityIdentifier($originalValue, false)
@@ -57,7 +57,7 @@ class ManyToOneAttributeType implements AttributeTypeInterface
     }
 
     #[\Override]
-    public function getSortableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
+    public function getSortableValue(FieldConfigModel $attribute, $originalValue, ?Localization $localization = null)
     {
         return $this->getSearchableValue($attribute, $originalValue, $localization);
     }

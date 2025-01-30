@@ -17,7 +17,7 @@ class NextPageLinkMetadata extends LinkMetadataDecorator
     public function __construct(
         LinkMetadataInterface $link,
         string $pageNumberFilterName,
-        QueryStringAccessorInterface $queryStringAccessor = null
+        ?QueryStringAccessorInterface $queryStringAccessor = null
     ) {
         parent::__construct($link);
         $this->pageNumberFilterName = $pageNumberFilterName;

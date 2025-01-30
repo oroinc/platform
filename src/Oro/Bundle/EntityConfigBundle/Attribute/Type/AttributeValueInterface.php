@@ -17,7 +17,7 @@ interface AttributeValueInterface
      *
      * @return string
      */
-    public function getSearchableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null);
+    public function getSearchableValue(FieldConfigModel $attribute, $originalValue, ?Localization $localization = null);
 
     /**
      * @param FieldConfigModel $attribute
@@ -26,7 +26,7 @@ interface AttributeValueInterface
      *
      * @return string|array
      */
-    public function getFilterableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null);
+    public function getFilterableValue(FieldConfigModel $attribute, $originalValue, ?Localization $localization = null);
 
     /**
      * @param FieldConfigModel $attribute
@@ -35,5 +35,5 @@ interface AttributeValueInterface
      *
      * @return string
      */
-    public function getSortableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null);
+    public function getSortableValue(FieldConfigModel $attribute, $originalValue, ?Localization $localization = null);
 }

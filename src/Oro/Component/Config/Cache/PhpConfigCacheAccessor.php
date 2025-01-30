@@ -13,7 +13,7 @@ class PhpConfigCacheAccessor
     /** @var callable|null */
     private $configValidator;
 
-    public function __construct(callable $configValidator = null)
+    public function __construct(?callable $configValidator = null)
     {
         $this->configValidator = $configValidator;
     }
@@ -52,7 +52,7 @@ class PhpConfigCacheAccessor
      * @throws \LogicException When the given config is invalid
      * @throws \RuntimeException When the cache file cannot be written
      */
-    public function save(ConfigCacheInterface $cache, mixed $config, array $metadata = null): void
+    public function save(ConfigCacheInterface $cache, mixed $config, ?array $metadata = null): void
     {
         try {
             if (null === $config) {

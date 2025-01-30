@@ -103,7 +103,7 @@ class EventTriggerCollectorListener implements OptionalListenerInterface, ResetI
      * @param string $event
      * @param array|null $changeSet
      */
-    private function schedule($entity, $event, array $changeSet = null): void
+    private function schedule($entity, $event, ?array $changeSet = null): void
     {
         $extensions = $this->getExtensions();
         foreach ($extensions as $extension) {

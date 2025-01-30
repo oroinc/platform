@@ -30,11 +30,11 @@ class GroupingChainWidgetProvider implements WidgetProviderInterface
     private $eventDispatcher;
 
     public function __construct(
-        array $providers,
-        ContainerInterface $providerContainer,
-        LabelProviderInterface $groupNameProvider = null,
-        EventDispatcherInterface $eventDispatcher = null,
-        int $pageType = null
+        array                     $providers,
+        ContainerInterface        $providerContainer,
+        ?LabelProviderInterface   $groupNameProvider = null,
+        ?EventDispatcherInterface $eventDispatcher = null,
+        ?int                      $pageType = null
     ) {
         $this->providers = $providers;
         $this->providerContainer = $providerContainer;

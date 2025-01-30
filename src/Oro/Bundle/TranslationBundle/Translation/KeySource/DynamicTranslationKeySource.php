@@ -28,7 +28,7 @@ class DynamicTranslationKeySource implements TranslationKeySourceInterface
      * @return $this
      * @throws \InvalidArgumentException
      */
-    public function configure(TranslationKeyTemplateInterface $keyTemplate, array $data = null)
+    public function configure(TranslationKeyTemplateInterface $keyTemplate, ?array $data = null)
     {
         $this->keyTemplate = $keyTemplate;
 

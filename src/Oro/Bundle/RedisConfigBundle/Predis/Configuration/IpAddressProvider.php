@@ -10,7 +10,7 @@ class IpAddressProvider
     /** @var string|null */
     private $serverIpAddress;
 
-    public function __construct(string $serverIpAddress = null)
+    public function __construct(?string $serverIpAddress = null)
     {
         if ('' === $serverIpAddress) {
             $serverIpAddress = null;

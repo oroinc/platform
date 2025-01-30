@@ -52,7 +52,7 @@ class ExpressionNormalizer implements
     }
 
     #[\Override]
-    public function normalize($object, string $format = null, array $context = [])
+    public function normalize($object, ?string $format = null, array $context = [])
     {
         /** @var ParsedExpression $object */
 
@@ -78,13 +78,13 @@ class ExpressionNormalizer implements
     }
 
     #[\Override]
-    public function supportsDenormalization($data, string $type, string $format = null): bool
+    public function supportsDenormalization($data, string $type, ?string $format = null): bool
     {
         return ParsedExpression::class === $type;
     }
 
     #[\Override]
-    public function denormalize($data, string $type, string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = [])
     {
         if (\array_key_exists(self::DATA_NODES, $data)) {
             return new SerializedParsedExpression($data[self::DATA_EXPRESSION], $data[self::DATA_NODES]);

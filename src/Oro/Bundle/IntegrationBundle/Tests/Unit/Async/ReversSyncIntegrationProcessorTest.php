@@ -295,7 +295,7 @@ class ReversSyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
         return $entityManager;
     }
 
-    private function createDoctrineHelper(EntityManagerInterface $entityManager = null): DoctrineHelper
+    private function createDoctrineHelper(?EntityManagerInterface $entityManager = null): DoctrineHelper
     {
         $helper = $this->createMock(DoctrineHelper::class);
         $helper->expects(self::any())

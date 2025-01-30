@@ -62,7 +62,7 @@ class MenuBuilderPass implements CompilerPassInterface
     private function findAndInverseSortTaggedServices(
         string $tagName,
         ContainerBuilder $container,
-        string $defaultAlias = null
+        ?string $defaultAlias = null
     ): array {
         $items = [];
         $taggedServices = $container->findTaggedServiceIds($tagName);

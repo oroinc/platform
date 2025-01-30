@@ -35,7 +35,7 @@ class EmailRecipientsProvider
     public function getEmailRecipients(
         $relatedEntity = null,
         $query = null,
-        Organization $organization = null,
+        ?Organization $organization = null,
         $limit = 100
     ) {
         $emails = [];

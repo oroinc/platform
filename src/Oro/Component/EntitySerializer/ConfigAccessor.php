@@ -7,7 +7,7 @@ namespace Oro\Component\EntitySerializer;
  */
 class ConfigAccessor
 {
-    public function getPropertyPath(string $fieldName, FieldConfig $fieldConfig = null): string
+    public function getPropertyPath(string $fieldName, ?FieldConfig $fieldConfig = null): string
     {
         if (null === $fieldConfig) {
             return $fieldName;

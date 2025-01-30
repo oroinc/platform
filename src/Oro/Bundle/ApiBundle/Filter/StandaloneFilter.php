@@ -17,7 +17,7 @@ class StandaloneFilter implements FilterInterface
     private bool $arrayAllowed = false;
     private bool $rangeAllowed = false;
 
-    public function __construct(string $dataType, string $description = null)
+    public function __construct(string $dataType, ?string $description = null)
     {
         $this->dataType = $dataType;
         $this->description = $description;
@@ -43,7 +43,7 @@ class StandaloneFilter implements FilterInterface
     /**
      * Gets a flag determines if a value can be an array.
      */
-    public function isArrayAllowed(string $operator = null): bool
+    public function isArrayAllowed(?string $operator = null): bool
     {
         return $this->arrayAllowed;
     }
@@ -59,7 +59,7 @@ class StandaloneFilter implements FilterInterface
     /**
      * Gets a flag determines if a value can be a pair of "from" and "to" values.
      */
-    public function isRangeAllowed(string $operator = null): bool
+    public function isRangeAllowed(?string $operator = null): bool
     {
         return $this->rangeAllowed;
     }
@@ -117,7 +117,7 @@ class StandaloneFilter implements FilterInterface
     }
 
     #[\Override]
-    public function apply(Criteria $criteria, FilterValue $value = null): void
+    public function apply(Criteria $criteria, ?FilterValue $value = null): void
     {
     }
 }

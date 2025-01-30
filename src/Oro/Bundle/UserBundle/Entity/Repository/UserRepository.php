@@ -150,7 +150,7 @@ class UserRepository extends AbstractUserRepository implements EmailAwareReposit
      *
      * @return User[]
      */
-    public function findUsersByEmailsAndOrganization(array $emails, Organization $organization = null)
+    public function findUsersByEmailsAndOrganization(array $emails, ?Organization $organization = null)
     {
         if (!$emails) {
             return [];

@@ -21,7 +21,7 @@ abstract class AbstractRelationshipMapper implements DataMapperInterface
     protected PropertyAccessorInterface $propertyAccessor;
     protected ?EntityMapper $entityMapper;
 
-    public function __construct(PropertyAccessorInterface $propertyAccessor, EntityMapper $entityMapper = null)
+    public function __construct(PropertyAccessorInterface $propertyAccessor, ?EntityMapper $entityMapper = null)
     {
         $this->propertyAccessor = $propertyAccessor;
         $this->entityMapper = $entityMapper;

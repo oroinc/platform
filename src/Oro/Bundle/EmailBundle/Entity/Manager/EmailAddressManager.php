@@ -49,7 +49,7 @@ class EmailAddressManager
     /**
      * Gets an entity repository for EmailAddress entity.
      */
-    public function getEmailAddressRepository(EntityManagerInterface $em = null): EntityRepository
+    public function getEmailAddressRepository(?EntityManagerInterface $em = null): EntityRepository
     {
         if (null === $em) {
             $em = $this->getEntityManager();

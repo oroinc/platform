@@ -76,7 +76,7 @@ class ConsumerState
     /**
      * Sets a consumption extension that is executed at the moment.
      */
-    public function setExtension(ExtensionInterface $extension = null)
+    public function setExtension(?ExtensionInterface $extension = null)
     {
         $this->extension = $extension;
     }
@@ -126,7 +126,7 @@ class ConsumerState
     /**
      * Sets a message that is processed at the moment.
      */
-    public function setMessage(MessageInterface $message = null)
+    public function setMessage(?MessageInterface $message = null)
     {
         $this->message = $message;
         $this->startTime = (int)(microtime(true) * 1000);
@@ -147,7 +147,7 @@ class ConsumerState
     /**
      * Sets a job that is executed at the moment.
      */
-    public function setJob(Job $job = null)
+    public function setJob(?Job $job = null)
     {
         $this->job = $job;
     }

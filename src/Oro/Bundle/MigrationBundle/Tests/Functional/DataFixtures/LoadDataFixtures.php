@@ -30,7 +30,7 @@ class LoadDataFixtures extends AbstractFixture
      *
      * @return DataFixture
      */
-    private function createDataFixture(array $fixtureData, \DateTime $now = null)
+    private function createDataFixture(array $fixtureData, ?\DateTime $now = null)
     {
         $fixture = new DataFixture();
 

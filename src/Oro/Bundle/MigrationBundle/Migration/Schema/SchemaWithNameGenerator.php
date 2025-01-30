@@ -26,7 +26,7 @@ class SchemaWithNameGenerator extends Schema
         DbIdentifierNameGenerator $nameGenerator,
         array $tables = [],
         array $sequences = [],
-        SchemaConfig $schemaConfig = null
+        ?SchemaConfig $schemaConfig = null
     ) {
         $this->nameGenerator = $nameGenerator;
 

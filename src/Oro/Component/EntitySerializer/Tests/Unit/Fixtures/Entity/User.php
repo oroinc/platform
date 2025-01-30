@@ -44,7 +44,7 @@ class User
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Department::class)]
     private ?Collection $departments = null;
 
-    public function __construct(int $id = null)
+    public function __construct(?int $id = null)
     {
         $this->id = $id;
         $this->groups = new ArrayCollection();

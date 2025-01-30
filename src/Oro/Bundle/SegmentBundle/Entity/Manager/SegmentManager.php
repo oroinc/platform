@@ -72,7 +72,7 @@ class SegmentManager
         string $entityName,
         ?string $term,
         int $page = 1,
-        int $skippedSegmentId = null
+        ?int $skippedSegmentId = null
     ): array {
         $queryBuilder = $this->getEntityRepository(Segment::class)
             ->createQueryBuilder('segment')

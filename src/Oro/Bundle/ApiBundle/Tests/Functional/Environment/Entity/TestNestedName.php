@@ -9,9 +9,9 @@ class TestNestedName
     private ?\DateTimeInterface $contactedAt;
 
     public function __construct(
-        string $firstName = null,
-        string $lastName = null,
-        \DateTimeInterface $contactedAt = null
+        ?string             $firstName = null,
+        ?string             $lastName = null,
+        ?\DateTimeInterface $contactedAt = null
     ) {
         $this->firstName = $firstName;
         $this->lastName = $lastName;

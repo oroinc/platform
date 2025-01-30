@@ -15,6 +15,6 @@ interface JobManagerInterface
         Job $rootJob,
         array $statuses,
         \DateTime $stoppedAt,
-        \DateTime $startedAt = null
+        ?\DateTime $startedAt = null
     ): void;
 }

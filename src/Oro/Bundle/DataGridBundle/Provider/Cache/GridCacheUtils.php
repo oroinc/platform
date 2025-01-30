@@ -17,7 +17,7 @@ class GridCacheUtils
         $this->cacheDirLength = \strlen($this->cacheDir);
     }
 
-    public function getGridConfigCache(string $gridName, string $folderName = null): ConfigCacheInterface
+    public function getGridConfigCache(string $gridName, ?string $folderName = null): ConfigCacheInterface
     {
         return new ResourceCheckerConfigCache($this->getGridFile($gridName, $folderName));
     }

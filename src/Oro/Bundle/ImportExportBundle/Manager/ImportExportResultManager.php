@@ -24,12 +24,12 @@ class ImportExportResultManager
     }
 
     public function saveResult(
-        int $jobId,
-        string $type,
-        string $entity,
-        User $owner = null,
-        string $fileName = null,
-        array $options = []
+        int     $jobId,
+        string  $type,
+        string  $entity,
+        ?User   $owner = null,
+        ?string $fileName = null,
+        array   $options = []
     ): ImportExportResult {
         $importExportResult = new ImportExportResult();
         $importExportResult

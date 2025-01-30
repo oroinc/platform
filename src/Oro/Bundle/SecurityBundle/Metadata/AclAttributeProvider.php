@@ -58,7 +58,7 @@ class AclAttributeProvider extends PhpConfigProvider
      *
      * @return AclAttribute|null AclAttribute object or NULL if ACL attribute was not found
      */
-    public function findAttribute(string $class, string $method = null): ?AclAttribute
+    public function findAttribute(string $class, ?string $method = null): ?AclAttribute
     {
         return $this->getStorage()->find($class, $method);
     }
@@ -66,7 +66,7 @@ class AclAttributeProvider extends PhpConfigProvider
     /**
      * Determines whether the given class/method has ACL attribute.
      */
-    public function hasAttribute(string $class, string $method = null): bool
+    public function hasAttribute(string $class, ?string $method = null): bool
     {
         return $this->getStorage()->has($class, $method);
     }
@@ -78,7 +78,7 @@ class AclAttributeProvider extends PhpConfigProvider
      *
      * @return AclAttribute[]
      */
-    public function getAttributes(string $type = null): array
+    public function getAttributes(?string $type = null): array
     {
         return $this->getStorage()->getAttributes($type);
     }

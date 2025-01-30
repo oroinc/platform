@@ -84,7 +84,7 @@ class TranslationManagerTest extends \PHPUnit\Framework\TestCase
         ?string $value,
         string $locale,
         string $domain,
-        int $id = null
+        ?int $id = null
     ): Translation {
         $translationKey = new TranslationKey();
         $translationKey->setKey($key)->setDomain($domain);

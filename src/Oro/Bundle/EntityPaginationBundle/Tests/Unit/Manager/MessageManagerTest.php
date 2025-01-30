@@ -61,7 +61,7 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getNotAvailableMessageDataProvider
      */
-    public function testGetNotAvailableMessage(string $expected, string $scope, int $count = null)
+    public function testGetNotAvailableMessage(string $expected, string $scope, ?int $count = null)
     {
         $entity = new \stdClass();
 
@@ -116,7 +116,7 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getNotAccessibleMessageDataProvider
      */
-    public function testGetNotAccessibleMessage(string $expected, string $scope, int $count = null)
+    public function testGetNotAccessibleMessage(string $expected, string $scope, ?int $count = null)
     {
         $entity = new \stdClass();
 
@@ -157,10 +157,10 @@ class MessageManagerTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetInfoMessage(
         ?string $expected,
-        string $scope,
-        bool $shown,
-        int $viewCount = null,
-        int $editCount = null
+        string  $scope,
+        bool    $shown,
+        ?int    $viewCount = null,
+        ?int    $editCount = null
     ) {
         $entity = new \stdClass();
         $entityName = get_class($entity);

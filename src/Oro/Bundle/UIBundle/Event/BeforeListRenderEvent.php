@@ -38,13 +38,13 @@ class BeforeListRenderEvent extends Event
      * @param Environment $environment
      * @param ScrollData        $scrollData
      * @param object            $entity
-     * @param FormView|null     $formView
+     * @param FormView|null $formView
      */
     public function __construct(
         Environment $environment,
         ScrollData $scrollData,
         $entity,
-        FormView $formView = null
+        ?FormView $formView = null
     ) {
         $this->environment = $environment;
         $this->scrollData = $scrollData;

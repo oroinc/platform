@@ -22,7 +22,7 @@ class ExpressionLanguage extends SymfonyExpressionLanguage
 
     protected ?Parser $parser = null;
 
-    public function __construct(CacheItemPoolInterface $cache = null, array $providers = [])
+    public function __construct(?CacheItemPoolInterface $cache = null, array $providers = [])
     {
         $this->cache = $cache ?? new ArrayAdapter();
         parent::__construct($cache, $providers);

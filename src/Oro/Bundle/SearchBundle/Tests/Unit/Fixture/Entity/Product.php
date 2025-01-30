@@ -102,7 +102,7 @@ class Product
      *
      * @return Product
      */
-    public function setManufacturer(Manufacturer $manufacturer = null)
+    public function setManufacturer(?Manufacturer $manufacturer = null)
     {
         $this->manufacturer = $manufacturer;
 

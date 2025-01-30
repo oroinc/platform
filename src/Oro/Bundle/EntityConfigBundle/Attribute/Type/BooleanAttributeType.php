@@ -32,19 +32,19 @@ class BooleanAttributeType implements AttributeTypeInterface
     }
 
     #[\Override]
-    public function getSearchableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
+    public function getSearchableValue(FieldConfigModel $attribute, $originalValue, ?Localization $localization = null)
     {
         throw new \RuntimeException('Not supported');
     }
 
     #[\Override]
-    public function getFilterableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
+    public function getFilterableValue(FieldConfigModel $attribute, $originalValue, ?Localization $localization = null)
     {
         return $originalValue ? self::TRUE_VALUE : self::FALSE_VALUE;
     }
 
     #[\Override]
-    public function getSortableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
+    public function getSortableValue(FieldConfigModel $attribute, $originalValue, ?Localization $localization = null)
     {
         return $originalValue ? self::TRUE_VALUE : self::FALSE_VALUE;
     }

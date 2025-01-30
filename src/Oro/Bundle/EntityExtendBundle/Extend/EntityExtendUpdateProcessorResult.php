@@ -10,7 +10,7 @@ class EntityExtendUpdateProcessorResult
     private bool $successful;
     private ?string $internalFailureMessage;
 
-    public function __construct(bool $successful, string $internalFailureMessage = null)
+    public function __construct(bool $successful, ?string $internalFailureMessage = null)
     {
         $this->successful = $successful;
         $this->internalFailureMessage = $internalFailureMessage;

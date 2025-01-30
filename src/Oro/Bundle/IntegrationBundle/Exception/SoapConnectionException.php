@@ -16,7 +16,7 @@ class SoapConnectionException extends TransportException
      * @param int|string      $code
      * @return static
      */
-    public static function createFromResponse($response, \Exception $exception = null, $request = '', $code = 'unknown')
+    public static function createFromResponse($response, ?\Exception $exception = null, $request = '', $code = 'unknown')
     {
         $exceptionMessage = '';
         $exceptionCode = 0;

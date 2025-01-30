@@ -40,7 +40,7 @@ class EntityMetadataFactory
     public function createMetaPropertyMetadata(
         ClassMetadata $classMetadata,
         string $propertyPath,
-        string $fieldType = null
+        ?string $fieldType = null
     ): MetaPropertyMetadata {
         /** @var ClassMetadata $classMetadata */
         /** @var string $fieldName */
@@ -55,7 +55,7 @@ class EntityMetadataFactory
     public function createFieldMetadata(
         ClassMetadata $classMetadata,
         string $propertyPath,
-        string $fieldType = null
+        ?string $fieldType = null
     ): FieldMetadata {
         /** @var ClassMetadata $classMetadata */
         /** @var string $fieldName */
@@ -93,7 +93,7 @@ class EntityMetadataFactory
     public function createAssociationMetadata(
         ClassMetadata $classMetadata,
         string $propertyPath,
-        string $associationDataType = null
+        ?string $associationDataType = null
     ): AssociationMetadata {
         /** @var ClassMetadata $classMetadata */
         /** @var string $associationName */

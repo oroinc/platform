@@ -231,11 +231,11 @@ class VariableGuesserTest extends \PHPUnit\Framework\TestCase
     }
 
     private function createVariable(
-        string $type,
-        string $propertyPath = null,
-        array $options = [],
-        string $value = null,
-        string $label = null
+        string  $type,
+        ?string $propertyPath = null,
+        array   $options = [],
+        ?string $value = null,
+        ?string $label = null
     ): Variable {
         $variable = new Variable();
         $variable->setType($type)

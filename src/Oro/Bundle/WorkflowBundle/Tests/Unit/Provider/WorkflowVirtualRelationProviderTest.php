@@ -217,7 +217,7 @@ class WorkflowVirtualRelationProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('virtual_relation', $this->provider->getTargetJoinAlias('', 'virtual_relation'));
     }
 
-    private function assertGetEntitiesWithoutCacheCall(string $class = null): void
+    private function assertGetEntitiesWithoutCacheCall(?string $class = null): void
     {
         $classes = [];
         $expectedClasses = [];

@@ -58,7 +58,7 @@ class FieldsDescriptionHelper
         string $entityClass,
         bool $isInherit,
         string $targetAction,
-        string $fieldPrefix = null
+        ?string $fieldPrefix = null
     ): void {
         $entityConfig = $this->getEntityConfig($entityClass);
         $identifierFieldName = $this->getIdentifierFieldName($definition);

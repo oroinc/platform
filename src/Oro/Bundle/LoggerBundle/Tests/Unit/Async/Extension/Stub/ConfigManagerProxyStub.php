@@ -11,7 +11,7 @@ use ProxyManager\Proxy\LazyLoadingInterface;
 class ConfigManagerProxyStub extends ConfigManager implements LazyLoadingInterface
 {
     #[\Override]
-    public function setProxyInitializer(\Closure $initializer = null)
+    public function setProxyInitializer(?\Closure $initializer = null)
     {
     }
 

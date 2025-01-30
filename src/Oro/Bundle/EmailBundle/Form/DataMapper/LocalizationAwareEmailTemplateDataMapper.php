@@ -18,7 +18,7 @@ class LocalizationAwareEmailTemplateDataMapper implements DataMapperInterface
     /**
      * @param DataMapperInterface|null $inner Original data mapper
      */
-    public function __construct(DataMapperInterface $inner = null)
+    public function __construct(?DataMapperInterface $inner = null)
     {
         $this->inner = $inner;
     }

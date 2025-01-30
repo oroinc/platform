@@ -89,7 +89,7 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
      * @param Organization|null $organization
      * @param array $ids
      */
-    public function setSourceEntityName($entityName, Organization $organization = null, array $ids = [])
+    public function setSourceEntityName($entityName, ?Organization $organization = null, array $ids = [])
     {
         $qb = $this->createSourceEntityQueryBuilder($entityName, $organization, $ids);
         $this->setSourceQuery($this->applyAcl($qb));
@@ -102,7 +102,7 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
      *
      * @return QueryBuilder
      */
-    protected function createSourceEntityQueryBuilder($entityName, Organization $organization = null, array $ids = [])
+    protected function createSourceEntityQueryBuilder($entityName, ?Organization $organization = null, array $ids = [])
     {
         /** @var EntityManager $entityManager */
         $entityManager = $this->registry
@@ -223,7 +223,7 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
      * @param string       $entityName
      * @param Organization|null $organization
      */
-    protected function addOrganizationLimits(QueryBuilder $queryBuilder, $entityName, Organization $organization = null)
+    protected function addOrganizationLimits(QueryBuilder $queryBuilder, $entityName, ?Organization $organization = null)
     {
         if ($organization) {
             $organizationField = $this->ownershipMetadata->getMetadata($entityName)->getOrganizationFieldName();

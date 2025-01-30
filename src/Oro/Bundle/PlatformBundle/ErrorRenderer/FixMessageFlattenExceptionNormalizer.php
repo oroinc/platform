@@ -26,7 +26,7 @@ class FixMessageFlattenExceptionNormalizer implements NormalizerInterface
     }
 
     #[\Override]
-    public function normalize($object, string $format = null, array $context = [])
+    public function normalize($object, ?string $format = null, array $context = [])
     {
         /** @var array $result */
         $result = $this->innerNormalizer->normalize($object, $format, $context);
@@ -44,7 +44,7 @@ class FixMessageFlattenExceptionNormalizer implements NormalizerInterface
     }
 
     #[\Override]
-    public function supportsNormalization($data, string $format = null): bool
+    public function supportsNormalization($data, ?string $format = null): bool
     {
         return $this->innerNormalizer->supportsNormalization($data, $format);
     }

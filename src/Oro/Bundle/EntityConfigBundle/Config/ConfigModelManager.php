@@ -351,7 +351,7 @@ class ConfigModelManager
      *
      * @return ConfigModel[]
      */
-    public function getModels(string $className = null): array
+    public function getModels(?string $className = null): array
     {
         $result = [];
 
@@ -379,8 +379,8 @@ class ConfigModelManager
      * @throws RuntimeException if models are locked
      */
     public function createEntityModel(
-        string $className = null,
-        string $mode = ConfigModel::MODE_DEFAULT
+        ?string $className = null,
+        string  $mode = ConfigModel::MODE_DEFAULT
     ): EntityConfigModel {
         if (!$this->isValidMode($mode)) {
             throw new \InvalidArgumentException(sprintf('Invalid $mode: "%s"', $mode));
@@ -459,7 +459,7 @@ class ConfigModelManager
      * Makes sure that an entity model for the given class is loaded
      * or, if the class name is not specified, make sure that all entity models are loaded.
      */
-    private function ensureEntityCacheWarmed(string $className = null): void
+    private function ensureEntityCacheWarmed(?string $className = null): void
     {
         if ($this->lockObject->isLocked()) {
             return;

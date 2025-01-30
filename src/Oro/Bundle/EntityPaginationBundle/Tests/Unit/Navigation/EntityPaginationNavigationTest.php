@@ -437,7 +437,7 @@ class EntityPaginationNavigationTest extends \PHPUnit\Framework\TestCase
         bool $inStorage,
         bool $isGranted,
         array $entityIds,
-        int $noEntityId = null
+        ?int $noEntityId = null
     ): void {
         $this->storage->expects($this->any())
             ->method('isEnvironmentValid')

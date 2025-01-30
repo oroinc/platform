@@ -170,7 +170,7 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     #[\Override]
-    public function run(TestResult $result = null): TestResult
+    public function run(?TestResult $result = null): TestResult
     {
         self::$initClientAllowed = true;
 
@@ -729,7 +729,7 @@ abstract class WebTestCase extends BaseWebTestCase
         return null !== self::$referenceRepository;
     }
 
-    protected function getReferenceRepository(string $class = null): ReferenceRepository
+    protected function getReferenceRepository(?string $class = null): ReferenceRepository
     {
         if (null === self::$referenceRepository) {
             throw new \LogicException('The reference repository is not set. Have you loaded fixtures?');

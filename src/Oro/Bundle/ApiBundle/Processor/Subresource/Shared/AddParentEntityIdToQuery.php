@@ -155,7 +155,7 @@ class AddParentEntityIdToQuery implements ProcessorInterface
         string $associationName,
         bool $isCollection,
         string $joinAlias,
-        string $parentJoinAlias = null
+        ?string $parentJoinAlias = null
     ): void {
         $joinFieldName = $this->getJoinFieldName($parentClassName, $associationName);
         if ($joinFieldName) {

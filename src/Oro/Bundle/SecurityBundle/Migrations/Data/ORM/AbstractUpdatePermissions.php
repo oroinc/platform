@@ -46,11 +46,11 @@ abstract class AbstractUpdatePermissions extends AbstractFixture implements Cont
     /**
      * @param ObjectManager $manager
      * @param string        $roleName
-     * @param string|null   $roleEntityClass
+     * @param string|null $roleEntityClass
      *
      * @return AbstractRole|null
      */
-    protected function getRole(ObjectManager $manager, string $roleName, string $roleEntityClass = null)
+    protected function getRole(ObjectManager $manager, string $roleName, ?string $roleEntityClass = null)
     {
         return $manager->getRepository($roleEntityClass ?? Role::class)->findOneBy(['role' => $roleName]);
     }
@@ -61,7 +61,7 @@ abstract class AbstractUpdatePermissions extends AbstractFixture implements Cont
      *
      * @return ArrayCollection|AclPrivilege[]
      */
-    protected function getPrivileges(SecurityIdentityInterface $sid, string $aclGroup = null)
+    protected function getPrivileges(SecurityIdentityInterface $sid, ?string $aclGroup = null)
     {
         return $this->getAclPrivilegeRepository()->getPrivileges($sid, $aclGroup);
     }

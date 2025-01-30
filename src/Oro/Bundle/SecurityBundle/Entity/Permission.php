@@ -154,10 +154,10 @@ class Permission
     }
 
     /**
-     * @param Collection|PermissionEntity[]|null $applyToEntities
+     * @param Collection|null $applyToEntities
      * @return $this
      */
-    public function setApplyToEntities(Collection $applyToEntities = null)
+    public function setApplyToEntities(?Collection $applyToEntities = null)
     {
         $this->applyToEntities = $applyToEntities;
 
@@ -199,10 +199,10 @@ class Permission
     }
 
     /**
-     * @param Collection|PermissionEntity[]|null $excludeEntities
+     * @param Collection|null $excludeEntities
      * @return $this
      */
-    public function setExcludeEntities(Collection $excludeEntities = null)
+    public function setExcludeEntities(?Collection $excludeEntities = null)
     {
         $this->excludeEntities = $excludeEntities;
 
@@ -247,7 +247,7 @@ class Permission
      * @param array|null $groupNames
      * @return $this
      */
-    public function setGroupNames(array $groupNames = null)
+    public function setGroupNames(?array $groupNames = null)
     {
         $this->groupNames = $groupNames;
 

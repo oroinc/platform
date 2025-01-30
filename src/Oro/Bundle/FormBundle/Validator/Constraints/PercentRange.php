@@ -43,7 +43,7 @@ class PercentRange extends Constraint
     /** @var string */
     public $type = self::FRACTIONAL;
 
-    public function __construct(array $options = null)
+    public function __construct(?array $options = null)
     {
         if (\is_array($options) && isset($options['min'], $options['max'])) {
             if (isset($options['minMessage']) || isset($options['maxMessage'])) {

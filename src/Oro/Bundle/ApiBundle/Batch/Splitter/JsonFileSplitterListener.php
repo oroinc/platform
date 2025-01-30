@@ -43,16 +43,16 @@ class JsonFileSplitterListener implements ListenerInterface
     /**
      * @param callable|null $sectionCallback     The callback for parsed first level key item
      * @param callable|null $objectCallback      The callback for parsed collection item
-     * @param string|null   $headerSectionName   The name of a header section
+     * @param string|null $headerSectionName   The name of a header section
      * @param callable|null $headerCallback      The callback for parsed header section
      * @param string[]      $sectionNamesToSplit The names of sections to be split
      */
     public function __construct(
-        callable $sectionCallback = null,
-        callable $objectCallback = null,
-        string $headerSectionName = null,
-        callable $headerCallback = null,
-        array $sectionNamesToSplit = []
+        ?callable $sectionCallback = null,
+        ?callable $objectCallback = null,
+        ?string   $headerSectionName = null,
+        ?callable $headerCallback = null,
+        array     $sectionNamesToSplit = []
     ) {
         $this->sectionCallback = $sectionCallback;
         $this->objectCallback = $objectCallback;

@@ -205,7 +205,7 @@ class UpdateListProcessingHelper
         string $chunkJobNameTemplate,
         array $parentBody,
         int $firstChunkFileIndex = 0,
-        int $previousAggregateTime = null
+        ?int $previousAggregateTime = null
     ): void {
         $body = array_merge($this->getCommonBody($parentBody), [
             'rootJobId'            => $rootJob->getId(),
@@ -224,7 +224,7 @@ class UpdateListProcessingHelper
         Job $rootJob,
         array $parentBody,
         int $firstChunkFileIndex = 0,
-        int $previousAggregateTime = null
+        ?int $previousAggregateTime = null
     ): void {
         $body = array_merge($this->getCommonBody($parentBody), [
             'rootJobId' => $rootJob->getId()

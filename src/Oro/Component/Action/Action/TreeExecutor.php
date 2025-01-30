@@ -27,7 +27,7 @@ class TreeExecutor extends AbstractAction
      * @param LoggerInterface|null $logger
      * @param string $logLevel
      */
-    public function __construct(LoggerInterface $logger = null, $logLevel = 'ALERT')
+    public function __construct(?LoggerInterface $logger = null, $logLevel = 'ALERT')
     {
         $this->logger = $logger;
         $this->logLevel = $logLevel;

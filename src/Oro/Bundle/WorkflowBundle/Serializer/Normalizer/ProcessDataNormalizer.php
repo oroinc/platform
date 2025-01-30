@@ -22,7 +22,7 @@ class ProcessDataNormalizer extends AbstractProcessNormalizer
     }
 
     #[\Override]
-    public function normalize($object, string $format = null, array $context = [])
+    public function normalize($object, ?string $format = null, array $context = [])
     {
         /** @var ProcessData $object */
         $processJob = $this->getProcessJob($context);
@@ -39,7 +39,7 @@ class ProcessDataNormalizer extends AbstractProcessNormalizer
     }
 
     #[\Override]
-    public function denormalize($data, string $type, string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = [])
     {
         $denormalizedData = $this->serializer->denormalize($data, '', $format, $context);
         $denormalizedData = $denormalizedData ?: [];
@@ -54,7 +54,7 @@ class ProcessDataNormalizer extends AbstractProcessNormalizer
     }
 
     #[\Override]
-    public function supportsDenormalization($data, string $type, string $format = null): bool
+    public function supportsDenormalization($data, string $type, ?string $format = null): bool
     {
         return $this->supportsClass($type);
     }

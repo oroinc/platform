@@ -108,7 +108,7 @@ class JobManager implements JobManagerInterface
         Job $rootJob,
         array $statuses,
         \DateTime $stoppedAt,
-        \DateTime $startedAt = null
+        ?\DateTime $startedAt = null
     ): void {
         $em = $this->getEntityManager();
         $tableName = $em->getClassMetadata(JobEntity::class)->getTableName();

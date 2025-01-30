@@ -30,11 +30,11 @@ class QueryComponent
 
     public function __construct(
         ClassMetadata $metadata,
-        array         $relation = null,
-        string        $parent = null,
-        string        $map = null,
-        int           $nestingLevel = null,
-        Token $token = null
+        ?array        $relation = null,
+        ?string       $parent = null,
+        ?string       $map = null,
+        ?int          $nestingLevel = null,
+        ?Token        $token = null
     ) {
         $this->metadata = $metadata;
         $this->relation = $relation;

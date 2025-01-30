@@ -208,7 +208,7 @@ class TestCollectionItem implements TestFrameworkEntityInterface
         return $this->withOrphanRemovalParent;
     }
 
-    public function setWithOrphanRemovalParent(TestCollection $parent = null)
+    public function setWithOrphanRemovalParent(?TestCollection $parent = null)
     {
         $this->withOrphanRemovalParent = $parent;
     }
@@ -221,7 +221,7 @@ class TestCollectionItem implements TestFrameworkEntityInterface
         return $this->withoutOrphanRemovalParent;
     }
 
-    public function setWithoutOrphanRemovalParent(TestCollection $parent = null)
+    public function setWithoutOrphanRemovalParent(?TestCollection $parent = null)
     {
         $this->withoutOrphanRemovalParent = $parent;
     }
@@ -234,7 +234,7 @@ class TestCollectionItem implements TestFrameworkEntityInterface
         return $this->lazyWithOrphanRemovalParent;
     }
 
-    public function setLazyWithOrphanRemovalParent(TestCollection $parent = null)
+    public function setLazyWithOrphanRemovalParent(?TestCollection $parent = null)
     {
         $this->lazyWithOrphanRemovalParent = $parent;
     }
@@ -247,7 +247,7 @@ class TestCollectionItem implements TestFrameworkEntityInterface
         return $this->lazyWithoutOrphanRemovalParent;
     }
 
-    public function setLazyWithoutOrphanRemovalParent(TestCollection $parent = null)
+    public function setLazyWithoutOrphanRemovalParent(?TestCollection $parent = null)
     {
         $this->lazyWithoutOrphanRemovalParent = $parent;
     }
@@ -260,7 +260,7 @@ class TestCollectionItem implements TestFrameworkEntityInterface
         return $this->extraLazyWithOrphanRemovalParent;
     }
 
-    public function setExtraLazyWithOrphanRemovalParent(TestCollection $parent = null)
+    public function setExtraLazyWithOrphanRemovalParent(?TestCollection $parent = null)
     {
         $this->extraLazyWithOrphanRemovalParent = $parent;
     }
@@ -273,7 +273,7 @@ class TestCollectionItem implements TestFrameworkEntityInterface
         return $this->extraLazyWithoutOrphanRemovalParent;
     }
 
-    public function setExtraLazyWithoutOrphanRemovalParent(TestCollection $parent = null)
+    public function setExtraLazyWithoutOrphanRemovalParent(?TestCollection $parent = null)
     {
         $this->extraLazyWithoutOrphanRemovalParent = $parent;
     }

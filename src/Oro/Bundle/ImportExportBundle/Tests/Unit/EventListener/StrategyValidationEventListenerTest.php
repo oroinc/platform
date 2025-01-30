@@ -68,7 +68,7 @@ class StrategyValidationEventListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['header: testerror'], $event->getErrors());
     }
 
-    private function getViolation(string $propertyPath = null): ConstraintViolation
+    private function getViolation(?string $propertyPath = null): ConstraintViolation
     {
         return new ConstraintViolation(
             'testerror',

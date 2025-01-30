@@ -15,14 +15,14 @@ class StandaloneFilterWithDefaultValue extends StandaloneFilter
 
     /**
      * @param string              $dataType
-     * @param string|null         $description
+     * @param string|null $description
      * @param mixed $defaultValue
      * @param callable|null       $defaultValueToStringConverter
      */
     public function __construct(
-        string $dataType,
-        string $description = null,
-        mixed $defaultValue = null,
+        string    $dataType,
+        ?string   $description = null,
+        mixed     $defaultValue = null,
         ?callable $defaultValueToStringConverter = null
     ) {
         parent::__construct($dataType, $description);

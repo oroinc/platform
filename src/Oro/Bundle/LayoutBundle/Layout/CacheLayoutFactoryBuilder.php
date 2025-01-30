@@ -32,7 +32,7 @@ class CacheLayoutFactoryBuilder extends LayoutFactoryBuilder
         RenderCache $renderCache,
         CacheMetadataProviderInterface $cacheMetadataProvider,
         EventDispatcherInterface $eventDispatcher,
-        BlockViewCache $blockViewCache = null
+        ?BlockViewCache $blockViewCache = null
     ) {
         $this->layoutContextStack = $layoutContextStack;
         $this->expressionProcessor = $expressionProcessor;

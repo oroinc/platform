@@ -48,7 +48,7 @@ class CompositeIdentifierFilter extends AbstractCompositeIdentifierFilter implem
     }
 
     #[\Override]
-    public function apply(Criteria $criteria, FilterValue $value = null): void
+    public function apply(Criteria $criteria, ?FilterValue $value = null): void
     {
         if (null !== $value) {
             $this->entityIdTransformer = $this->entityIdTransformerRegistry->getEntityIdTransformer($this->requestType);

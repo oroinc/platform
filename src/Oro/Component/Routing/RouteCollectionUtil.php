@@ -16,7 +16,7 @@ class RouteCollectionUtil
      *
      * @return RouteCollection The destination route collection
      */
-    public static function cloneWithoutHidden(RouteCollection $src, RouteCollection $dest = null)
+    public static function cloneWithoutHidden(RouteCollection $src, ?RouteCollection $dest = null)
     {
         if (null === $dest) {
             $dest = new RouteCollection();

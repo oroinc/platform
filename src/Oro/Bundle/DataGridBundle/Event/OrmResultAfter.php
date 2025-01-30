@@ -29,7 +29,7 @@ class OrmResultAfter extends Event implements GridEventInterface
     public function __construct(
         DatagridInterface $datagrid,
         array $records = [],
-        AbstractQuery $query = null
+        ?AbstractQuery $query = null
     ) {
         $this->datagrid = $datagrid;
         $this->records  = $records;

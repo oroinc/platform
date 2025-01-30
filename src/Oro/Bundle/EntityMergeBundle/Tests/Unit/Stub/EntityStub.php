@@ -21,7 +21,7 @@ class EntityStub
      */
     public $collection;
 
-    public function __construct($id = null, EntityStub $parent = null)
+    public function __construct($id = null, ?EntityStub $parent = null)
     {
         $this->id         = $id;
         $this->parent     = $parent;

@@ -12,5 +12,5 @@ interface FilterInterface
     /**
      * Applies the filter to the Criteria object.
      */
-    public function apply(Criteria $criteria, FilterValue $value = null): void;
+    public function apply(Criteria $criteria, ?FilterValue $value = null): void;
 }

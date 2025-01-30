@@ -203,7 +203,7 @@ class RelationType extends AbstractType
         );
     }
 
-    private function addBidirectionalField(FormInterface $form, array $data = null)
+    private function addBidirectionalField(FormInterface $form, ?array $data = null)
     {
         /** @var FieldConfigId $fieldConfigId */
         $fieldConfigId = $this->config->getId();

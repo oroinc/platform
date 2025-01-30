@@ -168,12 +168,12 @@ class EntityDefinitionConfig extends EntityConfig
      * Adds the configuration of a field.
      *
      * @param string                           $fieldName
-     * @param EntityDefinitionFieldConfig|null $field
+     * @param FieldConfigInterface|null $field
      *
      * @return EntityDefinitionFieldConfig
      */
     #[\Override]
-    public function addField(string $fieldName, FieldConfigInterface $field = null): EntityDefinitionFieldConfig
+    public function addField(string $fieldName, ?FieldConfigInterface $field = null): EntityDefinitionFieldConfig
     {
         if (null === $field) {
             $field = new EntityDefinitionFieldConfig();

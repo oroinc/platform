@@ -22,15 +22,15 @@ class ExceptionListener extends BaseExceptionListener
     private array $excludedRoutes = [];
 
     public function __construct(
-        TokenStorageInterface $tokenStorage,
+        TokenStorageInterface                $tokenStorage,
         AuthenticationTrustResolverInterface $trustResolver,
-        HttpUtils $httpUtils,
-        $providerKey,
-        AuthenticationEntryPointInterface $authenticationEntryPoint = null,
-        $errorPage = null,
-        AccessDeniedHandlerInterface $accessDeniedHandler = null,
-        LoggerInterface $logger = null,
-        $stateless = false
+        HttpUtils                            $httpUtils,
+                                             $providerKey,
+        ?AuthenticationEntryPointInterface   $authenticationEntryPoint = null,
+                                             $errorPage = null,
+        ?AccessDeniedHandlerInterface        $accessDeniedHandler = null,
+        ?LoggerInterface                     $logger = null,
+                                             $stateless = false
     ) {
         parent::__construct(
             $tokenStorage,

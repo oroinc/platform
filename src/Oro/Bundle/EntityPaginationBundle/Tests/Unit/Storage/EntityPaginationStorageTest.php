@@ -445,7 +445,7 @@ class EntityPaginationStorageTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isInfoMessageShownDataProvider
      */
-    public function testIsInfoMessageShown(?bool $expected, bool $enabled = false, array $storage = null)
+    public function testIsInfoMessageShown(?bool $expected, bool $enabled = false, ?array $storage = null)
     {
         $this->setEnabled($enabled);
 

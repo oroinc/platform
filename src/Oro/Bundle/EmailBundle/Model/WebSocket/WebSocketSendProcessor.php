@@ -38,7 +38,7 @@ class WebSocketSendProcessor
      * @param Organization|null $organization
      * @return string
      */
-    public static function getUserTopic($user, Organization $organization = null)
+    public static function getUserTopic($user, ?Organization $organization = null)
     {
         return sprintf(
             self::TOPIC,

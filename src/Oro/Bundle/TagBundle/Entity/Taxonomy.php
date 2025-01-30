@@ -226,7 +226,7 @@ class Taxonomy implements ExtendEntityInterface
      * @param Organization|null $organization
      * @return Taxonomy
      */
-    public function setOrganization(Organization $organization = null)
+    public function setOrganization(?Organization $organization = null)
     {
         $this->organization = $organization;
 

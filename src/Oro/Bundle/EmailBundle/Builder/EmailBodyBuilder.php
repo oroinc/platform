@@ -27,7 +27,7 @@ class EmailBodyBuilder
     /** @var EmailBodyHelper */
     private $emailBodyHelper;
 
-    public function __construct(ConfigManager $configManager = null)
+    public function __construct(?ConfigManager $configManager = null)
     {
         $this->configManager = $configManager;
     }

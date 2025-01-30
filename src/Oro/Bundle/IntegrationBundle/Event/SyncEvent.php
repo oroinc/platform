@@ -28,7 +28,7 @@ class SyncEvent extends Event
      * @param array     $configuration
      * @param JobResult|null $jobResult
      */
-    public function __construct($jobName, array $configuration, JobResult $jobResult = null)
+    public function __construct($jobName, array $configuration, ?JobResult $jobResult = null)
     {
         $this->jobName       = $jobName;
         $this->configuration = $configuration;

@@ -36,7 +36,7 @@ class DbalStateDriver implements StateDriverInterface
     }
 
     #[\Override]
-    public function setChangeStateDate(\DateTime $date = null)
+    public function setChangeStateDate(?\DateTime $date = null)
     {
         try {
             $this->saveChangeStateDate($date);
@@ -109,7 +109,7 @@ class DbalStateDriver implements StateDriverInterface
         return $this->doctrine->getConnection('message_queue');
     }
 
-    private function saveChangeStateDate(\DateTime $date = null)
+    private function saveChangeStateDate(?\DateTime $date = null)
     {
         $this->getConnection()->update(
             'oro_message_queue_state',

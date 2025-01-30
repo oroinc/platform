@@ -27,7 +27,7 @@ trait UpdatedByAwareTrait
      *
      * @return $this
      */
-    public function setUpdatedBy(User $updatedBy = null)
+    public function setUpdatedBy(?User $updatedBy = null)
     {
         $this->isUpdatedBySet = false;
         if ($updatedBy !== null) {

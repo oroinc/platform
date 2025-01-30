@@ -104,11 +104,11 @@ class ImpersonateUserCommandTest extends \PHPUnit\Framework\TestCase
     }
 
     private function createMocks(
-        bool $userEnabled = null,
-        string $authStatusId = null,
-        string $userClass = null,
-        bool $nullUserStub = null,
-        object $userStub = null
+        ?bool   $userEnabled = null,
+        ?string $authStatusId = null,
+        ?string $userClass = null,
+        ?bool   $nullUserStub = null,
+        ?object $userStub = null
     ): void {
         if (null === $userStub && true !== $nullUserStub) {
             $userStub = $this->getMockBuilder($userClass ?? User::class)

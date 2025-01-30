@@ -326,7 +326,7 @@ class UiExtensionTest extends TestCase
     /**
      * @dataProvider addUrlQueryProvider
      */
-    public function testAddUrlQuery($expected, $source, array $query = null): void
+    public function testAddUrlQuery($expected, $source, ?array $query = null): void
     {
         $request = new Request($query ?? []);
 

@@ -52,9 +52,9 @@ class TagSearchResultsGridListenerTest extends \PHPUnit\Framework\TestCase
      * @dataProvider onBuildAfterDataProvider
      */
     public function testOnBuildAfter(
-        string $alias,
-        string $entityClass = null,
-        EntityAliasNotFoundException $exception = null
+        string                        $alias,
+        ?string                       $entityClass = null,
+        ?EntityAliasNotFoundException $exception = null
     ) {
         $this->event->expects($this->once())
             ->method('getDatagrid')

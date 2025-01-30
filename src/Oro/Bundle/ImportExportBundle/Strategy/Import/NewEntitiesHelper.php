@@ -98,7 +98,7 @@ class NewEntitiesHelper
      * @param null|string $hashPrefix
      * @return object|null
      */
-    public function storeNewEntity($entity, array $identityValues = null, $hashPrefix = null)
+    public function storeNewEntity($entity, ?array $identityValues = null, $hashPrefix = null)
     {
         $knownNewEntity = null;
         if ($identityValues) {

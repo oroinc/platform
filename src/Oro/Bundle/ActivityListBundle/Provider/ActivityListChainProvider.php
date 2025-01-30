@@ -409,7 +409,7 @@ class ActivityListChainProvider implements ResetInterface
      * @param object                        $entity
      * @param ActivityListProviderInterface $provider
      * @param string                        $verb
-     * @param ActivityList|null             $list
+     * @param ActivityList|null $list
      *
      * @return ActivityList|null
      */
@@ -417,7 +417,7 @@ class ActivityListChainProvider implements ResetInterface
         $entity,
         ActivityListProviderInterface $provider,
         string $verb = ActivityList::VERB_CREATE,
-        ActivityList $list = null
+        ?ActivityList $list = null
     ): ?ActivityList {
         if (!$provider->isApplicable($entity)) {
             return null;

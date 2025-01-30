@@ -81,7 +81,7 @@ class TagImportManager
      *
      * @return array
      */
-    public function normalizeTags(Collection $tags = null)
+    public function normalizeTags(?Collection $tags = null)
     {
         if (!$tags) {
             return ['name' => ''];

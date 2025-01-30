@@ -22,7 +22,7 @@ class PermissionConfigurationProvider extends PhpArrayConfigProvider
         parent::__construct($cacheFile, $debug);
     }
 
-    public function getPermissionConfiguration(array $acceptedPermissions = null): array
+    public function getPermissionConfiguration(?array $acceptedPermissions = null): array
     {
         $permissions = $this->doGetConfig();
         if (null !== $acceptedPermissions) {

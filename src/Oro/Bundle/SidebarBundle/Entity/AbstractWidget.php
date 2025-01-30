@@ -181,7 +181,7 @@ class AbstractWidget
      * @param Organization|null $organization
      * @return Widget
      */
-    public function setOrganization(Organization $organization = null)
+    public function setOrganization(?Organization $organization = null)
     {
         $this->organization = $organization;
 

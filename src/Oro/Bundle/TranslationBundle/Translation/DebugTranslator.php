@@ -8,7 +8,7 @@ namespace Oro\Bundle\TranslationBundle\Translation;
 class DebugTranslator extends Translator
 {
     #[\Override]
-    public function trans(?string $id, array $parameters = [], string $domain = null, string $locale = null): string
+    public function trans(?string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
     {
         return sprintf(
             $this->getStringFormat($id, $domain, $locale),

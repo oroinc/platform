@@ -15,12 +15,12 @@ class PrimaryItemCollectionNormalizer extends CollectionNormalizer
      * Returned normalized data where first element is primary
      *
      * @param Collection $object object to normalize
-     * @param mixed $format
+     * @param string|null $format
      * @param array $context
      * @return array
      */
     #[\Override]
-    public function normalize($object, string $format = null, array $context = [])
+    public function normalize($object, ?string $format = null, array $context = [])
     {
         $result = array();
 
@@ -48,7 +48,7 @@ class PrimaryItemCollectionNormalizer extends CollectionNormalizer
      * @return ArrayCollection
      */
     #[\Override]
-    public function denormalize($data, string $type, string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = [])
     {
         $result = parent::denormalize($data, $type, $format, $context);
         $primary = true;
@@ -61,7 +61,7 @@ class PrimaryItemCollectionNormalizer extends CollectionNormalizer
     }
 
     #[\Override]
-    public function supportsNormalization($data, string $format = null, array $context = []): bool
+    public function supportsNormalization($data, ?string $format = null, array $context = []): bool
     {
         if ($data instanceof Collection && !$data->isEmpty()) {
             foreach ($data as $item) {
@@ -75,7 +75,7 @@ class PrimaryItemCollectionNormalizer extends CollectionNormalizer
     }
 
     #[\Override]
-    public function supportsDenormalization($data, string $type, string $format = null, array $context = array()): bool
+    public function supportsDenormalization($data, string $type, ?string $format = null, array $context = array()): bool
     {
         $itemType = $this->getItemType($type);
         if ($itemType && class_exists($itemType)) {

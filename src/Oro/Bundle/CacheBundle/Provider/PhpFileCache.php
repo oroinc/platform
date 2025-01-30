@@ -12,10 +12,10 @@ class PhpFileCache extends BasePhpFileCache implements DirectoryAwareFileCacheIn
     use DirectoryAwareFileCacheTrait;
 
     public function __construct(
-        string $namespace = '',
-        int $defaultLifetime = 0,
-        string $directory = null,
-        bool $appendOnly = false
+        string  $namespace = '',
+        int     $defaultLifetime = 0,
+        ?string $directory = null,
+        bool    $appendOnly = false
     ) {
         if ($directory) {
             $this->setDirectory($directory . DIRECTORY_SEPARATOR . $namespace);

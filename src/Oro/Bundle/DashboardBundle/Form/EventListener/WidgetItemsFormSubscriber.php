@@ -67,7 +67,7 @@ class WidgetItemsFormSubscriber implements EventSubscriberInterface
      *
      * @return array
      */
-    protected function getIndexedData(array $data = null)
+    protected function getIndexedData(?array $data = null)
     {
         $result = [];
 

@@ -40,7 +40,7 @@ class AuditMessageBodyProvider
         array $updates,
         array $deletions,
         array $collectionUpdates,
-        TokenInterface $securityToken = null
+        ?TokenInterface $securityToken = null
     ) {
         if (empty($insertions) && empty($updates) && empty($deletions) && empty($collectionUpdates)) {
             return [];

@@ -43,7 +43,7 @@ class MutableAclProvider extends AclProvider implements MutableAclProviderInterf
         Connection $connection,
         PermissionGrantingStrategyInterface $permissionGrantingStrategy,
         array $options,
-        AclCache $cache = null
+        ?AclCache $cache = null
     ) {
         parent::__construct($connection, $permissionGrantingStrategy, $options, $cache);
         $this->propertyChanges = new \SplObjectStorage();

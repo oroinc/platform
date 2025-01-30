@@ -16,7 +16,7 @@ class EntityAllMetadataProvider
     {
     }
 
-    public function setConfigConnactionName(string $configConnectionName = null): void
+    public function setConfigConnactionName(?string $configConnectionName = null): void
     {
         $this->configConnectionName = $configConnectionName;
     }

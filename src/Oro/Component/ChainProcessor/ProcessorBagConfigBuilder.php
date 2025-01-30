@@ -125,11 +125,11 @@ class ProcessorBagConfigBuilder implements ProcessorBagConfigProviderInterface
      * Registers a processor.
      */
     public function addProcessor(
-        string $processorId,
-        array $attributes,
-        string $action = null,
-        string $group = null,
-        int $priority = 0
+        string  $processorId,
+        array   $attributes,
+        ?string $action = null,
+        ?string $group = null,
+        int     $priority = 0
     ): void {
         $this->assertNotFrozen();
 
@@ -267,7 +267,7 @@ class ProcessorBagConfigBuilder implements ProcessorBagConfigProviderInterface
     /**
      * Calculates an internal priority of a processor based on its priority and a priority of its group.
      */
-    private static function calculatePriority(int $processorPriority, int $groupPriority = null): int
+    private static function calculatePriority(int $processorPriority, ?int $groupPriority = null): int
     {
         if (null === $groupPriority) {
             if ($processorPriority < 0) {

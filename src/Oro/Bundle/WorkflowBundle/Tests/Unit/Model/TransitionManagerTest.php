@@ -43,7 +43,7 @@ class TransitionManagerTest extends \PHPUnit\Framework\TestCase
      * @param array $transitions
      * @param Transition|null $expected
      */
-    public function testGetStartTransition($name, array $transitions, Transition $expected = null)
+    public function testGetStartTransition($name, array $transitions, ?Transition $expected = null)
     {
         $this->transitionManager->setTransitions($transitions);
 

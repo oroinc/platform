@@ -105,7 +105,7 @@ class SubresourceUtil
     public static function setSubresourceExcludedActions(
         ApiSubresource $subresource,
         array $accessibleResources,
-        array $subresourceExcludedActions = null
+        ?array $subresourceExcludedActions = null
     ): void {
         if (self::isAccessibleSubresource($subresource, $accessibleResources)) {
             if ($subresourceExcludedActions) {

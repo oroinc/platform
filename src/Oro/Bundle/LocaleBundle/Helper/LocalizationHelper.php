@@ -56,7 +56,7 @@ class LocalizationHelper
      * @param Localization|null $localization
      * @return AbstractLocalizedFallbackValue|null
      */
-    public function getLocalizedValue(Collection $values, Localization $localization = null)
+    public function getLocalizedValue(Collection $values, ?Localization $localization = null)
     {
         return $this->getFallbackValue($values, $localization ?: $this->getCurrentLocalization());
     }

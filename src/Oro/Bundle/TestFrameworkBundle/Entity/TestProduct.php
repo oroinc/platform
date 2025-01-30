@@ -65,7 +65,7 @@ class TestProduct implements TestFrameworkEntityInterface
         return $this->productType;
     }
 
-    public function setProductType(TestProductType $productType = null)
+    public function setProductType(?TestProductType $productType = null)
     {
         $this->productType = $productType;
     }

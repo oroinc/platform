@@ -14,7 +14,7 @@ class LoadRoleData extends AbstractFixture implements ContainerAwareInterface
     protected $container;
 
     #[\Override]
-    public function setContainer(ContainerInterface $container = null)
+    public function setContainer(?ContainerInterface $container = null)
     {
         $this->container = $container;
     }

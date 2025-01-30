@@ -11,7 +11,7 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 class FileTitleProvider implements FileTitleProviderInterface
 {
     #[\Override]
-    public function getTitle(File $file, Localization $localization = null): string
+    public function getTitle(File $file, ?Localization $localization = null): string
     {
         return (string)$file->getOriginalFilename();
     }

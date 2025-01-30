@@ -39,7 +39,7 @@ class NewApiBasedOnDefaultApiTest extends RestJsonApiTestCase
         string $uri,
         array $parameters = [],
         array $server = [],
-        string $content = null
+        ?string $content = null
     ): Response {
         $server['HTTP_X-Test-Request-Type'] = 'test_override';
 

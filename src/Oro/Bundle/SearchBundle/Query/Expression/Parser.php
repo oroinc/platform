@@ -28,7 +28,7 @@ class Parser
 
     /**
      * @param TokenStream                 $stream
-     * @param Query|null                  $query
+     * @param Query|null $query
      * @param FieldResolverInterface|null $fieldResolver
      * @param string|null                 $keyword
      *
@@ -37,10 +37,10 @@ class Parser
      * @throws ExpressionSyntaxError
      */
     public function parse(
-        TokenStream $stream,
-        Query $query = null,
-        FieldResolverInterface $fieldResolver = null,
-        $keyword = null
+        TokenStream             $stream,
+        ?Query                  $query = null,
+        ?FieldResolverInterface $fieldResolver = null,
+                                $keyword = null
     ) {
         if (null === $query) {
             $query = new Query();

@@ -110,7 +110,7 @@ class ChannelHandler
         }
     }
 
-    private function saveFormData(Integration $entity, User $userOwner = null)
+    private function saveFormData(Integration $entity, ?User $userOwner = null)
     {
         $isNewEntity = !$entity->getId();
         $oldState = $this->getIntegration($entity);

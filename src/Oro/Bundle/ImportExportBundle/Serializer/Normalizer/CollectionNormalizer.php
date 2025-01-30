@@ -43,13 +43,13 @@ class CollectionNormalizer implements
      * Returned normalized data
      *
      * @param Collection $object object to normalize
-     * @param mixed $format
+     * @param string|null $format
      * @param array $context
      *
      * @return array
      */
     #[\Override]
-    public function normalize($object, string $format = null, array $context = [])
+    public function normalize($object, ?string $format = null, array $context = [])
     {
         $result = [];
 
@@ -66,13 +66,13 @@ class CollectionNormalizer implements
      *
      * @param mixed $data
      * @param string $type
-     * @param mixed $format
+     * @param string|null $format
      * @param array $context
      *
      * @return ArrayCollection
      */
     #[\Override]
-    public function denormalize($data, string $type, string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = [])
     {
         if (!is_array($data)) {
             return new ArrayCollection();
@@ -106,13 +106,13 @@ class CollectionNormalizer implements
     }
 
     #[\Override]
-    public function supportsNormalization($data, string $format = null, array $context = []): bool
+    public function supportsNormalization($data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof Collection;
     }
 
     #[\Override]
-    public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization($data, string $type, ?string $format = null, array $context = []): bool
     {
         return (bool)preg_match(
             '/^(Doctrine\\\Common\\\Collections\\\ArrayCollection|ArrayCollection)(<[\w_<>\\\]+>)?$/',

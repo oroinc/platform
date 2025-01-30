@@ -59,7 +59,7 @@ class UserPermissionApiEntityManager extends ApiEntityManager
      *
      * @return array
      */
-    public function getUserPermissions(User $user, Criteria $filters = null)
+    public function getUserPermissions(User $user, ?Criteria $filters = null)
     {
         $entityAclExtension = $this->aclSelector->select($user);
 
@@ -136,7 +136,7 @@ class UserPermissionApiEntityManager extends ApiEntityManager
     /**
      * Switches the security context to the previous security token
      */
-    protected function undoImpersonation(TokenInterface $originalToken = null)
+    protected function undoImpersonation(?TokenInterface $originalToken = null)
     {
         if ($originalToken) {
             $this->tokenStorage->setToken($originalToken);

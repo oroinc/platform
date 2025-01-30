@@ -13,7 +13,7 @@ class InvalidMessageBodyException extends \RuntimeException implements RejectMes
         string $error,
         string $topicName,
         array|string|float|int|bool|null $body,
-        \Throwable $previousException = null
+        ?\Throwable $previousException = null
     ): self {
         $body = is_array($body) ? JSON::encode($body) : (string) $body;
 

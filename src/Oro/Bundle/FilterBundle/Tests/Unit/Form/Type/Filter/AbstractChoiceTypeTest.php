@@ -33,11 +33,11 @@ class AbstractChoiceTypeTest extends \PHPUnit\Framework\TestCase
      * @dataProvider finishViewDataProvider
      */
     public function testFinishView(
-        string $expectedTranslationDomain,
-        array $options,
-        string $parentTranslationDomain = null,
-        array $expectedChoices = [],
-        array $inputChoices = []
+        string  $expectedTranslationDomain,
+        array   $options,
+        ?string $parentTranslationDomain = null,
+        array   $expectedChoices = [],
+        array   $inputChoices = []
     ) {
         // expectations for translator
         if ($expectedChoices) {
@@ -107,7 +107,7 @@ class AbstractChoiceTypeTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    private function getFilterFormView(string $parentTranslationDomain = null, array $choices = []): FormView
+    private function getFilterFormView(?string $parentTranslationDomain = null, array $choices = []): FormView
     {
         $choicesFormView = new FormView();
         $choicesFormView->vars['choices'] = [];

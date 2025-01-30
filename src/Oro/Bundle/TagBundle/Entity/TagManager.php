@@ -151,7 +151,7 @@ class TagManager
     /**
      * Loads or creates a tag by name.
      */
-    public function loadOrCreateTag(string $name, Organization $organization = null): Tag
+    public function loadOrCreateTag(string $name, ?Organization $organization = null): Tag
     {
         $tags = $this->loadOrCreateTags([$name], $organization);
 
@@ -166,7 +166,7 @@ class TagManager
      *
      * @return Tag[]
      */
-    public function loadOrCreateTags(array $names, Organization $organization = null): array
+    public function loadOrCreateTags(array $names, ?Organization $organization = null): array
     {
         if (empty($names)) {
             return [];
@@ -206,7 +206,7 @@ class TagManager
         return $this->getRepository()->getEntities($tag);
     }
 
-    public function getPreparedArray(object $entity, Collection $tags = null, Organization $organization = null): array
+    public function getPreparedArray(object $entity, ?Collection $tags = null, ?Organization $organization = null): array
     {
         if (null === $tags) {
             $this->loadTagging($entity, $organization);
@@ -272,7 +272,7 @@ class TagManager
     /**
      * Saves tags for the given entity.
      */
-    public function saveTagging(object $entity, bool $flush = true, Organization $organization = null): void
+    public function saveTagging(object $entity, bool $flush = true, ?Organization $organization = null): void
     {
         // Tags stored for the entity.
         $oldAllTags = $this->fetchTags($entity, false, $organization);
@@ -304,7 +304,7 @@ class TagManager
     /**
      * Loads all tags for the given entity.
      */
-    public function loadTagging(object $entity, Organization $organization = null): void
+    public function loadTagging(object $entity, ?Organization $organization = null): void
     {
         $tags = $this->fetchTags($entity, false, $organization);
         $this->setTags($entity, $tags);
@@ -314,12 +314,12 @@ class TagManager
      * Deletes all tags for the given entity.
      *
      * @param object                 $entity
-     * @param User|null              $owner
+     * @param User|null $owner
      * @param Collection|Tag[]|int[] $tags
      *
      * @return int
      */
-    public function deleteTagging(object $entity, Collection|array $tags, User $owner = null): int
+    public function deleteTagging(object $entity, Collection|array $tags, ?User $owner = null): int
     {
         $entityClass = ClassUtils::getClass($entity);
         $entityId = TaggableHelper::getEntityId($entity);
@@ -376,7 +376,7 @@ class TagManager
         }
     }
 
-    private function fetchTags(object $entity, bool $all = false, Organization $organization = null): Collection
+    private function fetchTags(object $entity, bool $all = false, ?Organization $organization = null): Collection
     {
         $elements = $this->getRepository()->getTags(
             ClassUtils::getClass($entity),

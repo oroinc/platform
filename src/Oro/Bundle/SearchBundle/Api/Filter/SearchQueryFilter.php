@@ -56,7 +56,7 @@ class SearchQueryFilter extends StandaloneFilter implements FieldFilterInterface
     }
 
     #[\Override]
-    public function apply(Criteria $criteria, FilterValue $value = null): void
+    public function apply(Criteria $criteria, ?FilterValue $value = null): void
     {
         $expr = $this->createExpression($value);
         if (null !== $expr) {

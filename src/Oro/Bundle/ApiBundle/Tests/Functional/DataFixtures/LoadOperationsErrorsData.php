@@ -112,7 +112,7 @@ class LoadOperationsErrorsData extends AbstractFixture implements ContainerAware
         int $statusCode,
         string $sourcePointer,
         string $title,
-        string $detail = null
+        ?string $detail = null
     ): BatchError {
         return BatchError::create($title, $detail)
             ->setId($id)

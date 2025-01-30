@@ -45,7 +45,7 @@ class ExtendConfigProcessor
      * @param bool $dryRun Log modifications without apply them
      * @throws \Exception
      */
-    public function processConfigs(array $configs, LoggerInterface $logger = null, $dryRun = false)
+    public function processConfigs(array $configs, ?LoggerInterface $logger = null, $dryRun = false)
     {
         $this->logger = $logger ?: new NullLogger();
         if ($configs) {

@@ -98,9 +98,9 @@ class ConfigProviderMock extends ConfigProvider
 
     #[\Override]
     public function getId(
-        string $className = null,
-        string $fieldName = null,
-        string $fieldType = null
+        ?string $className = null,
+        ?string $fieldName = null,
+        ?string $fieldType = null
     ): ConfigIdInterface {
         return $fieldName
             ? new FieldConfigId($this->getScope(), $className, $fieldName, $fieldType)
@@ -108,7 +108,7 @@ class ConfigProviderMock extends ConfigProvider
     }
 
     #[\Override]
-    public function hasConfig(string $className, string $fieldName = null): bool
+    public function hasConfig(string $className, ?string $fieldName = null): bool
     {
         return $fieldName
             ? isset($this->fieldConfigs[$className][$fieldName])
@@ -124,7 +124,7 @@ class ConfigProviderMock extends ConfigProvider
     }
 
     #[\Override]
-    public function getConfig(string $className = null, string $fieldName = null): ConfigInterface
+    public function getConfig(?string $className = null, ?string $fieldName = null): ConfigInterface
     {
         if (!$this->hasConfig($className, $fieldName)) {
             if ($fieldName) {
@@ -156,7 +156,7 @@ class ConfigProviderMock extends ConfigProvider
     }
 
     #[\Override]
-    public function getIds(string $className = null, bool $withHidden = false): array
+    public function getIds(?string $className = null, bool $withHidden = false): array
     {
         $result = [];
         if ($className) {
@@ -189,7 +189,7 @@ class ConfigProviderMock extends ConfigProvider
     }
 
     #[\Override]
-    public function getConfigs(string $className = null, bool $withHidden = false): array
+    public function getConfigs(?string $className = null, bool $withHidden = false): array
     {
         $result = [];
         if ($className) {

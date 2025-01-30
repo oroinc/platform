@@ -52,7 +52,7 @@ class MailboxManager
      *
      * @return Collection|Mailbox[] Array or collection of Mailboxes
      */
-    public function findAvailableMailboxes($user, Organization $organization = null)
+    public function findAvailableMailboxes($user, ?Organization $organization = null)
     {
         return $this->createAvailableMailboxesQuery($user, $organization)
             ->getQuery()
@@ -67,7 +67,7 @@ class MailboxManager
      *
      * @return string[] Emails
      */
-    public function findAvailableMailboxEmails($user, Organization $organization = null)
+    public function findAvailableMailboxEmails($user, ?Organization $organization = null)
     {
         $result = $this->createAvailableMailboxesQuery($user, $organization)
             ->select('mb.email AS email')
@@ -102,7 +102,7 @@ class MailboxManager
      *
      * @return QueryBuilder
      */
-    protected function createAvailableMailboxesQuery($user, Organization $organization = null)
+    protected function createAvailableMailboxesQuery($user, ?Organization $organization = null)
     {
         return $this->registry->getRepository(Mailbox::class)
             ->createAvailableMailboxesQuery($user, $organization);

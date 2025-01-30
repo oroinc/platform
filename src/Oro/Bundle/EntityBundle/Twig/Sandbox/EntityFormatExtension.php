@@ -45,7 +45,7 @@ class EntityFormatExtension extends AbstractExtension
         string $name,
         string $path,
         string $parentPath,
-        string $notDefinedMessage = null
+        ?string $notDefinedMessage = null
     ): string {
         if ($notDefinedMessage) {
             return strtr(

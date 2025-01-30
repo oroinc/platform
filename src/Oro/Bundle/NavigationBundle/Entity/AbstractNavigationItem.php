@@ -42,7 +42,7 @@ abstract class AbstractNavigationItem implements
     #[ORM\Column(name: 'position', type: Types::SMALLINT)]
     protected ?int $position = null;
 
-    public function __construct(array $values = null)
+    public function __construct(?array $values = null)
     {
         if (!empty($values)) {
             $this->setValues($values);
@@ -119,7 +119,7 @@ abstract class AbstractNavigationItem implements
      * @param AbstractUser|null $user
      * @return AbstractNavigationItem
      */
-    public function setUser(AbstractUser $user = null)
+    public function setUser(?AbstractUser $user = null)
     {
         $this->user = $user;
 

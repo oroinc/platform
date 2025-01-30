@@ -50,7 +50,7 @@ class EntityPaginationExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getPagerDataProvider
      */
-    public function testGetPager(?array $expected, int $totalCount = null, int $currentNumber = null)
+    public function testGetPager(?array $expected, ?int $totalCount = null, ?int $currentNumber = null)
     {
         $entity = new \stdClass();
         $scope = 'test';

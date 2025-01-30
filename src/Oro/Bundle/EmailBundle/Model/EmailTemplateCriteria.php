@@ -11,7 +11,7 @@ class EmailTemplateCriteria
 
     private ?string $entityName;
 
-    public function __construct(string $name, string $entityName = null)
+    public function __construct(string $name, ?string $entityName = null)
     {
         $this->name = $name;
         $this->entityName = $entityName;

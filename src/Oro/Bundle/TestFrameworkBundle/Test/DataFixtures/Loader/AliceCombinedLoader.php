@@ -39,7 +39,7 @@ class AliceCombinedLoader implements LoaderInterface
         array $dataOrFiles,
         array $parameters = [],
         array $objects = [],
-        PurgeMode $purgeMode = null
+        ?PurgeMode $purgeMode = null
     ): array {
         if (!$dataOrFiles) {
             return [];

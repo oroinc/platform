@@ -24,7 +24,7 @@ class TranslatorProvider
      * @param string|null $locale
      * @return string
      */
-    public function getTrans(?string $id, array $parameters = [], string $domain = null, string $locale = null)
+    public function getTrans(?string $id, array $parameters = [], ?string $domain = null, ?string $locale = null)
     {
         return $this->translator->trans((string) $id, $parameters, $domain, $locale);
     }

@@ -14,7 +14,7 @@ class WebsocketServerCommandFactory
     public function createGosWebsocketCommand(
         ServerLauncherInterface $entryPoint,
         DsnBasedParameters $dsnParameters,
-        ServerRegistry $serverRegistry = null
+        ?ServerRegistry $serverRegistry = null
     ): WebsocketServerCommand {
         return new WebsocketServerCommand(
             $entryPoint,

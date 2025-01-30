@@ -131,7 +131,7 @@ class RepeatedTypeExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    private function createView(array $vars = [], array $children = [], FormView $parent = null): FormView
+    private function createView(array $vars = [], array $children = [], ?FormView $parent = null): FormView
     {
         $result = new FormView();
         $result->vars = array_merge_recursive($result->vars, $vars);

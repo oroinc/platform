@@ -106,7 +106,7 @@ class Note implements
      *
      * @return Note
      */
-    public function setOwner(User $owningUser = null)
+    public function setOwner(?User $owningUser = null)
     {
         $this->owner = $owningUser;
 

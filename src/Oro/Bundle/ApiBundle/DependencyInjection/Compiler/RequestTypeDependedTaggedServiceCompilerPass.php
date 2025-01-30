@@ -18,10 +18,10 @@ class RequestTypeDependedTaggedServiceCompilerPass extends PriorityNamedTaggedSe
      * @param bool          $isServiceOptional
      */
     public function __construct(
-        string $serviceId,
-        string $tagName,
-        \Closure $attributesHandler = null,
-        bool $isServiceOptional = false
+        string    $serviceId,
+        string    $tagName,
+        ?\Closure $attributesHandler = null,
+        bool      $isServiceOptional = false
     ) {
         if (null === $attributesHandler) {
             $updatedAttributesHandler = function ($attributes, $serviceId) {

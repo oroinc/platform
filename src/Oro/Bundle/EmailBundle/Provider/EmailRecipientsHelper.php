@@ -116,7 +116,7 @@ class EmailRecipientsHelper
      *
      * @return Recipient
      */
-    public function createRecipientFromEmail($name, Organization $organization = null)
+    public function createRecipientFromEmail($name, ?Organization $organization = null)
     {
         $em = $this->registry->getManager();
         $email = $this->addressHelper->extractPureEmailAddress($name);
@@ -239,7 +239,7 @@ class EmailRecipientsHelper
      *
      * @return bool
      */
-    public function isObjectAllowedForOrganization($object = null, Organization $organization = null)
+    public function isObjectAllowedForOrganization($object = null, ?Organization $organization = null)
     {
         if (!$organization ||
             !$object ||

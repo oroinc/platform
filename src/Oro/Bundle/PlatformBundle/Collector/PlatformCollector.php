@@ -39,7 +39,7 @@ class PlatformCollector extends DataCollector
     }
 
     #[\Override]
-    public function collect(Request $request, Response $response, \Throwable $exception = null): void
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
         $response->headers->setCookie(
             Cookie::create(

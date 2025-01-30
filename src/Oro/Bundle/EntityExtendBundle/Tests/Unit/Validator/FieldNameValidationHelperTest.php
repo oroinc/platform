@@ -201,10 +201,10 @@ class FieldNameValidationHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     protected function addFieldConfig(
-        string $fieldName,
-        string $fieldType = null,
-        array $values = [],
-        bool $hidden = false
+        string  $fieldName,
+        ?string $fieldType = null,
+        array   $values = [],
+        bool    $hidden = false
     ): void {
         $this->extendConfigProvider->addFieldConfig(
             self::ENTITY_CLASS,

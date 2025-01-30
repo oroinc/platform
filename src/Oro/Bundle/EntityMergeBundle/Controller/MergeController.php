@@ -60,7 +60,7 @@ class MergeController extends AbstractController
     #[Route(name: 'oro_entity_merge')]
     #[Template]
     #[Acl(id: 'oro_entity_merge', label: 'oro.entity_merge.acl.merge', type: 'action', category: 'entity')]
-    public function mergeAction(Request $request, EntityData $entityData = null)
+    public function mergeAction(Request $request, ?EntityData $entityData = null)
     {
         if (!$entityData) {
             $className = $request->get('className');

@@ -75,7 +75,7 @@ class NotificationAlertManager
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function addNotificationAlert(NotificationAlertInterface $alert, \DateTime $syncAt = null): string
+    public function addNotificationAlert(NotificationAlertInterface $alert, ?\DateTime $syncAt = null): string
     {
         if ($alert->getSourceType() !== $this->getSourceType()) {
             throw new \BadMethodCallException(sprintf(

@@ -13,7 +13,7 @@ class EmailTemplateCompilationException extends EmailTemplateException
 {
     public function __construct(
         EmailTemplateCriteria|EmailTemplateInterface $object,
-        Error $previous = null
+        ?Error $previous = null
     ) {
         $message = sprintf('Failed to compile the email template "%s"', $object->getName());
 

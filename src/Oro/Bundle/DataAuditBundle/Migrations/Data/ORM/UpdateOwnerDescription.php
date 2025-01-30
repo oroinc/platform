@@ -20,7 +20,7 @@ class UpdateOwnerDescription extends AbstractFixture implements ContainerAwareIn
     private $container;
 
     #[\Override]
-    public function setContainer(ContainerInterface $container = null)
+    public function setContainer(?ContainerInterface $container = null)
     {
         $this->container = $container;
     }

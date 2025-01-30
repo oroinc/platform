@@ -50,7 +50,7 @@ final class ClassGenerator
             : $this->printer->printClass($this->classType, $this->namespace);
     }
 
-    public function addUse(string $name, string $alias = null, string &$aliasOut = null): self
+    public function addUse(string $name, ?string $alias = null, ?string &$aliasOut = null): self
     {
         $aliasOut = !empty($aliasOut) ? $aliasOut : PhpNamespace::NAME_NORMAL;
 

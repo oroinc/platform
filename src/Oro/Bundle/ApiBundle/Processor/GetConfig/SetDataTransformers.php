@@ -56,7 +56,7 @@ class SetDataTransformers implements ProcessorInterface
     private function setDataTransformers(
         EntityDefinitionConfig $definition,
         RequestType $requestType,
-        ClassMetadata $metadata = null
+        ?ClassMetadata $metadata = null
     ): void {
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {

@@ -582,7 +582,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface, ResetIn
         return $cache;
     }
 
-    private function resolveRoutePath(string $routePath, string $entityType, string $associationName = null): string
+    private function resolveRoutePath(string $routePath, string $entityType, ?string $associationName = null): string
     {
         $routePath = str_replace(self::ENTITY_PLACEHOLDER, $entityType, $routePath);
         if ($associationName) {

@@ -75,7 +75,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     }
 
     #[\Override]
-    public function denormalize($data, string $type, string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = [])
     {
         $event = $this->dispatchDenormalize($data, $this->createObject($type), Events::BEFORE_DENORMALIZE_ENTITY);
         $result = $event->getObject();
@@ -119,7 +119,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     }
 
     #[\Override]
-    public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization($data, string $type, ?string $format = null, array $context = []): bool
     {
         return is_array($data) && class_exists($type) && $this->fieldHelper->hasConfig($type);
     }
@@ -129,7 +129,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
      *
      */
     #[\Override]
-    public function normalize($object, string $format = null, array $context = [])
+    public function normalize($object, ?string $format = null, array $context = [])
     {
         $entityName = ClassUtils::getClass($object);
         $fields = $this->fieldHelper->getEntityFields($entityName, EntityFieldProvider::OPTION_WITH_RELATIONS);
@@ -180,7 +180,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     }
 
     #[\Override]
-    public function supportsNormalization($data, string $format = null, array $context = []): bool
+    public function supportsNormalization($data, ?string $format = null, array $context = []): bool
     {
         if (is_object($data)) {
             $dataClass = ClassUtils::getClass($data);

@@ -311,7 +311,7 @@ class ReportControllerWithFiltersTest extends WebTestCase
         ];
     }
 
-    private function buildFilter(int $type, string $start = null, string $end = null, bool $isVariable = false): array
+    private function buildFilter(int $type, ?string $start = null, ?string $end = null, bool $isVariable = false): array
     {
         if ($isVariable) {
             $start = $start ?: '';

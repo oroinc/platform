@@ -48,7 +48,7 @@ class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
     }
 
     #[\Override]
-    public function schedule($entity, $event, array $changeSet = null)
+    public function schedule($entity, $event, ?array $changeSet = null)
     {
         $entityClass = ClassUtils::getClass($entity);
 
@@ -152,7 +152,7 @@ class TransitionEventTriggerExtension extends AbstractEventTriggerExtension
      *
      * @return object
      */
-    private function createEntityFromChangeSet($entity, array $changeSet = null)
+    private function createEntityFromChangeSet($entity, ?array $changeSet = null)
     {
         $accessor = PropertyAccess::createPropertyAccessor();
         $newEntity = clone $entity;

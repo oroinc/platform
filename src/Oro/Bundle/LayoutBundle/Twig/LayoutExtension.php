@@ -243,7 +243,7 @@ class LayoutExtension extends AbstractExtension implements ServiceSubscriberInte
         return $highlightString;
     }
 
-    public function cloneFormViewWithUniqueId(FormView $form, string $uniqueId, FormView $parent = null): FormView
+    public function cloneFormViewWithUniqueId(FormView $form, string $uniqueId, ?FormView $parent = null): FormView
     {
         $newForm = new FormView($parent);
         $newForm->vars = $form->vars;

@@ -65,7 +65,7 @@ class TagRepository extends EntityRepository
      *
      * @param string            $entityClassName
      * @param int               $entityId
-     * @param User|null         $owner
+     * @param User|null $owner
      * @param bool              $all
      * @param Organization|null $organization
      *
@@ -74,9 +74,9 @@ class TagRepository extends EntityRepository
     public function getTags(
         $entityClassName,
         $entityId,
-        User $owner = null,
+        ?User $owner = null,
         $all = false,
-        Organization $organization = null
+        ?Organization $organization = null
     ) {
         $qb = $this->createQueryBuilder('t')
             ->select('t')
@@ -128,11 +128,11 @@ class TagRepository extends EntityRepository
      * @param Tag[]|int[] $tags
      * @param string      $entityClassName
      * @param int         $entityId
-     * @param User|null   $owner
+     * @param User|null $owner
      *
      * @return int
      */
-    public function deleteTaggingByParams(array $tags, $entityClassName, $entityId, User $owner = null)
+    public function deleteTaggingByParams(array $tags, $entityClassName, $entityId, ?User $owner = null)
     {
         $builder = $this
             ->getDeleteTaggingQueryBuilder($entityClassName)

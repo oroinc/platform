@@ -406,7 +406,7 @@ class EntitySerializer
     private function isAssociation(
         string $fieldName,
         EntityMetadata $entityMetadata,
-        FieldConfig $fieldConfig = null
+        ?FieldConfig $fieldConfig = null
     ): bool {
         return
             (ConfigUtil::IGNORE_PROPERTY_PATH !== $fieldName && $entityMetadata->isAssociation($fieldName))

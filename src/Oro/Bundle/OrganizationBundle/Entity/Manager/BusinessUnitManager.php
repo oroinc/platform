@@ -46,7 +46,7 @@ class BusinessUnitManager
      *
      * @return array
      */
-    public function getBusinessUnitsTree(User $entity = null, $organizationId = null)
+    public function getBusinessUnitsTree(?User $entity = null, $organizationId = null)
     {
         return $this->getBusinessUnitRepo()->getBusinessUnitsTree($entity, $organizationId);
     }
@@ -88,7 +88,7 @@ class BusinessUnitManager
      *
      * @return BusinessUnit
      */
-    public function getBusinessUnit(array $criteria = [], array $orderBy = null)
+    public function getBusinessUnit(array $criteria = [], ?array $orderBy = null)
     {
         return $this->getBusinessUnitRepo()->findOneBy($criteria, $orderBy);
     }

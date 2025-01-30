@@ -59,7 +59,7 @@ class CumulativeConfigLoader
      *
      * @return CumulativeResourceInfo[]
      */
-    public function load(ResourcesContainerInterface $resourcesContainer = null): array
+    public function load(?ResourcesContainerInterface $resourcesContainer = null): array
     {
         $result = [];
 

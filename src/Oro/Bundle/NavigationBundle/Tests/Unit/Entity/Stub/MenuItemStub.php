@@ -307,7 +307,7 @@ class MenuItemStub implements ItemInterface
     }
 
     #[\Override]
-    public function setParent(ItemInterface $parent = null): self
+    public function setParent(?ItemInterface $parent = null): self
     {
         $this->parent = $parent;
 

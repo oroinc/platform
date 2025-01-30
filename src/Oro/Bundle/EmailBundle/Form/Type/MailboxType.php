@@ -230,7 +230,7 @@ class MailboxType extends AbstractType
     /**
      * Set folder start sync date to prevent sync old emails
      */
-    protected function setFolderStartSync(Mailbox $data = null)
+    protected function setFolderStartSync(?Mailbox $data = null)
     {
         if (!$data || !$origin = $data->getOrigin()) {
             return;
@@ -247,7 +247,7 @@ class MailboxType extends AbstractType
     /**
      * Sets proper organization to origin. Set owner to null.
      */
-    protected function setOriginOrganizationAndOwner(Mailbox $data = null)
+    protected function setOriginOrganizationAndOwner(?Mailbox $data = null)
     {
         if ($data !== null) {
             $organization = $data->getOrganization();

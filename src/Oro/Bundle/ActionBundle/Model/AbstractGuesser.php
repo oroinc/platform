@@ -63,7 +63,7 @@ abstract class AbstractGuesser
         $this->formConfigProvider = $formConfigProvider;
     }
 
-    public function setDoctrineTypeMappingProvider(DoctrineTypeMappingProvider $doctrineTypeMappingProvider = null)
+    public function setDoctrineTypeMappingProvider(?DoctrineTypeMappingProvider $doctrineTypeMappingProvider = null)
     {
         $this->doctrineTypeMappingProvider = $doctrineTypeMappingProvider;
     }

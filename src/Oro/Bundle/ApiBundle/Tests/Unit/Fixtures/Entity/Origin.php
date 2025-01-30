@@ -78,7 +78,7 @@ class Origin
         return $this->mailbox;
     }
 
-    public function setMailbox(Mailbox $mailbox = null)
+    public function setMailbox(?Mailbox $mailbox = null)
     {
         $this->mailbox = $mailbox;
     }
@@ -91,7 +91,7 @@ class Origin
         return $this->user;
     }
 
-    public function setUser(User $user = null)
+    public function setUser(?User $user = null)
     {
         $this->user = $user;
     }

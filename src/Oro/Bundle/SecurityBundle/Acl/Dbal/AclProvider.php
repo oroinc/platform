@@ -66,7 +66,7 @@ class AclProvider implements AclProviderInterface
         Connection $connection,
         PermissionGrantingStrategyInterface $permissionGrantingStrategy,
         array $options,
-        AclCache $cache = null
+        ?AclCache $cache = null
     ) {
         $this->connection = $connection;
         $this->permissionGrantingStrategy = $permissionGrantingStrategy;

@@ -34,7 +34,7 @@ class Transport implements TransportInterface, LoggerAwareInterface
     }
 
     #[\Override]
-    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
+    public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
     {
         try {
             $event = new BeforeMessageEvent($message, $envelope);

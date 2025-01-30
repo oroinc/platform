@@ -41,7 +41,7 @@ class SearchAggregationFilter extends StandaloneFilter implements FieldFilterInt
     }
 
     #[\Override]
-    public function apply(Criteria $criteria, FilterValue $value = null): void
+    public function apply(Criteria $criteria, ?FilterValue $value = null): void
     {
         if (!$this->entityClass) {
             throw new \InvalidArgumentException('The entity class must not be empty.');

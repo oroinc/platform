@@ -26,6 +26,6 @@ interface RepositoryCurrencyCheckerProviderInterface
      */
     public function hasRecordsWithRemovingCurrencies(
         array $removingCurrencies,
-        Organization $organization = null
+        ?Organization $organization = null
     );
 }

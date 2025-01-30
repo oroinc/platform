@@ -90,7 +90,7 @@ class QueueConsumer
      * @throws \Exception
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function consume(ExtensionInterface $runtimeExtension = null)
+    public function consume(?ExtensionInterface $runtimeExtension = null)
     {
         $session = $this->connection->createSession();
 

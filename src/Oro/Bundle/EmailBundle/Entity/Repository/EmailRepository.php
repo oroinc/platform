@@ -75,7 +75,7 @@ class EmailRepository extends EntityRepository
      *
      * @return array
      */
-    public function getNewEmails(User $user, Organization $organization, $limit, $folderId, AclHelper $aclHelper = null)
+    public function getNewEmails(User $user, Organization $organization, $limit, $folderId, ?AclHelper $aclHelper = null)
     {
         $qb = $this->getEmailList($user, $organization, $limit, $folderId, false);
         $query = $qb->getQuery();
@@ -110,7 +110,7 @@ class EmailRepository extends EntityRepository
         User $user,
         Organization $organization,
         $folderId = null,
-        AclHelper $aclHelper = null
+        ?AclHelper $aclHelper = null
     ) {
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('COUNT(DISTINCT IDENTITY(eu.email))')

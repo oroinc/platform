@@ -45,10 +45,10 @@ class Translator extends BaseTranslator
 
     public function __construct(
         ContainerInterface $container,
-        MessageFormatter $formatter,
-        string $defaultLocale = null,
-        array $loaderIds = [],
-        array $options = []
+        MessageFormatter   $formatter,
+        ?string            $defaultLocale = null,
+        array              $loaderIds = [],
+        array              $options = []
     ) {
         parent::__construct($container, $formatter, $defaultLocale, $loaderIds, $options);
 
@@ -137,7 +137,7 @@ class Translator extends BaseTranslator
     }
 
     #[\Override]
-    public function trans(?string $id, array $parameters = [], string $domain = null, string $locale = null): string
+    public function trans(?string $id, array $parameters = [], ?string $domain = null, ?string $locale = null): string
     {
         if (!$id) {
             return '';
@@ -245,7 +245,7 @@ class Translator extends BaseTranslator
     }
 
     #[\Override]
-    public function getCatalogue(string $locale = null): MessageCatalogueInterface
+    public function getCatalogue(?string $locale = null): MessageCatalogueInterface
     {
         $this->applyFallbackLocales($locale);
 
@@ -263,7 +263,7 @@ class Translator extends BaseTranslator
     }
 
     #[\Override]
-    public function addResource(string $format, $resource, string $locale, string $domain = null): void
+    public function addResource(string $format, $resource, string $locale, ?string $domain = null): void
     {
         if (\is_string($resource)) {
             $this->resourceFiles[$locale][] = $resource;

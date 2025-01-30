@@ -16,7 +16,7 @@ class Category
     #[ORM\Column(name: 'label', type: Types::STRING, length: 255, unique: true)]
     private ?string $label;
 
-    public function __construct(string $name = null, string $label = null)
+    public function __construct(?string $name = null, ?string $label = null)
     {
         $this->name = $name;
         $this->label = $label;

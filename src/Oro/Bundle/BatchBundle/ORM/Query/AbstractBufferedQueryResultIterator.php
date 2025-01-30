@@ -90,7 +90,7 @@ abstract class AbstractBufferedQueryResultIterator implements BufferedQueryResul
     }
 
     #[\Override]
-    public function setPageCallback(callable $callback = null)
+    public function setPageCallback(?callable $callback = null)
     {
         $this->pageCallback = $callback;
 
@@ -98,7 +98,7 @@ abstract class AbstractBufferedQueryResultIterator implements BufferedQueryResul
     }
 
     #[\Override]
-    public function setPageLoadedCallback(callable $callback = null)
+    public function setPageLoadedCallback(?callable $callback = null)
     {
         $this->pageLoadedCallback = $callback;
 

@@ -136,7 +136,7 @@ class DbalMessageProducerTest extends \PHPUnit\Framework\TestCase
         $this->messageProducer->send($queue, $message);
     }
 
-    private function getMessage(string $messageBody, array $properties, int $delay = null): DbalMessage
+    private function getMessage(string $messageBody, array $properties, ?int $delay = null): DbalMessage
     {
         $message = new DbalMessage();
         $message->setBody($messageBody);

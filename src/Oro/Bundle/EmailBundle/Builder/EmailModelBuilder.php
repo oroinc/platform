@@ -105,7 +105,7 @@ class EmailModelBuilder
      *
      * @return EmailModel
      */
-    public function createEmailModel(EmailModel $emailModel = null)
+    public function createEmailModel(?EmailModel $emailModel = null)
     {
         if (!$emailModel) {
             $emailModel = $this->factory->getEmail();
@@ -230,7 +230,7 @@ class EmailModelBuilder
         return $this->createEmailModel($emailModel);
     }
 
-    public function setRequest(Request $request = null)
+    public function setRequest(?Request $request = null)
     {
         $this->request = $request;
     }

@@ -307,7 +307,7 @@ class BuilderChainProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function getChildItem(string $name, int $position = null): ItemInterface
+    private function getChildItem(string $name, ?int $position = null): ItemInterface
     {
         return $this->createItem($name)
             ->setExtra(MenuUpdateInterface::POSITION, $position);

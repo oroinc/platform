@@ -13,10 +13,10 @@ class PersistentConnectionFactory extends ConnectionFactory
 {
     #[\Override]
     public function createConnection(
-        array $params,
-        Configuration $config = null,
-        EventManager $eventManager = null,
-        array $mappingTypes = array()
+        array          $params,
+        ?Configuration $config = null,
+        ?EventManager  $eventManager = null,
+        array          $mappingTypes = array()
     ) {
         $wrapperClass = PersistentConnection::class;
         if (isset($params['wrapperClass'])) {

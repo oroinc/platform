@@ -17,7 +17,7 @@ final class BeforeIsolatedTestEvent implements TestIsolationEvent
      */
     private $output;
 
-    public function __construct(OutputInterface $output, TaggedNodeInterface $test = null)
+    public function __construct(OutputInterface $output, ?TaggedNodeInterface $test = null)
     {
         $this->output = $output;
         $this->test = $test;

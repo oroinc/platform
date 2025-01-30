@@ -21,7 +21,7 @@ class ActionProcessorDataCollector extends DataCollector
     }
 
     #[\Override]
-    public function collect(Request $request, Response $response, \Throwable $exception = null): void
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
         $this->data['name'] = $this->logger->getSectionName();
         $this->data['actions'] = $this->logger->getActions();

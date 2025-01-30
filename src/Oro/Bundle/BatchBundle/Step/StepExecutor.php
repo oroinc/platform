@@ -75,7 +75,7 @@ class StepExecutor
      *
      * @throws \InvalidItemException If any critical error occurs
      */
-    public function execute(StepExecutionWarningHandlerInterface $warningHandler = null): void
+    public function execute(?StepExecutionWarningHandlerInterface $warningHandler = null): void
     {
         $itemsToWrite = [];
         $writeCount = 0;
@@ -123,7 +123,7 @@ class StepExecutor
      *
      * @return mixed|null processed item
      */
-    protected function process($readItem, StepExecutionWarningHandlerInterface $warningHandler = null)
+    protected function process($readItem, ?StepExecutionWarningHandlerInterface $warningHandler = null)
     {
         try {
             return $this->processor->process($readItem);
@@ -138,7 +138,7 @@ class StepExecutor
      * @param array $processedItems
      * @param StepExecutionWarningHandlerInterface|null $warningHandler
      */
-    protected function write($processedItems, StepExecutionWarningHandlerInterface $warningHandler = null): void
+    protected function write($processedItems, ?StepExecutionWarningHandlerInterface $warningHandler = null): void
     {
         try {
             $this->writer->write($processedItems);
@@ -150,7 +150,7 @@ class StepExecutor
     /**
      * Makes sure that all step elements are properly closed
      */
-    protected function ensureResourcesReleased(StepExecutionWarningHandlerInterface $warningHandler = null): void
+    protected function ensureResourcesReleased(?StepExecutionWarningHandlerInterface $warningHandler = null): void
     {
         $this->ensureElementClosed($this->reader, $warningHandler);
         $this->ensureElementClosed($this->processor, $warningHandler);
@@ -162,7 +162,7 @@ class StepExecutor
      */
     protected function ensureElementClosed(
         object $element,
-        StepExecutionWarningHandlerInterface $warningHandler = null
+        ?StepExecutionWarningHandlerInterface $warningHandler = null
     ): void {
         try {
             if ($element instanceof ClosableInterface) {
@@ -179,7 +179,7 @@ class StepExecutor
     protected function handleStepExecutionWarning(
         object $element,
         \Exception $e,
-        StepExecutionWarningHandlerInterface $warningHandler = null
+        ?StepExecutionWarningHandlerInterface $warningHandler = null
     ): void {
         if (null !== $warningHandler) {
             $warningName = $element instanceof AbstractConfigurableStepElement

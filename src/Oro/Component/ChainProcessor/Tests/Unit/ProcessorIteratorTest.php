@@ -14,10 +14,10 @@ class ProcessorIteratorTest extends \PHPUnit\Framework\TestCase
     private const TEST_ACTION = 'test_action';
 
     private function getProcessorIterator(
-        array $processors,
-        Context $context,
-        ApplicableCheckerInterface $applicableChecker = null,
-        bool $withApplicableCache = false
+        array                       $processors,
+        Context                     $context,
+        ?ApplicableCheckerInterface $applicableChecker = null,
+        bool                        $withApplicableCache = false
     ): ProcessorIterator {
         $factory = new ProcessorIteratorFactory($withApplicableCache ? [self::TEST_ACTION] : []);
 

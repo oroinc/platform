@@ -217,10 +217,10 @@ class ConstraintsProviderTest extends \PHPUnit\Framework\TestCase
     }
 
     private function createForm(
-        string $name,
-        string $dataClass = null,
-        array $options = [],
-        FormInterface $parent = null
+        string         $name,
+        ?string        $dataClass = null,
+        array          $options = [],
+        ?FormInterface $parent = null
     ): FormInterface {
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 

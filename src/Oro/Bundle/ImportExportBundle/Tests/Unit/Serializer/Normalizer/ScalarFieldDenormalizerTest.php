@@ -23,7 +23,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
         mixed $data,
         string $type,
         array $context = [],
-        string $format = null
+        ?string $format = null
     ) {
         $this->assertEquals(
             $isSupported,
@@ -165,7 +165,7 @@ class ScalarFieldDenormalizerTest extends \PHPUnit\Framework\TestCase
         mixed $data,
         string $type,
         array $context = [],
-        string $format = null
+        ?string $format = null
     ) {
         $this->assertEquals(
             $expectedValue,

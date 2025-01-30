@@ -28,7 +28,7 @@ class SyncProcessor extends AbstractSyncProcessor
         Executor $jobExecutor,
         TypesRegistry $registry,
         EventDispatcherInterface $eventDispatcher,
-        LoggerStrategy $logger = null
+        ?LoggerStrategy $logger = null
     ) {
         $this->doctrineRegistry = $doctrineRegistry;
 
@@ -78,7 +78,7 @@ class SyncProcessor extends AbstractSyncProcessor
      *
      * @return boolean
      */
-    protected function processConnectors(Integration $integration, array $parameters = [], callable $callback = null)
+    protected function processConnectors(Integration $integration, array $parameters = [], ?callable $callback = null)
     {
         $connectors = $this->getConnectorsToProcess($integration, $callback);
 
@@ -109,7 +109,7 @@ class SyncProcessor extends AbstractSyncProcessor
      *
      * @return ConnectorInterface[]
      */
-    protected function getConnectorsToProcess(Integration $integration, callable $callback = null)
+    protected function getConnectorsToProcess(Integration $integration, ?callable $callback = null)
     {
         $connectors = $this->loadConnectorsToProcess($integration, $callback);
 
@@ -122,7 +122,7 @@ class SyncProcessor extends AbstractSyncProcessor
      *
      * @return ConnectorInterface[]
      */
-    protected function loadConnectorsToProcess($integration, callable $callback = null)
+    protected function loadConnectorsToProcess($integration, ?callable $callback = null)
     {
         $connectorTypes = $this->getTypesOfConnectorsToProcess($integration, $callback);
 
@@ -140,7 +140,7 @@ class SyncProcessor extends AbstractSyncProcessor
      *
      * @return string[]
      */
-    protected function getTypesOfConnectorsToProcess(Integration $integration, callable $callback = null)
+    protected function getTypesOfConnectorsToProcess(Integration $integration, ?callable $callback = null)
     {
         $connectors = $integration->getConnectors();
 
@@ -316,7 +316,7 @@ class SyncProcessor extends AbstractSyncProcessor
     }
 
     #[\Override]
-    protected function formatResultMessage(ContextInterface $context = null)
+    protected function formatResultMessage(?ContextInterface $context = null)
     {
         return sprintf(
             '[%s] %s',

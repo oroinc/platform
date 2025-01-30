@@ -40,7 +40,7 @@ class AbstractActionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider executeDataProvider
      */
-    public function testExecute(bool $expectedAllowed, bool $conditionAllowed = null)
+    public function testExecute(bool $expectedAllowed, ?bool $conditionAllowed = null)
     {
         $context = ['key' => 'value'];
 

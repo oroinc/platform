@@ -48,7 +48,7 @@ class EnumTranslationCache
         }
     }
 
-    private function getKey(string $enumCode, string $locale = null): string
+    private function getKey(string $enumCode, ?string $locale = null): string
     {
         return UniversalCacheKeyGenerator::normalizeCacheKey(
             sprintf('%s|%s', $enumCode, $locale ?? $this->getLocaleKey())

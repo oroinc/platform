@@ -35,7 +35,7 @@ class MassNotificationsMailer implements MailerInterface, LoggerAwareInterface
     }
 
     #[\Override]
-    public function send(RawMessage $message, Envelope $envelope = null): void
+    public function send(RawMessage $message, ?Envelope $envelope = null): void
     {
         try {
             $sentMessage = $this->transport->send($message, $envelope);

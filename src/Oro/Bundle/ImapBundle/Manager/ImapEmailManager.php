@@ -116,7 +116,7 @@ class ImapEmailManager
      *
      * @return ImapEmailIterator
      */
-    public function getEmails(SearchQuery $query = null)
+    public function getEmails(?SearchQuery $query = null)
     {
         return new ImapEmailIterator(
             $this->connector->findItems($query),

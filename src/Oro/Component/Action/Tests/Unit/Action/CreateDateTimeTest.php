@@ -58,7 +58,7 @@ class CreateDateTimeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider executeDataProvider
      */
-    public function testExecute(array $options, \DateTime $expectedResult = null, array $context = [])
+    public function testExecute(array $options, ?\DateTime $expectedResult = null, array $context = [])
     {
         $context = new ItemStub($context);
         $attributeName = (string)$options['attribute'];

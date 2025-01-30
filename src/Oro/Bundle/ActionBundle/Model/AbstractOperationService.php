@@ -9,12 +9,12 @@ use Doctrine\Common\Collections\Collection;
  */
 abstract class AbstractOperationService implements OperationServiceInterface
 {
-    public function isPreConditionAllowed(ActionData $data, Collection $errors = null): bool
+    public function isPreConditionAllowed(ActionData $data, ?Collection $errors = null): bool
     {
         return true;
     }
 
-    public function isConditionAllowed(ActionData $data, Collection $errors = null): bool
+    public function isConditionAllowed(ActionData $data, ?Collection $errors = null): bool
     {
         return true;
     }

@@ -61,7 +61,7 @@ class AbstractPageState
      * @param AbstractUser|null $user
      * @return NavigationHistoryItem
      */
-    public function setUser(AbstractUser $user = null)
+    public function setUser(?AbstractUser $user = null)
     {
         $this->user = $user;
 

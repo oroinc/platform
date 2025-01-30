@@ -691,13 +691,13 @@ class AclPrivilegeRepository
      * @param string|null $aclGroup
      */
     protected function addPermissions(
-        SID $sid,
-        AclPrivilege $privilege,
-        OID $oid,
-        \SplObjectStorage $acls,
+        SID                   $sid,
+        AclPrivilege          $privilege,
+        OID                   $oid,
+        \SplObjectStorage     $acls,
         AclExtensionInterface $extension,
-        AclInterface $rootAcl = null,
-        $aclGroup = null
+        ?AclInterface         $rootAcl = null,
+                              $aclGroup = null
     ) {
         $allowedPermissions = $extension->getAllowedPermissions($oid, null, $aclGroup);
         $acl = $this->findAclByOid($acls, $oid);
@@ -722,17 +722,17 @@ class AclPrivilegeRepository
      * @param AclPrivilege          $privilege
      * @param string[]              $permissions
      * @param AclExtensionInterface $extension
-     * @param AclInterface|null     $rootAcl
-     * @param AclInterface|null     $acl
+     * @param AclInterface|null $rootAcl
+     * @param AclInterface|null $acl
      */
     protected function addAclPermissions(
-        SID $sid,
-        $field,
-        AclPrivilege $privilege,
-        array $permissions,
+        SID                   $sid,
+                              $field,
+        AclPrivilege          $privilege,
+        array                 $permissions,
         AclExtensionInterface $extension,
-        AclInterface $rootAcl = null,
-        AclInterface $acl = null
+        ?AclInterface         $rootAcl = null,
+        ?AclInterface         $acl = null
     ) {
         if ($acl !== null) {
             // check object ACEs

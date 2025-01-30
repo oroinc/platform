@@ -84,13 +84,13 @@ class Workflow
     protected ?WorkflowItem $stubWorkflowItem = null;
 
     public function __construct(
-        DoctrineHelper $doctrineHelper,
-        AclManager $aclManager,
-        RestrictionManager $restrictionManager,
-        StepManager $stepManager = null,
-        BaseAttributeManager $attributeManager = null,
-        TransitionManager $transitionManager = null,
-        VariableManager $variableManager = null
+        DoctrineHelper        $doctrineHelper,
+        AclManager            $aclManager,
+        RestrictionManager    $restrictionManager,
+        ?StepManager          $stepManager = null,
+        ?BaseAttributeManager $attributeManager = null,
+        ?TransitionManager    $transitionManager = null,
+        ?VariableManager      $variableManager = null
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->aclManager = $aclManager;
@@ -171,7 +171,7 @@ class Workflow
      *
      * @return WorkflowItem
      */
-    public function start($entity, array $data = [], $startTransition = null, Collection $errors = null)
+    public function start($entity, array $data = [], $startTransition = null, ?Collection $errors = null)
     {
         if (null === $startTransition) {
             $startTransition = TransitionManager::DEFAULT_START_TRANSITION_NAME;
@@ -210,9 +210,9 @@ class Workflow
      */
     public function isTransitionAllowed(
         WorkflowItem $workflowItem,
-        $transition,
-        Collection $errors = null,
-        $fireExceptions = false
+                     $transition,
+        ?Collection  $errors = null,
+                     $fireExceptions = false
     ) {
         // get current transition
         try {
@@ -290,7 +290,7 @@ class Workflow
      * @throws InvalidTransitionException
      * @throws WorkflowException
      */
-    public function transit(WorkflowItem $workflowItem, $transition, Collection $errors = null)
+    public function transit(WorkflowItem $workflowItem, $transition, ?Collection $errors = null)
     {
         $this->executeAndLogTransit($workflowItem, $transition, true, true, $errors);
     }
@@ -314,7 +314,7 @@ class Workflow
         $transition,
         bool $checkTransitionAllowance = true,
         bool $checkStepAllowance = true,
-        Collection $errors = null
+        ?Collection $errors = null
     ): void {
         $transition = $this->transitionManager->extractTransition($transition);
 
@@ -477,7 +477,7 @@ class Workflow
      *
      * @return bool
      */
-    public function isStartTransitionAvailable($transition, $entity, array $data = [], Collection $errors = null)
+    public function isStartTransitionAvailable($transition, $entity, array $data = [], ?Collection $errors = null)
     {
         $workflowItem = $this->createWorkflowItem($entity, $data);
 
@@ -493,7 +493,7 @@ class Workflow
      *
      * @return bool
      */
-    public function isTransitionAvailable(WorkflowItem $workflowItem, $transition, Collection $errors = null)
+    public function isTransitionAvailable(WorkflowItem $workflowItem, $transition, ?Collection $errors = null)
     {
         $transition = $this->transitionManager->extractTransition($transition);
 

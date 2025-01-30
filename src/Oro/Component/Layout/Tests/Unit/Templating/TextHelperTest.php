@@ -26,7 +26,7 @@ class TextHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processTextDataProvider
      */
-    public function testProcessText(array|string|null $value, array|string|null $expected, string $domain = null)
+    public function testProcessText(array|string|null $value, array|string|null $expected, ?string $domain = null)
     {
         $this->assertSame($expected, $this->helper->processText($value, $domain));
     }

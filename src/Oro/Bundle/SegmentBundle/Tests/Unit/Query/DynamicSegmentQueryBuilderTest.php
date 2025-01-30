@@ -200,7 +200,7 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
         $this->assertNotEmpty($qb->getDQLPart('join'));
     }
 
-    private function getQueryBuilder(ManagerRegistry $doctrine = null): DynamicSegmentQueryBuilder
+    private function getQueryBuilder(?ManagerRegistry $doctrine = null): DynamicSegmentQueryBuilder
     {
         $manager = $this->createMock(Manager::class);
         $manager->expects($this->any())
@@ -259,7 +259,7 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
      * Creates a new instance of a filter based on a configuration
      * of a filter registered in this manager with the given name
      */
-    public function createFilter(string $name, array $params = null): FilterInterface
+    public function createFilter(string $name, ?array $params = null): FilterInterface
     {
         $defaultParams = [
             'type' => $name

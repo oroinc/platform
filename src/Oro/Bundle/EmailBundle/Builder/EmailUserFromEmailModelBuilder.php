@@ -45,7 +45,7 @@ class EmailUserFromEmailModelBuilder
     public function createFromEmailModel(
         EmailModel $emailModel,
         string $messageId = '',
-        \DateTimeInterface $sentAt = null
+        ?\DateTimeInterface $sentAt = null
     ): EmailUser {
         $sentAt = $sentAt ?? new \DateTime('now', new \DateTimeZone('UTC'));
 

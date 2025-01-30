@@ -67,8 +67,8 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
     }
 
     private function prepareAssemblerMock(
-        WorkflowDefinition $workflowDefinition = null,
-        Workflow $workflow = null
+        ?WorkflowDefinition $workflowDefinition = null,
+        ?Workflow           $workflow = null
     ): void {
         if ($workflowDefinition && $workflow) {
             $this->assembler->expects($this->once())
@@ -444,7 +444,7 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
             ->willReturn($unitOfWork);
     }
 
-    private function createWorkflow(string $workflowName, string $relatedEntity = null): Workflow
+    private function createWorkflow(string $workflowName, ?string $relatedEntity = null): Workflow
     {
         $workflowDefinition = new WorkflowDefinition();
         $workflowDefinition->setName($workflowName);

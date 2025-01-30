@@ -57,7 +57,7 @@ class ConfigCache extends ResourceCheckerConfigCache
     }
 
     #[\Override]
-    public function write($content, array $metadata = null): void
+    public function write($content, ?array $metadata = null): void
     {
         if (null !== $metadata && !$this->debug) {
             $metadata = null;

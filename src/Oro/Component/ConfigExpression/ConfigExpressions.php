@@ -39,11 +39,11 @@ class ConfigExpressions
      *
      * @param array|ExpressionInterface $expr
      * @param mixed                     $context
-     * @param \ArrayAccess|null         $errors
+     * @param \ArrayAccess|null $errors
      *
      * @return mixed
      */
-    public function evaluate($expr, $context, \ArrayAccess $errors = null)
+    public function evaluate($expr, $context, ?\ArrayAccess $errors = null)
     {
         if ($expr === null) {
             return null;

@@ -762,9 +762,9 @@ class Context extends NormalizeResultContext implements ContextInterface
     }
 
     protected function initializeMetadata(
-        EntityMetadata $metadata,
-        string $path = null,
-        TargetMetadataAccessor $targetMetadataAccessor = null
+        EntityMetadata          $metadata,
+        ?string                 $path = null,
+        ?TargetMetadataAccessor $targetMetadataAccessor = null
     ): void {
         if (null === $targetMetadataAccessor) {
             $targetMetadataAccessor = new TargetMetadataAccessor(

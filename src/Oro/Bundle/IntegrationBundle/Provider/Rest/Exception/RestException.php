@@ -24,7 +24,7 @@ class RestException extends TransportException
     public static function createFromResponse(
         RestResponseInterface $response,
         $message = null,
-        \Exception $previous = null
+        ?\Exception $previous = null
     ) {
         if ($response->isClientError()) {
             $label = 'Client error response';

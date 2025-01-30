@@ -116,10 +116,10 @@ class ReminderTest extends \PHPUnit\Framework\TestCase
      * @dataProvider settersAndGettersDataProvider
      */
     public function testSettersAndGetters(
-        mixed $value,
-        string $property,
-        string $getter = null,
-        string $setter = null
+        mixed   $value,
+        string  $property,
+        ?string $getter = null,
+        ?string $setter = null
     ) {
         $getter = $getter ?: 'get' . \ucfirst($property);
         $setter = $setter ?: 'set' . \ucfirst($property);

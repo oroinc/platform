@@ -15,7 +15,7 @@ class TimezoneType extends AbstractType
     protected static ?array $timezones = null;
     protected ?CacheInterface $cache;
 
-    public function __construct(CacheInterface $cache = null)
+    public function __construct(?CacheInterface $cache = null)
     {
         $this->cache = $cache;
     }

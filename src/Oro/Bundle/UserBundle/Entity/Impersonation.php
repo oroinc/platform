@@ -68,7 +68,7 @@ class Impersonation
      * @param User|null $user
      * @return $this
      */
-    public function setUser(User $user = null)
+    public function setUser(?User $user = null)
     {
         $this->user = $user;
 

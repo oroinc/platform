@@ -363,13 +363,13 @@ class VariableAssemblerTest extends \PHPUnit\Framework\TestCase
     }
 
     private function getVariable(
-        string $name,
-        string $label,
-        string $type,
-        $value,
-        array $options = [],
-        string $propertyPath = null,
-        array $entityAcl = []
+        string  $name,
+        string  $label,
+        string  $type,
+                $value,
+        array   $options = [],
+        ?string $propertyPath = null,
+        array   $entityAcl = []
     ): Variable {
         $variable = new Variable();
         $variable

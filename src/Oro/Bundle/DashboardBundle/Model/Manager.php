@@ -53,7 +53,7 @@ class Manager
     /**
      * Find dashboard model by criteria.
      */
-    public function findOneDashboardModelBy(array $criteria, array $orderBy = null): ?DashboardModel
+    public function findOneDashboardModelBy(array $criteria, ?array $orderBy = null): ?DashboardModel
     {
         $entity = $this->entityManager->getRepository(Dashboard::class)
             ->findOneBy($criteria, $orderBy);
@@ -197,7 +197,7 @@ class Manager
     /**
      * @return DashboardModel[]
      */
-    public function findAllowedDashboards(string $permission = 'VIEW', int $organizationId = null): array
+    public function findAllowedDashboards(string $permission = 'VIEW', ?int $organizationId = null): array
     {
         $qb = $this->entityManager->getRepository(Dashboard::class)->createQueryBuilder('dashboard');
         if ($organizationId) {
@@ -208,7 +208,7 @@ class Manager
         return $this->getDashboardModels($this->aclHelper->apply($qb, $permission)->execute());
     }
 
-    public function findAllowedDashboardsShortenedInfo(string $permission = 'VIEW', int $organizationId = null): array
+    public function findAllowedDashboardsShortenedInfo(string $permission = 'VIEW', ?int $organizationId = null): array
     {
         $qb = $this->entityManager->getRepository(Dashboard::class)
             ->createQueryBuilder('dashboard')

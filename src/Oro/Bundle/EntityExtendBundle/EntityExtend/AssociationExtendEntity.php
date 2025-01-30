@@ -60,7 +60,7 @@ class AssociationExtendEntity
     public static function getTargets(
         object $object,
         AbstractAssociationEntityFieldExtension $assocExt,
-        string $targetClass = null
+        ?string $targetClass = null
     ): array|object {
         $associations = static::getAssociations($object, $assocExt);
         if ($targetClass === null) {
@@ -117,7 +117,7 @@ class AssociationExtendEntity
     public static function setTarget(
         object $object,
         AbstractAssociationEntityFieldExtension $assocExt,
-        object $target = null
+        ?object $target = null
     ): void {
         if ($target === null) {
             static::resetTargets($object, $assocExt);

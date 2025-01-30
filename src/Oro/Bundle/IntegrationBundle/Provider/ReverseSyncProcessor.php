@@ -28,7 +28,7 @@ class ReverseSyncProcessor extends AbstractSyncProcessor
         Executor $jobExecutor,
         TypesRegistry $registry,
         EventDispatcherInterface $eventDispatcher,
-        LoggerStrategy $logger = null
+        ?LoggerStrategy $logger = null
     ) {
         $this->doctrineRegistry = $doctrineRegistry;
 
@@ -143,7 +143,7 @@ class ReverseSyncProcessor extends AbstractSyncProcessor
     }
 
     #[\Override]
-    protected function formatResultMessage(ContextInterface $context = null)
+    protected function formatResultMessage(?ContextInterface $context = null)
     {
         return sprintf(
             '[%s] %s',

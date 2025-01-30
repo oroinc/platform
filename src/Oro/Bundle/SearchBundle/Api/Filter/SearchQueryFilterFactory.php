@@ -17,7 +17,7 @@ class SearchQueryFilterFactory
     public function __construct(
         AbstractSearchMappingProvider $searchMappingProvider,
         SearchFieldResolverFactory $searchFieldResolverFactory,
-        ExpressionVisitor $searchQueryCriteriaVisitor = null
+        ?ExpressionVisitor $searchQueryCriteriaVisitor = null
     ) {
         $this->searchMappingProvider = $searchMappingProvider;
         $this->searchFieldResolverFactory = $searchFieldResolverFactory;

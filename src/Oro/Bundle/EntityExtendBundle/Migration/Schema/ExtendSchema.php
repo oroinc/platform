@@ -30,7 +30,7 @@ class ExtendSchema extends SchemaWithNameGenerator
         ExtendDbIdentifierNameGenerator $nameGenerator,
         array $tables = [],
         array $sequences = [],
-        SchemaConfig $schemaConfig = null
+        ?SchemaConfig $schemaConfig = null
     ) {
         $this->extendOptionsManager = $extendOptionsManager;
 

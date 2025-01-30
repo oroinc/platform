@@ -146,7 +146,7 @@ class TranslationManager
         }
     }
 
-    private function canUpdateTranslation(int $scope, Translation $translation = null): bool
+    private function canUpdateTranslation(int $scope, ?Translation $translation = null): bool
     {
         return null === $translation || $translation->getScope() <= $scope;
     }

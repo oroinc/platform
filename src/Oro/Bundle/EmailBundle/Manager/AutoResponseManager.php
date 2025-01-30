@@ -163,7 +163,7 @@ class AutoResponseManager
         }
     }
 
-    protected function sendEmailModel(EmailModel $emailModel, EmailOrigin $origin = null)
+    protected function sendEmailModel(EmailModel $emailModel, ?EmailOrigin $origin = null)
     {
         try {
             $this->emailModelSender->send($emailModel, $origin);

@@ -99,7 +99,7 @@ class ConfigApiManager
      *
      * @throws ItemNotFoundException when the given path is invalid
      */
-    public function getData(string $path, string $scope = 'user', int $scopeId = null): array
+    public function getData(string $path, string $scope = 'user', ?int $scopeId = null): array
     {
         $variables = [];
         $this->extractVariables($variables, $this->configProvider->getApiTree($path));
@@ -126,7 +126,7 @@ class ConfigApiManager
      *
      * @throws ItemNotFoundException when the given path is invalid
      */
-    public function getDataItem(string $key, string $path, string $scope = 'user', int $scopeId = null): ?array
+    public function getDataItem(string $key, string $path, string $scope = 'user', ?int $scopeId = null): ?array
     {
         $variable = $this->configProvider->getApiTree($path)->getVariable($key);
         if (null === $variable) {

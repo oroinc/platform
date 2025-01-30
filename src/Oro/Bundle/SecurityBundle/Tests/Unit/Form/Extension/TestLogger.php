@@ -9,13 +9,13 @@ use Symfony\Component\HttpKernel\Log\DebugLoggerInterface;
 class TestLogger extends BaseTestLogger implements DebugLoggerInterface
 {
     #[\Override]
-    public function countErrors(Request $request = null): int
+    public function countErrors(?Request $request = null): int
     {
         return count($this->recordsByLevel['error'] ?? []);
     }
 
     #[\Override]
-    public function getLogs(Request $request = null): array
+    public function getLogs(?Request $request = null): array
     {
         return $this->records;
     }

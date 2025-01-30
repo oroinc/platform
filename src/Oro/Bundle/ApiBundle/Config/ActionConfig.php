@@ -149,7 +149,7 @@ class ActionConfig
     /**
      * Adds the configuration of the action.
      */
-    public function addField(string $fieldName, ActionFieldConfig $field = null): ActionFieldConfig
+    public function addField(string $fieldName, ?ActionFieldConfig $field = null): ActionFieldConfig
     {
         if (null === $field) {
             $field = new ActionFieldConfig();

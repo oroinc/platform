@@ -63,7 +63,7 @@ abstract class RestApiTestCase extends ApiTestCase
         string $uri,
         array $parameters = [],
         array $server = [],
-        string $content = null
+        ?string $content = null
     ): Response;
 
     protected function checkWsseAuthHeader(array &$server): void
@@ -683,9 +683,9 @@ abstract class RestApiTestCase extends ApiTestCase
     }
 
     protected function getApiConfig(
-        string $entityClass,
-        string $action = null,
-        bool $idOnly = false
+        string  $entityClass,
+        ?string $action = null,
+        bool    $idOnly = false
     ): ?EntityDefinitionConfig {
         $configExtras = [new EntityDefinitionConfigExtra($action)];
         if ($idOnly) {
@@ -705,9 +705,9 @@ abstract class RestApiTestCase extends ApiTestCase
     }
 
     protected function getApiMetadata(
-        string $entityClass,
-        string $action = null,
-        bool $idOnly = false
+        string  $entityClass,
+        ?string $action = null,
+        bool    $idOnly = false
     ): ?EntityMetadata {
         $config = $this->getApiConfig($entityClass, $action, $idOnly);
         if (null === $config) {

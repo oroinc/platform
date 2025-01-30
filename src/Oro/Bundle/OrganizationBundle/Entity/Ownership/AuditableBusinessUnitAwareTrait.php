@@ -31,7 +31,7 @@ trait AuditableBusinessUnitAwareTrait
      * @param BusinessUnit|null $owner
      * @return $this
      */
-    public function setOwner(BusinessUnit $owner = null)
+    public function setOwner(?BusinessUnit $owner = null)
     {
         $this->owner = $owner;
 

@@ -42,7 +42,7 @@ class LazyTransports implements TransportInterface
     }
 
     #[\Override]
-    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
+    public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
     {
         return $this->getTransports()->send($message, $envelope);
     }

@@ -16,7 +16,7 @@ class SyncWithNotificationAlertException extends \Exception
         EmailSyncNotificationAlert $notificationAlert,
         string $message = '',
         int $code = 0,
-        \Throwable $previous = null
+        ?\Throwable $previous = null
     ) {
         $this->notificationAlert = $notificationAlert;
         parent::__construct($message, $code, $previous);

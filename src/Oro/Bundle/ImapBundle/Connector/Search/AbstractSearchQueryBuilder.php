@@ -22,7 +22,7 @@ abstract class AbstractSearchQueryBuilder
      * @param Closure|null $callback
      * @return $this
      */
-    public function andOperator(Closure $callback = null)
+    public function andOperator(?Closure $callback = null)
     {
         $this->query->andOperator();
         if ($callback instanceof Closure) {
@@ -38,7 +38,7 @@ abstract class AbstractSearchQueryBuilder
      * @param Closure|null $callback
      * @return $this
      */
-    public function orOperator(Closure $callback = null)
+    public function orOperator(?Closure $callback = null)
     {
         $this->query->orOperator();
         if ($callback instanceof Closure) {
@@ -54,7 +54,7 @@ abstract class AbstractSearchQueryBuilder
      * @param Closure|null $callback
      * @return $this
      */
-    public function notOperator(Closure $callback = null)
+    public function notOperator(?Closure $callback = null)
     {
         $this->query->notOperator();
         if ($callback instanceof Closure) {

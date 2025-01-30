@@ -38,7 +38,7 @@ class SanitizeSqlLoader
         $this->alwayNullProcessorGuesser = new AlwaysNullGuesser();
     }
 
-    public function setConfigConnactionName(string $configConnectionName = null): void
+    public function setConfigConnactionName(?string $configConnectionName = null): void
     {
         $this->configConnectionName = $configConnectionName;
     }

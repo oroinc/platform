@@ -30,7 +30,7 @@ class EnumAttributeType implements AttributeTypeInterface
     }
 
     #[\Override]
-    public function getSearchableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
+    public function getSearchableValue(FieldConfigModel $attribute, $originalValue, ?Localization $localization = null)
     {
         if ($originalValue === null) {
             return null;
@@ -47,7 +47,7 @@ class EnumAttributeType implements AttributeTypeInterface
      *
      */
     #[\Override]
-    public function getFilterableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
+    public function getFilterableValue(FieldConfigModel $attribute, $originalValue, ?Localization $localization = null)
     {
         if ($originalValue === null) {
             return [];
@@ -62,7 +62,7 @@ class EnumAttributeType implements AttributeTypeInterface
     }
 
     #[\Override]
-    public function getSortableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
+    public function getSortableValue(FieldConfigModel $attribute, $originalValue, ?Localization $localization = null)
     {
         if ($originalValue === null) {
             return null;

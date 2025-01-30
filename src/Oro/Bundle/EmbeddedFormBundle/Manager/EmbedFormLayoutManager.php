@@ -40,7 +40,7 @@ class EmbedFormLayoutManager
      *
      * @return Layout
      */
-    public function getLayout(EmbeddedForm $formEntity, FormInterface $form = null)
+    public function getLayout(EmbeddedForm $formEntity, ?FormInterface $form = null)
     {
         $formTypeName = $formEntity->getFormType();
 

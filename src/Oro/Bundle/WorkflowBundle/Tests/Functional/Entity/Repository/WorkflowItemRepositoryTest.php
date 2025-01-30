@@ -89,7 +89,7 @@ class WorkflowItemRepositoryTest extends WebTestCase
         array $entities,
         array $workflows,
         bool $withWorkflowName = true,
-        array $workflowNames = null
+        ?array $workflowNames = null
     ) {
         $entities = array_map(function ($reference) {
             return $this->getReference($reference);
@@ -329,13 +329,13 @@ class WorkflowItemRepositoryTest extends WebTestCase
     }
 
     private function assertEntityIdsByWorkflow(
-        array $allEntityIds,
-        int $noneEntitiesCount,
-        int $noStartStepEntitiesCount,
-        int $withStartStepEntitiesCount,
-        array $noneEntityIds = null,
-        array $noStartStepEntityIds = null,
-        array $withStartStepEntityIds = null
+        array  $allEntityIds,
+        int    $noneEntitiesCount,
+        int    $noStartStepEntitiesCount,
+        int    $withStartStepEntitiesCount,
+        ?array $noneEntityIds = null,
+        ?array $noStartStepEntityIds = null,
+        ?array $withStartStepEntityIds = null
     ) {
         if ($noneEntitiesCount > 0) {
             $actualAllEntities = $allEntityIds['none'];

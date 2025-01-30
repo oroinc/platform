@@ -46,7 +46,7 @@ class EntityMapper
      *
      * @throws \InvalidArgumentException if the entity or the model class is not valid
      */
-    public function getModel(object $entity, string $modelClass = null): object
+    public function getModel(object $entity, ?string $modelClass = null): object
     {
         $updateReferences =
             $this->entityMap->offsetExists($entity)
@@ -71,7 +71,7 @@ class EntityMapper
      *
      * @throws \InvalidArgumentException if the model or the entity class is not valid
      */
-    public function getEntity(object $model, string $entityClass = null): object
+    public function getEntity(object $model, ?string $entityClass = null): object
     {
         if (!$this->hasModels()) {
             $modelClass = $this->doctrineHelper->getClass($model);
@@ -131,7 +131,7 @@ class EntityMapper
     /**
      * @throws \InvalidArgumentException
      */
-    private function innerGetModel(object $entity, string $modelClass = null): object
+    private function innerGetModel(object $entity, ?string $modelClass = null): object
     {
         $model = null;
         if ($this->entityMap->offsetExists($entity)) {
@@ -213,7 +213,7 @@ class EntityMapper
     /**
      * @throws \InvalidArgumentException
      */
-    private function innerGetEntity(object $model, string $entityClass = null): object
+    private function innerGetEntity(object $model, ?string $entityClass = null): object
     {
         $modelClass = null;
         $isNewEntity = false;
@@ -425,7 +425,7 @@ class EntityMapper
     /**
      * Gets ORM metadata for the given entity class.
      */
-    private function getEntityMetadata(string $entityClass, string $modelClass = null): ClassMetadata
+    private function getEntityMetadata(string $entityClass, ?string $modelClass = null): ClassMetadata
     {
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         if ($modelClass && self::isParentEntityClass($metadata)) {

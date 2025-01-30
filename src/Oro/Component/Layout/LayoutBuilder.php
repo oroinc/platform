@@ -39,7 +39,7 @@ class LayoutBuilder implements LayoutBuilderInterface
         LayoutRendererRegistryInterface $rendererRegistry,
         ExpressionProcessor $expressionProcessor,
         LayoutContextStack $layoutContextStack,
-        BlockViewCache $blockViewCache = null
+        ?BlockViewCache $blockViewCache = null
     ) {
         $this->registry            = $registry;
         $this->rawLayoutBuilder    = $rawLayoutBuilder;

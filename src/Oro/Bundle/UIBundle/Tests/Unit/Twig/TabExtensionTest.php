@@ -255,7 +255,7 @@ class TabExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @return MenuItem|\PHPUnit\Framework\MockObject\MockObject
      */
-    private function createMenuItem(MenuItem $child = null, array $options = []): MenuItem
+    private function createMenuItem(?MenuItem $child = null, array $options = []): MenuItem
     {
         $menuItem = $this->createMock(MenuItem::class);
         if ($child) {

@@ -18,7 +18,7 @@ class LayoutHelper
         $this->requestStack = $requestStack;
     }
 
-    public function isLayoutRequest(Request $request = null): bool
+    public function isLayoutRequest(?Request $request = null): bool
     {
         if (null === $request) {
             $request = $this->requestStack->getCurrentRequest();
@@ -27,7 +27,7 @@ class LayoutHelper
         return null !== $request && null !== $request->attributes->get('_layout');
     }
 
-    public function isTemplateRequest(Request $request = null): bool
+    public function isTemplateRequest(?Request $request = null): bool
     {
         return !$this->isLayoutRequest($request);
     }

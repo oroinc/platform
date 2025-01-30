@@ -32,7 +32,7 @@ class SystemConfigConnectionChecker implements ConnectionCheckerInterface
     }
 
     #[\Override]
-    public function checkConnection(Dsn $dsn, string &$error = null): bool
+    public function checkConnection(Dsn $dsn, ?string &$error = null): bool
     {
         $realDsn = $this->systemConfigTransportRealDsnProvider->getRealDsn($dsn);
 

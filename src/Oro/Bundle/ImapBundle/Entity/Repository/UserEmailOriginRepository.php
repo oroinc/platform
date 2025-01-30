@@ -20,7 +20,7 @@ class UserEmailOriginRepository extends EntityRepository
      * @param string|null $type
      * @return \Doctrine\ORM\QueryBuilder
      */
-    public function getAllOriginsWithAccessTokens(string $type = null)
+    public function getAllOriginsWithAccessTokens(?string $type = null)
     {
         $queryBuilder = $this->createQueryBuilder('user_email_origin');
         $queryBuilder->where($queryBuilder->expr()->isNotNull('user_email_origin.accessToken'));
@@ -37,7 +37,7 @@ class UserEmailOriginRepository extends EntityRepository
      * @param string|null $type
      * @return \Doctrine\ORM\QueryBuilder
      */
-    public function getAllOriginsWithRefreshTokens(string $type = null)
+    public function getAllOriginsWithRefreshTokens(?string $type = null)
     {
         $queryBuilder = $this->createQueryBuilder('user_email_origin');
         $queryBuilder->where($queryBuilder->expr()->isNotNull('user_email_origin.refreshToken'));

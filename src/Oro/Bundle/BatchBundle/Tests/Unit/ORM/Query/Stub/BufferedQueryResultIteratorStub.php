@@ -18,12 +18,12 @@ class BufferedQueryResultIteratorStub extends \ArrayIterator implements Buffered
     }
 
     #[\Override]
-    public function setPageCallback(callable $callback = null)
+    public function setPageCallback(?callable $callback = null)
     {
     }
 
     #[\Override]
-    public function setPageLoadedCallback(callable $callback = null)
+    public function setPageLoadedCallback(?callable $callback = null)
     {
     }
 

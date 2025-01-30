@@ -50,7 +50,7 @@ abstract class AbstractDashboardFixture extends AbstractFixture implements Conta
     /**
      * Creates a dashboard widget.
      */
-    protected function createWidgetModel(string  $widgetName, array $layoutPosition = null): WidgetModel
+    protected function createWidgetModel(string $widgetName, ?array $layoutPosition = null): WidgetModel
     {
         $dashboardManager = $this->getDashboardManager();
         $widget = $dashboardManager->createWidgetModel($widgetName);

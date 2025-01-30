@@ -470,7 +470,7 @@ JS;
 
     public function assertImageFilesCreatedAndRemembered(
         TableNode $table,
-        GaufretteFileManager $mediaCacheManager = null
+        ?GaufretteFileManager $mediaCacheManager = null
     ): void {
         $this->rememberedImagePaths = [];
 

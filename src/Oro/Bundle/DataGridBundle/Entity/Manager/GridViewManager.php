@@ -173,12 +173,12 @@ class GridViewManager
     }
 
     /**
-     * @param AbstractUser|null  $user
+     * @param AbstractUser|null $user
      * @param string $gridName
      *
      * @return array
      */
-    public function getAllGridViews(AbstractUser $user = null, $gridName = null)
+    public function getAllGridViews(?AbstractUser $user = null, $gridName = null)
     {
         $cacheKey = sprintf(
             '%s.%s.%s',

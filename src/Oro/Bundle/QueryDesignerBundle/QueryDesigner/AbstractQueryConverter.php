@@ -207,7 +207,7 @@ abstract class AbstractQueryConverter
     public function ensureChildTableJoined(
         string $tableAlias,
         string $joinByFieldName,
-        string $joinType = null
+        ?string $joinType = null
     ): string {
         $parentJoinId = $this->getJoinIdentifierByTableAlias($tableAlias);
         $joinId = $this->getJoinIdHelper()->buildJoinIdentifier(
@@ -947,7 +947,7 @@ abstract class AbstractQueryConverter
         return $joins;
     }
 
-    private function registerTableAlias(string $joinId, string $tableAlias = null): void
+    private function registerTableAlias(string $joinId, ?string $tableAlias = null): void
     {
         if (!$this->context()->hasTableAlias($joinId)) {
             if (!$tableAlias) {
@@ -1155,7 +1155,7 @@ abstract class AbstractQueryConverter
         }
     }
 
-    protected function buildJoinIdentifier(array $join, string $parentJoinId, string $joinType = null): string
+    protected function buildJoinIdentifier(array $join, string $parentJoinId, ?string $joinType = null): string
     {
         return $this->getJoinIdHelper()->buildJoinIdentifier(
             $join['join'],
@@ -1166,7 +1166,7 @@ abstract class AbstractQueryConverter
         );
     }
 
-    final protected function buildColumnJoinIdentifier(string $columnName, string $entityClass = null): string
+    final protected function buildColumnJoinIdentifier(string $columnName, ?string $entityClass = null): string
     {
         return $this->getJoinIdHelper()->buildColumnJoinIdentifier($columnName, $entityClass);
     }

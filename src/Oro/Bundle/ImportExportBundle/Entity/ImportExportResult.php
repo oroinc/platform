@@ -99,7 +99,7 @@ class ImportExportResult implements CreatedAtAwareInterface, OrganizationAwareIn
      *
      * @return $this
      */
-    public function setFilename(string $filename = null): ImportExportResult
+    public function setFilename(?string $filename = null): ImportExportResult
     {
         $this->filename = $filename;
 

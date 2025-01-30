@@ -916,7 +916,7 @@ class AclPrivilegeRepositoryTest extends \PHPUnit\Framework\TestCase
         $this->validateExpectationsForDeletePermission();
     }
 
-    private static function getMask(array $masks, MaskBuilder $maskBuilder = null): int
+    private static function getMask(array $masks, ?MaskBuilder $maskBuilder = null): int
     {
         if ($maskBuilder === null) {
             $maskBuilder = new EntityMaskBuilder(0, ['VIEW', 'CREATE', 'EDIT']);

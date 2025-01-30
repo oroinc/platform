@@ -142,7 +142,7 @@ class InverseAssociationAccessorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    private function getFieldMetadata(string $fieldName = null, array $options = []): FieldMetadata
+    private function getFieldMetadata(?string $fieldName = null, array $options = []): FieldMetadata
     {
         $doctrineMetadata = $this->createMock(DoctrineMetadata::class);
         $doctrineMetadata->expects($this->any())

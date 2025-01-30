@@ -75,7 +75,7 @@ class LayoutDataCollector extends DataCollector
     }
 
     #[\Override]
-    public function collect(Request $request, Response $response, \Throwable $exception = null): void
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
         foreach ($this->contexts as $contextHash => $context) {
             $this->collectContextItems($context);

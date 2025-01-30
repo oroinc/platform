@@ -41,7 +41,7 @@ abstract class WorkflowTestCase extends WebTestCase
         return $doctrineHelper->getEntityManagerForClass($class);
     }
 
-    protected function assertWorkflowItemsCount(int $expected, string $workflowName = null): void
+    protected function assertWorkflowItemsCount(int $expected, ?string $workflowName = null): void
     {
         $criteria = ['entityClass' => WorkflowAwareEntity::class];
 

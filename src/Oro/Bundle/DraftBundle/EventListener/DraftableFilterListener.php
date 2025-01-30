@@ -32,7 +32,7 @@ class DraftableFilterListener
         $this->handleRequest($event->getRequest());
     }
 
-    private function handleRequest(Request $request, callable $controller = null): void
+    private function handleRequest(Request $request, ?callable $controller = null): void
     {
         $entityId = $request->get('entityId');
 
@@ -51,7 +51,7 @@ class DraftableFilterListener
         return [$id, $className];
     }
 
-    private function getClassFromController(Request $request, callable $controller = null): array
+    private function getClassFromController(Request $request, ?callable $controller = null): array
     {
         $id = $request->get('id');
         $className = $id && $controller ? $this->getClassName($controller) : null;
@@ -89,7 +89,7 @@ class DraftableFilterListener
         return $r;
     }
 
-    private function allowDraftAction($id = null, string $className = null): void
+    private function allowDraftAction($id = null, ?string $className = null): void
     {
         if (!$id || !$className || !is_subclass_of($className, DraftableInterface::class)) {
             return;

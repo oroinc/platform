@@ -311,7 +311,7 @@ class AddressFormatterTest extends \PHPUnit\Framework\TestCase
         array $addressFormats,
         $localeOrRegion,
         string $expectedFormat,
-        string $defaultCountry = null
+        ?string $defaultCountry = null
     ) {
         $this->localeSettings->expects($this->once())
             ->method('getAddressFormats')

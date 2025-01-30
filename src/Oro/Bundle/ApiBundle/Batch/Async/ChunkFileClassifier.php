@@ -12,7 +12,7 @@ class ChunkFileClassifier implements ChunkFileClassifierInterface
     private string $primaryDataSectionName;
     private ?string $includedDataSectionName;
 
-    public function __construct(string $primaryDataSectionName, string $includedDataSectionName = null)
+    public function __construct(string $primaryDataSectionName, ?string $includedDataSectionName = null)
     {
         $this->primaryDataSectionName = $primaryDataSectionName;
         $this->includedDataSectionName = $includedDataSectionName;

@@ -15,9 +15,9 @@ class Loader extends AclProtectedQueryBuilderLoader
     /**
      * @param AclHelper $aclHelper
      * @param EntityManager $em
-     * @param array|null    $allowedTypes - integration types to include, null means that all types are allowed
+     * @param array|null $allowedTypes - integration types to include, null means that all types are allowed
      */
-    public function __construct(AclHelper $aclHelper, EntityManager $em, array $allowedTypes = null)
+    public function __construct(AclHelper $aclHelper, EntityManager $em, ?array $allowedTypes = null)
     {
         $qb = $em->createQueryBuilder();
         $qb->select('i');

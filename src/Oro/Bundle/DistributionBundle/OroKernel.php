@@ -381,7 +381,7 @@ abstract class OroKernel extends Kernel
                 $cache = new class($cachePath, $this->debug) extends ConfigCache {
                     public $lock;
 
-                    public function write($content, array $metadata = null)
+                    public function write($content, ?array $metadata = null)
                     {
                         rewind($this->lock);
                         ftruncate($this->lock, 0);

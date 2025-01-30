@@ -20,24 +20,24 @@ class DatagridConfigurationBuilderTestCase extends OrmQueryConverterTestCase
 {
     /**
      * @param AbstractQueryDesigner                 $source
-     * @param ManagerRegistry|null                  $doctrine
-     * @param FunctionProviderInterface|null        $functionProvider
-     * @param VirtualFieldProviderInterface|null    $virtualFieldProvider
+     * @param ManagerRegistry|null $doctrine
+     * @param FunctionProviderInterface|null $functionProvider
+     * @param VirtualFieldProviderInterface|null $virtualFieldProvider
      * @param VirtualRelationProviderInterface|null $virtualRelationProvider
      * @param ColumnOptionsGuesserInterface[]       $guessers
-     * @param EntityNameResolver|null               $entityNameResolver
+     * @param EntityNameResolver|null $entityNameResolver
      *
      * @return DatagridConfigurationBuilder
      */
     protected function createDatagridConfigurationBuilder(
-        AbstractQueryDesigner $source,
-        ManagerRegistry $doctrine = null,
-        FunctionProviderInterface $functionProvider = null,
-        VirtualFieldProviderInterface $virtualFieldProvider = null,
-        VirtualRelationProviderInterface $virtualRelationProvider = null,
-        array $guessers = [],
-        EntityNameResolver $entityNameResolver = null,
-        EnumTypeHelper $enumTypeHelper = null,
+        AbstractQueryDesigner             $source,
+        ?ManagerRegistry                  $doctrine = null,
+        ?FunctionProviderInterface        $functionProvider = null,
+        ?VirtualFieldProviderInterface    $virtualFieldProvider = null,
+        ?VirtualRelationProviderInterface $virtualRelationProvider = null,
+        array                             $guessers = [],
+        ?EntityNameResolver               $entityNameResolver = null,
+        ?EnumTypeHelper                   $enumTypeHelper = null,
     ): DatagridConfigurationBuilder {
         $builder = new DatagridConfigurationBuilder(
             $functionProvider ?? $this->getFunctionProvider(),

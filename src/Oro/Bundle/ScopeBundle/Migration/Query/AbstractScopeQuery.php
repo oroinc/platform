@@ -28,7 +28,7 @@ abstract class AbstractScopeQuery extends AbstractTableInformationQuery
     /**
      * @throws \Doctrine\DBAL\DBALException
      */
-    protected function getColumnsHashExpression(string $columnPrefix = null): string
+    protected function getColumnsHashExpression(?string $columnPrefix = null): string
     {
         if ($this->connection->getDatabasePlatform() instanceof PostgreSqlPlatform) {
             return $this->getColumnsHashExpressionForPgSql($columnPrefix);
@@ -40,7 +40,7 @@ abstract class AbstractScopeQuery extends AbstractTableInformationQuery
     /**
      * @throws \Doctrine\DBAL\DBALException
      */
-    protected function getColumnsHashExpressionForPgSql(string $columnPrefix = null): string
+    protected function getColumnsHashExpressionForPgSql(?string $columnPrefix = null): string
     {
         return 'MD5(' . implode(" || ':' || ", array_map(static function (string $name) use ($columnPrefix) {
             return "COALESCE({$columnPrefix}{$name}::text, '0')";
@@ -50,7 +50,7 @@ abstract class AbstractScopeQuery extends AbstractTableInformationQuery
     /**
      * @throws \Doctrine\DBAL\DBALException
      */
-    protected function getColumnsHashExpressionForMySql(string $columnPrefix = null): string
+    protected function getColumnsHashExpressionForMySql(?string $columnPrefix = null): string
     {
         return ' MD5(CONCAT(' . implode(", ':', ", array_map(static function (string $name) use ($columnPrefix) {
             return "COALESCE({$columnPrefix}{$name}, '0')";

@@ -39,7 +39,7 @@ class BusinessUnitRepository extends EntityRepository
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function getBusinessUnitsTree(User $user = null, $organizationId = null)
+    public function getBusinessUnitsTree(?User $user = null, $organizationId = null)
     {
         $businessUnits = $this->createQueryBuilder('businessUnit')->select(
             [

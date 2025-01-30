@@ -105,7 +105,7 @@ class PostProcessStepExecutor extends StepExecutor implements StepExecutionAware
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     #[\Override]
-    public function execute(StepExecutionWarningHandlerInterface $warningHandler = null): void
+    public function execute(?StepExecutionWarningHandlerInterface $warningHandler = null): void
     {
         $itemsToWrite = [];
         $writeCount   = 0;

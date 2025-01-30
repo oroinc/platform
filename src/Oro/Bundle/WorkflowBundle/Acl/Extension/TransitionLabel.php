@@ -20,7 +20,7 @@ class TransitionLabel extends Label
     /** @var string */
     protected $fromLabel;
 
-    public function __construct(string $transitionLabel, string $toStepLabel = null, string $fromStepLabel = null)
+    public function __construct(string $transitionLabel, ?string $toStepLabel = null, ?string $fromStepLabel = null)
     {
         parent::__construct($transitionLabel);
         $this->toLabel = $toStepLabel;

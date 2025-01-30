@@ -313,7 +313,7 @@ class LocaleSettings
      *
      * @return bool|string The symbol value or false on error
      */
-    public function getCurrencySymbolByCurrency(string $currencyCode = null, string $locale = null)
+    public function getCurrencySymbolByCurrency(?string $currencyCode = null, ?string $locale = null)
     {
         if (!$currencyCode) {
             $currencyCode = $this->getCurrency();

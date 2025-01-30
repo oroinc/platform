@@ -52,7 +52,7 @@ class AliceFixtureLoader implements LoaderInterface
         array $dataOrFiles,
         array $parameters = [],
         array $objects = [],
-        PurgeMode $purgeMode = null
+        ?PurgeMode $purgeMode = null
     ): array {
         $referenceRepositoryObjects = array_filter($this->referenceRepository->toArray());
         $objects = $this->loader->load(

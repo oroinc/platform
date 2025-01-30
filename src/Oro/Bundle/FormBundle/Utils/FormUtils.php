@@ -121,14 +121,14 @@ class FormUtils
      * @param FormBuilderInterface     $builder
      * @param DataTransformerInterface $transformerToReplace
      * @param string                   $type Model or View transformer type to replace in
-     * @param callable|null            $comparisonCallback Callable function that will be
+     * @param callable|null $comparisonCallback Callable function that will be
      *                                                     used for old transformer detection
      */
     public static function replaceTransformer(
         FormBuilderInterface $builder,
         DataTransformerInterface $transformerToReplace,
         $type = 'model',
-        callable $comparisonCallback = null
+        ?callable $comparisonCallback = null
     ) {
         $transformers    = 'model' === $type ? $builder->getModelTransformers() : $builder->getViewTransformers();
         $newTransformers = [];

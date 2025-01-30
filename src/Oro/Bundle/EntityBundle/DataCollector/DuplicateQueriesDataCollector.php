@@ -35,7 +35,7 @@ class DuplicateQueriesDataCollector extends DataCollector
     }
 
     #[\Override]
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null)
     {
         foreach ($this->loggers as $name => $logger) {
             $queryAnalyser = new DuplicateQueryAnalyzer();

@@ -97,7 +97,7 @@ class WorkflowDefinitionController extends AbstractFOSRestController
      * )
      */
     #[AclAncestor('oro_workflow_definition_create')]
-    public function postAction(Request $request, WorkflowDefinition $workflowDefinition = null)
+    public function postAction(Request $request, ?WorkflowDefinition $workflowDefinition = null)
     {
         try {
             $configuration = $this->getConfiguration($request);

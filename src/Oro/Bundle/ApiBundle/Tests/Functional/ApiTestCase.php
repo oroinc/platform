@@ -197,7 +197,7 @@ abstract class ApiTestCase extends WebTestCase
     /**
      * Loads the response content and convert it to an array.
      */
-    protected function loadYamlData(string $fileName, string $folderName = null): array
+    protected function loadYamlData(string $fileName, ?string $folderName = null): array
     {
         return Yaml::parse($this->loadData($fileName, $folderName));
     }
@@ -205,7 +205,7 @@ abstract class ApiTestCase extends WebTestCase
     /**
      * Loads the response content.
      */
-    protected function loadData(string $fileName, string $folderName = null): string
+    protected function loadData(string $fileName, ?string $folderName = null): string
     {
         if ($this->isRelativePath($fileName)) {
             $fileName = $this->getTestResourcePath($folderName, $fileName);
@@ -490,7 +490,7 @@ abstract class ApiTestCase extends WebTestCase
         return $headers->contains('Content-Type', 'application/json');
     }
 
-    protected function getEntityManager(string $entityClass = null): EntityManagerInterface
+    protected function getEntityManager(?string $entityClass = null): EntityManagerInterface
     {
         $doctrine = self::getContainer()->get('doctrine');
         if ($entityClass) {

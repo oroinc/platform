@@ -22,7 +22,7 @@ class NumberTypeFormatterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider formatTypeProvider
      */
-    public function testFormatType(int $value, string $type, \Exception $exception = null)
+    public function testFormatType(int $value, string $type, ?\Exception $exception = null)
     {
         if (null !== $exception) {
             $this->expectException(get_class($exception));

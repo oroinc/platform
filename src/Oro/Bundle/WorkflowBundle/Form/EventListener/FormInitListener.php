@@ -34,7 +34,7 @@ class FormInitListener implements EventSubscriberInterface
         $initAction->execute($workflowItem);
     }
 
-    public function dispatchFormInitEvents(WorkflowItem $workflowItem, Transition $transition = null): void
+    public function dispatchFormInitEvents(WorkflowItem $workflowItem, ?Transition $transition = null): void
     {
         if ($transition) {
             $transitionFormInitEvent = new TransitionFormInitEvent($workflowItem, $transition);

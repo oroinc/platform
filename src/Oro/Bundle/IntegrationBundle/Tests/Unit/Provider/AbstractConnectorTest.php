@@ -59,7 +59,7 @@ class AbstractConnectorTest extends \PHPUnit\Framework\TestCase
     public function testInitialization(
         TransportInterface|\PHPUnit\Framework\MockObject\MockObject|null $transport,
         ?object $source,
-        string $expectedException = null
+        ?string $expectedException = null
     ) {
         $logger = new LoggerStrategy(new NullLogger());
         $contextRegistry = new ContextRegistry();

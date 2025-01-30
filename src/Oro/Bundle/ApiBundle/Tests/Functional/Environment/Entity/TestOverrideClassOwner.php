@@ -66,7 +66,7 @@ class TestOverrideClassOwner implements TestFrameworkEntityInterface, ExtendEnti
         return $this->target;
     }
 
-    public function setTarget(TestOverrideClassTarget $target = null)
+    public function setTarget(?TestOverrideClassTarget $target = null)
     {
         $this->target = $target;
     }
@@ -103,7 +103,7 @@ class TestOverrideClassOwner implements TestFrameworkEntityInterface, ExtendEnti
         return $this->anotherTarget;
     }
 
-    public function setAnotherTarget(TestOverrideClassTargetA $target = null)
+    public function setAnotherTarget(?TestOverrideClassTargetA $target = null)
     {
         $this->anotherTarget = $target;
     }

@@ -54,7 +54,7 @@ class FormUtil
     public static function ensureFieldSubmitted(
         FormInterface $form,
         string $propertyName,
-        EntityDefinitionConfig $config = null
+        ?EntityDefinitionConfig $config = null
     ): void {
         $fieldName = $config?->findFieldNameByPropertyPath($propertyName);
         if (null === $fieldName) {
@@ -92,9 +92,9 @@ class FormUtil
      * Creates an instance of TransformationFailedException.
      */
     public static function createTransformationFailedException(
-        string $message,
-        string $invalidMessage = null,
-        array $invalidMessageParameters = null
+        string  $message,
+        ?string $invalidMessage = null,
+        ?array  $invalidMessageParameters = null
     ): TransformationFailedException {
         $result = new TransformationFailedException($message);
         if ($invalidMessage) {
@@ -110,7 +110,7 @@ class FormUtil
     public static function addFormError(
         FormInterface $form,
         string $errorMessage,
-        string $propertyPath = null
+        ?string $propertyPath = null
     ): void {
         if (null === $propertyPath) {
             $form->addError(new FormError($errorMessage));
@@ -126,10 +126,10 @@ class FormUtil
      */
     public static function addNamedFormError(
         FormInterface $form,
-        string $errorType,
-        string $errorMessage,
-        string $propertyPath = null,
-        int $statusCode = null
+        string        $errorType,
+        string        $errorMessage,
+        ?string       $propertyPath = null,
+        ?int          $statusCode = null
     ): void {
         self::addFormConstraintViolation(
             $form,
@@ -144,9 +144,9 @@ class FormUtil
      */
     public static function addFormConstraintViolation(
         FormInterface $form,
-        Constraint $constraint,
-        string $errorMessage = null,
-        string $propertyPath = null
+        Constraint    $constraint,
+        ?string       $errorMessage = null,
+        ?string       $propertyPath = null
     ): void {
         if (!$errorMessage && property_exists($constraint, 'message')) {
             $errorMessage = $constraint->message;

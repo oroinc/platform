@@ -69,7 +69,7 @@ class OwnershipMetadataProvider extends AbstractOwnershipMetadataProvider
     }
 
     #[\Override]
-    public function getMaxAccessLevel(int $accessLevel, string $className = null): int
+    public function getMaxAccessLevel(int $accessLevel, ?string $className = null): int
     {
         // Fix Access Level for given object. Change it from SYSTEM_LEVEL to GLOBAL_LEVEL
         // if object have owner type OWNER_TYPE_BUSINESS_UNIT, OWNER_TYPE_USER or OWNER_TYPE_ORGANIZATION.

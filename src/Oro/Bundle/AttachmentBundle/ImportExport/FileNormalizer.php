@@ -36,19 +36,19 @@ class FileNormalizer implements ContextAwareNormalizerInterface, ContextAwareDen
     }
 
     #[\Override]
-    public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization($data, string $type, ?string $format = null, array $context = []): bool
     {
         return File::class === $type;
     }
 
     #[\Override]
-    public function supportsNormalization($data, string $format = null, array $context = []): bool
+    public function supportsNormalization($data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof File;
     }
 
     #[\Override]
-    public function denormalize($data, string $type, string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = [])
     {
         return $this->createFileEntity(
             $data['uri'] ?? '',
@@ -62,7 +62,7 @@ class FileNormalizer implements ContextAwareNormalizerInterface, ContextAwareDen
      * @param File $object
      */
     #[\Override]
-    public function normalize($object, string $format = null, array $context = [])
+    public function normalize($object, ?string $format = null, array $context = [])
     {
         $fileUrl = null;
         // It is impossible to generate URL for a file without ID.

@@ -113,9 +113,9 @@ class SegmentManagerTest extends WebTestCase
 
     private function assertGetSegmentQueryBuilder(
         Segment $segment,
-        string $expectedSql = null,
-        array $firstTryCacheStats = null,
-        array $secondTryCacheStats = null
+        ?string $expectedSql = null,
+        ?array  $firstTryCacheStats = null,
+        ?array  $secondTryCacheStats = null
     ): void {
         $this->clearSegmentQueryConverterCache();
         if ($firstTryCacheStats) {

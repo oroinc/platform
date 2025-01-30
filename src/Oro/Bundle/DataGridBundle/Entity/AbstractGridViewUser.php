@@ -97,7 +97,7 @@ abstract class AbstractGridViewUser
      *
      * @return $this
      */
-    abstract public function setUser(AbstractUser $user = null);
+    abstract public function setUser(?AbstractUser $user = null);
 
     /**
      * @param AbstractGridView $gridView

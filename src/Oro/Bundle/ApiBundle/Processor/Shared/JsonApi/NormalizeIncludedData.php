@@ -462,7 +462,7 @@ class NormalizeIncludedData implements ProcessorInterface
     private function getEntityConfig(
         string $entityClass,
         bool $full = false,
-        string $action = null
+        ?string $action = null
     ): EntityDefinitionConfig {
         if (null === $action) {
             $action = $this->context->getAction();

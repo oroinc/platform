@@ -250,9 +250,9 @@ class QueryExpressionVisitor extends ExpressionVisitor
      * @return QueryBuilder
      */
     public function createSubquery(
-        string $field = null,
-        bool $disallowJoinUsage = false,
-        string $expression = null
+        ?string $field = null,
+        bool    $disallowJoinUsage = false,
+        ?string $expression = null
     ): QueryBuilder {
         if (null === $this->query) {
             throw new QueryException('No query is set before invoking createSubquery().');
@@ -462,7 +462,7 @@ class QueryExpressionVisitor extends ExpressionVisitor
         string $path,
         bool $disallowJoinUsage,
         bool $allowEndsWithField = true,
-        string $expression = null
+        ?string $expression = null
     ): QueryBuilder {
         if (!$disallowJoinUsage && isset($this->queryJoinMap[$path])) {
             return $this->createSubqueryByJoin($this->queryJoinMap[$path]);
@@ -561,7 +561,7 @@ class QueryExpressionVisitor extends ExpressionVisitor
         return $query;
     }
 
-    private function createSubqueryByRootAssociation(string $associationName, string $expression = null): QueryBuilder
+    private function createSubqueryByRootAssociation(string $associationName, ?string $expression = null): QueryBuilder
     {
         if ($expression) {
             $subqueryAlias = $this->generateSubqueryAlias($associationName);

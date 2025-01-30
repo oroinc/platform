@@ -35,7 +35,7 @@ class OptionValueBagNormalizer implements NormalizerInterface, DenormalizerInter
     }
 
     #[\Override]
-    public function normalize($object, string $format = null, array $context = [])
+    public function normalize($object, ?string $format = null, array $context = [])
     {
         $actions = [
             'add' => [],
@@ -101,13 +101,13 @@ class OptionValueBagNormalizer implements NormalizerInterface, DenormalizerInter
     }
 
     #[\Override]
-    public function supportsDenormalization($data, string $type, string $format = null): bool
+    public function supportsDenormalization($data, string $type, ?string $format = null): bool
     {
         return $type === OptionValueBag::class;
     }
 
     #[\Override]
-    public function denormalize($data, string $type, string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = [])
     {
         $bag = new OptionValueBag();
 

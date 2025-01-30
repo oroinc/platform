@@ -43,7 +43,7 @@ class TranslationReaderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider readProvider
      */
-    public function testRead(int $offset, string $locale, array $expectedData = null)
+    public function testRead(int $offset, string $locale, ?array $expectedData = null)
     {
         $this->languageRepository->expects($this->exactly(2))
             ->method('getTranslationsForExport')

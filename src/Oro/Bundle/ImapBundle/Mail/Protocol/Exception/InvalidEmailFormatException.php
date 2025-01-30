@@ -15,7 +15,7 @@ class InvalidEmailFormatException extends RuntimeException
         array $collectedData,
         string $message = "",
         int $code = 0,
-        \Throwable $previous = null
+        ?\Throwable $previous = null
     ) {
         $this->collectedData = $collectedData;
         parent::__construct($message, $code, $previous);

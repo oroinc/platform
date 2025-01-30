@@ -12,7 +12,7 @@ class TestButtonProviderExtension implements ButtonProviderExtensionInterface
     /** @var ButtonProviderExtensionInterface|null */
     private $decoratedExtension;
 
-    public function setDecoratedExtension(ButtonProviderExtensionInterface $decoratedExtension = null)
+    public function setDecoratedExtension(?ButtonProviderExtensionInterface $decoratedExtension = null)
     {
         $this->decoratedExtension = $decoratedExtension;
     }
@@ -31,7 +31,7 @@ class TestButtonProviderExtension implements ButtonProviderExtensionInterface
     public function isAvailable(
         ButtonInterface $button,
         ButtonSearchContext $buttonSearchContext,
-        Collection $errors = null
+        ?Collection $errors = null
     ) {
         if (null === $this->decoratedExtension) {
             return false;

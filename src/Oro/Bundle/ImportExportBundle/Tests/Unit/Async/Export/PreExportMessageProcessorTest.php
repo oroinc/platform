@@ -145,7 +145,7 @@ class PreExportMessageProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertMessageSentWithPriority(ExportTopic::getName(), MessagePriority::LOW);
     }
 
-    private function createJob(int $id, Job $rootJob = null): Job
+    private function createJob(int $id, ?Job $rootJob = null): Job
     {
         $job = new Job();
         $job->setId($id);

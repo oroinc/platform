@@ -45,7 +45,7 @@ class DynamicTranslationCacheTest extends \PHPUnit\Framework\TestCase
         $this->cache = new DynamicTranslationCache($this->cacheImpl, $this->eventDispatcher);
     }
 
-    private function getCacheItem(bool $isHit = false, array $value = null): CacheItemInterface
+    private function getCacheItem(bool $isHit = false, ?array $value = null): CacheItemInterface
     {
         $item = $this->createMock(CacheItemInterface::class);
         $item->expects(self::any())

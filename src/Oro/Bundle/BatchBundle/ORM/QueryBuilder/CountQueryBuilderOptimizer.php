@@ -28,7 +28,7 @@ class CountQueryBuilderOptimizer
     /** @var QueryOptimizationContext */
     protected $context;
 
-    public function __construct(QueryBuilderTools $qbTools = null)
+    public function __construct(?QueryBuilderTools $qbTools = null)
     {
         if (!$qbTools) {
             $qbTools = new QueryBuilderTools();

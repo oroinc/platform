@@ -114,7 +114,7 @@ class OAuthAuthenticator implements
     }
 
     #[\Override]
-    public function start(Request $request, AuthenticationException $authException = null): Response
+    public function start(Request $request, ?AuthenticationException $authException = null): Response
     {
         if ($this->options['use_forward'] ?? false) {
             $subRequest = $this->httpUtils->createRequest($request, $this->options['login_path']);
@@ -244,7 +244,7 @@ class OAuthAuthenticator implements
      *
      * @return T
      */
-    public function recreateToken(OAuthToken $token, UserInterface $user = null): OAuthToken
+    public function recreateToken(OAuthToken $token, ?UserInterface $user = null): OAuthToken
     {
         $user = $user instanceof UserInterface ? $user : $token->getUser();
 

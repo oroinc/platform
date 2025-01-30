@@ -38,7 +38,7 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
         string $uri,
         array $parameters = [],
         array $server = [],
-        string $content = null
+        ?string $content = null
     ): Response {
         $contentTypeHeaderValue = $server['CONTENT_TYPE'] ?? null;
         $this->checkTwigState();
@@ -75,12 +75,12 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
      *
      * @param array|string $expectedContent The file name or full file path to YAML template file or array
      * @param Response     $response
-     * @param object|null  $entity          If not null, object will set as entity reference
+     * @param object|null $entity          If not null, object will set as entity reference
      */
     protected function assertResponseContains(
         array|string $expectedContent,
         Response $response,
-        object $entity = null
+        ?object $entity = null
     ): void {
         if ($entity) {
             $this->getReferenceRepository()->addReference('entity', $entity);

@@ -50,7 +50,7 @@ class ImapMessageIterator implements \Iterator, \Countable
      * @param int[]|null $ids
      * @param bool       $uidMode
      */
-    public function __construct(Imap $imap, array $ids = null, $uidMode = false)
+    public function __construct(Imap $imap, ?array $ids = null, $uidMode = false)
     {
         $this->imap = $imap;
         $this->ids  = $ids;
@@ -86,7 +86,7 @@ class ImapMessageIterator implements \Iterator, \Countable
      * @param \Closure|null $callback The callback function is called when a batch is loaded
      *                                function (Message[] $batch)
      */
-    public function setBatchCallback(\Closure $callback = null)
+    public function setBatchCallback(?\Closure $callback = null)
     {
         $this->onBatchLoaded = $callback;
     }
@@ -99,7 +99,7 @@ class ImapMessageIterator implements \Iterator, \Countable
      * @param \Closure|null $callback The callback function.
      *                                function (\Exception)
      */
-    public function setConvertErrorCallback(\Closure $callback = null)
+    public function setConvertErrorCallback(?\Closure $callback = null)
     {
         if (null !== $callback) {
             $this->imap->setConvertErrorCallback($callback);

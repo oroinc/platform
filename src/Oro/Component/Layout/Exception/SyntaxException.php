@@ -16,7 +16,7 @@ class SyntaxException extends LogicException
      * @param string $path
      * @param \Throwable|null $previous
      */
-    public function __construct(string $message, $source, string $path = '.', \Throwable $previous = null)
+    public function __construct(string $message, $source, string $path = '.', ?\Throwable $previous = null)
     {
         $this->source = $source;
 

@@ -19,7 +19,7 @@ class AclAncestor
     /**
      * @throws InvalidArgumentException
      */
-    public static function fromArray(array $data = null): static
+    public static function fromArray(?array $data = null): static
     {
         if ($data === null) {
             return new static();

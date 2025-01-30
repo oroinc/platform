@@ -18,7 +18,7 @@ class EntityTypeStub extends AbstractType
     private ?array $choices;
     private ?array $options;
 
-    public function __construct(array $choices = [], array $options = null)
+    public function __construct(array $choices = [], ?array $options = null)
     {
         $this->choices = $choices;
         $this->options = $options;

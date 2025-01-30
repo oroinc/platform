@@ -96,7 +96,7 @@ class HandleMetaPropertyFilter implements ProcessorInterface
         }
     }
 
-    private function createInvalidFilterValueKeyError(string $filterKey, string $detail = null): Error
+    private function createInvalidFilterValueKeyError(string $filterKey, ?string $detail = null): Error
     {
         return Error::createValidationError(Constraint::FILTER, $detail)
             ->setSource(ErrorSource::createByParameter($filterKey));

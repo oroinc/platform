@@ -14,7 +14,7 @@ class BeforeMessageEvent extends Event
     private RawMessage $message;
     private ?Envelope $envelope;
 
-    public function __construct(RawMessage $message, Envelope $envelope = null)
+    public function __construct(RawMessage $message, ?Envelope $envelope = null)
     {
         $this->message = $message;
         $this->envelope = $envelope;

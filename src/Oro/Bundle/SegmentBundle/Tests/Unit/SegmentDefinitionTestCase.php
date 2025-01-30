@@ -13,7 +13,7 @@ class SegmentDefinitionTestCase extends OrmQueryConverterTestCase
     protected const TEST_IDENTIFIER_NAME = 'id';
     protected const TEST_IDENTIFIER = 32;
 
-    public function getSegment(array $definition = null, string $entity = null, int $identifier = null): Segment
+    public function getSegment(?array $definition = null, ?string $entity = null, ?int $identifier = null): Segment
     {
         $segment = new Segment();
         ReflectionUtil::setId($segment, $identifier ?? self::TEST_IDENTIFIER);

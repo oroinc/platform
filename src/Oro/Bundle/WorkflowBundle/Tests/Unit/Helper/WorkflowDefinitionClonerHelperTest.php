@@ -103,7 +103,7 @@ class WorkflowDefinitionClonerHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getOptionsProvider
      */
-    public function testGetOptions(array $options, ?string $key, mixed $expected, array $default = null)
+    public function testGetOptions(array $options, ?string $key, mixed $expected, ?array $default = null)
     {
         $result = WorkflowDefinitionClonerHelper::getOption($key, $options, $default);
 

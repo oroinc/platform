@@ -13,7 +13,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 class ErrorCompleter extends AbstractErrorCompleter
 {
     #[\Override]
-    public function complete(Error $error, RequestType $requestType, EntityMetadata $metadata = null): void
+    public function complete(Error $error, RequestType $requestType, ?EntityMetadata $metadata = null): void
     {
         $this->completeStatusCode($error);
         $this->completeCode($error);
@@ -27,7 +27,7 @@ class ErrorCompleter extends AbstractErrorCompleter
         string $entityPath,
         Error $error,
         RequestType $requestType,
-        EntityMetadata $metadata = null
+        ?EntityMetadata $metadata = null
     ): void {
     }
 }
