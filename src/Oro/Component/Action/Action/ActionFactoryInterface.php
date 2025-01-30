@@ -16,5 +16,5 @@ interface ActionFactoryInterface extends FactoryWithTypesInterface
      * @throws \RunTimeException
      * @return ActionInterface
      */
-    public function create($type, array $options = array(), ExpressionInterface $condition = null);
+    public function create($type, array $options = array(), ?ExpressionInterface $condition = null);
 }

@@ -62,7 +62,7 @@ class DateHelper
         string $rowKey,
         string $dataKey,
         bool $isConvertEmptyData = false,
-        string $scaleType = null
+        ?string $scaleType = null
     ): array {
         if ($isConvertEmptyData === false && empty($data)) {
             return [];
@@ -147,7 +147,7 @@ class DateHelper
      *
      * @return array
      */
-    public function getDatePeriod(\DateTime $start, \DateTime $end, string $scaleType = null)
+    public function getDatePeriod(\DateTime $start, \DateTime $end, ?string $scaleType = null)
     {
         $start      = clone $start;
         $end        = clone $end;
@@ -209,7 +209,7 @@ class DateHelper
         \DateTime $end,
         QueryBuilder $qb,
         string $entityField,
-        string $scaleType = null
+        ?string $scaleType = null
     ) {
         QueryBuilderUtil::checkField($entityField);
         $scaleType = $scaleType ?? $this->getFormatStrings($start, $end)['viewType'];
@@ -299,7 +299,7 @@ class DateHelper
      *
      * @return string
      */
-    public function getKey(\DateTime $start, \DateTime $end, array $row, string $scaleType = null)
+    public function getKey(\DateTime $start, \DateTime $end, array $row, ?string $scaleType = null)
     {
         $config = $scaleType
             ? $this->getDateIntervalConfigByScaleType($scaleType)

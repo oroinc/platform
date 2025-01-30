@@ -62,7 +62,7 @@ class DeleteMassActionExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isApplicableDataProvider
      */
-    public function testIsApplicable(ActionData $actionData, Operation $operation = null, bool $expected = false)
+    public function testIsApplicable(ActionData $actionData, ?Operation $operation = null, bool $expected = false)
     {
         $this->registry->expects($this->once())
             ->method('findByName')

@@ -195,7 +195,7 @@ abstract class AbstractUser implements
      * @return AbstractUser
      */
     #[\Override]
-    public function setLastLogin(\DateTime $time = null)
+    public function setLastLogin(?\DateTime $time = null)
     {
         $this->lastLogin = $time;
 
@@ -429,7 +429,7 @@ abstract class AbstractUser implements
     }
 
     #[\Override]
-    public function setOrganization(OrganizationInterface $organization = null)
+    public function setOrganization(?OrganizationInterface $organization = null)
     {
         $this->organization = $organization;
 
@@ -483,7 +483,7 @@ abstract class AbstractUser implements
      * @return AbstractUser
      */
     #[\Override]
-    public function setPasswordRequestedAt(\DateTime $time = null)
+    public function setPasswordRequestedAt(?\DateTime $time = null)
     {
         $this->passwordRequestedAt = $time;
 
@@ -501,7 +501,7 @@ abstract class AbstractUser implements
      * @return AbstractUser
      */
     #[\Override]
-    public function setPasswordChangedAt(\DateTime $time = null)
+    public function setPasswordChangedAt(?\DateTime $time = null)
     {
         $this->passwordChangedAt = $time;
 

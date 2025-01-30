@@ -21,7 +21,7 @@ class Recipient implements EmailHolderInterface
      * @param string $name
      * @param RecipientEntity|null $entity
      */
-    public function __construct($email, $name = '', RecipientEntity $entity = null)
+    public function __construct($email, $name = '', ?RecipientEntity $entity = null)
     {
         $this->email = $email;
         $this->name = trim($name);

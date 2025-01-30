@@ -80,7 +80,7 @@ class BaseCart
      * @param \DateTime|null $createdAt
      * @return $this
      */
-    public function setCreatedAt(\DateTime $createdAt = null)
+    public function setCreatedAt(?\DateTime $createdAt = null)
     {
         $this->createdAt = $createdAt;
         return $this;
@@ -98,7 +98,7 @@ class BaseCart
      * @param \DateTime|null $updatedAt
      * @return $this
      */
-    public function setUpdatedAt(\DateTime $updatedAt = null)
+    public function setUpdatedAt(?\DateTime $updatedAt = null)
     {
         $this->updatedAt = $updatedAt;
         return $this;

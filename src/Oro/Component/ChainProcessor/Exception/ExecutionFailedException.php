@@ -18,9 +18,9 @@ class ExecutionFailedException extends \RuntimeException
 
     public function __construct(
         string $processorId,
-        string $action = null,
-        string $group = null,
-        \Exception $previous = null
+        ?string $action = null,
+        ?string $group = null,
+        ?\Exception $previous = null
     ) {
         $this->processorId = $processorId;
         $this->action = $action;

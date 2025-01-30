@@ -33,7 +33,7 @@ class EmailRecipientsProviderArgs
         $query,
         $limit,
         array $excludedRecipients = [],
-        Organization $organization = null
+        ?Organization $organization = null
     ) {
         $this->relatedEntity = $relatedEntity;
         $this->query = $query;

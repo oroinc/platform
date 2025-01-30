@@ -87,7 +87,7 @@ class Config implements ConfigInterface
     }
 
     #[\Override]
-    public function all(\Closure $filter = null)
+    public function all(?\Closure $filter = null)
     {
         if (null === $filter) {
             return $this->values;

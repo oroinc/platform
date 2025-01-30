@@ -48,7 +48,7 @@ class ActionGroup implements ActionGroupInterface
     }
 
     #[\Override]
-    public function execute(ActionData $data, Collection $errors = null): ActionData
+    public function execute(ActionData $data, ?Collection $errors = null): ActionData
     {
         $this->parametersResolver->resolve($data, $this, $errors);
 
@@ -76,7 +76,7 @@ class ActionGroup implements ActionGroupInterface
     }
 
     #[\Override]
-    public function isAllowed(ActionData $data, Collection $errors = null): bool
+    public function isAllowed(ActionData $data, ?Collection $errors = null): bool
     {
         $guardEvent = new ActionGroupGuardEvent($data, $this->getDefinition(), $errors);
         $this->eventDispatcher->dispatch($guardEvent);

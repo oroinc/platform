@@ -17,7 +17,7 @@ class CustomerStub implements NameInterface
      * @param string $name
      * @param Organization|null $organization
      */
-    public function __construct($name = '', Organization $organization = null)
+    public function __construct($name = '', ?Organization $organization = null)
     {
         $this->name = $name;
         $this->organization = $organization;

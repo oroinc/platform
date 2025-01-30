@@ -16,7 +16,7 @@ interface ScheduleIntervalInterface
      * @param \DateTime|null $activeAt
      * @return $this
      */
-    public function setActiveAt(\DateTime $activeAt = null);
+    public function setActiveAt(?\DateTime $activeAt = null);
 
     /**
      * @return \DateTime|null
@@ -27,7 +27,7 @@ interface ScheduleIntervalInterface
      * @param \DateTime|null $deactivateAt
      * @return $this
      */
-    public function setDeactivateAt(\DateTime $deactivateAt = null);
+    public function setDeactivateAt(?\DateTime $deactivateAt = null);
 
     /**
      * @return ScheduleIntervalsAwareInterface

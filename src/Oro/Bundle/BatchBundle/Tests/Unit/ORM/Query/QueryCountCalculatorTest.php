@@ -51,7 +51,7 @@ class QueryCountCalculatorTest extends OrmTestCase
         $this->em->getConfiguration()->setMetadataDriverImpl(new AttributeDriver([]));
     }
 
-    private function getQuery(string $dql, array $params = null): Query
+    private function getQuery(string $dql, ?array $params = null): Query
     {
         $query = new Query($this->em);
         $query->setDQL($dql);
@@ -310,7 +310,7 @@ class QueryCountCalculatorTest extends OrmTestCase
     /**
      * @dataProvider getSqlCountDataProvider
      */
-    public function testCalculateCountForSqlQuery(string $sql, bool $useWalker = null)
+    public function testCalculateCountForSqlQuery(string $sql, ?bool $useWalker = null)
     {
         $qb = $this->createMock(SqlQueryBuilder::class);
 

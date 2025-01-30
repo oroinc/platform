@@ -31,7 +31,7 @@ class EntityFieldFixtureTest extends \PHPUnit\Framework\TestCase
         $this->fixture = new EntityFieldFixture($this->fieldTypeProvider, $this->typeRegistry);
     }
 
-    private function createFieldConfigModel(string $type = null, array $data = []): FieldConfigModel
+    private function createFieldConfigModel(?string $type = null, array $data = []): FieldConfigModel
     {
         $entity = new FieldConfigModel();
 

@@ -79,7 +79,7 @@ class EmailActivityManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function getEmail(int $id = null, int $threadId = null): Email
+    private function getEmail(?int $id = null, ?int $threadId = null): Email
     {
         $email = new Email();
         if (null !== $id) {

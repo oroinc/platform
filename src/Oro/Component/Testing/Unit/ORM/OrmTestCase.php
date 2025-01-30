@@ -52,7 +52,7 @@ abstract class OrmTestCase extends TestCase
      */
     protected function getTestEntityManager(
         mixed $conn = null,
-        EventManager $eventManager = null,
+        ?EventManager $eventManager = null,
         bool $withSharedMetadata = true
     ): EntityManagerMock {
         $config = new \Doctrine\ORM\Configuration();

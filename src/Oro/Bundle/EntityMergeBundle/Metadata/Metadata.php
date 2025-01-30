@@ -49,7 +49,7 @@ class Metadata implements MetadataInterface
     }
 
     #[\Override]
-    public function all(\Closure $filter = null)
+    public function all(?\Closure $filter = null)
     {
         if ($filter) {
             return array_filter($this->options, $filter);

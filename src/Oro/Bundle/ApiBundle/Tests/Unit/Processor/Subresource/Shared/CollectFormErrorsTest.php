@@ -29,7 +29,7 @@ class CollectFormErrorsTest extends ChangeRelationshipProcessorTestCase
         );
     }
 
-    private function createErrorObject(string $title, string $detail, string $propertyPath = null): Error
+    private function createErrorObject(string $title, string $detail, ?string $propertyPath = null): Error
     {
         $error = Error::createValidationError($title, $detail);
         if (null !== $propertyPath) {

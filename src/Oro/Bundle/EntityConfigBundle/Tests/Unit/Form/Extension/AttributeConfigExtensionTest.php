@@ -294,7 +294,7 @@ class AttributeConfigExtensionTest extends TypeTestCase
         $this->assertEmpty($event->getData());
     }
 
-    private function getFieldConfigModel(int $id = null): FieldConfigModel
+    private function getFieldConfigModel(?int $id = null): FieldConfigModel
     {
         $entityConfigModel = new EntityConfigModel('class');
         $fieldConfigModel = new FieldConfigModel('test', 'string');

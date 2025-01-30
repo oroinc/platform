@@ -15,7 +15,7 @@ class OroPropertyAccessorBuilder extends PropertyAccessorBuilder
     private $magicMethods = OroPropertyAccessor::MAGIC_GET | OroPropertyAccessor::MAGIC_SET;
 
     public function getPropertyAccessorWithDotArraySyntax(
-        int $magicMethods = null,
+        ?int $magicMethods = null,
         $isThrow = null
     ): PropertyAccessorInterface {
         $throw = OroPropertyAccessor::DO_NOT_THROW;

@@ -25,8 +25,8 @@ final class PropertyAccess
     }
 
     public static function createPropertyAccessorWithDotSyntax(
-        int $magicMethods = null,
-        int $throw = null
+        ?int $magicMethods = null,
+        ?int $throw = null
     ): PropertyAccessorInterface {
         return self::createPropertyAccessorBuilder()->getPropertyAccessorWithDotArraySyntax($magicMethods, $throw);
     }

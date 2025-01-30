@@ -16,7 +16,7 @@ abstract class AbstractExpression implements ExpressionInterface
     protected $errors;
 
     #[\Override]
-    public function evaluate($context, \ArrayAccess $errors = null)
+    public function evaluate($context, ?\ArrayAccess $errors = null)
     {
         $this->errors = $errors;
         $result       = $this->doEvaluate($context);

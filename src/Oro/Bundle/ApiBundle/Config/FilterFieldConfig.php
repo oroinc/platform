@@ -170,7 +170,7 @@ class FilterFieldConfig implements FieldConfigInterface
      * Gets the path of the field value.
      */
     #[\Override]
-    public function getPropertyPath(string $defaultValue = null): ?string
+    public function getPropertyPath(?string $defaultValue = null): ?string
     {
         if (empty($this->items[ConfigUtil::PROPERTY_PATH])) {
             return $defaultValue;
@@ -183,7 +183,7 @@ class FilterFieldConfig implements FieldConfigInterface
      * Sets the path of the field value.
      */
     #[\Override]
-    public function setPropertyPath(string $propertyPath = null): void
+    public function setPropertyPath(?string $propertyPath = null): void
     {
         if ($propertyPath) {
             $this->items[ConfigUtil::PROPERTY_PATH] = $propertyPath;

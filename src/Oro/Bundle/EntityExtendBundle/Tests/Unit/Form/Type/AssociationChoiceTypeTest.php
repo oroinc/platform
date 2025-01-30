@@ -67,7 +67,7 @@ class AssociationChoiceTypeTest extends AssociationTypeTestCase
         $this->assertEquals(ChoiceType::class, $this->getFormType()->getParent());
     }
 
-    protected function getDisabledFormView(string $cssClass = null): array
+    protected function getDisabledFormView(?string $cssClass = null): array
     {
         return [
             'disabled' => true,

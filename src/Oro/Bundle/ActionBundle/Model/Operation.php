@@ -115,7 +115,7 @@ class Operation
      * @param Collection $errors
      * @throws ForbiddenOperationException
      */
-    public function execute(ActionData $data, Collection $errors = null)
+    public function execute(ActionData $data, ?Collection $errors = null)
     {
         if (!$this->isAllowed($data, $errors)) {
             throw new ForbiddenOperationException(sprintf('Operation "%s" is not allowed.', $this->getName()));
@@ -152,14 +152,14 @@ class Operation
      * @param Collection|null $errors
      * @return bool
      */
-    public function isAllowed(ActionData $data, Collection $errors = null)
+    public function isAllowed(ActionData $data, ?Collection $errors = null)
     {
         return $this->isPreConditionAllowed($data, $errors)
             && $this->getDefinition()->getEnabled()
             && $this->isConditionAllowed($data, $errors);
     }
 
-    private function isConditionAllowed(ActionData $data, Collection $errors = null): bool
+    private function isConditionAllowed(ActionData $data, ?Collection $errors = null): bool
     {
         $guardEvent = new OperationGuardEvent($data, $this->getDefinition(), $errors);
         $this->eventDispatcher->dispatch($guardEvent);
@@ -179,7 +179,7 @@ class Operation
      * @param Collection|null $errors
      * @return bool
      */
-    protected function isPreConditionAllowed(ActionData $data, Collection $errors = null)
+    protected function isPreConditionAllowed(ActionData $data, ?Collection $errors = null)
     {
         $announceEvent = new OperationAnnounceEvent($data, $this->getDefinition(), $errors);
         $this->eventDispatcher->dispatch($announceEvent);
@@ -267,7 +267,7 @@ class Operation
      * @param Collection|null $errors
      * @return boolean
      */
-    protected function evaluateConditions(ActionData $data, $name, Collection $errors = null)
+    protected function evaluateConditions(ActionData $data, $name, ?Collection $errors = null)
     {
         if (!array_key_exists($name, $this->conditions)) {
             $this->conditions[$name] = false;

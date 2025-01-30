@@ -111,8 +111,8 @@ class AttributeGroupTypeTest extends FormIntegrationTestCase
 
     private function createLocalizedValue(
         string $string,
-        string $text = null,
-        Localization $localization = null
+        ?string $text = null,
+        ?Localization $localization = null
     ): LocalizedFallbackValue {
         $value = new LocalizedFallbackValue();
         $value->setString($string)

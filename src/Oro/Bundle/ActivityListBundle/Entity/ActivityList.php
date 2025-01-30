@@ -305,7 +305,7 @@ class ActivityList implements
      *
      * @return self
      */
-    public function setOrganization(Organization $organization = null)
+    public function setOrganization(?Organization $organization = null)
     {
         $this->organization = $organization;
 
@@ -317,7 +317,7 @@ class ActivityList implements
      *
      * @return self
      */
-    public function setOwner(User $owner = null)
+    public function setOwner(?User $owner = null)
     {
         $this->owner = $owner;
 
@@ -346,7 +346,7 @@ class ActivityList implements
      * @return self
      */
     #[\Override]
-    public function setUpdatedBy(User $updatedBy = null)
+    public function setUpdatedBy(?User $updatedBy = null)
     {
         $this->updatedBySet = false;
         if ($updatedBy !== null) {
@@ -422,7 +422,7 @@ class ActivityList implements
      * @return $this
      */
     #[\Override]
-    public function setCreatedAt(\DateTimeInterface $createdAt = null)
+    public function setCreatedAt(?\DateTimeInterface $createdAt = null)
     {
         $this->createdAt = $createdAt;
 
@@ -444,7 +444,7 @@ class ActivityList implements
      * @return $this
      */
     #[\Override]
-    public function setUpdatedAt(\DateTimeInterface $updatedAt = null)
+    public function setUpdatedAt(?\DateTimeInterface $updatedAt = null)
     {
         $this->updatedAtSet = false;
         if ($updatedAt !== null) {

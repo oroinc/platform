@@ -111,7 +111,7 @@ class EntityConfigModel extends ConfigModel
      * @param \Closure|null $filter function (FieldConfigModel $model)
      * @return ArrayCollection|FieldConfigModel[]
      */
-    public function getFields(\Closure $filter = null)
+    public function getFields(?\Closure $filter = null)
     {
         return $filter ? $this->fields->filter($filter) : $this->fields;
     }

@@ -167,7 +167,7 @@ class EmailAttachment implements FileExtensionInterface
      *
      * @return $this
      */
-    public function setFile(File $file = null)
+    public function setFile(?File $file = null)
     {
         $this->file = $file;
 

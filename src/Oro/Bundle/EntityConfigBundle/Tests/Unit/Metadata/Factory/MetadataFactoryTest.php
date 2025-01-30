@@ -24,8 +24,8 @@ class MetadataFactoryTest extends \PHPUnit\Framework\TestCase
     private function getFieldMetadata(
         string $class,
         string $name,
-        string $mode = null,
-        array $defaultValues = null
+        ?string $mode = null,
+        ?array $defaultValues = null
     ): FieldMetadata {
         $fieldMetadata = new FieldMetadata($class, $name);
         $fieldMetadata->mode = $mode;

@@ -114,7 +114,7 @@ class ExternalUrlProviderTest extends \PHPUnit\Framework\TestCase
     }
 
     private function getFile(
-        string $externalUrl = null
+        ?string $externalUrl = null
     ): File|\PHPUnit\Framework\MockObject\MockObject {
         $file = $this->createMock(File::class);
         $file->expects(self::any())

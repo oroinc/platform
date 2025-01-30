@@ -32,7 +32,7 @@ class StartAsyncOperationTest extends UpdateListProcessorTestCase
         $this->syncProcessingLimitProvider = $this->createMock(SyncProcessingLimitProvider::class);
     }
 
-    private function getProcessor(MessageProducerInterface $producer = null): StartAsyncOperation
+    private function getProcessor(?MessageProducerInterface $producer = null): StartAsyncOperation
     {
         return new StartAsyncOperation(
             $producer ?? $this->producer,

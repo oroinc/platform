@@ -11,10 +11,10 @@ Feature: Upload Settings Allowed URLs Regexp
     And I go to System/ Configuration
     When I follow "System Configuration/General Setup/Upload Settings" on configuration sidebar
     And uncheck "Use default" for "Allowed URLs RegExp" field
-    And I fill in "Allowed URLs RegExp" with "invalid~regexp"
+    And I fill in "Allowed URLs RegExp" with "invalid~test"
     And I save form
     Then I should see validation errors:
-      | Allowed URLs RegExp | This value is not a valid regular expression. Reason: "preg_match(): Unknown modifier 'r'" |
+      | Allowed URLs RegExp | This value is not a valid regular expression. Reason: "preg_match(): Unknown modifier 't'" |
 
   Scenario: Correct regular expression is saved
     When I fill in "Allowed URLs RegExp" with "^http(s)?://example\.org/"

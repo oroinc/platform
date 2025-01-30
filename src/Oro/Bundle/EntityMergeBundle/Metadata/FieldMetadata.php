@@ -16,7 +16,7 @@ class FieldMetadata extends Metadata implements MetadataInterface
      */
     protected $doctrineMetadata;
 
-    public function __construct(array $options = [], DoctrineMetadata $doctrineMetadata = null)
+    public function __construct(array $options = [], ?DoctrineMetadata $doctrineMetadata = null)
     {
         parent::__construct($options);
         if ($doctrineMetadata) {

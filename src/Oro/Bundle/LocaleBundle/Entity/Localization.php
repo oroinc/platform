@@ -194,7 +194,7 @@ class Localization implements DatesAwareInterface, ExtendEntityInterface
      *
      * @return $this
      */
-    public function setParentLocalization(Localization $parentLocalization = null)
+    public function setParentLocalization(?Localization $parentLocalization = null)
     {
         $this->parentLocalization = $parentLocalization;
 

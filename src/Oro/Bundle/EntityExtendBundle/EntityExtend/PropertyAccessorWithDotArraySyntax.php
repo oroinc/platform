@@ -102,7 +102,7 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
     public function __construct(
         $magicMethods = self::MAGIC_GET | self::MAGIC_SET,
         $throw = self::THROW_ON_INVALID_PROPERTY_PATH,
-        CacheItemPoolInterface $cacheItemPool = null,
+        ?CacheItemPoolInterface $cacheItemPool = null,
         $readInfoExtractor = null,
         $writeInfoExtractor = null
     ) {
@@ -310,7 +310,7 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
         array      $trace,
         int        $i,
         string     $propertyPath,
-        \Throwable $previous = null
+        ?\Throwable $previous = null
     ): void {
         if (!isset($trace[$i]['file']) || __FILE__ !== $trace[$i]['file']) {
             return;
@@ -968,7 +968,7 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
         string          $namespace,
         int             $defaultLifetime,
         string          $version,
-        LoggerInterface $logger = null
+        ?LoggerInterface $logger = null
     ) {
         if (!class_exists(ApcuAdapter::class)) {
             throw new \LogicException(

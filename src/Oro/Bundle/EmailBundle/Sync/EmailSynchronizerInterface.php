@@ -51,7 +51,7 @@ interface EmailSynchronizerInterface
      *
      * @throws \Exception
      */
-    public function syncOrigins(array $originIds, SynchronizationProcessorSettings $settings = null): void;
+    public function syncOrigins(array $originIds, ?SynchronizationProcessorSettings $settings = null): void;
 
     /**
      * Schedule origins sync job

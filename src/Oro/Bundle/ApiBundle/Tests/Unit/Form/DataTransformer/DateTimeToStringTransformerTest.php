@@ -198,7 +198,7 @@ class DateTimeToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidValueForReverseTransformDataProvider
      */
-    public function testReverseTransformWithInvalidValue(string $value, string $exceptionMessage = null)
+    public function testReverseTransformWithInvalidValue(string $value, ?string $exceptionMessage = null)
     {
         if (null === $exceptionMessage) {
             $exceptionMessage = sprintf('The value "%s" is not a valid datetime.', $value);
@@ -323,7 +323,7 @@ class DateTimeToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidValueForReverseTransformDateDataProvider
      */
-    public function testReverseTransformDateWithInvalidValue(string $value, string $exceptionMessage = null)
+    public function testReverseTransformDateWithInvalidValue(string $value, ?string $exceptionMessage = null)
     {
         if (null === $exceptionMessage) {
             $exceptionMessage = sprintf('The value "%s" is not a valid date.', $value);
@@ -425,7 +425,7 @@ class DateTimeToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidValueForReverseTransformTimeDataProvider
      */
-    public function testReverseTransformTimeWithInvalidValue(string $value, string $exceptionMessage = null)
+    public function testReverseTransformTimeWithInvalidValue(string $value, ?string $exceptionMessage = null)
     {
         if (null === $exceptionMessage) {
             $exceptionMessage = sprintf('The value "%s" is not a valid time.', $value);

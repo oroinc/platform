@@ -213,7 +213,7 @@ class ParametersResolverTest extends \PHPUnit\Framework\TestCase
         string $type,
         string $gotType,
         string $gotValue,
-        string $customMessage = null
+        ?string $customMessage = null
     ): array {
         $typedParam = new Parameter($paramName);
         $typedParam->setType($type);

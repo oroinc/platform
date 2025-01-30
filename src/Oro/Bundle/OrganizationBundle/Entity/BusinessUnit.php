@@ -378,7 +378,7 @@ class BusinessUnit implements
      *
      * @return BusinessUnit
      */
-    public function setParentBusinessUnit(BusinessUnit $value = null)
+    public function setParentBusinessUnit(?BusinessUnit $value = null)
     {
         $this->setOwner($value);
 

@@ -53,7 +53,7 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function expectMarkAsRunningQuery(int $operationId, int $affectedRows, \Exception $exception = null): void
+    private function expectMarkAsRunningQuery(int $operationId, int $affectedRows, ?\Exception $exception = null): void
     {
         $qb = $this->createMock(QueryBuilder::class);
         $query = $this->createMock(AbstractQuery::class);
@@ -116,7 +116,7 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    private function expectMarkAsFailedQuery(int $operationId, int $affectedRows, \Exception $exception = null): void
+    private function expectMarkAsFailedQuery(int $operationId, int $affectedRows, ?\Exception $exception = null): void
     {
         $qb = $this->createMock(QueryBuilder::class);
         $query = $this->createMock(AbstractQuery::class);

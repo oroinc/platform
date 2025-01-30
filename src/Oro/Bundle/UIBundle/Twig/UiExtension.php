@@ -177,7 +177,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
         $pageIdentifier,
         array $data,
         $entity,
-        FormView $formView = null
+        ?FormView $formView = null
     ) {
         $event = new BeforeListRenderEvent($environment, new ScrollData($data), $entity, $formView);
         $this->getEventDispatcher()->dispatch($event, 'oro_ui.scroll_data.before.' . $pageIdentifier);
@@ -427,7 +427,7 @@ class UiExtension extends AbstractExtension implements ServiceSubscriberInterfac
      *
      * @return array
      */
-    public function getContent(array $additionalContent = null, array $keys = null)
+    public function getContent(?array $additionalContent = null, ?array $keys = null)
     {
         $content = $this->getContentProviderManager()->getContent($keys);
         if ($additionalContent) {

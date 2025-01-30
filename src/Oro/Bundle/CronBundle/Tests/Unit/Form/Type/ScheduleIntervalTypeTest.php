@@ -25,7 +25,7 @@ class ScheduleIntervalTypeTest extends FormIntegrationTestCase
     public function testSubmit(
         array $submittedData,
         ScheduleIntervalInterface $expected,
-        ScheduleIntervalInterface $data = null
+        ?ScheduleIntervalInterface $data = null
     ) {
         if (!$data) {
             $data = new ScheduleIntervalStub();

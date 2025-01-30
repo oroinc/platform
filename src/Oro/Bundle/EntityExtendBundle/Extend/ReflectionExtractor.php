@@ -21,12 +21,12 @@ class ReflectionExtractor extends BasicReflectionExtractor
     private Inflector $inflector;
 
     public function __construct(
-        array $mutatorPrefixes = null,
-        array $accessorPrefixes = null,
-        array $arrayMutatorPrefixes = null,
+        ?array $mutatorPrefixes = null,
+        ?array $accessorPrefixes = null,
+        ?array $arrayMutatorPrefixes = null,
         bool $enableConstructorExtraction = true,
         int $accessFlags = BasicReflectionExtractor::ALLOW_PUBLIC,
-        InflectorInterface $inflector = null,
+        ?InflectorInterface $inflector = null,
         int $magicMethodsFlags = BasicReflectionExtractor::ALLOW_MAGIC_GET | BasicReflectionExtractor::ALLOW_MAGIC_SET
     ) {
         parent::__construct(

@@ -34,8 +34,8 @@ class CommentLifecycleListenerTest extends TestCase
     public function testPreUpdate(
         object $entity,
         bool $mockUser = false,
-        bool $detachedUser = null,
-        bool $reloadUser = null
+        ?bool $detachedUser = null,
+        ?bool $reloadUser = null
     ) {
         $oldUser = new User();
         $oldUser->setFirstName('oldUser');
@@ -102,7 +102,7 @@ class CommentLifecycleListenerTest extends TestCase
     /**
      * @return EntityManagerInterface|MockObject
      */
-    private function getEntityManagerMock(bool $reloadUser = false, User $newUser = null)
+    private function getEntityManagerMock(bool $reloadUser = false, ?User $newUser = null)
     {
         $result = $this->createMock(EntityManagerInterface::class);
 

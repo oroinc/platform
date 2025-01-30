@@ -55,9 +55,9 @@ class ConfigProvider
      * Gets an instance of FieldConfigId or EntityConfigId depends on the given parameters.
      */
     public function getId(
-        string $className = null,
-        string $fieldName = null,
-        string $fieldType = null
+        ?string $className = null,
+        ?string $fieldName = null,
+        ?string $fieldType = null
     ): ConfigIdInterface {
         if ($className) {
             $className = ClassUtils::getRealClass($className);
@@ -77,7 +77,7 @@ class ConfigProvider
     /**
      * Determines if this provider has configuration data for the given entity or field.
      */
-    public function hasConfig(string $className, string $fieldName = null): bool
+    public function hasConfig(string $className, ?string $fieldName = null): bool
     {
         return $this->configManager->hasConfig(ClassUtils::getRealClass($className), $fieldName);
     }
@@ -97,7 +97,7 @@ class ConfigProvider
     /**
      * Gets configuration data for the given entity or field.
      */
-    public function getConfig(string $className = null, string $fieldName = null): ConfigInterface
+    public function getConfig(?string $className = null, ?string $fieldName = null): ConfigInterface
     {
         if ($className) {
             $className = ClassUtils::getRealClass($className);
@@ -145,7 +145,7 @@ class ConfigProvider
      *
      * @return ConfigIdInterface[]
      */
-    public function getIds(string $className = null, bool $withHidden = false): array
+    public function getIds(?string $className = null, bool $withHidden = false): array
     {
         if ($className) {
             $className = ClassUtils::getRealClass($className);
@@ -164,7 +164,7 @@ class ConfigProvider
      *
      * @return ConfigInterface[]
      */
-    public function getConfigs(string $className = null, bool $withHidden = false): array
+    public function getConfigs(?string $className = null, bool $withHidden = false): array
     {
         if ($className) {
             $className = ClassUtils::getRealClass($className);
@@ -183,7 +183,7 @@ class ConfigProvider
      *
      * @return array
      */
-    public function map($callback, string $className = null, bool $withHidden = false): array
+    public function map($callback, ?string $className = null, bool $withHidden = false): array
     {
         return array_map($callback, $this->getConfigs($className, $withHidden));
     }
@@ -198,7 +198,7 @@ class ConfigProvider
      *
      * @return ConfigInterface[]
      */
-    public function filter($callback, string $className = null, bool $withHidden = false): array
+    public function filter($callback, ?string $className = null, bool $withHidden = false): array
     {
         return array_filter($this->getConfigs($className, $withHidden), $callback);
     }

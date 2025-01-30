@@ -220,7 +220,7 @@ class BasePerson implements FullNameInterface, EmailHolderInterface
      *
      * @return $this
      */
-    public function setBirthday(\DateTime $birthday = null)
+    public function setBirthday(?\DateTime $birthday = null)
     {
         $this->birthday = $birthday;
 

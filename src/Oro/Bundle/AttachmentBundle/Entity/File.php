@@ -229,7 +229,7 @@ class File implements FileExtensionInterface, ExtendEntityInterface
         return $this->updatedAt;
     }
 
-    public function setFile(\SplFileInfo $file = null)
+    public function setFile(?\SplFileInfo $file = null)
     {
         $this->file = $file;
 

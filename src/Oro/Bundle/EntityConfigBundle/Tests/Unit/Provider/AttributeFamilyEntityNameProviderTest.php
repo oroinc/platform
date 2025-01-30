@@ -20,7 +20,7 @@ class AttributeFamilyEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new AttributeFamilyEntityNameProvider();
     }
 
-    private function getAttributeFamilyLabel(string $string, Localization $localization = null): LocalizedFallbackValue
+    private function getAttributeFamilyLabel(string $string, ?Localization $localization = null): LocalizedFallbackValue
     {
         $value = new LocalizedFallbackValue();
         $value->setString($string);

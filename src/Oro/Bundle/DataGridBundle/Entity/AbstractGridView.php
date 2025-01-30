@@ -228,7 +228,7 @@ abstract class AbstractGridView implements ViewInterface
      *
      * @return $this
      */
-    abstract public function setOwner(AbstractUser $owner = null);
+    abstract public function setOwner(?AbstractUser $owner = null);
 
     /**
      * @return View
@@ -315,7 +315,7 @@ abstract class AbstractGridView implements ViewInterface
      *
      * @return $this
      */
-    public function setOrganization(OrganizationInterface $organization = null)
+    public function setOrganization(?OrganizationInterface $organization = null)
     {
         $this->organization = $organization;
 

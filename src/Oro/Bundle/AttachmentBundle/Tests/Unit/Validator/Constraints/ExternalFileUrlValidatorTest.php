@@ -60,7 +60,7 @@ class ExternalFileUrlValidatorTest extends ConstraintValidatorTestCase
     public function testViolationWhenInvalidRegExp(): void
     {
         $externalFile = new ExternalFile('');
-        $constraint = new ExternalFileUrl(['allowedUrlsRegExp' => '/invalid/regexp/']);
+        $constraint = new ExternalFileUrl(['allowedUrlsRegExp' => '/invalid/test/']);
 
         $this->logger->expects(self::once())
             ->method('error')
@@ -68,7 +68,7 @@ class ExternalFileUrlValidatorTest extends ConstraintValidatorTestCase
                 'Allowed URLs regular expression ({regexp}) is invalid: {reason}',
                 [
                     'regexp' => $constraint->allowedUrlsRegExp,
-                    'reason' => 'preg_match(): Unknown modifier \'r\'',
+                    'reason' => "preg_match(): Unknown modifier 't'",
                     'code' => ExternalFileUrl::INVALID_REGEXP_ERROR,
                 ]
             );

@@ -82,7 +82,7 @@ interface ConfigInterface
      * @param \Closure|null $filter The callback function to be used to filter attributes
      * @return array
      */
-    public function all(\Closure $filter = null);
+    public function all(?\Closure $filter = null);
 
     /**
      * Returns all configuration attributes.

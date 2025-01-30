@@ -43,8 +43,8 @@ abstract class AbstractDebugCommandTestCase extends \PHPUnit\Framework\TestCase
     public function testExecute(
         array $types,
         array $expected,
-        string $argument = null,
-        \Throwable $exception = null
+        ?string $argument = null,
+        ?\Throwable $exception = null
     ): void {
         $this->input->expects($this->once())
             ->method('getArgument')

@@ -110,7 +110,7 @@ trait CommandTestingTrait
         self::assertThat($commandTester, new CommandOutputIsEmpty());
     }
 
-    private function assertProducedWarning(CommandTester $commandTester, string $expectedWarningMessage = null): void
+    private function assertProducedWarning(CommandTester $commandTester, ?string $expectedWarningMessage = null): void
     {
         self::assertThat($commandTester, new CommandProducedWarning($expectedWarningMessage));
     }
@@ -120,7 +120,7 @@ trait CommandTestingTrait
         self::assertThat($commandTester, new CommandSuccessReturnCode());
     }
 
-    private function assertProducedError(CommandTester $commandTester, string $expectedErrorMessage = null): void
+    private function assertProducedError(CommandTester $commandTester, ?string $expectedErrorMessage = null): void
     {
         self::assertThat($commandTester, new CommandProducedError($expectedErrorMessage));
     }

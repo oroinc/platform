@@ -13,6 +13,7 @@ use Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumOptionRepository;
 use Oro\Bundle\EntityExtendBundle\Form\Type\AbstractEnumType;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Fixtures\TestEntity;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -24,10 +25,10 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 class AbstractEnumTypeTestCase extends TypeTestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ConfigManager|MockObject */
     protected $configManager;
 
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ManagerRegistry|MockObject */
     protected $doctrine;
 
     #[\Override]
@@ -341,9 +342,9 @@ class AbstractEnumTypeTestCase extends TypeTestCase
     }
 
     protected function expectFormWillReturnParentForm(
-        FormInterface|\PHPUnit\Framework\MockObject\MockObject $form,
-        FormInterface|\PHPUnit\Framework\MockObject\MockObject $parentForm = null
-    ): FormInterface|\PHPUnit\Framework\MockObject\MockObject {
+        FormInterface|MockObject $form,
+        FormInterface|MockObject|null $parentForm = null
+    ): FormInterface|MockObject {
         if (!$parentForm) {
             $parentForm = $this->createMock(FormInterface::class);
         }
@@ -356,8 +357,8 @@ class AbstractEnumTypeTestCase extends TypeTestCase
     }
 
     protected function expectFormWillReturnData(
-        FormInterface|\PHPUnit\Framework\MockObject\MockObject $form,
-        mixed $data
+        FormInterface|MockObject $form,
+        mixed                    $data
     ): void {
         $form->expects($this->once())
             ->method('getData')
@@ -365,9 +366,9 @@ class AbstractEnumTypeTestCase extends TypeTestCase
     }
 
     protected function expectFormWillReturnFormConfig(
-        FormInterface|\PHPUnit\Framework\MockObject\MockObject $form,
-        FormConfigInterface|\PHPUnit\Framework\MockObject\MockObject $formConfig = null
-    ): FormConfigInterface|\PHPUnit\Framework\MockObject\MockObject {
+        FormInterface|MockObject            $form,
+        FormConfigInterface|MockObject|null $formConfig = null
+    ): FormConfigInterface|MockObject {
         if (!$formConfig) {
             $formConfig = $this->createMock(FormConfigInterface::class);
         }
@@ -380,7 +381,7 @@ class AbstractEnumTypeTestCase extends TypeTestCase
     }
 
     protected function expectFormConfigWillReturnOptions(
-        \PHPUnit\Framework\MockObject\MockObject $formConfig,
+        MockObject $formConfig,
         array $optionsValueMap
     ): void {
         $formConfig->expects($this->atLeastOnce())

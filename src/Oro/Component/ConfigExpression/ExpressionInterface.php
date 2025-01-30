@@ -19,7 +19,7 @@ interface ExpressionInterface
      *
      * @return mixed
      */
-    public function evaluate($context, \ArrayAccess $errors = null);
+    public function evaluate($context, ?\ArrayAccess $errors = null);
 
     /**
      * Sets the condition error message.

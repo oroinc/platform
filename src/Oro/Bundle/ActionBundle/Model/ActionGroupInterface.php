@@ -16,7 +16,7 @@ interface ActionGroupInterface
      * @return ActionData
      * @throws ForbiddenActionGroupException
      */
-    public function execute(ActionData $data, Collection $errors = null): ActionData;
+    public function execute(ActionData $data, ?Collection $errors = null): ActionData;
 
     /**
      * @return ActionGroupDefinition
@@ -30,7 +30,7 @@ interface ActionGroupInterface
      * @param Collection|null $errors
      * @return bool
      */
-    public function isAllowed(ActionData $data, Collection $errors = null): bool;
+    public function isAllowed(ActionData $data, ?Collection $errors = null): bool;
 
     /**
      * @return array|Parameter[]

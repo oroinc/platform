@@ -283,7 +283,7 @@ class EmailTemplate extends EmailTemplateModel implements ExtendEntityInterface
      *
      * @return EmailTemplate
      */
-    public function setOrganization(Organization $organization = null)
+    public function setOrganization(?Organization $organization = null)
     {
         $this->organization = $organization;
 
