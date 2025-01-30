@@ -11,6 +11,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class ExtendableActionEvent extends Event
 {
+    public const CONTEXT_KEY = '__context__';
     public const NAME = 'extendable_action';
 
     /**
@@ -26,6 +27,7 @@ class ExtendableActionEvent extends Event
     public function __construct($context = null)
     {
         $this->context = $context;
+        $this->initDataByContext();
     }
 
     /**
@@ -49,10 +51,6 @@ class ExtendableActionEvent extends Event
 
     public function getData(): ?AbstractStorage
     {
-        if (null === $this->data) {
-            $this->initDataByContext();
-        }
-
         return $this->data;
     }
 
@@ -72,12 +70,22 @@ class ExtendableActionEvent extends Event
             return;
         }
 
+        $dataArray = [];
         if ($this->context instanceof ActionDataStorageAwareInterface) {
-            $this->data = $this->context->getActionDataStorage();
+            $dataArray = $this->context->getActionDataStorage()->toArray();
         } elseif ($this->context instanceof AbstractStorage) {
-            $this->data = $this->context;
+            $dataArray = $this->context->toArray();
         } elseif (\is_array($this->context)) {
-            $this->data = new ExtendableEventData($this->context);
+            $dataArray = $this->context;
+        }
+
+        $this->data = new ExtendableEventData($dataArray);
+
+        if ($this->data->offsetExists(self::CONTEXT_KEY)) {
+            $this->context = $this->data->offsetGet(self::CONTEXT_KEY);
+            $this->data->offsetUnset(self::CONTEXT_KEY);
+            // Reset modified flag
+            $this->data = new ExtendableEventData($this->data->toArray());
         }
     }
 }

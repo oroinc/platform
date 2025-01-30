@@ -20,6 +20,9 @@ class ExtendableConditionEventTest extends TestCase
     public function testGetContextWithNonNullValue(): void
     {
         $context = $this->createMock(AbstractStorage::class);
+        $context->expects($this->any())
+            ->method('toArray')
+            ->willReturn([]);
         $event = new ExtendableConditionEvent($context);
 
         $this->assertSame($context, $event->getContext());
@@ -72,7 +75,11 @@ class ExtendableConditionEventTest extends TestCase
 
     public function testGetDataActionDataStorageAwareContext()
     {
-        $dataArray = ['test' => 'value'];
+        $executionContext = new \stdClass();
+        $dataArray = [
+            'test' => 'value',
+            ExtendableConditionEvent::CONTEXT_KEY => $executionContext
+        ];
 
         $storage = $this->createMock(AbstractStorage::class);
         $storage->expects($this->any())
@@ -84,7 +91,8 @@ class ExtendableConditionEventTest extends TestCase
             ->willReturn($storage);
         $event = new ExtendableConditionEvent($context);
 
-        $this->assertEquals(new ExtendableEventData($dataArray), $event->getData());
+        $this->assertEquals(new ExtendableEventData(['test' => 'value']), $event->getData());
+        $this->assertEquals($executionContext, $event->getContext());
     }
 
     public function testGetDataAbstractStorageContext()
@@ -103,6 +111,9 @@ class ExtendableConditionEventTest extends TestCase
     public function testGetDataWhenDataSet()
     {
         $context = $this->createMock(AbstractStorage::class);
+        $context->expects($this->any())
+            ->method('toArray')
+            ->willReturn([]);
         $data = new ExtendableEventData(['test' => 'value']);
         $event = new ExtendableConditionEvent($context);
         $event->setData($data);

@@ -7,6 +7,7 @@ use Oro\Component\Action\Action\ExtendableAction;
 use Oro\Component\Action\Event\ExecuteActionEvents;
 use Oro\Component\Action\Event\ExtendableActionEvent;
 use Oro\Component\Action\Event\ExtendableEventData;
+use Oro\Component\Action\Model\AbstractStorage;
 use Oro\Component\Action\Model\ActionDataStorageAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\ReflectionUtil;
@@ -128,8 +129,13 @@ class ExtendableActionTest extends \PHPUnit\Framework\TestCase
     public function testExecuteWithActionDataStorageAwareInterface()
     {
         $context = $this->createMock(ActionDataStorageAwareInterface::class);
-        $context->expects($this->never())
-            ->method('getActionDataStorage');
+        $storage = $this->createMock(AbstractStorage::class);
+        $storage->expects($this->any())
+            ->method('toArray')
+            ->willReturn([]);
+        $context->expects($this->any())
+            ->method('getActionDataStorage')
+            ->willReturn($storage);
         $eventWithoutListeners = 'some_event_without_listeners';
         $eventWithListeners = 'some_event_with_listeners';
         $event = new ExtendableActionEvent($context);

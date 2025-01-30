@@ -20,6 +20,9 @@ class ExtendableActionEventTest extends TestCase
     public function testGetContextWithNonNullValue(): void
     {
         $context = $this->createMock(AbstractStorage::class);
+        $context->expects($this->any())
+            ->method('toArray')
+            ->willReturn([]);
         $event = new ExtendableActionEvent($context);
 
         $this->assertSame($context, $event->getContext());
@@ -44,31 +47,47 @@ class ExtendableActionEventTest extends TestCase
 
     public function testGetDataActionDataStorageAwareContext()
     {
+        $executionContext = new \stdClass();
+        $dataArray = [
+            'test' => 'value',
+            ExtendableActionEvent::CONTEXT_KEY => $executionContext
+        ];
+
         $storage = $this->createMock(AbstractStorage::class);
+        $storage->expects($this->any())
+            ->method('toArray')
+            ->willReturn($dataArray);
         $context = $this->createMock(ActionDataStorageAwareInterface::class);
         $context->expects($this->once())
             ->method('getActionDataStorage')
             ->willReturn($storage);
         $event = new ExtendableActionEvent($context);
 
-        $this->assertSame($storage, $event->getData());
+        $this->assertEquals(new ExtendableEventData(['test' => 'value']), $event->getData());
+        $this->assertEquals($executionContext, $event->getContext());
     }
 
     public function testGetDataAbstractStorageContext()
     {
         $context = $this->createMock(AbstractStorage::class);
+        $context->expects($this->any())
+            ->method('toArray')
+            ->willReturn(['test' => 'value']);
         $event = new ExtendableActionEvent($context);
 
-        $this->assertSame($context, $event->getData());
+        $this->assertEquals(new ExtendableEventData(['test' => 'value']), $event->getData());
     }
 
     public function testGetDataWhenDataSet()
     {
         $context = $this->createMock(AbstractStorage::class);
+        $context->expects($this->any())
+            ->method('toArray')
+            ->willReturn([]);
         $data = new ExtendableEventData(['test' => 'value']);
         $event = new ExtendableActionEvent($context);
         $event->setData($data);
 
-        $this->assertSame($data, $event->getData());
+        $this->assertEquals($data, $event->getData());
     }
 }

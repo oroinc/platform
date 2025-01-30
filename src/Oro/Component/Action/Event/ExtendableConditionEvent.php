@@ -12,6 +12,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class ExtendableConditionEvent extends Event
 {
+    public const CONTEXT_KEY = '__context__';
     const NAME = 'extendable';
 
     /**
@@ -32,6 +33,7 @@ class ExtendableConditionEvent extends Event
     public function __construct($context = null)
     {
         $this->context = $context;
+        $this->initDataByContext();
         $this->errors = new ArrayCollection();
     }
 
@@ -56,10 +58,6 @@ class ExtendableConditionEvent extends Event
 
     public function getData(): ?AbstractStorage
     {
-        if (null === $this->data) {
-            $this->initDataByContext();
-        }
-
         return $this->data;
     }
 
@@ -89,6 +87,13 @@ class ExtendableConditionEvent extends Event
         }
 
         $this->data = new ExtendableEventData($dataArray);
+
+        if ($this->data->offsetExists(self::CONTEXT_KEY)) {
+            $this->context = $this->data->offsetGet(self::CONTEXT_KEY);
+            $this->data->offsetUnset(self::CONTEXT_KEY);
+            // Reset modified flag
+            $this->data = new ExtendableEventData($this->data->toArray());
+        }
     }
 
     /**

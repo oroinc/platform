@@ -5,6 +5,7 @@ namespace Oro\Component\Action\Tests\Unit\Condition;
 use Oro\Component\Action\Condition\ExtendableCondition;
 use Oro\Component\Action\Event\ExtendableConditionEvent;
 use Oro\Component\Action\Event\ExtendableEventData;
+use Oro\Component\Action\Model\AbstractStorage;
 use Oro\Component\Action\Model\ActionDataStorageAwareInterface;
 use Oro\Component\Action\Model\ExtendableConditionEventErrorsProcessorInterface;
 use Oro\Component\ConfigExpression\ContextAccessor;
@@ -134,8 +135,13 @@ class ExtendableConditionTest extends \PHPUnit\Framework\TestCase
     {
         $options = ['events' => ['test_event']];
         $context = $this->createMock(ActionDataStorageAwareInterface::class);
-        $context->expects($this->never())
-            ->method('getActionDataStorage');
+        $dataStorage = $this->createMock(AbstractStorage::class);
+        $dataStorage->expects($this->any())
+            ->method('toArray')
+            ->willReturn($options);
+        $context->expects($this->any())
+            ->method('getActionDataStorage')
+            ->willReturn($dataStorage);
 
         $this->eventDispatcher->expects($this->once())
             ->method('hasListeners')
