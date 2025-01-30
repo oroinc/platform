@@ -29,7 +29,7 @@ class CompleteDefinitionHelperTestCase extends \PHPUnit\Framework\TestCase
         return $this->configLoaderFactory->getLoader(ConfigUtil::DEFINITION)->load($config);
     }
 
-    protected function createRelationConfigObject(array $definition = null): Config
+    protected function createRelationConfigObject(?array $definition = null): Config
     {
         $config = new Config();
         if (null !== $definition) {
@@ -55,7 +55,7 @@ class CompleteDefinitionHelperTestCase extends \PHPUnit\Framework\TestCase
     }
 
     protected function getClassMetadataMock(
-        string $className = null
+        ?string $className = null
     ): ClassMetadata|\PHPUnit\Framework\MockObject\MockObject {
         if ($className) {
             $classMetadata = $this->getMockBuilder(ClassMetadata::class)

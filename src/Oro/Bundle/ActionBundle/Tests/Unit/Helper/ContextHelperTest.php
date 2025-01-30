@@ -216,7 +216,7 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
         ?Request $request,
         int $requestStackCalls,
         ActionData $expected,
-        array $context = null
+        ?array $context = null
     ) {
         $entity = new \stdClass();
         $entity->id = 42;
@@ -393,7 +393,7 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($actionData, $this->helper->getActionData($context2));
     }
 
-    private function getEntity(int $id = null): object
+    private function getEntity(?int $id = null): object
     {
         $entity = new \stdClass();
         $entity->id = $id;
@@ -402,9 +402,9 @@ class ContextHelperTest extends \PHPUnit\Framework\TestCase
     }
 
     private function generateOperationToken(
-        string $entityClass = null,
+        ?string $entityClass = null,
         mixed $entityId = null,
-        string $datagrid = null
+        ?string $datagrid = null
     ): string {
         $array = [];
 

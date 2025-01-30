@@ -24,8 +24,8 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
 {
     private function getEntityToIdTransformer(
         AssociationMetadata $metadata,
-        EntityMapper $entityMapper = null,
-        IncludedEntityCollection $includedEntities = null
+        ?EntityMapper $entityMapper = null,
+        ?IncludedEntityCollection $includedEntities = null
     ): EntityToIdTransformer {
         return new EntityToIdTransformer(
             $this->doctrineHelper,

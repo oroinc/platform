@@ -129,7 +129,7 @@ class SortersConfig implements EntityConfigInterface
      * Adds the configuration of the sorter.
      */
     #[\Override]
-    public function addField(string $fieldName, FieldConfigInterface $field = null): SorterFieldConfig
+    public function addField(string $fieldName, ?FieldConfigInterface $field = null): SorterFieldConfig
     {
         if (null === $field) {
             $field = new SorterFieldConfig();

@@ -36,7 +36,7 @@ class DatasourceBindParametersListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider onBuildAfterDataProvider
      */
-    public function testOnBuildAfterWorks(array $config, array $expectedBindParameters = null)
+    public function testOnBuildAfterWorks(array $config, ?array $expectedBindParameters = null)
     {
         $config = DatagridConfiguration::create($config);
 

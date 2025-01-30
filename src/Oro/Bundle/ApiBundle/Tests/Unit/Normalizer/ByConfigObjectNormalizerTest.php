@@ -92,7 +92,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         return new RequestType([RequestType::REST]);
     }
 
-    private function normalizeObject(object $object, EntityDefinitionConfig $config = null, array $context = []): array
+    private function normalizeObject(object $object, ?EntityDefinitionConfig $config = null, array $context = []): array
     {
         if (!isset($context[ApiContext::REQUEST_TYPE])) {
             $context[ApiContext::REQUEST_TYPE] = $this->getRequestType();

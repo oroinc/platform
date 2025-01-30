@@ -44,13 +44,13 @@ class EntityFieldNormalizer implements ContextAwareNormalizerInterface, ContextA
     }
 
     #[\Override]
-    public function supportsNormalization($data, string $format = null, array $context = []): bool
+    public function supportsNormalization($data, ?string $format = null, array $context = []): bool
     {
         return $data instanceof FieldConfigModel;
     }
 
     #[\Override]
-    public function normalize($object, string $format = null, array $context = [])
+    public function normalize($object, ?string $format = null, array $context = [])
     {
         $result = [
             'id' => $object->getId(),
@@ -70,13 +70,13 @@ class EntityFieldNormalizer implements ContextAwareNormalizerInterface, ContextA
     }
 
     #[\Override]
-    public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization($data, string $type, ?string $format = null, array $context = []): bool
     {
         return is_array($data) && is_a($type, FieldConfigModel::class, true);
     }
 
     #[\Override]
-    public function denormalize($data, string $type, string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = [])
     {
         if (!isset($data['entity']['id'])) {
             throw new UnexpectedValueException('Data doesn\'t contains entity id');

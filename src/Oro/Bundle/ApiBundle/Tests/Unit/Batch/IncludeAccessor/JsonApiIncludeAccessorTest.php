@@ -201,7 +201,7 @@ class JsonApiIncludeAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider updateRelationshipsProvider
      */
-    public function testUpdateRelationships(array $item, array $expectedResult = null)
+    public function testUpdateRelationships(array $item, ?array $expectedResult = null)
     {
         if (null === $expectedResult) {
             $expectedResult = $item;

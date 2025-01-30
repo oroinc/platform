@@ -295,7 +295,7 @@ class AbstractAddressTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    private function createAddress(int $id = null): AbstractAddress
+    private function createAddress(?int $id = null): AbstractAddress
     {
         $address = $this->getMockForAbstractClass(AbstractAddress::class);
         if (null !== $id) {

@@ -234,7 +234,7 @@ class FieldHelper
         }
     }
 
-    public function getObjectValueWithReflection($object, string $fieldName, \Throwable $exception = null)
+    public function getObjectValueWithReflection($object, string $fieldName, ?\Throwable $exception = null)
     {
         $class = ClassUtils::getClass($object);
         while ($class && !EntityPropertyInfo::propertyExists($class, $fieldName) && $class = get_parent_class($class)) {

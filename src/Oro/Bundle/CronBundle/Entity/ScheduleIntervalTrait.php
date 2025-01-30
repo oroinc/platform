@@ -23,7 +23,7 @@ trait ScheduleIntervalTrait
      * @param \DateTime|null $activeAt
      * @return $this
      */
-    public function setActiveAt(\DateTime $activeAt = null)
+    public function setActiveAt(?\DateTime $activeAt = null)
     {
         $this->activeAt = $activeAt;
 
@@ -42,7 +42,7 @@ trait ScheduleIntervalTrait
      * @param \DateTime|null $deactivateAt
      * @return $this
      */
-    public function setDeactivateAt(\DateTime $deactivateAt = null)
+    public function setDeactivateAt(?\DateTime $deactivateAt = null)
     {
         $this->deactivateAt = $deactivateAt;
 

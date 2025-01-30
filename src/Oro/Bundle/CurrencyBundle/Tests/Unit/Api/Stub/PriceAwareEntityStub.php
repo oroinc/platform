@@ -17,7 +17,7 @@ class PriceAwareEntityStub
         return $this->price;
     }
 
-    public function setPrice(Price $price = null)
+    public function setPrice(?Price $price = null)
     {
         $this->price = $price;
     }

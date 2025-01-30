@@ -48,7 +48,7 @@ interface EntityConfigInterface
     /**
      * Adds the configuration of the field.
      */
-    public function addField(string $fieldName, FieldConfigInterface $field = null): FieldConfigInterface;
+    public function addField(string $fieldName, ?FieldConfigInterface $field = null): FieldConfigInterface;
 
     /**
      * Removes the configuration of the field.

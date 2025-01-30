@@ -38,7 +38,7 @@ interface PasswordRecoveryInterface
     /**
      * @param \DateTime|null $time New password request time. Null by default.
      */
-    public function setPasswordRequestedAt(\DateTime $time = null);
+    public function setPasswordRequestedAt(?\DateTime $time = null);
 
     /**
      * @return \DateTime|null
@@ -48,5 +48,5 @@ interface PasswordRecoveryInterface
     /**
      * @param \DateTime|null $time Password changed time. Null by default.
      */
-    public function setPasswordChangedAt(\DateTime $time = null);
+    public function setPasswordChangedAt(?\DateTime $time = null);
 }

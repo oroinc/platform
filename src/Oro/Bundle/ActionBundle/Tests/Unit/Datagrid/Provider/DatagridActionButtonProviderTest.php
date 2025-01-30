@@ -144,7 +144,7 @@ class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
         ResultRecord $record,
         ButtonsCollection $buttonsCollection,
         array $expectedActions,
-        array $groups = null
+        ?array $groups = null
     ): void {
         $this->buttonProvider->expects($this->any())
             ->method('match')
@@ -501,7 +501,7 @@ class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function getRowActionConfig(string $label = null, array $data = []): array
+    private function getRowActionConfig(?string $label = null, array $data = []): array
     {
         return array_merge([
             'type' => 'button-widget',
@@ -535,7 +535,7 @@ class DatagridActionButtonProviderTest extends \PHPUnit\Framework\TestCase
         string $name,
         bool $isAvailable,
         array $datagridOptions = [],
-        string $label = null
+        ?string $label = null
     ): ButtonInterface {
         $definition = $this->createMock(OperationDefinition::class);
         $definition->expects($this->any())

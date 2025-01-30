@@ -98,7 +98,7 @@ class UpdateEmailVisibilitiesForOrganizationProcessorTest extends OrmTestCase
         );
     }
 
-    private function addDataQueryExpectation(int $organizationId, array $data, int $offset = null): void
+    private function addDataQueryExpectation(int $organizationId, array $data, ?int $offset = null): void
     {
         $sql = 'SELECT o0_.id AS id_0'
             . ' FROM oro_email o0_'

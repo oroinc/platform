@@ -55,7 +55,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function getMetadataAccessor(EntityMetadata $metadata = null): MetadataAccessorInterface
+    private function getMetadataAccessor(?EntityMetadata $metadata = null): MetadataAccessorInterface
     {
         $metadataAccessor = $this->createMock(MetadataAccessorInterface::class);
         if (null === $metadata) {
@@ -74,7 +74,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
 
     private function getConfigAccessor(
         string $className,
-        EntityDefinitionConfig $config = null
+        ?EntityDefinitionConfig $config = null
     ): ConfigAccessorInterface {
         $configAccessor = $this->createMock(ConfigAccessorInterface::class);
         if (null === $config) {

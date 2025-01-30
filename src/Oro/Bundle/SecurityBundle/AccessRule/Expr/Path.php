@@ -15,7 +15,7 @@ class Path implements ExpressionInterface
     /** @var string */
     private $field;
 
-    public function __construct(string $field, string $alias = null)
+    public function __construct(string $field, ?string $alias = null)
     {
         $this->alias = $alias;
         $this->field = $field;

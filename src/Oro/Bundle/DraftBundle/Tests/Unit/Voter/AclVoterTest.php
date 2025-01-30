@@ -14,7 +14,7 @@ class AclVoterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider voteDataProvider
      */
-    public function testVote(array $expected, string $sourceUuid = null): void
+    public function testVote(array $expected, ?string $sourceUuid = null): void
     {
         $source = new DraftableEntityStub();
         $source->setDraftUuid($sourceUuid);

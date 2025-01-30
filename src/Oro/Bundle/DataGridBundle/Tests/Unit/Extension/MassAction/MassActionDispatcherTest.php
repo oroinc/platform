@@ -115,8 +115,8 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
     }
 
     private function createDatagrid(
-        DatasourceInterface $datasource = null,
-        DatagridConfiguration $gridConfig = null
+        ?DatasourceInterface $datasource = null,
+        ?DatagridConfiguration $gridConfig = null
     ): DatagridInterface {
         $gridParameters = $this->createMock(ParameterBag::class);
         $gridParameters->expects($this->once())
@@ -144,7 +144,7 @@ class MassActionDispatcherTest extends \PHPUnit\Framework\TestCase
         return $datagrid;
     }
 
-    private function createMassAction(ActionConfiguration $actionConfiguration = null): MassActionInterface
+    private function createMassAction(?ActionConfiguration $actionConfiguration = null): MassActionInterface
     {
         $massAction = $this->createMock(MassActionInterface::class);
         $massAction->expects($this->any())

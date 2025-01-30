@@ -187,7 +187,7 @@ class TranslatedEmailTemplateProviderTest extends TestCase
         );
     }
 
-    private function createLocalization(int $id, Localization $parentLocalization = null): Localization
+    private function createLocalization(int $id, ?Localization $parentLocalization = null): Localization
     {
         $localization = new LocalizationStub($id);
         if ($parentLocalization !== null) {

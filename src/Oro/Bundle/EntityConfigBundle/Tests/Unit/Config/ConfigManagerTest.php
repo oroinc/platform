@@ -1948,7 +1948,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-    private function getEntityMetadata(string $className, array $defaultValues = null): EntityMetadata
+    private function getEntityMetadata(string $className, ?array $defaultValues = null): EntityMetadata
     {
         $metadata = new EntityMetadata($className);
         $metadata->mode = ConfigModel::MODE_DEFAULT;
@@ -1959,7 +1959,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         return $metadata;
     }
 
-    private function getFieldMetadata(string $className, string $fieldName, array $defaultValues = null): FieldMetadata
+    private function getFieldMetadata(string $className, string $fieldName, ?array $defaultValues = null): FieldMetadata
     {
         $metadata = new FieldMetadata($className, $fieldName);
         if (null !== $defaultValues) {
@@ -1969,7 +1969,7 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         return $metadata;
     }
 
-    private function getConfig(ConfigIdInterface $configId, array $values = null): Config
+    private function getConfig(ConfigIdInterface $configId, ?array $values = null): Config
     {
         $config = new Config($configId);
         if (null !== $values) {

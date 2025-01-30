@@ -47,7 +47,7 @@ class NestedTreeFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider filterDataProvider
      */
-    public function testFilter(FilterValue $filterValue, Comparison $expectation, string $field = null)
+    public function testFilter(FilterValue $filterValue, Comparison $expectation, ?string $field = null)
     {
         $supportedOperators = [
             FilterOperator::GT,

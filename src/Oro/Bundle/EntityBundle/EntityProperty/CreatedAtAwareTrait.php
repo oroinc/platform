@@ -27,7 +27,7 @@ trait CreatedAtAwareTrait
      * @param \DateTime|null $createdAt
      * @return $this
      */
-    public function setCreatedAt(\DateTime $createdAt = null)
+    public function setCreatedAt(?\DateTime $createdAt = null)
     {
         $this->createdAt = $createdAt;
 

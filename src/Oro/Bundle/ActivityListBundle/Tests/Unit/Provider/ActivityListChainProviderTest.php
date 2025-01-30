@@ -62,7 +62,7 @@ class ActivityListChainProviderTest extends \PHPUnit\Framework\TestCase
         $this->testActivityProvider = new TestActivityProvider();
     }
 
-    private function getActivityListChainProvider(string $testActivityAclClass = null): ActivityListChainProvider
+    private function getActivityListChainProvider(?string $testActivityAclClass = null): ActivityListChainProvider
     {
         $activityAclClasses = [];
         if ($testActivityAclClass) {

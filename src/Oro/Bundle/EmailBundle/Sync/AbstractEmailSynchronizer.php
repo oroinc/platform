@@ -145,7 +145,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
     }
 
     #[\Override]
-    public function syncOrigins(array $originIds, SynchronizationProcessorSettings $settings = null): void
+    public function syncOrigins(array $originIds, ?SynchronizationProcessorSettings $settings = null): void
     {
         if ($this->logger === null) {
             $this->logger = new NullLogger();
@@ -212,7 +212,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
      *
      * @throws \Exception
      */
-    protected function doSyncOrigin(EmailOrigin $origin, SynchronizationProcessorSettings $settings = null): void
+    protected function doSyncOrigin(EmailOrigin $origin, ?SynchronizationProcessorSettings $settings = null): void
     {
         $this->impersonateOrganization($origin->getOrganization());
         try {
@@ -260,7 +260,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
     protected function delegateToProcessor(
         EmailOrigin $origin,
         AbstractEmailSynchronizationProcessor $processor,
-        SynchronizationProcessorSettings $settings = null
+        ?SynchronizationProcessorSettings $settings = null
     ): void {
         $inProcessCode = $settings && $settings->isForceMode()
             ? self::SYNC_CODE_IN_PROCESS_FORCE : self::SYNC_CODE_IN_PROCESS;
@@ -280,7 +280,7 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
      * Switches the security context to the given organization
      * Should be deleted after email sync process will be refactored
      */
-    protected function impersonateOrganization(Organization $organization = null): void
+    protected function impersonateOrganization(?Organization $organization = null): void
     {
         if ($this->tokenStorage->getToken() === null && $organization) {
             $this->tokenStorage->setToken(

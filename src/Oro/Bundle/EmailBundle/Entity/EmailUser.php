@@ -164,7 +164,7 @@ class EmailUser
      * @param OrganizationInterface|null $organization
      * @return $this
      */
-    public function setOrganization(OrganizationInterface $organization = null)
+    public function setOrganization(?OrganizationInterface $organization = null)
     {
         $this->organization = $organization;
 
@@ -289,7 +289,7 @@ class EmailUser
      *
      * @return $this
      */
-    public function setMailboxOwner(Mailbox $mailboxOwner = null)
+    public function setMailboxOwner(?Mailbox $mailboxOwner = null)
     {
         $this->mailboxOwner = $mailboxOwner;
 

@@ -21,7 +21,7 @@ abstract class AbstractLoader extends CumulativeRoutingFileLoader
     /**
      * Sets the event dispatcher
      */
-    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher = null)
+    public function setEventDispatcher(?EventDispatcherInterface $eventDispatcher = null)
     {
         $this->eventDispatcher = $eventDispatcher;
     }
@@ -29,7 +29,7 @@ abstract class AbstractLoader extends CumulativeRoutingFileLoader
     /**
      * Sets an object that can be used to share data between different loaders
      */
-    public function setCache(SharedData $cache = null)
+    public function setCache(?SharedData $cache = null)
     {
         $this->cache = $cache;
     }

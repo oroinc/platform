@@ -434,8 +434,8 @@ class AbstractGuesserTest extends \PHPUnit\Framework\TestCase
         string $field,
         bool $multiple = false,
         bool $hasConfig = true,
-        string $label = null,
-        string $fieldType = null
+        ?string $label = null,
+        ?string $fieldType = null
     ): void {
         $labelOption = $multiple ? 'plural_label' : 'label';
 

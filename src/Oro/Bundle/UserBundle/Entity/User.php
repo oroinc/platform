@@ -364,7 +364,7 @@ class User extends AbstractUser implements
      *
      * @return User
      */
-    public function setBirthday(\DateTime $birthday = null)
+    public function setBirthday(?\DateTime $birthday = null)
     {
         $this->birthday = $birthday;
 
@@ -386,7 +386,7 @@ class User extends AbstractUser implements
      *
      * @return User
      */
-    public function setCreatedAt(\DateTime $createdAt = null)
+    public function setCreatedAt(?\DateTime $createdAt = null)
     {
         $this->createdAt = $createdAt;
 
@@ -408,7 +408,7 @@ class User extends AbstractUser implements
      *
      * @return User
      */
-    public function setUpdatedAt(\DateTime $updatedAt = null)
+    public function setUpdatedAt(?\DateTime $updatedAt = null)
     {
         $this->updatedAt = $updatedAt;
 
@@ -680,7 +680,7 @@ class User extends AbstractUser implements
             : $items->first();
     }
 
-    public function setImapAccountType(AccountTypeModel $accountTypeModel = null)
+    public function setImapAccountType(?AccountTypeModel $accountTypeModel = null)
     {
         $this->imapAccountType = $accountTypeModel;
         if ($accountTypeModel instanceof AccountTypeModel) {

@@ -13,7 +13,7 @@ interface UpdatedAtAwareInterface
      * @param \DateTime|null $updatedAt
      * @return mixed
      */
-    public function setUpdatedAt(\DateTime $updatedAt = null);
+    public function setUpdatedAt(?\DateTime $updatedAt = null);
 
     /**
      * @return bool

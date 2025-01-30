@@ -34,7 +34,7 @@ interface MetadataInterface
      * @param \Closure|null $filter
      * @return array
      */
-    public function all(\Closure $filter = null);
+    public function all(?\Closure $filter = null);
 
     /**
      * Merges values of this object with another set of data

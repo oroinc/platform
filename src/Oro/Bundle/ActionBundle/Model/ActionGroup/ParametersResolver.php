@@ -26,7 +26,7 @@ class ParametersResolver
     public function resolve(
         ActionData $data,
         ActionGroupInterface $actionGroup,
-        Collection $errors = null,
+        ?Collection $errors = null,
         bool $checkSnakeCase = false
     ) {
         $violations = [];

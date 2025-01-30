@@ -30,7 +30,7 @@ trait UserAwareTrait
      * @param User|null $owner
      * @return $this
      */
-    public function setOwner(User $owner = null)
+    public function setOwner(?User $owner = null)
     {
         $this->owner = $owner;
 

@@ -24,7 +24,7 @@ class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
         array $processors,
         array $groups,
         Context $context,
-        ApplicableCheckerInterface $applicableChecker = null,
+        ?ApplicableCheckerInterface $applicableChecker = null,
         bool $withApplicableCache = false
     ): OptimizedProcessorIterator {
         $processorBag = $this->createMock(ProcessorBagInterface::class);

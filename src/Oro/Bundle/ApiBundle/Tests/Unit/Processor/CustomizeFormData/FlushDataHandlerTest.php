@@ -68,7 +68,7 @@ class FlushDataHandlerTest extends TestCase
 
     private function getFormContext(
         ?FormInterface $form,
-        IncludedEntityCollection $itemIncludedEntities = null,
+        ?IncludedEntityCollection $itemIncludedEntities = null,
         bool $noHasErrorsExpectation = false
     ): FormContext {
         $context = $this->createMock(FormContext::class);
@@ -107,7 +107,7 @@ class FlushDataHandlerTest extends TestCase
 
     private function getSubresourceFormContext(
         ?FormInterface $form,
-        IncludedEntityCollection $itemIncludedEntities = null
+        ?IncludedEntityCollection $itemIncludedEntities = null
     ): FormContext {
         $context = $this->createMock(ChangeRelationshipContext::class);
         $context->expects(self::any())
@@ -129,7 +129,7 @@ class FlushDataHandlerTest extends TestCase
     private function expectsFlush(
         array &$calls,
         EntityManagerInterface|MockObject $em,
-        \Throwable $exception = null
+        ?\Throwable $exception = null
     ): void {
         $connection = $this->createMock(Connection::class);
 

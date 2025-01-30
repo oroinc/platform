@@ -24,7 +24,7 @@ final class FilterValue
         string $sourceKey,
         string $path,
         string $value,
-        string $operator = null
+        ?string $operator = null
     ): self {
         $filterValue = new FilterValue($path, $value, $operator);
         $filterValue->sourceKey = $sourceKey;

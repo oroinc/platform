@@ -89,7 +89,7 @@ class ConfigTypeHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getImmutableProvider
      */
-    public function testGetImmutable(mixed $value, string $fieldName = null)
+    public function testGetImmutable(mixed $value, ?string $fieldName = null)
     {
         $scope = 'test_scope';
         $className = 'Test\Entity';
@@ -140,8 +140,8 @@ class ConfigTypeHelperTest extends \PHPUnit\Framework\TestCase
     public function testIsImmutable(
         mixed $value,
         bool $expected,
-        string $fieldName = null,
-        string $constraintName = null
+        ?string $fieldName = null,
+        ?string $constraintName = null
     ) {
         $scope = 'test_scope';
         $className = 'Test\Entity';

@@ -65,7 +65,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
     /**
      * @dataProvider getCountQueryBuilderDataProvider
      */
-    public function testGetCountQueryBuilder(callable $queryBuilder, string $expectedDql, string $platformClass = null)
+    public function testGetCountQueryBuilder(callable $queryBuilder, string $expectedDql, ?string $platformClass = null)
     {
         if (null !== $platformClass) {
             $this->em->getConnection()->setDatabasePlatform(new $platformClass());

@@ -129,7 +129,7 @@ class FiltersConfig implements EntityConfigInterface
      * Adds the configuration of the filter.
      */
     #[\Override]
-    public function addField(string $fieldName, FieldConfigInterface $field = null): FilterFieldConfig
+    public function addField(string $fieldName, ?FieldConfigInterface $field = null): FilterFieldConfig
     {
         if (null === $field) {
             $field = new FilterFieldConfig();

@@ -17,7 +17,7 @@ class PreloadedExtension extends BasePreloadExtension
      */
     private $types = [];
 
-    public function __construct(array $types, array $typeExtensions, FormTypeGuesserInterface $typeGuesser = null)
+    public function __construct(array $types, array $typeExtensions, ?FormTypeGuesserInterface $typeGuesser = null)
     {
         foreach ($types as $key => $type) {
             if (is_string($key)) {

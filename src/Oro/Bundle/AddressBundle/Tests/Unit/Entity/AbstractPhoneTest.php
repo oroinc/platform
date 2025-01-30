@@ -79,7 +79,7 @@ class AbstractPhoneTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    private function createPhone(string $phone = null, int $id = null): AbstractPhone
+    private function createPhone(?string $phone = null, ?int $id = null): AbstractPhone
     {
         $arguments = [];
         if ($phone) {

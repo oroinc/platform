@@ -60,7 +60,7 @@ class ActivityOwner
      *
      * @return self
      */
-    public function setOrganization(Organization $organization = null)
+    public function setOrganization(?Organization $organization = null)
     {
         $this->organization = $organization;
 
@@ -84,7 +84,7 @@ class ActivityOwner
      *
      * @return self
      */
-    public function setActivity(ActivityList $activity = null)
+    public function setActivity(?ActivityList $activity = null)
     {
         $this->activity = $activity;
 
@@ -96,7 +96,7 @@ class ActivityOwner
      *
      * @return self
      */
-    public function setUser(User $user = null)
+    public function setUser(?User $user = null)
     {
         $this->user = $user;
 

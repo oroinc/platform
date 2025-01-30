@@ -143,7 +143,7 @@ class DatagridConfigurationTest extends \PHPUnit\Framework\TestCase
         array $expected,
         string $name,
         array $definition,
-        string $select = null,
+        ?string $select = null,
         array $sorter = [],
         array $filter = []
     ): void {

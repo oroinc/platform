@@ -79,7 +79,7 @@ class AbstractEmailTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    private function createEmail(string $email = null, int $id = null): AbstractEmail
+    private function createEmail(?string $email = null, ?int $id = null): AbstractEmail
     {
         $arguments = [];
         if ($email) {

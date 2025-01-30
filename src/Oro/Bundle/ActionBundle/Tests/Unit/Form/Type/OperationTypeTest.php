@@ -49,7 +49,7 @@ class OperationTypeTest extends FormIntegrationTestCase
         array $submittedData,
         ActionData $expectedData,
         array $expectedChildrenOptions = [],
-        ActionData $expectedDefaultData = null
+        ?ActionData $expectedDefaultData = null
     ) {
         $form = $this->factory->create(OperationType::class, $defaultData, $inputOptions);
 
@@ -224,7 +224,7 @@ class OperationTypeTest extends FormIntegrationTestCase
     /**
      * @dataProvider exceptionDataProvider
      */
-    public function testException(array $options, string $exception, string $message, ActionData $data = null)
+    public function testException(array $options, string $exception, string $message, ?ActionData $data = null)
     {
         $this->expectException($exception);
         $this->expectExceptionMessage($message);

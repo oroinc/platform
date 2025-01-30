@@ -263,7 +263,7 @@ class OperationRegistryTest extends TestCase
     public function testFindByName(
         string $operationName,
         ?string $expected,
-        OperationFindCriteria $criteria = null,
+        ?OperationFindCriteria $criteria = null,
         array $filterResult = []
     ) {
         $this->configurationProvider->expects($this->once())

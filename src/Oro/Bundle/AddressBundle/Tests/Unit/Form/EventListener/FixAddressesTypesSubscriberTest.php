@@ -21,7 +21,7 @@ class FixAddressesTypesSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber = new FixAddressesTypesSubscriber('owner.addresses');
     }
 
-    private function createAddress(AddressType $type = null): TypedAddress
+    private function createAddress(?AddressType $type = null): TypedAddress
     {
         $address = new TypedAddress();
         if (null !== $type) {

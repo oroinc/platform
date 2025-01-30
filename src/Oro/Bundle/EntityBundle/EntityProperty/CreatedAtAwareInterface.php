@@ -13,5 +13,5 @@ interface CreatedAtAwareInterface
      * @param \DateTime|null $createdAt
      * @return mixed
      */
-    public function setCreatedAt(\DateTime $createdAt = null);
+    public function setCreatedAt(?\DateTime $createdAt = null);
 }

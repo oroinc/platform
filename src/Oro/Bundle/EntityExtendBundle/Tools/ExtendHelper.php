@@ -231,7 +231,7 @@ class ExtendHelper
     public static function generateEnumCode(
         string $entityClassName,
         string $fieldName,
-        int $maxEnumCodeSize = null
+        ?int $maxEnumCodeSize = null
     ): string {
         if ('' === $entityClassName) {
             throw new \InvalidArgumentException('$entityClassName must not be empty.');

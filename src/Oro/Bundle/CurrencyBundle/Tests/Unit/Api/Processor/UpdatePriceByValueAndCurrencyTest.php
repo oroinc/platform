@@ -25,7 +25,7 @@ class UpdatePriceByValueAndCurrencyTest extends CustomizeFormDataProcessorTestCa
         $this->processor = new UpdatePriceByValueAndCurrency();
     }
 
-    private function getEntity(Price $price = null): PriceAwareEntityStub
+    private function getEntity(?Price $price = null): PriceAwareEntityStub
     {
         $entity = new PriceAwareEntityStub();
         $entity->setPrice($price);

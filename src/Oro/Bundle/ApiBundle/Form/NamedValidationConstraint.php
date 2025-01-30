@@ -25,7 +25,7 @@ class NamedValidationConstraint extends Constraint implements ConstraintWithStat
      *                                 * a human readable constraint type, e.g. "not blank" or "not_blank"
      * @param int|null $statusCode     HTTP status code that should be returned if the constraint is not satisfied
      */
-    public function __construct(string $constraintType, int $statusCode = null)
+    public function __construct(string $constraintType, ?int $statusCode = null)
     {
         parent::__construct([]);
         $this->constraintType = $constraintType;

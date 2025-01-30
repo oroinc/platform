@@ -75,7 +75,7 @@ class FlushDataTest extends BatchUpdateProcessorTestCase
         BatchFlushDataHandlerInterface|\PHPUnit\Framework\MockObject\MockObject $flushDataHandler,
         array $items,
         bool $flushDataCall = true,
-        \Exception $flushDataError = null
+        ?\Exception $flushDataError = null
     ): void {
         $finished = null;
 
