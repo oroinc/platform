@@ -32,7 +32,7 @@ processes:
                     method: 'send'
                     method_parameters:
                         - '$.topic'
-                        - { id: $origin.id }`
+                        - { id: $origin.id }
 
     triggers:
         clear_user_email_origin_on_deactivation:
