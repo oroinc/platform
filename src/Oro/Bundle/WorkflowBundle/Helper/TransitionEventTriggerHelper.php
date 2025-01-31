@@ -108,10 +108,10 @@ class TransitionEventTriggerHelper
      */
     public static function buildContextValues(
         ?WorkflowDefinition $workflowDefinition = null,
-                            $entity = null,
-                            $mainEntity = null,
-        ?WorkflowItem       $item = null,
-                            $prevEntity = null
+        $entity = null,
+        $mainEntity = null,
+        ?WorkflowItem $item = null,
+        $prevEntity = null
     ) {
         return [
             self::TRIGGER_WORKFLOW_DEFINITION => $workflowDefinition,

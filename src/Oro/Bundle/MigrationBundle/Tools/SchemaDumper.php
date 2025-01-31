@@ -47,9 +47,9 @@ class SchemaDumper extends AbstractVisitor
      */
     public function dump(
         ?array $allowedTables = null,
-               $namespace = null,
-               $className = self::DEFAULT_CLASS_NAME,
-               $version = self::DEFAULT_VERSION,
+        $namespace = null,
+        $className = self::DEFAULT_CLASS_NAME,
+        $version = self::DEFAULT_VERSION,
         ?array $extendedOptions = null
     ) {
         $content = $this->twig->render(

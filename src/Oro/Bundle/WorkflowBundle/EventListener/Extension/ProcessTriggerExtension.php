@@ -184,10 +184,10 @@ class ProcessTriggerExtension extends AbstractEventTriggerExtension
      */
     protected function scheduleProcess(
         ProcessTrigger $trigger,
-                       $entity,
-        ?array         $changeSet = null,
-                       $old = null,
-                       $new = null
+        $entity,
+        ?array $changeSet = null,
+        $old = null,
+        $new = null
     ) {
         $entityClass = ClassUtils::getClass($entity);
 

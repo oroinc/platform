@@ -223,8 +223,11 @@ class EntityReader extends IteratorBasedReader implements BatchIdsReaderInterfac
      * @param string       $entityName
      * @param Organization|null $organization
      */
-    protected function addOrganizationLimits(QueryBuilder $queryBuilder, $entityName, ?Organization $organization = null)
-    {
+    protected function addOrganizationLimits(
+        QueryBuilder $queryBuilder,
+        $entityName,
+        ?Organization $organization = null
+    ) {
         if ($organization) {
             $organizationField = $this->ownershipMetadata->getMetadata($entityName)->getOrganizationFieldName();
             if ($organizationField) {

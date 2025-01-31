@@ -75,8 +75,13 @@ class EmailRepository extends EntityRepository
      *
      * @return array
      */
-    public function getNewEmails(User $user, Organization $organization, $limit, $folderId, ?AclHelper $aclHelper = null)
-    {
+    public function getNewEmails(
+        User $user,
+        Organization $organization,
+        $limit,
+        $folderId,
+        ?AclHelper $aclHelper = null
+    ) {
         $qb = $this->getEmailList($user, $organization, $limit, $folderId, false);
         $query = $qb->getQuery();
         if ($aclHelper) {

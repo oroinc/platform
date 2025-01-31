@@ -206,8 +206,11 @@ class TagManager
         return $this->getRepository()->getEntities($tag);
     }
 
-    public function getPreparedArray(object $entity, ?Collection $tags = null, ?Organization $organization = null): array
-    {
+    public function getPreparedArray(
+        object $entity,
+        ?Collection $tags = null,
+        ?Organization $organization = null
+    ): array {
         if (null === $tags) {
             $this->loadTagging($entity, $organization);
             $tags = $this->getTags($entity);

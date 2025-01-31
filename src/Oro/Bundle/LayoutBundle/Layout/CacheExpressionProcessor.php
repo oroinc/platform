@@ -17,11 +17,11 @@ class CacheExpressionProcessor extends ExpressionProcessor
 
     #[\Override]
     public function processExpressions(
-        array                  &$values,
-        ContextInterface       $context,
+        array &$values,
+        ContextInterface $context,
         ?DataAccessorInterface $data = null,
-                               $evaluate = true,
-                               $encoding = null
+        $evaluate = true,
+        $encoding = null
     ): void {
         if (!$evaluate && $encoding === null) {
             return;

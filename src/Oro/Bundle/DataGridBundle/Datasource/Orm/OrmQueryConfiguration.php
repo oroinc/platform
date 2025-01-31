@@ -164,7 +164,7 @@ class OrmQueryConfiguration
      */
     public function getRootEntity(
         ?EntityClassResolver $entityClassResolver = null,
-                             $lookAtExtendedEntityClassName = false
+        $lookAtExtendedEntityClassName = false
     ) {
         if ($lookAtExtendedEntityClassName) {
             $entityClassName = $this->config->getExtendedEntityClassName();

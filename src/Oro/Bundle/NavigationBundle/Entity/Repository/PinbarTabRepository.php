@@ -75,10 +75,10 @@ class PinbarTabRepository extends EntityRepository implements NavigationReposito
      * @return integer
      */
     public function countNavigationItems(
-        string                 $url,
-                               $user,
+        string $url,
+        $user,
         ?OrganizationInterface $organization = null,
-                               $type = null
+        $type = null
     ): int {
         $qb = $this->createNavigationItemsQueryBuiler($user, $organization, $type);
 

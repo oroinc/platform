@@ -210,9 +210,9 @@ class Workflow
      */
     public function isTransitionAllowed(
         WorkflowItem $workflowItem,
-                     $transition,
-        ?Collection  $errors = null,
-                     $fireExceptions = false
+        $transition,
+        ?Collection $errors = null,
+        $fireExceptions = false
     ) {
         // get current transition
         try {

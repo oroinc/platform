@@ -81,8 +81,10 @@ abstract class AbstractEntityFieldExtension implements EntityFieldExtensionInter
         return [];
     }
 
-    protected function initializeDefaultValue(EntityFieldProcessTransport $transport, ?string $propertyName = null): void
-    {
+    protected function initializeDefaultValue(
+        EntityFieldProcessTransport $transport,
+        ?string $propertyName = null
+    ): void {
         $propertyName = $propertyName ?? $transport->getName();
         $defaultValue = null;
         if (!$transport->getStorage()->offsetExists($propertyName)) {
