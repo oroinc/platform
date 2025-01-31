@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Model\Error;
 class NullErrorCompleter implements ErrorCompleterInterface
 {
     #[\Override]
-    public function complete(Error $error, RequestType $requestType, EntityMetadata $metadata = null): void
+    public function complete(Error $error, RequestType $requestType, ?EntityMetadata $metadata = null): void
     {
     }
 
@@ -20,7 +20,7 @@ class NullErrorCompleter implements ErrorCompleterInterface
         string $entityPath,
         Error $error,
         RequestType $requestType,
-        EntityMetadata $metadata = null
+        ?EntityMetadata $metadata = null
     ): void {
     }
 }

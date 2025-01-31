@@ -100,7 +100,7 @@ class EmailOriginHelper
      */
     public function getEmailOrigin(
         $email,
-        OrganizationInterface $organization = null,
+        ?OrganizationInterface $organization = null,
         $originName = InternalEmailOrigin::BAP,
         $enableUseUserEmailOrigin = true,
         $secured = false
@@ -245,7 +245,7 @@ class EmailOriginHelper
      *
      * @return \Closure
      */
-    protected function getImapEnabledFilter(OrganizationInterface $organization = null)
+    protected function getImapEnabledFilter(?OrganizationInterface $organization = null)
     {
         return function ($item) use ($organization) {
             return $item instanceof UserEmailOrigin && $item->isActive() && $item->isSmtpConfigured()
@@ -258,7 +258,7 @@ class EmailOriginHelper
      *
      * @return \Closure
      */
-    protected function getInternalFilter(OrganizationInterface $organization = null)
+    protected function getInternalFilter(?OrganizationInterface $organization = null)
     {
         return function ($item) use ($organization) {
             return ($item->getOrganization() === $organization || !$organization) &&
@@ -272,7 +272,7 @@ class EmailOriginHelper
      *
      * @return InternalEmailOrigin
      */
-    protected function createUserInternalOrigin(User $user, OrganizationInterface $organization = null)
+    protected function createUserInternalOrigin(User $user, ?OrganizationInterface $organization = null)
     {
         $organization = $organization ?: $user->getOrganization();
         $originName = InternalEmailOrigin::BAP . '_User_' . $user->getId();

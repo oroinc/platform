@@ -18,7 +18,7 @@ class AclSidManager extends AbstractAclManager
     /**
      * Constructor
      */
-    public function __construct(MutableAclProvider $aclProvider = null)
+    public function __construct(?MutableAclProvider $aclProvider = null)
     {
         $this->aclProvider = $aclProvider;
     }

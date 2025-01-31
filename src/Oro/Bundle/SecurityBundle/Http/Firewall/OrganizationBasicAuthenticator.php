@@ -126,7 +126,7 @@ class OrganizationBasicAuthenticator extends AbstractAuthenticator implements Au
     }
 
     #[\Override]
-    public function start(Request $request, AuthenticationException $authException = null): Response
+    public function start(Request $request, ?AuthenticationException $authException = null): Response
     {
         $response = new Response();
         $response->headers->set('WWW-Authenticate', sprintf('Basic realm="%s"', $this->realmName));

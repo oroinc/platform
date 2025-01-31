@@ -78,7 +78,7 @@ abstract class AbstractEntityConfigQuery extends ParametrizedMigrationQuery
      * @param int                  $id
      * @param LoggerInterface|null $logger
      */
-    protected function updateEntityConfigData(array $entityData, $id, LoggerInterface $logger = null)
+    protected function updateEntityConfigData(array $entityData, $id, ?LoggerInterface $logger = null)
     {
         $query = 'UPDATE oro_entity_config SET data = ? WHERE id = ?';
         $parameters = [$this->connection->convertToDatabaseValue($entityData, Types::ARRAY), $id];
@@ -96,7 +96,7 @@ abstract class AbstractEntityConfigQuery extends ParametrizedMigrationQuery
      * @param int                  $id
      * @param LoggerInterface|null $logger
      */
-    protected function updateFieldConfigData(array $fieldData, $id, LoggerInterface $logger = null)
+    protected function updateFieldConfigData(array $fieldData, $id, ?LoggerInterface $logger = null)
     {
         $query = 'UPDATE oro_entity_config_field SET data = ? WHERE id = ?';
         $parameters = [$this->connection->convertToDatabaseValue($fieldData, Types::ARRAY), $id];

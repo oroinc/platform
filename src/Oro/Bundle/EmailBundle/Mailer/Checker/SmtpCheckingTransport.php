@@ -11,7 +11,7 @@ use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
  */
 class SmtpCheckingTransport extends EsmtpTransport
 {
-    public function check(string &$error = null): bool
+    public function check(?string &$error = null): bool
     {
         try {
             $this->getStream()->initialize();

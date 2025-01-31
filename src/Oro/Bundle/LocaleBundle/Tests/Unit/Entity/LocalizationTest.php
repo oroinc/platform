@@ -46,7 +46,7 @@ class LocalizationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isUpdatedAtSetDataProvider
      */
-    public function testIsUpdatedAtSet(bool $expected, \DateTime $date = null): void
+    public function testIsUpdatedAtSet(bool $expected, ?\DateTime $date = null): void
     {
         $entity = new Localization();
         $entity->setUpdatedAt($date);
@@ -153,10 +153,10 @@ class LocalizationTest extends \PHPUnit\Framework\TestCase
     }
 
     protected function createLocalizedValue(
-        string $value,
-        bool $default = false,
-        Localization $localization = null,
-        string $fallbackValue = 'some string'
+        string        $value,
+        bool          $default = false,
+        ?Localization $localization = null,
+        string        $fallbackValue = 'some string'
     ): LocalizedFallbackValue {
         $localized = (new LocalizedFallbackValue())->setString($fallbackValue);
 

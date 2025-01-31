@@ -41,7 +41,7 @@ class ErrorCompleter extends AbstractErrorCompleter
     }
 
     #[\Override]
-    public function complete(Error $error, RequestType $requestType, EntityMetadata $metadata = null): void
+    public function complete(Error $error, RequestType $requestType, ?EntityMetadata $metadata = null): void
     {
         $this->completeStatusCode($error);
         $this->completeCode($error);
@@ -56,7 +56,7 @@ class ErrorCompleter extends AbstractErrorCompleter
         string $entityPath,
         Error $error,
         RequestType $requestType,
-        EntityMetadata $metadata = null
+        ?EntityMetadata $metadata = null
     ): void {
         $this->completeSource($error, $requestType, $metadata);
         $errorSource = $error->getSource();
@@ -81,7 +81,7 @@ class ErrorCompleter extends AbstractErrorCompleter
         }
     }
 
-    private function completeSource(Error $error, RequestType $requestType, EntityMetadata $metadata = null): void
+    private function completeSource(Error $error, RequestType $requestType, ?EntityMetadata $metadata = null): void
     {
         $source = $error->getSource();
         if (null === $source && $this->isConfigFilterConstraintViolation($error)) {

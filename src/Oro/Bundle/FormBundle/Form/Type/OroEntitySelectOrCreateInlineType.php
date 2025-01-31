@@ -233,11 +233,11 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
     }
 
     private function createDefaultTransformer(
-        string $entityClass,
-        string $newItemPropertyName = null,
-        bool $newItemAllowEmptyProperty = false,
-        string $newItemValuePath = null,
-        bool $isCreateGranted = true
+        string  $entityClass,
+        ?string $newItemPropertyName = null,
+        bool    $newItemAllowEmptyProperty = false,
+        ?string $newItemValuePath = null,
+        bool    $isCreateGranted = true
     ): DataTransformerInterface {
         if ($newItemPropertyName && $isCreateGranted) {
             $transformer = new EntityCreationTransformer($this->entityManager, $entityClass);

@@ -124,7 +124,7 @@ class EmailGridListener
      * @param QueryBuilder $queryBuilder
      * @param QueryBuilder|null $countQb
      */
-    protected function prepareQueryToFilter($filtersState, QueryBuilder $queryBuilder, QueryBuilder $countQb = null)
+    protected function prepareQueryToFilter($filtersState, QueryBuilder $queryBuilder, ?QueryBuilder $countQb = null)
     {
         $this->filterJoins = [];
         $groupByFilters = ['cc', 'bcc', 'to', 'folders', 'folder', 'mailbox'];

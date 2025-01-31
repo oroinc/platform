@@ -52,7 +52,7 @@ class EmailModelSender
      *
      * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
      */
-    public function send(EmailModel $emailModel, EmailOrigin $emailOrigin = null, bool $persist = true): EmailUser
+    public function send(EmailModel $emailModel, ?EmailOrigin $emailOrigin = null, bool $persist = true): EmailUser
     {
         if ($emailModel->getType() === 'html') {
             // Extracts embedded images from email body and adds them as attachments.

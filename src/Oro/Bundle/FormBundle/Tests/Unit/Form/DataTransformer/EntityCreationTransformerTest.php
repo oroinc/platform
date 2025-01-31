@@ -44,7 +44,7 @@ class EntityCreationTransformerTest extends \PHPUnit\Framework\TestCase
         ?string $valuePath = 'value',
         bool $allowEmptyProperty = false,
         string $newEntityPropertyName = 'name',
-        \Exception $exception = null,
+        ?\Exception $exception = null,
         bool $loadEntity = false
     ) {
         $this->transformer->setValuePath($valuePath);

@@ -23,7 +23,7 @@ class CollectionTypeSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber = new CollectionTypeSubscriber();
     }
 
-    private function createEvent(mixed $data, FormInterface $form = null): FormEvent
+    private function createEvent(mixed $data, ?FormInterface $form = null): FormEvent
     {
         return new FormEvent(
             $form ?? $this->createMock(FormInterface::class),

@@ -21,7 +21,7 @@ class SerializerExtension extends BaseSerializerExtension implements ServiceSubs
     }
 
     #[\Override]
-    public function serialize($object, $type = 'json', SerializationContext $context = null): string
+    public function serialize($object, $type = 'json', ?SerializationContext $context = null): string
     {
         if (null === $this->serializer) {
             $this->serializer = $this->getSerializer();

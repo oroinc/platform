@@ -26,7 +26,7 @@ class JobRunner
         JobProcessor $jobProcessor,
         ExtensionInterface $jobExtension,
         TopicRegistry $topicRegistry,
-        Job $rootJob = null
+        ?Job $rootJob = null
     ) {
         $this->jobProcessor = $jobProcessor;
         $this->jobExtension = $jobExtension;

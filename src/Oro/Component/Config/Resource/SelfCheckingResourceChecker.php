@@ -19,7 +19,7 @@ class SelfCheckingResourceChecker implements ResourceCheckerInterface
 
     public function __construct(
         bool $debug,
-        SymfonySelfCheckingResourceChecker $innerResourceChecker = null
+        ?SymfonySelfCheckingResourceChecker $innerResourceChecker = null
     ) {
         $this->debug = $debug;
         $this->innerResourceChecker = $innerResourceChecker ?? new SymfonySelfCheckingResourceChecker();

@@ -106,7 +106,7 @@ abstract class AbstractAudit
      * @param AbstractUser|null $user
      * @return AbstractAudit
      */
-    abstract public function setUser(AbstractUser $user = null);
+    abstract public function setUser(?AbstractUser $user = null);
 
     /**
      * Get user
@@ -183,7 +183,7 @@ abstract class AbstractAudit
      * @param Organization|null $organization
      * @return AbstractAudit
      */
-    public function setOrganization(Organization $organization = null)
+    public function setOrganization(?Organization $organization = null)
     {
         $this->organization = $organization;
 
@@ -204,7 +204,7 @@ abstract class AbstractAudit
      * @param Impersonation|null $impersonation
      * @return $this
      */
-    public function setImpersonation(Impersonation $impersonation = null)
+    public function setImpersonation(?Impersonation $impersonation = null)
     {
         $this->impersonation = $impersonation;
 
@@ -266,7 +266,7 @@ abstract class AbstractAudit
         return $this->loggedAt;
     }
 
-    public function setLoggedAt(\DateTime $loggedAt = null)
+    public function setLoggedAt(?\DateTime $loggedAt = null)
     {
         $this->loggedAt = $loggedAt ?: new \DateTime();
     }

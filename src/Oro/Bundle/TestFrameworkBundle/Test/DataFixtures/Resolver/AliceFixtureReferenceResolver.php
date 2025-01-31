@@ -49,7 +49,7 @@ final class AliceFixtureReferenceResolver implements ChainableValueResolverInter
 
     protected array $instances = [];
 
-    public function __construct(ObjectGeneratorInterface $generator = null)
+    public function __construct(?ObjectGeneratorInterface $generator = null)
     {
         $this->generator = $generator;
     }
@@ -124,7 +124,7 @@ final class AliceFixtureReferenceResolver implements ChainableValueResolverInter
         string $referredFixtureId,
         ResolvedFixtureSet $fixtureSet,
         GenerationContext $context,
-        bool $passIncompleteObject = null
+        ?bool $passIncompleteObject = null
     ): ResolvedValueWithFixtureSet {
         if ($fixtureSet->getObjects()->has($referredFixture)) {
             $referredObject = $fixtureSet->getObjects()->get($referredFixture);

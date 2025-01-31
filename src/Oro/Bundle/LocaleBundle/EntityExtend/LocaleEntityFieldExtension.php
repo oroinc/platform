@@ -175,7 +175,7 @@ class LocaleEntityFieldExtension extends AbstractEntityFieldExtension implements
         }
     }
 
-    private function getValue(Collection $values, Localization $localization = null): mixed
+    private function getValue(Collection $values, ?Localization $localization = null): mixed
     {
         $result = null;
         foreach ($values as $value) {
@@ -207,7 +207,7 @@ EOF;
         return $result;
     }
 
-    private function getLocalizedFallbackValue(Collection $values, Localization $localization = null)
+    private function getLocalizedFallbackValue(Collection $values, ?Localization $localization = null)
     {
         $value = $this->getValue($values, $localization);
         if (null !== $localization) {

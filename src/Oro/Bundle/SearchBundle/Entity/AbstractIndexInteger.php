@@ -68,7 +68,7 @@ abstract class AbstractIndexInteger implements ItemFieldInterface
     }
 
     #[\Override]
-    public function setItem(AbstractItem $index = null)
+    public function setItem(?AbstractItem $index = null)
     {
         $this->item = $index;
 

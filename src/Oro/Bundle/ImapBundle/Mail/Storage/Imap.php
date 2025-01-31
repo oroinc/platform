@@ -502,7 +502,7 @@ class Imap extends \Laminas\Mail\Storage\Imap
      * @param Closure|null $callback The callback function.
      *                                function (\Exception)
      */
-    public function setConvertErrorCallback(Closure $callback = null)
+    public function setConvertErrorCallback(?Closure $callback = null)
     {
         $this->onConvertError = $callback;
     }

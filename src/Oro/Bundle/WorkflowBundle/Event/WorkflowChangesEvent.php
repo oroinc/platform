@@ -13,7 +13,7 @@ class WorkflowChangesEvent extends Event
     /** @var WorkflowDefinition */
     private $originalDefinition;
 
-    public function __construct(WorkflowDefinition $definition, WorkflowDefinition $original = null)
+    public function __construct(WorkflowDefinition $definition, ?WorkflowDefinition $original = null)
     {
         $this->definition = $definition;
         $this->originalDefinition = $original;

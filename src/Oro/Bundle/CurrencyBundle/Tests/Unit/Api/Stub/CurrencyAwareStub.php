@@ -7,12 +7,12 @@ class CurrencyAwareStub
     /** @var string|null */
     private $currency;
 
-    public function __construct(string $currency = null)
+    public function __construct(?string $currency = null)
     {
         $this->currency = $currency;
     }
 
-    public function setCurrency(string $currency = null)
+    public function setCurrency(?string $currency = null)
     {
         $this->currency = $currency;
     }

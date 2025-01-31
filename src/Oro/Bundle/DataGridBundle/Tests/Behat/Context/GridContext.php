@@ -1915,7 +1915,7 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
         string $action,
         string $elementName,
         string $rowNumber = 'first',
-        string $gridName = null
+        ?string $gridName = null
     ) {
         $grid = $this->getGrid($gridName);
         $rowElements = $grid->getRowElements($elementName);
@@ -1980,14 +1980,14 @@ class GridContext extends OroFeatureContext implements OroPageObjectAware
      * @Given I click on :title in grid view list
      * @Given I click on :title in grid view list in "(?P<gridName>[^"]+)"
      */
-    public function clickLinkInViewList(string $title, string $gridName = null)
+    public function clickLinkInViewList(string $title, ?string $gridName = null)
     {
         $list = $this->getViewList($gridName);
         $list->press();
         $list->clickLink($title);
     }
 
-    private function getViewList(string $gridName = null): Element
+    private function getViewList(?string $gridName = null): Element
     {
         if ($gridName === null) {
             $list = $this->elementFactory->createElement('GridViewList');
@@ -2513,7 +2513,7 @@ TEXT;
      * @Given /^(?:|I )show filter "(?P<filter>(?:[^"]|\\")*)" in grid$/
      * @Given /^(?:|I )show filter "(?P<filter>(?:[^"]|\\")*)" in "(?P<gridName>[^"]+)" grid$/
      */
-    public function iShowFilterInGrid(string $filter, string $gridName = null)
+    public function iShowFilterInGrid(string $filter, ?string $gridName = null)
     {
         $grid = $this->getGrid($gridName);
 
@@ -2746,7 +2746,7 @@ TEXT;
     public function iShouldSeeElementInGridRowContainingContent(
         string $elementName,
         string $content,
-        string $gridName = null
+        ?string $gridName = null
     ) {
         $grid = $this->getGrid($gridName);
         $rowElement = $grid->getRowByContent($content);
@@ -2990,7 +2990,7 @@ TEXT;
      * @Then /^I should see mass action checkbox in row with (?P<content>(?:[^"]|\\")*) content for "(?P<gridName>[^"]+)"$/
      */
     //@codingStandardsIgnoreEnd
-    public function iShouldSeeMassActionCheckbox(string $content, string $gridName = null)
+    public function iShouldSeeMassActionCheckbox(string $content, ?string $gridName = null)
     {
         static::assertTrue(
             $this->getGrid($gridName)->getRowByContent($content)->hasMassActionCheckbox(),
@@ -3007,7 +3007,7 @@ TEXT;
      * @Then /^I should not see mass action checkbox in row with (?P<content>(?:[^"]|\\")*) content for "(?P<gridName>[^"]+)"$/
      */
     //@codingStandardsIgnoreEnd
-    public function iShouldNotSeeMassActionCheckbox(string $content, string $gridName = null)
+    public function iShouldNotSeeMassActionCheckbox(string $content, ?string $gridName = null)
     {
         static::assertFalse(
             $this->getGrid($gridName)->getRowByContent($content)->hasMassActionCheckbox(),

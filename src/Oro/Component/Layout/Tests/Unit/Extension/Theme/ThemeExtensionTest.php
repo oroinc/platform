@@ -211,7 +211,7 @@ class ThemeExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->getLayoutUpdates($this->getLayoutItem('root', $themeName));
     }
 
-    private function getLayoutItem(string $id, string $theme = null): LayoutItemInterface
+    private function getLayoutItem(string $id, ?string $theme = null): LayoutItemInterface
     {
         $context = new LayoutContext([], ['theme']);
         $context->set('theme', $theme);

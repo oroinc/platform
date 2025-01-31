@@ -106,7 +106,7 @@ class BrowserTabContext extends OroFeatureContext implements BrowserTabManagerAw
      * @When /^(?:|I )close (?:|the )current browser tab$/
      * @When /^(?:|I )close (?:|the )browser tab "(?P<alias>[^"]+)"$/
      */
-    public function iCloseTheCurrentWindow(string $alias = null)
+    public function iCloseTheCurrentWindow(?string $alias = null)
     {
         $this->browserTabManager->closeTab($this->getMink(), $alias);
     }

@@ -12,11 +12,11 @@ trait FallbackTrait
 {
     /**
      * @param Collection|AbstractLocalizedFallbackValue[] $values
-     * @param Localization|null                           $localization
+     * @param Localization|null $localization
      *
      * @return AbstractLocalizedFallbackValue|null
      */
-    protected function getFallbackValue(Collection $values, Localization $localization = null)
+    protected function getFallbackValue(Collection $values, ?Localization $localization = null)
     {
         return $this->getLocalizedFallbackValue($values, $localization);
     }
@@ -67,7 +67,7 @@ trait FallbackTrait
      *
      * @throws \LogicException
      */
-    private function getLocalizedFallbackValue(Collection $values, Localization $localization = null)
+    private function getLocalizedFallbackValue(Collection $values, ?Localization $localization = null)
     {
         $value = $this->getValue($values, $localization);
         if (null !== $localization) {
@@ -101,13 +101,13 @@ trait FallbackTrait
 
     /**
      * @param Collection|AbstractLocalizedFallbackValue[] $values
-     * @param Localization|null                           $localization
+     * @param Localization|null $localization
      *
      * @return AbstractLocalizedFallbackValue|null
      *
      * @throws \LogicException
      */
-    private function getValue(Collection $values, Localization $localization = null)
+    private function getValue(Collection $values, ?Localization $localization = null)
     {
         $result = null;
         foreach ($values as $value) {

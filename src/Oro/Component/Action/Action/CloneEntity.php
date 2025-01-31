@@ -32,11 +32,11 @@ class CloneEntity extends CloneObject
     protected $logger;
 
     public function __construct(
-        ContextAccessor $contextAccessor,
-        ManagerRegistry $registry,
+        ContextAccessor     $contextAccessor,
+        ManagerRegistry     $registry,
         TranslatorInterface $translator,
-        RequestStack $requestStack = null,
-        LoggerInterface $logger = null
+        ?RequestStack       $requestStack = null,
+        ?LoggerInterface    $logger = null
     ) {
         parent::__construct($contextAccessor);
 

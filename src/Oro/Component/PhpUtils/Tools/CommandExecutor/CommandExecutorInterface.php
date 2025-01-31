@@ -18,7 +18,7 @@ interface CommandExecutorInterface
      *
      * @return int The exit status code
      */
-    public function runCommand(string $command, array $params = [], LoggerInterface $logger = null): int;
+    public function runCommand(string $command, array $params = [], ?LoggerInterface $logger = null): int;
 
     /**
      * Sets the default value of a given option

@@ -353,13 +353,13 @@ class AttributeAssemblerTest extends \PHPUnit\Framework\TestCase
     }
 
     private function getAttribute(
-        string $name,
-        string $label,
-        string $type,
-        array $options = [],
-        mixed $default = null,
-        string $propertyPath = null,
-        array $entityAcl = []
+        string  $name,
+        string  $label,
+        string  $type,
+        array   $options = [],
+        mixed   $default = null,
+        ?string $propertyPath = null,
+        array   $entityAcl = []
     ): Attribute {
         $attribute = new Attribute();
         $attribute->setName($name);

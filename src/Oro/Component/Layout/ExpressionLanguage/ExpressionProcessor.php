@@ -50,11 +50,11 @@ class ExpressionProcessor
     }
 
     public function processExpressions(
-        array &$values,
-        ContextInterface $context,
-        DataAccessorInterface $data = null,
-        bool $evaluate = true,
-        string $encoding = null
+        array                  &$values,
+        ContextInterface       $context,
+        ?DataAccessorInterface $data = null,
+        bool                   $evaluate = true,
+        ?string                $encoding = null
     ): void {
         if (!$evaluate && $encoding === null) {
             return;

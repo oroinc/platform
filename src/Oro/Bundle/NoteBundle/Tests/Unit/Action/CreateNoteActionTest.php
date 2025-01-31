@@ -50,14 +50,14 @@ class CreateNoteActionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider initializeData
      */
-    public function testAction(array $options, string $message, string $target, string $attribute = null)
+    public function testAction(array $options, string $message, string $target, ?string $attribute = null)
     {
         $this->action->initialize($options);
 
         $this->assertActionConfigured($message, $target, $attribute);
     }
 
-    private function assertActionConfigured(string $message, string $target, string $attribute = null): void
+    private function assertActionConfigured(string $message, string $target, ?string $attribute = null): void
     {
         $context = new ActionData([]);
         $targetObject = (object)['target_object'];

@@ -99,7 +99,7 @@ class LocalizationManager implements ClearableConfigCacheInterface
         return $cache[$id] ?? [];
     }
 
-    public function getLocalizations(array $ids = null, bool $useCache = true): array
+    public function getLocalizations(?array $ids = null, bool $useCache = true): array
     {
         $cacheKey = static::getCacheKey();
         $localizations = false;

@@ -177,7 +177,7 @@ class PermissionRepositoryTest extends WebTestCase
      *
      * @return int[]|null
      */
-    private function getPermissionsIds(array $names = null): ?array
+    private function getPermissionsIds(?array $names = null): ?array
     {
         if (null === $names) {
             return null;

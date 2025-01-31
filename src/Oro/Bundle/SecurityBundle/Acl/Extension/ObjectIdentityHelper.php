@@ -41,7 +41,7 @@ class ObjectIdentityHelper
     /**
      * Return full identity string by extension key, class name and optionally field name.
      */
-    public static function encodeIdentityString(string $extensionKey, string $class, string $fieldName = null): string
+    public static function encodeIdentityString(string $extensionKey, string $class, ?string $fieldName = null): string
     {
         if ($fieldName) {
             $class = self::encodeEntityFieldInfo($class, $fieldName);

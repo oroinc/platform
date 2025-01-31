@@ -29,7 +29,7 @@ class GridViewUser extends AbstractGridViewUser
     }
 
     #[\Override]
-    public function setUser(AbstractUser $user = null)
+    public function setUser(?AbstractUser $user = null)
     {
         $this->user = $user;
 

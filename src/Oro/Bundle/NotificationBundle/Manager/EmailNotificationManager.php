@@ -52,7 +52,7 @@ class EmailNotificationManager implements LoggerAwareInterface
      *                                     this logger will be used instead of a logger specified
      *                                     in the constructor
      */
-    public function process(array $notifications, array $params = [], LoggerInterface $logger = null): void
+    public function process(array $notifications, array $params = [], ?LoggerInterface $logger = null): void
     {
         foreach ($notifications as $notification) {
             try {
@@ -78,7 +78,7 @@ class EmailNotificationManager implements LoggerAwareInterface
     public function processSingle(
         TemplateEmailNotificationInterface $notification,
         array $params = [],
-        LoggerInterface $logger = null
+        ?LoggerInterface $logger = null
     ): void {
         try {
             $sender = $this->getSender($notification);

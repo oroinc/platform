@@ -65,7 +65,7 @@ class HandleProcessTriggerCommandTest extends TestCase
     /**
      * @dataProvider executeProvider
      */
-    public function testExecute(int $id, array $expectedOutput, \Exception $exception = null)
+    public function testExecute(int $id, array $expectedOutput, ?\Exception $exception = null)
     {
         $this->input->expects($this->exactly(2))
             ->method('getOption')

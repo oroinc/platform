@@ -21,14 +21,14 @@ class ExpandedAssociationExtractor
      *
      * @param EntityDefinitionConfig           $config
      * @param ExpandRelatedEntitiesConfigExtra $expandConfigExtra
-     * @param string|null                      $associationPath
+     * @param string|null $associationPath
      *
      * @return EntityDefinitionFieldConfig[] [field name => EntityDefinitionFieldConfig, ...]
      */
     public function getExpandedAssociations(
         EntityDefinitionConfig $config,
         ExpandRelatedEntitiesConfigExtra $expandConfigExtra,
-        string $associationPath = null
+        ?string $associationPath = null
     ): array {
         $result = [];
         $fields = $config->getFields();

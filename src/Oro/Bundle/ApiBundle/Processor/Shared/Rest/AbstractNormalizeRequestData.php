@@ -113,7 +113,7 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
         return $this->entityIdTransformerRegistry->getEntityIdTransformer($requestType);
     }
 
-    protected function addValidationError(string $title, string $propertyPath = null): Error
+    protected function addValidationError(string $title, ?string $propertyPath = null): Error
     {
         $error = Error::createValidationError($title);
         if (null !== $propertyPath) {

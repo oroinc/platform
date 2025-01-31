@@ -14,7 +14,7 @@ interface ErrorCompleterInterface
     /**
      * Completes all properties of the given Error object.
      */
-    public function complete(Error $error, RequestType $requestType, EntityMetadata $metadata = null): void;
+    public function complete(Error $error, RequestType $requestType, ?EntityMetadata $metadata = null): void;
 
     /**
      * Adds the given entity path to the source of the given Error object.
@@ -23,6 +23,6 @@ interface ErrorCompleterInterface
         string $entityPath,
         Error $error,
         RequestType $requestType,
-        EntityMetadata $metadata = null
+        ?EntityMetadata $metadata = null
     ): void;
 }

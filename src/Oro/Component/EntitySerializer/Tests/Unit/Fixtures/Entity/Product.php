@@ -36,7 +36,7 @@ class Product
     #[ORM\InverseJoinColumn(name: 'product_group_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private ?Collection $groups = null;
 
-    public function __construct(int $id = null)
+    public function __construct(?int $id = null)
     {
         $this->id = $id;
         $this->groups = new ArrayCollection();

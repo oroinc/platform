@@ -17,7 +17,7 @@ class EmailOriginAwareEnvelope extends Envelope
 
     private ?EmailOrigin $emailOrigin;
 
-    public function __construct(RawMessage $message, EmailOrigin $emailOrigin = null)
+    public function __construct(RawMessage $message, ?EmailOrigin $emailOrigin = null)
     {
         $this->envelope = parent::create($message);
         $this->emailOrigin = $emailOrigin;

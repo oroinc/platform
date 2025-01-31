@@ -90,7 +90,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
     }
 
     #[\Override]
-    public function isArrayAllowed(string $operator = null): bool
+    public function isArrayAllowed(?string $operator = null): bool
     {
         return
             parent::isArrayAllowed($operator)
@@ -105,7 +105,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
     }
 
     #[\Override]
-    public function isRangeAllowed(string $operator = null): bool
+    public function isRangeAllowed(?string $operator = null): bool
     {
         return
             parent::isRangeAllowed($operator)
@@ -132,7 +132,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
     }
 
     #[\Override]
-    public function apply(Criteria $criteria, FilterValue $value = null): void
+    public function apply(Criteria $criteria, ?FilterValue $value = null): void
     {
         $expr = $this->createExpression($value);
         if (null !== $expr) {
@@ -143,7 +143,7 @@ class ComparisonFilter extends StandaloneFilter implements FieldAwareFilterInter
     /**
      * Creates an expression that can be used to in WHERE statement to filter data by this filter.
      */
-    protected function createExpression(FilterValue $value = null): ?Expression
+    protected function createExpression(?FilterValue $value = null): ?Expression
     {
         if (null === $value) {
             return null;

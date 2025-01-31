@@ -30,7 +30,7 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
         string $workflowName,
         array $attributes = [],
         array $steps = [],
-        string $relatedEntity = null
+        ?string $relatedEntity = null
     ): Workflow {
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $aclManager = $this->createMock(AclManager::class);
@@ -63,10 +63,10 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
     }
 
     protected function createAttribute(
-        string $name = null,
-        string $type = null,
-        string $label = null,
-        string $propertyPath = null
+        ?string $name = null,
+        ?string $type = null,
+        ?string $label = null,
+        ?string $propertyPath = null
     ): Attribute {
         $result = new Attribute();
         $result->setName($name);
@@ -77,7 +77,7 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
         return $result;
     }
 
-    protected function createStep(string $name = null): Step
+    protected function createStep(?string $name = null): Step
     {
         $result = new Step();
         $result->setName($name);
@@ -85,7 +85,7 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
         return $result;
     }
 
-    protected function createWorkflowItem(Workflow $workflow, WorkflowStep $currentStep = null): WorkflowItem
+    protected function createWorkflowItem(Workflow $workflow, ?WorkflowStep $currentStep = null): WorkflowItem
     {
         $result = new WorkflowItem();
         $result->setCurrentStep($currentStep);
@@ -98,14 +98,14 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function createWorkflowAttributesType(
-        WorkflowRegistry $workflowRegistry = null,
-        AttributeGuesser $attributeGuesser = null,
-        DefaultValuesListener $defaultValuesListener = null,
-        FormInitListener $formInitListener = null,
-        RequiredAttributesListener $requiredAttributesListener = null,
-        EventDispatcherInterface $dispatcher = null,
-        PropertyPathSecurityHelper $propertyPathSecurityHelper = null,
-        TranslatorInterface $translator = null
+        ?WorkflowRegistry           $workflowRegistry = null,
+        ?AttributeGuesser           $attributeGuesser = null,
+        ?DefaultValuesListener      $defaultValuesListener = null,
+        ?FormInitListener           $formInitListener = null,
+        ?RequiredAttributesListener $requiredAttributesListener = null,
+        ?EventDispatcherInterface   $dispatcher = null,
+        ?PropertyPathSecurityHelper $propertyPathSecurityHelper = null,
+        ?TranslatorInterface        $translator = null
     ): WorkflowAttributesType {
         if (!$workflowRegistry) {
             $workflowRegistry = $this->createMock(WorkflowRegistry::class);

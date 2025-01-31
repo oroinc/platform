@@ -83,7 +83,7 @@ class Email implements EmailInterface
      * @param User|null $user
      * @return Email
      */
-    public function setUser(User $user = null)
+    public function setUser(?User $user = null)
     {
         $this->user = $user;
 

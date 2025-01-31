@@ -48,7 +48,7 @@ class VariableAssembler extends BaseAbstractAssembler
      * @return Collection
      * @throws AssemblerException If configuration is invalid
      */
-    public function assemble(Workflow $workflow, array $configuration = null)
+    public function assemble(Workflow $workflow, ?array $configuration = null)
     {
         $variables = new ArrayCollection();
         if (!is_array($configuration)) {

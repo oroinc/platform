@@ -66,7 +66,7 @@ class Acl
     /**
      * @throws \InvalidArgumentException
      */
-    public static function fromArray(array $data = null)
+    public static function fromArray(?array $data = null)
     {
         return new static(
             id: $data['id'] ?? null,

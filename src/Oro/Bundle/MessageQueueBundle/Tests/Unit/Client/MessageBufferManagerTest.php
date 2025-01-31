@@ -23,7 +23,7 @@ class MessageBufferManagerTest extends \PHPUnit\Framework\TestCase
         $this->doctrine = $this->createMock(ManagerRegistry::class);
     }
 
-    private function getMessageBufferManager(string $connectionName = null): MessageBufferManager
+    private function getMessageBufferManager(?string $connectionName = null): MessageBufferManager
     {
         return new MessageBufferManager($this->bufferedProducer, $this->doctrine, $connectionName);
     }

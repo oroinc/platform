@@ -96,7 +96,7 @@ abstract class AddActivityListsData extends AbstractFixture implements Container
         $manager->clear();
     }
 
-    protected function setSecurityContext(User $user, Organization $organization = null): void
+    protected function setSecurityContext(User $user, ?Organization $organization = null): void
     {
         $tokenStorage = $this->container->get('security.token_storage');
         if ($organization) {

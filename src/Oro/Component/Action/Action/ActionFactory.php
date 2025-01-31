@@ -30,11 +30,11 @@ class ActionFactory implements ActionFactoryInterface
      * @param string $type
      * @param array $options
      * @param ExpressionInterface|null $condition
-     * @throws \RunTimeException
      * @return ActionInterface
+     *@throws \RunTimeException
      */
     #[\Override]
-    public function create($type, array $options = [], ExpressionInterface $condition = null)
+    public function create($type, array $options = [], ?ExpressionInterface $condition = null)
     {
         if (!$type) {
             throw new \RuntimeException('The action type must be defined');

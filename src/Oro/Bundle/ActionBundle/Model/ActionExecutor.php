@@ -34,10 +34,10 @@ class ActionExecutor
     }
 
     public function evaluateExpression(
-        string $expressionName,
-        array $data = [],
-        \ArrayAccess $errors = null,
-        string $message = null
+        string        $expressionName,
+        array         $data = [],
+        ?\ArrayAccess $errors = null,
+        ?string       $message = null
     ): bool {
         $options = $this->prepareOptions($data);
         $expression = $this->expressionFactory->create($expressionName, $options);

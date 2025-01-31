@@ -63,11 +63,11 @@ class UpdateHandlerFacade
      *          if form was successfully submitted from create/update page
      */
     public function update(
-        string|object $data,
-        string|FormInterface $form,
-        ?string $saveMessage,
-        Request $request = null,
-        FormHandlerInterface|string|callable|null $formHandler = null,
+        string|object                                          $data,
+        string|FormInterface                                   $form,
+        ?string                                                $saveMessage,
+        ?Request                                               $request = null,
+        FormHandlerInterface|string|callable|null              $formHandler = null,
         FormTemplateDataProviderInterface|string|callable|null $resultProvider = null
     ): array|RedirectResponse {
         $update = $this->updateFactory->createUpdate($data, $form, $formHandler, $resultProvider);

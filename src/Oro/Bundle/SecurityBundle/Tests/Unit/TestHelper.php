@@ -44,9 +44,9 @@ class TestHelper
     }
 
     public function createAclExtensionSelector(
-        OwnershipMetadataProviderInterface $metadataProvider = null,
-        OwnerTree $ownerTree = null,
-        AccessLevelOwnershipDecisionMakerInterface $decisionMaker = null
+        ?OwnershipMetadataProviderInterface         $metadataProvider = null,
+        ?OwnerTree                                  $ownerTree = null,
+        ?AccessLevelOwnershipDecisionMakerInterface $decisionMaker = null
     ): AclExtensionSelector {
         $doctrineHelper = $this->testCase->getMockBuilder(DoctrineHelper::class)
             ->disableOriginalConstructor()
@@ -81,13 +81,13 @@ class TestHelper
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function createEntityAclExtension(
-        OwnershipMetadataProviderInterface $metadataProvider = null,
-        OwnerTree $ownerTree = null,
-        ObjectIdAccessor $idAccessor = null,
-        AccessLevelOwnershipDecisionMakerInterface $decisionMaker = null,
-        EntityOwnerAccessor $entityOwnerAccessor = null,
-        PermissionManager $permissionManager = null,
-        AclGroupProviderInterface $groupProvider = null
+        ?OwnershipMetadataProviderInterface         $metadataProvider = null,
+        ?OwnerTree                                  $ownerTree = null,
+        ?ObjectIdAccessor                           $idAccessor = null,
+        ?AccessLevelOwnershipDecisionMakerInterface $decisionMaker = null,
+        ?EntityOwnerAccessor                        $entityOwnerAccessor = null,
+        ?PermissionManager                          $permissionManager = null,
+        ?AclGroupProviderInterface                  $groupProvider = null
     ): EntityAclExtension {
         if ($idAccessor === null) {
             $doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)
@@ -174,11 +174,11 @@ class TestHelper
     }
 
     public function createFieldAclExtension(
-        OwnershipMetadataProviderInterface $metadataProvider = null,
-        OwnerTree $ownerTree = null,
-        ObjectIdAccessor $idAccessor = null,
-        AccessLevelOwnershipDecisionMakerInterface $decisionMaker = null,
-        ConfigManager $configManager = null
+        ?OwnershipMetadataProviderInterface         $metadataProvider = null,
+        ?OwnerTree                                  $ownerTree = null,
+        ?ObjectIdAccessor                           $idAccessor = null,
+        ?AccessLevelOwnershipDecisionMakerInterface $decisionMaker = null,
+        ?ConfigManager                              $configManager = null
     ): FieldAclExtension {
         if ($idAccessor === null) {
             $doctrineHelper = $this->getMockBuilder(DoctrineHelper::class)

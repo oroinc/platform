@@ -28,7 +28,7 @@ class Parser
 
     /**
      * @param TokenStream                 $stream
-     * @param Query|null                  $query
+     * @param Query|null $query
      * @param FieldResolverInterface|null $fieldResolver
      * @param string|null                 $keyword
      *
@@ -38,8 +38,8 @@ class Parser
      */
     public function parse(
         TokenStream $stream,
-        Query $query = null,
-        FieldResolverInterface $fieldResolver = null,
+        ?Query $query = null,
+        ?FieldResolverInterface $fieldResolver = null,
         $keyword = null
     ) {
         if (null === $query) {

@@ -17,7 +17,7 @@ use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 class SimpleSearchFilter extends StandaloneFilter implements FieldFilterInterface
 {
     #[\Override]
-    public function apply(Criteria $criteria, FilterValue $value = null): void
+    public function apply(Criteria $criteria, ?FilterValue $value = null): void
     {
         if (null === $value) {
             return;

@@ -9,9 +9,9 @@ use Doctrine\Common\Collections\Collection;
  */
 interface OperationServiceInterface
 {
-    public function isPreConditionAllowed(ActionData $data, Collection $errors = null): bool;
+    public function isPreConditionAllowed(ActionData $data, ?Collection $errors = null): bool;
 
-    public function isConditionAllowed(ActionData $data, Collection $errors = null): bool;
+    public function isConditionAllowed(ActionData $data, ?Collection $errors = null): bool;
 
     public function execute(ActionData $data): void;
 }

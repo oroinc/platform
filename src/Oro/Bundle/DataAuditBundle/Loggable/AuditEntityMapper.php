@@ -55,7 +55,7 @@ class AuditEntityMapper
      *
      * @return string
      */
-    public function getAuditEntryClass(AbstractUser $user = null)
+    public function getAuditEntryClass(?AbstractUser $user = null)
     {
         if (null === $user) {
             return $this->getDefaultEntry('entry');
@@ -74,7 +74,7 @@ class AuditEntityMapper
      *
      * @return string
      */
-    public function getAuditEntryFieldClass(AbstractUser $user = null)
+    public function getAuditEntryFieldClass(?AbstractUser $user = null)
     {
         if (null === $user) {
             return $this->getDefaultEntry('field_entry');

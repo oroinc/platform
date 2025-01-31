@@ -64,11 +64,11 @@ class WorkflowTransitCommandTest extends \PHPUnit\Framework\TestCase
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function testExecute(
-        string|int $id,
-        ?string $transition,
-        array $expectedOutput,
-        \Exception $exception = null,
-        \Exception $expectedException = null
+        string|int  $id,
+        ?string     $transition,
+        array       $expectedOutput,
+        ?\Exception $exception = null,
+        ?\Exception $expectedException = null
     ) {
         $this->input->expects($this->exactly(2))
             ->method('getOption')

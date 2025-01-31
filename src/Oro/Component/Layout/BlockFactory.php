@@ -219,7 +219,7 @@ class BlockFactory implements BlockFactoryInterface
      *
      * @return BlockView
      */
-    protected function buildBlockView($id, BlockView $parentView = null)
+    protected function buildBlockView($id, ?BlockView $parentView = null)
     {
         $blockType       = $this->rawLayout->getProperty($id, RawLayout::BLOCK_TYPE, true);
         $resolvedOptions = $this->rawLayout->getProperty($id, RawLayout::RESOLVED_OPTIONS, true);

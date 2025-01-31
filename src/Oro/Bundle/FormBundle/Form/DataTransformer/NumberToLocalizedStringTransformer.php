@@ -19,10 +19,10 @@ class NumberToLocalizedStringTransformer extends Symfony54NumberToLocalizedStrin
 
     public function __construct(
         NumberFormatter $numberFormatter,
-        int $scale = null,
-        ?bool $grouping = false,
-        ?int $roundingMode = \NumberFormatter::ROUND_HALFUP,
-        string $locale = null
+        ?int            $scale = null,
+        ?bool           $grouping = false,
+        ?int            $roundingMode = \NumberFormatter::ROUND_HALFUP,
+        ?string         $locale = null
     ) {
         $this->numberFormatter = $numberFormatter;
 

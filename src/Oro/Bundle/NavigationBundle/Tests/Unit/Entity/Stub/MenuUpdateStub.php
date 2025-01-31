@@ -59,7 +59,7 @@ class MenuUpdateStub implements MenuUpdateInterface
      * @param Localization|null $localization
      * @return LocalizedFallbackValue|null
      */
-    public function getTitle(Localization $localization = null)
+    public function getTitle(?Localization $localization = null)
     {
         return $this->getFallbackValue($this->titles, $localization);
     }
@@ -81,7 +81,7 @@ class MenuUpdateStub implements MenuUpdateInterface
      * @param Localization|null $localization
      * @return LocalizedFallbackValue|null
      */
-    public function getDescription(Localization $localization = null)
+    public function getDescription(?Localization $localization = null)
     {
         return $this->getFallbackValue($this->descriptions, $localization);
     }

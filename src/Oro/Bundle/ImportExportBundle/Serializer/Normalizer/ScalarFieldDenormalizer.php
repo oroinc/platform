@@ -85,7 +85,7 @@ class ScalarFieldDenormalizer implements ScalarFieldDenormalizerInterface
      * @return bool
      */
     #[\Override]
-    public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization($data, string $type, ?string $format = null, array $context = []): bool
     {
         if (!\array_key_exists('fieldName', $context) || !\array_key_exists('className', $context)) {
             return false;
@@ -104,7 +104,7 @@ class ScalarFieldDenormalizer implements ScalarFieldDenormalizerInterface
     }
 
     #[\Override]
-    public function denormalize($data, string $type, string $format = null, array $context = [])
+    public function denormalize($data, string $type, ?string $format = null, array $context = [])
     {
         if ('' === $data) {
             return $data;

@@ -33,10 +33,10 @@ class Symfony54NumberToLocalizedStringTransformer implements DataTransformerInte
     private $locale;
 
     public function __construct(
-        int $scale = null,
-        ?bool $grouping = false,
-        ?int $roundingMode = \NumberFormatter::ROUND_HALFUP,
-        string $locale = null
+        ?int    $scale = null,
+        ?bool   $grouping = false,
+        ?int    $roundingMode = \NumberFormatter::ROUND_HALFUP,
+        ?string $locale = null
     ) {
         $this->scale = $scale;
         $this->grouping = $grouping ?? false;

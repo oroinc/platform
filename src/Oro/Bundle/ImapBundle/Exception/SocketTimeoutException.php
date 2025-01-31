@@ -16,7 +16,7 @@ class SocketTimeoutException extends \RuntimeException
     public function __construct(
         $message = '',
         $code = 0,
-        \Exception $previous = null,
+        ?\Exception $previous = null,
         $socketMetadata = []
     ) {
         $this->socketMetadata = $socketMetadata;

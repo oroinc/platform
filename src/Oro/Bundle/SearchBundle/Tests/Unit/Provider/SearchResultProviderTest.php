@@ -373,7 +373,7 @@ class SearchResultProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    private function getConfigEntity(string $fqcn, string $label = null, string $icon = null): ConfigInterface
+    private function getConfigEntity(string $fqcn, ?string $label = null, ?string $icon = null): ConfigInterface
     {
         $values = [];
         if ($label) {

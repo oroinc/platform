@@ -209,7 +209,7 @@ class Transition
      * @param ExpressionInterface|null $condition
      * @return Transition
      */
-    public function setCondition(ExpressionInterface $condition = null)
+    public function setCondition(?ExpressionInterface $condition = null)
     {
         $this->condition = $condition;
 
@@ -276,7 +276,7 @@ class Transition
      * @param ActionInterface|null $preAction
      * @return Transition
      */
-    public function setPreAction(ActionInterface $preAction = null)
+    public function setPreAction(?ActionInterface $preAction = null)
     {
         $this->preAction = $preAction;
 
@@ -295,7 +295,7 @@ class Transition
      * @param ActionInterface|null $action
      * @return Transition
      */
-    public function setAction(ActionInterface $action = null)
+    public function setAction(?ActionInterface $action = null)
     {
         $this->action = $action;
 
@@ -404,7 +404,7 @@ class Transition
      * @param Collection|null $errors
      * @return boolean
      */
-    protected function isConditionAllowed(WorkflowItem $workflowItem, Collection $errors = null)
+    protected function isConditionAllowed(WorkflowItem $workflowItem, ?Collection $errors = null)
     {
         // Pre-guard transition to be able to block transition on early stages
         // without a need to execute conditions.
@@ -438,7 +438,7 @@ class Transition
      * @param Collection|null $errors
      * @return boolean
      */
-    protected function isPreConditionAllowed(WorkflowItem $workflowItem, Collection $errors = null)
+    protected function isPreConditionAllowed(WorkflowItem $workflowItem, ?Collection $errors = null)
     {
         // Pre-announce transition to be able to block transition availability on early stages
         // without a need to execute pre-actions and pre-conditions.
@@ -474,7 +474,7 @@ class Transition
      * @param Collection|null $errors
      * @return bool
      */
-    public function isAllowed(WorkflowItem $workflowItem, Collection $errors = null)
+    public function isAllowed(WorkflowItem $workflowItem, ?Collection $errors = null)
     {
         return $this->isPreConditionAllowed($workflowItem, $errors)
             && $this->isConditionAllowed($workflowItem, $errors);
@@ -487,7 +487,7 @@ class Transition
      * @param Collection|null $errors
      * @return bool
      */
-    public function isAvailable(WorkflowItem $workflowItem, Collection $errors = null)
+    public function isAvailable(WorkflowItem $workflowItem, ?Collection $errors = null)
     {
         $result = $this->hasForm()
             ? $this->isPreConditionAllowed($workflowItem, $errors)
@@ -503,7 +503,7 @@ class Transition
      *
      * @throws ForbiddenTransitionException
      */
-    public function transit(WorkflowItem $workflowItem, Collection $errors = null)
+    public function transit(WorkflowItem $workflowItem, ?Collection $errors = null)
     {
         if ($workflowItem->isLocked()) {
             throw new WorkflowException('Can not transit locked WorkflowItem. Transit is allowed only in "actions".');

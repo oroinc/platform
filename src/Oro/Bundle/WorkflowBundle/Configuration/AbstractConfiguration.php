@@ -9,7 +9,7 @@ abstract class AbstractConfiguration
      * @param array|null $config
      * @return array
      */
-    protected function mergeConfigs(array $fields, array $config = null)
+    protected function mergeConfigs(array $fields, ?array $config = null)
     {
         if ($config) {
             foreach ($fields as $originalName => $aliasName) {

@@ -209,7 +209,7 @@ class RestDocHandler implements HandlerInterface
         string $action,
         EntityDefinitionConfig $config,
         EntityMetadata $metadata,
-        string $associationName = null
+        ?string $associationName = null
     ): void {
         if ($this->isActionWithOutput($action, $annotation)) {
             if ($metadata->hasIdentifierFields()) {

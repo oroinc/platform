@@ -113,8 +113,8 @@ class DateTimeRangeTypeTest extends AbstractTypeTestCase
      * @throws \Exception
      */
     private function createDateTime(
-        string $dateString,
-        string $timeZone = null,
+        string  $dateString,
+        ?string $timeZone = null,
         ?string $format = 'yyyy-MM-dd HH:mm'
     ): \DateTime {
         $pattern = $format ?: null;

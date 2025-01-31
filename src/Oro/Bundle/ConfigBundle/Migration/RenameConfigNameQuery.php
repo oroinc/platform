@@ -24,7 +24,7 @@ class RenameConfigNameQuery extends ParametrizedMigrationQuery
     /** @var string|null */
     private $newSection;
 
-    public function __construct(string $oldName, string $newName, string $oldSection, string $newSection = null)
+    public function __construct(string $oldName, string $newName, string $oldSection, ?string $newSection = null)
     {
         $this->oldName = $oldName;
         $this->newName = $newName;

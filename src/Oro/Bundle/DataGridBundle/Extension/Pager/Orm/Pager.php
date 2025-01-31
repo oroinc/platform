@@ -64,7 +64,7 @@ class Pager extends AbstractPager
         QueryHintResolver $queryHintResolver,
         QueryExecutorInterface $queryExecutor,
         $maxPerPage = 10,
-        QueryBuilder $qb = null
+        ?QueryBuilder $qb = null
     ) {
         $this->qb = $qb;
         parent::__construct($maxPerPage);

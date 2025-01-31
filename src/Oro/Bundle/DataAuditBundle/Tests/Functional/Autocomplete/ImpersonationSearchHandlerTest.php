@@ -299,13 +299,13 @@ class ImpersonationSearchHandlerTest extends WebTestCase
         self::assertEquals(1, $auditsAmount);
     }
 
-    private function createImpersonationAndAuditLog(Impersonation $impersonation, string $transactionId = null): void
+    private function createImpersonationAndAuditLog(Impersonation $impersonation, ?string $transactionId = null): void
     {
         $this->saveImpersonation($impersonation);
         $this->createImpersonationAuditLog($impersonation, $transactionId);
     }
 
-    private function createImpersonationAuditLog(Impersonation $impersonation, string $transactionId = null): void
+    private function createImpersonationAuditLog(Impersonation $impersonation, ?string $transactionId = null): void
     {
         $this->entityChangesToAuditEntryConverter->convert(
             [

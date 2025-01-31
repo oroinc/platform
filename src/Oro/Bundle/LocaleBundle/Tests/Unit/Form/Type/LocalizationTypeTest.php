@@ -112,7 +112,7 @@ class LocalizationTypeTest extends FormIntegrationTestCase
         string $languageId,
         string $formattingCode,
         bool $rtlMode = false,
-        Localization $parentLocalization = null
+        ?Localization $parentLocalization = null
     ): Localization {
         /** @var Localization $localization */
         $localization = $this->getEntity(

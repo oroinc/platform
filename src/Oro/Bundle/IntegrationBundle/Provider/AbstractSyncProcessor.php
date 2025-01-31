@@ -43,7 +43,7 @@ abstract class AbstractSyncProcessor implements
         Executor $jobExecutor,
         TypesRegistry $registry,
         EventDispatcherInterface $eventDispatcher,
-        LoggerStrategy $logger = null
+        ?LoggerStrategy $logger = null
     ) {
         $this->processorRegistry = $processorRegistry;
         $this->jobExecutor       = $jobExecutor;
@@ -65,7 +65,7 @@ abstract class AbstractSyncProcessor implements
      *
      * @return string
      */
-    protected function formatResultMessage(ContextInterface $context = null)
+    protected function formatResultMessage(?ContextInterface $context = null)
     {
         $statistic = $this->fetchStatistic($context);
 
@@ -91,7 +91,7 @@ abstract class AbstractSyncProcessor implements
      *
      * @return array
      */
-    private function fetchStatistic(ContextInterface $context = null)
+    private function fetchStatistic(?ContextInterface $context = null)
     {
         $counts = array_fill_keys(['read', 'processed', 'updated', 'deleted', 'added', 'invalid'], 0);
         if ($context) {
@@ -137,7 +137,7 @@ abstract class AbstractSyncProcessor implements
      *
      * @return SyncEvent
      */
-    protected function dispatchSyncEvent($eventName, $jobName, array $configuration, JobResult $jobResult = null)
+    protected function dispatchSyncEvent($eventName, $jobName, array $configuration, ?JobResult $jobResult = null)
     {
         $event = new SyncEvent($jobName, $configuration, $jobResult);
         $this->eventDispatcher->dispatch($event, $eventName);

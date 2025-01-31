@@ -10,5 +10,5 @@ interface TransactionWatcherAwareInterface
     /**
      * Sets the transaction watcher.
      */
-    public function setTransactionWatcher(TransactionWatcherInterface $transactionWatcher = null);
+    public function setTransactionWatcher(?TransactionWatcherInterface $transactionWatcher = null);
 }

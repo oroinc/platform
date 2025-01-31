@@ -23,7 +23,7 @@ interface EventTriggerExtensionInterface
      * @param string $event
      * @param array|null $changeSet
      */
-    public function schedule($entity, $event, array $changeSet = null);
+    public function schedule($entity, $event, ?array $changeSet = null);
 
     public function process(ObjectManager $manager);
 

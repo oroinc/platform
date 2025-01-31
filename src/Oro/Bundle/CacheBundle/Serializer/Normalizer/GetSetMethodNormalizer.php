@@ -15,10 +15,10 @@ class GetSetMethodNormalizer extends BaseGetSetMethodNormalizer
 {
     #[\Override]
     protected function getAttributeValue(
-        object $object,
-        string $attribute,
-        string $format = null,
-        array $context = []
+        object  $object,
+        string  $attribute,
+        ?string $format = null,
+        array   $context = []
     ): mixed {
         $value = parent::getAttributeValue($object, $attribute, $format, $context);
 

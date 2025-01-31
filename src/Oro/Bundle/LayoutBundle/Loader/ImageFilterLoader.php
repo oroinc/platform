@@ -58,7 +58,7 @@ class ImageFilterLoader
         $this->load();
     }
 
-    public function load(Theme $theme = null)
+    public function load(?Theme $theme = null)
     {
         if (!$this->shouldBeLoaded) {
             return;

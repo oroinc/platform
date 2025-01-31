@@ -65,7 +65,7 @@ class OroElementFactory implements SuiteAwareInterface
      *
      * @return Element
      */
-    public function createElement($name, NodeElement $context = null)
+    public function createElement($name, ?NodeElement $context = null)
     {
         $configName = $this->guessElement($name);
         if (!$configName) {
@@ -170,7 +170,7 @@ class OroElementFactory implements SuiteAwareInterface
      *
      * @return Element
      */
-    public function findElementContains($name, $text, Element $context = null)
+    public function findElementContains($name, $text, ?Element $context = null)
     {
         $configName = $this->guessElement($name);
 
@@ -206,7 +206,7 @@ class OroElementFactory implements SuiteAwareInterface
      *
      * @return Element
      */
-    public function findElementContainsByCss($name, $text, Element $context = null)
+    public function findElementContainsByCss($name, $text, ?Element $context = null)
     {
         return $this->findElement(
             $name,
@@ -226,7 +226,7 @@ class OroElementFactory implements SuiteAwareInterface
      *
      * @return Element
      */
-    public function findElementContainsByXPath($name, $text, $useChildren = true, Element $context = null)
+    public function findElementContainsByXPath($name, $text, $useChildren = true, ?Element $context = null)
     {
         return $this->findElement(
             $name,
@@ -246,7 +246,7 @@ class OroElementFactory implements SuiteAwareInterface
      * @param NodeElement|null $context
      * @return Element[]
      */
-    public function findAllElements($name, NodeElement $context = null)
+    public function findAllElements($name, ?NodeElement $context = null)
     {
         $configName = $this->guessElement($name);
 
@@ -298,7 +298,7 @@ class OroElementFactory implements SuiteAwareInterface
      *
      * @return Element
      */
-    protected function findElement($name, $selectorCallback, Element $context = null)
+    protected function findElement($name, $selectorCallback, ?Element $context = null)
     {
         $configName = $this->guessElement($name);
 

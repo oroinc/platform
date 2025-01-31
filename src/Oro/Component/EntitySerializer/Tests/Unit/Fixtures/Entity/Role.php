@@ -31,7 +31,7 @@ class Role
     #[ORM\InverseJoinColumn(name: 'role_group_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private ?Collection $groups = null;
 
-    public function __construct(string $code = null)
+    public function __construct(?string $code = null)
     {
         $this->code = $code;
         $this->groups = new ArrayCollection();

@@ -29,19 +29,19 @@ class StringAttributeType implements AttributeTypeInterface
     }
 
     #[\Override]
-    public function getSearchableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
+    public function getSearchableValue(FieldConfigModel $attribute, $originalValue, ?Localization $localization = null)
     {
         return $this->getFilterableValue($attribute, $originalValue, $localization);
     }
 
     #[\Override]
-    public function getFilterableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
+    public function getFilterableValue(FieldConfigModel $attribute, $originalValue, ?Localization $localization = null)
     {
         return (string)$originalValue;
     }
 
     #[\Override]
-    public function getSortableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
+    public function getSortableValue(FieldConfigModel $attribute, $originalValue, ?Localization $localization = null)
     {
         return $this->getFilterableValue($attribute, $originalValue, $localization);
     }

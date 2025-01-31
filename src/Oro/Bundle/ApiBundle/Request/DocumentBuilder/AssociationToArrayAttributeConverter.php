@@ -29,7 +29,7 @@ class AssociationToArrayAttributeConverter
      * @return mixed The result can be an array, a scalar or NULL
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function convertObjectToArray(mixed $object, AssociationMetadata $association = null): mixed
+    public function convertObjectToArray(mixed $object, ?AssociationMetadata $association = null): mixed
     {
         if (null === $object || is_scalar($object)) {
             return $object;
@@ -71,7 +71,7 @@ class AssociationToArrayAttributeConverter
         return $result;
     }
 
-    public function convertCollectionToArray(iterable $collection, AssociationMetadata $association = null): array
+    public function convertCollectionToArray(iterable $collection, ?AssociationMetadata $association = null): array
     {
         $result = [];
         foreach ($collection as $object) {

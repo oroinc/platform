@@ -21,7 +21,7 @@ class EventDispatcher extends ImmutableEventDispatcher
      * @throws InvalidArgumentException
      */
     #[\Override]
-    public function dispatch(object $event, string $eventName = null): object
+    public function dispatch(object $event, ?string $eventName = null): object
     {
         /** @var DatagridConfiguration $config */
         if ($event instanceof GridEventInterface) {

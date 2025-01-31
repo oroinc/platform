@@ -67,7 +67,7 @@ class OAuthManagerRegistry
     /**
      * Checks if any registered manager is enabled or a manager for the given type is enabled.
      */
-    public function isOauthImapEnabled(string $type = null): bool
+    public function isOauthImapEnabled(?string $type = null): bool
     {
         foreach ($this->managers as $manager) {
             if (!$type && $manager->isOAuthEnabled()) {

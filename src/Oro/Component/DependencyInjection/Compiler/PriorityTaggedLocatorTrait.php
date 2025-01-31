@@ -52,7 +52,7 @@ trait PriorityTaggedLocatorTrait
     private function findAndSortTaggedServicesWithOptionalNameAttribute(
         string $tagName,
         ContainerBuilder $container,
-        string $nameAttribute = null
+        ?string $nameAttribute = null
     ): array {
         $items = [];
         $taggedServices = $container->findTaggedServiceIds($tagName, true);

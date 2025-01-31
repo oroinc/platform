@@ -78,7 +78,7 @@ class LocaleListenerTest extends \PHPUnit\Framework\TestCase
         bool|string|null $installed,
         bool $isSetLocale,
         string $expectedLanguage,
-        Localization $localization = null
+        ?Localization $localization = null
     ): void {
         $customLanguage = 'ru';
         $customLocale = 'fr';

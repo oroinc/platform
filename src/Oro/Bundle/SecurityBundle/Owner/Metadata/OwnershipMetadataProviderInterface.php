@@ -35,7 +35,7 @@ interface OwnershipMetadataProviderInterface
     /**
      * Gets the maximum access level this provider supports.
      */
-    public function getMaxAccessLevel(int $accessLevel, string $className = null): int;
+    public function getMaxAccessLevel(int $accessLevel, ?string $className = null): int;
 
     /**
      * Clears the ownership metadata cache.

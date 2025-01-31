@@ -25,7 +25,7 @@ class LayoutFactory implements LayoutFactoryInterface
         LayoutRegistryInterface $registry,
         LayoutRendererRegistryInterface $rendererRegistry,
         ExpressionProcessor $expressionProcessor,
-        BlockViewCache $blockViewCache = null
+        ?BlockViewCache $blockViewCache = null
     ) {
         $this->registry            = $registry;
         $this->rendererRegistry    = $rendererRegistry;

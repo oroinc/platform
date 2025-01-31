@@ -121,7 +121,7 @@ class StatisticRepository implements BatchRepositoryInterface, ObjectRepository,
     }
 
     #[\Override]
-    public function findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+    public function findBy(array $criteria, ?array $orderBy = null, $limit = null, $offset = null)
     {
         $orderBy = $orderBy ?: ['id', 'DESC'];
         $limit = $limit ?: self::MAX_LIMIT;

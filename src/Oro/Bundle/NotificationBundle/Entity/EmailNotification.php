@@ -118,7 +118,7 @@ class EmailNotification implements ExtendEntityInterface
      *
      * @return EmailNotification
      */
-    public function setTemplate(EmailTemplate $template = null)
+    public function setTemplate(?EmailTemplate $template = null)
     {
         $this->template = $template;
 
@@ -142,7 +142,7 @@ class EmailNotification implements ExtendEntityInterface
      *
      * @return EmailNotification
      */
-    public function setRecipientList(RecipientList $recipientList = null)
+    public function setRecipientList(?RecipientList $recipientList = null)
     {
         $this->recipientList = $recipientList;
 

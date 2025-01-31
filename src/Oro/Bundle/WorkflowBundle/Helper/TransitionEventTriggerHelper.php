@@ -107,10 +107,10 @@ class TransitionEventTriggerHelper
      * @return array
      */
     public static function buildContextValues(
-        WorkflowDefinition $workflowDefinition = null,
+        ?WorkflowDefinition $workflowDefinition = null,
         $entity = null,
         $mainEntity = null,
-        WorkflowItem $item = null,
+        ?WorkflowItem $item = null,
         $prevEntity = null
     ) {
         return [

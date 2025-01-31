@@ -34,7 +34,7 @@ class FileTitleProvider implements FileTitleProviderInterface
     }
 
     #[\Override]
-    public function getTitle(File $file, Localization $localization = null): string
+    public function getTitle(File $file, ?Localization $localization = null): string
     {
         /** @var DigitalAsset|null $digitalAsset */
         $digitalAsset = $file->getDigitalAsset();

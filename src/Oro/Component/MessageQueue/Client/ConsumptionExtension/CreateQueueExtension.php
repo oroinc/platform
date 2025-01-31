@@ -15,7 +15,7 @@ class CreateQueueExtension extends AbstractExtension
     /** @var QueueCollection */
     private $createdQueues;
 
-    public function __construct(DriverInterface $driver, QueueCollection $createdQueues = null)
+    public function __construct(DriverInterface $driver, ?QueueCollection $createdQueues = null)
     {
         $this->driver = $driver;
         if (null === $createdQueues) {

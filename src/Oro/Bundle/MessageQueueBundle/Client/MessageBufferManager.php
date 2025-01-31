@@ -23,7 +23,7 @@ class MessageBufferManager
     public function __construct(
         BufferedMessageProducer $bufferedProducer,
         ManagerRegistry $doctrine,
-        string $connectionName = null
+        ?string $connectionName = null
     ) {
         $this->bufferedProducer = $bufferedProducer;
         $this->doctrine = $doctrine;

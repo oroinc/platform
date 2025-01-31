@@ -131,7 +131,7 @@ trait RolePermissionExtension
         string $roleName,
         string $objectIdentity,
         array $permissions,
-        string $fieldName = null
+        ?string $fieldName = null
     ): void {
         /** @var AclManager $aclManager */
         $aclManager = self::getContainer()->get('oro_security.acl.manager');

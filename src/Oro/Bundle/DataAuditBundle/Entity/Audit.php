@@ -48,7 +48,7 @@ class Audit extends AbstractAudit
     protected ?string $ownerDescription = null;
 
     #[\Override]
-    public function setUser(AbstractUser $user = null)
+    public function setUser(?AbstractUser $user = null)
     {
         $this->user = $user;
 

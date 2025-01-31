@@ -26,7 +26,7 @@ class OriginalUrlProvider
      * We can't use js for this, because it doesn't cover the situation
      * when one user shares this link to another user.
      */
-    public function getOriginalUrl(ButtonSearchContext $buttonSearchContext = null): ?string
+    public function getOriginalUrl(?ButtonSearchContext $buttonSearchContext = null): ?string
     {
         $originalUrl = $this->requestStack->getMainRequest()?->getRequestUri();
         if (null === $originalUrl) {

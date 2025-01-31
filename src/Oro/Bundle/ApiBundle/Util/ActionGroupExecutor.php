@@ -35,7 +35,7 @@ class ActionGroupExecutor
         string $name,
         ActionData $data,
         NormalizeResultContext $context,
-        string $errorTitle = null
+        ?string $errorTitle = null
     ): bool {
         $actionGroup = $this->actionGroupRegistry->get($name);
         $errors = new ArrayCollection();
@@ -56,7 +56,7 @@ class ActionGroupExecutor
     private function processErrors(
         Collection $errors,
         NormalizeResultContext $context,
-        string $errorTitle = null
+        ?string $errorTitle = null
     ): void {
         if (null === $errorTitle) {
             $errorTitle = 'action constraint';

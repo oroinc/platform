@@ -36,7 +36,7 @@ class YamlFileLoader extends BaseLoader
     }
 
     #[\Override]
-    protected function doSupports($resource, string $type = null): bool
+    protected function doSupports($resource, ?string $type = null): bool
     {
         return \is_string($resource)
             && \in_array(pathinfo($resource, PATHINFO_EXTENSION), ['yml', 'yaml'], true)

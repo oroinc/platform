@@ -167,7 +167,7 @@ class WorkflowItemRepository extends ServiceEntityRepository
         $entityClass,
         array $entityIds,
         $withWorkflowName = true,
-        array $workflowNames = null
+        ?array $workflowNames = null
     ) {
         $entityIds = array_map(function ($item) {
             return (string)$item;

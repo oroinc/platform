@@ -10,7 +10,7 @@ class TestEmailAddressProxy extends OriginalEmailAddress
     /** @var EmailOwnerInterface */
     private $owner;
 
-    public function __construct(EmailOwnerInterface $owner = null)
+    public function __construct(?EmailOwnerInterface $owner = null)
     {
         $this->owner = $owner;
     }
@@ -22,7 +22,7 @@ class TestEmailAddressProxy extends OriginalEmailAddress
     }
 
     #[\Override]
-    public function setOwner(EmailOwnerInterface $owner = null)
+    public function setOwner(?EmailOwnerInterface $owner = null)
     {
         $this->owner = $owner;
 

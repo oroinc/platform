@@ -42,8 +42,8 @@ class WorkflowConfigurationProvider
      * @throws InvalidConfigurationException
      */
     public function getWorkflowDefinitionConfiguration(
-        array $usedDirectories = null,
-        array $usedWorkflows = null
+        ?array $usedDirectories = null,
+        ?array $usedWorkflows = null
     ) {
         $configs = [];
 

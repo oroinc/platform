@@ -66,7 +66,7 @@ class GoogleOAuthProvider extends AbstractOAuthProvider
     }
 
     #[\Override]
-    protected function getAccessTokenParameters(string $code, array $scopes = null): array
+    protected function getAccessTokenParameters(string $code, ?array $scopes = null): array
     {
         $parameters = parent::getAccessTokenParameters($code, $scopes);
         $parameters['redirect_uri'] = 'postmessage';

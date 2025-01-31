@@ -39,7 +39,7 @@ class ContextRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertNotSame($barContext, $barContext2);
     }
 
-    private function createStepExecution(string $alias = null): StepExecution
+    private function createStepExecution(?string $alias = null): StepExecution
     {
         $stepExecution = $this->createMock(StepExecution::class);
 

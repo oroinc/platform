@@ -181,7 +181,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         return $entity;
     }
 
-    protected function storeNewEntity(object $entity, array $identityValues = null): ?object
+    protected function storeNewEntity(object $entity, ?array $identityValues = null): ?object
     {
         return $this->newEntitiesHelper->storeNewEntity($entity, $identityValues, self::STRATEGY_CONTEXT);
     }
@@ -280,7 +280,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @throws ErrorException
      */
-    protected function updateRelations($entity, array $itemData = null)
+    protected function updateRelations($entity, ?array $itemData = null)
     {
         $entityName = ClassUtils::getClass($entity);
         $fields = $this->fieldHelper->getEntityFields($entityName, EntityFieldProvider::OPTION_WITH_RELATIONS);

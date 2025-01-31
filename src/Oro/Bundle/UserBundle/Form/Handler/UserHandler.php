@@ -35,13 +35,13 @@ class UserHandler extends AbstractUserHandler
     private ?EmailTemplateSender $emailTemplateSender;
 
     public function __construct(
-        FormInterface $form,
-        RequestStack $requestStack,
-        UserManager $manager,
-        EmailTemplateSender $emailTemplateSender = null,
-        ConfigManager $userConfigManager = null,
-        TranslatorInterface $translator = null,
-        LoggerInterface $logger = null
+        FormInterface        $form,
+        RequestStack         $requestStack,
+        UserManager          $manager,
+        ?EmailTemplateSender $emailTemplateSender = null,
+        ?ConfigManager       $userConfigManager = null,
+        ?TranslatorInterface $translator = null,
+        ?LoggerInterface     $logger = null
     ) {
         parent::__construct($form, $requestStack, $manager);
 

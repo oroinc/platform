@@ -450,7 +450,7 @@ class ConfigManager
     /**
      * Removes all configuration data or for the given object (if $configId is specified) from a cache.
      */
-    public function clearCache(ConfigIdInterface $configId = null)
+    public function clearCache(?ConfigIdInterface $configId = null)
     {
         if ($configId) {
             if ($configId instanceof FieldConfigId) {
@@ -1142,9 +1142,9 @@ class ConfigManager
      * Extracts entity default values from an annotation and config file
      */
     protected function getEntityDefaultValues(
-        string $scope,
-        string $className = null,
-        EntityMetadata $metadata = null
+        string          $scope,
+        ?string         $className = null,
+        ?EntityMetadata $metadata = null
     ): array {
         $propertyConfig = $this->getPropertyConfig($scope);
         $defaultValues = $this->getConfigurationHandler()->process(
@@ -1176,7 +1176,7 @@ class ConfigManager
         string $className,
         string $fieldName,
         string $fieldType,
-        FieldMetadata $metadata = null
+        ?FieldMetadata $metadata = null
     ): array {
         $propertyConfig = $this->getPropertyConfig($scope);
         $defaultValues = $this->getConfigurationHandler()->process(

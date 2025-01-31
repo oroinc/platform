@@ -6,5 +6,5 @@ use Doctrine\Common\Collections\Collection;
 
 interface ConfigurationValidatorInterface
 {
-    public function validate(array $configuration, Collection $errors = null);
+    public function validate(array $configuration, ?Collection $errors = null);
 }

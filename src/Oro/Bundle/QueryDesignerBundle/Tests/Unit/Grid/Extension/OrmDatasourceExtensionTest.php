@@ -187,7 +187,7 @@ class OrmDatasourceExtensionTest extends OrmTestCase
      *
      * @return FilterInterface
      */
-    private function createFilter(string $name, array $params = null): FilterInterface
+    private function createFilter(string $name, ?array $params = null): FilterInterface
     {
         $defaultParams = [
             'type' => $name

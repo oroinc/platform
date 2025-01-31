@@ -32,7 +32,7 @@ interface BufferedQueryResultIteratorInterface extends \Iterator, \Countable
      *
      * @return $this
      */
-    public function setPageCallback(callable $callback = null);
+    public function setPageCallback(?callable $callback = null);
 
     /**
      * Sets callback to be called after a page is loaded.
@@ -41,7 +41,7 @@ interface BufferedQueryResultIteratorInterface extends \Iterator, \Countable
      *
      * @return $this
      */
-    public function setPageLoadedCallback(callable $callback = null);
+    public function setPageLoadedCallback(?callable $callback = null);
 
     /**
      * Sets the hydration mode to be used to get results.

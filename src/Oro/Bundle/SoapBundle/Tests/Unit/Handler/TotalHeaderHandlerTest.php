@@ -62,7 +62,7 @@ class TotalHeaderHandlerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($configuration);
     }
 
-    private function createContext(object $controller = null, string $action = null): Context
+    private function createContext(?object $controller = null, ?string $action = null): Context
     {
         return new Context(
             $controller ?: new \stdClass(),

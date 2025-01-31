@@ -28,7 +28,7 @@ class FieldAccessor
     public function __construct(
         DoctrineHelper $doctrineHelper,
         DataAccessorInterface $dataAccessor,
-        EntityFieldFilterInterface $entityFieldFilter = null
+        ?EntityFieldFilterInterface $entityFieldFilter = null
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->dataAccessor = $dataAccessor;
@@ -234,7 +234,7 @@ class FieldAccessor
     /**
      * Gets the path to entity property for the given field.
      */
-    private function getPropertyPath(string $fieldName, FieldConfig $fieldConfig = null): string
+    private function getPropertyPath(string $fieldName, ?FieldConfig $fieldConfig = null): string
     {
         if (null === $fieldConfig) {
             return $fieldName;

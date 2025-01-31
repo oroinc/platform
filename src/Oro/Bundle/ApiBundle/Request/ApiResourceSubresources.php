@@ -53,7 +53,7 @@ class ApiResourceSubresources
     /**
      * Adds a sub-resource.
      */
-    public function addSubresource(string $associationName, ApiSubresource $subresource = null): ApiSubresource
+    public function addSubresource(string $associationName, ?ApiSubresource $subresource = null): ApiSubresource
     {
         if (null === $subresource) {
             $subresource = new ApiSubresource();

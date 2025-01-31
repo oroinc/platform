@@ -13,7 +13,7 @@ final class QueryDesigner extends AbstractQueryDesigner
     /** @var string|null */
     private $definition;
 
-    public function __construct(string $entity = null, string $definition = null)
+    public function __construct(?string $entity = null, ?string $definition = null)
     {
         $this->entity = $entity;
         $this->definition = $definition;

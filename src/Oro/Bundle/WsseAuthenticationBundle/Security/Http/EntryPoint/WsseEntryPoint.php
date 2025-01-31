@@ -22,7 +22,7 @@ class WsseEntryPoint implements AuthenticationEntryPointInterface
     }
 
     #[\Override]
-    public function start(Request $request, AuthenticationException $authException = null): Response
+    public function start(Request $request, ?AuthenticationException $authException = null): Response
     {
         if ($this->env !== 'test') {
             return new Response('WSSE is deprecated', 401);

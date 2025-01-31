@@ -19,7 +19,7 @@ class FixSkipNullValuesArrayNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeDataProvider
      */
-    public function testNormalize(array $data, array $context, array $result = null): void
+    public function testNormalize(array $data, array $context, ?array $result = null): void
     {
         if (null === $result) {
             $result = $data;

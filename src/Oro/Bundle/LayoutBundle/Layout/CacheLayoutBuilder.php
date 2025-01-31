@@ -38,7 +38,7 @@ class CacheLayoutBuilder extends LayoutBuilder
         ExpressionProcessor $expressionProcessor,
         LayoutContextStack $layoutContextStack,
         RenderCache $renderCache,
-        BlockViewCache $blockViewCache = null
+        ?BlockViewCache $blockViewCache = null
     ) {
         $this->renderCache = $renderCache;
         $this->layoutContextStack = $layoutContextStack;

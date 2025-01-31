@@ -88,8 +88,8 @@ class DateRangeTypeTest extends AbstractTypeTestCase
      * @throws \Exception
      */
     private function createDateTime(
-        string $dateString,
-        string $timeZone = null,
+        string  $dateString,
+        ?string $timeZone = null,
         ?string $format = 'yyyy-MM-dd'
     ): \DateTime {
         $pattern = $format ?: null;

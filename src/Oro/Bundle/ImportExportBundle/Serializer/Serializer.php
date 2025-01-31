@@ -37,7 +37,7 @@ class Serializer extends SymfonySerializer implements SerializerInterface
     #[\Override]
     public function normalize(
         $data,
-        string $format = null,
+        ?string $format = null,
         array $context = []
     ): \ArrayObject|array|string|int|float|bool|null {
         if (null === $data || is_scalar($data)) {
@@ -73,7 +73,7 @@ class Serializer extends SymfonySerializer implements SerializerInterface
     }
 
     #[\Override]
-    public function denormalize($data, string $type, string $format = null, array $context = []): mixed
+    public function denormalize($data, string $type, ?string $format = null, array $context = []): mixed
     {
         if (!$this->normalizers) {
             throw new LogicException('You must register at least one normalizer to be able to denormalize objects.');
@@ -102,7 +102,7 @@ class Serializer extends SymfonySerializer implements SerializerInterface
     }
 
     #[\Override]
-    public function supportsNormalization($data, string $format = null, array $context = []): bool
+    public function supportsNormalization($data, ?string $format = null, array $context = []): bool
     {
         try {
             $this->getNormalizer($data, $format, $context);
@@ -114,7 +114,7 @@ class Serializer extends SymfonySerializer implements SerializerInterface
     }
 
     #[\Override]
-    public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
+    public function supportsDenormalization($data, string $type, ?string $format = null, array $context = []): bool
     {
         try {
             $this->getDenormalizer($data, $type, $format, $context);
@@ -125,7 +125,7 @@ class Serializer extends SymfonySerializer implements SerializerInterface
         return true;
     }
 
-    protected function getCacheKey(string $type, string $format = null, array $context = []): string
+    protected function getCacheKey(string $type, ?string $format = null, array $context = []): string
     {
         $cacheKeyFields = [$type, $format];
 
@@ -139,7 +139,7 @@ class Serializer extends SymfonySerializer implements SerializerInterface
         return md5(implode('', $cacheKeyFields));
     }
 
-    protected function cleanCacheIfDataIsCollection(object $data, string $format = null, array $context = []): void
+    protected function cleanCacheIfDataIsCollection(object $data, ?string $format = null, array $context = []): void
     {
         if ($data instanceof Collection) {
             $cacheKey = $this->getCacheKey(get_class($data), $format, $context);
@@ -149,7 +149,7 @@ class Serializer extends SymfonySerializer implements SerializerInterface
         }
     }
 
-    private function normalizeObject($object, string $format = null, array $context = [])
+    private function normalizeObject($object, ?string $format = null, array $context = [])
     {
         if (!$this->normalizers) {
             throw new LogicException('You must register at least one normalizer to be able to normalize objects.');
@@ -179,7 +179,7 @@ class Serializer extends SymfonySerializer implements SerializerInterface
         );
     }
 
-    private function getNormalizer($data, string $format = null, array $context = []): ContextAwareNormalizerInterface
+    private function getNormalizer($data, ?string $format = null, array $context = []): ContextAwareNormalizerInterface
     {
         foreach ($this->normalizers as $normalizer) {
             if (!$normalizer instanceof ContextAwareNormalizerInterface) {
@@ -197,7 +197,7 @@ class Serializer extends SymfonySerializer implements SerializerInterface
     private function getDenormalizer(
         $data,
         string $type,
-        string $format = null,
+        ?string $format = null,
         array $context = []
     ): ContextAwareDenormalizerInterface {
         foreach ($this->normalizers as $normalizer) {

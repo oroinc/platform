@@ -207,12 +207,12 @@ class IndexerTest extends \PHPUnit\Framework\TestCase
      * @dataProvider simpleSearchDataProvider
      */
     public function testSimpleSearch(
-        string $expectedQuery,
-        string $string,
-        ?int $offset = 0,
-        ?int $maxResults = 0,
-        string $from = null,
-        int $page = 0
+        string  $expectedQuery,
+        string  $string,
+        ?int    $offset = 0,
+        ?int    $maxResults = 0,
+        ?string $from = null,
+        int     $page = 0
     ) {
         $searchResults = ['one', 'two', 'three'];
 

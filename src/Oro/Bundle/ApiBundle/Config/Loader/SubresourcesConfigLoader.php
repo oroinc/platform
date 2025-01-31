@@ -46,7 +46,7 @@ class SubresourcesConfigLoader extends AbstractConfigLoader
         return $subresource;
     }
 
-    private function loadActions(SubresourceConfig $subresource, array $actions = null): void
+    private function loadActions(SubresourceConfig $subresource, ?array $actions = null): void
     {
         if (!empty($actions)) {
             if (null === $this->actionsConfigLoader) {

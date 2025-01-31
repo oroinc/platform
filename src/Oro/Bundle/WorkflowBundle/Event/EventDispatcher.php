@@ -18,7 +18,7 @@ class EventDispatcher
 
     public function dispatch(
         WorkflowItemAwareEvent $event,
-        string $contextName = null
+        ?string $contextName = null
     ): void {
         $workflowItem = $event->getWorkflowItem();
         $workflowName = $workflowItem->getWorkflowName();

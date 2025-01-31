@@ -57,7 +57,7 @@ class SubresourcesConfig
     /**
      * Adds the configuration of the subresource.
      */
-    public function addSubresource(string $associationName, SubresourceConfig $subresource = null): SubresourceConfig
+    public function addSubresource(string $associationName, ?SubresourceConfig $subresource = null): SubresourceConfig
     {
         if (null === $subresource) {
             $subresource = new SubresourceConfig();

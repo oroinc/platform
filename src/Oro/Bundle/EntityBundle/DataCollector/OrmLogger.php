@@ -38,7 +38,7 @@ class OrmLogger
     /** @var Stopwatch|null */
     private $stopwatch;
 
-    public function __construct(Stopwatch $stopwatch = null)
+    public function __construct(?Stopwatch $stopwatch = null)
     {
         $this->stopwatch = $stopwatch;
     }

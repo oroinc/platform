@@ -58,7 +58,7 @@ class FileManager
      * @param string      $filesystemName The name of Gaufrette filesystem this manager works with
      * @param string|null $subDirectory   The name of a sub-directory if it is different than the filesystem name
      */
-    public function __construct(string $filesystemName, string $subDirectory = null)
+    public function __construct(string $filesystemName, ?string $subDirectory = null)
     {
         if (!$filesystemName) {
             throw new \InvalidArgumentException('The filesystem name must not be empty.');
@@ -562,7 +562,7 @@ class FileManager
      *
      * @throws IOException if a temporary file cannot be created
      */
-    public function writeToTemporaryFile(string $content, string $originalFileName = null): ComponentFile
+    public function writeToTemporaryFile(string $content, ?string $originalFileName = null): ComponentFile
     {
         $tmpFileName = $this->getTemporaryFileName($originalFileName);
         if (false === @file_put_contents($tmpFileName, $content)) {
@@ -585,7 +585,7 @@ class FileManager
      * @throws \RuntimeException if the destination stream cannot be opened
      * @throws \LogicException if the source stream does not allow read or the destination stream does not allow write
      */
-    public function writeStreamToTemporaryFile(Stream $srcStream, string $originalFileName = null): ComponentFile
+    public function writeStreamToTemporaryFile(Stream $srcStream, ?string $originalFileName = null): ComponentFile
     {
         $tmpFileName = $this->getTemporaryFileName($originalFileName);
         $srcStream->open(new StreamMode('rb'));
@@ -614,7 +614,7 @@ class FileManager
      *
      * @return string The full path to a temporary file
      */
-    public function getTemporaryFileName(string $suggestedFileName = null): string
+    public function getTemporaryFileName(?string $suggestedFileName = null): string
     {
         $tmpDir = $this->getTempDirPath();
         $extension = null;
@@ -636,7 +636,7 @@ class FileManager
     /**
      * Generates unique file name with the given extension.
      */
-    protected function generateFileName(string $extension = null): string
+    protected function generateFileName(?string $extension = null): string
     {
         $fileName = str_replace('.', '', uniqid('', true));
         if ($extension) {

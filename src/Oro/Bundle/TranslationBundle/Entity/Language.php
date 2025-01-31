@@ -78,7 +78,7 @@ class Language implements DatesAwareInterface, OrganizationAwareInterface
      *
      * @return $this
      */
-    public function setInstalledBuildDate(\DateTime $installedBuildDate = null)
+    public function setInstalledBuildDate(?\DateTime $installedBuildDate = null)
     {
         $this->installedBuildDate = $installedBuildDate;
 

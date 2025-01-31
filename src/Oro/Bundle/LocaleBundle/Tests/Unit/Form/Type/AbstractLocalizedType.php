@@ -64,7 +64,7 @@ abstract class AbstractLocalizedType extends FormIntegrationTestCase
         int $id,
         string $languageCode,
         string $formattingCode,
-        Localization $parentLocalization = null
+        ?Localization $parentLocalization = null
     ): Localization {
         $website = $this->createMock(Localization::class);
         $website->expects($this->any())

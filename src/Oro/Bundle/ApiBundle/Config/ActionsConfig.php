@@ -57,7 +57,7 @@ class ActionsConfig
     /**
      * Adds the configuration of the action.
      */
-    public function addAction(string $actionName, ActionConfig $action = null): ActionConfig
+    public function addAction(string $actionName, ?ActionConfig $action = null): ActionConfig
     {
         if (null === $action) {
             $action = new ActionConfig();

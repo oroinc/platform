@@ -31,12 +31,12 @@ class IncludedData
     private ?array $sectionNames = null;
 
     public function __construct(
-        ItemKeyBuilder $itemKeyBuilder,
+        ItemKeyBuilder           $itemKeyBuilder,
         IncludeAccessorInterface $includeAccessor,
-        FileLockManager $fileLockManager,
-        array $lockFileNames = null,
-        array $items = [],
-        array $processedItems = []
+        FileLockManager          $fileLockManager,
+        ?array                   $lockFileNames = null,
+        array                    $items = [],
+        array                    $processedItems = []
     ) {
         $this->itemKeyBuilder = $itemKeyBuilder;
         $this->includeAccessor = $includeAccessor;

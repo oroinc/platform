@@ -27,7 +27,7 @@ class StatusCodesConfigLoader extends AbstractConfigLoader
         return $codes;
     }
 
-    private function loadCode(array $config = null): StatusCodeConfig
+    private function loadCode(?array $config = null): StatusCodeConfig
     {
         $code = new StatusCodeConfig();
         if (!empty($config)) {

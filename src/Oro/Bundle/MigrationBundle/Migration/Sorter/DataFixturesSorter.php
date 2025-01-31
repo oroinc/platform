@@ -208,11 +208,11 @@ class DataFixturesSorter
 
     /**
      * @param array      $sequences
-     * @param null|array $classes
+     * @param array|null $classes
      *
      * @return array
      */
-    protected function getUnsequencedClasses(array $sequences, array $classes = null)
+    protected function getUnsequencedClasses(array $sequences, ?array $classes = null)
     {
         $unsequencedClasses = array();
 

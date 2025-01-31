@@ -441,7 +441,7 @@ class SyncIntegrationProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     private function createDoctrine(
-        EntityManagerInterface $entityManager = null
+        ?EntityManagerInterface $entityManager = null
     ): ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject {
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects(self::any())

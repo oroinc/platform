@@ -27,7 +27,7 @@ abstract class AbstractOAuthProvider implements OAuthProviderInterface
     }
 
     #[\Override]
-    public function getAccessTokenByAuthCode(string $code, array $scopes = null): OAuthAccessTokenData
+    public function getAccessTokenByAuthCode(string $code, ?array $scopes = null): OAuthAccessTokenData
     {
         $response = $this->doAccessTokenHttpRequest($this->getAccessTokenParameters($code, $scopes));
         if (empty($response['access_token'])) {
@@ -38,7 +38,7 @@ abstract class AbstractOAuthProvider implements OAuthProviderInterface
     }
 
     #[\Override]
-    public function getAccessTokenByRefreshToken(string $refreshToken, array $scopes = null): OAuthAccessTokenData
+    public function getAccessTokenByRefreshToken(string $refreshToken, ?array $scopes = null): OAuthAccessTokenData
     {
         $response = $this->doAccessTokenHttpRequest($this->getRefreshTokenParameters($refreshToken, $scopes));
         if (empty($response['access_token'])) {
@@ -80,7 +80,7 @@ abstract class AbstractOAuthProvider implements OAuthProviderInterface
     /**
      * Gets parameters for a request to exchange the authorization code to the access token.
      */
-    protected function getAccessTokenParameters(string $code, array $scopes = null): array
+    protected function getAccessTokenParameters(string $code, ?array $scopes = null): array
     {
         return [
             'grant_type' => 'authorization_code',
@@ -91,7 +91,7 @@ abstract class AbstractOAuthProvider implements OAuthProviderInterface
     /**
      * Gets parameters for a request to renew the access token via the refresh token.
      */
-    protected function getRefreshTokenParameters(string $refreshToken, array $scopes = null): array
+    protected function getRefreshTokenParameters(string $refreshToken, ?array $scopes = null): array
     {
         $parameters = [
             'grant_type'    => 'refresh_token',

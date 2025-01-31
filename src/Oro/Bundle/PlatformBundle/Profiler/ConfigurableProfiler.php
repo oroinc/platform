@@ -32,7 +32,7 @@ class ConfigurableProfiler extends Profiler
     }
 
     #[\Override]
-    public function collect(Request $request, Response $response, \Throwable $exception = null): ?Profile
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): ?Profile
     {
         if ($this->platformCollector) {
             $this->platformCollector->setCollectors($this->fetchedCollectors);

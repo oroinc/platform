@@ -130,7 +130,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     }
 
     #[\Override]
-    public function setPasswordRequestedAt(\DateTime $time = null)
+    public function setPasswordRequestedAt(?\DateTime $time = null)
     {
         $this->passwordRequestedAt = $time;
 
@@ -144,7 +144,7 @@ class PasswordRecoveryInterfaceStub implements UserInterface, PasswordRecoveryIn
     }
 
     #[\Override]
-    public function setPasswordChangedAt(\DateTime $time = null)
+    public function setPasswordChangedAt(?\DateTime $time = null)
     {
         $this->passwordChangedAt = $time;
 

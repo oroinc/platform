@@ -87,7 +87,7 @@ class MailboxProcessStorage
      *
      * @return array('type' => 'Process Type Label (translate id)')
      */
-    public function getProcessTypeChoiceList(Mailbox $mailbox = null)
+    public function getProcessTypeChoiceList(?Mailbox $mailbox = null)
     {
         $choices = [];
         foreach ($this->processes as $type => $provider) {

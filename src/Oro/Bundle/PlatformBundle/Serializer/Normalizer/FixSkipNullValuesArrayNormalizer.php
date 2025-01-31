@@ -23,7 +23,7 @@ class FixSkipNullValuesArrayNormalizer implements NormalizerInterface, Serialize
     }
 
     #[\Override]
-    public function normalize($object, string $format = null, array $context = [])
+    public function normalize($object, ?string $format = null, array $context = [])
     {
         if (!($context[AbstractObjectNormalizer::SKIP_NULL_VALUES] ?? false)) {
             return $object;
@@ -37,7 +37,7 @@ class FixSkipNullValuesArrayNormalizer implements NormalizerInterface, Serialize
     }
 
     #[\Override]
-    public function supportsNormalization($data, string $format = null): bool
+    public function supportsNormalization($data, ?string $format = null): bool
     {
         return \is_array($data) && !empty($data);
     }

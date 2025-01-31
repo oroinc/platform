@@ -51,7 +51,7 @@ class EntityRuleMatcher
     /**
      * Checks if an entity field matches at least one field or entity rule this matcher contains.
      */
-    public function isFieldMatched(string $entityClass, string $fieldName, string $fieldType = null): bool
+    public function isFieldMatched(string $entityClass, string $fieldName, ?string $fieldType = null): bool
     {
         $this->ensureRulesInitialized();
 

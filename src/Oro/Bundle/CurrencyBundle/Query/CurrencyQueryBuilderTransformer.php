@@ -10,7 +10,7 @@ class CurrencyQueryBuilderTransformer implements CurrencyQueryBuilderTransformer
     #[\Override]
     public function getTransformSelectQuery(
         $originalFieldName,
-        QueryBuilder $qb = null,
+        ?QueryBuilder $qb = null,
         $rootAlias = null,
         $newFieldName = null
     ) {

@@ -51,7 +51,7 @@ class SegmentRepository extends EntityRepository
     /**
      * @return Segment[]
      */
-    public function findByNameStartsWith(string $nameStartsWith, string $entityClass = null): array
+    public function findByNameStartsWith(string $nameStartsWith, ?string $entityClass = null): array
     {
         $qb = $this->createQueryBuilder('s');
         $qb->andWhere($qb->expr()->like('s.name', ':name'))

@@ -84,7 +84,7 @@ class ActiveDashboard
      * @param Organization|null $organization
      * @return ActiveDashboard
      */
-    public function setOrganization(Organization $organization = null)
+    public function setOrganization(?Organization $organization = null)
     {
         $this->organization = $organization;
 

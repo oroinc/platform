@@ -204,7 +204,7 @@ class DynamicAttributesExtension extends AbstractTypeExtension implements Servic
      * @param string $dataClass
      * @param AttributeFamily|null $attributeFamily
      */
-    private function addAttributes(FormInterface $form, $dataClass, AttributeFamily $attributeFamily = null)
+    private function addAttributes(FormInterface $form, $dataClass, ?AttributeFamily $attributeFamily = null)
     {
         if (!$attributeFamily || empty($this->fields[$dataClass])) {
             return;

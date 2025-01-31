@@ -42,17 +42,17 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
      * @dataProvider formatDataProvider
      */
     public function testFormat(
-        int $expectedDateType,
-        int $expectedTimeType,
-        \DateTime $expectedDate,
+        int                  $expectedDateType,
+        int                  $expectedTimeType,
+        \DateTime            $expectedDate,
         \DateTime|string|int $date,
-        int|string|null $dateType,
-        int|string|null $timeType,
-        ?string $locale,
-        ?string $timeZone,
-        string $language,
-        string $defaultLocale = null,
-        string $defaultTimeZone = null
+        int|string|null      $dateType,
+        int|string|null      $timeType,
+        ?string              $locale,
+        ?string              $timeZone,
+        string               $language,
+        ?string              $defaultLocale = null,
+        ?string              $defaultTimeZone = null
     ) {
         $this->localeSettings->expects($this->once())
             ->method('getLanguage')
@@ -208,14 +208,14 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
      * @dataProvider formatDateDataProvider
      */
     public function testFormatDate(
-        int $expectedDateType,
-        \DateTime $date,
+        int             $expectedDateType,
+        \DateTime       $date,
         int|string|null $dateType,
-        ?string $locale,
-        ?string $timeZone,
-        string $language,
-        string $defaultLocale = null,
-        string $defaultTimeZone = null
+        ?string         $locale,
+        ?string         $timeZone,
+        string          $language,
+        ?string         $defaultLocale = null,
+        ?string         $defaultTimeZone = null
     ) {
         $this->localeSettings->expects($this->once())
             ->method('getLanguage')
@@ -320,8 +320,8 @@ class DateTimeFormatterTest extends \PHPUnit\Framework\TestCase
         ?string $locale,
         ?string $timeZone,
         string $language,
-        string $defaultLocale = null,
-        string $defaultTimeZone = null
+        ?string $defaultLocale = null,
+        ?string $defaultTimeZone = null
     ) {
         $this->localeSettings->expects($this->once())
             ->method('getLanguage')

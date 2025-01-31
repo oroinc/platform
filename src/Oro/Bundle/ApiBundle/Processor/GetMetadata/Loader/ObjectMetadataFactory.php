@@ -87,7 +87,7 @@ class ObjectMetadataFactory
         string $fieldName,
         EntityDefinitionFieldConfig $field,
         ?string $targetAction,
-        string $targetClass = null
+        ?string $targetClass = null
     ): AssociationMetadata {
         if (!$targetClass) {
             $targetClass = $field->getTargetClass();

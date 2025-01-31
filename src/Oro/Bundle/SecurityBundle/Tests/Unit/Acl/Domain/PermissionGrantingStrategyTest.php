@@ -96,7 +96,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         return $serviceLink;
     }
 
-    private function getAcl(ObjectIdentity $oid = null, bool $entriesInheriting = true): Acl
+    private function getAcl(?ObjectIdentity $oid = null, bool $entriesInheriting = true): Acl
     {
         static $id = 1;
 
@@ -652,7 +652,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function setFieldSecurityMetadata(object $object, string $fieldName, string $fieldAlias = null)
+    private function setFieldSecurityMetadata(object $object, string $fieldName, ?string $fieldAlias = null)
     {
         $securityMetadataProvider = $this->createMock(EntitySecurityMetadataProvider::class);
         $securityMetadataProvider->expects($this->any())

@@ -42,9 +42,9 @@ class FormSubmitTemplateResponseProcessorTest extends \PHPUnit\Framework\TestCas
     }
 
     private function createContext(
-        string $message,
-        int $code = null,
-        WorkflowItem $workflowItem = null
+        string        $message,
+        ?int          $code = null,
+        ?WorkflowItem $workflowItem = null
     ): TransitionContext {
         $context = new TransitionContext();
         $context->setResultType(new TemplateResultType());

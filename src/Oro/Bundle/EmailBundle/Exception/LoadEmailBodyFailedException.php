@@ -6,7 +6,7 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 
 class LoadEmailBodyFailedException extends LoadEmailBodyException
 {
-    public function __construct(Email $email, \Exception $previous = null)
+    public function __construct(Email $email, ?\Exception $previous = null)
     {
         $message = sprintf('Cannot load a body for "%s" email.', $email->getSubject());
         if ($previous) {

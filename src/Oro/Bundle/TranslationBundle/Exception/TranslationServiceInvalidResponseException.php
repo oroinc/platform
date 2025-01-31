@@ -9,7 +9,7 @@ class TranslationServiceInvalidResponseException extends TranslationServiceAdapt
 {
     private string $response;
 
-    public function __construct(string $message, string $response, \Throwable $previous = null)
+    public function __construct(string $message, string $response, ?\Throwable $previous = null)
     {
         parent::__construct($message, $previous);
         $this->response = $response;

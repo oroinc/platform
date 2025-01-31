@@ -35,7 +35,7 @@ class CacheLayoutFactory implements LayoutFactoryInterface
         ExpressionProcessor $expressionProcessor,
         RenderCache $renderCache,
         EventDispatcherInterface $eventDispatcher,
-        BlockViewCache $blockViewCache = null
+        ?BlockViewCache $blockViewCache = null
     ) {
         $this->baseLayoutFactory = $baseLayoutFactory;
         $this->layoutContextStack = $layoutContextStack;

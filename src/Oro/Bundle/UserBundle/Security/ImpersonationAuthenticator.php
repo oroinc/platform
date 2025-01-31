@@ -102,7 +102,7 @@ class ImpersonationAuthenticator implements AuthenticatorInterface, Authenticati
     }
 
     #[\Override]
-    public function start(Request $request, AuthenticationException $authException = null): Response
+    public function start(Request $request, ?AuthenticationException $authException = null): Response
     {
         if ($authException) {
             $request->getSession()->set(Security::AUTHENTICATION_ERROR, $authException);
@@ -123,7 +123,7 @@ class ImpersonationAuthenticator implements AuthenticatorInterface, Authenticati
         return $request->query->get(static::TOKEN_PARAMETER);
     }
 
-    private function checkImpersonation(Impersonation $impersonation = null): void
+    private function checkImpersonation(?Impersonation $impersonation = null): void
     {
         if (!$impersonation) {
             throw new AuthenticationCredentialsNotFoundException();

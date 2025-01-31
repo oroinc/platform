@@ -19,7 +19,7 @@ class TitleNode extends Node
      * @param int $lineno
      * @param null $tag
      */
-    public function __construct(Node $expr = null, $lineno = 0, $tag = null)
+    public function __construct(?Node $expr = null, $lineno = 0, $tag = null)
     {
         parent::__construct(['expr' => $expr], [], $lineno, $tag);
     }

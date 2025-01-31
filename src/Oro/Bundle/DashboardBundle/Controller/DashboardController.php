@@ -54,7 +54,7 @@ class DashboardController extends AbstractController
      * @return Response
      */
     #[Route(path: '/view/{id}', name: 'oro_dashboard_view', requirements: ['id' => '\d+'], defaults: ['id' => 0])]
-    public function viewAction(Request $request, Dashboard $dashboard = null)
+    public function viewAction(Request $request, ?Dashboard $dashboard = null)
     {
         $currentDashboard = $this->findAllowedDashboard($dashboard);
 
@@ -287,7 +287,7 @@ class DashboardController extends AbstractController
      * @param string    $permission
      * @return DashboardModel|null
      */
-    protected function findAllowedDashboard(Dashboard $dashboard = null, $permission = 'VIEW')
+    protected function findAllowedDashboard(?Dashboard $dashboard = null, $permission = 'VIEW')
     {
         if ($dashboard) {
             $dashboard = $this->getDashboardManager()->getDashboardModel($dashboard);

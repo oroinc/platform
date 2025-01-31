@@ -18,7 +18,7 @@ class SecurityContext implements SecurityContextInterface
     private TokenStorageInterface $tokenStorage;
     private ?RequestStack $requestStack;
 
-    public function __construct(TokenStorageInterface $tokenStorage, RequestStack $requestStack = null)
+    public function __construct(TokenStorageInterface $tokenStorage, ?RequestStack $requestStack = null)
     {
         $this->tokenStorage = $tokenStorage;
         $this->requestStack = $requestStack;

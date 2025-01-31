@@ -208,7 +208,7 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->handler->process($trigger, TransitionTriggerMessage::create($trigger)));
     }
 
-    private function getWorkflow(Transition $transition = null): Workflow
+    private function getWorkflow(?Transition $transition = null): Workflow
     {
         $transitions = [];
 

@@ -64,7 +64,7 @@ class ChoiceAccountType extends AbstractType
     /**
      * Returns choices callable for available account types
      */
-    protected function getAccountTypeChoicesCallback(string $additionalType = null): callable
+    protected function getAccountTypeChoicesCallback(?string $additionalType = null): callable
     {
         return function () use ($additionalType) {
             $choices = [

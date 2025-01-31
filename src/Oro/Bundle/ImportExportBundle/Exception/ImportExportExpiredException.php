@@ -20,7 +20,7 @@ class ImportExportExpiredException extends HttpException
     public function __construct(
         $statusCode = Response::HTTP_GONE,
         $message = 'The link has expired.',
-        \Exception $previous = null,
+        ?\Exception $previous = null,
         array $headers = [],
         int $code = 0
     ) {

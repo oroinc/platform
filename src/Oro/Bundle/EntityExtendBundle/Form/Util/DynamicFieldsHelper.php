@@ -68,7 +68,7 @@ class DynamicFieldsHelper
         $className,
         ConfigInterface $formConfig,
         FormView $view,
-        bool $extraField = null
+        ?bool $extraField = null
     ) {
         $extendConfigProvider = $this->configManager->getProvider('extend');
 

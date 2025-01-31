@@ -28,7 +28,7 @@ trait MessageQueueExtension
     }
 
     /** @return array<int, array{topic: string, message: MessageInterface, context: Context}> */
-    protected function consumeMessages(int $sentMessagesCount = null, string $collectTopic = null): array
+    protected function consumeMessages(?int $sentMessagesCount = null, ?string $collectTopic = null): array
     {
         $result = [];
 
@@ -52,7 +52,7 @@ trait MessageQueueExtension
     }
 
     /** @return array<int, array{topic: string, message: MessageInterface, context: Context}> */
-    protected function consumeAllMessages(string $collectTopic = null): array
+    protected function consumeAllMessages(?string $collectTopic = null): array
     {
         $result = [];
 

@@ -19,7 +19,7 @@ class CacheExpressionProcessor extends ExpressionProcessor
     public function processExpressions(
         array &$values,
         ContextInterface $context,
-        DataAccessorInterface $data = null,
+        ?DataAccessorInterface $data = null,
         $evaluate = true,
         $encoding = null
     ): void {

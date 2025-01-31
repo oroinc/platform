@@ -16,7 +16,7 @@ class ChainOwnershipMetadataProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @return OwnershipMetadataProviderInterface|\PHPUnit\Framework\MockObject\MockObject
      */
-    private function getMetadataProviderMock(bool $supported, OwnershipMetadataInterface $metadata = null)
+    private function getMetadataProviderMock(bool $supported, ?OwnershipMetadataInterface $metadata = null)
     {
         $provider = $this->createMock(OwnershipMetadataProviderInterface::class);
         $provider->expects(self::any())

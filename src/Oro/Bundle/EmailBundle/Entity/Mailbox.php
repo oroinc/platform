@@ -184,7 +184,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
      *
      * @return $this
      */
-    public function setProcessSettings(MailboxProcessSettings $processSettings = null)
+    public function setProcessSettings(?MailboxProcessSettings $processSettings = null)
     {
         if ($processSettings) {
             $processSettings->setMailbox($this);
@@ -426,7 +426,7 @@ class Mailbox implements EmailOwnerInterface, EmailHolderInterface
         return $this->autoResponseRules;
     }
 
-    public function setImapAccountType(AccountTypeModel $accountTypeModel = null)
+    public function setImapAccountType(?AccountTypeModel $accountTypeModel = null)
     {
         $this->imapAccountType = $accountTypeModel;
         if ($accountTypeModel instanceof AccountTypeModel) {

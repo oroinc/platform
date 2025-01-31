@@ -61,7 +61,7 @@ class Mailbox
         return $this->origin;
     }
 
-    public function setOrigin(Origin $origin = null)
+    public function setOrigin(?Origin $origin = null)
     {
         $this->origin = $origin;
     }

@@ -34,7 +34,7 @@ class MenuUpdateTreeHandler
      * @param bool               $includeRoot
      * @return array
      */
-    public function createTree(ItemInterface $root = null, $includeRoot = true)
+    public function createTree(?ItemInterface $root = null, $includeRoot = true)
     {
         if ($root === null) {
             return [];

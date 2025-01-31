@@ -11,7 +11,7 @@ class ArrayCondition extends ArrayCollection implements ExpressionInterface
     private $message;
 
     #[\Override]
-    public function evaluate($context, \ArrayAccess $errors = null)
+    public function evaluate($context, ?\ArrayAccess $errors = null)
     {
         $result = $this->isConditionAllowed($context);
 

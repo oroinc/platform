@@ -108,7 +108,7 @@ class OperationRegistry
      *
      * @return null|Operation
      */
-    public function findByName($name, OperationFindCriteria $criteria = null)
+    public function findByName($name, ?OperationFindCriteria $criteria = null)
     {
         $this->loadConfiguration();
 

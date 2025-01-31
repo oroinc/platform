@@ -732,7 +732,7 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
     }
 
     #[\Override]
-    protected function getTriggers(string $triggerName = null): array|object
+    protected function getTriggers(?string $triggerName = null): array|object
     {
         if (!$this->triggers) {
             $triggerPriority = 0;

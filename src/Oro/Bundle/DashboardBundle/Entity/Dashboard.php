@@ -264,7 +264,7 @@ class Dashboard implements ExtendEntityInterface
      * @param Dashboard|null $dashboard
      * @return Dashboard
      */
-    public function setStartDashboard(Dashboard $dashboard = null)
+    public function setStartDashboard(?Dashboard $dashboard = null)
     {
         $this->startDashboard = $dashboard;
 
@@ -297,7 +297,7 @@ class Dashboard implements ExtendEntityInterface
      * @param Organization|null $organization
      * @return Dashboard
      */
-    public function setOrganization(Organization $organization = null)
+    public function setOrganization(?Organization $organization = null)
     {
         $this->organization = $organization;
 

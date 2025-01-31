@@ -82,7 +82,7 @@ class FolderContentCumulativeLoader implements CumulativeResourceLoader
         $relativeFolderPath,
         $maxNestingLevel = -1,
         $plainResultStructure = true,
-        FileMatcherInterface $fileMatcher = null
+        ?FileMatcherInterface $fileMatcher = null
     ) {
         $this->relativeFolderPath = $relativeFolderPath;
         $this->maxNestingLevel = -1 === $maxNestingLevel

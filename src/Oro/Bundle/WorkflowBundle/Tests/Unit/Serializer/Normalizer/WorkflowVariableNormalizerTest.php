@@ -356,7 +356,7 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
         string $type,
         $value = null,
         array $options = [],
-        string $propertyPath = null
+        ?string $propertyPath = null
     ): Variable {
         $variable = new Variable();
         $variable
@@ -370,7 +370,7 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
         return $variable;
     }
 
-    private function getMockNormalizer(Variable $expected = null, array $options = []): WorkflowVariableNormalizer
+    private function getMockNormalizer(?Variable $expected = null, array $options = []): WorkflowVariableNormalizer
     {
         if (!$expected instanceof Variable || 'entity' !== $expected->getType()) {
             $doctrine = $this->createMock(ManagerRegistry::class);

@@ -31,11 +31,11 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
      * @dataProvider addBlockDataProvider
      */
     public function testAddBlock(
-        array $expected,
-        string $title,
-        int $priority = null,
-        string $class = null,
-        bool $useSubBlockDivider = true
+        array   $expected,
+        string  $title,
+        ?int    $priority = null,
+        ?string $class = null,
+        bool    $useSubBlockDivider = true
     ) {
         $this->assertEquals(0, $this->scrollData->addBlock($title, $priority, $class, $useSubBlockDivider));
         $this->assertEquals($expected, $this->scrollData->getData());
@@ -79,7 +79,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider addSubBlockDataProvider
      */
-    public function testAddSubBlock(array $source, array $expected, int $blockId, string $title = null)
+    public function testAddSubBlock(array $source, array $expected, int $blockId, ?string $title = null)
     {
         $this->scrollData->setData($source);
         $this->assertEquals(0, $this->scrollData->addSubBlock($blockId, $title));
@@ -127,7 +127,7 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider addSubBlockAsFirstDataProvider
      */
-    public function testAddSubBlockAsFirst(array $source, array $expected, int $blockId, string $title = null)
+    public function testAddSubBlockAsFirst(array $source, array $expected, int $blockId, ?string $title = null)
     {
         $this->scrollData->setData($source);
         $this->assertEquals(0, $this->scrollData->addSubBlockAsFirst($blockId, $title));

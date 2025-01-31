@@ -175,7 +175,7 @@ class ProcessDataNormalizerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    private function createProcessJob(string $event = null): ProcessJob
+    private function createProcessJob(?string $event = null): ProcessJob
     {
         $definition = new ProcessDefinition();
         $definition->setRelatedEntity('Test\Entity');

@@ -58,10 +58,10 @@ class Tagging implements ExtendEntityInterface
     protected ?int $recordId = null;
 
     /**
-     * @param Tag|null    $tag
+     * @param Tag|null $tag
      * @param object|null $entity
      */
-    public function __construct(Tag $tag = null, $entity = null)
+    public function __construct(?Tag $tag = null, $entity = null)
     {
         if ($tag != null) {
             $this->setTag($tag);

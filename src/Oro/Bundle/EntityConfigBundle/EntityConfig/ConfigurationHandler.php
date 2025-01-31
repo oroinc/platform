@@ -94,11 +94,11 @@ class ConfigurationHandler
     }
 
     public function process(
-        int $type,
-        string $scope,
-        array $values,
-        string $entityOrTableName = null,
-        string $fieldType = null
+        int     $type,
+        string  $scope,
+        array   $values,
+        ?string $entityOrTableName = null,
+        ?string $fieldType = null
     ): array {
         $configuration = $this->getConfiguration($type, $scope);
         if (empty($values) && empty($configuration)) {
@@ -146,7 +146,7 @@ class ConfigurationHandler
         array $configValues,
         array $incomingConfigValues,
         string $scope,
-        string $fieldType = null
+        ?string $fieldType = null
     ): array {
         foreach ($configValues as $configName => $configValue) {
             if (is_array($configValue) && !count($configValue)) {
@@ -204,7 +204,7 @@ class ConfigurationHandler
         $this->validateScope(array_key_first($invalidScopes), $type, $entityOrTableName);
     }
 
-    private function validateScope(string $scope, int $type, string $entityOrTableName = null): void
+    private function validateScope(string $scope, int $type, ?string $entityOrTableName = null): void
     {
         $availableScopes = $this->getAvailableScopes($type);
         if (!in_array($scope, $availableScopes)) {

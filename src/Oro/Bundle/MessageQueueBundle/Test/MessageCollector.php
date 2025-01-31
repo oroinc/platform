@@ -15,7 +15,7 @@ class MessageCollector implements MessageProducerInterface
     /** @var array [['topic' => topic name, 'message' => message (string|array|Message)], ...] */
     private $sentMessages = [];
 
-    public function __construct(MessageProducerInterface $messageProducer = null)
+    public function __construct(?MessageProducerInterface $messageProducer = null)
     {
         $this->messageProducer = $messageProducer;
     }

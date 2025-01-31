@@ -166,11 +166,11 @@ class DbalDriverTest extends \PHPUnit\Framework\TestCase
     }
 
     private function getMessage(
-        string $messageId,
-        string $body,
-        int $timestamp = null,
-        int $delay = null,
-        string $priority = null
+        string  $messageId,
+        string  $body,
+        ?int    $timestamp = null,
+        ?int    $delay = null,
+        ?string $priority = null
     ): Message {
         $message = new Message($body, $priority);
         $message->setMessageId($messageId);

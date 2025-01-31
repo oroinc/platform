@@ -132,7 +132,7 @@ class WsseAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
     }
 
     #[\Override]
-    public function start(Request $request, AuthenticationException $authException = null): Response
+    public function start(Request $request, ?AuthenticationException $authException = null): Response
     {
         return $this->authenticationEntryPoint->start($request, $authException);
     }

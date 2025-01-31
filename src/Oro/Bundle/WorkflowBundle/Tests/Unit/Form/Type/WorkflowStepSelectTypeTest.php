@@ -211,7 +211,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
 
     private function getWorkflowDefinitionAwareClass(
         string $class,
-        string $definitionLabel = null
+        ?string $definitionLabel = null
     ): Workflow|WorkflowStep {
         $definition = $this->createMock(WorkflowDefinition::class);
         $definition->expects($this->any())

@@ -11,7 +11,7 @@ use ProxyManager\Proxy\LazyLoadingInterface;
 class LoggerProxyStub extends BufferingLogger implements LazyLoadingInterface
 {
     #[\Override]
-    public function setProxyInitializer(\Closure $initializer = null)
+    public function setProxyInitializer(?\Closure $initializer = null)
     {
     }
 

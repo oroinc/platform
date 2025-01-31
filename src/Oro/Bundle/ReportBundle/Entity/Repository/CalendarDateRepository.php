@@ -15,7 +15,7 @@ class CalendarDateRepository extends EntityRepository
      * @param \DateTime|null $date
      * @return CalendarDate|null
      */
-    public function getDate(\DateTime $date = null)
+    public function getDate(?\DateTime $date = null)
     {
         $qb = $this->createQueryBuilder('d')->orderBy('d.date', 'DESC')->setMaxResults(1);
         if ($date) {

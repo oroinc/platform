@@ -123,7 +123,7 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
     protected function delegateToProcessor(
         EmailOrigin $origin,
         AbstractEmailSynchronizationProcessor $processor,
-        SynchronizationProcessorSettings $settings = null
+        ?SynchronizationProcessorSettings $settings = null
     ): void {
         try {
             parent::delegateToProcessor($origin, $processor, $settings);
@@ -143,7 +143,7 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
     }
 
     #[\Override]
-    protected function doSyncOrigin(EmailOrigin $origin, SynchronizationProcessorSettings $settings = null): void
+    protected function doSyncOrigin(EmailOrigin $origin, ?SynchronizationProcessorSettings $settings = null): void
     {
         try {
             parent::doSyncOrigin($origin, $settings);

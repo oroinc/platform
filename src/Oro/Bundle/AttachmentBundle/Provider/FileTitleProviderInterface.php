@@ -10,5 +10,5 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
  */
 interface FileTitleProviderInterface
 {
-    public function getTitle(File $file, Localization $localization = null): string;
+    public function getTitle(File $file, ?Localization $localization = null): string;
 }

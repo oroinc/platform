@@ -30,7 +30,7 @@ class SegmentQueryConverter extends QueryBuilderGroupingOrmQueryConverter
         VirtualRelationProviderInterface $virtualRelationProvider,
         DoctrineHelper $doctrineHelper,
         RestrictionBuilderInterface $restrictionBuilder,
-        SegmentQueryConverterState $state = null
+        ?SegmentQueryConverterState $state = null
     ) {
         parent::__construct($functionProvider, $virtualFieldProvider, $virtualRelationProvider, $doctrineHelper);
         $this->restrictionBuilder = $restrictionBuilder;

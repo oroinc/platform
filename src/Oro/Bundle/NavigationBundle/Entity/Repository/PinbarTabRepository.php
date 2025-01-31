@@ -77,7 +77,7 @@ class PinbarTabRepository extends EntityRepository implements NavigationReposito
     public function countNavigationItems(
         string $url,
         $user,
-        OrganizationInterface $organization = null,
+        ?OrganizationInterface $organization = null,
         $type = null
     ): int {
         $qb = $this->createNavigationItemsQueryBuiler($user, $organization, $type);
@@ -100,8 +100,8 @@ class PinbarTabRepository extends EntityRepository implements NavigationReposito
      */
     private function createNavigationItemsQueryBuiler(
         $user,
-        OrganizationInterface $organization = null,
-        string $type = null
+        ?OrganizationInterface $organization = null,
+        ?string $type = null
     ): QueryBuilder {
         $qb = $this->_em->createQueryBuilder();
 
@@ -140,7 +140,7 @@ class PinbarTabRepository extends EntityRepository implements NavigationReposito
     public function countPinbarTabDuplicatedTitles(
         string $titleShort,
         $user,
-        OrganizationInterface $organization = null
+        ?OrganizationInterface $organization = null
     ): int {
         $qb = $this->createNavigationItemsQueryBuiler($user, $organization, 'pinbar');
 

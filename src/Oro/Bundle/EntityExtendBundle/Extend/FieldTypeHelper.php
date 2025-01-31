@@ -42,7 +42,7 @@ class FieldTypeHelper
         );
     }
 
-    public function getUnderlyingType(?string $type, ConfigInterface $fieldConfig = null): ?string
+    public function getUnderlyingType(?string $type, ?ConfigInterface $fieldConfig = null): ?string
     {
         if (null !== $fieldConfig && ExtendHelper::isEnumerableType($type)) {
             return $this->getEnumUnderlyingType($fieldConfig);

@@ -73,7 +73,7 @@ class StatusCodesConfig
     /**
      * Adds the configuration of the status code.
      */
-    public function addCode(string $code, StatusCodeConfig $config = null): StatusCodeConfig
+    public function addCode(string $code, ?StatusCodeConfig $config = null): StatusCodeConfig
     {
         if (null === $config) {
             $config = new StatusCodeConfig();

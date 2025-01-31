@@ -46,7 +46,7 @@ class UserEmailOriginTransport implements TransportInterface
     }
 
     #[\Override]
-    public function send(RawMessage $message, Envelope $envelope = null): ?SentMessage
+    public function send(RawMessage $message, ?Envelope $envelope = null): ?SentMessage
     {
         if (!$message instanceof Message) {
             throw new \InvalidArgumentException(

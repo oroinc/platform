@@ -17,7 +17,7 @@ class FlashMessageHelper
     ) {
     }
 
-    public function addFlashMessage(string $type, string $message, array $params, string $domain = null)
+    public function addFlashMessage(string $type, string $message, array $params, ?string $domain = null)
     {
         $message = $this->translator->trans($message, $params, $domain);
 

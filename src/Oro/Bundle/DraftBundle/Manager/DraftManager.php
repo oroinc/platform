@@ -43,7 +43,7 @@ class DraftManager
         $this->publisher = $publisher;
     }
 
-    public function createDraft(DraftableInterface $source, \ArrayAccess $context = null): DraftableInterface
+    public function createDraft(DraftableInterface $source, ?\ArrayAccess $context = null): DraftableInterface
     {
         $context = $context ?? $this->createContext();
         $this->contextAccessor->setValue($context, 'action', self::ACTION_CREATE_DRAFT);
@@ -52,7 +52,7 @@ class DraftManager
         return $copier->copy($source);
     }
 
-    public function createPublication(DraftableInterface $source, \ArrayAccess $context = null): DraftableInterface
+    public function createPublication(DraftableInterface $source, ?\ArrayAccess $context = null): DraftableInterface
     {
         $context = $context ?? $this->createContext();
         $this->contextAccessor->setValue($context, 'action', self::ACTION_PUBLISH_DRAFT);

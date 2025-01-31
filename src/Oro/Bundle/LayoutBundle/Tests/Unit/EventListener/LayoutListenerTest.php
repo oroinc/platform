@@ -354,8 +354,8 @@ class LayoutListenerTest extends \PHPUnit\Framework\TestCase
 
     private function setupLayoutExpectations(
         ?LayoutBuilderInterface $builder = null,
-        \Closure $assertContextCallback = null,
-        array $renderBlocks = []
+        ?\Closure               $assertContextCallback = null,
+        array                   $renderBlocks = []
     ): void {
         if (null === $builder) {
             $builder = $this->createMock(LayoutBuilderInterface::class);

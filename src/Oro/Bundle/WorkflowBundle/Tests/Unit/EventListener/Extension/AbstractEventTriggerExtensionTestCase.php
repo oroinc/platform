@@ -64,7 +64,7 @@ abstract class AbstractEventTriggerExtensionTestCase extends \PHPUnit\Framework\
         }
     }
 
-    protected function prepareRepository(array $triggers = null): void
+    protected function prepareRepository(?array $triggers = null): void
     {
         $this->repository->expects($this->once())
             ->method('findAllWithDefinitions')
@@ -81,11 +81,11 @@ abstract class AbstractEventTriggerExtensionTestCase extends \PHPUnit\Framework\
     }
 
     /**
-     * @param null|string $triggerName
+     * @param string|null $triggerName
      *
      * @return EventTriggerInterface[]|EventTriggerInterface
      */
-    abstract protected function getTriggers(string $triggerName = null): array|object;
+    abstract protected function getTriggers(?string $triggerName = null): array|object;
 
     /**
      * @param EventTriggerInterface[] $triggers

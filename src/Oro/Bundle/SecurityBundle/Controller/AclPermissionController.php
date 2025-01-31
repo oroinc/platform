@@ -34,7 +34,7 @@ class AclPermissionController
         defaults: ['_format' => 'json', 'permission' => null]
     )]
     #[Template]
-    public function aclAccessLevelsAction(string $oid, string $permission = null): array
+    public function aclAccessLevelsAction(string $oid, ?string $permission = null): array
     {
         if (ObjectIdentityHelper::getExtensionKeyFromIdentityString($oid) === EntityAclExtension::NAME) {
             $entity = ObjectIdentityHelper::getClassFromIdentityString($oid);

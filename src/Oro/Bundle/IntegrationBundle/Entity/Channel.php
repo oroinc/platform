@@ -317,7 +317,7 @@ class Channel implements OrganizationAwareInterface
      *
      * @return $this
      */
-    public function setDefaultUserOwner(User $owner = null)
+    public function setDefaultUserOwner(?User $owner = null)
     {
         $this->defaultUserOwner = $owner;
 

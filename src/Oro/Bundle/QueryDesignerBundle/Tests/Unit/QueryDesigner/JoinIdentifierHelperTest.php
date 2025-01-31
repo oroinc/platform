@@ -44,7 +44,7 @@ class JoinIdentifierHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildColumnJoinIdentifierProvider
      */
-    public function testBuildColumnJoinIdentifier(string $expected, string $columnName, string $entityClass = null)
+    public function testBuildColumnJoinIdentifier(string $expected, string $columnName, ?string $entityClass = null)
     {
         $this->assertEquals(
             $expected,

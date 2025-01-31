@@ -80,7 +80,7 @@ class LayoutFactoryBuilder implements LayoutFactoryBuilderInterface
      */
     private $debug = false;
 
-    public function __construct(ExpressionProcessor $expressionProcessor, BlockViewCache $blockViewCache = null)
+    public function __construct(ExpressionProcessor $expressionProcessor, ?BlockViewCache $blockViewCache = null)
     {
         $this->expressionProcessor = $expressionProcessor;
         $this->blockViewCache = $blockViewCache;

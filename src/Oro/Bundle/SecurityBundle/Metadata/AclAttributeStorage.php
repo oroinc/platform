@@ -187,7 +187,7 @@ class AclAttributeStorage
     /**
      * Removes an attribute binding.
      */
-    public function removeBinding(string $class, string $method = null): void
+    public function removeBinding(string $class, ?string $method = null): void
     {
         if (empty($class)) {
             throw new \InvalidArgumentException('$class must not be empty.');

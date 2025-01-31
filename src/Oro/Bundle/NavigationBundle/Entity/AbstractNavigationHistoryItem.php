@@ -55,7 +55,7 @@ abstract class AbstractNavigationHistoryItem implements
 
     protected ?AbstractUser $user = null;
 
-    public function __construct(array $values = null)
+    public function __construct(?array $values = null)
     {
         if (!empty($values)) {
             $this->setValues($values);
@@ -197,7 +197,7 @@ abstract class AbstractNavigationHistoryItem implements
      * @param AbstractUser|null $user
      * @return AbstractNavigationHistoryItem
      */
-    public function setUser(AbstractUser $user = null)
+    public function setUser(?AbstractUser $user = null)
     {
         $this->user = $user;
 

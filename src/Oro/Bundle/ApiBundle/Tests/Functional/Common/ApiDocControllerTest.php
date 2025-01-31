@@ -21,7 +21,7 @@ class ApiDocControllerTest extends WebTestCase
         $this->initClient([], $this->generateBasicAuthHeader());
     }
 
-    private function sendApiDocRequest(string $view = null): Response
+    private function sendApiDocRequest(?string $view = null): Response
     {
         $parameters = [];
         if (null !== $view) {

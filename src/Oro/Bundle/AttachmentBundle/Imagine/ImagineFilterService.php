@@ -46,7 +46,7 @@ class ImagineFilterService
         string $path,
         string $filterName,
         string $format = '',
-        string $resolver = null
+        ?string $resolver = null
     ): string {
         if (!$format) {
             $format = $this->filterConfiguration->get($filterName)['format'] ?? '';

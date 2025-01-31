@@ -21,7 +21,7 @@ class StartTransitionButtonProviderExtension extends AbstractStartTransitionButt
     public function isAvailable(
         ButtonInterface $button,
         ButtonSearchContext $buttonSearchContext,
-        Collection $errors = null
+        ?Collection $errors = null
     ) {
         if (!$this->supports($button)) {
             throw $this->createUnsupportedButtonException($button);
@@ -92,7 +92,7 @@ class StartTransitionButtonProviderExtension extends AbstractStartTransitionButt
      *
      * @return array
      */
-    private function getNodeInitTransitions($value, array $data = null)
+    private function getNodeInitTransitions($value, ?array $data = null)
     {
         return ($data && array_key_exists($value, $data)) ? $data[$value] : [];
     }

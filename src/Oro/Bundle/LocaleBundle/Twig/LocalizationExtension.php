@@ -73,7 +73,7 @@ class LocalizationExtension extends AbstractExtension implements ServiceSubscrib
         return $this->getFormattingCodeFormatter()->format($code);
     }
 
-    public function getLocalizedValue(Collection $values, Localization $localization = null): string
+    public function getLocalizedValue(Collection $values, ?Localization $localization = null): string
     {
         return (string)$this->getLocalizationHelper()->getLocalizedValue($values, $localization);
     }

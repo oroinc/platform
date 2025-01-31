@@ -223,7 +223,7 @@ class FixtureLoader
      * @param string|null $property
      * @return mixed
      */
-    public function getReference(string $name, string $property = null)
+    public function getReference(string $name, ?string $property = null)
     {
         return $this->aliceLoader->getReferenceRepository()->find($name, $property);
     }
@@ -319,7 +319,7 @@ class FixtureLoader
         $this->setSecurityToken($token);
     }
 
-    private function setSecurityToken(TokenInterface $token = null): ?TokenInterface
+    private function setSecurityToken(?TokenInterface $token = null): ?TokenInterface
     {
         $tokenStorage = $this->kernel->getContainer()->get('security.token_storage');
 

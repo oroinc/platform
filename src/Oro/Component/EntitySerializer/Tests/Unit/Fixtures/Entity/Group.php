@@ -30,7 +30,7 @@ class Group
     #[ORM\Column(name: 'is_exception', type: Types::BOOLEAN)]
     private ?bool $isException = false;
 
-    public function __construct(int $id = null)
+    public function __construct(?int $id = null)
     {
         $this->id = $id;
     }

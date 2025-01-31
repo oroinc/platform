@@ -45,7 +45,7 @@ trait PageObjectDictionary
      * @param NodeElement|null $context
      * @return Element
      */
-    public function createElement($name, NodeElement $context = null)
+    public function createElement($name, ?NodeElement $context = null)
     {
         return $this->elementFactory->createElement($name, $context);
     }
@@ -55,7 +55,7 @@ trait PageObjectDictionary
      * @param NodeElement|null $context
      * @return Element[]
      */
-    public function findAllElements($name, NodeElement $context = null)
+    public function findAllElements($name, ?NodeElement $context = null)
     {
         return $this->elementFactory->findAllElements($name, $context);
     }
@@ -67,7 +67,7 @@ trait PageObjectDictionary
      *
      * @return OroElement
      */
-    public function findElementContains($name, $text, OroElement $context = null)
+    public function findElementContains($name, $text, ?OroElement $context = null)
     {
         return $this->elementFactory->findElementContains($name, $text, $context);
     }
@@ -90,7 +90,7 @@ trait PageObjectDictionary
      *
      * @return bool
      */
-    public function isElementVisible($elementName, NodeElement $context = null)
+    public function isElementVisible($elementName, ?NodeElement $context = null)
     {
         if ($this->hasElement($elementName)) {
             $element = $this->createElement($elementName, $context);

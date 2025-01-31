@@ -19,7 +19,7 @@ class TraceLogger
     private array $applicableCheckers = [];
     private string $lastApplicableChecker;
 
-    public function __construct(string $sectionName, Stopwatch $stopwatch = null)
+    public function __construct(string $sectionName, ?Stopwatch $stopwatch = null)
     {
         $this->sectionName = $sectionName;
         $this->stopwatch = $stopwatch;
@@ -89,7 +89,7 @@ class TraceLogger
     /**
      * Marks an action as stopped.
      */
-    public function stopAction(\Exception $exception = null): void
+    public function stopAction(?\Exception $exception = null): void
     {
         $action = array_pop($this->actionStack);
         $this->lastActionIndex--;
@@ -117,7 +117,7 @@ class TraceLogger
     /**
      * Marks a processor as stopped.
      */
-    public function stopProcessor(\Exception $exception = null): void
+    public function stopProcessor(?\Exception $exception = null): void
     {
         $processor = array_pop($this->processorStack);
         $processor['time'] = microtime(true) - $processor['time'] - $processor['subtrahend'];

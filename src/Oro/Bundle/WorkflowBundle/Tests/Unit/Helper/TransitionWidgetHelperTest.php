@@ -25,7 +25,7 @@ class TransitionWidgetHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getOrCreateEntityReferenceDataProvider
      */
-    public function testGetOrCreateEntityReference(string $entityClass, int $entityId = null)
+    public function testGetOrCreateEntityReference(string $entityClass, ?int $entityId = null)
     {
         if ($entityId) {
             $this->doctrineHelper->expects($this->once())
@@ -43,7 +43,7 @@ class TransitionWidgetHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getOrCreateEntityReferenceDataProvider
      */
-    public function testGetOrCreateEntityReferenceException(string $entityClass, int $entityId = null)
+    public function testGetOrCreateEntityReferenceException(string $entityClass, ?int $entityId = null)
     {
         $this->expectException(BadRequestHttpException::class);
         if ($entityId) {

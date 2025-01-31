@@ -25,9 +25,9 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
     }
 
     private function createManager(
-        array $definitions = [],
-        ThemeFactoryInterface $factory = null,
-        array $enabledThemes = []
+        array                  $definitions = [],
+        ?ThemeFactoryInterface $factory = null,
+        array                  $enabledThemes = []
     ): ThemeManager {
         $themeDefinitionBag = $this->createMock(ThemeDefinitionBagInterface::class);
         $themeDefinitionBag->expects(self::any())

@@ -23,7 +23,7 @@ class ProcessLogger
      */
     protected $enabled = true;
 
-    public function __construct(DoctrineHelper $doctrineHelper, LoggerInterface $logger = null)
+    public function __construct(DoctrineHelper $doctrineHelper, ?LoggerInterface $logger = null)
     {
         $this->doctrineHelper = $doctrineHelper;
         $this->logger = $logger;

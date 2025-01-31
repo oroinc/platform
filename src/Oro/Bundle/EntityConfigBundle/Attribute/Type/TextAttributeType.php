@@ -17,7 +17,7 @@ class TextAttributeType extends StringAttributeType
     }
 
     #[\Override]
-    public function getSortableValue(FieldConfigModel $attribute, $originalValue, Localization $localization = null)
+    public function getSortableValue(FieldConfigModel $attribute, $originalValue, ?Localization $localization = null)
     {
         throw new \RuntimeException('Not supported');
     }

@@ -227,7 +227,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         array $formOptions,
         array $childrenOptions,
         array $guessedData = [],
-        WorkflowData $sourceWorkflowData = null
+        ?WorkflowData $sourceWorkflowData = null
     ) {
         // Check default values listener is subscribed or not subscribed
         if (!empty($formOptions['attribute_default_values'])) {

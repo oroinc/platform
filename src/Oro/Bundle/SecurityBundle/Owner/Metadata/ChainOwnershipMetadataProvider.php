@@ -80,7 +80,7 @@ class ChainOwnershipMetadataProvider implements OwnershipMetadataProviderInterfa
     }
 
     #[\Override]
-    public function getMaxAccessLevel(int $accessLevel, string $className = null): int
+    public function getMaxAccessLevel(int $accessLevel, ?string $className = null): int
     {
         return $this->getSupportedProvider()->getMaxAccessLevel($accessLevel, $className);
     }

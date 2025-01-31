@@ -28,7 +28,7 @@ class FileBasedProviderDecorator extends FileBasedProvider
         );
     }
 
-    public function setRuleFiles(array $ruleFiles = null): void
+    public function setRuleFiles(?array $ruleFiles = null): void
     {
         if (null !== $ruleFiles) {
             $this->ruleFiles = array_map(function ($file) {

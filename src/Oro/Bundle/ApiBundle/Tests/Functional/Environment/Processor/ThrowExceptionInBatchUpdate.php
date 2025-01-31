@@ -16,7 +16,7 @@ class ThrowExceptionInBatchUpdate implements ProcessorInterface
     private BatchUpdateExceptionController $exceptionController;
     private ?string $stage;
 
-    public function __construct(BatchUpdateExceptionController $exceptionController, string $stage = null)
+    public function __construct(BatchUpdateExceptionController $exceptionController, ?string $stage = null)
     {
         $this->exceptionController = $exceptionController;
         $this->stage = $stage;

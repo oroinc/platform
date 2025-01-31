@@ -20,7 +20,7 @@ class LoggerStrategy implements LoggerInterface
     /**
      * Constructor allows us to pass logger when strategy is instantiating or whenever you want
      */
-    public function __construct(LoggerInterface $logger = null)
+    public function __construct(?LoggerInterface $logger = null)
     {
         $this->setLogger($logger ?: new NullLogger());
     }

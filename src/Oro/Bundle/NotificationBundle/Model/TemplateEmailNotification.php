@@ -42,7 +42,7 @@ class TemplateEmailNotification implements TemplateEmailNotificationInterface, S
         EmailTemplateCriteria $emailTemplateCriteria,
         iterable $recipients,
         $entity = null,
-        From $sender = null
+        ?From $sender = null
     ) {
         $this->emailTemplateCriteria = $emailTemplateCriteria;
         $this->recipients = $recipients;

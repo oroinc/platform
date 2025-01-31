@@ -43,7 +43,7 @@ class BrowserTabManager
         $this->aliases[$alias] = $mink->getSession()->getWindowName();
     }
 
-    public function closeTab(Mink $mink, string $alias = null)
+    public function closeTab(Mink $mink, ?string $alias = null)
     {
         $session = $mink->getSession();
         $driver = $session->getDriver();

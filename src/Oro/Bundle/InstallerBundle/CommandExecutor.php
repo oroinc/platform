@@ -30,7 +30,7 @@ class CommandExecutor extends AbstractCommandExecutor
         InputInterface $input,
         OutputInterface $output,
         Application $application,
-        OroDataCacheManager $dataCacheManager = null
+        ?OroDataCacheManager $dataCacheManager = null
     ) {
         $this->input = $input;
         $this->output = $output;

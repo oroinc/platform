@@ -12,7 +12,7 @@ class ConnectionWithTransactionWatcher extends Connection implements Transaction
     private $transactionWatcher;
 
     #[\Override]
-    public function setTransactionWatcher(TransactionWatcherInterface $transactionWatcher = null)
+    public function setTransactionWatcher(?TransactionWatcherInterface $transactionWatcher = null)
     {
         $this->transactionWatcher = $transactionWatcher;
     }

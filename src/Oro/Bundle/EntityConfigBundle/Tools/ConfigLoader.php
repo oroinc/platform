@@ -353,9 +353,9 @@ class ConfigLoader
      * Extracts entity default values from an annotation and config file
      */
     private function getEntityDefaultValues(
-        string $scope,
-        string $className = null,
-        EntityMetadata $metadata = null
+        string          $scope,
+        ?string         $className = null,
+        ?EntityMetadata $metadata = null
     ): array {
         $propertyConfig = $this->getPropertyConfig($scope);
         $defaultValues = $this->configurationHandler->process(
@@ -387,7 +387,7 @@ class ConfigLoader
         string $className,
         string $fieldName,
         string $fieldType,
-        FieldMetadata $metadata = null
+        ?FieldMetadata $metadata = null
     ): array {
         $propertyConfig = $this->getPropertyConfig($scope);
         $defaultValues = $this->configurationHandler->process(

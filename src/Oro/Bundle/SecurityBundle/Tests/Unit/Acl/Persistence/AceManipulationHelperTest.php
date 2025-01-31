@@ -444,11 +444,11 @@ class AceManipulationHelperTest extends \PHPUnit\Framework\TestCase
 
     private function getAce(
         SecurityIdentityInterface $sid,
-        bool $granting = null,
-        int $mask = null,
-        string $strategy = null,
-        int $getMaskCallCount = 1,
-        int $getStrategyCallCount = 1
+        ?bool                     $granting = null,
+        ?int                      $mask = null,
+        ?string                   $strategy = null,
+        int                       $getMaskCallCount = 1,
+        int                       $getStrategyCallCount = 1
     ): EntryInterface {
         $ace = $this->createMock(EntryInterface::class);
         $ace->expects($this->once())

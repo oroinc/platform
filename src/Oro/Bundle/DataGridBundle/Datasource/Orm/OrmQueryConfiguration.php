@@ -163,7 +163,7 @@ class OrmQueryConfiguration
      * @return string|null
      */
     public function getRootEntity(
-        EntityClassResolver $entityClassResolver = null,
+        ?EntityClassResolver $entityClassResolver = null,
         $lookAtExtendedEntityClassName = false
     ) {
         if ($lookAtExtendedEntityClassName) {
@@ -198,7 +198,7 @@ class OrmQueryConfiguration
      *
      * @return string|null
      */
-    public function findRootAlias($entityClass, EntityClassResolver $entityClassResolver = null)
+    public function findRootAlias($entityClass, ?EntityClassResolver $entityClassResolver = null)
     {
         $entity = null;
         $fromPart = $this->getFrom();

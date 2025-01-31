@@ -26,7 +26,7 @@ class MessageQueueCollector extends DataCollector
     }
 
     #[\Override]
-    public function collect(Request $request, Response $response, \Throwable $exception = null)
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null)
     {
         if ($this->messageProducer instanceof TraceableMessageProducer) {
             $this->data['sent_messages'] = $this->messageProducer->getTraces();

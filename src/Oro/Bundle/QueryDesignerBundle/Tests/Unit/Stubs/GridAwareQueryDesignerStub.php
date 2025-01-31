@@ -15,7 +15,7 @@ class GridAwareQueryDesignerStub extends AbstractQueryDesigner implements GridQu
     /** @var string */
     private $definition;
 
-    public function __construct(string $entity = null, string $definition = null)
+    public function __construct(?string $entity = null, ?string $definition = null)
     {
         $this->entity = $entity;
         $this->definition = $definition;

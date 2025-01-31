@@ -11,13 +11,13 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 abstract class TransitionServiceAbstract implements TransitionServiceInterface
 {
     #[\Override]
-    public function isPreConditionAllowed(WorkflowItem $workflowItem, Collection $errors = null): bool
+    public function isPreConditionAllowed(WorkflowItem $workflowItem, ?Collection $errors = null): bool
     {
         return true;
     }
 
     #[\Override]
-    public function isConditionAllowed(WorkflowItem $workflowItem, Collection $errors = null): bool
+    public function isConditionAllowed(WorkflowItem $workflowItem, ?Collection $errors = null): bool
     {
         return true;
     }

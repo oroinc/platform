@@ -18,7 +18,7 @@ class RouteData
      * @param string $route
      * @param array|null $routeParameters
      */
-    public function __construct($route, array $routeParameters = null)
+    public function __construct($route, ?array $routeParameters = null)
     {
         $this->route = $route;
         if ($routeParameters === null) {

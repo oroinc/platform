@@ -126,7 +126,7 @@ class EventTriggerCollectorListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider preFunctionProvider
      */
-    public function testPreFunction(string $event, array $changeSet = null, array $expectedChangeSet = null)
+    public function testPreFunction(string $event, ?array $changeSet = null, ?array $expectedChangeSet = null)
     {
         $entity = new \stdClass();
 

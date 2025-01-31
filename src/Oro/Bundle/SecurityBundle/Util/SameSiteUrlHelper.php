@@ -17,7 +17,7 @@ class SameSiteUrlHelper
         $this->requestStack = $requestStack;
     }
 
-    public function getSameSiteReferer(Request $request = null, string $fallbackUrl = ''): string
+    public function getSameSiteReferer(?Request $request = null, string $fallbackUrl = ''): string
     {
         $request = $request ?? $this->requestStack->getMainRequest();
         if (!$request) {

@@ -201,7 +201,7 @@ class OwnershipConditionDataBuilder implements AclConditionDataBuilderInterface
 
     protected function getOrganizationId(
         array|string $permissions,
-        OwnershipMetadataInterface $metadata = null
+        ?OwnershipMetadataInterface $metadata = null
     ): array|int|string|null {
         $token = $this->tokenStorage->getToken();
         if ($token instanceof OrganizationAwareTokenInterface) {

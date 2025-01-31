@@ -56,7 +56,7 @@ class ActionGroupExecutionArgs
      * @param Collection|null $errors
      * @return ActionData
      */
-    public function execute(ActionGroupRegistry $registry, Collection $errors = null)
+    public function execute(ActionGroupRegistry $registry, ?Collection $errors = null)
     {
         return $registry->get($this->getActionGroupName())->execute($this->getActionData(), $errors);
     }

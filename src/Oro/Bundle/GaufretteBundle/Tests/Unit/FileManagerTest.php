@@ -46,7 +46,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($this->filesystemAdapter);
     }
 
-    private function getFileManager(bool $useSubDirectory, string $subDirectory = null): FileManager
+    private function getFileManager(bool $useSubDirectory, ?string $subDirectory = null): FileManager
     {
         $fileManager = new FileManager(self::TEST_FILE_SYSTEM_NAME, $subDirectory);
         $fileManager->setProtocol(self::TEST_PROTOCOL);

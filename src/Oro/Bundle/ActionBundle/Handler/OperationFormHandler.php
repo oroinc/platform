@@ -167,7 +167,7 @@ class OperationFormHandler
      *
      * @return ArrayCollection
      */
-    private function getErrorMessages(\Exception $e, Collection $errors = null)
+    private function getErrorMessages(\Exception $e, ?Collection $errors = null)
     {
         $messages = new ArrayCollection();
 

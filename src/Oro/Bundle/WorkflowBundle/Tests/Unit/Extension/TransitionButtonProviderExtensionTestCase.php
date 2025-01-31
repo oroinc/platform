@@ -67,7 +67,7 @@ abstract class TransitionButtonProviderExtensionTestCase extends AbstractTransit
     /**
      * @dataProvider findDataProvider
      */
-    public function testFind(bool $expected, string $entityClass = null, string $datagrid = null)
+    public function testFind(bool $expected, ?string $entityClass = null, ?string $datagrid = null)
     {
         $this->applicationProvider->expects($this->atLeastOnce())
             ->method('getCurrentApplication')

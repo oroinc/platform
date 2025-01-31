@@ -18,7 +18,7 @@ class LoadStuckRootJobDependentData extends AbstractFixture implements Container
     private $container;
 
     #[\Override]
-    public function setContainer(ContainerInterface $container = null)
+    public function setContainer(?ContainerInterface $container = null)
     {
         $this->container = $container;
     }

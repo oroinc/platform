@@ -19,7 +19,7 @@ class BlockView extends FormView
      */
     public $blocks = [];
 
-    public function __construct(BlockView $parent = null)
+    public function __construct(?BlockView $parent = null)
     {
         parent::__construct($parent);
 

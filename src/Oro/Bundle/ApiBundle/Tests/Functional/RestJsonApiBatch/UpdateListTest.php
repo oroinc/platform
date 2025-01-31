@@ -97,12 +97,12 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
     }
 
     private function createBatchError(
-        string $id,
-        int $statusCode,
-        string $title,
-        string $detail = null,
-        int $itemIndex = null,
-        string $sourcePointer = null
+        string  $id,
+        int     $statusCode,
+        string  $title,
+        ?string $detail = null,
+        ?int    $itemIndex = null,
+        ?string $sourcePointer = null
     ): BatchError {
         $error = BatchError::create($title, $detail)
             ->setId($id)

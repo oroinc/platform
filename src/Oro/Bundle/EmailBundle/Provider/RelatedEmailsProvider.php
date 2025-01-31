@@ -60,7 +60,7 @@ class RelatedEmailsProvider
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function getRecipients($object, $depth = 1, $ignoreAcl = false, Organization $organization = null)
+    public function getRecipients($object, $depth = 1, $ignoreAcl = false, ?Organization $organization = null)
     {
         $recipients = [];
 
@@ -152,7 +152,7 @@ class RelatedEmailsProvider
      * @param Organization|null $organization
      * @return bool
      */
-    protected function isAccessDenyForOrganization($object, $ignoreAcl, Organization $organization = null)
+    protected function isAccessDenyForOrganization($object, $ignoreAcl, ?Organization $organization = null)
     {
         return !$ignoreAcl && !$this->emailRecipientsHelper->isObjectAllowedForOrganization($object, $organization);
     }

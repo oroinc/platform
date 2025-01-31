@@ -49,7 +49,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
         string $uri,
         array $parameters = [],
         array $server = [],
-        string $content = null
+        ?string $content = null
     ): Response {
         $contentTypeHeaderValue = $server['CONTENT_TYPE'] ?? null;
         $this->checkTwigState();

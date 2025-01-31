@@ -35,7 +35,7 @@ abstract class AbstractConfigurationSection implements ConfigurationSectionInter
     protected function addPreProcessCallbacks(
         ArrayNodeDefinition $node,
         string $section,
-        callable $customPreProcessCallback = null
+        ?callable $customPreProcessCallback = null
     ): void {
         $node
             ->beforeNormalization()
@@ -57,7 +57,7 @@ abstract class AbstractConfigurationSection implements ConfigurationSectionInter
     protected function addPostProcessCallbacks(
         ArrayNodeDefinition $node,
         string $section,
-        callable $customPostProcessCallback = null
+        ?callable $customPostProcessCallback = null
     ): void {
         $node
             ->validate()

@@ -664,7 +664,7 @@ class EntityAclExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getAccessLevelProvider
      */
-    public function testGetAccessLevel(int $mask, int $expectedLevel, string $permission = null)
+    public function testGetAccessLevel(int $mask, int $expectedLevel, ?string $permission = null)
     {
         $this->assertEquals($expectedLevel, $this->extension->getAccessLevel($mask, $permission));
     }

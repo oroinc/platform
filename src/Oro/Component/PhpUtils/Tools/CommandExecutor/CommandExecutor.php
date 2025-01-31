@@ -43,7 +43,7 @@ class CommandExecutor extends AbstractCommandExecutor implements CommandExecutor
      * @throws \RuntimeException if command failed and '--ignore-errors' parameter is not specified
      */
     #[\Override]
-    public function runCommand(string $command, array $params = [], LoggerInterface $logger = null): int
+    public function runCommand(string $command, array $params = [], ?LoggerInterface $logger = null): int
     {
         $params = $this->prepareParameters($command, $params);
 

@@ -46,7 +46,7 @@ trait JobsAwareTestTrait
         return $childJob;
     }
 
-    protected function createDelayedJob(Job $rootJob = null): Job
+    protected function createDelayedJob(?Job $rootJob = null): Job
     {
         if (!$rootJob) {
             $rootJob = $this->createUniqueJob()->getRootJob();

@@ -247,7 +247,7 @@ class TranslationDownloader
 
     private static function createTmpDirCreationException(
         string $path,
-        \Throwable $previous = null
+        ?\Throwable $previous = null
     ): TranslationDownloaderException {
         return new TranslationDownloaderException(
             sprintf('Directory "%s" cannot be created or accessed.', $path),

@@ -10,9 +10,9 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
  */
 interface TransitionServiceInterface
 {
-    public function isPreConditionAllowed(WorkflowItem $workflowItem, Collection $errors = null): bool;
+    public function isPreConditionAllowed(WorkflowItem $workflowItem, ?Collection $errors = null): bool;
 
-    public function isConditionAllowed(WorkflowItem $workflowItem, Collection $errors = null): bool;
+    public function isConditionAllowed(WorkflowItem $workflowItem, ?Collection $errors = null): bool;
 
     public function execute(WorkflowItem $workflowItem): void;
 }

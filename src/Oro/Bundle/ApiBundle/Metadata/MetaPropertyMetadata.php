@@ -19,7 +19,7 @@ class MetaPropertyMetadata extends PropertyMetadata
      *                                  The "__id__" property can be used to get an entity identifier.
      *                                  See {@see \Oro\Bundle\ApiBundle\Metadata\DataAccessorInterface}.
      */
-    public function __construct(string $name = null, string $dataType = null, string $propertyPath = null)
+    public function __construct(?string $name = null, ?string $dataType = null, ?string $propertyPath = null)
     {
         parent::__construct($name);
         if (null !== $dataType) {

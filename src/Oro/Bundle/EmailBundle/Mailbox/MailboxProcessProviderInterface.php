@@ -34,7 +34,7 @@ interface MailboxProcessProviderInterface
      *
      * @return bool
      */
-    public function isEnabled(Mailbox $mailbox = null);
+    public function isEnabled(?Mailbox $mailbox = null);
 
     /**
      * Returns name of process definition.

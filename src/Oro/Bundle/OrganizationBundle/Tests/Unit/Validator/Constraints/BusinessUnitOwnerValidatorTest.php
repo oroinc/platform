@@ -15,7 +15,7 @@ class BusinessUnitOwnerValidatorTest extends ConstraintValidatorTestCase
         return new BusinessUnitOwnerValidator();
     }
 
-    private function getBusinessUnit(int $id = null): BusinessUnit
+    private function getBusinessUnit(?int $id = null): BusinessUnit
     {
         $businessUnit = new BusinessUnit();
         if (null !== $id) {

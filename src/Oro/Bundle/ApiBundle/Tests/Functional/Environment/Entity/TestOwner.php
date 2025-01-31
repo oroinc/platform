@@ -52,7 +52,7 @@ class TestOwner implements TestFrameworkEntityInterface, ExtendEntityInterface
         return $this->target;
     }
 
-    public function setTarget(TestTarget $target = null)
+    public function setTarget(?TestTarget $target = null)
     {
         $this->target = $target;
     }

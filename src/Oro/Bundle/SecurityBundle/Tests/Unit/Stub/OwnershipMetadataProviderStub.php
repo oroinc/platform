@@ -67,7 +67,7 @@ class OwnershipMetadataProviderStub extends OwnershipMetadataProvider
     }
 
     #[\Override]
-    public function getMaxAccessLevel(int $accessLevel, string $className = null): int
+    public function getMaxAccessLevel(int $accessLevel, ?string $className = null): int
     {
         return $accessLevel;
     }

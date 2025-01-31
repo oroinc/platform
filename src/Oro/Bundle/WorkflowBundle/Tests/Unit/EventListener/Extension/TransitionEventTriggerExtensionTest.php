@@ -308,7 +308,7 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
     }
 
     #[\Override]
-    protected function getTriggers(string $triggerName = null): array|object
+    protected function getTriggers(?string $triggerName = null): array|object
     {
         if (!$this->triggers) {
             $priority = 0;

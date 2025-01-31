@@ -55,7 +55,7 @@ class DatagridDateGroupingBuilder
     public function __construct(
         $calendarDateEntity,
         DateHelper $dateHelper,
-        JoinIdentifierHelper $joinIdHelper = null
+        ?JoinIdentifierHelper $joinIdHelper = null
     ) {
         $this->calendarDateClass = $calendarDateEntity;
         $this->joinIdHelper = $joinIdHelper;

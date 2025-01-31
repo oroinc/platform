@@ -50,7 +50,7 @@ class ConfigLoaderFactory
      * This method can be used to register a loader for new configuration type
      * or to override a default loader.
      */
-    private function setLoader(string $configType, ConfigLoaderInterface $loader = null): void
+    private function setLoader(string $configType, ?ConfigLoaderInterface $loader = null): void
     {
         if ($loader instanceof ConfigLoaderFactoryAwareInterface) {
             $loader->setConfigLoaderFactory($this);

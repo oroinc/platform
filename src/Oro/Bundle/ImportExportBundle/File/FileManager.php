@@ -41,7 +41,7 @@ class FileManager
      *
      * @return array [file name => Gaufrette\File, ...]
      */
-    public function getFilesByPeriod(\DateTime $from = null, \DateTime $to = null): array
+    public function getFilesByPeriod(?\DateTime $from = null, ?\DateTime $to = null): array
     {
         $files = [];
         foreach ($this->gaufretteFileManager->findFiles() as $fileName) {
@@ -127,7 +127,7 @@ class FileManager
     /**
      * Generates unique file name with a given extension
      */
-    public static function generateUniqueFileName(string $extension = null): string
+    public static function generateUniqueFileName(?string $extension = null): string
     {
         $fileName = str_replace('.', '', uniqid('', true));
         if ($extension) {

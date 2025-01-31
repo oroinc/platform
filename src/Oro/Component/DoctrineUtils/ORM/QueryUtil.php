@@ -120,13 +120,13 @@ class QueryUtil
 
     /**
      * @param Query                   $query
-     * @param Query\ParserResult|null $parsedQuery
+     * @param ParserResult|null $parsedQuery
      *
      * @return string
      *
      * @throws QueryException
      */
-    public static function getExecutableSql(Query $query, Query\ParserResult $parsedQuery = null)
+    public static function getExecutableSql(Query $query, ?ParserResult $parsedQuery = null)
     {
         if (null === $parsedQuery) {
             $parsedQuery = static::parseQuery($query);
@@ -189,19 +189,19 @@ class QueryUtil
      * Removes parameters from ORM query.
      * Removes parameter mappings from {@see ParserResult} if any.
      */
-    public static function resetParameters(Query $query, ParserResult $parserResult = null): void
+    public static function resetParameters(Query $query, ?ParserResult $parserResult = null): void
     {
         // Removes parameters and parameter mappings.
         $query->setParameters(new ArrayCollection());
 
         if ($parserResult === null) {
-            /** @var Query\ParserResult $parserResult */
+            /** @var ParserResult $parserResult */
             $parserResult = \Closure::bind(static fn (Query $query) => $query->parserResult, null, $query)($query);
         }
 
         if ($parserResult !== null) {
             $clearMappings = \Closure::bind(
-                static function (Query\ParserResult $parserResult) {
+                static function (ParserResult $parserResult) {
                     $parserResult->parameterMappings = [];
                 },
                 null,

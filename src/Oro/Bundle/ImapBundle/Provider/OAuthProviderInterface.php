@@ -31,7 +31,7 @@ interface OAuthProviderInterface
      *
      * @throws OAuthAccessTokenFailureException if receiving the access token failed
      */
-    public function getAccessTokenByAuthCode(string $code, array $scopes = null): OAuthAccessTokenData;
+    public function getAccessTokenByAuthCode(string $code, ?array $scopes = null): OAuthAccessTokenData;
 
     /**
      * Requests the access token by the refresh token.
@@ -43,7 +43,7 @@ interface OAuthProviderInterface
      *
      * @throws RefreshOAuthAccessTokenFailureException if receiving the access token failed
      */
-    public function getAccessTokenByRefreshToken(string $refreshToken, array $scopes = null): OAuthAccessTokenData;
+    public function getAccessTokenByRefreshToken(string $refreshToken, ?array $scopes = null): OAuthAccessTokenData;
 
     /**
      * Requests the information about a user issued the given assess token.

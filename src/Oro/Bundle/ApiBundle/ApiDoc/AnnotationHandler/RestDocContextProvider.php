@@ -35,10 +35,10 @@ class RestDocContextProvider
     }
 
     public function getContext(
-        string $action,
-        string $entityClass,
-        string $associationName = null,
-        Route $route = null
+        string  $action,
+        string  $entityClass,
+        ?string $associationName = null,
+        ?Route  $route = null
     ): Context|SubresourceContext {
         $processor = $this->processorBag->getProcessor($action);
         /** @var Context $context */
@@ -114,7 +114,7 @@ class RestDocContextProvider
         Route $route,
         string $action,
         string $entityClass,
-        string $associationName = null
+        ?string $associationName = null
     ): void {
         $actionType = self::getActionType($route);
         if (!$actionType) {
@@ -173,7 +173,7 @@ class RestDocContextProvider
         Route $route,
         string $action,
         string $entityClass,
-        string $associationName = null
+        ?string $associationName = null
     ): \LogicException {
         $message .= sprintf(' Entity Class: %s. Action: %s.', $entityClass, $action);
         if ($associationName) {

@@ -15,7 +15,7 @@ use Oro\Bundle\ApiBundle\Exception\InvalidFilterOperatorException;
 abstract class AbstractCompositeIdentifierFilter extends StandaloneFilter implements FieldFilterInterface
 {
     #[\Override]
-    public function apply(Criteria $criteria, FilterValue $value = null): void
+    public function apply(Criteria $criteria, ?FilterValue $value = null): void
     {
         if (null !== $value) {
             $criteria->andWhere(

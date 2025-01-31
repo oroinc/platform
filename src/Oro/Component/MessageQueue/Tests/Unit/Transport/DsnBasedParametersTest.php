@@ -41,15 +41,15 @@ class DsnBasedParametersTest extends \PHPUnit\Framework\TestCase
      * @dataProvider properDsnProvider
      */
     public function testProperDsnProcessing(
-        string $dsn,
-        string $transportName,
-        array $parameters,
-        array $parameter,
-        string $user = null,
-        string $password = null,
-        string $host = null,
-        string $port = null,
-        string $path = null
+        string  $dsn,
+        string  $transportName,
+        array   $parameters,
+        array   $parameter,
+        ?string $user = null,
+        ?string $password = null,
+        ?string $host = null,
+        ?string $port = null,
+        ?string $path = null
     ): void {
         $dsnParametersBag = new DsnBasedParameters($dsn);
         self::assertEquals($transportName, $dsnParametersBag->getTransportName());

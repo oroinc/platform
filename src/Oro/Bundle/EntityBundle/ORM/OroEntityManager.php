@@ -28,7 +28,7 @@ class OroEntityManager extends EntityManager
     private $defaultQueryCacheLifetime = false;
 
     #[\Override]
-    public static function create($conn, Configuration $config, EventManager $eventManager = null)
+    public static function create($conn, Configuration $config, ?EventManager $eventManager = null)
     {
         if (!$config->getMetadataDriverImpl()) {
             throw ORMException::missingMappingDriverImpl();

@@ -11,11 +11,11 @@ class ScheduleIntervalChecker
 {
     /**
      * @param ScheduleIntervalInterface[]|\Traversable $schedules
-     * @param null|\DateTime $dateTime
+     * @param \DateTime|null $dateTime
      *
      * @return bool
      */
-    public function hasActiveSchedule(\Traversable $schedules, \DateTime $dateTime = null)
+    public function hasActiveSchedule(\Traversable $schedules, ?\DateTime $dateTime = null)
     {
         if (!$dateTime) {
             $dateTime = new \DateTime('now', new \DateTimeZone('UTC'));

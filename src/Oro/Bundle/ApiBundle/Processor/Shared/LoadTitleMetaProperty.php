@@ -202,7 +202,7 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
      * @param string                 $entityClass
      * @param string                 $idFieldName
      * @param EntityDefinitionConfig $config
-     * @param string|null            $associationPath
+     * @param string|null $associationPath
      *
      * @return array [data item key => [entity key, association map], ...]
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
@@ -213,7 +213,7 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
         string $entityClass,
         string $idFieldName,
         EntityDefinitionConfig $config,
-        string $associationPath = null
+        ?string $associationPath = null
     ): array {
         $associationMap = [];
         $isMultiTargetAssociation = is_a($entityClass, EntityIdentifier::class, true);
@@ -264,7 +264,7 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
      * @param string                 $entityClass
      * @param string[]               $idFieldName
      * @param EntityDefinitionConfig $config
-     * @param string|null            $associationPath
+     * @param string|null $associationPath
      *
      * @return array [data item key => [entity key, association map], ...]
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
@@ -275,7 +275,7 @@ abstract class LoadTitleMetaProperty implements ProcessorInterface
         string $entityClass,
         array $idFieldName,
         EntityDefinitionConfig $config,
-        string $associationPath = null
+        ?string $associationPath = null
     ): array {
         $associationMap = [];
         $isMultiTargetAssociation = is_a($entityClass, EntityIdentifier::class, true);

@@ -225,7 +225,7 @@ abstract class AbstractDocumentBuilder implements DocumentBuilderInterface
     protected function getEntityType(
         ?string $entityClass,
         RequestType $requestType,
-        string $fallbackEntityClass = null
+        ?string $fallbackEntityClass = null
     ): string {
         $entityType = null;
         if ($entityClass) {

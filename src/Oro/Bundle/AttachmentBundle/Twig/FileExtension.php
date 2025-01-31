@@ -303,7 +303,7 @@ class FileExtension extends AbstractExtension implements ServiceSubscriberInterf
     /**
      * Provides file title which can be used, e.g. in title or alt HTML attributes.
      */
-    public function getFileTitle(?File $file, Localization $localization = null): string
+    public function getFileTitle(?File $file, ?Localization $localization = null): string
     {
         if (!$file) {
             return '';

@@ -446,7 +446,7 @@ class CollectFormErrors implements ProcessorInterface
         return $field->getConfig()->getCompound();
     }
 
-    protected function createErrorObject(FormError $formError, string $propertyPath = null): Error
+    protected function createErrorObject(FormError $formError, ?string $propertyPath = null): Error
     {
         $error = Error::createValidationError($this->getFormErrorTitle($formError), $formError->getMessage());
         $statusCode = $this->getFormErrorStatusCode($formError);

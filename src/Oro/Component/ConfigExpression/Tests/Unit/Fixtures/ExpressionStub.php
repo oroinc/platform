@@ -28,7 +28,7 @@ class ExpressionStub implements ExpressionInterface
     }
 
     #[\Override]
-    public function evaluate($context, \ArrayAccess $errors = null)
+    public function evaluate($context, ?\ArrayAccess $errors = null)
     {
     }
 

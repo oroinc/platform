@@ -6,7 +6,7 @@ class TestObject
 {
     private ?string $code;
 
-    public function __construct(string $code = null)
+    public function __construct(?string $code = null)
     {
         $this->code = $code;
     }

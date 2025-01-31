@@ -107,7 +107,7 @@ class WorkflowManager implements LoggerAwareInterface
      * @param Collection|null $errors
      * @return bool
      */
-    public function isTransitionAvailable(WorkflowItem $workflowItem, $transition, Collection $errors = null)
+    public function isTransitionAvailable(WorkflowItem $workflowItem, $transition, ?Collection $errors = null)
     {
         $workflow = $this->workflowRegistry->getWorkflow($workflowItem->getWorkflowName());
 
@@ -127,7 +127,7 @@ class WorkflowManager implements LoggerAwareInterface
         $transition,
         $entity,
         array $data = [],
-        Collection $errors = null
+        ?Collection $errors = null
     ) {
         //consider to refactor (e.g. remove) type check in favor of string usage only as most cases are.
         //Any way - if developer has Workflow instance already it is possible to get decision from it directly as below
@@ -184,7 +184,7 @@ class WorkflowManager implements LoggerAwareInterface
         $transition = null,
         array $data = [],
         $throwGroupException = true,
-        Collection $errors = null
+        ?Collection $errors = null
     ) {
         try {
             $workflowItem = $this->doStartWorkflow($workflow, $entity, $transition, $data, [], $errors);
@@ -229,7 +229,7 @@ class WorkflowManager implements LoggerAwareInterface
         $transition = null,
         array $data = [],
         array $workflowItems = [],
-        Collection $errors = null
+        ?Collection $errors = null
     ) {
         //consider to refactor (e.g. remove) type check in favor of string usage only as most cases are
         $workflow = $this->getWorkflow($workflow);
@@ -352,7 +352,7 @@ class WorkflowManager implements LoggerAwareInterface
      * @throws InvalidTransitionException
      * @throws WorkflowException
      */
-    public function transit(WorkflowItem $workflowItem, string|Transition $transition, Collection $errors = null)
+    public function transit(WorkflowItem $workflowItem, string|Transition $transition, ?Collection $errors = null)
     {
         $this->transitWorkflow($workflowItem, $transition, $errors, self::METHOD_TRANSIT);
     }
@@ -363,10 +363,10 @@ class WorkflowManager implements LoggerAwareInterface
     }
 
     private function transitWorkflow(
-        WorkflowItem $workflowItem,
+        WorkflowItem      $workflowItem,
         string|Transition $transition,
-        Collection $errors = null,
-        int $transitionMethod = self::METHOD_TRANSIT
+        ?Collection       $errors = null,
+        int               $transitionMethod = self::METHOD_TRANSIT
     ): void {
         $workflow = $this->workflowRegistry->getWorkflow($workflowItem->getWorkflowName(), true);
 

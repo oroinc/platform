@@ -68,7 +68,7 @@ class TestEmployee extends TestPerson
      *
      * @return self
      */
-    public function setOrganization(Organization $organization = null)
+    public function setOrganization(?Organization $organization = null)
     {
         $this->organization = $organization;
 

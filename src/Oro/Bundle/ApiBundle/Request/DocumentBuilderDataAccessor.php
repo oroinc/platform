@@ -88,7 +88,7 @@ class DocumentBuilderDataAccessor implements DataAccessorInterface
      * If the last element contains data for another association,
      * it will be overridden by the given data.
      */
-    public function setAssociation(string $name, ?array $data, int $index = null): void
+    public function setAssociation(string $name, ?array $data, ?int $index = null): void
     {
         if (-1 === $this->lastIndex) {
             throw new \LogicException('Either addEntity() or setEntity() method should be called before.');
@@ -110,7 +110,7 @@ class DocumentBuilderDataAccessor implements DataAccessorInterface
     /**
      * Sets the item index for a current association.
      */
-    public function setAssociationIndex(int $index = null): void
+    public function setAssociationIndex(?int $index = null): void
     {
         if (-1 === $this->lastIndex || !$this->isLastElementAssociation()) {
             throw new \LogicException('setAssociation() method should be called before.');

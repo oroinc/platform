@@ -22,7 +22,7 @@ class SmtpSettingsChecker
         $this->smtpConnectionChecker = $smtpConnectionChecker;
     }
 
-    public function checkConnection(SmtpSettings $smtpSettings, string &$error = null): bool
+    public function checkConnection(SmtpSettings $smtpSettings, ?string &$error = null): bool
     {
         if (!$smtpSettings->isEligible()) {
             $error = 'Not eligible SmtpSettings are given';

@@ -90,7 +90,7 @@ class ApiResolvedFormType implements ResolvedFormTypeInterface
     }
 
     #[\Override]
-    public function createView(FormInterface $form, FormView $parent = null): FormView
+    public function createView(FormInterface $form, ?FormView $parent = null): FormView
     {
         return $this->innerType->createView($form, $parent);
     }

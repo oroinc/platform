@@ -21,14 +21,16 @@ class CommandExecutor implements CommandExecutorInterface
      */
     private $dataCacheManager;
 
-    public function __construct(CommandExecutorInterface $commandExecutor, OroDataCacheManager $dataCacheManager = null)
-    {
+    public function __construct(
+        CommandExecutorInterface $commandExecutor,
+        ?OroDataCacheManager $dataCacheManager = null
+    ) {
         $this->commandExecutor = $commandExecutor;
         $this->dataCacheManager = $dataCacheManager;
     }
 
     #[\Override]
-    public function runCommand(string $command, array $params = [], LoggerInterface $logger = null): int
+    public function runCommand(string $command, array $params = [], ?LoggerInterface $logger = null): int
     {
         $disableCacheSync = false;
         if (array_key_exists('--disable-cache-sync', $params)) {

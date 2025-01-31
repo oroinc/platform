@@ -15,7 +15,7 @@ class LocalizedValueExtractor
      * @param Localization|null $localization
      * @return mixed|null
      */
-    public function getLocalizedFallbackValue(array $values, Localization $localization = null)
+    public function getLocalizedFallbackValue(array $values, ?Localization $localization = null)
     {
         if (empty($values)) {
             return null;

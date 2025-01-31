@@ -18,7 +18,7 @@ class DeduplicationHandlerCacheWarmer implements CacheWarmerInterface
      */
     private $deduplicationHandler;
 
-    public function __construct(DeduplicationHandler $deduplicationHandler = null)
+    public function __construct(?DeduplicationHandler $deduplicationHandler = null)
     {
         $this->deduplicationHandler = $deduplicationHandler;
     }

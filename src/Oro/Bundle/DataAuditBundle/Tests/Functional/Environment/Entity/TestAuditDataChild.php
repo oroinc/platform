@@ -131,7 +131,7 @@ class TestAuditDataChild implements
         return $this->owners;
     }
 
-    public function setOwners(Collection $owners = null)
+    public function setOwners(?Collection $owners = null)
     {
         $this->owners = $owners;
     }
@@ -144,7 +144,7 @@ class TestAuditDataChild implements
         return $this->owner;
     }
 
-    public function setOwner(TestAuditDataOwner $owner = null)
+    public function setOwner(?TestAuditDataOwner $owner = null)
     {
         $this->owner = $owner;
     }
@@ -158,9 +158,9 @@ class TestAuditDataChild implements
     }
 
     /**
-     * @param mixed $ownerManyToOne
+     * @param TestAuditDataOwner|null $ownerManyToOne
      */
-    public function setOwnerManyToOne(TestAuditDataOwner $ownerManyToOne = null)
+    public function setOwnerManyToOne(?TestAuditDataOwner $ownerManyToOne = null)
     {
         $this->ownerManyToOne = $ownerManyToOne;
     }

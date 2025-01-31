@@ -74,7 +74,7 @@ class OperationButtonProviderExtension implements ButtonProviderExtensionInterfa
     public function isAvailable(
         ButtonInterface $button,
         ButtonSearchContext $buttonSearchContext,
-        Collection $errors = null
+        ?Collection $errors = null
     ) {
         if (!$this->supports($button)) {
             throw new UnsupportedButtonException(

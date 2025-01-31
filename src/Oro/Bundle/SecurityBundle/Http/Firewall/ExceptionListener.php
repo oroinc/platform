@@ -26,10 +26,10 @@ class ExceptionListener extends BaseExceptionListener
         AuthenticationTrustResolverInterface $trustResolver,
         HttpUtils $httpUtils,
         $providerKey,
-        AuthenticationEntryPointInterface $authenticationEntryPoint = null,
+        ?AuthenticationEntryPointInterface $authenticationEntryPoint = null,
         $errorPage = null,
-        AccessDeniedHandlerInterface $accessDeniedHandler = null,
-        LoggerInterface $logger = null,
+        ?AccessDeniedHandlerInterface $accessDeniedHandler = null,
+        ?LoggerInterface $logger = null,
         $stateless = false
     ) {
         parent::__construct(

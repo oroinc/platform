@@ -67,7 +67,7 @@ class CacheWarmerAggregate extends SymfonyCacheWarmerAggregate
      * @param SymfonyStyle|null $io
      */
     #[\Override]
-    public function warmUp(string $cacheDir, string|SymfonyStyle $buildDir = null, SymfonyStyle $io = null): array
+    public function warmUp(string $cacheDir, string|SymfonyStyle|null $buildDir = null, ?SymfonyStyle $io = null): array
     {
         $cacheWarmerLink = $this->cacheWarmerLink;
         if (CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)
