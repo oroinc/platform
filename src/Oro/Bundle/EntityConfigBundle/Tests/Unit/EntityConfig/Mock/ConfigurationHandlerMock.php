@@ -24,12 +24,12 @@ class ConfigurationHandlerMock extends ConfigurationHandler
 
     #[\Override]
     public function process(
-        int     $type,
-        string  $sectionName,
-        array   $values,
+        int $type,
+        string $sectionName,
+        array $values,
         ?string $entityOrTableName = null,
         ?string $fieldType = null,
-        array   $skipOptionsFilterRegex = []
+        array $skipOptionsFilterRegex = []
     ): array {
         return $values;
     }

@@ -45,23 +45,19 @@ abstract class AbstractEntityFieldExtension implements EntityFieldExtensionInter
 
     protected function setExtensionCacheItem(
         EntityFieldProcessTransport $transport,
-        string                      $extensionClass,
-        string                      $key,
-        mixed                       $value
+        string $extensionClass,
+        string $key,
+        mixed $value
     ): void {
         $this->extensionCache[$transport->getClass()][$extensionClass][$key] = $value;
     }
 
     protected function getCachedExtensionItem(
         EntityFieldProcessTransport $transport,
-        string                      $extensionClass,
-        string                      $key
+        string $extensionClass,
+        string $key
     ): mixed {
-        if (!isset($this->extensionCache[$transport->getClass()][$extensionClass][$key])) {
-            return null;
-        }
-
-        return $this->extensionCache[$transport->getClass()][$extensionClass][$key];
+        return $this->extensionCache[$transport->getClass()][$extensionClass][$key] ?? null;
     }
 
     #[\Override]

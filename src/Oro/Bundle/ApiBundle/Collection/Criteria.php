@@ -77,8 +77,8 @@ class Criteria extends BaseCriteria
      * @return Join
      */
     public function addInnerJoin(
-        string  $propertyPath,
-        string  $join,
+        string $propertyPath,
+        string $join,
         ?string $conditionType = null,
         ?string $condition = null,
         ?string $indexBy = null
@@ -102,8 +102,8 @@ class Criteria extends BaseCriteria
      * @return Join
      */
     public function addLeftJoin(
-        string  $propertyPath,
-        string  $join,
+        string $propertyPath,
+        string $join,
         ?string $conditionType = null,
         ?string $condition = null,
         ?string $indexBy = null
@@ -124,9 +124,9 @@ class Criteria extends BaseCriteria
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function addJoin(
-        string  $propertyPath,
-        string  $joinType,
-        string  $join,
+        string $propertyPath,
+        string $joinType,
+        string $join,
         ?string $conditionType = null,
         ?string $condition = null,
         ?string $indexBy = null

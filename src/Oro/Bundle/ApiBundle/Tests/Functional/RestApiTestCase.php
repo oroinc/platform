@@ -683,9 +683,9 @@ abstract class RestApiTestCase extends ApiTestCase
     }
 
     protected function getApiConfig(
-        string  $entityClass,
+        string $entityClass,
         ?string $action = null,
-        bool    $idOnly = false
+        bool $idOnly = false
     ): ?EntityDefinitionConfig {
         $configExtras = [new EntityDefinitionConfigExtra($action)];
         if ($idOnly) {
@@ -705,9 +705,9 @@ abstract class RestApiTestCase extends ApiTestCase
     }
 
     protected function getApiMetadata(
-        string  $entityClass,
+        string $entityClass,
         ?string $action = null,
-        bool    $idOnly = false
+        bool $idOnly = false
     ): ?EntityMetadata {
         $config = $this->getApiConfig($entityClass, $action, $idOnly);
         if (null === $config) {

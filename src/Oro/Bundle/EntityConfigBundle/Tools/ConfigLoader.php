@@ -353,8 +353,8 @@ class ConfigLoader
      * Extracts entity default values from an annotation and config file
      */
     private function getEntityDefaultValues(
-        string          $scope,
-        ?string         $className = null,
+        string $scope,
+        ?string $className = null,
         ?EntityMetadata $metadata = null
     ): array {
         $propertyConfig = $this->getPropertyConfig($scope);
@@ -411,7 +411,7 @@ class ConfigLoader
 
     private function prepareEntityIndexQueries(int $entityId, string $className, array $data): void
     {
-        list($moduleName, $entityName) = ConfigHelper::getModuleAndEntityNames($className);
+        [$moduleName, $entityName] = ConfigHelper::getModuleAndEntityNames($className);
         $data['entity_config'] = ['entity_name' => $entityName, 'module_name' => $moduleName];
 
         $this->prepareConfigIndexQueryByType($entityId, 'entity_id', $data);

@@ -15,9 +15,9 @@ class FilesystemCache extends FilesystemAdapter implements DirectoryAwareFileCac
     use ShortFileNameGeneratorTrait;
 
     public function __construct(
-        string               $namespace = '',
-        int                  $defaultLifetime = 0,
-        ?string              $directory = null,
+        string $namespace = '',
+        int $defaultLifetime = 0,
+        ?string $directory = null,
         ?MarshallerInterface $marshaller = null
     ) {
         if ($directory) {

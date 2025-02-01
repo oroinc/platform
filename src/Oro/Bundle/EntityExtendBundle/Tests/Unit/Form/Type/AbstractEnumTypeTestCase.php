@@ -356,17 +356,15 @@ class AbstractEnumTypeTestCase extends TypeTestCase
         return $parentForm;
     }
 
-    protected function expectFormWillReturnData(
-        FormInterface|MockObject $form,
-        mixed                    $data
-    ): void {
+    protected function expectFormWillReturnData(FormInterface|MockObject $form, mixed $data): void
+    {
         $form->expects($this->once())
             ->method('getData')
             ->willReturn($data);
     }
 
     protected function expectFormWillReturnFormConfig(
-        FormInterface|MockObject            $form,
+        FormInterface|MockObject $form,
         FormConfigInterface|MockObject|null $formConfig = null
     ): FormConfigInterface|MockObject {
         if (!$formConfig) {

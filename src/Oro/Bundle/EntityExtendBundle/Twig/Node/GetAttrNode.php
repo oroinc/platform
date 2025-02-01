@@ -372,8 +372,8 @@ class GetAttrNode extends GetAttrExpression
 
     private static function isMethodWithPrefixExists(
         object|string $objectOrClass,
-        string        $prefix,
-        string        $methodCandidate
+        string $prefix,
+        string $methodCandidate
     ): bool {
         if (!str_starts_with($methodCandidate, $prefix)) {
             $methodCandidate = self::getInflector()->camelize($prefix . ucfirst($methodCandidate));

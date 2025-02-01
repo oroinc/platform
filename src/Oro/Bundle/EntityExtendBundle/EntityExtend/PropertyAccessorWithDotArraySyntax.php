@@ -306,10 +306,10 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
     }
 
     private static function throwInvalidArgumentException(
-        string     $message,
-        array      $trace,
-        int        $i,
-        string     $propertyPath,
+        string $message,
+        array $trace,
+        int $i,
+        string $propertyPath,
         ?\Throwable $previous = null
     ): void {
         if (!isset($trace[$i]['file']) || __FILE__ !== $trace[$i]['file']) {
@@ -427,10 +427,10 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
      * @throws NoSuchIndexException    If a non-existing index is accessed
      */
     private function readPropertiesUntil(
-        array                 $zval,
+        array $zval,
         PropertyPathInterface $propertyPath,
-        int                   $lastIndex,
-        bool                  $ignoreInvalidIndices = true
+        int $lastIndex,
+        bool $ignoreInvalidIndices = true
     ): array {
         if (!\is_object($zval[self::VALUE]) && !\is_array($zval[self::VALUE])) {
             throw new UnexpectedTypeException($zval[self::VALUE], $propertyPath, 0);
@@ -838,9 +838,9 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
      * Adjusts a collection-valued property by calling add*() and remove*() methods.
      */
     private function writeCollection(
-        array             $zval,
-        string            $property,
-        iterable          $collection,
+        array $zval,
+        string $property,
+        iterable $collection,
         PropertyWriteInfo $addMethod,
         PropertyWriteInfo $removeMethod,
         $shouldRemoveItems = true
@@ -965,9 +965,9 @@ class PropertyAccessorWithDotArraySyntax implements PropertyAccessorInterface
      * @throws \LogicException When the Cache Component isn't available
      */
     public static function createCache(
-        string          $namespace,
-        int             $defaultLifetime,
-        string          $version,
+        string $namespace,
+        int $defaultLifetime,
+        string $version,
         ?LoggerInterface $logger = null
     ) {
         if (!class_exists(ApcuAdapter::class)) {

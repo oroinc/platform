@@ -68,7 +68,7 @@ class WorkflowRegistryTest extends \PHPUnit\Framework\TestCase
 
     private function prepareAssemblerMock(
         ?WorkflowDefinition $workflowDefinition = null,
-        ?Workflow           $workflow = null
+        ?Workflow $workflow = null
     ): void {
         if ($workflowDefinition && $workflow) {
             $this->assembler->expects($this->once())

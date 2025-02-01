@@ -94,11 +94,11 @@ class EmailTest extends \PHPUnit\Framework\TestCase
      * @dataProvider getAttachmentsDataProvider
      */
     public function testGetAttachments(
-        array        $attachments,
-        bool         $getBodyCalled,
+        array $attachments,
+        bool $getBodyCalled,
         ?ContentType $contentType = null,
-        ?Attachment  $msgAsAttachment = null,
-        array        $expected = []
+        ?Attachment $msgAsAttachment = null,
+        array $expected = []
     ) {
         $this->message->expects($this->once())
             ->method('getAttachments')

@@ -89,7 +89,7 @@ class AttributeMultiSelectType extends AbstractType
             return $fieldAttributes['field_name'];
         }
 
-        return  $field->getFieldName();
+        return $field->getFieldName();
     }
 
     #[\Override]

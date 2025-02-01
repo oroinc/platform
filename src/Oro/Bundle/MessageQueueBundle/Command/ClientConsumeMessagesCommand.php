@@ -29,11 +29,11 @@ class ClientConsumeMessagesCommand extends ConsumeMessagesCommand
     protected JobManager $jobManager;
 
     public function __construct(
-        QueueConsumer           $queueConsumer,
+        QueueConsumer $queueConsumer,
         DestinationMetaRegistry $destinationMetaRegistry,
-        ConsumerState           $consumerState,
-        LoggerInterface         $logger,
-        JobManager              $jobManager
+        ConsumerState $consumerState,
+        LoggerInterface $logger,
+        JobManager $jobManager
     ) {
         parent::__construct($queueConsumer, $destinationMetaRegistry);
 

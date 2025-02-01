@@ -63,8 +63,8 @@ class OroAssetsBuildCommand extends Command
      */
     public function __construct(
         AssetCommandProcessFactory $nodeProcessFactory,
-        AssetConfigCache           $cache,
-        string                     $npmPath,
+        AssetConfigCache $cache,
+        string $npmPath,
         $buildTimeout,
         $npmInstallTimeout,
         bool $withBabel

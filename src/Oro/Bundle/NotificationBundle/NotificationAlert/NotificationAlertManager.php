@@ -158,9 +158,9 @@ class NotificationAlertManager
     }
 
     public function resolveNotificationAlertByItemIdForUserAndOrganization(
-        int  $itemId,
+        int $itemId,
         ?int $userId,
-        int  $organizationId
+        int $organizationId
     ): void {
         $this->doResolveNotificationAlert([
             self::SOURCE_TYPE   => $this->getSourceType(),
@@ -186,8 +186,8 @@ class NotificationAlertManager
 
     public function resolveNotificationAlertsByAlertTypeForUserAndOrganization(
         string $alertType,
-        ?int   $userId,
-        int    $organizationId
+        ?int $userId,
+        int $organizationId
     ): void {
         $this->doResolveNotificationAlert([
             self::SOURCE_TYPE   => $this->getSourceType(),
@@ -211,8 +211,8 @@ class NotificationAlertManager
     public function resolveNotificationAlertsByAlertTypeAndStepForUserAndOrganization(
         string $alertType,
         string $step,
-        ?int   $userId,
-        int    $organizationId
+        ?int $userId,
+        int $organizationId
     ): void {
         $this->doResolveNotificationAlert([
             self::SOURCE_TYPE   => $this->getSourceType(),
@@ -281,8 +281,8 @@ class NotificationAlertManager
      * @return array [alertType => notificationAlertCount, ...]
      */
     public function getNotificationAlertsCountGroupedByTypeForUserAndOrganization(
-        ?int   $userId,
-        int    $organizationId
+        ?int $userId,
+        int $organizationId
     ): array {
         $result = [];
         $notificationAlerts = $this->doGetNotificationAlertsCount([

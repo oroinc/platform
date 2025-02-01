@@ -109,11 +109,9 @@ class DateTimeRangeTypeTest extends AbstractTypeTestCase
 
     /**
      * Creates date time object from date string
-     *
-     * @throws \Exception
      */
     private function createDateTime(
-        string  $dateString,
+        string $dateString,
         ?string $timeZone = null,
         ?string $format = 'yyyy-MM-dd HH:mm'
     ): \DateTime {

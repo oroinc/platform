@@ -153,10 +153,10 @@ class LocalizationTest extends \PHPUnit\Framework\TestCase
     }
 
     protected function createLocalizedValue(
-        string        $value,
-        bool          $default = false,
+        string $value,
+        bool $default = false,
         ?Localization $localization = null,
-        string        $fallbackValue = 'some string'
+        string $fallbackValue = 'some string'
     ): LocalizedFallbackValue {
         $localized = (new LocalizedFallbackValue())->setString($fallbackValue);
 

@@ -98,14 +98,14 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function createWorkflowAttributesType(
-        ?WorkflowRegistry           $workflowRegistry = null,
-        ?AttributeGuesser           $attributeGuesser = null,
-        ?DefaultValuesListener      $defaultValuesListener = null,
-        ?FormInitListener           $formInitListener = null,
+        ?WorkflowRegistry $workflowRegistry = null,
+        ?AttributeGuesser $attributeGuesser = null,
+        ?DefaultValuesListener $defaultValuesListener = null,
+        ?FormInitListener $formInitListener = null,
         ?RequiredAttributesListener $requiredAttributesListener = null,
-        ?EventDispatcherInterface   $dispatcher = null,
+        ?EventDispatcherInterface $dispatcher = null,
         ?PropertyPathSecurityHelper $propertyPathSecurityHelper = null,
-        ?TranslatorInterface        $translator = null
+        ?TranslatorInterface $translator = null
     ): WorkflowAttributesType {
         if (!$workflowRegistry) {
             $workflowRegistry = $this->createMock(WorkflowRegistry::class);

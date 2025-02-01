@@ -94,9 +94,9 @@ class ConfigurationHandler
     }
 
     public function process(
-        int     $type,
-        string  $scope,
-        array   $values,
+        int $type,
+        string $scope,
+        array $values,
         ?string $entityOrTableName = null,
         ?string $fieldType = null
     ): array {

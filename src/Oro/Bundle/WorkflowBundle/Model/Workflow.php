@@ -84,13 +84,13 @@ class Workflow
     protected ?WorkflowItem $stubWorkflowItem = null;
 
     public function __construct(
-        DoctrineHelper        $doctrineHelper,
-        AclManager            $aclManager,
-        RestrictionManager    $restrictionManager,
-        ?StepManager          $stepManager = null,
+        DoctrineHelper $doctrineHelper,
+        AclManager $aclManager,
+        RestrictionManager $restrictionManager,
+        ?StepManager $stepManager = null,
         ?BaseAttributeManager $attributeManager = null,
-        ?TransitionManager    $transitionManager = null,
-        ?VariableManager      $variableManager = null
+        ?TransitionManager $transitionManager = null,
+        ?VariableManager $variableManager = null
     ) {
         $this->doctrineHelper = $doctrineHelper;
         $this->aclManager = $aclManager;

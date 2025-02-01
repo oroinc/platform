@@ -45,10 +45,10 @@ class Translator extends BaseTranslator
 
     public function __construct(
         ContainerInterface $container,
-        MessageFormatter   $formatter,
-        ?string            $defaultLocale = null,
-        array              $loaderIds = [],
-        array              $options = []
+        MessageFormatter $formatter,
+        ?string $defaultLocale = null,
+        array $loaderIds = [],
+        array $options = []
     ) {
         parent::__construct($container, $formatter, $defaultLocale, $loaderIds, $options);
 

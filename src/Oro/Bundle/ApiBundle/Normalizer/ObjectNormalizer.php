@@ -62,10 +62,10 @@ class ObjectNormalizer
     }
 
     public function normalizeObjects(
-        array                   $objects,
+        array $objects,
         ?EntityDefinitionConfig $config = null,
-        array                   $context = [],
-        bool                    $skipPostSerializationForPrimaryObjects = false
+        array $context = [],
+        bool $skipPostSerializationForPrimaryObjects = false
     ): array {
         $normalizedObjects = [];
         if ($objects) {

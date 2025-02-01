@@ -30,10 +30,10 @@ class DatagridPreExportTopic extends AbstractTopic implements JobAwareTopicInter
     private ConfigurationProviderInterface $provider;
 
     public function __construct(
-        int                            $batchSize,
-        TokenAccessorInterface         $tokenAccessor,
+        int $batchSize,
+        TokenAccessorInterface $tokenAccessor,
         ConfigurationProviderInterface $provider,
-        array                          $outputFormats = ['csv', 'xlsx'],
+        array $outputFormats = ['csv', 'xlsx']
     ) {
         $this->batchSize = $batchSize;
         $this->tokenAccessor = $tokenAccessor;

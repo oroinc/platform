@@ -2,38 +2,21 @@
 
 namespace Oro\Bundle\ImportExportBundle\Reader;
 
+/**
+ * The registry that allows to get the batch jobs reader for a specific alias.
+ */
 class ReaderChain
 {
-    /**
-     * @var ReaderInterface[]
-     */
-    private $readers;
+    /** @var ReaderInterface[] [alias => reader, ...] */
+    private array $readers = [];
 
-    public function __construct()
-    {
-        $this->readers = [];
-    }
-
-    /**
-     * @param ReaderInterface $reader
-     * @param string $alias
-     */
-    public function addReader(ReaderInterface $reader, $alias)
+    public function addReader(ReaderInterface $reader, string $alias): void
     {
         $this->readers[$alias] = $reader;
     }
 
-    /**
-     * @param $alias
-     *
-     * @return ReaderInterface | null
-     */
-    public function getReader($alias)
+    public function getReader(string $alias): ?ReaderInterface
     {
-        if (array_key_exists($alias, $this->readers)) {
-            return  $this->readers[$alias];
-        }
-
-        return null;
+        return $this->readers[$alias] ?? null;
     }
 }

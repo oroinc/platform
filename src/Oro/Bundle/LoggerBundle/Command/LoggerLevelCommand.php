@@ -41,10 +41,10 @@ class LoggerLevelCommand extends Command
     ];
 
     public function __construct(
-        ConfigManager  $globalConfigManager,
-        ConfigManager  $userConfigManager,
+        ConfigManager $globalConfigManager,
+        ConfigManager $userConfigManager,
         CacheInterface $cache,
-        UserManager    $userManager
+        UserManager $userManager
     ) {
         parent::__construct();
 

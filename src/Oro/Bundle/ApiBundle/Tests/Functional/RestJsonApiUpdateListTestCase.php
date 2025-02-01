@@ -278,11 +278,11 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
     }
 
     protected function processUpdateListAndValidateJobs(
-        string       $entityClass,
+        string $entityClass,
         array|string $data,
-        array        $expectedJobs,
-        ?string      $failedGroupName = null,
-        ?array       $entityConfig = null
+        array $expectedJobs,
+        ?string $failedGroupName = null,
+        ?array $entityConfig = null
     ): int {
         $operationId = $this->sendUpdateListRequest($entityClass, $data);
 

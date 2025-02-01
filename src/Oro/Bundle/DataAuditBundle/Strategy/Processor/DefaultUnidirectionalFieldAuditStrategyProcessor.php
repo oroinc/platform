@@ -55,9 +55,9 @@ class DefaultUnidirectionalFieldAuditStrategyProcessor implements EntityAuditStr
      */
     protected function processEntityAssociationsFromCollection(
         ClassMetadata $sourceEntityMeta,
-        ?object       $sourceEntity,
-        array         $sourceEntityData,
-        \Closure      $getValueCallback
+        ?object $sourceEntity,
+        array $sourceEntityData,
+        \Closure $getValueCallback
     ): ?array {
         $fieldsData = [];
 

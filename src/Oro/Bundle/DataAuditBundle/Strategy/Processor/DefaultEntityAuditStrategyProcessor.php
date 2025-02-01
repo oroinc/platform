@@ -55,8 +55,8 @@ class DefaultEntityAuditStrategyProcessor implements EntityAuditStrategyProcesso
      */
     private function processEntityAssociationsFromCollection(
         ClassMetadata $sourceEntityMeta,
-        object        $sourceEntity,
-        array         $sourceEntityData
+        object $sourceEntity,
+        array $sourceEntityData
     ): ?array {
         $fieldsData = [];
 

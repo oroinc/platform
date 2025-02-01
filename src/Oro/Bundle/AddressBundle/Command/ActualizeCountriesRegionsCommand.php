@@ -324,7 +324,7 @@ HELP
 
         $parsedData = Yaml::parse(file_get_contents($fileName));
 
-        return  $parsedData ?? [];
+        return $parsedData ?? [];
     }
 
     private function saveDataToFile(string $fileName, string $filePath, array $data): void
@@ -334,7 +334,7 @@ HELP
             throw new \LogicException('Folder ' . $filePath . ' is not exist or not writable');
         }
 
-        $filePath = $filePath . DIRECTORY_SEPARATOR . $fileName;
+        $filePath .= DIRECTORY_SEPARATOR . $fileName;
         $yaml = Yaml::dump($data, Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE);
 
         if (!file_put_contents($filePath, $yaml)) {

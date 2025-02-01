@@ -56,7 +56,7 @@ class EntityLabelBuilderTest extends \PHPUnit\Framework\TestCase
         string $expected,
         string $propertyName,
         string $className,
-        ?string  $fieldName
+        ?string $fieldName
     ) {
         $result = EntityLabelBuilder::getTranslationKey($propertyName, $className, $fieldName);
         $this->assertEquals($expected, $result);

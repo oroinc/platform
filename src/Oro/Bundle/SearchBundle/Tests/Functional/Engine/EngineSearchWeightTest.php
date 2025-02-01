@@ -44,11 +44,11 @@ class EngineSearchWeightTest extends SearchBundleWebTestCase
      * @dataProvider searchWeightDataProvider
      */
     public function testSearchWeight(
-        array       $expectedItems,
-        callable    $listener,
+        array $expectedItems,
+        callable $listener,
         ?Expression $condition = null,
-        array       $orderings = [],
-        ?string     $engine = null
+        array $orderings = [],
+        ?string $engine = null
     ) {
         $engineName = self::getContainer()->get('oro_search.engine.parameters')->getEngineName();
         if ($engine && $engineName !== $engine) {
