@@ -5,7 +5,8 @@ define(function(require) {
     const EmailTemplateModel = require('./email-template-model');
     const BaseCollection = require('oroui/js/app/models/base/collection');
     const _ = require('underscore');
-
+    const systemAccessModeOrganizationProvider =
+        require('oroorganization/js/app/tools/system-access-mode-organization-provider');
     /**
      * @export oroemail/js/app/models/email-template-collection
      */
@@ -17,6 +18,8 @@ define(function(require) {
         includeNonEntity: false,
 
         includeSystemTemplates: true,
+
+        _sa_org_id: null,
 
         url: null,
 
@@ -33,7 +36,13 @@ define(function(require) {
          * @inheritdoc
          */
         initialize: function(models, options) {
-            _.extend(this, _.pick(options, ['route', 'routeId', 'includeNonEntity', 'includeSystemTemplates']));
+            _.extend(this, _.pick(options, [
+                'route',
+                'routeId',
+                'includeNonEntity',
+                'includeSystemTemplates',
+                '_sa_org_id'
+            ]));
 
             const routeParams = {};
 
@@ -54,6 +63,7 @@ define(function(require) {
             routeParams[this.routeId] = id;
             routeParams.includeNonEntity = this.includeNonEntity ? '1' : '0';
             routeParams.includeSystemTemplates = this.includeSystemTemplates ? '1' : '0';
+            routeParams._sa_org_id = systemAccessModeOrganizationProvider.getOrganizationId();
             this.url = routing.generate(this.route, routeParams);
         }
     });

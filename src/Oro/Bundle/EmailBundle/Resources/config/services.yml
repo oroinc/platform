@@ -1633,6 +1633,12 @@ services:
         parent: oro_entity.entity_provider.abstract
         lazy: true
 
+    oro_email.email_template_organization_provider:
+        arguments:
+            - '@oro_security.token_accessor'
+        class: Oro\Bundle\EmailBundle\Provider\EmailTemplateOrganizationProvider
+        lazy: true
+
     oro_email.event_listener.default_email_user_owner:
         class: Oro\Bundle\EmailBundle\EventListener\DefaultEmailUserOwnerListener
         arguments:

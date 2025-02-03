@@ -8,10 +8,10 @@ use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment;
+use Oro\Bundle\EmailBundle\Provider\EmailTemplateOrganizationProvider;
 use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
-use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Event\PostSubmitEvent;
@@ -38,28 +38,13 @@ class EmailType extends AbstractType
     ];
     private const WYSIWYG_CUSTOM_ELEMENTS = ['style'];
 
-    private AuthorizationCheckerInterface $authorizationChecker;
-
-    private TokenAccessorInterface $tokenAccessor;
-
-    private EmailModelBuilderHelper $emailModelBuilderHelper;
-
-    private ConfigManager $configManager;
-
-    private EventSubscriberInterface $emailTemplateRenderingSubscriber;
-
     public function __construct(
-        AuthorizationCheckerInterface $authorizationChecker,
-        TokenAccessorInterface $tokenAccessor,
-        EmailModelBuilderHelper $emailModelBuilderHelper,
-        ConfigManager $configManager,
-        EventSubscriberInterface $emailTemplateRenderingSubscriber
+        private AuthorizationCheckerInterface $authorizationChecker,
+        private EmailModelBuilderHelper $emailModelBuilderHelper,
+        private ConfigManager $configManager,
+        private EventSubscriberInterface $emailTemplateRenderingSubscriber,
+        private EmailTemplateOrganizationProvider $emailTemplateOrganizationProvider,
     ) {
-        $this->authorizationChecker = $authorizationChecker;
-        $this->tokenAccessor = $tokenAccessor;
-        $this->emailModelBuilderHelper = $emailModelBuilderHelper;
-        $this->configManager = $configManager;
-        $this->emailTemplateRenderingSubscriber = $emailTemplateRenderingSubscriber;
     }
 
     /**
@@ -237,16 +222,18 @@ class EmailType extends AbstractType
         }
 
         $entityClass = is_object($data) ? $data->getEntityClass() : $data['entityClass'];
+        $organization = $this->emailTemplateOrganizationProvider->getOrganization();
+
         FormUtils::replaceField(
             $form,
             'template',
             [
                 'selectedEntity' => $entityClass,
                 'query_builder'  =>
-                    function (EmailTemplateRepository $templateRepository) use ($entityClass) {
+                    function (EmailTemplateRepository $templateRepository) use ($entityClass, $organization) {
                         return $templateRepository->getEntityTemplatesQueryBuilder(
                             $entityClass,
-                            $this->tokenAccessor->getOrganization(),
+                            $organization,
                             true
                         );
                     },
