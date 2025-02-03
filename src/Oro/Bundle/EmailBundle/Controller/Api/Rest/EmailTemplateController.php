@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Controller\Api\Rest;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
+use Oro\Bundle\EmailBundle\Provider\EmailTemplateOrganizationProvider;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\VariablesProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -20,6 +21,8 @@ use Twig\Error\SyntaxError;
  */
 class EmailTemplateController extends RestController
 {
+    private EmailTemplateOrganizationProvider $organizationProvider;
+
     /**
      * REST DELETE
      *
@@ -84,13 +87,13 @@ class EmailTemplateController extends RestController
         $entityName = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityName);
 
         /** @var EmailTemplateRepository $emailTemplateRepository */
-        $emailTemplateRepository = $this->getDoctrine()->getRepository('OroEmailBundle:EmailTemplate');
+        $emailTemplateRepository = $this->container->get('doctrine')->getRepository('OroEmailBundle:EmailTemplate');
 
         $templates = $emailTemplateRepository
             ->getTemplateByEntityName(
                 $this->get('oro_security.acl_helper'),
                 $entityName,
-                $this->get('oro_security.token_accessor')->getOrganization(),
+                $this->organizationProvider->getOrganization(),
                 (bool)$includeNonEntity,
                 (bool)$includeSystemTemplates
             );
@@ -232,5 +235,10 @@ class EmailTemplateController extends RestController
             'entity_name' => $template->getEntityName(),
             'type'        => $template->getType()
         ];
+    }
+
+    public function setOrganizationProvider(EmailTemplateOrganizationProvider $organizationProvider): void
+    {
+        $this->organizationProvider = $organizationProvider;
     }
 }

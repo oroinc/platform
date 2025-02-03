@@ -7,3 +7,8 @@ services:
         resource: '../../Controller/Api/Rest/*Controller.php'
         calls:
             - [setContainer, ['@service_container']]
+
+    Oro\Bundle\EmailBundle\Controller\Api\Rest\EmailTemplateController:
+        calls:
+            - [setContainer, ['@service_container']]
+            - [setOrganizationProvider, ['@oro_email.email_template_organization_provider']]

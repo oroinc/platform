@@ -1504,6 +1504,12 @@ services:
         tags:
             - { name: oro_entity.virtual_relation_provider, priority: -150 }
 
+    oro_email.email_template_organization_provider:
+        arguments:
+            - '@oro_security.token_accessor'
+        class: Oro\Bundle\EmailBundle\Provider\EmailTemplateOrganizationProvider
+        lazy: true
+
     oro_email.email_template_entity_provider:
         class: Oro\Bundle\EmailBundle\Provider\EmailTemplateEntityProvider
         parent: oro_entity.entity_provider.abstract
