@@ -370,4 +370,16 @@ class FeatureContext extends OroFeatureContext implements
             $label
         ))->click();
     }
+
+    /**
+     * (Attempt to) Open the system configuration page.
+     * It is generated from 'oro_config_configuration_system' route name for current application
+     *
+     * @Given I go to the direct URL of the System Configuration page
+     */
+    public function iGoToDirectUrlOfSystemConfigurationPage()
+    {
+        $uri = $this->getAppContainer()->get('router')->generate('oro_config_configuration_system');
+        $this->visitPath($uri);
+    }
 }

@@ -44,6 +44,54 @@ class FeatureContext extends OroFeatureContext implements
     }
 
     /**
+     * (Attempt to) Open the user profile view page.
+     * It is generated from 'oro_user_profile_view' route name for current application
+     *
+     * @Given I go to the direct URL of the User Profile View page
+     */
+    public function iGoToDirectUrlOfUserProfileViewPage()
+    {
+        $uri = $this->getAppContainer()->get('router')->generate('oro_user_profile_view');
+        $this->visitPath($uri);
+    }
+
+    /**
+     * (Attempt to) Open the user profile edit page.
+     * It is generated from 'oro_user_profile_update' route name for current application
+     *
+     * @Given I go to the direct URL of the User Profile Edit page
+     */
+    public function iGoToDirectUrlOfUserProfileEditPage()
+    {
+        $uri = $this->getAppContainer()->get('router')->generate('oro_user_profile_update');
+        $this->visitPath($uri);
+    }
+
+    /**
+     * (Attempt to) Open the user configuration page.
+     * It is generated from 'oro_user_profile_configuration' route name for current application
+     *
+     * @Given I go to the direct URL of the User Configuration page
+     */
+    public function iGoToDirectUrlOfUserConfigurationPage()
+    {
+        $uri = $this->getAppContainer()->get('router')->generate('oro_user_profile_configuration');
+        $this->visitPath($uri);
+    }
+
+    /**
+     * (Attempt to) Open the login check page.
+     * It is generated from 'oro_user_security_check' route name for current application
+     *
+     * @Given I go to the direct URL of the Login Check page
+     */
+    public function iGoToDirectUrlOfLoginCheckPagePage()
+    {
+        $uri = $this->getAppContainer()->get('router')->generate('oro_user_security_check');
+        $this->visitPath($uri);
+    }
+
+    /**
      * Logout user
      *
      * @Given I am logged out
