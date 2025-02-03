@@ -26,16 +26,15 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 class Symfony54NumberToLocalizedStringTransformer implements DataTransformerInterface
 {
     protected $grouping;
-
     protected $roundingMode;
 
     private $scale;
     private $locale;
 
     public function __construct(
-        ?int    $scale = null,
-        ?bool   $grouping = false,
-        ?int    $roundingMode = \NumberFormatter::ROUND_HALFUP,
+        ?int $scale = null,
+        ?bool $grouping = false,
+        ?int $roundingMode = \NumberFormatter::ROUND_HALFUP,
         ?string $locale = null
     ) {
         $this->scale = $scale;

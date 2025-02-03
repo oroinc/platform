@@ -48,7 +48,7 @@ class WorkflowDefinitionFilters
             return new ArrayCollection();
         }
 
-        return  $this->filters->filter(function (WorkflowDefinitionFilterInterface $filter) {
+        return $this->filters->filter(function (WorkflowDefinitionFilterInterface $filter) {
             return !$this->isSystem() || $filter instanceof SystemFilterInterface;
         });
     }

@@ -98,8 +98,8 @@ class DatagridConfigurationQueryConverterContext extends GroupingOrmQueryConvert
     }
 
     public function addInnerJoin(
-        string  $join,
-        string  $alias,
+        string $join,
+        string $alias,
         ?string $conditionType = null,
         ?string $condition = null
     ): void {
@@ -115,8 +115,8 @@ class DatagridConfigurationQueryConverterContext extends GroupingOrmQueryConvert
     }
 
     public function addLeftJoin(
-        string  $join,
-        string  $alias,
+        string $join,
+        string $alias,
         ?string $conditionType = null,
         ?string $condition = null
     ): void {

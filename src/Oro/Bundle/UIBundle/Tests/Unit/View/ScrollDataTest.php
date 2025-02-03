@@ -31,11 +31,11 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
      * @dataProvider addBlockDataProvider
      */
     public function testAddBlock(
-        array   $expected,
-        string  $title,
-        ?int    $priority = null,
+        array $expected,
+        string $title,
+        ?int $priority = null,
         ?string $class = null,
-        bool    $useSubBlockDivider = true
+        bool $useSubBlockDivider = true
     ) {
         $this->assertEquals(0, $this->scrollData->addBlock($title, $priority, $class, $useSubBlockDivider));
         $this->assertEquals($expected, $this->scrollData->getData());

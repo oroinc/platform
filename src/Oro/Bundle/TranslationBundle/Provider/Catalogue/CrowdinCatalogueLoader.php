@@ -17,7 +17,7 @@ class CrowdinCatalogueLoader implements CatalogueLoaderInterface
 
     public function __construct(
         TranslationServiceAdapterInterface $translationServiceAdapter,
-        TranslationReader                  $translationReader
+        TranslationReader $translationReader
     ) {
         $this->translationServiceAdapter = $translationServiceAdapter;
         $this->translationReader = $translationReader;

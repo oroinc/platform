@@ -15,10 +15,10 @@ class GetSetMethodNormalizer extends BaseGetSetMethodNormalizer
 {
     #[\Override]
     protected function getAttributeValue(
-        object  $object,
-        string  $attribute,
+        object $object,
+        string $attribute,
         ?string $format = null,
-        array   $context = []
+        array $context = []
     ): mixed {
         $value = parent::getAttributeValue($object, $attribute, $format, $context);
 
@@ -56,7 +56,7 @@ class GetSetMethodNormalizer extends BaseGetSetMethodNormalizer
         $class = \is_object($classOrObject) ? \get_class($classOrObject) : $classOrObject;
 
         if (ExtendHelper::isExtendEntity($class)) {
-            return  $this->isAllowedExtendEntityAttribute($class, $attribute, $context);
+            return $this->isAllowedExtendEntityAttribute($class, $attribute, $context);
         }
 
         return parent::isAllowedAttribute($classOrObject, $attribute, $format, $context);

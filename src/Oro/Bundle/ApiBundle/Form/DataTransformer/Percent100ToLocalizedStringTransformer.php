@@ -12,9 +12,9 @@ class Percent100ToLocalizedStringTransformer extends NumberToLocalizedStringTran
     public const PERCENT_SCALE = 12;
 
     public function __construct(
-        ?int    $scale = null,
-        ?bool   $grouping = false,
-        ?int    $roundingMode = \NumberFormatter::ROUND_HALFUP,
+        ?int $scale = null,
+        ?bool $grouping = false,
+        ?int $roundingMode = \NumberFormatter::ROUND_HALFUP,
         ?string $locale = null
     ) {
         parent::__construct(($scale ?? self::PERCENT_SCALE) + 2, $grouping, $roundingMode, $locale);

@@ -251,7 +251,7 @@ class QueryExpressionVisitor extends ExpressionVisitor
      */
     public function createSubquery(
         ?string $field = null,
-        bool    $disallowJoinUsage = false,
+        bool $disallowJoinUsage = false,
         ?string $expression = null
     ): QueryBuilder {
         if (null === $this->query) {

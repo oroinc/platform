@@ -422,8 +422,8 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
     }
 
     private function createLocalizedFallbackValue(
-        ?int    $id,
-        ?int    $localizationId = null,
+        ?int $id,
+        ?int $localizationId = null,
         ?string $fallback = null,
         ?string $string = null,
         ?string $text = null
@@ -435,8 +435,8 @@ class LocalizedFallbackValueCollectionTransformerTest extends \PHPUnit\Framework
     }
 
     private function createCustomLocalizedFallbackValue(
-        ?int    $id,
-        ?int    $localizationId = null,
+        ?int $id,
+        ?int $localizationId = null,
         ?string $fallback = null,
         ?string $string = null,
         ?string $text = null

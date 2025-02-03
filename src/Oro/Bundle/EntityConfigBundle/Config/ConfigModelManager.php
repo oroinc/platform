@@ -380,7 +380,7 @@ class ConfigModelManager
      */
     public function createEntityModel(
         ?string $className = null,
-        string  $mode = ConfigModel::MODE_DEFAULT
+        string $mode = ConfigModel::MODE_DEFAULT
     ): EntityConfigModel {
         if (!$this->isValidMode($mode)) {
             throw new \InvalidArgumentException(sprintf('Invalid $mode: "%s"', $mode));

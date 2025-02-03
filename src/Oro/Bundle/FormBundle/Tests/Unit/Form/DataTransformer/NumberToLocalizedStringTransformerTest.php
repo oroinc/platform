@@ -29,11 +29,11 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit\Framework\TestCase
      * @dataProvider transformDataProvider
      */
     public function testTransform(
-        float   $from,
-        string  $to,
-        ?int    $scale = null,
-        ?bool   $grouping = false,
-        ?int    $roundingMode = \NumberFormatter::ROUND_HALFUP,
+        float $from,
+        string $to,
+        ?int $scale = null,
+        ?bool $grouping = false,
+        ?int $roundingMode = \NumberFormatter::ROUND_HALFUP,
         ?string $locale = null
     ): void {
         if (null !== $scale) {
@@ -73,14 +73,14 @@ class NumberToLocalizedStringTransformerTest extends \PHPUnit\Framework\TestCase
      * @dataProvider reverseTransformDataProvider
      */
     public function testReverseTransform(
-        ?string           $from,
+        ?string $from,
         string|float|null $to,
-        ?int              $scale = null,
-        ?bool             $grouping = false,
-        ?int              $roundingMode = \NumberFormatter::ROUND_HALFUP,
-        string            $locale = 'en',
-        string            $decimalSeparator = '.',
-        string            $groupingSeparator = ','
+        ?int $scale = null,
+        ?bool $grouping = false,
+        ?int $roundingMode = \NumberFormatter::ROUND_HALFUP,
+        string $locale = 'en',
+        string $decimalSeparator = '.',
+        string $groupingSeparator = ','
     ): void {
         $this->numberFormatter->expects(self::any())
             ->method('getSymbol')

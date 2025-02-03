@@ -26,10 +26,10 @@ class ServiceLocatorCompilerPass implements CompilerPassInterface
     private $isServiceLocatorOptional;
 
     public function __construct(
-        string  $serviceLocatorServiceId,
-        string  $tagName,
+        string $serviceLocatorServiceId,
+        string $tagName,
         ?string $nameAttribute = null,
-        bool    $isServiceLocatorOptional = false
+        bool $isServiceLocatorOptional = false
     ) {
         $this->serviceLocatorServiceId = $serviceLocatorServiceId;
         $this->tagName = $tagName;

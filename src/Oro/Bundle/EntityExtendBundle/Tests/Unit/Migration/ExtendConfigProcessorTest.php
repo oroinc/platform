@@ -577,8 +577,8 @@ class ExtendConfigProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     private function createConfig(
-        string  $scope,
-        string  $className,
+        string $scope,
+        string $className,
         ?string $fieldName = null,
         ?string $fieldType = null
     ): Config {

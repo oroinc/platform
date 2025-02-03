@@ -37,12 +37,12 @@ class UserLoginAttemptLogger
     ];
 
     public function __construct(
-        ManagerRegistry                  $doctrine,
+        ManagerRegistry $doctrine,
         UserLoggingInfoProviderInterface $userInfoProvider,
-        TranslatorInterface              $translator,
-        LoggerInterface                  $logger,
-        string                           $attemptClass,
-        array                            $loginSources
+        TranslatorInterface $translator,
+        LoggerInterface $logger,
+        string $attemptClass,
+        array $loginSources
     ) {
         $this->doctrine = $doctrine;
         $this->userInfoProvider = $userInfoProvider;
@@ -82,10 +82,10 @@ class UserLoginAttemptLogger
     }
 
     private function doLogAttempt(
-        bool   $success,
-        mixed  $user,
+        bool $success,
+        mixed $user,
         string $source,
-        array  $additionalContext = []
+        array $additionalContext = []
     ): void {
         $sourceCode = isset($this->loginSources[$source])
             ? $this->loginSources[$source]['code']

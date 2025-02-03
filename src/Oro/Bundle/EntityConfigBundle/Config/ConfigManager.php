@@ -1142,8 +1142,8 @@ class ConfigManager
      * Extracts entity default values from an annotation and config file
      */
     protected function getEntityDefaultValues(
-        string          $scope,
-        ?string         $className = null,
+        string $scope,
+        ?string $className = null,
         ?EntityMetadata $metadata = null
     ): array {
         $propertyConfig = $this->getPropertyConfig($scope);

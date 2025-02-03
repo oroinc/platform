@@ -16,7 +16,7 @@ class ExtendedEntityFieldsProcessor
     protected static ExtendEntityMetadataProviderInterface $metadataProvider;
 
     public static function initialize(
-        EntityFieldIteratorInterface          $iterator,
+        EntityFieldIteratorInterface $iterator,
         ExtendEntityMetadataProviderInterface $metadataProvider
     ): void {
         self::$iterator = $iterator;

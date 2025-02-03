@@ -329,10 +329,10 @@ class WorkflowItemRepositoryTest extends WebTestCase
     }
 
     private function assertEntityIdsByWorkflow(
-        array  $allEntityIds,
-        int    $noneEntitiesCount,
-        int    $noStartStepEntitiesCount,
-        int    $withStartStepEntitiesCount,
+        array $allEntityIds,
+        int $noneEntitiesCount,
+        int $noStartStepEntitiesCount,
+        int $withStartStepEntitiesCount,
         ?array $noneEntityIds = null,
         ?array $noStartStepEntityIds = null,
         ?array $withStartStepEntityIds = null

@@ -37,13 +37,13 @@ class Client extends BaseKernelBrowser
      */
     #[\Override]
     public function request(
-        string  $method,
-        string  $uri,
-        array   $parameters = [],
-        array   $files = [],
-        array   $server = [],
+        string $method,
+        string $uri,
+        array $parameters = [],
+        array $files = [],
+        array $server = [],
         ?string $content = null,
-        bool    $changeHistory = true
+        bool $changeHistory = true
     ): Crawler {
         if (!str_starts_with($uri, 'http://') && !str_starts_with($uri, 'https://')) {
             $uri = self::LOCAL_URL . $uri;

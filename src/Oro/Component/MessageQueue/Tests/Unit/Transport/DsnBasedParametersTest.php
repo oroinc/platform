@@ -41,10 +41,10 @@ class DsnBasedParametersTest extends \PHPUnit\Framework\TestCase
      * @dataProvider properDsnProvider
      */
     public function testProperDsnProcessing(
-        string  $dsn,
-        string  $transportName,
-        array   $parameters,
-        array   $parameter,
+        string $dsn,
+        string $transportName,
+        array $parameters,
+        array $parameter,
         ?string $user = null,
         ?string $password = null,
         ?string $host = null,

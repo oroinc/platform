@@ -363,10 +363,10 @@ class WorkflowManager implements LoggerAwareInterface
     }
 
     private function transitWorkflow(
-        WorkflowItem      $workflowItem,
+        WorkflowItem $workflowItem,
         string|Transition $transition,
-        ?Collection       $errors = null,
-        int               $transitionMethod = self::METHOD_TRANSIT
+        ?Collection $errors = null,
+        int $transitionMethod = self::METHOD_TRANSIT
     ): void {
         $workflow = $this->workflowRegistry->getWorkflow($workflowItem->getWorkflowName(), true);
 

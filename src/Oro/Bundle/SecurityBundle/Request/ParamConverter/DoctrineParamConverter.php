@@ -25,10 +25,10 @@ class DoctrineParamConverter extends BaseParamConverter
     private $defaultOptions;
 
     public function __construct(
-        ?ManagerRegistry             $registry = null,
-        ?ExpressionLanguage          $expressionLanguage = null,
+        ?ManagerRegistry $registry = null,
+        ?ExpressionLanguage $expressionLanguage = null,
         ?RequestAuthorizationChecker $requestAuthorizationChecker = null,
-        array                        $options = []
+        array $options = []
     ) {
         parent::__construct($registry, $expressionLanguage, $options);
 

@@ -29,11 +29,11 @@ class ProcessorBag implements ProcessorBagInterface
     protected $processorApplicableChecker;
 
     public function __construct(
-        ProcessorBagConfigProviderInterface         $configProvider,
-        ProcessorRegistryInterface                  $processorRegistry,
-        bool                                        $debug = false,
+        ProcessorBagConfigProviderInterface $configProvider,
+        ProcessorRegistryInterface $processorRegistry,
+        bool $debug = false,
         ?ProcessorApplicableCheckerFactoryInterface $applicableCheckerFactory = null,
-        ?ProcessorIteratorFactoryInterface          $processorIteratorFactory = null
+        ?ProcessorIteratorFactoryInterface $processorIteratorFactory = null
     ) {
         $this->configProvider = $configProvider;
         $this->processorRegistry = $processorRegistry;

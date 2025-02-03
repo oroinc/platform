@@ -27,14 +27,14 @@ Feature: Update user profile and user entity ACL
 
   Scenario: User should be able to edit their profile when user entity permissions are disabled
     Given I click "Entity Edit Button"
-    And I fill in "Name prefix" with "Sir"
+    And I fill in "Name prefix" with "SomeNamePrefix"
     And I save and close form
     Then I should see "User saved" flash message
-    And I should see "Sir John Doe"
+    And I should see "SomeNamePrefix"
 
   Scenario: Profile page should not be available to not logged in user
     Given I am logged out
-    And I am on "/admin/user/profile/view"
+    And I go to the direct URL of the User Profile View page
     Then I should be on Login page
     And I login as administrator
     And I go to System/User Management/Roles
@@ -44,8 +44,8 @@ Feature: Update user profile and user entity ACL
     When I save and close form
     Then I should see "Role saved" flash message
 
-  Scenario: User Profile capability is on and User Edit permission is None for Sales Manager Role by default
-    And I open "Sales Manager" role view page
+  Scenario: User Profile capability is on and User Edit permission is None for Manager Role by default
+    And I open "Manager" role view page
     Then the role has following active permissions:
       | User | View:Global | Edit:None |
     And following capability permissions should be checked:
@@ -67,7 +67,7 @@ Feature: Update user profile and user entity ACL
     When I reload the page
     Then I should see "Bobby Fischer" in the "User Menu" element
 
-  Scenario: Disable Update User Profile capability and set User Edit permission to None for Sales Manager Role
+  Scenario: Disable Update User Profile capability and set User Edit permission to None for Manager Role
     Given I proceed as the Admin
     And I should be on Role View page
     When I click "Edit"
@@ -94,15 +94,15 @@ Feature: Update user profile and user entity ACL
 
   @skipWait
   Scenario: Profile edit page should not be available by direct URL
-    When I am on "/admin/user/profile/edit"
+    When I go to the direct URL of the User Profile Edit page
     Then I should see "You don't have permission to access this page"
-    And I go to "/admin/user/profile/view"
+    And I go to the direct URL of the User Profile View page
     Then I should be on User Profile View page
 
-  Scenario: Turn on Update User Profile capability and set User Edit permission to Global for Sales Manager Role
+  Scenario: Turn on Update User Profile capability and set User Edit permission to Global for Manager Role
     Given I proceed as the Admin
     And I go to System/User Management/Roles
-    And I click edit Sales Manager in grid
+    And I click edit Manager in grid
     And I check "Update User Profile" entity permission
     And I click "Entity" in scrollspy
     And select following permissions:
@@ -127,7 +127,7 @@ Feature: Update user profile and user entity ACL
     When I reload the page
     Then I should see "Anatoliy Karpov" in the "User Menu" element
 
-  Scenario: Turn off Update User Profile capability and set User Edit permission to Global for Sales Manager Role
+  Scenario: Turn off Update User Profile capability and set User Edit permission to Global for Manager Role
     Given I proceed as the Admin
     And I should be on Role View page
     When I click "Edit"
@@ -176,16 +176,16 @@ Feature: Update user profile and user entity ACL
     And I should see "Groups and Roles"
     And I should see "Access Settings"
 
-  Scenario: Set Sales Manager edit user and user profile permissions
+  Scenario: Set Manager edit user and user profile permissions
     When I go to System/User Management/Roles
-    And I click edit "Sales Manager" in grid
+    And I click edit "Manager" in grid
     And select following permissions:
       | User | Edit:Global |
     And I check "Update User Profile" entity permission
     When I save and close form
     Then I should see "Role saved" flash message
 
-  Scenario: Check is Sales Manager not see groups and access settings on edit pages
+  Scenario: Check is Manager not see groups and access settings on edit pages
     Given I proceed as the Manager
     And I click My User in user menu
     And I reload the page

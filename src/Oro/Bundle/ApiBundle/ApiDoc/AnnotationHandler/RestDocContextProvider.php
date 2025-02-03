@@ -35,10 +35,10 @@ class RestDocContextProvider
     }
 
     public function getContext(
-        string  $action,
-        string  $entityClass,
+        string $action,
+        string $entityClass,
         ?string $associationName = null,
-        ?Route  $route = null
+        ?Route $route = null
     ): Context|SubresourceContext {
         $processor = $this->processorBag->getProcessor($action);
         /** @var Context $context */

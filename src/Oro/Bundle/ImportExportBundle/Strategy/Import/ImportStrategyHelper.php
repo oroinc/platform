@@ -190,9 +190,9 @@ class ImportStrategyHelper
      *                                    string in format "permission;descriptor"
      *                                    (VIEW;entity:AcmeDemoBundle:AcmeEntity, EDIT;action:acme_action)
      *                                    or something else, it depends on registered security voters
-     * @param  object|string $obj        A domain object, object identity or object identity descriptor
+     * @param object|string   $obj        A domain object, object identity or object identity descriptor
+     * @param string          $property
      *
-     * @param  string         $property
      * @return bool
      */
     public function isGranted($attributes, $obj, $property = null)

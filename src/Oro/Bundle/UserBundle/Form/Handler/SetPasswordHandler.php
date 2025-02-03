@@ -14,10 +14,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Class SetPasswordHandler
- *
- * @package Oro\Bundle\UserBundle\Form\Handler
- *
+ * Handles set user password form.
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class SetPasswordHandler
@@ -47,11 +44,11 @@ class SetPasswordHandler
 
     public function __construct(
         LoggerInterface $logger,
-        RequestStack    $requestStack,
+        RequestStack $requestStack,
         TranslatorInterface $translator,
-        FormInterface   $form,
-        Processor       $mailerProcessor,
-        UserManager     $userManager,
+        FormInterface $form,
+        Processor $mailerProcessor,
+        UserManager $userManager,
         ValidatorInterface $validator
     ) {
         $this->logger          = $logger;

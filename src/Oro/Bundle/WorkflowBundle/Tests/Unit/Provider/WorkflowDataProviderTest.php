@@ -174,7 +174,7 @@ class WorkflowDataProviderTest extends \PHPUnit\Framework\TestCase
      */
     private function getWorkflow(
         ?WorkflowDefinition $workflowDefinition = null,
-        ?StepManager        $stepManager = null
+        ?StepManager $stepManager = null
     ) {
         if ($workflowDefinition === null) {
             $workflowDefinition = $this->createMock(WorkflowDefinition::class);

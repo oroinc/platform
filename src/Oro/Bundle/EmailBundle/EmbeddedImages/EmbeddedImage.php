@@ -16,7 +16,7 @@ class EmbeddedImage
     private ?string $encoding;
 
     public function __construct(
-        string  $encodedContent,
+        string $encodedContent,
         ?string $filename = null,
         ?string $contentType = null,
         ?string $encoding = null

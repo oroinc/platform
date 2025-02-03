@@ -71,11 +71,11 @@ class EntityIdHelper
      * Adds a restriction by the entity identifier to the given query builder.
      */
     public function applyEntityIdentifierRestriction(
-        QueryBuilder              $qb,
-        mixed                     $entityId,
+        QueryBuilder $qb,
+        mixed $entityId,
         EntityIdMetadataInterface $metadata,
-        ?string                   $entityAlias = null,
-        ?string                   $idParamName = null
+        ?string $entityAlias = null,
+        ?string $idParamName = null
     ): void {
         if (!$entityAlias) {
             $entityAlias = QueryBuilderUtil::getSingleRootAlias($qb);

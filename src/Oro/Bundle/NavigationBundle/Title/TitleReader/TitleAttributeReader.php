@@ -15,10 +15,10 @@ use ReflectionMethod;
 class TitleAttributeReader extends PhpArrayConfigProvider implements ReaderInterface
 {
     public function __construct(
-        string                                   $cacheFile,
-        bool                                     $debug,
+        string $cacheFile,
+        bool $debug,
         private readonly ControllerClassProvider $controllerClassProvider,
-        private readonly AttributeReader         $reader
+        private readonly AttributeReader $reader
     ) {
         parent::__construct($cacheFile, $debug);
     }
@@ -36,7 +36,7 @@ class TitleAttributeReader extends PhpArrayConfigProvider implements ReaderInter
     {
         $config = [];
         $controllers = $this->controllerClassProvider->getControllers();
-        foreach ($controllers as $routeName => list($class, $method)) {
+        foreach ($controllers as $routeName => [$class, $method]) {
             /** @var TitleTemplate|null $attribute */
             $attribute = $this->reader->getMethodAttribute(
                 new ReflectionMethod($class, $method),

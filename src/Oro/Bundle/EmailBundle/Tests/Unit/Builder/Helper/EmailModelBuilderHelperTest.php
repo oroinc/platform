@@ -239,7 +239,7 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
     public function testPreciseFullEmailAddressWithProvider(
         string $expected,
         string $emailAddress,
-        ?string  $ownerClass,
+        ?string $ownerClass,
         ?int $ownerId
     ): void {
         $emailAddressRepository = $this->createMock(EntityRepository::class);

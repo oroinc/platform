@@ -125,11 +125,11 @@ class ProcessorBagConfigBuilder implements ProcessorBagConfigProviderInterface
      * Registers a processor.
      */
     public function addProcessor(
-        string  $processorId,
-        array   $attributes,
+        string $processorId,
+        array $attributes,
         ?string $action = null,
         ?string $group = null,
-        int     $priority = 0
+        int $priority = 0
     ): void {
         $this->assertNotFrozen();
 
