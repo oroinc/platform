@@ -6,6 +6,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
+use Oro\Bundle\EmailBundle\Provider\EmailTemplateOrganizationProvider;
 use Oro\Bundle\EmailBundle\Tools\EmailTemplateSerializer;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\VariablesProvider;
 use Oro\Bundle\SecurityBundle\Attribute\Acl;
@@ -23,6 +24,8 @@ use Twig\Error\SyntaxError;
  */
 class EmailTemplateController extends RestController
 {
+    private EmailTemplateOrganizationProvider $organizationProvider;
+
     /**
      * REST DELETE
      *
@@ -88,7 +91,7 @@ class EmailTemplateController extends RestController
             ->getTemplateByEntityName(
                 $this->container->get('oro_security.acl_helper'),
                 $entityName,
-                $this->container->get('oro_security.token_accessor')->getOrganization(),
+                $this->organizationProvider->getOrganization(),
                 (bool)$includeNonEntity,
                 (bool)$includeSystemTemplates
             );
@@ -232,5 +235,10 @@ class EmailTemplateController extends RestController
                 EmailTemplateSerializer::class,
             ]
         );
+    }
+
+    public function setOrganizationProvider(EmailTemplateOrganizationProvider $organizationProvider): void
+    {
+        $this->organizationProvider = $organizationProvider;
     }
 }

@@ -8,6 +8,7 @@ use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment;
+use Oro\Bundle\EmailBundle\Provider\EmailTemplateOrganizationProvider;
 use Oro\Bundle\FormBundle\Form\Type\OroResizeableRichTextType;
 use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
@@ -47,6 +48,8 @@ class EmailType extends AbstractType
     private ConfigManager $configManager;
 
     private EventSubscriberInterface $emailTemplateRenderingSubscriber;
+
+    private EmailTemplateOrganizationProvider $emailTemplateOrganizationProvider;
 
     public function __construct(
         AuthorizationCheckerInterface $authorizationChecker,
@@ -237,16 +240,18 @@ class EmailType extends AbstractType
         }
 
         $entityClass = is_object($data) ? $data->getEntityClass() : $data['entityClass'];
+        $organization = $this->emailTemplateOrganizationProvider->getOrganization();
+
         FormUtils::replaceField(
             $form,
             'template',
             [
                 'selectedEntity' => $entityClass,
                 'query_builder'  =>
-                    function (EmailTemplateRepository $templateRepository) use ($entityClass) {
+                    function (EmailTemplateRepository $templateRepository) use ($entityClass, $organization) {
                         return $templateRepository->getEntityTemplatesQueryBuilder(
                             $entityClass,
-                            $this->tokenAccessor->getOrganization(),
+                            $organization,
                             true
                         );
                     },
@@ -292,5 +297,10 @@ class EmailType extends AbstractType
             'extended_valid_elements' => implode(',', self::WYSIWYG_VALID_ELEMENTS),
             'custom_elements' => implode(',', self::WYSIWYG_CUSTOM_ELEMENTS)
         ];
+    }
+
+    public function setOrganizationProvider(EmailTemplateOrganizationProvider $emailTemplateOrganizationProvider): void
+    {
+        $this->emailTemplateOrganizationProvider = $emailTemplateOrganizationProvider;
     }
 }

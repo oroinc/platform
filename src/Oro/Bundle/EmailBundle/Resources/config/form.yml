@@ -111,6 +111,8 @@ services:
             - '@oro_email.email.model.builder.helper'
             - '@oro_config.user'
             - '@oro_email.form.subscriber.email_template_rendering_subscriber'
+        calls:
+            - [setOrganizationProvider, ['@oro_email.email_template_organization_provider']]
         tags:
             - { name: form.type, alias: oro_email_email }
 

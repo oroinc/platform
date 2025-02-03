@@ -165,6 +165,12 @@ define(function(require) {
                 this._wid = this.options.wid;
             }
 
+            const saOrgIdSelector = $('input#_sa_org_id');
+            const saOrgId = saOrgIdSelector ? saOrgIdSelector.val() : null;
+            if (saOrgId !== null && saOrgId > 0) {
+                systemAccessModeOrganizationProvider.setOrganizationId(saOrgId);
+            }
+
             this.on('adoptedFormSubmitClick', this._onAdoptedFormSubmitClick.bind(this));
             this.on('adoptedFormResetClick', this._onAdoptedFormResetClick.bind(this));
             this.on('adoptedFormSubmit', this._onAdoptedFormSubmit.bind(this));
