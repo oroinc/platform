@@ -10,6 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\FixtureLoaderDictionary;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext;
 use Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\PageObjectDictionary;
 
+/** @SuppressWarnings(PHPMD.TooManyPublicMethods) */
 class FeatureContext extends OroFeatureContext implements
     FixtureLoaderAwareInterface,
     OroPageObjectAware
