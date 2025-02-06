@@ -238,8 +238,8 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->userScopeManager->expects(self::exactly(2))
             ->method('getSettingValue')
             ->willReturnMap([
-                [$item1Name, true, $scopeIdentifier, true, ['value' => 'old value']],
-                [$item2Name, true, $scopeIdentifier, true, ['value' => 2000]]
+                [$item1Name, true, $idValue, true, ['value' => 'old value']],
+                [$item2Name, true, $idValue, true, ['value' => 2000]]
             ]);
 
         $item1BeforeEvent = new ConfigSettingsUpdateEvent($this->manager, $item1sValue);
@@ -381,17 +381,14 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->userScopeManager->expects(self::exactly(2))
             ->method('getScopedEntityName')
             ->willReturn('user');
-        $this->userScopeManager->expects(self::exactly(2))
+        $this->userScopeManager->expects(self::exactly(3))
             ->method('resolveIdentifier')
             ->with(self::isNull())
-            ->willReturn($resolvedScopeId);
-        $this->userScopeManager->expects(self::once())
-            ->method('getScopeId')
             ->willReturn($resolvedScopeId);
 
         $this->userScopeManager->expects(self::once())
             ->method('getSettingValue')
-            ->with($itemName, self::isTrue(), self::isNull())
+            ->with($itemName, self::isTrue(), $resolvedScopeId)
             ->willReturn(['value' => $itemValue]);
 
         $loadEvent = new ConfigGetEvent($this->manager, $itemName, $itemValue, false, 'user', $resolvedScopeId);
@@ -419,8 +416,9 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->userScopeManager->expects(self::exactly(2))
             ->method('getScopedEntityName')
             ->willReturn('user');
-        $this->userScopeManager->expects(self::never())
-            ->method('resolveIdentifier');
+        $this->userScopeManager->expects(self::exactly(3))
+            ->method('resolveIdentifier')
+            ->willReturn($scopeIdentifier);
         $this->userScopeManager->expects(self::never())
             ->method('getScopeId');
 
@@ -454,10 +452,8 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->userScopeManager->expects(self::exactly(2))
             ->method('getScopedEntityName')
             ->willReturn('user');
-        $this->userScopeManager->expects(self::never())
+        $this->userScopeManager->expects(self::exactly(3))
             ->method('resolveIdentifier');
-        $this->userScopeManager->expects(self::never())
-            ->method('getScopeId');
 
         $this->userScopeManager->expects(self::once())
             ->method('getSettingValue')
@@ -487,18 +483,16 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         $scopeIdentifier = new \stdClass();
         $resolvedScopeId = 10;
 
+        $this->userScopeManager->expects(self::exactly(3))
+            ->method('resolveIdentifier')
+            ->willReturn($resolvedScopeId);
         $this->userScopeManager->expects(self::exactly(2))
             ->method('getScopedEntityName')
             ->willReturn('user');
-        $this->userScopeManager->expects(self::exactly(3))
-            ->method('getScopeIdFromEntity')
-            ->willReturn($resolvedScopeId);
-        $this->userScopeManager->expects(self::never())
-            ->method('getScopeId');
 
         $this->userScopeManager->expects(self::once())
             ->method('getSettingValue')
-            ->with($itemName, self::isTrue(), $scopeIdentifier)
+            ->with($itemName, true, $resolvedScopeId, false)
             ->willReturn(['value' => $itemValue]);
 
         $loadEvent = new ConfigGetEvent($this->manager, $itemName, $itemValue, false, 'user', $resolvedScopeId);
@@ -526,12 +520,12 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->userScopeManager->expects(self::once())
             ->method('getSettingValue')
-            ->with($itemName, true, $scopeIdentifier)
+            ->with($itemName, true, null)
             ->willReturn(null);
 
         $this->globalScopeManager->expects(self::once())
             ->method('getSettingValue')
-            ->with($itemName, true, $scopeIdentifier)
+            ->with($itemName, true, null)
             ->willReturn(null);
 
         self::assertEquals('anyvalue', $this->manager->get($itemName, false, false, $scopeIdentifier));
@@ -734,13 +728,13 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->userScopeManager->expects(self::any())
             ->method('resolveIdentifier')
             ->willReturnMap([
-                [$entity1, null],
-                [$entity2, 55]
+                [$entity1, 1],
+                [$entity2, 2]
             ]);
         $this->globalScopeManager->expects(self::any())
             ->method('resolveIdentifier')
             ->willReturnMap([
-                [$entity1, 33],
+                [$entity1, 10],
             ]);
 
         $this->userScopeManager->expects(self::any())
@@ -754,15 +748,15 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
         $this->userScopeManager->expects(self::exactly(2))
             ->method('getSettingValue')
             ->willReturnMap([
-                [$itemName, true, $entity1, false, ['value' => 'val1']],
-                [$itemName, true, $entity2, false, ['value' => 'val2']]
+                [$itemName, true, 1, false, ['value' => 'val1']],
+                [$itemName, true, 2, false, ['value' => 'val2']]
             ]);
         $this->globalScopeManager->expects(self::never())
             ->method('getSettingValue');
 
-        self::assertEquals([33 => 'val1', 55 => 'val2'], $this->manager->getValues($itemName, $entities));
+        self::assertEquals([1 => 'val1', 2 => 'val2'], $this->manager->getValues($itemName, $entities));
         // check cache
-        self::assertEquals([33 => 'val1', 55 => 'val2'], $this->manager->getValues($itemName, $entities));
+        self::assertEquals([1 => 'val1', 2 => 'val2'], $this->manager->getValues($itemName, $entities));
     }
 
     public static function scopeIdentifierDataProvider(): array
@@ -784,19 +778,20 @@ class ConfigManagerTest extends \PHPUnit\Framework\TestCase
 
         $this->userScopeManager->expects(self::once())
             ->method('getSettingValue')
-            ->with($itemName, true, $scopeIdentifier)
+            ->with($itemName, true, null)
             ->willReturn(null);
 
         $this->globalScopeManager->expects(self::once())
             ->method('getSettingValue')
-            ->with($itemName, true, $scopeIdentifier)
+            ->with($itemName, true, null)
             ->willReturn(null);
 
         $this->defaultValueProvider->expects(self::once())
             ->method('getValue')
             ->willReturn($itemValue);
+        $val = $this->manager->get($itemName, false, false, $scopeIdentifier);
 
-        self::assertSame($itemValue, $this->manager->get($itemName, false, false, $scopeIdentifier));
+        self::assertEquals($itemValue, $val);
         // check cache
         self::assertSame($itemValue, $this->manager->get($itemName, false, false, $scopeIdentifier));
     }

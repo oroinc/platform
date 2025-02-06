@@ -69,34 +69,49 @@ class LocalizationManager implements ClearableConfigCacheInterface
      */
     public function getLocalizationData(int $id, bool $useCache = true): array
     {
-        $cache = false;
         if ($useCache) {
             $cacheItem = $this->cacheProvider->getItem(self::SIMPLE_CACHE_NAMESPACE);
-            $cache = $cacheItem->isHit() ? $cacheItem->get() : false;
-        }
-        if ($cache === false) {
-            $sql = 'SELECT loc.id, loc.formatting_code AS formatting, lang.code AS language, loc.rtl_mode AS rtl ' .
-                'FROM oro_localization AS loc ' .
-                'INNER JOIN oro_language AS lang ON lang.id = loc.language_id';
-            $stmt = $this->doctrineHelper->getEntityManager(Localization::class)
-                ->getConnection()
-                ->executeQuery($sql);
-            $cache = [];
-            foreach ($stmt->fetchAllAssociative() as $row) {
-                $cache[$row['id']] = [
-                    'languageCode' => $row['language'],
-                    'formattingCode' => $row['formatting'],
-                    'rtlMode' => (bool)$row['rtl'], # cast to boolean as Mysql stores value as TINYINT(1)
-                ];
+            if ($cacheItem->isHit()) {
+                $cacheData = $cacheItem->get();
+                if (isset($cacheData[$id])) {
+                    return $cacheData[$id];
+                }
             }
         }
 
+        $localizationData = $this->fetchLocalizationData();
+
         if ($useCache) {
-            $cacheItem->set($cache);
+            $cacheItem->set($localizationData);
             $this->cacheProvider->save($cacheItem);
         }
 
-        return $cache[$id] ?? [];
+        return $localizationData[$id] ?? [];
+    }
+
+    private function fetchLocalizationData(): array
+    {
+        $sql = <<<SQL
+            SELECT loc.id, loc.formatting_code AS formatting, lang.code AS language, loc.rtl_mode AS rtl 
+            FROM oro_localization AS loc 
+            INNER JOIN oro_language AS lang ON lang.id = loc.language_id
+        SQL;
+
+        $stmt = $this->doctrineHelper
+            ->getEntityManager(Localization::class)
+            ->getConnection()
+            ->executeQuery($sql);
+
+        $data = [];
+        foreach ($stmt->fetchAllAssociative() as $row) {
+            $data[$row['id']] = [
+                'languageCode' => $row['language'],
+                'formattingCode' => $row['formatting'],
+                'rtlMode' => (bool) $row['rtl'],
+            ];
+        }
+
+        return $data;
     }
 
     public function getLocalizations(array $ids = null, bool $useCache = true): array

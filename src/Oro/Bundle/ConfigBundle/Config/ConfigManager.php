@@ -364,20 +364,14 @@ class ConfigManager
         $resolvedScopeId = null;
         $settingValue = null;
         $managers = $this->getScopeManagersToGetValue($default);
+
         foreach ($managers as $scopeName => $manager) {
-            if (null === $resolvedScopeId && null !== $scopeIdentifier) {
-                if (\is_object($scopeIdentifier)) {
-                    $identifier = $manager->getScopeIdFromEntity($scopeIdentifier);
-                    if (null !== $identifier) {
-                        $resolvedScope = $scopeName;
-                        $resolvedScopeId = $identifier;
-                    }
-                } else {
-                    $resolvedScope = $scopeName;
-                    $resolvedScopeId = $scopeIdentifier;
-                }
+            $resolvedScopeId = $manager->resolveIdentifier($scopeIdentifier);
+            if ($resolvedScopeId) {
+                $resolvedScope = $scopeName;
             }
-            $settingValue = $manager->getSettingValue($name, true, $scopeIdentifier, $skipChanges);
+
+            $settingValue = $manager->getSettingValue($name, true, $resolvedScopeId, $skipChanges);
             if (null !== $settingValue) {
                 // in case if we get value not from current scope,
                 // we should mark value that it was get from another scope
@@ -423,24 +417,21 @@ class ConfigManager
         $scope = $scopeManager->getScopedEntityName();
         $resolvedScope = null;
         $resolvedScopeId = null;
-        if (\is_object($scopeIdentifier)) {
-            $managers = $this->getScopeManagersToGetValue($default);
-            foreach ($managers as $scopeNam => $manager) {
-                $resolvedScopeId = $manager->getScopeIdFromEntity($scopeIdentifier);
-                if (null !== $resolvedScopeId) {
-                    $resolvedScope = $scopeNam;
-                    break;
-                }
+        $managers = $this->getScopeManagersToGetValue($default);
+        foreach ($managers as $scopeName => $manager) {
+            $resolvedScopeId = $manager->resolveIdentifier($scopeIdentifier);
+            if ($resolvedScopeId) {
+                $resolvedScope = $scopeName;
+
+                break;
             }
-        } elseif (null === $scopeIdentifier) {
-            $resolvedScopeId = $scopeManager->resolveIdentifier($scopeIdentifier);
         }
 
         return sprintf(
             '%s|%s|%d|%s|%d|%d|%d',
             $scope,
             $resolvedScope,
-            $resolvedScopeId ?? 0,
+            $resolvedScopeId,
             $name,
             (int)$default,
             (int)$full,
@@ -529,7 +520,7 @@ class ConfigManager
         $managers = $this->getScopeManagersToGetValue(false);
         foreach ($managers as $scopeManager) {
             $identifier = $scopeManager->resolveIdentifier($scopeIdentifier);
-            if (null !== $identifier) {
+            if ($identifier) {
                 return $identifier;
             }
         }

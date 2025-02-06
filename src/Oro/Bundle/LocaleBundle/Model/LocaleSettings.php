@@ -227,12 +227,9 @@ class LocaleSettings
      */
     public function getLocale()
     {
-        if (null === $this->locale) {
-            $localization = $this->getLocalizationData();
+        $localization = $this->getLocalizationData();
 
-            $this->locale = $localization['formattingCode'] ?? Configuration::DEFAULT_LOCALE;
-        }
-        return $this->locale;
+        return $localization['formattingCode'] ?? Configuration::DEFAULT_LOCALE;
     }
 
     /**
@@ -242,11 +239,7 @@ class LocaleSettings
      */
     public function getLanguage()
     {
-        if (null === $this->language) {
-            $this->language = $this->getLanguageConfigurationValue();
-        }
-
-        return $this->language;
+        return $this->getLanguageConfigurationValue();
     }
 
     public function isRtlMode(): bool
