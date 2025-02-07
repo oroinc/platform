@@ -118,23 +118,12 @@
             'separateLayout': false
         }) }}
     {% endset %}
-    {% set apiKeyWidget %}
-        {% if app.environment == 'test' and (isProfileView or app.user.id == entity.id or is_granted('MANAGE_API_KEY', entity)) %}
-            {{ oro_widget_render({
-                'widgetType': 'block',
-                'url': path('oro_user_apigen', { id: entity.id }),
-                'alias': 'user-apikey-gen-widget',
-                'elementFirst': true,
-                'separateLayout': false
-            }) }}
-        {% endif %}
-    {% endset %}
     {% set dataBlocks = [
         {
             'title': 'General Information'|trans,
             'subblocks': [
                 {'data' : [userInformationWidget]},
-                {'data' : [apiKeyWidget]},
+                {'data' : []},
             ]
         }
     ] %}

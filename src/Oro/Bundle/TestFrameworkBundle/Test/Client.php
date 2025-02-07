@@ -49,9 +49,8 @@ class Client extends BaseKernelBrowser
             $uri = self::LOCAL_URL . $uri;
         }
 
-        if (!isset($server['HTTP_X-WSSE']) && $this->getServerParameter('HTTP_X-WSSE', '') !== '') {
-            // generate new WSSE header
-            $this->mergeServerParameters(WebTestCase::generateWsseAuthHeader());
+        if (!isset($server['HTTP_X-API-TEST']) && $this->getServerParameter('HTTP_X-API-TEST', '') !== '') {
+            $this->mergeServerParameters(WebTestCase::generateApiAuthHeader());
         }
 
         $hashNavigationHeader = $this->getHashNavigationHeader();
@@ -409,7 +408,7 @@ class Client extends BaseKernelBrowser
 
     private function setSessionCookie(array &$server)
     {
-        if (array_key_exists('HTTP_X-WSSE', $server)) {
+        if (array_key_exists('HTTP_X-API-TEST', $server)) {
             return;
         }
 

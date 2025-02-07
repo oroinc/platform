@@ -9,7 +9,7 @@ class RestAddressTypeApiTest extends WebTestCase
     #[\Override]
     protected function setUp(): void
     {
-        $this->initClient([], self::generateWsseAuthHeader());
+        $this->initClient([], self::generateApiAuthHeader());
     }
 
     public function testGetAddressTypes(): array

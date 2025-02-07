@@ -14,7 +14,7 @@ class FileUrlProviderTest extends WebTestCase
     #[\Override]
     protected function setUp(): void
     {
-        $this->initClient([], self::generateWsseAuthHeader());
+        $this->initClient([], self::generateApiAuthHeader());
 
         $this->loadFixtures([LoadImageData::class]);
 

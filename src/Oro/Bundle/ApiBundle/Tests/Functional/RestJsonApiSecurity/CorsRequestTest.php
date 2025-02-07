@@ -504,13 +504,13 @@ class CorsRequestTest extends RestJsonApiTestCase
             [],
             [
                 'HTTP_Origin' => 'https://api.test.com',
-                'HTTP_X-WSSE' => self::generateWsseAuthHeader('NotExistingUser')
+                'HTTP_X-API-TEST' => self::generateApiAuthHeader('NotExistingUser')
             ],
             false
         );
         self::assertResponseStatusCodeEquals($response, Response::HTTP_UNAUTHORIZED);
         self::assertSame('', $response->getContent());
-        self::assertResponseHeader($response, 'WWW-Authenticate', 'WSSE realm="Secured API", profile="UsernameToken"');
+        self::assertResponseHeader($response, 'WWW-Authenticate', 'TEST_API');
         self::assertResponseHeader($response, 'Access-Control-Allow-Origin', 'https://api.test.com');
         self::assertResponseHeaderNotExists($response, 'Access-Control-Allow-Methods');
         self::assertResponseHeaderNotExists($response, 'Access-Control-Allow-Headers');

@@ -8,12 +8,12 @@ use Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailData;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Entity\User;
 
-class EmailActivityTestForPrivateEmails extends WebTestCase
+class EmailActivityTestForPrivateEmailsTest extends WebTestCase
 {
     #[\Override]
     protected function setUp(): void
     {
-        $this->initClient([], $this->generateWsseAuthHeader());
+        $this->initClient([], self::generateApiAuthHeader());
         $this->loadFixtures([LoadEmailData::class]);
     }
 
@@ -47,7 +47,7 @@ class EmailActivityTestForPrivateEmails extends WebTestCase
 
     public function testGetAdminActivityListByAdmin(): void
     {
-        $this->initClient([], $this->generateWsseAuthHeader('simple_user', 'simple_password'));
+        $this->initClient([], self::generateApiAuthHeader('simple_user'));
 
         $user = $this->getReference('simple_user');
         $routingHelper = $this->getContainer()->get('oro_entity.routing_helper');

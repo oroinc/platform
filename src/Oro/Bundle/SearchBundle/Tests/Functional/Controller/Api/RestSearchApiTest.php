@@ -19,7 +19,7 @@ class RestSearchApiTest extends SearchBundleWebTestCase
     {
         parent::setUp();
 
-        $this->initClient([], $this->generateWsseAuthHeader());
+        $this->initClient([], self::generateApiAuthHeader());
 
         $this->loadFixture(Item::class, LoadSearchItemData::class, LoadSearchItemData::COUNT);
         $this->loadFixture(Product::class, LoadSearchProductData::class, count(LoadSearchProductData::PRODUCTS));

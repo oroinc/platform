@@ -7,12 +7,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UnauthenticatedTest extends RestJsonApiTestCase
 {
-    private const WWW_AUTHENTICATE_HEADER_VALUE = 'WSSE realm="Secured API", profile="UsernameToken"';
+    private const WWW_AUTHENTICATE_HEADER_VALUE = 'TEST_API';
 
     #[\Override]
-    protected function getWsseAuthHeader(): array
+    protected function getAuthHeader(): array
     {
-        return self::generateWsseAuthHeader('NotExistingUser');
+        return self::generateApiAuthHeader('NotExistingUser');
     }
 
     public function testGetList()

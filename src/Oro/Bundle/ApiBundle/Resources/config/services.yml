@@ -1378,3 +1378,6 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
             - { name: monolog.logger, channel: api }
+
+    oro_api.security.http.entry_point.api:
+        class:  Oro\Bundle\ApiBundle\Security\Http\EntryPoint\ApiEntryPoint

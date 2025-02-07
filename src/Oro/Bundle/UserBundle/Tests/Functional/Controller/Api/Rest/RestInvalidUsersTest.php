@@ -15,7 +15,7 @@ class RestInvalidUsersTest extends WebTestCase
     /**
      * @dataProvider usernameKeyDataProvider
      */
-    public function testInvalidCredentials(string $username, string $key): void
+    public function testInvalidCredentials(string $username, ?int $organizationId): void
     {
         $request = [
             'user' => [
@@ -32,7 +32,7 @@ class RestInvalidUsersTest extends WebTestCase
             'POST',
             $this->getUrl('oro_api_post_user'),
             $request,
-            $this->generateWsseAuthHeader($username, $key)
+            self::generateApiAuthHeader($username, $organizationId)
         );
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 401);
@@ -41,8 +41,8 @@ class RestInvalidUsersTest extends WebTestCase
     public function usernameKeyDataProvider(): array
     {
         return [
-            'invalid key' => [self::USER_NAME, 'invalid_key'],
-            'invalid user' => ['invalid_user', self::USER_PASSWORD],
+            'invalid key' => [self::USER_NAME, 55],
+            'invalid user' => ['invalid_user', null],
         ];
     }
 }

@@ -33,6 +33,12 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('formatting_code')->end()
                     ->end()
                 ->end()
+                ->arrayNode('test_auth_firewalls')
+                    ->info('The list of security firewalls for which test authorization should be enabled.')
+                    ->prototype('scalar')
+                        ->cannotBeEmpty()
+                    ->end()
+                ->end()
             ->end();
 
         return $builder;

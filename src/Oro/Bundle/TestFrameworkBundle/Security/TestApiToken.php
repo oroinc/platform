@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WsseAuthenticationBundle\Security;
+namespace Oro\Bundle\TestFrameworkBundle\Security;
 
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\SecurityBundle\Authentication\Token\RolesAndOrganizationAwareTokenTrait;
@@ -9,9 +9,9 @@ use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 /**
- * The WSSE authentication token.
+ * The API test token used in functional tests.
  */
-class WsseToken extends UsernamePasswordToken implements OrganizationAwareTokenInterface, RolesAwareTokenInterface
+class TestApiToken extends UsernamePasswordToken implements OrganizationAwareTokenInterface, RolesAwareTokenInterface
 {
     use RolesAndOrganizationAwareTokenTrait;
 

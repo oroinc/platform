@@ -13,7 +13,7 @@ class DashboardControllerTest extends WebTestCase
     #[\Override]
     protected function setUp(): void
     {
-        $this->initClient([], $this->generateWsseAuthHeader());
+        $this->initClient([], self::generateApiAuthHeader());
 
         $this->dashboard = new Dashboard();
         $this->dashboard->setName('dashboard');
