@@ -86,8 +86,6 @@ oro:
         entity_plural_label:                Users
         entity_grid_all_view_label: All %entity_plural_label%
         configure.label:                    Configure
-        api_keys.label:                     API keys
-        api.label:                          API key
         birthday:
             label:                          Birthday
             description:                    The date of the user's birth.
@@ -316,7 +314,7 @@ oro:
                 description: Is the login was success.
             source:
                 label: Source
-                description: The login type source (default, OAuth, WSSE, impersonation, …).
+                description: The login type source (default, OAuth, impersonation, …).
             username:
                 label: Username
                 description: The tracked username.
@@ -409,8 +407,6 @@ oro:
         permission:
             update_configuration:
                 label: Configure
-            manage_api_key:
-                label: Manage API Key
 
         security:
             password_changed.message: Your password was updated by an administrator. New password was sent to you by email.
@@ -420,9 +416,6 @@ oro:
             title: User bar
         image.tooltip: The avatar must be in BMP, JPEG or PNG formats, and the file must be less than %file_size% in size
         invite.tooltip: When this option is selected, an invitation email will be sent.
-        api.tooltip_text: >
-            An API key could be used for authentication in third party software.
-            Please keep your regular password in secret.
 
         dashboard:
             role: Role

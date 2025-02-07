@@ -12,7 +12,7 @@ class EmbedFormControllerTest extends WebTestCase
     #[\Override]
     protected function setUp(): void
     {
-        $this->initClient([], $this->generateWsseAuthHeader());
+        $this->initClient([], self::generateApiAuthHeader());
         $this->loadFixtures([
             LoadEmbeddedFormData::class,
         ]);

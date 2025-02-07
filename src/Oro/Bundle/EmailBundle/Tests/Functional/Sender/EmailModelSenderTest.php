@@ -22,7 +22,7 @@ class EmailModelSenderTest extends WebTestCase
     #[\Override]
     protected function setUp(): void
     {
-        $this->initClient([], $this->generateWsseAuthHeader());
+        $this->initClient([], self::generateApiAuthHeader());
         $this->loadFixtures([LoadUserData::class]);
 
         $this->emailModelSender = $this->getContainer()->get('oro_email.sender.email_model_sender');

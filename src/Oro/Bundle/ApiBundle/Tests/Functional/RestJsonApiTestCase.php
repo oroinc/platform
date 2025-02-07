@@ -54,7 +54,7 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
         $contentTypeHeaderValue = $server['CONTENT_TYPE'] ?? null;
         $this->checkTwigState();
         $this->checkHateoasHeader($server);
-        $this->checkWsseAuthHeader($server);
+        $this->checkApiAuthHeader($server);
         $this->checkCsrfHeader($server);
 
         if (!empty($parameters['filter'])) {

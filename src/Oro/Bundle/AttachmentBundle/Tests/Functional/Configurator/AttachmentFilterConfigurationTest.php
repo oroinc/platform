@@ -18,7 +18,7 @@ class AttachmentFilterConfigurationTest extends WebTestCase
     #[\Override]
     protected function setUp(): void
     {
-        $this->initClient([], $this->generateWsseAuthHeader());
+        $this->initClient([], self::generateApiAuthHeader());
         $this->attachmentFilterConfigurator =
             $this->getContainer()->get('oro_attachment.configurator.attachment_filter_configuration');
     }

@@ -128,12 +128,6 @@ services:
         arguments:
             - '%oro_embedded_form.csrf_token_lifetime%'
 
-    oro_wsse_authentication.nonce_cache:
-        abstract: true
-        class: Symfony\Component\Cache\Adapter\ArrayAdapter
-        arguments:
-            - '<lifetime>' # set in WsseNonceCachePass
-
     oro_test.transport_provider:
         class: Oro\Bundle\TestFrameworkBundle\Provider\TestTransportProvider
         tags:
@@ -188,3 +182,12 @@ services:
     oro_test.datagrid.filter.action_filter:
         class: Oro\Bundle\TestFrameworkBundle\Datagrid\Filter\ActionFilter
         public: true
+
+    oro_test.security.core.test_authentication:
+        class: Oro\Bundle\TestFrameworkBundle\Security\Core\Authentication\TestApiAuthenticator
+        arguments:
+            - '@oro_security.authentication.organization_guesser'
+            - '@oro_security.token.factory.username_password_organization'
+            - '@doctrine'
+            - '@oro_api.security.authenticator.feature_checker'
+        abstract: true

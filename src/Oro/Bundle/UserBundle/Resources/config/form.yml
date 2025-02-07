@@ -364,13 +364,3 @@ services:
             - [ setConverter, ['@oro_user.widget_config_value.widget_user_multiselect.converter', 'users', 'oro.user.dashboard.owner'] ]
         tags:
             - { name: oro_dashboard.value.converter, form_type: Oro\Bundle\UserBundle\Form\Type\WidgetOwnersType }
-
-    oro_user.form.type.apikey_gen:
-        class: Oro\Bundle\UserBundle\Form\Type\UserApiKeyGenType
-        tags:
-            - { name: form.type, alias: oro_user_apikey_gen }
-
-    oro_user.form.type.apikey_gen_key:
-        class: Oro\Bundle\UserBundle\Form\Type\UserApiKeyGenKeyType
-        tags:
-            - { name: form.type, alias: oro_user_apikey_gen_key }

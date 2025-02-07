@@ -17,7 +17,7 @@ Feature: Update user profile and user entity ACL
     And I go to System/User Management/Roles
     And I click edit Administrator in grid
     And select following permissions:
-      | User | View:None | Create:None | Edit:None | Delete:None | Assign:None | Configure:None | Manage API Key:None |
+      | User | View:None | Create:None | Edit:None | Delete:None | Assign:None | Configure:None |
     When I save and close form
     Then I should see "Role saved" flash message
     When I reload the page
@@ -40,7 +40,7 @@ Feature: Update user profile and user entity ACL
     And I go to System/User Management/Roles
     And I click edit Administrator in grid
     And select following permissions:
-      | User | View:Global | Create:Global | Edit:Global | Delete:Global | Assign:Global | Configure:Global | Manage API Key:Global |
+      | User | View:Global | Create:Global | Edit:Global | Delete:Global | Assign:Global | Configure:Global |
     When I save and close form
     Then I should see "Role saved" flash message
 

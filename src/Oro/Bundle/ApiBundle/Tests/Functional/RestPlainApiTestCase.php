@@ -43,7 +43,7 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
         $contentTypeHeaderValue = $server['CONTENT_TYPE'] ?? null;
         $this->checkTwigState();
         $this->checkHateoasHeader($server);
-        $this->checkWsseAuthHeader($server);
+        $this->checkApiAuthHeader($server);
         $this->checkCsrfHeader($server);
 
         if (!\array_key_exists('HTTP_ACCEPT', $server)) {

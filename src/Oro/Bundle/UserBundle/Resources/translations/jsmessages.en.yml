@@ -27,9 +27,6 @@ oro:
                 confirm_title: Enable users
                 confirm_content: Selected users will be disabled.
                 confirm_ok: Apply
-        apikey_gen:
-            new_key:
-                success: Generate key was successful. New key:{{ new_api_key }}
     role:
         tabs:
             all.label: All

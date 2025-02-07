@@ -249,12 +249,14 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetLocale(string $expectedValue, ?string $configurationValue)
     {
-        $this->configManager->expects($this->once())
+        // We cannot cache localization because it depends on ConfigManager, which can work in different scopes
+        // and there is already a cache that takes into account the scope.
+        $this->configManager->expects($this->exactly(2))
             ->method('get')
             ->with('oro_locale.default_localization')
             ->willReturn(42);
 
-        $this->localizationManager->expects($this->once())
+        $this->localizationManager->expects($this->exactly(2))
             ->method('getLocalizationData')
             ->with(42)
             ->willReturn(['id' => 42, 'formattingCode' => $configurationValue]);
@@ -425,13 +427,15 @@ class LocaleSettingsTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetLanguage(string $expectedValue, ?string $configurationValue)
     {
-        $this->configManager->expects($this->once())
+        // We cannot cache localization because it depends on ConfigManager, which can work in different scopes
+        // and there is already a cache that takes into account the scope.
+        $this->configManager->expects($this->exactly(2))
             ->method('get')
             ->with('oro_locale.default_localization')
             ->willReturn(42);
 
         if ($configurationValue) {
-            $this->localizationManager->expects($this->once())
+            $this->localizationManager->expects($this->exactly(2))
                 ->method('getLocalizationData')
                 ->with(42)
                 ->willReturn(['id' => 42, 'languageCode' => $configurationValue]);

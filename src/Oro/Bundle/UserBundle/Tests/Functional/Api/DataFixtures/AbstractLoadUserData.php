@@ -12,7 +12,6 @@ use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganizatio
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Entity\UserApi;
 
 abstract class AbstractLoadUserData extends AbstractFixture implements DependentFixtureInterface
 {
@@ -33,10 +32,6 @@ abstract class AbstractLoadUserData extends AbstractFixture implements Dependent
             /** @var Organization $organization */
             $organization = $this->getReference(LoadOrganization::ORGANIZATION);
 
-            $api = new UserApi();
-            $api->setApiKey($userData['apiKey'])
-                ->setOrganization($organization)
-                ->setUser($user);
             $user
                 ->setUsername($userData['username'])
                 ->setPlainPassword($userData['plainPassword'])
@@ -47,7 +42,6 @@ abstract class AbstractLoadUserData extends AbstractFixture implements Dependent
                 ->setOwner($this->getReference(LoadBusinessUnit::BUSINESS_UNIT))
                 ->setOrganization($organization)
                 ->setOrganizations(new ArrayCollection([$organization]))
-                ->addApiKey($api)
                 ->setSalt('');
             if ($role) {
                 $user->addUserRole($role);

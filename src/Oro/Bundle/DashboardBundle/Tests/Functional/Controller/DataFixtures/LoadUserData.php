@@ -8,7 +8,6 @@ use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadOrganization;
 use Oro\Bundle\UserBundle\Entity\Role;
-use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -47,12 +46,6 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface, D
         $user = $userManager->createUser();
         $organization = $this->getReference('organization');
 
-        $apiKey = new UserApi();
-        $apiKey
-            ->setApiKey('user_api_key')
-            ->setUser($user)
-            ->setOrganization($organization);
-
         $user
             ->setOwner($this->getReference('business_unit'))
             ->setUsername(self::USER_NAME)
@@ -61,7 +54,6 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface, D
             ->setLastName('User')
             ->addUserRole($role[0])
             ->setEmail('simple@example.com')
-            ->addApiKey($apiKey)
             ->setOrganization($organization)
             ->addOrganization($organization)
             ->setSalt('');

@@ -9,10 +9,9 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\UpdateWithOrganization;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\UserBundle\Entity\UserApi;
 
 /**
- * Sets a default organization to User, Group and UserApi entities.
+ * Sets a default organization to User and Group entities.
  */
 class UpdateUserEntitiesWithOrganization extends UpdateWithOrganization implements DependentFixtureInterface
 {
@@ -32,7 +31,6 @@ class UpdateUserEntitiesWithOrganization extends UpdateWithOrganization implemen
     {
         $this->update($manager, User::class);
         $this->update($manager, Group::class);
-        $this->update($manager, UserApi::class);
 
         $organization = $manager->getRepository(Organization::class)->getFirst();
         $usersQB = $manager->getRepository(User::class)->createQueryBuilder('u');

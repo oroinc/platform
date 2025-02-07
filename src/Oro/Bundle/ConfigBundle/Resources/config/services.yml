@@ -208,3 +208,11 @@ services:
         public: true
         arguments:
             - "@oro_config.user"
+
+    oro_config.consumption.reset_config_manager_memory_cache:
+        class: Oro\Bundle\ConfigBundle\Consumption\Extension\ResetConfigManagerMemoryCacheExtension
+        arguments:
+            - '@oro_config.manager.memory_cache'
+            - '@oro_config.cache'
+        tags:
+            - { name: 'oro_message_queue.consumption.extension', priority: -256 }

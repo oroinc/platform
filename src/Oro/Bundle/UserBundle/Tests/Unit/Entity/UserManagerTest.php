@@ -6,9 +6,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumOptionsProvider;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Oro\Bundle\UserBundle\Entity\Repository\UserApiRepository;
-use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Bundle\UserBundle\Mailer\Processor;
 use Oro\Bundle\UserBundle\Security\UserLoaderInterface;
@@ -92,47 +89,6 @@ class UserManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturn($passwordHasher);
 
         return $passwordHasher;
-    }
-
-    public function testGetApi(): void
-    {
-        $user = new User();
-        $organization = new Organization();
-        $userApi = new UserApi();
-
-        $em = $this->expectGetEntityManager();
-        $repository = $this->createMock(UserApiRepository::class);
-        $em->expects(self::once())
-            ->method('getRepository')
-            ->with(UserApi::class)
-            ->willReturn($repository);
-
-        $repository->expects(self::once())
-            ->method('getApi')
-            ->with($user, $organization)
-            ->willReturn($userApi);
-
-        self::assertSame($userApi, $this->userManager->getApi($user, $organization));
-    }
-
-    public function testGetApiWhenApiKeyDoesNotExist(): void
-    {
-        $user = new User();
-        $organization = new Organization();
-
-        $em = $this->expectGetEntityManager();
-        $repository = $this->createMock(UserApiRepository::class);
-        $em->expects(self::once())
-            ->method('getRepository')
-            ->with(UserApi::class)
-            ->willReturn($repository);
-
-        $repository->expects(self::once())
-            ->method('getApi')
-            ->with($user, $organization)
-            ->willReturn(null);
-
-        self::assertNull($this->userManager->getApi($user, $organization));
     }
 
     public function testUpdateUserWithPlainPassword(): void

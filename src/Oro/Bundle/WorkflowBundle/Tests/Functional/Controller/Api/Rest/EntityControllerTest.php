@@ -13,7 +13,7 @@ class EntityControllerTest extends WebTestCase
     #[\Override]
     protected function setUp(): void
     {
-        $this->initClient([], $this->generateWsseAuthHeader());
+        $this->initClient([], self::generateApiAuthHeader());
         $this->provider = $this->client->getContainer()->get('oro_workflow.entity_field_list_provider');
     }
 

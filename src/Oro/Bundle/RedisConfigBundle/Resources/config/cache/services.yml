@@ -12,14 +12,6 @@ services:
         arguments:
             $redis: '@oro.cache.redis_provider'
 
-    oro_wsse_authentication.nonce_cache:
-        abstract: true
-        class: Symfony\Component\Cache\Adapter\RedisAdapter
-        arguments:
-            - '@oro.cache.redis_provider'
-            - '<namespace>' # set in WsseNonceCachePass
-            - '<lifetime>' # set in WsseNonceCachePass
-
     oro_embedded_form.csrf_token_cache:
         class: Symfony\Component\Cache\Adapter\RedisAdapter
         arguments:

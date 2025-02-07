@@ -69,9 +69,8 @@ abstract class WebTestCase extends BaseWebTestCase
      */
     protected const NEST_TRANSACTIONS_WITH_SAVEPOINTS = 'nestTransactionsWithSavepoints';
 
-    /** Default WSSE credentials */
+    /** Default test API credentials */
     protected const USER_NAME = 'admin';
-    protected const USER_PASSWORD = 'admin_api_key';
 
     /**  Default user name and password */
     protected const AUTH_USER = 'admin@example.com';
@@ -955,38 +954,16 @@ abstract class WebTestCase extends BaseWebTestCase
     }
 
     /**
-     * Generate WSSE authorization header
-     *
-     * @param string $userName
-     * @param string $userPassword
-     * @param string|null $nonce
-     *
-     * @return array
+     * Generate test API authorization header
      */
-    public static function generateWsseAuthHeader(
-        $userName = self::USER_NAME,
-        $userPassword = self::USER_PASSWORD,
-        $nonce = null
-    ) {
-        if (null === $nonce) {
-            $nonce = uniqid('nonce', true);
-        }
-
-        $created = date('c');
-        $digest = base64_encode(sha1(base64_decode($nonce) . $created . $userPassword, true));
-        $wsseHeader = [
+    public static function generateApiAuthHeader(
+        string $userName = self::USER_NAME,
+        ?int $organizationId = null
+    ): array {
+        return [
             'CONTENT_TYPE' => 'application/json',
-            'HTTP_Authorization' => 'WSSE profile="UsernameToken"',
-            'HTTP_X-WSSE' => sprintf(
-                'UsernameToken Username="%s", PasswordDigest="%s", Nonce="%s", Created="%s"',
-                $userName,
-                $digest,
-                $nonce,
-                $created
-            )
+            'HTTP_X-API-TEST' => $organizationId ? $userName . '^' . $organizationId : $userName
         ];
-
-        return $wsseHeader;
     }
 
     /**
@@ -1000,7 +977,7 @@ abstract class WebTestCase extends BaseWebTestCase
         return [
             'PHP_AUTH_USER' => $userName,
             'PHP_AUTH_PW' => $userPassword,
-            'HTTP_PHP_AUTH_ORGANIZATION' => $userOrganization
+            'HTTP_PHP_AUTH_ORGANIZATION' => $userOrganization,
         ];
     }
 

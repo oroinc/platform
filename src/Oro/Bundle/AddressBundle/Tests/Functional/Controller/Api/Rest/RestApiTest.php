@@ -9,7 +9,7 @@ class RestApiTest extends WebTestCase
     #[\Override]
     protected function setUp(): void
     {
-        $this->initClient([], self::generateWsseAuthHeader());
+        $this->initClient([], self::generateApiAuthHeader());
     }
 
     public function testGetCountries(): array
@@ -92,7 +92,7 @@ class RestApiTest extends WebTestCase
                 'GET',
                 $this->getUrl('oro_api_get_region', ['id' => $region['combinedCode']]),
                 [],
-                self::generateWsseAuthHeader()
+                self::generateApiAuthHeader()
             );
 
             $expectedResult = self::getJsonResponseContent($this->client->getResponse(), 200);

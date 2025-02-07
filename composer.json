@@ -303,7 +303,6 @@
             "Oro\\Bundle\\ViewSwitcherBundle\\": "src/Oro/Bundle/ViewSwitcherBundle",
             "Oro\\Bundle\\WindowsBundle\\": "src/Oro/Bundle/WindowsBundle",
             "Oro\\Bundle\\WorkflowBundle\\": "src/Oro/Bundle/WorkflowBundle",
-            "Oro\\Bundle\\WsseAuthenticationBundle\\": "src/Oro/Bundle/WsseAuthenticationBundle",
             "Oro\\Component\\Action\\": "src/Oro/Component/Action",
             "Oro\\Component\\ChainProcessor\\": "src/Oro/Component/ChainProcessor",
             "Oro\\Component\\Config\\": "src/Oro/Component/Config",
