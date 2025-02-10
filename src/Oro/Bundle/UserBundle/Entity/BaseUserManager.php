@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\UserBundle\Security\UserLoaderInterface;
 use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 
 /**
  * The base class for work with a user entity.
@@ -68,7 +69,7 @@ class BaseUserManager
     {
         $password = $user->getPlainPassword();
         if ($password !== null && 0 !== strlen($password)) {
-            $encoder = $this->encoderFactory->getEncoder($user);
+            $encoder = $this->getPasswordEncoder($user);
             $user->setPassword($encoder->encodePassword($password, $user->getSalt()));
             $user->eraseCredentials();
         }
@@ -152,6 +153,11 @@ class BaseUserManager
     public function reloadUser(UserInterface $user): void
     {
         $this->getEntityManager()->refresh($user);
+    }
+
+    protected function getPasswordEncoder(UserInterface $user): PasswordEncoderInterface
+    {
+        return $this->encoderFactory->getEncoder($user);
     }
 
     /**
