@@ -40,8 +40,8 @@ security:
             custom_authenticators:
                 - oro_user.impersonation_authenticator
         public_openapi_specifications:
-            pattern: '^/public-openapi-specification/\d+/.+$'
-            methods: [GET]
+            pattern: '^/public-openapi-specification($|/.*)'
+            methods: [GET,OPTIONS]
             security: false
             stateless: true
 

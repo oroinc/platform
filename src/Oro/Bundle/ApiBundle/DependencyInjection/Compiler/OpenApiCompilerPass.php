@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
 
 use Oro\Bundle\ApiBundle\ApiDoc\OpenApi\Describer;
 use Oro\Bundle\ApiBundle\ApiDoc\OpenApi\Generator\OpenApiGenerator;
+use Oro\Bundle\ApiBundle\Controller\DownloadPublicOpenApiSpecificationController;
 use Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
@@ -42,6 +43,7 @@ class OpenApiCompilerPass implements CompilerPassInterface
                 $config['documentation_path'] ?? null
             );
             $this->registerApiDocDescriber($container, $view, $requestType);
+            $this->configureOpenApiCors($container);
             if (isset($config['label'])) {
                 $viewLabels[$view] = $config['label'];
             }
@@ -146,6 +148,16 @@ class OpenApiCompilerPass implements CompilerPassInterface
             ->addArgument(new Reference('oro_api.api_doc.open_api.resource_info_provider'))
             ->addArgument(new Reference('oro_api.rest.doc_view_detector'))
             ->addTag('oro.api.open_api.describer.' . $view, ['priority' => 50]);
+    }
+
+    private function configureOpenApiCors(ContainerBuilder $container): void
+    {
+        $openApiConfig = $this->getOpenApiConfig($container);
+        $corsConfig = $openApiConfig['cors'];
+        $container->getDefinition(DownloadPublicOpenApiSpecificationController::class)
+            ->replaceArgument(2, $corsConfig['preflight_max_age'])
+            ->replaceArgument(3, $corsConfig['allow_origins'])
+            ->replaceArgument(4, $corsConfig['allow_headers']);
     }
 
     private function getApiDocViews(ContainerBuilder $container): array
