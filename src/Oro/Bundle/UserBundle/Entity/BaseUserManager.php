@@ -8,6 +8,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\UserBundle\Security\UserLoaderInterface;
 use Symfony\Component\PasswordHasher\Hasher\MigratingPasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 /**
  * The base class for work with a user entity.
@@ -70,7 +71,7 @@ class BaseUserManager
         $password = $user->getPlainPassword();
         if ($password !== null && 0 !== strlen($password)) {
             /** @var MigratingPasswordHasher $passwordHasher */
-            $passwordHasher = $this->passwordHasherFactory->getPasswordHasher($user);
+            $passwordHasher = $this->getPasswordHasher($user);
             $user->setPassword($passwordHasher->hash($password, $user->getSalt()));
             $user->eraseCredentials();
         }
@@ -154,6 +155,11 @@ class BaseUserManager
     public function reloadUser(UserInterface $user): void
     {
         $this->getEntityManager()->refresh($user);
+    }
+
+    protected function getPasswordHasher(UserInterface $user): PasswordHasherInterface
+    {
+        return $this->passwordHasherFactory->getPasswordHasher($user);
     }
 
     /**
