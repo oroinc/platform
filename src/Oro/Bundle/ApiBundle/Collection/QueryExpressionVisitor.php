@@ -143,7 +143,7 @@ class QueryExpressionVisitor extends ExpressionVisitor
     }
 
     /**
-     * Builds an expression for for the given parameter name and parameter value.
+     * Builds an expression for the given parameter name and parameter value.
      */
     public function buildParameterExpression(string $parameterName, mixed $parameterValue): mixed
     {

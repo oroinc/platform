@@ -29,3 +29,6 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_api.open_api_specification_archive'
+            - 0 # preflightMaxAge. It is set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\OpenApiCompilerPass
+            - [] # allowedOrigins. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\OpenApiCompilerPass
+            - [] # allowedHeaders. They are set by Oro\Bundle\ApiBundle\DependencyInjection\Compiler\OpenApiCompilerPass

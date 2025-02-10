@@ -22,6 +22,7 @@ features:
             - oro_openapi_specification_publish
             - oro_openapi_specification_download
             - oro_public_openapi_specification_download
+            - oro_public_openapi_specification_download_options
         entities:
             - Oro\Bundle\ApiBundle\Entity\OpenApiSpecification
         navigation_items:
