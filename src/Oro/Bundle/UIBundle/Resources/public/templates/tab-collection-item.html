@@ -1,11 +1,8 @@
 <a  href="#"
     id="<%- uniqueId %>"
     class="<%- obj.templateClassName %><% if(obj.active) { %> active<% } %>"
-    role="tab"
     data-emulate-btn-press=""
     data-toggle="tab"
-    aria-controls="<% if(obj.controlTabPanel) { %><%- controlTabPanel %><% } else { %><%- id %><% } %>"
-    aria-selected="<% if(obj.active) { %>true<% } else { %>false<% } %>"
     >
     <%- label %>
 </a>

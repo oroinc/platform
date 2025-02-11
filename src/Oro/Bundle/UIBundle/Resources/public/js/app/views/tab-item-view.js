@@ -38,6 +38,14 @@ define(function(require, exports, module) {
         initialize: function(options) {
             TabItemView.__super__.initialize.call(this, options);
 
+            this.$el.attr('role', 'tab');
+
+            const tabPanel = this.model.get('controlTabPanel') || this.model.get('id');
+            this.$el.attr('aria-controls', tabPanel);
+
+            const ariaSelectedStatus = this.model.get('active') || false;
+            this.$el.attr('aria-selected', ariaSelectedStatus);
+
             this.updateStates();
         },
 
@@ -51,11 +59,11 @@ define(function(require, exports, module) {
 
         updateStates: function() {
             this.$el.toggleClass('changed', !!this.model.get('changed'));
-            const $tab = this.$('[role="tab"]');
-            if ($tab.attr('aria-selected') !== String(this.model.get('active'))) {
-                $tab.attr('aria-selected', this.model.get('active'));
-            }
-            if (this.model.get('active')) {
+
+            const isActive = this.model.get('active');
+            this.$el.attr('aria-selected', isActive);
+
+            if (isActive) {
                 const tabPanel = this.model.get('controlTabPanel') || this.model.get('id');
                 $('#' + tabPanel).attr('aria-labelledby', this.model.get('uniqueId'));
             }
