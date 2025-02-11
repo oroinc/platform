@@ -348,7 +348,6 @@ define(function(require) {
         showSearch: function(original, showSearchInput) {
             original.call(this, showSearchInput);
             this.container.toggleClass('select2-container-with-searchbox', showSearchInput);
-            this.search.attr('aria-hidden', !showSearchInput);
         }
     };
 
