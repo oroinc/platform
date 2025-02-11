@@ -178,9 +178,9 @@ Feature: Import extend entity fields
       | _loremipsum                                        | string | label value 17 | no                   | 0                   |
     When I import file
     Then Email should contains the following "Errors: 10 processed: 0, read: 10, added: 0, updated: 0, replaced: 0" text
-    And number of records should be 46
+    And number of records should be 45
     When I reload the page
-    Then number of records should be 46
+    Then number of records should be 45
     And I should not see "Update schema"
 
   Scenario: It should be impossible to updated columns with similar names

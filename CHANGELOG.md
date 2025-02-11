@@ -4,6 +4,10 @@ The current file describes significant changes in the code that may affect the u
 
 ## UNRELEASED
 
+### Security Changes
+* Security firewall `wsse_secured` renamed to `old_api_secured`.
+* Security firewall `api_wsse_secured` renamed to `api_secured`.
+
 ### Added
 
 #### DistributionBundle
@@ -787,6 +791,9 @@ Scenario: Create Multi-Select fields with one auditable
 
 #### EntityBundle
 * Removed **activity_support** configuration option from **dictionary** entity config scope. Consider replacing it with **collapsed_associations** configuration option of QueryDesignerBundle when it is used for your entity.
+
+#### WsseAuthenticationBundle
+* WsseAuthenticationBundle was removed. WSSE auth headers cannot be used for API. Use Oauth 2.0 instead.
 
 ## Changes in the Platform package versions
 

@@ -24,15 +24,11 @@ security:
             methods: [OPTIONS]
             security: false
             stateless: true
-        api_wsse_secured:
+        api_secured:
             pattern: '%oro_api.rest.pattern%'
             provider: oro_user
             stateless: true
-            wsse:
-                lifetime: 3600
-                realm:    "Secured API"
-                profile:  "UsernameToken"
-            entry_point: wsse
+            entry_point: oro_api.security.http.entry_point.api
             context: main
             organization-remember-me: # should be the same as for "main" firewall except "csrf_protected_mode" option
                 token_provider:             oro_security.token.provider.rememberme
@@ -41,10 +37,11 @@ security:
                 lifetime:                   1209600   # stay logged for two weeks
                 httponly:                   true
                 csrf_protected_mode:        true
-            custom_authenticator: oro_user.impersonation_authenticator
+            custom_authenticators:
+                - oro_user.impersonation_authenticator
         public_openapi_specifications:
-            pattern: '^/public-openapi-specification/\d+/.+$'
-            methods: [GET]
+            pattern: '^/public-openapi-specification($|/.*)'
+            methods: [GET,OPTIONS]
             security: false
             stateless: true
 
@@ -66,17 +63,16 @@ knp_gaufrette:
         api:
             adapter: api
             alias: api_filesystem
-
 oro_api:
     api_firewalls:
-        api_wsse_secured:
+        api_secured:
             feature_name: web_api
             feature_firewall_authenticators: # FeatureDependAuthenticatorChecker
-                - Oro\Bundle\WsseAuthenticationBundle\Security\Core\Authentication\WsseAuthenticator
-        wsse_secured:
+                - Oro\Bundle\TestFrameworkBundle\Security\Core\Authentication\TestApiAuthenticator
+        old_api_secured:
             feature_name: web_api
             feature_firewall_authenticators: # FeatureDependAuthenticatorChecker
-                - Oro\Bundle\WsseAuthenticationBundle\Security\Core\Authentication\WsseAuthenticator
+                - Oro\Bundle\TestFrameworkBundle\Security\Core\Authentication\TestApiAuthenticator
         api_options:
             feature_name: web_api
 
@@ -888,3 +884,8 @@ oro_api:
                 initialize: ~
                 transform_data: ~
                 normalize_result: ~
+
+oro_test_framework:
+    test_auth_firewalls:
+        - api_secured
+        - old_api_secured

@@ -21,7 +21,7 @@ class EmailActivityTest extends WebTestCase
     #[\Override]
     protected function setUp(): void
     {
-        $this->initClient([], $this->generateWsseAuthHeader());
+        $this->initClient([], self::generateApiAuthHeader());
         self::addPublicEmailOwner(User::class);
     }
 
@@ -63,7 +63,7 @@ class EmailActivityTest extends WebTestCase
     public function testGetAdminActivityListByAdmin()
     {
         $this->loadFixtures([LoadEmailData::class]);
-        $this->initClient([], $this->generateWsseAuthHeader('simple_user', 'simple_password'));
+        $this->initClient([], self::generateApiAuthHeader('simple_user'));
 
         $routingHelper = $this->getContainer()->get('oro_entity.routing_helper');
         $url = $this->getUrl(
@@ -99,7 +99,7 @@ class EmailActivityTest extends WebTestCase
             $url,
             [],
             [],
-            $this->generateWsseAuthHeader($user->getUserIdentifier(), $user->getUserIdentifier())
+            self::generateApiAuthHeader($user->getUserIdentifier())
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);

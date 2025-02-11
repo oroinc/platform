@@ -24,7 +24,6 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Form\Type\UserSelectType;
-use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
 
 /**
  * This entity represents a user of a system
@@ -68,7 +67,6 @@ class User extends AbstractUser implements
     EmailOwnerInterface,
     EmailHolderInterface,
     FullNameInterface,
-    AdvancedApiUserInterface,
     ExtendEntityInterface
 {
     use ExtendEntityTrait;
@@ -152,21 +150,6 @@ class User extends AbstractUser implements
     protected ?BusinessUnit $owner = null;
 
     /**
-     * @var Collection<int, UserApi>
-     */
-    #[ORM\OneToMany(
-        mappedBy: 'user',
-        targetEntity: UserApi::class,
-        cascade: ['persist', 'remove'],
-        fetch: 'EXTRA_LAZY',
-        orphanRemoval: true
-    )]
-    #[ConfigField(
-        defaultValues: ['importexport' => ['excluded' => true], 'email' => ['available_in_template' => false]]
-    )]
-    protected ?Collection $apiKeys = null;
-
-    /**
      * @var Collection<int, Email>
      */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Email::class, cascade: ['persist'], orphanRemoval: true)]
@@ -227,7 +210,6 @@ class User extends AbstractUser implements
         $this->organizations = new ArrayCollection();
         $this->businessUnits = new ArrayCollection();
         $this->emailOrigins = new ArrayCollection();
-        $this->apiKeys = new ArrayCollection();
         $this->groups = new ArrayCollection();
     }
 
@@ -411,45 +393,6 @@ class User extends AbstractUser implements
     public function setUpdatedAt(?\DateTime $updatedAt = null)
     {
         $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
-    #[\Override]
-    public function getApiKeys()
-    {
-        return $this->apiKeys;
-    }
-
-    /**
-     * Add UserApi to User
-     *
-     * @param UserApi $api
-     *
-     * @return User
-     */
-    public function addApiKey(UserApi $api)
-    {
-        if (!$this->apiKeys->contains($api)) {
-            $this->apiKeys->add($api);
-            $api->setUser($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Delete UserApi from User
-     *
-     * @param UserApi $api
-     *
-     * @return User
-     */
-    public function removeApiKey(UserApi $api)
-    {
-        if ($this->apiKeys->contains($api)) {
-            $this->apiKeys->removeElement($api);
-        }
 
         return $this;
     }

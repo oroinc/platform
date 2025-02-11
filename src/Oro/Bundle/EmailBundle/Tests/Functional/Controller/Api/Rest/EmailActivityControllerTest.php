@@ -13,7 +13,7 @@ class EmailActivityControllerTest extends WebTestCase
     #[\Override]
     protected function setUp(): void
     {
-        $this->initClient([], self::generateWsseAuthHeader());
+        $this->initClient([], self::generateApiAuthHeader());
         $this->loadFixtures([LoadEmailActivityData::class]);
         $this->baseUrl = $this->getUrl('oro_api_get_email_activity_relations_by_filters');
     }

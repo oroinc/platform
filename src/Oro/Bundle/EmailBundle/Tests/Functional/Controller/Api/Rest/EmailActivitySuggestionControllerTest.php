@@ -11,7 +11,7 @@ class EmailActivitySuggestionControllerTest extends WebTestCase
     {
         $this->markTestSkipped('Due to BAP-8365');
 
-        $this->initClient([], $this->generateWsseAuthHeader());
+        $this->initClient([], self::generateApiAuthHeader());
         $this->loadFixtures(
             [
                 'Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadEmailActivityData',

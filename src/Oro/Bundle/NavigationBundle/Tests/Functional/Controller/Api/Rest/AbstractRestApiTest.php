@@ -50,7 +50,7 @@ abstract class AbstractRestApiTest extends WebTestCase
                 ['type' => $this->getItemType(), 'itemId' => $this->getItemId()]
             ),
             $updatedPintab,
-            self::generateWsseAuthHeader(LoadUserData::USER_NAME_2, LoadUserData::USER_PASSWORD_2)
+            self::generateApiAuthHeader(LoadUserData::USER_NAME_2)
         );
 
         $result = $this->client->getResponse();
@@ -68,7 +68,7 @@ abstract class AbstractRestApiTest extends WebTestCase
             'GET',
             $this->getUrl('oro_api_get_navigationitems', ['type' => $this->getItemType()]),
             [],
-            self::generateWsseAuthHeader(LoadUserData::USER_NAME_2, LoadUserData::USER_PASSWORD_2)
+            self::generateApiAuthHeader(LoadUserData::USER_NAME_2)
         );
 
         $result = $this->client->getResponse();
@@ -89,7 +89,7 @@ abstract class AbstractRestApiTest extends WebTestCase
                 ['type' => $this->getItemType(), 'itemId' => $this->getItemId()]
             ),
             [],
-            self::generateWsseAuthHeader(LoadUserData::USER_NAME_2, LoadUserData::USER_PASSWORD_2)
+            self::generateApiAuthHeader(LoadUserData::USER_NAME_2)
         );
 
         $result = $this->client->getResponse();
@@ -106,7 +106,7 @@ abstract class AbstractRestApiTest extends WebTestCase
                 ['type' => $this->getItemType(), 'itemId' => PHP_INT_MAX]
             ),
             ['url' => 'sample/url'],
-            self::generateWsseAuthHeader(LoadUserData::USER_NAME_2, LoadUserData::USER_PASSWORD_2)
+            self::generateApiAuthHeader(LoadUserData::USER_NAME_2)
         );
 
         $result = $this->client->getResponse();
@@ -121,7 +121,7 @@ abstract class AbstractRestApiTest extends WebTestCase
                 ['type' => $this->getItemType(), 'itemId' => PHP_INT_MAX]
             ),
             [],
-            self::generateWsseAuthHeader(LoadUserData::USER_NAME_2, LoadUserData::USER_PASSWORD_2)
+            self::generateApiAuthHeader(LoadUserData::USER_NAME_2)
         );
         $result = $this->client->getResponse();
         self::assertJsonResponseStatusCodeEquals($result, 404);
@@ -178,7 +178,7 @@ abstract class AbstractRestApiTest extends WebTestCase
                 $requestType,
                 $url,
                 [],
-                self::generateWsseAuthHeader(LoadUserData::USER_NAME_2, LoadUserData::USER_PASSWORD_2)
+                self::generateApiAuthHeader(LoadUserData::USER_NAME_2)
             );
 
             $response = $this->client->getResponse();
@@ -200,7 +200,7 @@ abstract class AbstractRestApiTest extends WebTestCase
             'POST',
             $this->getUrl('oro_api_post_navigationitems', ['type' => $this->getItemType()]),
             $parameters,
-            self::generateWsseAuthHeader(LoadUserData::USER_NAME_2, LoadUserData::USER_PASSWORD_2)
+            self::generateApiAuthHeader(LoadUserData::USER_NAME_2)
         );
 
         $result = $this->client->getResponse();

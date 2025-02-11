@@ -1,8 +1,4 @@
 features:
-    web_api:
-        routes:
-            - oro_user_apigen
-
     manage_users:
         label: oro.user.feature.manage.label
         description: oro.user.feature.manage.description

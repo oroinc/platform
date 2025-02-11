@@ -1,15 +1,11 @@
 security:
     firewalls:
-        wsse_secured:
+        old_api_secured:
             pattern: ^/api/rest.*
             provider: oro_user
             stateless:  true
-            wsse:
-                lifetime: 3600
-                realm:    "Secured API"
-                profile:  "UsernameToken"
-            entry_point: wsse
             context: main
+            entry_point: oro_api.security.http.entry_point.api
             organization-remember-me: # should be the same as for "main" firewall except "csrf_protected_mode" option
                 token_provider:             oro_security.token.provider.rememberme
                 secret:                     '%kernel.secret%'

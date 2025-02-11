@@ -18,6 +18,3 @@ oro_sanitize:
         oro_user_email:
             fields:
                 email: email
-        oro_user_api:
-            fields:
-                api_key: md5

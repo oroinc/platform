@@ -40,7 +40,7 @@ class OroUserBundleInstaller implements
     #[\Override]
     public function getMigrationVersion(): string
     {
-        return 'v2_13';
+        return 'v2_14';
     }
 
     #[\Override]
@@ -48,7 +48,6 @@ class OroUserBundleInstaller implements
     {
         /** Tables generation **/
         $this->createOroUserEmailTable($schema, $queries);
-        $this->createOroUserApiTable($schema);
         $this->createOroUserTable($schema);
         $this->createOroUserOrganizationTable($schema);
         $this->createOroUserImpersonationTable($schema);
@@ -65,7 +64,6 @@ class OroUserBundleInstaller implements
 
         /** Foreign keys generation **/
         $this->addOroUserEmailForeignKeys($schema);
-        $this->addOroUserApiForeignKeys($schema);
         $this->addOroUserForeignKeys($schema);
         $this->addOroUserOrganizationForeignKeys($schema);
         $this->addOroUserImpersonationForeignKeys($schema);
@@ -112,22 +110,6 @@ class OroUserBundleInstaller implements
                 'CREATE INDEX idx_user_email_ci ON oro_user_email (LOWER(email))'
             ));
         }
-    }
-
-    /**
-     * Create oro_user_api table
-     */
-    private function createOroUserApiTable(Schema $schema): void
-    {
-        $table = $schema->createTable('oro_user_api');
-        $table->addColumn('id', 'integer', ['precision' => 0, 'autoincrement' => true]);
-        $table->addColumn('organization_id', 'integer', ['notnull' => false]);
-        $table->addColumn('user_id', 'integer');
-        $table->addColumn('api_key', 'crypted_string', ['length' => 255]);
-        $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['api_key'], 'UNIQ_296B6993C912ED9D');
-        $table->addIndex(['user_id'], 'IDX_296B6993A76ED395');
-        $table->addIndex(['organization_id'], 'IDX_296B699332C8A3DE');
     }
 
     /**
@@ -386,26 +368,6 @@ class OroUserBundleInstaller implements
             $schema->getTable('oro_user'),
             ['user_id'],
             ['id']
-        );
-    }
-
-    /**
-     * Add oro_user_api foreign keys.
-     */
-    private function addOroUserApiForeignKeys(Schema $schema): void
-    {
-        $table = $schema->getTable('oro_user_api');
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_organization'),
-            ['organization_id'],
-            ['id'],
-            ['onDelete' => 'SET NULL', 'onUpdate' => null]
-        );
-        $table->addForeignKeyConstraint(
-            $schema->getTable('oro_user'),
-            ['user_id'],
-            ['id'],
-            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
     }
 

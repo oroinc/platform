@@ -190,9 +190,6 @@ class HtmlFormatter extends AbstractFormatter
     {
         $result = $this->getFileContent('@NelmioApiDocBundle/Resources/public/js/all.js');
         $result .= "\n" . $this->getFileContent('@OroApiBundle/Resources/public/lib/jquery.bind-first-0.2.3.min.js');
-        if ($this->enableSandbox) {
-            $result .= "\n" . $this->getFileContent('@OroApiBundle/Resources/public/lib/wsse.js');
-        }
 
         return $result;
     }

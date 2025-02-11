@@ -4,7 +4,6 @@ namespace Oro\Bundle\UserBundle\Entity;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumOptionsProvider;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Mailer\Processor;
 use Oro\Bundle\UserBundle\Security\UserLoaderInterface;
 use Oro\Component\DependencyInjection\ServiceLink;
@@ -35,14 +34,6 @@ class UserManager extends BaseUserManager
         parent::__construct($userLoader, $doctrine, $passwordHasherFactory);
         $this->enumOptionsProvider = $enumOptionsProvider;
         $this->emailProcessorLink = $emailProcessor;
-    }
-
-    /**
-     * Return UserApi entity for the given user and organization
-     */
-    public function getApi(User $user, Organization $organization): ?UserApi
-    {
-        return $this->getEntityManager()->getRepository(UserApi::class)->getApi($user, $organization);
     }
 
     /**

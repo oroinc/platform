@@ -35,7 +35,7 @@ class DashboardControllerAclTest extends WebTestCase
                 ]
             ),
             [],
-            $this->generateWsseAuthHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
+            self::generateApiAuthHeader(LoadUserData::USER_NAME)
         );
         $result = $this->client->getResponse();
         $this->assertJsonResponseStatusCodeEquals($result, 403);

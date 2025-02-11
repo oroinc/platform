@@ -11,10 +11,12 @@ use Oro\Component\MessageQueue\Consumption\ChainExtension;
 use Oro\Component\MessageQueue\Consumption\Context;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumedMessagesExtension;
 use Oro\Component\MessageQueue\Consumption\Extension\LimitConsumptionTimeExtension;
+use Oro\Component\MessageQueue\Consumption\Extension\LoggerExtension;
 use Oro\Component\MessageQueue\Consumption\QueueConsumer;
 use Oro\Component\MessageQueue\Test\Async\Extension\ConsumedMessagesCollectorExtension;
 use Oro\Component\MessageQueue\Transport\Dbal\DbalConnection;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -26,6 +28,11 @@ trait MessageQueueConsumerTestTrait
     protected static function getConsumer(): QueueConsumer
     {
         return self::getContainer()->get('oro_message_queue.consumption.queue_consumer');
+    }
+
+    protected static function getLogger(): LoggerInterface
+    {
+        return self::getContainer()->get('logger');
     }
 
     protected static function purgeMessageQueue(string $queueName = 'oro.default'): void
@@ -90,8 +97,9 @@ trait MessageQueueConsumerTestTrait
                 ->bind('oro.default')
                 ->consume(
                     new ChainExtension([
+                        new LoggerExtension(self::getLogger()),
                         new LimitConsumedMessagesExtension($messagesCount ?? count(self::getSentMessages())),
-                        new LimitConsumptionTimeExtension(new \DateTime('+' . $timeLimit . ' sec')),
+                        new LimitConsumptionTimeExtension(new \DateTime('+' . $timeLimit . ' sec'))
                     ])
                 );
 
