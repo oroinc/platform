@@ -208,10 +208,14 @@ define(function(require) {
             $select2Element.attr('aria-required', true);
         }
 
+        const $select2Chosen = $select2Element.prev().find('.select2-chosen');
+
         if ($realSelect.attr('aria-label')) {
             $select2Element.attr('aria-label', $realSelect.attr('aria-label'));
+            $select2Chosen.attr('aria-label', $realSelect.attr('aria-label'));
         } else if ($realSelect.attr('aria-labelledby')) {
             $select2Element.attr('aria-labelledby', $realSelect.attr('aria-labelledby'));
+            $select2Chosen.attr('aria-labelledby', $realSelect.attr('aria-labelledby'));
         } else {
             const $relatedLabel = $('label[for="' + $select2Element.attr('id') + '"]');
 
@@ -219,7 +223,7 @@ define(function(require) {
             // will have another form-related element to trick WAVE checker.
             if ($relatedLabel.length) {
                 $realSelect.attr('aria-label', $relatedLabel[0].childNodes[0].textContent);
-
+                $select2Chosen.attr('aria-label', $relatedLabel[0].childNodes[0].textContent);
                 return true;
             }
         }
