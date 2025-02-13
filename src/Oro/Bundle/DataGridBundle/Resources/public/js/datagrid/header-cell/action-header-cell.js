@@ -1,6 +1,7 @@
 define(function(require) {
     'use strict';
 
+    const __ = require('orotranslation/js/translator');
     const Backgrid = require('backgrid');
     const ActionsPanel = require('orodatagrid/js/datagrid/actions-panel');
     const BaseView = require('oroui/js/app/views/base/view');
@@ -18,6 +19,8 @@ define(function(require) {
 
         _attributes() {
             const attrs = Backgrid.Cell.prototype._attributes.call(this);
+
+            attrs['aria-label'] = __('oro.datagrid.cell.action_header.aria_label');
 
             return attrs;
         },
