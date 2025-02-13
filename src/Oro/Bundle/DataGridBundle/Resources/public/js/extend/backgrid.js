@@ -112,14 +112,6 @@ define(function(require) {
 
     Backgrid.Cell.prototype._attributes = function() {
         const attrs = {};
-        const {collection} = this.column || {};
-
-        if (collection && collection.length) {
-            const rowIndex = collection.indexOf(this.column);
-            if (rowIndex !== -1 && (!this.model || this.model.get('isAuxiliary') !== true)) {
-                attrs['aria-colindex'] = rowIndex + 1;
-            }
-        }
 
         if (
             this.model && this.model.get('isAuxiliary') !== true &&
