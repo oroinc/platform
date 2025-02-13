@@ -6,7 +6,7 @@ define(function(require) {
     require('bootstrap-tooltip');
 
     const Tooltip = $.fn.tooltip.Constructor;
-    const original = _.pick(Tooltip.prototype, 'show', 'hide', '_getContainer');
+    const original = _.pick(Tooltip.prototype, 'show', 'hide', '_getContainer', '_getAttachment');
 
     const DATA_ATTRIBUTE_PATTERN = /^data-[\w-]*$/i;
     Tooltip.Default.whiteList['*'].push(DATA_ATTRIBUTE_PATTERN);
@@ -55,6 +55,11 @@ define(function(require) {
         }
 
         return original.hide.apply(this, args);
+    };
+
+    Tooltip.prototype._getAttachment = function(placement) {
+        const [base, align] = placement.split('-');
+        return [original._getAttachment.call(this, base), align].filter(item => item).join('-');
     };
 
     Tooltip.prototype._getContainer = function(...args) {
