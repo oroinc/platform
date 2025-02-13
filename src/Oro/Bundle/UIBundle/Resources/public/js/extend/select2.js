@@ -611,7 +611,6 @@ define(function(require) {
                 }.bind(this));
 
             this.opts.element
-                .attr('aria-hidden', true)
                 .trigger($.Event('select2-init'));
 
             this.container
@@ -621,6 +620,11 @@ define(function(require) {
 
 
         prototype.destroy = function() {
+            // Returns back the original "for" attribute
+            if (this.focusser) {
+                $(`label[for="${this.focusser.attr('id')}"]`).attr('for', this.opts.element.attr('id'));
+            }
+
             toUnAssignAriaAttributesForSelect.call(this);
 
             if (this.propertyObserver) {
@@ -633,6 +637,7 @@ define(function(require) {
             // Remove previously auto generated name
             this.search.attr('name', null);
             delete this._activedescendantElements;
+
             destroy.call(this);
         };
 

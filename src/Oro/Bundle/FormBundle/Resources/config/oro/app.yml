@@ -29,6 +29,7 @@ oro_form:
                         - src
                         - width
                         - allow
+                        - title
                 table:
                     attributes:
                         - cellspacing
