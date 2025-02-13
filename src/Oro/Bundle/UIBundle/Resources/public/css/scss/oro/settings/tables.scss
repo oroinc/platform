@@ -66,8 +66,8 @@ $table-tbody-row-selected-hover-background: $row-selected-background !default;
 
 $table-tbody-row-selected-hover-td-background: inherit !default;
 
-$table-tbody-td-border-top: 1px solid $primary-860 !default;
-$table-tbody-td-border-bottom: 1px solid $primary-860 !default;
+$table-tbody-td-border-top: 1px solid var(--table-tbody-tr-border-color, #{$primary-860}) !default;
+$table-tbody-td-border-bottom: 1px solid var(--table-tbody-tr-border-color, #{$primary-860}) !default;
 $table-tbody-td-offset: $content-padding-small !default;
 
 $table-tfoot-th-background: $primary-200 !default;
@@ -124,3 +124,6 @@ $table-open-tr-td-border-bottom: 0 !default;
 $table-open-tr-td-background: #f4f4f4 !default;
 
 $table-open-tr-open-row-background-position: 0 -13px !default;
+
+$sub-table-border-radius: 4px !default;
+$table-thead-th-background: $primary-200 !default;

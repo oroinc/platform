@@ -428,3 +428,28 @@
         content: $table-td-expander-content;
     }
 }
+
+.table.table-bordered .table.sub-table {
+    > thead {
+        > tr {
+            > th {
+                background: $primary-860;
+                color: $primary-200;
+                padding: 8px 17px;
+                text-transform: none;
+                font-size: $base-font-size;
+                line-height: normal;
+
+                &:first-child {
+                    border-top-left-radius: $sub-table-border-radius;
+                    border-bottom-left-radius: $sub-table-border-radius;
+                }
+
+                &:last-child {
+                    border-top-right-radius: $sub-table-border-radius;
+                    border-bottom-right-radius: $sub-table-border-radius;
+                }
+            }
+        }
+    }
+}
