@@ -37,7 +37,7 @@ class HtmlTagProviderTest extends WebTestCase
         'i',
         'br',
         'span[data-title|data-type]',
-        'img[src|width|height|alt|loading]',
+        'img[src|srcset|width|height|alt|loading]',
         'h1',
         'h2',
         'h3',
