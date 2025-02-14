@@ -107,6 +107,7 @@ oro_form:
                 img:
                     attributes:
                         - src
+                        - srcset
                         - width
                         - height
                         - alt

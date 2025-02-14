@@ -50,6 +50,7 @@ services:
         arguments:
             - '@oro_config.manager'
             - '@oro_form.captcha.service_registry'
+            - '@security.token_storage'
 
     oro_form.captcha.protected_forms_registry:
         class: Oro\Bundle\FormBundle\Captcha\CaptchaProtectedFormsRegistry

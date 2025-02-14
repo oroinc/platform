@@ -30,6 +30,10 @@ class OroFormExtensionTest extends \PHPUnit\Framework\TestCase
                             'value' => false,
                             'scope' => 'app'
                         ],
+                        Configuration::USE_CAPTCHA_FOR_LOGGED_IN => [
+                            'value' => true,
+                            'scope' => 'app'
+                        ],
                         Configuration::CAPTCHA_SERVICE => [
                             'value' => 'recaptcha',
                             'scope' => 'app'
