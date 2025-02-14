@@ -17,6 +17,7 @@ class Configuration implements ConfigurationInterface
     public const ENABLED_CAPTCHA = 'enabled_captcha';
     public const CAPTCHA_SERVICE = 'captcha_service';
     public const CAPTCHA_PROTECTED_FORMS = 'captcha_protected_forms';
+    public const USE_CAPTCHA_FOR_LOGGED_IN = 'use_captcha_for_logged_in';
 
     public const RECAPTCHA_PUBLIC_KEY = 'recaptcha_public_key';
     public const RECAPTCHA_PRIVATE_KEY = 'recaptcha_private_key';
@@ -43,6 +44,10 @@ class Configuration implements ConfigurationInterface
                 self::WYSIWYG_ENABLED => ['value' => true, 'type' => 'bool'],
                 self::ENABLED_CAPTCHA => [
                     'value' => false,
+                    'type' => 'boolean'
+                ],
+                self::USE_CAPTCHA_FOR_LOGGED_IN => [
+                    'value' => true,
                     'type' => 'boolean'
                 ],
                 self::CAPTCHA_SERVICE => [
