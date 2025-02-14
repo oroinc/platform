@@ -35,6 +35,12 @@ system_configuration:
             options:
                 label: oro.form.system_configuration.fields.enabled_captcha.label
                 required: false
+        oro_form.use_captcha_for_logged_in:
+            data_type: boolean
+            type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
+            options:
+                label: oro.form.system_configuration.fields.use_captcha_for_logged_in.label
+                required: false
         oro_form.captcha_service:
             data_type: string
             type: Oro\Bundle\FormBundle\Form\Type\CaptchaServiceSelectType
@@ -134,6 +140,7 @@ system_configuration:
                                     captcha_general:
                                         children:
                                             - oro_form.enabled_captcha
+                                            - oro_form.use_captcha_for_logged_in
                                             - oro_form.captcha_service
                                             - oro_form.captcha_protected_forms
                                     captcha_recaptcha:
