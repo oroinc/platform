@@ -275,6 +275,8 @@ oro:
                     tooltip: 'Select the option to enable the WYSIWYG editor for all text fields.'
                 enabled_captcha:
                     label: 'Enable CAPTCHA protection'
+                use_captcha_for_logged_in:
+                    label: 'Use CAPTCHA for logged in user'
                 captcha_service:
                     label: 'CAPTCHA service'
                 captcha_protected_forms:

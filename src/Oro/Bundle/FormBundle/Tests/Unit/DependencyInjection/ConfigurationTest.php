@@ -3,15 +3,19 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\FormBundle\DependencyInjection\Configuration;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Processor;
 
-class ConfigurationTest extends \PHPUnit\Framework\TestCase
+class ConfigurationTest extends TestCase
 {
     private function processConfiguration(array $configs): array
     {
         return (new Processor())->processConfiguration(new Configuration(), $configs);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testProcessConfiguration(): void
     {
         $this->assertEquals(
@@ -24,6 +28,10 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ],
                     Configuration::ENABLED_CAPTCHA => [
                         'value' => false,
+                        'scope' => 'app'
+                    ],
+                    Configuration::USE_CAPTCHA_FOR_LOGGED_IN => [
+                        'value' => true,
                         'scope' => 'app'
                     ],
                     Configuration::CAPTCHA_SERVICE => [
@@ -123,6 +131,10 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                     ],
                     Configuration::ENABLED_CAPTCHA => [
                         'value' => false,
+                        'scope' => 'app'
+                    ],
+                    Configuration::USE_CAPTCHA_FOR_LOGGED_IN => [
+                        'value' => true,
                         'scope' => 'app'
                     ],
                     Configuration::CAPTCHA_SERVICE => [
