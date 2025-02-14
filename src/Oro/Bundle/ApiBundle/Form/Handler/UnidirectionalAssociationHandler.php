@@ -18,6 +18,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Handles "update", "add" and "delete" operations for forms that have unidirectional associations.
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class UnidirectionalAssociationHandler
 {
@@ -58,6 +59,11 @@ class UnidirectionalAssociationHandler
         }
         $metadata = new EntityIdMetadataAdapter($this->doctrineHelper->getClass($entity), $config);
         foreach ($unidirectionalAssociations as $fieldName => $targetAssociationName) {
+            // hotfix. will be fixed in BAP-22934
+            if (!$form->has($fieldName)) {
+                continue;
+            }
+
             $fieldForm = $form->get($fieldName);
             if (!FormUtil::isSubmittedAndValid($fieldForm)) {
                 continue;
