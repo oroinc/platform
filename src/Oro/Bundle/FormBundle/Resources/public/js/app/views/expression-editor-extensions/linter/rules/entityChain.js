@@ -12,7 +12,7 @@ const createEntityChainChecker = (util, view) => {
         const entityName = getNodeContent(entityNode);
         const foundEntity = entities.find(entity => entity.name === entityName.replace(/\[([\S\s?]+)?\]/g, ''));
 
-        if (!foundEntity) {
+        if (entityName !== 'null' && !foundEntity) {
             results.push(
                 createErrorValidationConfig(entityNode, __('oro.form.expression_editor.validation.entity_name', {
                     entityName
@@ -20,7 +20,7 @@ const createEntityChainChecker = (util, view) => {
             );
         }
 
-        if (entityNode && !propertyNodes.length) {
+        if (entityNode && !propertyNodes.length && entityName !== 'null') {
             results.push(
                 createErrorValidationConfig(
                     entityNode,
