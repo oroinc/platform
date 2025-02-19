@@ -36,7 +36,7 @@
                     {% set isActiveEntity = (chosenEntityName and chosenEntityName == config.entityClass) or (not chosenEntityName and loop.index == 1) %}
 
                     {% if entityVisibility[config.entityClass] is not empty %}
-                    <li class="nav-item">
+                    <li class="nav-item" role="presentation">
                         <a id="importExport{{ shortEntityName ~ tabId }}-tab"
                            href="#importExport{{ shortEntityName ~ tabId }}"
                            class="nav-link{% if isActiveEntity %} active{% endif %}"

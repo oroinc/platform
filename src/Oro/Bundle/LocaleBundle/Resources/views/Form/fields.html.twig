@@ -170,7 +170,7 @@
 {% endblock %}
 
 {% macro renderTabNavItem(form, isDefault, uniqid) %}
-    <li class="nav-item">
+    <li class="nav-item" role="presentation">
         <a id="{{ uniqid ~ '-tab'}}"
            class="nav-link {% if isDefault %}active{% endif %}"
            role="tab"

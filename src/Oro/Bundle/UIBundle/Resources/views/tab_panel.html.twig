@@ -41,7 +41,7 @@
         <ul class="nav nav-tabs {{ extraClasses }}" role="tablist">
             {% for tab in tabs %}
                 {% set isActiveTab = activeTabAlias ? activeTabAlias == tab.alias : loop.index == 1 %}
-                <li class="nav-item">
+                <li class="nav-item" role="presentation">
                     {% set widgetOptions = {
                         'type': tab.widgetType|default('block'),
                         'event': 'shown.bs.tab',
