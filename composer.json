@@ -317,7 +317,7 @@
             "Oro\\Component\\Testing\\": "src/Oro/Component/Testing",
             "Oro\\Component\\TestUtils\\": "src/Oro/Component/TestUtils"
         },
-        "exclude-from-classmap": ["/Tests/"]
+        "exclude-from-classmap": ["**/Tests/"]
     },
     "config": {
         "allow-plugins": {
