@@ -322,7 +322,7 @@
             "Oro\\Component\\TestUtils\\": "src/Oro/Component/TestUtils"
         },
         "exclude-from-classmap": [
-            "/Tests/"
+            "**/Tests/"
         ]
     },
     "config": {
