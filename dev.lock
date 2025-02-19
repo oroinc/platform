@@ -5551,7 +5551,7 @@
             "dist": {
                 "type": "path",
                 "url": "../redis-config",
-                "reference": "32180191cdf78e221123b30db9eaa592962a3d5e"
+                "reference": "9499d0cb8329b3dc94698adefc1113dda28a1b8b"
             },
             "require": {
                 "predis/predis": "~1.1.6",
@@ -5571,7 +5571,7 @@
                     "Oro\\Bundle\\RedisConfigBundle\\": ""
                 },
                 "exclude-from-classmap": [
-                    "/Tests/"
+                    "**/Tests/"
                 ]
             },
             "license": [
