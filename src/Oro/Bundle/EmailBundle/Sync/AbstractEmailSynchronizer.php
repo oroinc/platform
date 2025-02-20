@@ -508,6 +508,11 @@ abstract class AbstractEmailSynchronizer implements EmailSynchronizerInterface, 
                 . ' - (CASE o.syncCode WHEN :success THEN 0 ELSE :timeShift END)) AS HIDDEN p2'
             )
             ->where('o.isActive = :isActive AND (o.syncCodeUpdatedAt IS NULL OR o.syncCodeUpdatedAt <= :border)')
+            ->andWhere('o.imapHost IS NOT NULL')
+            ->andWhere('o.imapPort > 0')
+            ->andWhere('o.user IS NOT NULL')
+            ->andWhere('o.password IS NOT NULL')
+            ->andWhere('o.accessToken IS NOT NULL')
             ->andWhere('(o.isSyncEnabled is NULL or o.isSyncEnabled = :isSyncEnabled)')
             ->orderBy('p1, p2 DESC, o.syncCodeUpdatedAt')
             ->setParameter('inProcess', self::SYNC_CODE_IN_PROCESS)

@@ -69,6 +69,12 @@ class LoadOriginData extends AbstractFixture implements DependentFixtureInterfac
             $this->setReference($data['reference'], $origin);
             $manager->persist($origin);
 
+            $origin->setImapHost('imap.example.com');
+            $origin->setImapPort(993);
+            $origin->setUser($this->getReference($data['owner']));
+            $origin->setPassword(base64_encode(random_bytes(32)));
+            $origin->setAccessToken(base64_encode(random_bytes(32)));
+
             if (array_key_exists('folder', $data)) {
                 $folder = new EmailFolder();
                 $folder->setOrigin($origin);
