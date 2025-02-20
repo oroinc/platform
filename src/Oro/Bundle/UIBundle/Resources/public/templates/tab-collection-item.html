@@ -3,6 +3,9 @@
     class="<%- obj.templateClassName %><% if(obj.active) { %> active<% } %>"
     data-emulate-btn-press=""
     data-toggle="tab"
+    role="tab"
+    aria-controls="<%- uniqueId %>"
+    aria-selected="<%- !!obj.active %>"
     >
     <%- label %>
 </a>
