@@ -14,7 +14,6 @@
     display: $checkbox-display;
     // To prevent shrink or grow checkbox if it's in flex container context
     flex: $checkbox-flex;
-    outline: $checkbox-outline;
 
     &::before {
         content: $checkbox-icon-content;
@@ -99,7 +98,6 @@
     display: $checkbox-display;
     // To prevent shrink or grow checkbox if it's in flex container context
     flex: $checkbox-flex;
-    outline: $checkbox-outline;
 
     &::before {
         content: $checkbox-radio-icon-content;
