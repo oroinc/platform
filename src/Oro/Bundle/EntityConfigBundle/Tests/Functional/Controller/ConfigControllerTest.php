@@ -1,6 +1,6 @@
 <?php
 
-namespace Functional\Controller;
+namespace Oro\Bundle\EntityConfigBundle\Tests\Functional\Controller;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Oro\Bundle\AttachmentBundle\Entity\File;
