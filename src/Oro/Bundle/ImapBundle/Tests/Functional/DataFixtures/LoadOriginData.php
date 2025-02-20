@@ -50,6 +50,12 @@ class LoadOriginData extends AbstractFixture implements DependentFixtureInterfac
             $origin->setOrganization($this->getReference(LoadOrganization::ORGANIZATION));
             $origin->setOwner($this->getReference($data['owner']));
             $origin->setMailboxName($data['mailboxName']);
+            $origin->setImapHost('imap.example.com');
+            $origin->setImapPort(993);
+            $origin->setUser($this->getReference($data['owner']));
+            $origin->setPassword(base64_encode(random_bytes(32)));
+            $origin->setAccessToken(base64_encode(random_bytes(32)));
+
             $this->setReference($reference, $origin);
             $manager->persist($origin);
             if (\array_key_exists('folder', $data)) {

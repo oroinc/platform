@@ -483,7 +483,7 @@ class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
         $qb->expects(self::once())
             ->method('leftJoin')
             ->willReturnSelf();
-        $qb->expects(self::exactly(2))
+        $qb->expects(self::exactly(7))
             ->method('andWhere')
             ->willReturnSelf();
         $qb->expects(self::once())

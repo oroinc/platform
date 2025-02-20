@@ -4,7 +4,7 @@ params:
     --id: origin_one
 log_info:
     - 'Finding an email origin (id:'
-    - 'Found " ()" email origin. Id: '
+    - 'Found "simple_user_enabled (imap.example.com)" email origin. Id: '
     - 'Refresh the folders.'
     - 'Get folders enabled for sync...'
     - 'Got 0 folder(s)'
