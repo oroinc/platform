@@ -604,6 +604,19 @@ label.radio.error {
     }
 }
 
+.collection-element-primary {
+    &--flex {
+        display: flex;
+        align-items: center;
+        gap: 0 $content-padding-small;
+    }
+    &--flex-baseline {
+        display: flex;
+        align-items: baseline;
+        gap: 0 $content-padding-small;
+    }
+}
+
 .collection-fields-list-bg.oro-item-collection {
     > div {
         position: relative;
