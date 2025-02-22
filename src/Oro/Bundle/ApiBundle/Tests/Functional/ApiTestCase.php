@@ -5,6 +5,8 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
+use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
@@ -97,8 +99,17 @@ abstract class ApiTestCase extends WebTestCase
 
     protected function runForEntities(callable $callback): void
     {
+        $resourcesProvider = $this->getResourcesProvider();
         $entities = $this->getEntities();
         foreach ($entities as [$entityClass, $excludedActions]) {
+            if (!$resourcesProvider->isResourceEnabled(
+                $entityClass,
+                ApiAction::OPTIONS,
+                Version::LATEST,
+                $this->getRequestType()
+            )) {
+                continue;
+            }
             try {
                 $callback($entityClass, $excludedActions);
             } catch (\Throwable $e) {
@@ -138,8 +149,18 @@ abstract class ApiTestCase extends WebTestCase
 
     protected function runForSubresources(callable $callback): void
     {
+        $resourcesProvider = $this->getResourcesProvider();
         $subresources = $this->getSubresources();
+        /** @var ApiSubresource $subresource */
         foreach ($subresources as [$entityClass, $associationName, $subresource]) {
+            if (!$resourcesProvider->isResourceEnabled(
+                $subresource->getTargetClassName(),
+                ApiAction::OPTIONS,
+                Version::LATEST,
+                $this->getRequestType()
+            )) {
+                continue;
+            }
             try {
                 $callback($entityClass, $associationName, $subresource);
             } catch (\Throwable $e) {
