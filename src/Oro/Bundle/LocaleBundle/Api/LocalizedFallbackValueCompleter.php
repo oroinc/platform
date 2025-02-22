@@ -44,11 +44,11 @@ class LocalizedFallbackValueCompleter implements CustomDataTypeCompleterInterfac
         $localizedFallbackField = $definition->findField($localizedFallbackFieldName, true);
         if (null === $localizedFallbackField) {
             if ($localizedFallbackFieldName === $fieldName) {
-                throw new \RuntimeException(sprintf(
+                throw new \RuntimeException(\sprintf(
                     'The circular dependency is detected for localized fallback value field "%1$s::%2$s".'
                     . ' To solve this you can rename the target property of this field. For example:%3$s'
                     . '_%2$s:%3$s    property_path: %2$s%3$s',
-                    $metadata->name,
+                    $metadata->getName(),
                     $fieldName,
                     "\n"
                 ));

@@ -30,9 +30,11 @@ trusted_data:
         Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\ExpandAssociatedEntities:
             loadAssociationData:
                 idPropertyName: true
+        Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CustomAssociationCompleter:
+            completeEnumAssociation:
+                propertyName: true
         Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\UnidirectionalAssociationCompleter:
             createAssociationQuery:
-                targetEntityClass: true
                 targetAssociationName: true
         Oro\Bundle\ApiBundle\Processor\Subresource\Shared\BuildUnidirectionalAssociationSubresourceQuery:
             process:

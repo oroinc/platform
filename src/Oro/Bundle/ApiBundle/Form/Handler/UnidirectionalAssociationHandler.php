@@ -352,7 +352,7 @@ class UnidirectionalAssociationHandler
     {
         $methods = ReflectionUtil::findAdderAndRemover($entityClass, $associationName);
         if (!$methods) {
-            throw new \RuntimeException(sprintf(
+            throw new \RuntimeException(\sprintf(
                 'The class "%s" must have adder and remover methods for the association "%s".',
                 $entityClass,
                 $associationName

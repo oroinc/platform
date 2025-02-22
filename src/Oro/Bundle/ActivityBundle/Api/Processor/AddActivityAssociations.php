@@ -66,7 +66,7 @@ class AddActivityAssociations implements ProcessorInterface
         if ($definition->hasField($associationName)) {
             $dataType = $definition->getField($associationName)->getDataType();
             if ($dataType && self::ACTIVITY_TARGETS_ASSOCIATION_DATA_TYPE !== $dataType) {
-                throw new \RuntimeException(sprintf(
+                throw new \RuntimeException(\sprintf(
                     'The association "%s" cannot be added to "%s"'
                     . ' because an association with this name already exists.',
                     $associationName,
@@ -86,10 +86,11 @@ class AddActivityAssociations implements ProcessorInterface
         string $activityEntityClass,
         string $activityAssociationName
     ): void {
+        $activityAssociationDataType = 'unidirectionalAssociation:' . $activityAssociationName;
         if ($definition->hasField($associationName)) {
             $dataType = $definition->getField($associationName)->getDataType();
-            if ($dataType && 'unidirectionalAssociation:' . $activityAssociationName !== $dataType) {
-                throw new \RuntimeException(sprintf(
+            if ($dataType && $activityAssociationDataType !== $dataType) {
+                throw new \RuntimeException(\sprintf(
                     'The activity association "%2$s" cannot be added to "%1$s"'
                     . ' because an association with this name already exists.'
                     . ' To rename the association to the "%3$s" activity entity'
@@ -106,6 +107,6 @@ class AddActivityAssociations implements ProcessorInterface
 
         $association = $definition->getOrAddField($associationName);
         $association->setTargetClass($activityEntityClass);
-        $association->setDataType('unidirectionalAssociation:' . $activityAssociationName);
+        $association->setDataType($activityAssociationDataType);
     }
 }

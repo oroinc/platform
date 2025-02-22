@@ -54,10 +54,11 @@ class AddCommentAssociations implements ProcessorInterface
         string $commentAssociationName,
         ?string $targetAction
     ): void {
+        $commentAssociationDataType = 'unidirectionalAssociation:' . $commentAssociationName;
         if ($definition->hasField($associationName)) {
             $dataType = $definition->getField($associationName)->getDataType();
-            if ($dataType && 'unidirectionalAssociation:' . $commentAssociationName !== $dataType) {
-                throw new \RuntimeException(sprintf(
+            if ($dataType && $commentAssociationDataType !== $dataType) {
+                throw new \RuntimeException(\sprintf(
                     'The association "%s" cannot be added to "%s"'
                     . ' because an association with this name already exists.',
                     $associationName,
@@ -68,7 +69,7 @@ class AddCommentAssociations implements ProcessorInterface
 
         $association = $definition->getOrAddField($associationName);
         $association->setTargetClass(Comment::class);
-        $association->setDataType('unidirectionalAssociation:' . $commentAssociationName);
+        $association->setDataType($commentAssociationDataType);
         if (ApiAction::UPDATE === $targetAction) {
             $association->setFormOption('mapped', false);
         }
