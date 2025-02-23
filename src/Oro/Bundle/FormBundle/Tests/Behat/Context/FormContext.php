@@ -66,7 +66,11 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
         /** @var Form $form */
         $this->waitForAjax();
         $form = $this->createElement($formName);
-        $form->fill($table);
+        $this->spin(function () use ($form, $table) {
+            $form->fill($table);
+
+            return true;
+        }, 3);
     }
 
     //@codingStandardsIgnoreStart
