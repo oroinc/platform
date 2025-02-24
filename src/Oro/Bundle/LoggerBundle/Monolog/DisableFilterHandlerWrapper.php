@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LoggerBundle\Monolog;
 
-use Monolog\Handler\FilterHandler;
+use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\HandlerWrapper;
 use Monolog\Logger;
 use Monolog\ResettableInterface;
@@ -13,19 +13,11 @@ use Monolog\ResettableInterface;
  */
 class DisableFilterHandlerWrapper extends HandlerWrapper
 {
-    /**
-     * @var FilterHandler
-     */
-    protected $handler;
-
-    private LogLevelConfig $logLevelConfig;
-
     private bool $filterHandlerIsDisabled = false;
 
-    public function __construct(LogLevelConfig $config, FilterHandler $handler)
+    public function __construct(protected LogLevelConfig $logLevelConfig, protected HandlerInterface $innerHandler)
     {
-        parent::__construct($handler);
-        $this->logLevelConfig = $config;
+        parent::__construct($innerHandler);
     }
 
     #[\Override]
@@ -44,12 +36,9 @@ class DisableFilterHandlerWrapper extends HandlerWrapper
         parent::handleBatch($records);
     }
 
-    /**
-     * @return array
-     */
-    public function getAcceptedLevels()
+    public function getAcceptedLevels(): array
     {
-        return $this->handler->getAcceptedLevels();
+        return $this->innerHandler->getAcceptedLevels();
     }
 
     /**
@@ -58,28 +47,28 @@ class DisableFilterHandlerWrapper extends HandlerWrapper
      * @param int|string       $maxLevel       Maximum level or level name to accept, only used if $minLevelOrList is
      *                                         not an array
      */
-    public function setAcceptedLevels($minLevelOrList = Logger::DEBUG, $maxLevel = Logger::EMERGENCY)
+    public function setAcceptedLevels($minLevelOrList = Logger::DEBUG, $maxLevel = Logger::EMERGENCY): void
     {
-        $this->handler->setAcceptedLevels($minLevelOrList, $maxLevel);
+        $this->innerHandler->setAcceptedLevels($minLevelOrList, $maxLevel);
     }
 
     private function setMinLevel(): void
     {
         if (!$this->filterHandlerIsDisabled && $this->logLevelConfig->isActive()) {
             // log all the levels
-            $this->handler->setAcceptedLevels();
+            $this->innerHandler->setAcceptedLevels();
             $this->filterHandlerIsDisabled = true;
         }
     }
 
     #[\Override]
-    public function reset()
+    public function reset(): void
     {
-        $nestedHandler = $this->handler->getHandler();
+        $nestedHandler = $this->innerHandler->getHandler();
         if ($nestedHandler instanceof ResettableInterface) {
             $nestedHandler->reset();
         }
 
-        return parent::reset();
+        parent::reset();
     }
 }

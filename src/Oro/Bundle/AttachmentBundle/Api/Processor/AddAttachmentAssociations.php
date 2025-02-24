@@ -54,10 +54,11 @@ class AddAttachmentAssociations implements ProcessorInterface
         string $attachmentAssociationName,
         ?string $targetAction
     ): void {
+        $attachmentAssociationDataType = 'unidirectionalAssociation:' . $attachmentAssociationName;
         if ($definition->hasField($associationName)) {
             $dataType = $definition->getField($associationName)->getDataType();
-            if ($dataType && 'unidirectionalAssociation:' . $attachmentAssociationName !== $dataType) {
-                throw new \RuntimeException(sprintf(
+            if ($dataType && $attachmentAssociationDataType !== $dataType) {
+                throw new \RuntimeException(\sprintf(
                     'The association "%s" cannot be added to "%s"'
                     . ' because an association with this name already exists.',
                     $associationName,
@@ -68,7 +69,7 @@ class AddAttachmentAssociations implements ProcessorInterface
 
         $association = $definition->getOrAddField($associationName);
         $association->setTargetClass(Attachment::class);
-        $association->setDataType('unidirectionalAssociation:' . $attachmentAssociationName);
+        $association->setDataType($attachmentAssociationDataType);
         if (ApiAction::UPDATE === $targetAction) {
             $association->setFormOption('mapped', false);
         }
