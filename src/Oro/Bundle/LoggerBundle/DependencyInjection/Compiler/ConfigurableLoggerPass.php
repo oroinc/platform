@@ -3,11 +3,13 @@
 namespace Oro\Bundle\LoggerBundle\DependencyInjection\Compiler;
 
 use Oro\Bundle\LoggerBundle\Monolog\ConfigurableFingersCrossedHandler;
+use Oro\Bundle\LoggerBundle\Monolog\DisableDeprecationsHandlerWrapper;
 use Oro\Bundle\LoggerBundle\Monolog\DisableFilterHandlerWrapper;
 use Oro\Bundle\LoggerBundle\Monolog\DisableHandlerWrapper;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -16,6 +18,9 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class ConfigurableLoggerPass implements CompilerPassInterface
 {
+    public const DISABLE_FILTER_WRAPPER_POSTFIX = '.disable_filter_wrapper';
+    public const DISABLE_DEPRECATIONS_WRAPPER_POSTFIX = '.disable_deprecations';
+
     /**
      * @inheritDoc
      */
@@ -25,16 +30,18 @@ class ConfigurableLoggerPass implements CompilerPassInterface
         $config = (new Processor())->processConfiguration($configuration, $container->getExtensionConfig('monolog'));
 
         foreach ($config['handlers'] as $handlerName => $handlerConfig) {
+            $handlerId = $this->getHandlerId($handlerName);
+
             switch ($handlerConfig['type']) {
                 case 'fingers_crossed':
-                    $handlerId = $this->getHandlerId($handlerName);
                     $container->getDefinition($handlerId)
                         ->setClass(ConfigurableFingersCrossedHandler::class)
-                        ->addMethodCall('setLogLevelConfig', [new Reference('oro_logger.log_level_config_provider')]);
+                        ->addMethodCall('setLogLevelConfig', [
+                            new Reference('oro_logger.log_level_config_provider')]);
+                    $this->addDisableDeprecationsWrapper($container, $handlerId);
                     break;
                 case 'filter':
-                    $handlerId = $this->getHandlerId($handlerName);
-                    $disableWrapperServiceId = $handlerId.'.disable_filter_wrapper';
+                    $disableWrapperServiceId = $handlerId . self::DISABLE_FILTER_WRAPPER_POSTFIX;
                     $container
                         ->register($disableWrapperServiceId, DisableFilterHandlerWrapper::class)
                         ->setArguments(
@@ -45,12 +52,15 @@ class ConfigurableLoggerPass implements CompilerPassInterface
                         )
                         ->setDecoratedService($handlerId)
                         ->setPublic(false);
+                    $this->addDisableDeprecationsWrapper($container, $handlerId);
+                    break;
+                case 'service':
+                    $this->addDisableDeprecationsWrapper($container, $handlerId);
                     break;
                 case 'swift_mailer':
                 case 'native_mailer':
                 case 'symfony_mailer':
-                    $handlerId = $this->getHandlerId($handlerName);
-                    $disableWrapperServiceId = $handlerId.'.disable_wrapper';
+                    $disableWrapperServiceId = $handlerId . '.disable_wrapper';
                     $container
                         ->register($disableWrapperServiceId, DisableHandlerWrapper::class)
                         ->setArguments(
@@ -64,6 +74,27 @@ class ConfigurableLoggerPass implements CompilerPassInterface
                     break;
             }
         }
+    }
+
+    protected function addDisableDeprecationsWrapper(ContainerBuilder $container, string $handlerId): void
+    {
+        if (!$container->hasParameter('oro_platform.collect_deprecations')
+            || $container->getParameter('oro_platform.collect_deprecations')
+        ) {
+            return;
+        }
+        $disableDeprecationWrapperDefinition = new Definition(
+            DisableDeprecationsHandlerWrapper::class,
+            [
+                new Reference('.inner'),
+                '%oro_platform.collect_deprecations%'
+            ]
+        );
+        $disableDeprecationWrapperDefinition->setDecoratedService($handlerId);
+        $container->setDefinition(
+            $handlerId . self::DISABLE_DEPRECATIONS_WRAPPER_POSTFIX,
+            $disableDeprecationWrapperDefinition
+        );
     }
 
     private function getHandlerId(string $name): string
