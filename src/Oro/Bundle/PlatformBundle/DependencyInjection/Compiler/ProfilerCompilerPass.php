@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\PlatformBundle\DependencyInjection\Compiler;
 
-use Oro\Bundle\PlatformBundle\Monolog\DeprecationDebugProcessor;
 use Oro\Bundle\PlatformBundle\Profiler\ConfigurableProfiler;
 use Oro\Bundle\PlatformBundle\Profiler\DynamicallyTraceableVoter;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -21,11 +20,6 @@ class ProfilerCompilerPass implements CompilerPassInterface
     {
         $debug = $container->getParameter('kernel.debug');
         if ($container->hasDefinition('profiler')) {
-            if ($container->hasDefinition('debug.log_processor')) {
-                $container->getDefinition('debug.log_processor')
-                    ->setClass(DeprecationDebugProcessor::class)
-                    ->addMethodCall('setCollectDeprecations', ['%oro_platform.collect_deprecations%']);
-            }
             $container->getDefinition('profiler')
                 ->setClass(ConfigurableProfiler::class);
         }

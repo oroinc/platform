@@ -14,7 +14,6 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
 /**
  * Completes the configuration of different kind of custom associations.
@@ -53,7 +52,7 @@ class CustomAssociationCompleter implements CustomDataTypeCompleterInterface
             $this->associationHelper->completeNestedAssociation($definition, $field, $version, $requestType);
             $result = true;
         } elseif (DataType::isExtendedAssociation($dataType)) {
-            $this->completeExtendedAssociation($metadata->name, $fieldName, $field, $version, $requestType);
+            $this->completeExtendedAssociation($metadata->getName(), $fieldName, $field, $version, $requestType);
             $result = true;
         } else {
             $targetClass = $field->getTargetClass();
@@ -74,14 +73,14 @@ class CustomAssociationCompleter implements CustomDataTypeCompleterInterface
         RequestType $requestType
     ): void {
         if ($field->hasTargetType()) {
-            throw new \RuntimeException(sprintf(
+            throw new \RuntimeException(\sprintf(
                 'The "target_type" option cannot be configured for "%s::%s".',
                 $entityClass,
                 $fieldName
             ));
         }
         if ($field->getDependsOn()) {
-            throw new \RuntimeException(sprintf(
+            throw new \RuntimeException(\sprintf(
                 'The "depends_on" option cannot be configured for "%s::%s".',
                 $entityClass,
                 $fieldName
@@ -122,28 +121,17 @@ class CustomAssociationCompleter implements CustomDataTypeCompleterInterface
     ): void {
         $this->associationHelper->completeAssociation($field, $field->getTargetClass(), $version, $requestType);
         $qb = $this->doctrineHelper->createQueryBuilder(EnumOption::class, 'r');
-        $fieldName = $field->getPropertyPath($fieldName);
-        QueryBuilderUtil::checkField($fieldName);
+        $propertyName = $field->getPropertyPath($fieldName);
         if ($field->isCollectionValuedAssociation()) {
-            $qb->innerJoin(
-                $metadata->getName(),
-                'e',
-                Join::WITH,
-                sprintf(
-                    "JSONB_ARRAY_CONTAINS_JSON(e.serialized_data, '%s', CONCAT('\"', r.id, '\"')) = true",
-                    $fieldName
-                )
-            );
+            $qb->innerJoin($metadata->getName(), 'e', Join::WITH, \sprintf(
+                "JSONB_ARRAY_CONTAINS_JSON(e.serialized_data, '%s', CONCAT('\"', r.id, '\"')) = true",
+                $propertyName
+            ));
         } else {
-            $qb->innerJoin(
-                $metadata->getName(),
-                'e',
-                Join::WITH,
-                sprintf(
-                    "JSON_EXTRACT(e.serialized_data, '%s') = r.id",
-                    $fieldName
-                )
-            );
+            $qb->innerJoin($metadata->getName(), 'e', Join::WITH, \sprintf(
+                "JSON_EXTRACT(e.serialized_data, '%s') = r.id",
+                $propertyName
+            ));
         }
         $field->setAssociationQuery($qb);
     }

@@ -610,6 +610,11 @@ label.radio.error {
         align-items: center;
         gap: 0 $content-padding-small;
     }
+    &--flex-baseline {
+        display: flex;
+        align-items: baseline;
+        gap: 0 $content-padding-small;
+    }
 }
 
 .collection-fields-list-bg.oro-item-collection {

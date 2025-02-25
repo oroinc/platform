@@ -352,7 +352,7 @@ abstract class OroKernel extends Kernel
         $cache = new ConfigCache($cacheDir.'/'.$class.'.php', $debug);
         $cachePath = $cache->getPath();
 
-        $errorLevel = error_reporting(\E_ALL ^ \E_WARNING ^ \E_DEPRECATED ^ \E_USER_DEPRECATED);
+        $errorLevel = $this->getErrorReportingLevel();
         // @codingStandardsIgnoreStart
         try {
             if (file_exists($cachePath) && \is_object($this->container = include $cachePath)
@@ -505,6 +505,11 @@ abstract class OroKernel extends Kernel
     {
         $this->warmupDir = $warmupDir;
         parent::reboot($warmupDir);
+    }
+
+    protected function getErrorReportingLevel(): int
+    {
+        return error_reporting(\E_ALL ^ \E_WARNING ^ \E_DEPRECATED ^ \E_USER_DEPRECATED);
     }
 
     #[\Override]

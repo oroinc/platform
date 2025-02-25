@@ -59,7 +59,6 @@ class UnidirectionalAssociationHandler
         }
         $metadata = new EntityIdMetadataAdapter($this->doctrineHelper->getClass($entity), $config);
         foreach ($unidirectionalAssociations as $fieldName => $targetAssociationName) {
-            // hotfix. will be fixed in BAP-22934
             if (!$form->has($fieldName)) {
                 continue;
             }
@@ -352,7 +351,7 @@ class UnidirectionalAssociationHandler
     {
         $methods = ReflectionUtil::findAdderAndRemover($entityClass, $associationName);
         if (!$methods) {
-            throw new \RuntimeException(sprintf(
+            throw new \RuntimeException(\sprintf(
                 'The class "%s" must have adder and remover methods for the association "%s".',
                 $entityClass,
                 $associationName
