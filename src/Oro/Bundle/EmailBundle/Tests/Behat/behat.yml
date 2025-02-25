@@ -187,7 +187,7 @@ oro_behat_extension:
     Ellipsis button:
       selector:
         type: xpath
-        locator: '//div[@class="emailtemplate-translatation oro-tabs tabbable"]//a[@role="button"]'
+        locator: '//div[@class="emailtemplate-translatation oro-tabs tabbable"]//a[@data-toggle="dropdown"]'
 
     Email Page Contexts:
       selector: 'div.activity-context-activity'

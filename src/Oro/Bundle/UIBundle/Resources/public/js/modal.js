@@ -49,7 +49,8 @@ define(function(require, exports, module) {
             focusOk: true,
             okCloses: true,
             animate: false,
-            disposeOnHidden: true
+            disposeOnHidden: true,
+            fixHeightOnMobile: tools.isMobile()
         }
     }, config);
 
@@ -373,7 +374,7 @@ define(function(require, exports, module) {
                 this.triggerEventOnContent(EVENTS.HIDDEN);
             }.bind(this));
 
-            if (tools.isMobile()) {
+            if (this.defaults.fixHeightOnMobile) {
                 this._fixHeightForMobile();
                 $(window).on(EVENTS.RESIZE + this.eventNamespace(), this._fixHeightForMobile.bind(this));
             }

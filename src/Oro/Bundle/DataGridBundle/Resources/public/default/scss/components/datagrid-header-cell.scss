@@ -56,7 +56,7 @@
         color: $datagrid-header-cell-link-color;
         position: $datagrid-header-cell-link-position;
         opacity: $datagrid-header-cell-link-opacity;
-        text-transform: uppercase;
+        text-transform: $datagrid-header-cell-link-text-transform;
     }
 
     &__link {

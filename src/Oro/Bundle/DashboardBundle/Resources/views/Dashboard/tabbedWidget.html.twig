@@ -11,7 +11,7 @@
             {% set tabTabId = 'tab-'|uniqid %}
             {% set tabContentId = 'tab-content-'|uniqid %}
             {% for tab in tabs %}
-                <li class="nav-item tab">
+                <li class="nav-item tab" role="presentation">
                     <a id="{{ (loop.index == 0) ? tabTabId : tabTabId ~ loop.index }}"
                        href="#{{ tabContentId }}"
                        role="tab"

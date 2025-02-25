@@ -351,7 +351,7 @@
         uniqid       - is unique identifier
 #}
 {% macro renderTabNavItem(form, isActive = false, uniqid = null) %}
-    <li class="nav-item">
+    <li class="nav-item" role="presentation">
         <a href="#"
            class="nav-link {% if isActive %}active{% endif %}"
            data-role="change-localization"

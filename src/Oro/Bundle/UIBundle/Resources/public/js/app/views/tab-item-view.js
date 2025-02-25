@@ -28,6 +28,10 @@ define(function(require, exports, module) {
             'click': 'onTabClick'
         },
 
+        attributes: {
+            role: 'presentation'
+        },
+
         /**
          * @inheritdoc
          */
@@ -50,12 +54,11 @@ define(function(require, exports, module) {
         },
 
         updateStates: function() {
+            const isActive = this.model.get('active');
+
             this.$el.toggleClass('changed', !!this.model.get('changed'));
-            const $tab = this.$('[role="tab"]');
-            if ($tab.attr('aria-selected') !== String(this.model.get('active'))) {
-                $tab.attr('aria-selected', this.model.get('active'));
-            }
-            if (this.model.get('active')) {
+
+            if (isActive) {
                 const tabPanel = this.model.get('controlTabPanel') || this.model.get('id');
                 $('#' + tabPanel).attr('aria-labelledby', this.model.get('uniqueId'));
             }

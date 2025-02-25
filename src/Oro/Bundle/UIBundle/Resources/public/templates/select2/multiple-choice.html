@@ -1,12 +1,12 @@
 <% var resultsId = _.uniqueId('select2-results-'); %>
 
-<div class="select2-container select2-container-multi">
-    <ul class="select2-choices"
-        role="combobox"
-        aria-haspopup="true"
-        aria-expanded="false"
-        aria-owns="<%- resultsId %>"
-    >
+<div class="select2-container select2-container-multi"
+     role="combobox"
+     aria-haspopup="true"
+     aria-expanded="false"
+     aria-owns="<%- resultsId %>"
+>
+    <ul class="select2-choices" role="presentation">
         <li class="select2-search-field" role="presentation">
             <input type="text"
                    autocomplete="off"
@@ -27,7 +27,6 @@
             aria-multiselectable="true"
             id="<%- resultsId %>"
             aria-expanded="false"
-            aria-hidden="true"
             tabindex="-1"
         ></ul>
     </div>

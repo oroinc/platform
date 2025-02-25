@@ -46,6 +46,8 @@ define(function(require) {
                 this.delegateEvents();
             }
 
+            this.$el.find('[type="checkbox"]').attr('aria-label', __('oro.datagrid.action.select_row'));
+
             return this;
         },
 
