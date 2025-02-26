@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "943a766f87bcadc25fe7ee332bd94112",
+    "content-hash": "2d849f6fe339fbcb2df3261cedc5731b",
     "packages": [
         {
             "name": "ass/xmlsecurity",
