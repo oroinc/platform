@@ -24,6 +24,7 @@ class DoctrineAclCacheListener
     private OwnerTreeProviderInterface $ownerTreeProvider;
 
     private bool $isCacheOutdated = false;
+    private ?OwnerTreeInterface $ownerTree = null;
 
     /**
      * @var array [className => [fieldName => shouldValueBeCheckedOnBoolean, ...], ...]
@@ -62,27 +63,31 @@ class DoctrineAclCacheListener
         }
 
         $em = $args->getObjectManager();
-        $changedEntities = $this->getChangedEntities($em->getUnitOfWork());
-        $this->isCacheOutdated = count($changedEntities) > 0;
+        $this->ownerTree = null;
 
-        if ($this->isCacheOutdated) {
-            $this->queryCacheProvider->clearForEntities(User::class, $changedEntities);
+        try {
+            $changedEntities = $this->getChangedEntities($em->getUnitOfWork());
+            $this->isCacheOutdated = count($changedEntities) > 0;
+
+            if ($this->isCacheOutdated) {
+                $this->queryCacheProvider->clearForEntities(User::class, $changedEntities);
+            }
+        } finally {
+            $this->ownerTree = null;
         }
     }
 
     private function getChangedEntities(UnitOfWork $uow): array
     {
         $usersToBreakTheCache = [];
-        $ownerTree = $this->ownerTreeProvider->getTree();
-
-        $usersToBreakTheCache[] = $this->getUsersShouldBeUpdatedByUpdates($uow, $ownerTree);
-        $usersToBreakTheCache[] = $this->getUsersShouldBeUpdatedByDeletions($uow, $ownerTree);
-        $usersToBreakTheCache[] = $this->getUsersShouldBeUpdatedByCollectionUpdates($uow, $ownerTree);
+        $usersToBreakTheCache[] = $this->getUsersShouldBeUpdatedByUpdates($uow);
+        $usersToBreakTheCache[] = $this->getUsersShouldBeUpdatedByDeletions($uow);
+        $usersToBreakTheCache[] = $this->getUsersShouldBeUpdatedByCollectionUpdates($uow);
 
         return array_unique(array_merge(...$usersToBreakTheCache));
     }
 
-    private function getUsersShouldBeUpdatedByDeletions(UnitOfWork $uow, OwnerTreeInterface $ownerTree): array
+    private function getUsersShouldBeUpdatedByDeletions(UnitOfWork $uow): array
     {
         $usersToBreakTheCache = [];
         $deletedBusinessUnits = $this->getInsertedOrDeletedEntities(
@@ -90,6 +95,7 @@ class DoctrineAclCacheListener
             [BusinessUnit::class]
         );
         foreach ($deletedBusinessUnits as $deletedEntity) {
+            $ownerTree = $this->getOwnerTree();
             $parentBusinessUnits = [];
             $this->collectParentBUs($deletedEntity, $parentBusinessUnits);
             $buIds = array_merge(
@@ -103,7 +109,7 @@ class DoctrineAclCacheListener
         return array_unique(array_merge(...$usersToBreakTheCache));
     }
 
-    private function getUsersShouldBeUpdatedByUpdates(UnitOfWork $uow, OwnerTreeInterface $ownerTree): array
+    private function getUsersShouldBeUpdatedByUpdates(UnitOfWork $uow): array
     {
         $usersToBreakTheCache = [];
         $updatedEntities = $this->getUpdatedEntities($uow, $this->entitiesShouldBeProcessedByUpdate);
@@ -124,7 +130,7 @@ class DoctrineAclCacheListener
                     [$entity->getId()]
                 ));
 
-                $usersToBreakTheCache[] = $ownerTree->getUsersAssignedToBusinessUnits($buIds);
+                $usersToBreakTheCache[] = $this->getOwnerTree()->getUsersAssignedToBusinessUnits($buIds);
             } elseif ($entity instanceof Organization) {
                 $userIds = [];
                 foreach ($entity->getUsers() as $user) {
@@ -141,7 +147,7 @@ class DoctrineAclCacheListener
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    private function getUsersShouldBeUpdatedByCollectionUpdates(UnitOfWork $uow, OwnerTreeInterface $ownerTree): array
+    private function getUsersShouldBeUpdatedByCollectionUpdates(UnitOfWork $uow): array
     {
         $usersToBreakTheCache = [];
         $updatedRelations = $this->getToManyRelations(
@@ -166,7 +172,7 @@ class DoctrineAclCacheListener
                         $businessUnitsShouldBeUpdated[] = $parents;
                     }
                     $businessUnitsShouldBeUpdated = array_unique(array_merge(...$businessUnitsShouldBeUpdated));
-                    $users = $ownerTree->getUsersAssignedToBusinessUnits(
+                    $users = $this->getOwnerTree()->getUsersAssignedToBusinessUnits(
                         $businessUnitsShouldBeUpdated
                     );
                     if ($entity->getId() && !\in_array($entity->getId(), $users, true)) {
@@ -184,7 +190,7 @@ class DoctrineAclCacheListener
                         }
                     }
                     $businessUnitsShouldBeUpdated = array_unique(array_merge(...$businessUnitsShouldBeUpdated));
-                    $users = $ownerTree->getUsersAssignedToBusinessUnits(
+                    $users = $this->getOwnerTree()->getUsersAssignedToBusinessUnits(
                         $businessUnitsShouldBeUpdated
                     );
                     if ($entity->getId() && !\in_array($entity->getId(), $users, true)) {
@@ -203,7 +209,7 @@ class DoctrineAclCacheListener
                     }
                     $usersToBreakTheCache[] = array_unique(array_merge(
                         $changedUserIds,
-                        $ownerTree->getUsersAssignedToBusinessUnits(
+                        $this->getOwnerTree()->getUsersAssignedToBusinessUnits(
                             $parentBuIds
                         )
                     ));
@@ -286,5 +292,14 @@ class DoctrineAclCacheListener
         if ($businessUnit->getOwner()) {
             $this->collectParentBUs($businessUnit->getOwner(), $parentBUs);
         }
+    }
+
+    private function getOwnerTree(): OwnerTreeInterface
+    {
+        if (null === $this->ownerTree) {
+            $this->ownerTree = $this->ownerTreeProvider->getTree();
+        }
+
+        return $this->ownerTree;
     }
 }
