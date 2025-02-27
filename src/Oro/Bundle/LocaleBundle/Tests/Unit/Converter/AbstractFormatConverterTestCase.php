@@ -12,6 +12,7 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit\Framework\TestCa
     protected const LOCALE_EN = 'en';
     protected const LOCALE_RU = 'ru';
     protected const LOCALE_AR = 'ar';
+    protected const LOCALE_BS_BA = 'bs_BA';
     protected const LOCALE_PT_BR = 'pt_BR';
     protected const LOCALE_ZH_CN = 'zh_CN';
 
@@ -69,6 +70,16 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit\Framework\TestCa
         [\IntlDateFormatter::LONG, \IntlDateFormatter::NONE, self::LOCALE_ZH_CN, null, "y年M月d日"],
         [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, self::LOCALE_ZH_CN, null, "y年M月d日 HH:mm"],
         [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, self::LOCALE_ZH_CN, null, "y年M月d日"],
+
+        [null, null, self::LOCALE_BS_BA, null, "d. MMM y."],
+        [\IntlDateFormatter::LONG, \IntlDateFormatter::MEDIUM, self::LOCALE_BS_BA, null, "d. MMMM y. 'u' HH:mm:ss"],
+        [\IntlDateFormatter::LONG, \IntlDateFormatter::NONE, self::LOCALE_BS_BA, null, "d. MMMM y."],
+        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, self::LOCALE_BS_BA, null, "d. MMM y. 'u' HH:mm"],
+        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, self::LOCALE_BS_BA, null, "d. MMM y."],
+        [null, \IntlDateFormatter::NONE, self::LOCALE_BS_BA, null, "d. MMM y."],
+        [\IntlDateFormatter::NONE, \IntlDateFormatter::MEDIUM, self::LOCALE_BS_BA, null, "HH:mm:ss"],
+        [\IntlDateFormatter::NONE, \IntlDateFormatter::SHORT, self::LOCALE_BS_BA, null, "HH:mm"],
+        [\IntlDateFormatter::NONE, null, self::LOCALE_BS_BA, null, "HH:mm"],
     ];
 
     #[\Override]

@@ -119,8 +119,8 @@ services:
     oro_test.entity_class_resolver:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\EntityClassResolver
         arguments:
-           - '@oro_entity.entity_alias_resolver'
-           - '@Doctrine\Inflector\Inflector'
+            - '@oro_entity.entity_alias_resolver'
+            - '@Doctrine\Inflector\Inflector'
 
     oro_test.entity_supplement:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Fixtures\EntitySupplement
@@ -131,7 +131,7 @@ services:
 
     oro_test.reference_repository:
         class: Doctrine\Common\Collections\ArrayCollection
-        factory: ['@oro_test.alice_loader', getReferenceRepository]
+        factory: [ '@oro_test.alice_loader', getReferenceRepository ]
 
     oro_behat_extension.suite.oro_suite_generator:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Suite\OroSuiteGenerator
@@ -154,7 +154,7 @@ services:
             - '@oro_test.provider.xss_payload_provider'
             - '@oro_test.encoder.default'
         tags:
-            - {name: nelmio_alice.faker.provider}
+            - { name: nelmio_alice.faker.provider }
 
     oro_test.faker.provider.user_hash_password:
         class: Oro\Bundle\TestFrameworkBundle\Faker\UserHashPasswordProvider
@@ -244,6 +244,5 @@ services:
         public: true
         arguments:
             - '@output.formatter.pretty'
+            - '@event_dispatcher'
             - !tagged_iterator oro_test.behat.healer
-        calls:
-            - [ setHealers, [ !tagged_iterator oro_test.behat.healer ] ]

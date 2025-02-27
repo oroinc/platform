@@ -1,8 +1,8 @@
 /* @theme: default; */
 
 @mixin badge(
-    $badge-size:        18px,
-    $badge-f-size:      12px,
+    $badge-size:        var(--badge-size, 18px),
+    $badge-f-size:      var(--badge-f-size, 12px),
     $badge-bg:          var(--badge-bg-color, get-var-color('primary', 'main')),
     $badge-radius:      100px,
     $badge-color:       var(--badge-color, get-var-color('neutral', 'white-100')),
@@ -18,10 +18,10 @@
     min-height: $badge-size;
 
     padding-inline: 5px;
-
+    letter-spacing: .2px;
     text-align: center;
+    font-weight: font-weight('medium');
     font-size: $badge-f-size;
-
     background-color: $badge-bg;
     border-radius: $badge-radius;
     color: $badge-color;

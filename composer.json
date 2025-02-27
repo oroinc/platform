@@ -184,7 +184,7 @@
             "when": "3.7.8",
             "crypto-js": "4.2.0",
             "jquery-mousewheel": "3.1.13",
-            "tinymce": "7.1.*",
+            "tinymce": "6.8.5",
             "timepicker": "1.14.0",
             "datepair.js": "0.4.*",
             "jquery-ui-multiselect-widget": "2.0.1",

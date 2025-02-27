@@ -1,0 +1,14 @@
+/* @theme: default; */
+
+@mixin indicator(
+    $indicator-width: var(--indicator-width, 8px),
+    $indicator-height: var(--indicator-height, 8px),
+    $indicator-background-color: var(--indicator-bg-color, get-var-color('primary', 'main')),
+) {
+    display: block;
+    width: $indicator-width;
+    height: $indicator-height;
+
+    border-radius: 50%;
+    background-color: $indicator-background-color;
+}

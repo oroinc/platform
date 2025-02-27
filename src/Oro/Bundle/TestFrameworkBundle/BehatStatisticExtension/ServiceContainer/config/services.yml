@@ -45,3 +45,12 @@ services:
             - [setClassName, ['Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Model\FeatureStatistic']]
         tags:
             - { name: 'avg_strategy_aware' }
+
+    oro_behat_statistic.healer_statistic_subscriber:
+        class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\EventListener\HealerStatisticSubscriber
+        arguments:
+            - '@oro_behat_statistic.database.connection'
+            - '@oro_behat_statistic.criteria_array_collection'
+            - '@fob_symfony.kernel'
+        tags:
+            - { name: 'event_dispatcher.subscriber' }
