@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\LocaleBundle\Converter;
 
+/**
+ * Datetime converter for moment.js format
+ */
 class MomentDateTimeFormatConverter extends AbstractDateTimeFormatConverter
 {
     const NAME = 'moment';
@@ -70,6 +73,17 @@ class MomentDateTimeFormatConverter extends AbstractDateTimeFormatConverter
      */
     protected function convertFormat($format)
     {
-        return preg_replace('~[\'"](.*?)[\'"]~', '[$1]', parent::convertFormat($format));
+        /**
+         * we replace element inside quotes only if it's not empty, we don't need empty [] in datetime format
+         * e.g. return incorrect Bosnian datetime format with empty square brackets
+         */
+        $convertedFormat =  preg_replace_callback('~[\'"](.*?)[\'"]~', function ($matches) {
+            if ($matches[1] === '') {
+                return $matches[1];
+            }
+            return "[{$matches[1]}]";
+        }, parent::convertFormat($format));
+
+        return preg_replace('/\s+/', ' ', $convertedFormat);
     }
 }
