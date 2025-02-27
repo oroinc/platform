@@ -25,6 +25,9 @@ class MomentDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
             'en custom' => ["MMMM D, YYYY", \IntlDateFormatter::LONG, self::LOCALE_EN],
             'ru default' => ["DD.MM.YYYY", null, self::LOCALE_RU],
             'ru custom' => ["D MMMM YYYY [г.]", \IntlDateFormatter::LONG, self::LOCALE_RU],
+            'bs default' => ["D. MMM YYYY.", null, 'bs_BA'],
+            'bs custom medium' => ["D. MMM YYYY.", \IntlDateFormatter::MEDIUM, 'bs_BA'],
+            'bs custom long' => ["D. MMMM YYYY.", \IntlDateFormatter::LONG, 'bs_BA'],
             'ar default' => ['D MMMM YYYY', null, self::LOCALE_AR],
             'ar custom' => ['DD‏/MM‏/YYYY', \IntlDateFormatter::MEDIUM, self::LOCALE_AR],
         ];
@@ -42,6 +45,8 @@ class MomentDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
             'ru custom' => ["H:mm:ss", \IntlDateFormatter::MEDIUM, self::LOCALE_RU],
             'ar default' => ['h:mm:ss', null, self::LOCALE_AR],
             'ar custom' => ['h:mm', \IntlDateFormatter::SHORT, self::LOCALE_AR],
+            'bs default' => ["HH:mm", null, self::LOCALE_BS_BA],
+            'bs custom' => ["HH:mm:ss", \IntlDateFormatter::MEDIUM, self::LOCALE_BS_BA],
         ];
     }
 
@@ -72,6 +77,13 @@ class MomentDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
                 \IntlDateFormatter::SHORT,
                 self::LOCALE_AR,
             ],
+            'bs default' => ["D. MMM YYYY.", null, null, self::LOCALE_BS_BA],
+            'bs custom' => [
+                "D. MMM YYYY. HH:mm",
+                \IntlDateFormatter::MEDIUM,
+                \IntlDateFormatter::SHORT,
+                self::LOCALE_BS_BA,
+            ],
         ];
     }
 
@@ -84,6 +96,7 @@ class MomentDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
             'en default' => ["MMM D", self::LOCALE_EN],
             'ru default' => ["DD.MM", self::LOCALE_RU],
             'ar default' => ["DD‏/MM", self::LOCALE_AR],
+            'bs default' => ["D. MMM", self::LOCALE_BS_BA],
         ];
     }
 }
