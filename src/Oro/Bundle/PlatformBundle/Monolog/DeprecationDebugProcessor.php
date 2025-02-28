@@ -7,6 +7,7 @@ use Symfony\Bridge\Monolog\Processor\DebugProcessor;
 /**
  * Decorates DebugProcessor to allow disabling of deprecations logging as there are too many of them.
  * This significantly improves dev environment performance.
+ * @deprecated Use Oro/Bundle/LoggerBundle/Monolog/DisableDeprecationsHandlerWrapper.php instead.
  */
 class DeprecationDebugProcessor extends DebugProcessor
 {
