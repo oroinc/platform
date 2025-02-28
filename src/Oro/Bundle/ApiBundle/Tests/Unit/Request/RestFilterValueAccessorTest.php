@@ -34,7 +34,8 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
                 FilterOperator::ENDS_WITH       => '$',
                 FilterOperator::NOT_ENDS_WITH   => '!$',
                 FilterOperator::EMPTY_VALUE     => null
-            ]
+            ],
+            ['test_key']
         );
         $accessor->enableRequestBodyParsing();
 
@@ -49,7 +50,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testParseQueryString()
+    public function testParseQueryString(): void
     {
         $queryStringValues = [
             'prm1[eq]=val1'              => ['prm1', 'eq', 'val1', 'prm1', 'prm1[eq]'],
@@ -149,7 +150,21 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testParseUrlEncodedQueryString()
+    public function testParseUrlQueryStringWithTestKeyThatShouldBeSkipped(): void
+    {
+        $request = Request::create('http://test.com?test_key=test_value');
+
+        $accessor = $this->getRestFilterValueAccessor($request);
+
+        self::assertEquals('', $accessor->getQueryString());
+        self::assertCount(0, $accessor->getAll(), 'getAll');
+        self::assertEquals(
+            [],
+            $accessor->getGroup('filter')
+        );
+    }
+
+    public function testParseUrlEncodedQueryString(): void
     {
         $queryStringValues = [
             'filter%5Bfield1%5D%5Beq%5D=val1' => ['filter[field1]', 'eq', 'val1', 'field1', 'filter[field1]']
@@ -172,7 +187,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testParseQueryStringWithEmptyValues()
+    public function testParseQueryStringWithEmptyValues(): void
     {
         $queryStringValues = [
             'prm1='             => ['prm1', 'eq', '', 'prm1', 'prm1'],
@@ -248,7 +263,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testRequestBody()
+    public function testRequestBody(): void
     {
         $requestBody = [
             'prm1'   => ['eq' => 'val1', 'neq' => 'val1_1'],
@@ -385,7 +400,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testRequestBodyForNotStructuredData()
+    public function testRequestBodyForNotStructuredData(): void
     {
         $requestBody = [
             'prm1[eq]'            => 'val1',
@@ -577,7 +592,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
     public function testRequestBodyWithUnexpectedNotStructuredData(
         array $requestBody,
         string $queryString
-    ) {
+    ): void {
         $request = Request::create('http://test.com', 'DELETE', $requestBody);
 
         $accessor = $this->getRestFilterValueAccessor($request);
@@ -602,7 +617,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testRequestBodyWithEmptyValues()
+    public function testRequestBodyWithEmptyValues(): void
     {
         $requestBody = [
             'prm1'   => '',
@@ -675,7 +690,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRequestBodyWithNotStringScalarParameterValue()
+    public function testRequestBodyWithNotStringScalarParameterValue(): void
     {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Expected string value for the filter "prm1", given "int".');
@@ -690,7 +705,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getAll();
     }
 
-    public function testRequestBodyWithArrayParameterValue()
+    public function testRequestBodyWithArrayParameterValue(): void
     {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Expected string value for the filter "prm1", given "array".');
@@ -705,7 +720,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getAll();
     }
 
-    public function testRequestBodyWithWithObjectParameterValue()
+    public function testRequestBodyWithWithObjectParameterValue(): void
     {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Expected string value for the filter "prm1", given "stdClass".');
@@ -720,7 +735,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getAll();
     }
 
-    public function testRequestBodyWithNotStringScalarParameterValueWithOperator()
+    public function testRequestBodyWithNotStringScalarParameterValueWithOperator(): void
     {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Expected string value for the filter "prm1[neq]", given "int".');
@@ -735,7 +750,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getAll();
     }
 
-    public function testRequestBodyWithArrayParameterValueWithOperator()
+    public function testRequestBodyWithArrayParameterValueWithOperator(): void
     {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Expected string value for the filter "prm1[neq]", given "array".');
@@ -750,7 +765,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getAll();
     }
 
-    public function testRequestBodyWithObjectParameterValueWithOperator()
+    public function testRequestBodyWithObjectParameterValueWithOperator(): void
     {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Expected string value for the filter "prm1[neq]", given "stdClass".');
@@ -765,7 +780,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getAll();
     }
 
-    public function testRequestBodyWithNestedParameterAndNotStringScalarParameterValue()
+    public function testRequestBodyWithNestedParameterAndNotStringScalarParameterValue(): void
     {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Expected string value for the filter "filter[prm1]", given "int".');
@@ -780,7 +795,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getAll();
     }
 
-    public function testRequestBodyWithNestedParameterAndArrayParameterValue()
+    public function testRequestBodyWithNestedParameterAndArrayParameterValue(): void
     {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Expected string value for the filter "filter[prm1]", given "array".');
@@ -795,7 +810,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getAll();
     }
 
-    public function testRequestBodyWithNestedParameterAndObjectParameterValue()
+    public function testRequestBodyWithNestedParameterAndObjectParameterValue(): void
     {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Expected string value for the filter "filter[prm1]", given "stdClass".');
@@ -810,7 +825,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getAll();
     }
 
-    public function testRequestBodyWithNestedParameterAndNotStringScalarParameterValueWithOperator()
+    public function testRequestBodyWithNestedParameterAndNotStringScalarParameterValueWithOperator(): void
     {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Expected string value for the filter "filter[prm1][neq]", given "int".');
@@ -825,7 +840,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getAll();
     }
 
-    public function testRequestBodyWithNestedParameterAndArrayParameterValueWithOperator()
+    public function testRequestBodyWithNestedParameterAndArrayParameterValueWithOperator(): void
     {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Expected string value for the filter "filter[prm1][neq]", given "array".');
@@ -840,7 +855,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getAll();
     }
 
-    public function testRequestBodyWithNestedParameterAndObjectParameterValueWithOperator()
+    public function testRequestBodyWithNestedParameterAndObjectParameterValueWithOperator(): void
     {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Expected string value for the filter "filter[prm1][neq]", given "stdClass".');
@@ -855,7 +870,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getAll();
     }
 
-    public function testFilterFromQueryStringShouldOverrideFilterFromRequestBody()
+    public function testFilterFromQueryStringShouldOverrideFilterFromRequestBody(): void
     {
         $request = Request::create(
             'http://test.com?prm1=val1',
@@ -879,7 +894,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGroupedFilterFromQueryStringShouldOverrideFilterFromRequestBody()
+    public function testGroupedFilterFromQueryStringShouldOverrideFilterFromRequestBody(): void
     {
         $request = Request::create(
             'http://test.com?filter[field1]=val1',
@@ -903,7 +918,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFilterFromRequestBodyShouldByIgnoredWhenRequestBodyParsingDisabled()
+    public function testFilterFromRequestBodyShouldByIgnoredWhenRequestBodyParsingDisabled(): void
     {
         $request = Request::create(
             'http://test.com?prm1=val1',
@@ -927,7 +942,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOverrideExistingFilterValue()
+    public function testOverrideExistingFilterValue(): void
     {
         $accessor = $this->getRestFilterValueAccessor(Request::create('http://test.com?prm1=oldValue'));
 
@@ -956,7 +971,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOverrideExistingGroupedFilterValue()
+    public function testOverrideExistingGroupedFilterValue(): void
     {
         $accessor = $this->getRestFilterValueAccessor(Request::create('http://test.com?group[path]=oldValue'));
 
@@ -985,7 +1000,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddNewFilterValue()
+    public function testAddNewFilterValue(): void
     {
         $accessor = $this->getRestFilterValueAccessor(Request::create('http://test.com'));
 
@@ -1008,7 +1023,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddNewGroupedFilterValue()
+    public function testAddNewGroupedFilterValue(): void
     {
         $accessor = $this->getRestFilterValueAccessor(Request::create('http://test.com'));
 
@@ -1031,7 +1046,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRemoveExistingFilterValueViaSetMethod()
+    public function testRemoveExistingFilterValueViaSetMethod(): void
     {
         $accessor = $this->getRestFilterValueAccessor(Request::create('http://test.com?prm1=val1'));
 
@@ -1049,7 +1064,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRemoveExistingGroupedFilterValueViaSetMethod()
+    public function testRemoveExistingGroupedFilterValueViaSetMethod(): void
     {
         $accessor = $this->getRestFilterValueAccessor(Request::create('http://test.com?group[path]=val1'));
 
@@ -1070,7 +1085,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRemoveExistingFilterValueViaRemoveMethod()
+    public function testRemoveExistingFilterValueViaRemoveMethod(): void
     {
         $accessor = $this->getRestFilterValueAccessor(Request::create('http://test.com?prm1=val1'));
 
@@ -1088,7 +1103,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRemoveExistingGroupedFilterValueViaRemoveMethod()
+    public function testRemoveExistingGroupedFilterValueViaRemoveMethod(): void
     {
         $accessor = $this->getRestFilterValueAccessor(Request::create('http://test.com?group[path]=val1'));
 
@@ -1109,7 +1124,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDefaultGroup()
+    public function testDefaultGroup(): void
     {
         $accessor = $this->getRestFilterValueAccessor(
             Request::create('http://test.com?filter1=val1&filter[filter2]=val2')

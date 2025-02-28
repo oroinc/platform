@@ -59,8 +59,10 @@ class RestFilterValueAccessor extends FilterValueAccessor
     /** @var array [operator short name => operator name, ...] */
     private array $operatorShortNameMap;
     private bool $enableRequestBodyParsing = false;
+    /** @var array array with the filters should be skipped */
+    private array $skippedFilterKeys;
 
-    public function __construct(Request $request, array $operatorNameMap)
+    public function __construct(Request $request, array $operatorNameMap, array $skippedFilterKeys)
     {
         $this->request = $request;
         $this->operatorNameMap = $operatorNameMap;
@@ -70,6 +72,8 @@ class RestFilterValueAccessor extends FilterValueAccessor
                 $this->operatorShortNameMap[$shortName] = $name;
             }
         }
+
+        $this->skippedFilterKeys = $skippedFilterKeys;
     }
 
     public function enableRequestBodyParsing(): void
@@ -182,6 +186,10 @@ class RestFilterValueAccessor extends FilterValueAccessor
                 } else {
                     $path = strtr($path, ['][' => ConfigUtil::PATH_DELIMITER, '[' => '', ']' => '']);
                     $normalizedKey = $group . '[' . $path . ']';
+                }
+
+                if (in_array($path, $this->skippedFilterKeys, true)) {
+                    continue;
                 }
 
                 $this->addParsed($sourceKey, $group, $normalizedKey, $path, rawurldecode($match['value']), $operator);

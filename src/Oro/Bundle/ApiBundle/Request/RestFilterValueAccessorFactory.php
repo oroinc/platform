@@ -13,6 +13,8 @@ class RestFilterValueAccessorFactory
     /** @var string[] [operator name => operator, ...] */
     private array $operators;
 
+    private array $skippedFilterKeys = [];
+
     /**
      * @param string[] $operators
      */
@@ -21,12 +23,17 @@ class RestFilterValueAccessorFactory
         $this->operators = $operators;
     }
 
+    public function addSkippedFilterKey(string $filterKey): void
+    {
+        $this->skippedFilterKeys[] = $filterKey;
+    }
+
     /**
      * Creates new instance of the filter value accessor.
      */
     public function create(Request $request, string $action): FilterValueAccessorInterface
     {
-        $filterValueAccessor = new RestFilterValueAccessor($request, $this->operators);
+        $filterValueAccessor = new RestFilterValueAccessor($request, $this->operators, $this->skippedFilterKeys);
         // the filter values can be sent in the request body only for the "delete_list" API action
         // or when the HTTP method is overridden, e.g. via the "X-HTTP-Method-Override" header (for example
         // for a case when GET HTTP request is sent via POST method due to a lot of filters
