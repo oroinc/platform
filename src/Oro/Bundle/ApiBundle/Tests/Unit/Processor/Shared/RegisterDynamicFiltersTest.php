@@ -68,11 +68,14 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 
     private function getRestFilterValueAccessor(Request $request): RestFilterValueAccessor
     {
-        return new RestFilterValueAccessor(
+        $accessor = new RestFilterValueAccessor(
             $request,
             '(!|<|>|%21|%3C|%3E)?(=|%3D)|<>|%3C%3E|<|>|\*|%3C|%3E|%2A|(!|%21)?(\*|~|\^|\$|%2A|%7E|%5E|%24)',
             [FilterOperator::EQ => '=', FilterOperator::NEQ => '!=']
         );
+        $accessor->setSkippedFilterKeys(['test_key']);
+
+        return $accessor;
     }
 
     private function getComparisonFilter(string $dataType, bool $isCollection = false): ComparisonFilter
@@ -618,7 +621,7 @@ class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
         self::assertEquals($expectedFilters, $this->context->getFilters());
     }
 
-    public function testProcessForToManyRelatedEntityFieldWithNotEqualOperator()
+    public function testProcessForToManyRelatedEntityFieldWithNotEqualOperator(): void
     {
         $primaryEntityConfig = $this->getEntityDefinitionConfig(['id', 'groups']);
         $primaryEntityFilters = $this->getFiltersConfig();

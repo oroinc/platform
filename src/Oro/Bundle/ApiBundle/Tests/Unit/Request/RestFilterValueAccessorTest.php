@@ -37,6 +37,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
                 FilterOperator::EMPTY_VALUE     => null
             ]
         );
+        $accessor->setSkippedFilterKeys(['test_key']);
         $accessor->enableRequestBodyParsing();
 
         return $accessor;
@@ -316,6 +317,20 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testParseUrlQueryStringWithTestKeyThatShouldBeSkipped(): void
+    {
+        $request = Request::create('http://test.com?test_key=test_value');
+
+        $accessor = $this->getRestFilterValueAccessor($request);
+
+        self::assertEquals('', $accessor->getQueryString());
+        self::assertCount(0, $accessor->getAll(), 'getAll');
+        self::assertEquals(
+            [],
+            $accessor->getGroup('filter')
+        );
+    }
+
     public function testParseUrlEncodedQueryStringWithAlternativeSyntaxOfFilters()
     {
         $queryStringValues = [
@@ -339,7 +354,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testParseQueryStringWithEmptyValues()
+    public function testParseQueryStringWithEmptyValues(): void
     {
         $queryStringValues = [
             'prm1='             => ['prm1', 'eq', '', 'prm1', 'prm1'],
@@ -415,7 +430,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testRequestBody()
+    public function testRequestBody(): void
     {
         $requestBody = [
             'prm1'   => 'val1',
@@ -1119,7 +1134,7 @@ class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         $accessor->getAll();
     }
 
-    public function testFilterFromQueryStringShouldOverrideFilterFromRequestBody()
+    public function testFilterFromQueryStringShouldOverrideFilterFromRequestBody(): void
     {
         $request = Request::create(
             'http://test.com?prm1=val1',
