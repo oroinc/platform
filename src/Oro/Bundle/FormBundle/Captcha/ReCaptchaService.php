@@ -49,7 +49,9 @@ class ReCaptchaService implements CaptchaServiceInterface
 
     private function getSiteUrl(): string
     {
-        return rtrim(str_replace(['http://', 'https://'], '', $this->getCurrentUrl()), '/');
+        $urlParts = parse_url($this->getCurrentUrl());
+
+        return $urlParts['host'];
     }
 
     protected function getCurrentUrl(): string
