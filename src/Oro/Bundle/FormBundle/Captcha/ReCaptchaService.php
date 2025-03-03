@@ -28,6 +28,10 @@ class ReCaptchaService implements CaptchaServiceInterface
 
     public function isVerified($value): bool
     {
+        if (!$value) {
+            return false;
+        }
+
         $privateKey = $this->getPrivateKey();
         $score = $this->getScoreThreshold();
         $reCaptcha = $this->reCaptchaClientFactory->create($privateKey);
