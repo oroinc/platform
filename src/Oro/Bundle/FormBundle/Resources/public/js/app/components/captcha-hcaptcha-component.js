@@ -1,9 +1,10 @@
 import BaseComponent from 'oroui/js/app/components/base/component';
 import $ from 'jquery';
 import scriptjs from 'scriptjs';
+import _ from 'underscore';
 
 const CaptchaHCaptchaComponent = BaseComponent.extend({
-    apiScript: 'https://js.hcaptcha.com/1/api.js?render=explicit&onload=onloadHCaptchaCallback',
+    apiScript: 'https://js.hcaptcha.com/1/api.js?onload=onloadHCaptchaCallback&render=explicit',
 
     constructor: function CaptchaHCaptchaComponent(options) {
         CaptchaHCaptchaComponent.__super__.constructor.call(this, options);
@@ -25,9 +26,7 @@ const CaptchaHCaptchaComponent = BaseComponent.extend({
             };
 
             if (typeof window.hcaptcha == 'undefined') {
-                scriptjs(this.apiScript, function() {
-                    window.onloadHCaptchaCallback();
-                });
+                scriptjs(this.apiScript);
             }
         }
 
@@ -39,21 +38,26 @@ const CaptchaHCaptchaComponent = BaseComponent.extend({
     dispose: function() {
         CaptchaHCaptchaComponent.__super__.dispose.call(this);
 
+        delete window.loadHCaptchaCallbacks;
         if (typeof window.hcaptcha != 'undefined' && this.captchaWidgetId) {
             window.hcaptcha.reset();
         }
     },
 
     initializeView(options) {
-        const $container = $('<div id="' + $(options._sourceElement).attr('id') + '_container"/>');
+        const $sourceEl = $(options._sourceElement);
+        const $container = $('<div id="' + $sourceEl.attr('id') + '_container"/>');
         $container.insertAfter(options._sourceElement);
 
-        window.hcaptcha.render($container[0], {
+        const allowedOptions = ['size', 'theme', 'orientation', 'tabindex'];
+        const captchaOptions = Object.assign({
             sitekey: options.site_key,
             callback: function(token) {
                 options._sourceElement.val(token);
             }
-        });
+        }, _.pick($sourceEl.data(), allowedOptions));
+
+        window.hcaptcha.render($container[0], captchaOptions);
     }
 });
 

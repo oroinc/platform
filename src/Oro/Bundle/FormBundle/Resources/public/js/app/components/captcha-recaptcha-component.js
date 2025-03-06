@@ -17,11 +17,22 @@ const CaptchaReCaptchaComponent = BaseComponent.extend({
 
     initializeView(options) {
         window.grecaptcha.ready(function() {
-            window.grecaptcha
-                .execute(options.site_key, {action: options.action})
-                .then(function(token) {
-                    options._sourceElement.val(token);
-                });
+            options._sourceElement.data('captcha-received', false);
+            const $form = $(options._sourceElement).closest('form');
+            $form.on('submit', function(e) {
+                if (options._sourceElement.data('captcha-received')) {
+                    return;
+                }
+
+                e.preventDefault();
+                window.grecaptcha
+                    .execute(options.site_key, {action: options.action})
+                    .then(function(token) {
+                        options._sourceElement.data('captcha-received', true);
+                        options._sourceElement.val(token);
+                        $form.trigger('submit');
+                    });
+            });
         });
     }
 });
