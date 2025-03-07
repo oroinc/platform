@@ -413,4 +413,20 @@ trait DocumentationTestTrait
             );
         }
     }
+
+    private function assertEmptyDocumentation(): void
+    {
+        $docs = $this->getExtractor()->all(self::VIEW);
+        $apiResources = [];
+        foreach ($docs as $doc) {
+            /** @var ApiDoc $annotation */
+            $annotation = $doc['annotation'];
+            $methods = implode(', ', $annotation->getRoute()->getMethods());
+            if (!$methods) {
+                $methods = 'ANY';
+            }
+            $apiResources[] = $methods . ' ' . $annotation->getRoute()->getPath();
+        }
+        self::assertSame([], $apiResources);
+    }
 }

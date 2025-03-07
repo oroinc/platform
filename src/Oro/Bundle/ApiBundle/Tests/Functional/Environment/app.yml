@@ -1,5 +1,11 @@
 oro_api:
     config_files:
+        test_empty:
+            file_name: api_test_empty.yml
+            request_type: ['test_empty']
+        test_empty_based_on_rest_json_api:
+            file_name: api_test_empty.yml
+            request_type: ['test_empty_based_on_rest_json_api']
         test_new:
             file_name: api_test_new.yml
             request_type: ['test_new']
@@ -11,6 +17,19 @@ oro_api:
             request_type: ['test_no_api_doc_view']
 
     api_doc_views:
+        test_empty_rest_api:
+            label: Test API without resources
+            headers:
+                Accept: application/vnd.api+json
+                X-Test-Request-Type: test_empty
+            request_type: ['rest', 'json_api', 'test_empty']
+        test_empty_rest_api_based_on_rest_json_api:
+            label: Test API without resources (underlying_view = rest_json_api)
+            underlying_view: rest_json_api
+            headers:
+                Accept: application/vnd.api+json
+                X-Test-Request-Type: test_empty
+            request_type: ['rest', 'json_api', 'test_empty_based_on_rest_json_api']
         test_new_rest_api:
             label: Test API without default api.yml
             headers:

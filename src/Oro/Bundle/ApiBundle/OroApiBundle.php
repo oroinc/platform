@@ -4,11 +4,14 @@ namespace Oro\Bundle\ApiBundle;
 
 use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler;
+use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ProcessorBagCompilerPass;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\DependencyInjection\TestApiPass;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass;
 use Oro\Component\ChainProcessor\DependencyInjection\LoadApplicableCheckersCompilerPass;
 use Oro\Component\DependencyInjection\Compiler\PriorityNamedTaggedServiceCompilerPass;
 use Oro\Component\DependencyInjection\Compiler\PriorityNamedTaggedServiceWithHandlerCompilerPass;
+use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -155,6 +158,10 @@ class OroApiBundle extends Bundle
                     [$this->getPath() . '/Tests/Functional/Environment/Entity']
                 )
             );
+            if ($container instanceof ExtendedContainerBuilder) {
+                $container->addCompilerPass(new TestApiPass());
+                $container->moveCompilerPassBefore(TestApiPass::class, ProcessorBagCompilerPass::class);
+            }
         }
     }
 }
