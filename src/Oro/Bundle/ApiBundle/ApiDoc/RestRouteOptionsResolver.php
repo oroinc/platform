@@ -82,7 +82,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface, ResetIn
             $this->resolveTemplateRoute($route, $routes);
         } else {
             $entityType = $route->getDefault(self::ENTITY_ATTRIBUTE);
-            if ($entityType && $this->isResourceWithoutIdentifier($entityType)) {
+            if ($entityType && (!$this->getResource($entityType) || $this->isResourceWithoutIdentifier($entityType))) {
                 $route->setOption(self::HIDDEN_OPTION, true);
             }
         }
@@ -142,13 +142,11 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface, ResetIn
         }
         $resource = $this->getResource($entityType);
         if (null === $resource) {
-            throw new \LogicException(sprintf(
-                'The route "%s" has default value "%s" equals to "%s" that is unknown entity type.',
-                $routes->getName($route),
-                self::ENTITY_ATTRIBUTE,
-                $entityType
-            ));
+            $route->setOption(self::HIDDEN_OPTION, true);
+
+            return;
         }
+
         $subresource = null;
         $associationName = $route->getDefault(self::ASSOCIATION_ATTRIBUTE);
         if ($associationName) {
