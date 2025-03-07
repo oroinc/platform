@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Processor\NormalizeValue\AbstractProcessor;
  */
 class NormalizeDateTime extends AbstractProcessor
 {
-    public const REQUIREMENT = '\d{4}(-\d{2}(-\d{2}(T\d{2}(:\d{2}(:\d{2}(\.\d+)?)?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?)?';
+    public const REQUIREMENT = '\d{4}(-\d{2}(-\d{2}(T\d{2}(:\d{2})?(:\d{2})?(\.\d{2})?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?';
 
     #[\Override]
     protected function getDataTypeString(): string
@@ -39,6 +39,12 @@ class NormalizeDateTime extends AbstractProcessor
         $value = str_replace(' ', '+', $value);
 
         $precision = NormalizedDateTime::PRECISION_DAY;
+        $timezone = null;
+        $timezonePos = $this->findTimezonePas($value);
+        if ($timezonePos) {
+            $timezone .= substr($value, $timezonePos);
+            $value = substr($value, 0, $timezonePos);
+        }
         $delimiterCount = substr_count($value, '-');
         if (0 === $delimiterCount) {
             $value .= '-01-01';
@@ -58,6 +64,9 @@ class NormalizeDateTime extends AbstractProcessor
                 $precision = NormalizedDateTime::PRECISION_MINUTE;
             }
         }
+        if ($timezone) {
+            $value .= $timezone;
+        }
 
         // The timezone is ignored when DateTime value specifies a timezone (e.g. 2010-01-28T15:00:00+02:00)
         // This should be fixed in BAP-8710. Need to use timezone from system config instead of UTC.
@@ -65,5 +74,29 @@ class NormalizeDateTime extends AbstractProcessor
         $result->setPrecision($precision);
 
         return $result;
+    }
+
+    private function findTimezonePas(string $value): ?int
+    {
+        $timePos = strrpos($value, 'T');
+        if (false === $timePos) {
+            return null;
+        }
+
+        $timePos++;
+        $timezonePos = strrpos($value, 'Z', $timePos);
+        if (false !== $timezonePos) {
+            return $timezonePos;
+        }
+        $timezonePos = strrpos($value, '+', $timePos);
+        if (false !== $timezonePos) {
+            return $timezonePos;
+        }
+        $timezonePos = strrpos($value, '-', $timePos);
+        if (false !== $timezonePos) {
+            return $timezonePos;
+        }
+
+        return null;
     }
 }
