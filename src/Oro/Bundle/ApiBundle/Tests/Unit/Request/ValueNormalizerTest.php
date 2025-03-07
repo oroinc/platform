@@ -909,8 +909,57 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 true
             ],
             [
+                $this->getNormalizedDateTime('2010-01-28T15:01:00', NormalizedDateTime::PRECISION_MINUTE),
+                '2010-01-28T15:01Z',
+                DataType::DATETIME,
+                [RequestType::REST],
+                true
+            ],
+            [
+                $this->getNormalizedDateTime('2010-01-28T15:01:00', NormalizedDateTime::PRECISION_MINUTE),
+                '2010-01-28T15:01+00:00',
+                DataType::DATETIME,
+                [RequestType::REST],
+                true
+            ],
+            [
+                $this->getNormalizedDateTime('2010-01-28T15:01:00', NormalizedDateTime::PRECISION_MINUTE),
+                '2010-01-28T15:01-00:00',
+                DataType::DATETIME,
+                [RequestType::REST],
+                true
+            ],
+            [
                 $this->getNormalizedDateTime('2010-01-28T15:00:00', NormalizedDateTime::PRECISION_HOUR),
                 '2010-01-28T15',
+                DataType::DATETIME,
+                [RequestType::REST],
+                true
+            ],
+            [
+                $this->getNormalizedDateTime('2010-01-28T15:00:00', NormalizedDateTime::PRECISION_HOUR),
+                '2010-01-28T15Z',
+                DataType::DATETIME,
+                [RequestType::REST],
+                true
+            ],
+            [
+                $this->getNormalizedDateTime('2010-01-28T15:00:00', NormalizedDateTime::PRECISION_HOUR),
+                '2010-01-28T15+00:00',
+                DataType::DATETIME,
+                [RequestType::REST],
+                true
+            ],
+            [
+                $this->getNormalizedDateTime('2010-01-28T15:00:00', NormalizedDateTime::PRECISION_HOUR),
+                '2010-01-28T15-00:00',
+                DataType::DATETIME,
+                [RequestType::REST],
+                true
+            ],
+            [
+                $this->getNormalizedDateTime('2010-01-28T15:01:02'),
+                '2010-01-28T15:01:02',
                 DataType::DATETIME,
                 [RequestType::REST],
                 true
@@ -925,6 +974,13 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
             [
                 $this->getNormalizedDateTime('2010-01-28T15:01:02'),
                 '2010-01-28T15:01:02+00:00',
+                DataType::DATETIME,
+                [RequestType::REST],
+                true
+            ],
+            [
+                $this->getNormalizedDateTime('2010-01-28T15:01:02'),
+                '2010-01-28T15:01:02-00:00',
                 DataType::DATETIME,
                 [RequestType::REST],
                 true
