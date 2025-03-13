@@ -18,6 +18,17 @@
     width: auto;
 }
 
+// Visually separate group for dependent fields if container contains depend attribute
+.dependent-fields-container {
+    max-width: $form-container-control-group-max-width;
+
+    border-radius: $border-radius;
+
+    background-color: $primary-900;
+    padding-top: $content-padding-medium;
+    padding-bottom: $content-padding-large;
+}
+
 .form-horizontal {
     .control-group {
         display: flex;
