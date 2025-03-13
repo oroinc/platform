@@ -37,7 +37,7 @@
     {{ form_widget(form) }}
     {% set collapseId = 'collapse-' ~ form.vars.id|default('') %}
     {% if form.vars.attr['data-role']|default('') == constant('Oro\\Bundle\\ThemeBundle\\Form\\Configuration\\ConfigurationChildBuilderInterface::DATA_ROLE_CHANGE_PREVIEW') %}
-        <div class="heme-configuration-trigger">
+        <div class="theme-configuration-trigger">
             <button type="button"
                 class="btn btn-link btn--no-x-offset"
                 data-toggle="collapse"
