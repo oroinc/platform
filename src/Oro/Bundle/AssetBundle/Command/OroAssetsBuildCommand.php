@@ -6,6 +6,7 @@ namespace Oro\Bundle\AssetBundle\Command;
 
 use Oro\Bundle\AssetBundle\AssetCommandProcessFactory;
 use Oro\Bundle\AssetBundle\Cache\AssetConfigCache;
+use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -38,6 +39,8 @@ class OroAssetsBuildCommand extends Command
         OutputInterface::VERBOSITY_VERBOSE => 'minimal',
     ];
 
+    private const ADMIN_ORO_THEME = 'admin.oro';
+
     protected static $defaultName = 'oro:assets:build';
 
     private AssetCommandProcessFactory $nodeProcessFactory;
@@ -52,6 +55,8 @@ class OroAssetsBuildCommand extends Command
     private $npmInstallTimeout;
 
     private bool $withBabel;
+
+    private ThemeManager $themeManager;
 
     /**
      * @param AssetCommandProcessFactory $nodeProcessFactory
@@ -102,6 +107,7 @@ class OroAssetsBuildCommand extends Command
             ->addOption('skip-sourcemap', null, InputOption::VALUE_NONE, 'Skip building source maps')
             ->addOption('skip-rtl', null, InputOption::VALUE_NONE, 'Skip building RTL styles')
             ->addOption('analyze', null, InputOption::VALUE_NONE, 'Run BundleAnalyzerPlugin')
+            ->addOption('iterate-themes', null, InputOption::VALUE_NONE, 'Run webpack for each theme separately')
         ;
         $this
             ->setDescription('Runs webpack to build assets.')
@@ -169,6 +175,9 @@ The <info>--analyze</info> option can be used to run BundleAnalyzerPlugin:
 
   <info>php %command.full_name% --analyze</info>
 
+The <info>--iterate-themes</info> option can be used to run webpack for each enabled theme separately:
+
+  <info>php %command.full_name% --iterate-themes</info>
 HELP
                 // @codingStandardsIgnoreEnd
             );
@@ -194,6 +203,7 @@ HELP
             ->addUsage('--skip-rtl')
             ->addUsage('--with-babel')
             ->addUsage('--analyze')
+            ->addUsage('--iterate-themes')
         ;
     }
 
@@ -216,7 +226,8 @@ HELP
         }
 
         $output->writeln('<info>Building assets.</info>');
-        $this->buildAssets($input, $output);
+        $this->handleAssets($input, $output);
+
         if (!$input->getOption('hot') && !$input->getOption('watch')) {
             $io->success('All assets were successfully built.');
         }
@@ -365,8 +376,29 @@ HELP
         }
     }
 
+    private function handleAssets(InputInterface $input, OutputInterface $output): void
+    {
+        if (!$input->getArgument('theme') && $input->getOption('iterate-themes')) {
+            /** Build asset for default admin oro theme */
+            $input->setArgument('theme', self::ADMIN_ORO_THEME);
+            $this->buildAssets($input, $output);
+
+            foreach ($this->themeManager->getEnabledThemes() as $theme) {
+                $input->setArgument('theme', $theme->getName());
+                $this->buildAssets($input, $output);
+            }
+        } else {
+            $this->buildAssets($input, $output);
+        }
+    }
+
     private function getKernel(): Kernel
     {
         return $this->getApplication()->getKernel();
+    }
+
+    public function setThemeManager(ThemeManager $themeManager): void
+    {
+        $this->themeManager = $themeManager;
     }
 }
