@@ -9,7 +9,7 @@ define(function(require) {
     const routing = require('routing');
     const BaseComponent = require('oroui/js/app/components/base/component');
 
-    const ShemaUpdateActionComponent = BaseComponent.extend({
+    const SchemaUpdateActionComponent = BaseComponent.extend({
         /**
          * @property {Object}
          */
@@ -20,8 +20,8 @@ define(function(require) {
         /**
          * @inheritdoc
          */
-        constructor: function ShemaUpdateActionComponent(options) {
-            ShemaUpdateActionComponent.__super__.constructor.call(this, options);
+        constructor: function SchemaUpdateActionComponent(options) {
+            SchemaUpdateActionComponent.__super__.constructor.call(this, options);
         },
 
         /**
@@ -31,13 +31,13 @@ define(function(require) {
             this.options = _.defaults(options || {}, this.options);
 
             const el = this.options._sourceElement;
-            const self = this;
+            const title = __('Schema update confirmation');
+            const content = `
+                <p>${__('Your config changes will be applied to schema.')}
+                <br>${__('It may take few minutes...')}</p>
+            `;
 
-            $(el).on('click', function(e) {
-                const title = __('Schema update confirmation');
-                const content = '<p>' + __('Your config changes will be applied to schema.') + '<br/>' +
-                    __('It may take few minutes...') + '</p>';
-                /** @type oro.Modal */
+            $(el).on('click', e => {
                 const confirmUpdate = new Modal({
                     className: 'modal modal-primary',
                     cancelText: __('Cancel'),
@@ -46,8 +46,7 @@ define(function(require) {
                     content: content
                 });
 
-                function execute() {
-                    const url = routing.generate(self.options.route);
+                confirmUpdate.on('ok', () => {
                     const progress = $('#progressbar').clone();
                     progress
                         .removeAttr('id')
@@ -63,47 +62,166 @@ define(function(require) {
                         content: content
                     });
                     modal.open();
-                    modal.$el.find('.modal-body').append(progress);
-                    modal.$el.find('.modal-footer').html('');
-                    progress.show();
-
-                    $.post({
-                        url: url,
-                        errorHandlerMessage: function(event, xhr) {
-                            let message = __('oro.entity_extend.schema_update_failed');
-                            if (xhr.responseJSON && xhr.responseJSON.message) {
-                                message += ' ' + xhr.responseJSON.message;
-                            }
-                            return message;
-                        }
-                    }).done(function() {
-                        modal.close();
-                        mediator.execute(
-                            'showFlashMessage',
-                            'success',
-                            __('oro.entity_extend.schema_updated'),
-                            {afterReload: true}
-                        );
-                        mediator.execute('showMessage', 'info', __('Please wait for the page to reload...'));
-                        mediator.execute('showLoading');
-                        // force reload of the application to make sure 'js/routes' is reloaded
-                        if (typeof self.options.redirectRoute !== 'undefined') {
-                            window.location.href = routing.generate(self.options.redirectRoute);
-                        } else {
-                            window.location.reload();
-                        }
-                    }).fail(function() {
+                    this.once('schema-update:finished', () => {
                         modal.close();
                     });
-                }
+                    modal.$el.find('.modal-body').append(progress);
+                    modal.$el.find('.modal-footer').html('');
 
-                confirmUpdate.on('ok', execute);
+                    progress.show();
+                    this._updateSchema();
+                });
                 confirmUpdate.open();
 
                 return false;
             });
+        },
+
+        /**
+         * Sends request to update schema
+         * @private
+         */
+        _updateSchema() {
+            $.post({
+                url: routing.generate(this.options.route),
+                errorHandlerMessage: false
+            }).done((data = {}, textStatus, jqXHR) => {
+                // Considering schema update will be delayed
+                if (Object.keys(data).length) {
+                    this._postponeSchemaUpdate(data);
+                } else {
+                    this._updateSchemaDone(data, textStatus, jqXHR);
+                }
+            }).fail((jqXHR, textStatus, errorThrown) => {
+                this._updateSchemaFail(jqXHR);
+            });
+        },
+
+        /**
+         * @param {Object} data
+         * @private
+         */
+        _postponeSchemaUpdate(data) {
+            const {id, operationTimeout, status} = data;
+
+            if (!id) {
+                throw new Error('Option "id" is required');
+            }
+
+            if (!operationTimeout) {
+                throw new Error('Option "operationTimeout" is required');
+            }
+
+            if (!status) {
+                throw new Error('Option "status" is required');
+            }
+
+            // Considering an operation is finished, so nothing to do
+            if (status === 'failed' || status === 'success') {
+                return;
+            }
+
+            const waitingTime = Date.now() + operationTimeout * 1000;
+            // Time before next reconnection attempt, 10 sec
+            const retryDelay = 10000;
+            const URL = routing.generate(
+                'oro_rest_api_item',
+                {
+                    entity: 'multihostoperationstatus',
+                    id: id
+                }
+            );
+            let retryCount = 0;
+
+            const checkStatus = () => {
+                return $.ajax({
+                    type: 'PATCH',
+                    url: URL,
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    // Max time to wait until response
+                    timeout: operationTimeout * 1000,
+                    data: JSON.stringify({
+                        id: id
+                    }),
+                    errorHandlerMessage: false
+                }).done((data, textStatus, jqXHR) => {
+                    switch (data.status) {
+                        case 'success':
+                            this._updateSchemaDone(data, textStatus, jqXHR);
+                            break;
+                        case 'failed':
+                            this._updateSchemaFail(jqXHR);
+                            break;
+                        case 'new':
+                        case 'running':
+                            if (Date.now() < waitingTime) {
+                                retryCount += 1;
+                                setTimeout(() => {
+                                    checkStatus();
+                                }, retryCount * retryDelay);
+                            } else {
+                                this._updateSchemaFail(jqXHR);
+                            }
+                            break;
+                        default:
+                            throw new Error('Unknown operation type');
+                    }
+                }).fail((jqXHR, textStatus, errorThrown) => {
+                    // Considering any server error responses as a server under maintenance
+                    if (jqXHR.status >= 500 && Date.now() < waitingTime) {
+                        retryCount += 1;
+                        setTimeout(() => {
+                            checkStatus();
+                        }, retryCount * retryDelay);
+                    } else {
+                        this._updateSchemaFail(jqXHR);
+                    }
+                });
+            };
+
+            checkStatus();
+        },
+
+        /**
+         *
+         * @param {Object} data
+         * @param {string} textStatus
+         * @param {XMLHttpRequest} jqXHR
+         * @private
+         */
+        _updateSchemaDone(data, textStatus, jqXHR) {
+            this.trigger('schema-update:finished', {isSuccessful: true});
+            mediator.execute(
+                'showFlashMessage',
+                'success',
+                __('oro.entity_extend.schema_updated'),
+                {afterReload: true}
+            );
+            mediator.execute('showMessage', 'info', __('Please wait for the page to reload...'));
+            mediator.execute('showLoading');
+            // force reload of the application to make sure 'js/routes' is reloaded
+            if (this.options.redirectRoute !== void 0) {
+                window.location.href = routing.generate(this.options.redirectRoute);
+            } else {
+                window.location.reload();
+            }
+        },
+
+        /**
+         * @param {XMLHttpRequest} jqXHR
+         * @private
+         */
+        _updateSchemaFail(jqXHR) {
+            this.trigger('schema-update:finished', {isSuccessful: false});
+            let message = __('oro.entity_extend.schema_update_failed');
+            if (jqXHR?.responseJSON?.message) {
+                message += ' ' + jqXHR.responseJSON.message;
+            }
+
+            mediator.execute('showFlashMessage', 'error', message.trim());
         }
     });
 
-    return ShemaUpdateActionComponent;
+    return SchemaUpdateActionComponent;
 });

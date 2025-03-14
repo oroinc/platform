@@ -7,6 +7,8 @@ namespace Oro\Bundle\EntityExtendBundle\Extend;
  */
 final class EntityExtendUpdateResult
 {
+    private array $resultData = [];
+
     /** @var bool */
     private $successful;
 
@@ -33,5 +35,17 @@ final class EntityExtendUpdateResult
     public function getFailureMessage(): ?string
     {
         return $this->failureMessage;
+    }
+
+    public function setResultData(array $resultData): self
+    {
+        $this->resultData = $resultData;
+
+        return $this;
+    }
+
+    public function getResultData(): array
+    {
+        return $this->resultData;
     }
 }
