@@ -28,6 +28,7 @@ class OroAssetsInstallCommand extends AbstractCommand
                 InputOption::VALUE_NONE,
                 'Symlink using relative path instead of absolute'
             )
+            ->addOption('iterate-themes', null, InputOption::VALUE_NONE, 'Run webpack for each theme separately')
             ->setDescription('Installs and builds application assets.')
             ->setHelp(
                 <<<HELP
@@ -44,6 +45,11 @@ If the <info>--relative-symlink</info> option is provided, the command creates s
 of absolute:
 
   <info>php %command.full_name% --relative-symlink</info>
+
+If the <info>--iterate-themes</info> option is provided, the command uses it in oro:assets:build to run webpack for
+each enabled theme separately:
+
+  <info>php %command.full_name% --iterate-themes</info>
 
 You may run individual steps if necessary as follows:
 
@@ -76,11 +82,16 @@ HELP
             $assetsOptions['--relative'] = true;
         }
 
+        $assetsBuildOptions = [];
+        if ($input->hasOption('iterate-themes') && $input->getOption('iterate-themes')) {
+            $assetsBuildOptions['--iterate-themes'] = true;
+        }
+
         $commandExecutor = $this->getCommandExecutor($input, $output);
         $commandExecutor
             ->runCommand('oro:localization:dump')
             ->runCommand('assets:install', $assetsOptions)
-            ->runCommand('oro:assets:build');
+            ->runCommand('oro:assets:build', $assetsBuildOptions);
 
         return Command::SUCCESS;
     }

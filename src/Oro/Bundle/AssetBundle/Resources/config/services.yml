@@ -24,6 +24,8 @@ services:
             - '%oro_asset.build_timeout%'
             - '%oro_asset.npm_install_timeout%'
             - '%oro_asset.with_babel%'
+        calls:
+            - [ setThemeManager, [ '@oro_layout.theme_manager' ] ]
         tags:
             - { name: console.command, command: 'oro:assets:build' }
 
