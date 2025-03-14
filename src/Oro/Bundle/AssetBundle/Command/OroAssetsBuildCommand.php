@@ -6,6 +6,7 @@ namespace Oro\Bundle\AssetBundle\Command;
 
 use Oro\Bundle\AssetBundle\AssetCommandProcessFactory;
 use Oro\Bundle\AssetBundle\Cache\AssetConfigCache;
+use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -38,6 +39,8 @@ class OroAssetsBuildCommand extends Command
         OutputInterface::VERBOSITY_VERBOSE => 'minimal',
     ];
 
+    private const ADMIN_ORO_THEME = 'admin.oro';
+
     protected static $defaultName = 'oro:assets:build';
 
     private AssetCommandProcessFactory $nodeProcessFactory;
@@ -53,6 +56,8 @@ class OroAssetsBuildCommand extends Command
 
     private bool $withBabel;
 
+    private ThemeManager $themeManager;
+
     /**
      * @param AssetCommandProcessFactory $nodeProcessFactory
      * @param AssetConfigCache $cache
@@ -60,6 +65,7 @@ class OroAssetsBuildCommand extends Command
      * @param int|float|null $buildTimeout
      * @param int|float|null $npmInstallTimeout
      * @param bool $withBabel
+     * @param ThemeManager $themeManager
      */
     public function __construct(
         AssetCommandProcessFactory $nodeProcessFactory,
@@ -67,7 +73,8 @@ class OroAssetsBuildCommand extends Command
         string $npmPath,
         $buildTimeout,
         $npmInstallTimeout,
-        bool $withBabel
+        bool $withBabel,
+        ThemeManager $themeManager
     ) {
         $this->nodeProcessFactory = $nodeProcessFactory;
         $this->cache = $cache;
@@ -75,6 +82,7 @@ class OroAssetsBuildCommand extends Command
         $this->buildTimeout = $buildTimeout;
         $this->npmInstallTimeout = $npmInstallTimeout;
         $this->withBabel = $withBabel;
+        $this->themeManager = $themeManager;
 
         parent::__construct();
     }
@@ -104,6 +112,7 @@ class OroAssetsBuildCommand extends Command
             ->addOption('skip-rtl', null, InputOption::VALUE_NONE, 'Skip building RTL styles')
             ->addOption('skip-svg', null, InputOption::VALUE_NONE, 'Skip building SVG sprite')
             ->addOption('analyze', null, InputOption::VALUE_NONE, 'Run BundleAnalyzerPlugin')
+            ->addOption('iterate-themes', null, InputOption::VALUE_NONE, 'Run webpack for each theme separately')
         ;
         $this
             ->setDescription('Runs webpack to build assets.')
@@ -172,6 +181,9 @@ The <info>--analyze</info> option can be used to run BundleAnalyzerPlugin:
 
   <info>php %command.full_name% --analyze</info>
 
+The <info>--iterate-themes</info> option can be used to run webpack for each enabled theme separately:
+
+  <info>php %command.full_name% --iterate-themes</info>
 HELP
                 // @codingStandardsIgnoreEnd
             );
@@ -198,6 +210,7 @@ HELP
             ->addUsage('--skip-svg')
             ->addUsage('--with-babel')
             ->addUsage('--analyze')
+            ->addUsage('--iterate-themes')
         ;
     }
 
@@ -221,7 +234,8 @@ HELP
         }
 
         $output->writeln('<info>Building assets.</info>');
-        $this->buildAssets($input, $output);
+        $this->handleAssets($input, $output);
+
         if (!$input->getOption('hot') && !$input->getOption('watch')) {
             $io->success('All assets were successfully built.');
         }
@@ -370,6 +384,22 @@ HELP
             $output->writeln('Done.');
         } else {
             throw new \RuntimeException($process->getErrorOutput());
+        }
+    }
+
+    private function handleAssets(InputInterface $input, OutputInterface $output): void
+    {
+        if (!$input->getArgument('theme') && $input->getOption('iterate-themes')) {
+            /** Build asset for default admin oro theme */
+            $input->setArgument('theme', self::ADMIN_ORO_THEME);
+            $this->buildAssets($input, $output);
+
+            foreach ($this->themeManager->getEnabledThemes() as $theme) {
+                $input->setArgument('theme', $theme->getName());
+                $this->buildAssets($input, $output);
+            }
+        } else {
+            $this->buildAssets($input, $output);
         }
     }
 
