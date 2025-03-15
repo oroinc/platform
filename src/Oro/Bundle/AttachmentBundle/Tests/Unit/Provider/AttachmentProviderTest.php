@@ -3,9 +3,9 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Provider;
 
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
@@ -15,29 +15,33 @@ use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\AttachmentAwareTestClass;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestClass;
 use Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AttachmentProviderTest extends \PHPUnit\Framework\TestCase
+class AttachmentProviderTest extends TestCase
 {
-    private EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $em;
-    private AttachmentAssociationHelper|\PHPUnit\Framework\MockObject\MockObject $attachmentAssociationHelper;
-    private AttachmentManager|\PHPUnit\Framework\MockObject\MockObject $attachmentManager;
-    private PictureSourcesProviderInterface|\PHPUnit\Framework\MockObject\MockObject $pictureSourcesProvider;
+    private ManagerRegistry&MockObject $doctrine;
+    private AttachmentAssociationHelper&MockObject $attachmentAssociationHelper;
+    private AttachmentManager&MockObject $attachmentManager;
+    private PictureSourcesProviderInterface&MockObject $pictureSourcesProvider;
     private AttachmentProvider $attachmentProvider;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManagerInterface::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->attachmentAssociationHelper = $this->createMock(AttachmentAssociationHelper::class);
         $this->attachmentManager = $this->createMock(AttachmentManager::class);
         $this->pictureSourcesProvider = $this->createMock(PictureSourcesProviderInterface::class);
 
         $this->attachmentProvider = new AttachmentProvider(
-            $this->em,
+            $this->doctrine,
             $this->attachmentAssociationHelper,
             $this->attachmentManager,
-            $this->pictureSourcesProvider
+            $this->pictureSourcesProvider,
+            PropertyAccess::createPropertyAccessor()
         );
     }
 
@@ -52,6 +56,7 @@ class AttachmentProviderTest extends \PHPUnit\Framework\TestCase
     public function testGetEntityAttachments(): void
     {
         $entity = new TestClass();
+        $attachments = [new Attachment()];
 
         $this->attachmentAssociationHelper->expects($this->once())
             ->method('isAttachmentAssociationEnabled')
@@ -60,7 +65,7 @@ class AttachmentProviderTest extends \PHPUnit\Framework\TestCase
 
         $repo = $this->createMock(EntityRepository::class);
 
-        $this->em->expects($this->once())
+        $this->doctrine->expects($this->once())
             ->method('getRepository')
             ->with(Attachment::class)
             ->willReturn($repo);
@@ -80,7 +85,7 @@ class AttachmentProviderTest extends \PHPUnit\Framework\TestCase
 
         $query->expects($this->once())
             ->method('getResult')
-            ->willReturn('result');
+            ->willReturn($attachments);
 
         $qb->expects($this->once())
             ->method('getQuery')
@@ -93,7 +98,7 @@ class AttachmentProviderTest extends \PHPUnit\Framework\TestCase
 
         $result = $this->attachmentProvider->getEntityAttachments($entity);
 
-        self::assertEquals('result', $result);
+        self::assertEquals($attachments, $result);
     }
 
     public function testUnsupportedAttachments(): void

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
 use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
@@ -17,37 +17,20 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The form type to select an entity.
+ */
 class OroJquerySelect2HiddenType extends AbstractType
 {
-    const NAME = 'oro_jqueryselect2_hidden';
-
-    /**
-     * @var EntityManager
-     */
-    protected $entityManager;
-
-    /**
-     * @var SearchRegistry
-     */
-    protected $searchRegistry;
-
-    /**
-     * @var ConfigProvider
-     */
-    protected $configProvider;
-
     public function __construct(
-        EntityManager $entityManager,
-        SearchRegistry $registry,
-        ConfigProvider $configProvider
+        protected ManagerRegistry $doctrine,
+        protected SearchRegistry $searchRegistry,
+        protected ConfigProvider $configProvider
     ) {
-        $this->entityManager  = $entityManager;
-        $this->searchRegistry = $registry;
-        $this->configProvider = $configProvider;
     }
 
     #[\Override]
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $defaultConfig = [
             'placeholder'        => 'oro.form.choose_value',
@@ -98,12 +81,10 @@ class OroJquerySelect2HiddenType extends AbstractType
                 }
 
                 if (!$value instanceof DataTransformerInterface) {
-                    throw new TransformationFailedException(
-                        sprintf(
-                            'The option "transformer" must be an instance of "%s".',
-                            'Symfony\Component\Form\DataTransformerInterface'
-                        )
-                    );
+                    throw new TransformationFailedException(\sprintf(
+                        'The option "transformer" must be an instance of "%s".',
+                        DataTransformerInterface::class
+                    ));
                 }
 
                 return $value;
@@ -111,7 +92,7 @@ class OroJquerySelect2HiddenType extends AbstractType
         );
     }
 
-    protected function setConverterNormalizer(OptionsResolver $resolver)
+    protected function setConverterNormalizer(OptionsResolver $resolver): void
     {
         $resolver->setNormalizer(
             'converter',
@@ -125,10 +106,7 @@ class OroJquerySelect2HiddenType extends AbstractType
                 }
 
                 if (!$value instanceof ConverterInterface) {
-                    throw new UnexpectedTypeException(
-                        $value,
-                        'Oro\Bundle\FormBundle\Autocomplete\ConverterInterface'
-                    );
+                    throw new UnexpectedTypeException($value, ConverterInterface::class);
                 }
 
                 return $value;
@@ -136,7 +114,7 @@ class OroJquerySelect2HiddenType extends AbstractType
         );
     }
 
-    protected function setConfigsNormalizer(OptionsResolver $resolver, array $defaultConfig)
+    protected function setConfigsNormalizer(OptionsResolver $resolver, array $defaultConfig): void
     {
         $resolver->setNormalizer(
             'configs',
@@ -144,10 +122,10 @@ class OroJquerySelect2HiddenType extends AbstractType
                 $result = array_replace_recursive($defaultConfig, $configs);
 
                 if (!empty($options['autocomplete_alias'])) {
-                    $autoCompleteAlias            = $options['autocomplete_alias'];
+                    $autoCompleteAlias = $options['autocomplete_alias'];
                     $result['autocomplete_alias'] = $autoCompleteAlias;
                     if (empty($result['properties'])) {
-                        $searchHandler        = $this->searchRegistry->getSearchHandler($autoCompleteAlias);
+                        $searchHandler = $this->searchRegistry->getSearchHandler($autoCompleteAlias);
                         $result['properties'] = $searchHandler->getProperties();
                     }
                     if (empty($result['route_name'])) {
@@ -158,14 +136,12 @@ class OroJquerySelect2HiddenType extends AbstractType
                     }
                 }
 
-                if (!array_key_exists('route_parameters', $result)) {
+                if (!\array_key_exists('route_parameters', $result)) {
                     $result['route_parameters'] = [];
                 }
 
                 if (empty($result['route_name'])) {
-                    throw new InvalidConfigurationException(
-                        'Option "configs[route_name]" must be set.'
-                    );
+                    throw new InvalidConfigurationException('Option "configs[route_name]" must be set.');
                 }
 
                 return $result;
@@ -173,21 +149,13 @@ class OroJquerySelect2HiddenType extends AbstractType
         );
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return EntityToIdTransformer
-     */
-    public function createDefaultTransformer($entityClass)
+    protected function createDefaultTransformer(string $entityClass): DataTransformerInterface
     {
-        return new EntityToIdTransformer($this->entityManager, $entityClass);
+        return new EntityToIdTransformer($this->doctrine, $entityClass);
     }
 
-    /**
-     * Set data-title attribute to element to show selected value
-     */
     #[\Override]
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         parent::buildView($view, $form, $options);
 
@@ -220,11 +188,6 @@ class OroJquerySelect2HiddenType extends AbstractType
     public function getParent(): ?string
     {
         return Select2HiddenType::class;
-    }
-
-    public function getName()
-    {
-        return $this->getBlockPrefix();
     }
 
     #[\Override]

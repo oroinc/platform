@@ -3,7 +3,8 @@
 namespace Oro\Bundle\MigrationBundle\Migration\Loader;
 
 use Doctrine\Common\DataFixtures\FixtureInterface;
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\DataFixtures\Loader;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\MigrationBundle\Entity\DataFixture;
 use Oro\Bundle\MigrationBundle\Fixture\LoadedFixtureVersionAwareInterface;
 use Oro\Bundle\MigrationBundle\Fixture\RenamedFixtureInterface;
@@ -13,7 +14,6 @@ use Oro\Bundle\MigrationBundle\Migration\Sorter\DataFixturesSorter;
 use Oro\Bundle\MigrationBundle\Migration\UpdateDataFixturesFixture;
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
 
 /**
  * Provides list of data fixtures to perform
@@ -21,17 +21,11 @@ use Symfony\Component\HttpKernel\KernelInterface;
 class DataFixturesLoader extends ContainerAwareLoader
 {
     /** @var DataFixture[] */
-    protected $loadedFixtures;
+    private $loadedFixtures;
+    private ?\ReflectionProperty $ref = null;
 
-    /** @var \ReflectionProperty */
-    protected $ref;
-
-    /**
-     * Constructor.
-     */
     public function __construct(
-        protected EntityManager $em,
-        protected KernelInterface $kernel,
+        private EntityManagerInterface $em,
         ContainerInterface $container
     ) {
         parent::__construct($container);
@@ -40,14 +34,14 @@ class DataFixturesLoader extends ContainerAwareLoader
     #[\Override]
     public function getFixtures()
     {
-        $sorter   = new DataFixturesSorter();
+        $sorter = new DataFixturesSorter();
         $fixtures = $sorter->sort($this->getAllFixtures());
 
         $this->fillLoadedFixtures();
 
         $renameFixture = new RenameDataFixturesFixture();
         $updateFixture = new UpdateDataFixturesFixture();
-        foreach ($fixtures as $key => $fixture) {
+        foreach ($fixtures as $fixture) {
             $this->collectToRename($fixture, $renameFixture);
             $this->collectToLoad($fixture, $updateFixture);
         }
@@ -66,15 +60,13 @@ class DataFixturesLoader extends ContainerAwareLoader
         return $toLoad;
     }
 
-    /**
-     * @return array
-     */
-    private function getAllFixtures()
+    private function getAllFixtures(): array
     {
         if (!$this->ref) {
-            $this->ref = new \ReflectionProperty('Doctrine\Common\DataFixtures\Loader', 'fixtures');
+            $this->ref = new \ReflectionProperty(Loader::class, 'fixtures');
             $this->ref->setAccessible(true);
         }
+
         return $this->ref->getValue($this);
     }
 

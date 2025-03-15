@@ -2,42 +2,28 @@
 
 namespace Oro\Bundle\UserBundle\Entity\Manager;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\UserBundle\Entity\Repository\RoleRepository;
 use Oro\Bundle\UserBundle\Entity\Role;
 
 /**
- * Role entity manager
+ * Manager for the Role entity.
  */
 class RoleManager
 {
-    /**
-     * @var EntityManager
-     */
-    private $em;
-
-    public function __construct(EntityManager $em)
-    {
-        $this->em = $em;
+    public function __construct(
+        private ManagerRegistry $doctrine
+    ) {
     }
 
-    /**
-     * Get user query builder
-     *
-     * @param  Role         $role
-     * @return QueryBuilder
-     */
-    public function getUserQueryBuilder(Role $role)
+    public function getUserQueryBuilder(Role $role): QueryBuilder
     {
         return $this->getRoleRepo()->getUserQueryBuilder($role);
     }
 
-    /**
-     * @return RoleRepository
-     */
-    protected function getRoleRepo()
+    private function getRoleRepo(): RoleRepository
     {
-        return $this->em->getRepository(Role::class);
+        return $this->doctrine->getRepository(Role::class);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Functional\Entity\Repository;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizedFallbackValueRepository;
@@ -11,7 +11,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class LocalizedFallbackValueRepositoryTest extends WebTestCase
 {
-    private EntityManager $entityManager;
+    private EntityManagerInterface $entityManager;
     private LocalizedFallbackValueRepository $repository;
 
     #[\Override]

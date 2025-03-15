@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityMergeBundle\Model\Accessor;
 
 use Doctrine\Common\Util\ClassUtils;
-use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
@@ -15,12 +14,10 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class InverseAssociationAccessor implements AccessorInterface
 {
-    private DoctrineHelper $doctrineHelper;
-    private ?PropertyAccessorInterface $propertyAccessor = null;
-
-    public function __construct(DoctrineHelper $doctrineHelper)
-    {
-        $this->doctrineHelper = $doctrineHelper;
+    public function __construct(
+        private PropertyAccessorInterface $propertyAccessor,
+        private DoctrineHelper $doctrineHelper,
+    ) {
     }
 
     #[\Override]
@@ -79,8 +76,11 @@ class InverseAssociationAccessor implements AccessorInterface
             $relatedEntity->$setter($value);
         } else {
             try {
-                $this->getPropertyAccessor()
-                    ->setValue($relatedEntity, $metadata->getDoctrineMetadata()->getFieldName(), $value);
+                $this->propertyAccessor->setValue(
+                    $relatedEntity,
+                    $metadata->getDoctrineMetadata()->getFieldName(),
+                    $value
+                );
             } catch (NoSuchPropertyException $e) {
                 // If setter is not exist
                 $reflection = new \ReflectionProperty(
@@ -91,14 +91,5 @@ class InverseAssociationAccessor implements AccessorInterface
                 $reflection->setValue($relatedEntity, $value);
             }
         }
-    }
-
-    private function getPropertyAccessor(): PropertyAccessorInterface
-    {
-        if (!$this->propertyAccessor) {
-            $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
-        }
-
-        return $this->propertyAccessor;
     }
 }

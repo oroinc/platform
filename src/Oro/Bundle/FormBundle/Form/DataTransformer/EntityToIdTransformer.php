@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\FormBundle\Form\DataTransformer;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\FormBundle\Form\Exception\FormException;
 use Symfony\Component\Form\DataTransformerInterface;
@@ -12,83 +13,34 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
- * Transforms between entity and id
+ * Transforms between an entity and its ID.
  */
 class EntityToIdTransformer implements DataTransformerInterface
 {
-    /**
-     * @var EntityManager
-     */
-    protected $em;
-
-    /**
-     * @var string
-     */
-    protected $className;
-
-    /**
-     * @var string
-     */
-    protected $property;
-
-    /**
-     * @var PropertyPath
-     */
-    protected $propertyPath;
-
-    /**
-     * @var callable
-     */
+    protected ManagerRegistry $doctrine;
+    protected string $className;
+    private ?string $property;
+    /** @var callable */
     protected $queryBuilderCallback;
+    private ?PropertyAccessorInterface $propertyAccessor = null;
+    private ?PropertyPath $propertyPath = null;
 
-    /**
-     * @var PropertyAccessorInterface
-     */
-    protected $propertyAccessor;
-
-    /**
-     * @param EntityManager $em
-     * @param string $className
-     * @param string|null $property
-     * @param callable $queryBuilderCallback
-     * @throws UnexpectedTypeException When $queryBuilderCallback is set and not callable
-     */
-    public function __construct(EntityManager $em, $className, $property = null, $queryBuilderCallback = null)
-    {
-        $this->em = $em;
+    public function __construct(
+        ManagerRegistry $doctrine,
+        string $className,
+        ?string $property = null,
+        mixed $queryBuilderCallback = null
+    ) {
+        $this->doctrine = $doctrine;
         $this->className = $className;
-        if (!$property) {
-            $property = $this->getIdPropertyPathFromEntityManager($em, $className);
-        }
         $this->property = $property;
-        $this->createPropertyAccessor();
-        $this->propertyPath = new PropertyPath($this->property);
-        if (null !== $queryBuilderCallback && !is_callable($queryBuilderCallback)) {
+        if (null !== $queryBuilderCallback && !\is_callable($queryBuilderCallback)) {
             throw new UnexpectedTypeException($queryBuilderCallback, 'callable');
         }
         $this->queryBuilderCallback = $queryBuilderCallback;
-    }
-
-    /**
-     * Get identifier field name of entity using metadata
-     *
-     * @param EntityManager $em
-     * @param string $className
-     * @return string
-     * @throws FormException When entity has composite key
-     */
-    protected function getIdPropertyPathFromEntityManager(EntityManager $em, $className)
-    {
-        $meta = $em->getClassMetadata($className);
-        try {
-            return $meta->getSingleIdentifierFieldName();
-        } catch (MappingException $e) {
-            throw new FormException(
-                "Cannot get id property path of entity. \"$className\" has composite primary key."
-            );
-        }
     }
 
     #[\Override]
@@ -98,11 +50,11 @@ class EntityToIdTransformer implements DataTransformerInterface
             return null;
         }
 
-        if (!is_object($value)) {
+        if (!\is_object($value)) {
             throw new UnexpectedTypeException($value, 'object');
         }
 
-        return $this->propertyAccessor->getValue($value, $this->propertyPath);
+        return $this->getPropertyAccessor()->getValue($value, $this->getPropertyPath());
     }
 
     #[\Override]
@@ -116,21 +68,18 @@ class EntityToIdTransformer implements DataTransformerInterface
     }
 
     /**
-     * Load entity by id
-     *
-     * @param mixed $id
-     * @return object
      * @throws UnexpectedTypeException if query builder callback returns invalid type
      * @throws TransformationFailedException if value not matched given $id
      */
-    protected function loadEntityById($id)
+    protected function loadEntityById(mixed $id): object
     {
-        $repository = $this->em->getRepository($this->className);
+        /** @var EntityRepository $repository */
+        $repository = $this->doctrine->getRepository($this->className);
         if ($this->queryBuilderCallback) {
-            /** @var $qb QueryBuilder */
-            $qb = call_user_func($this->queryBuilderCallback, $repository, $id);
+            /** @var QueryBuilder $qb */
+            $qb = \call_user_func($this->queryBuilderCallback, $repository, $id);
             if (!$qb instanceof QueryBuilder) {
-                throw new UnexpectedTypeException($qb, 'Doctrine\ORM\QueryBuilder');
+                throw new UnexpectedTypeException($qb, QueryBuilder::class);
             }
             $result = $qb->getQuery()->execute();
         } else {
@@ -140,15 +89,50 @@ class EntityToIdTransformer implements DataTransformerInterface
             }
         }
 
-        if (null === $result || count($result) !== 1) {
-            throw new TransformationFailedException(sprintf('The value "%s" does not exist or not unique.', $id));
+        if (null === $result || \count($result) !== 1) {
+            throw new TransformationFailedException(\sprintf('The value "%s" does not exist or not unique.', $id));
         }
 
         return reset($result);
     }
 
-    protected function createPropertyAccessor()
+    protected function getProperty(): string
     {
-        $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax();
+        if (null === $this->property) {
+            $meta = $this->doctrine->getManagerForClass($this->className)->getClassMetadata($this->className);
+            try {
+                $this->property = $meta->getSingleIdentifierFieldName();
+            } catch (MappingException $e) {
+                throw new FormException(\sprintf(
+                    'Cannot get id property path of entity. "%s" has composite primary key.',
+                    $this->className
+                ));
+            }
+        }
+
+        return $this->property;
+    }
+
+    protected function getPropertyPath(): PropertyPathInterface
+    {
+        if (null === $this->propertyPath) {
+            $this->propertyPath = new PropertyPath($this->getProperty());
+        }
+
+        return $this->propertyPath;
+    }
+
+    protected function getPropertyAccessor(): PropertyAccessorInterface
+    {
+        if (null === $this->propertyAccessor) {
+            $this->propertyAccessor = $this->createPropertyAccessor();
+        }
+
+        return $this->propertyAccessor;
+    }
+
+    protected function createPropertyAccessor(): PropertyAccessorInterface
+    {
+        return PropertyAccess::createPropertyAccessorWithDotSyntax();
     }
 }

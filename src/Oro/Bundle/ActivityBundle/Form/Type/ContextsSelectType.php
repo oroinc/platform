@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ActivityBundle\Form\Type;
 
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
 use Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
@@ -24,40 +24,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class ContextsSelectType extends AbstractType
 {
-    const NAME = 'oro_activity_contexts_select';
-
-    /** @var EntityManagerInterface */
-    protected $entityManager;
-
-    /** @var ConfigManager */
-    protected $configManager;
-
-    /** @var TranslatorInterface */
-    protected $translator;
-
-    /** @var EventDispatcherInterface */
-    protected $dispatcher;
-
-    /** @var EntityNameResolver */
-    protected $entityNameResolver;
-
-    /** @var FeatureChecker */
-    protected $featureChecker;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        ConfigManager $configManager,
-        TranslatorInterface $translator,
-        EventDispatcherInterface $dispatcher,
-        EntityNameResolver $entityNameResolver,
-        FeatureChecker $featureChecker
+        protected ManagerRegistry $doctrine,
+        protected ConfigManager $configManager,
+        protected TranslatorInterface $translator,
+        protected EventDispatcherInterface $dispatcher,
+        protected EntityNameResolver $entityNameResolver,
+        protected FeatureChecker $featureChecker
     ) {
-        $this->entityManager = $entityManager;
-        $this->configManager = $configManager;
-        $this->translator = $translator;
-        $this->dispatcher = $dispatcher;
-        $this->entityNameResolver = $entityNameResolver;
-        $this->featureChecker = $featureChecker;
     }
 
     #[\Override]
@@ -65,7 +39,7 @@ class ContextsSelectType extends AbstractType
     {
         $builder->resetViewTransformers();
         $contextsToViewTransformer = new ContextsToViewTransformer(
-            $this->entityManager,
+            $this->doctrine,
             $options['collectionModel']
         );
         $contextsToViewTransformer->setSeparator($options['configs']['separator']);
@@ -186,14 +160,9 @@ class ContextsSelectType extends AbstractType
         return Select2HiddenType::class;
     }
 
-    public function getName()
-    {
-        return $this->getBlockPrefix();
-    }
-
     #[\Override]
     public function getBlockPrefix(): string
     {
-        return self::NAME;
+        return 'oro_activity_contexts_select';
     }
 }

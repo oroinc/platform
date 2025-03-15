@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -26,8 +26,7 @@ class BusinessUnitTypeTest extends FormIntegrationTestCase
 {
     private const NAME = 'Sample Name';
 
-    /** @var BusinessUnitType */
-    private $form;
+    private BusinessUnitType $form;
 
     #[\Override]
     protected function setUp(): void
@@ -49,28 +48,31 @@ class BusinessUnitTypeTest extends FormIntegrationTestCase
     #[\Override]
     protected function getExtensions(): array
     {
-        $registry = $this->createMock(ManagerRegistry::class);
-        $registry->expects($this->any())
-            ->method('getManagerForClass')
-            ->willReturn($entityManager = $this->createMock(EntityManager::class));
+        $classMetadata = new ClassMetadata(User::class);
+        $classMetadata->setIdentifier(['id']);
 
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects($this->any())
             ->method('getClassMetadata')
-            ->willReturn($classMetadata = new ClassMetadata(User::class));
-        $classMetadata->setIdentifier(['id']);
+            ->willReturn($classMetadata);
+
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturn($entityManager);
+
+        $handler = $this->createMock(SearchHandlerInterface::class);
+        $handler->expects($this->any())
+            ->method('getProperties')
+            ->willReturn([]);
+        $handler->expects($this->any())
+            ->method('getEntityName')
+            ->willReturn(BusinessUnit::class);
 
         $searchRegistry = $this->createMock(SearchRegistry::class);
         $searchRegistry->expects($this->any())
             ->method('getSearchHandler')
-            ->willReturn($handler = $this->createMock(SearchHandlerInterface::class));
-
-        $handler->expects($this->any())
-            ->method('getProperties')
-            ->willReturn([]);
-
-        $handler->expects($this->any())
-            ->method('getEntityName')
-            ->willReturn(BusinessUnit::class);
+            ->willReturn($handler);
 
         return [
             new PreloadedExtension([
@@ -79,13 +81,12 @@ class BusinessUnitTypeTest extends FormIntegrationTestCase
                     $this->createMock(TokenAccessorInterface::class)
                 ),
                 BusinessUnitSelectAutocomplete::class => new BusinessUnitSelectAutocomplete(
-                    $entityManager,
-                    BusinessUnit::class,
+                    $doctrine,
                     $this->createMock(BusinessUnitManager::class)
                 ),
-                EntityIdentifierType::class => new EntityIdentifierType($registry),
+                EntityIdentifierType::class => new EntityIdentifierType($doctrine),
                 OroJquerySelect2HiddenType::class => new OroJquerySelect2HiddenType(
-                    $entityManager,
+                    $doctrine,
                     $searchRegistry,
                     $this->createMock(ConfigProvider::class)
                 ),

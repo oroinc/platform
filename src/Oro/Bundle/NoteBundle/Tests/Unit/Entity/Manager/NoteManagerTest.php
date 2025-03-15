@@ -3,13 +3,14 @@
 namespace Oro\Bundle\NoteBundle\Tests\Unit\Entity\Manager;
 
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
 use Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\NoteBundle\Entity\Manager\NoteManager;
 use Oro\Bundle\NoteBundle\Entity\Note;
 use Oro\Bundle\NoteBundle\Entity\Repository\NoteRepository;
@@ -23,22 +24,17 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class NoteManagerTest extends TestCase
 {
-    private EntityManager|MockObject $em;
-
-    private AuthorizationCheckerInterface|MockObject $authorizationChecker;
-
-    private AclHelper|MockObject $aclHelper;
-
-    private EntityNameResolver|MockObject $entityNameResolver;
-
-    private PictureSourcesProviderInterface|MockObject $pictureSourcesProvider;
-
+    private ManagerRegistry&MockObject $doctrine;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private AclHelper&MockObject $aclHelper;
+    private EntityNameResolver&MockObject $entityNameResolver;
+    private PictureSourcesProviderInterface&MockObject $pictureSourcesProvider;
     private NoteManager $manager;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManager::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $this->aclHelper = $this->createMock(AclHelper::class);
         $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
@@ -46,19 +42,18 @@ class NoteManagerTest extends TestCase
         $attachmentAssociationHelper = $this->createMock(AttachmentAssociationHelper::class);
         $attachmentManager = $this->createMock(AttachmentManager::class);
 
-        $attachmentProvider = new AttachmentProviderStub(
-            $this->em,
-            $attachmentAssociationHelper,
-            $attachmentManager,
-            $this->pictureSourcesProvider
-        );
-
         $this->manager = new NoteManager(
-            $this->em,
+            $this->doctrine,
             $this->authorizationChecker,
             $this->aclHelper,
             $this->entityNameResolver,
-            $attachmentProvider,
+            new AttachmentProviderStub(
+                $this->doctrine,
+                $attachmentAssociationHelper,
+                $attachmentManager,
+                $this->pictureSourcesProvider,
+                PropertyAccess::createPropertyAccessor()
+            ),
             $this->pictureSourcesProvider
         );
     }
@@ -66,14 +61,14 @@ class NoteManagerTest extends TestCase
     public function testGetList(): void
     {
         $entityClass = 'Test\Entity';
-        $entityId    = 123;
-        $sorting     = 'DESC';
-        $result      = ['result'];
+        $entityId = 123;
+        $sorting = 'DESC';
+        $result = ['result'];
 
         $qb = $this->createMock(QueryBuilder::class);
         $query = $this->createMock(AbstractQuery::class);
         $repo = $this->createMock(NoteRepository::class);
-        $this->em->expects(self::once())
+        $this->doctrine->expects(self::once())
             ->method('getRepository')
             ->with(Note::class)
             ->willReturn($repo);

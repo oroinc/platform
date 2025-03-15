@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\ORM\Walker;
 
 use Doctrine\ORM\Configuration;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Oro\Bundle\SecurityBundle\AccessRule\AccessRuleExecutor;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
@@ -46,7 +46,7 @@ class AclHelperTest extends \PHPUnit\Framework\TestCase
             ->method('getCurrentUserCache')
             ->willReturn($this->cache);
 
-        $this->em = $this->createMock(EntityManager::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
         $configuration = $this->createMock(Configuration::class);
         $this->em->expects($this->any())
             ->method('getConfiguration')

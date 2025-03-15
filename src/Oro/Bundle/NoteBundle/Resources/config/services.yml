@@ -6,7 +6,7 @@ services:
         class: Oro\Bundle\NoteBundle\Entity\Manager\NoteManager
         public: true
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@security.authorization_checker'
             - '@oro_security.acl_helper'
             - '@oro_entity.entity_name_resolver'

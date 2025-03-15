@@ -123,7 +123,7 @@ services:
     oro_user.role_manager:
         class: Oro\Bundle\UserBundle\Entity\Manager\RoleManager
         arguments:
-            - "@doctrine.orm.entity_manager"
+            - "@doctrine"
 
     oro_user.role_manager.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
@@ -136,7 +136,7 @@ services:
     oro_user.group_manager:
         class: Oro\Bundle\UserBundle\Entity\Manager\GroupManager
         arguments:
-            - "@doctrine.orm.entity_manager"
+            - "@doctrine"
 
     oro_user.group_manager.api:
         class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
@@ -511,7 +511,7 @@ services:
     oro_user.imap_configuration.subscriber:
         class: Oro\Bundle\UserBundle\Form\EventListener\UserImapConfigSubscriber
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@request_stack'
             - '@oro_security.token_accessor'
 

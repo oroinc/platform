@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Model\Accessor;
 
-use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -11,7 +10,10 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class DefaultAccessor implements AccessorInterface
 {
-    private ?PropertyAccessorInterface $propertyAccessor = null;
+    public function __construct(
+        private PropertyAccessorInterface $propertyAccessor
+    ) {
+    }
 
     #[\Override]
     public function getName()
@@ -34,8 +36,7 @@ class DefaultAccessor implements AccessorInterface
             return $entity->$getter();
         }
 
-        return $this->getPropertyAccessor()
-            ->getValue($entity, $this->getPropertyPath($metadata));
+        return $this->propertyAccessor->getValue($entity, $this->getPropertyPath($metadata));
     }
 
     #[\Override]
@@ -48,23 +49,13 @@ class DefaultAccessor implements AccessorInterface
             return;
         }
 
-        $this->getPropertyAccessor()
-            ->setValue($entity, $this->getPropertyPath($metadata), $value);
+        $this->propertyAccessor->setValue($entity, $this->getPropertyPath($metadata), $value);
     }
 
-    protected function getPropertyPath(FieldMetadata $metadata): string
+    private function getPropertyPath(FieldMetadata $metadata): string
     {
         return $metadata->has('property_path')
             ? $metadata->get('property_path')
             : $metadata->getFieldName();
-    }
-
-    protected function getPropertyAccessor(): PropertyAccessorInterface
-    {
-        if (!$this->propertyAccessor) {
-            $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
-        }
-
-        return $this->propertyAccessor;
     }
 }

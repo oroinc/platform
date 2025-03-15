@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Functional\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterface;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -15,22 +15,38 @@ class RefreshContextListenerTest extends WebTestCase
     #[\Override]
     protected function setUp(): void
     {
-        $this->initClient([], $this->generateBasicAuthHeader());
+        $this->initClient([], self::generateBasicAuthHeader());
         $this->client->useHashNavigation(true);
     }
 
-    public function testSecurityContextAfterClear()
+    private function assertTokenEntities(EntityManagerInterface $entityManager, TokenInterface $token): void
+    {
+        $unitOfWork = $entityManager->getUnitOfWork();
+
+        self::assertEquals(
+            UnitOfWork::STATE_MANAGED,
+            $unitOfWork->getEntityState($token->getUser())
+        );
+
+        if ($token instanceof OrganizationAwareTokenInterface) {
+            self::assertEquals(
+                UnitOfWork::STATE_MANAGED,
+                $unitOfWork->getEntityState($token->getOrganization())
+            );
+        }
+    }
+
+    public function testSecurityContextAfterClear(): void
     {
         // any route just to initialize security context
         $this->client->request('GET', $this->getUrl('oro_user_index'));
 
-        $token = $this->getContainer()->get('security.token_storage')->getToken();
-        $this->assertNotEmpty($token);
-        $this->assertInstanceOf('Symfony\Component\Security\Core\Authentication\Token\TokenInterface', $token);
+        $token = self::getContainer()->get('security.token_storage')->getToken();
+        self::assertNotEmpty($token);
+        self::assertInstanceOf(TokenInterface::class, $token);
 
-        /** @var EntityManager $entityManager */
-        $entityManager = $this->getContainer()->get('doctrine')->getManager();
-        $this->assertInstanceOf('Doctrine\ORM\EntityManager', $entityManager);
+        $entityManager = self::getContainer()->get('doctrine')->getManager();
+        self::assertInstanceOf(EntityManagerInterface::class, $entityManager);
 
         // entities must be fresh before clear
         $this->assertTokenEntities($entityManager, $token);
@@ -41,52 +57,33 @@ class RefreshContextListenerTest extends WebTestCase
         $this->assertTokenEntities($entityManager, $token);
     }
 
-    private function assertTokenEntities(EntityManager $entityManager, TokenInterface $token): void
-    {
-        $unitOfWork = $entityManager->getUnitOfWork();
-
-        $this->assertEquals(
-            UnitOfWork::STATE_MANAGED,
-            $unitOfWork->getEntityState($token->getUser())
-        );
-
-        if ($token instanceof OrganizationAwareTokenInterface) {
-            $this->assertEquals(
-                UnitOfWork::STATE_MANAGED,
-                $unitOfWork->getEntityState($token->getOrganization())
-            );
-        }
-    }
-
-    public function testUserReloadFailed()
+    public function testUserReloadFailed(): void
     {
         // any route just to initialize security context
         $this->client->request('GET', $this->getUrl('oro_user_index'));
 
-        $this->getContainer()->get('security.token_storage')->getToken()->setUser(new User());
+        self::getContainer()->get('security.token_storage')->getToken()->setUser(new User());
 
-        /** @var EntityManager $entityManager */
-        $entityManager = $this->getContainer()->get('doctrine')->getManager();
-        $this->assertInstanceOf('Doctrine\ORM\EntityManager', $entityManager);
+        $entityManager = self::getContainer()->get('doctrine')->getManager();
+        self::assertInstanceOf(EntityManagerInterface::class, $entityManager);
 
         $entityManager->clear();
-        $this->assertNull($this->getContainer()->get('security.token_storage')->getToken());
+        self::assertNull(self::getContainer()->get('security.token_storage')->getToken());
     }
 
-    public function testRefreshNotExistingUser()
+    public function testRefreshNotExistingUser(): void
     {
         // any route just to initialize security context
         $this->client->request('GET', $this->getUrl('oro_user_index'));
         $user = new User();
         ReflectionUtil::setId($user, 999);
 
-        $this->getContainer()->get('security.token_storage')->getToken()->setUser($user);
+        self::getContainer()->get('security.token_storage')->getToken()->setUser($user);
 
-        /** @var EntityManager $entityManager */
-        $entityManager = $this->getContainer()->get('doctrine')->getManager();
-        $this->assertInstanceOf('Doctrine\ORM\EntityManager', $entityManager);
+        $entityManager = self::getContainer()->get('doctrine')->getManager();
+        self::assertInstanceOf(EntityManagerInterface::class, $entityManager);
 
         $entityManager->clear();
-        $this->assertNull($this->getContainer()->get('security.token_storage')->getToken());
+        self::assertNull(self::getContainer()->get('security.token_storage')->getToken());
     }
 }

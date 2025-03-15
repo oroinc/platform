@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -16,30 +17,19 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class UserImapConfigSubscriberTest extends TestCase
 {
-    /** @var TokenAccessorInterface|MockObject */
-    private $tokenAccessor;
-
-    /** @var EntityManager|MockObject */
-    private $manager;
-
-    /** @var RequestStack */
-    private $requestStack;
-
-    /** @var FormEvent|MockObject */
-    private $eventMock;
-
-    /** @var UserImapConfigSubscriber */
-    private $subscriber;
+    private ManagerRegistry&MockObject $doctrine;
+    private RequestStack $requestStack;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private UserImapConfigSubscriber $subscriber;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->requestStack = new RequestStack();
-        $this->manager = $this->createMock(EntityManager::class);
-        $this->eventMock = $this->createMock(FormEvent::class);
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
 
-        $this->subscriber = new UserImapConfigSubscriber($this->manager, $this->requestStack, $this->tokenAccessor);
+        $this->subscriber = new UserImapConfigSubscriber($this->doctrine, $this->requestStack, $this->tokenAccessor);
     }
 
     public function testSubscribedEvents()
@@ -73,16 +63,22 @@ class UserImapConfigSubscriberTest extends TestCase
             ->method('getOrganization')
             ->willReturn($organization);
 
-        $this->manager->expects($this->once())
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects($this->once())
             ->method('find')
             ->with(User::class, $id)
             ->willReturn($user);
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->with(User::class)
+            ->willReturn($em);
 
-        $this->eventMock->expects($this->once())
+        $event = $this->createMock(FormEvent::class);
+        $event->expects($this->once())
             ->method('setData')
             ->with($this->equalTo($user));
 
-        $this->subscriber->preSetData($this->eventMock);
+        $this->subscriber->preSetData($event);
     }
 
     public function testPreSetDataForProfileConfig()
@@ -97,8 +93,8 @@ class UserImapConfigSubscriberTest extends TestCase
         );
         $this->requestStack->push($request);
 
-        $this->manager->expects($this->never())
-            ->method('find');
+        $this->doctrine->expects($this->never())
+            ->method('getManagerForClass');
 
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
@@ -107,11 +103,12 @@ class UserImapConfigSubscriberTest extends TestCase
             ->method('getOrganization')
             ->willReturn($organization);
 
-        $this->eventMock->expects($this->once())
+        $event = $this->createMock(FormEvent::class);
+        $event->expects($this->once())
             ->method('setData')
             ->with($this->equalTo($user));
 
-        $this->subscriber->preSetData($this->eventMock);
+        $this->subscriber->preSetData($event);
 
         $this->assertSame($organization, $user->getCurrentOrganization());
     }
@@ -124,10 +121,11 @@ class UserImapConfigSubscriberTest extends TestCase
         $request->attributes->set('oro_user_emailsettings', $data);
         $this->requestStack->push($request);
 
-        $this->eventMock->expects($this->once())
+        $event = $this->createMock(FormEvent::class);
+        $event->expects($this->once())
             ->method('getData')
             ->willReturn($eventData);
-        $this->eventMock->expects($this->once())
+        $event->expects($this->once())
             ->method('setData')
             ->with($this->equalTo(
                 [
@@ -138,6 +136,6 @@ class UserImapConfigSubscriberTest extends TestCase
                 ]
             ));
 
-        $this->subscriber->preSubmit($this->eventMock);
+        $this->subscriber->preSubmit($event);
     }
 }

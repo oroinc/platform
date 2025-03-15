@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\OrganizationBundle\Provider;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
 /**
@@ -10,40 +10,23 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
  */
 class BusinessUnitGridService
 {
-    /** @var EntityManager */
-    protected $em;
+    private array $choices = [];
 
-    /** @var array */
-    protected $choices;
-
-    public function __construct(EntityManager $em)
-    {
-        $this->em = $em;
+    public function __construct(
+        private ManagerRegistry $doctrine
+    ) {
     }
 
-    /**
-     * Return filter choices for owner grid column
-     *
-     * @return array
-     */
-    public function getOwnerChoices()
+    public function getOwnerChoices(): array
     {
-        return $this->getChoices('name', 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit');
+        return $this->getChoices('name', BusinessUnit::class);
     }
 
-    /**
-     * @param string $field
-     * @param string $entity
-     * @param string $alias
-     *
-     * @return array
-     */
-    protected function getChoices($field, $entity, $alias = 'bu')
+    protected function getChoices(string $field, string $entity, string $alias = 'bu'): array
     {
         $key = $entity . '|' . $field;
         if (!isset($this->choices[$key])) {
-            $choices = $this->em
-                ->getRepository(BusinessUnit::class)
+            $choices = $this->doctrine->getRepository(BusinessUnit::class)
                 ->getGridFilterChoices($field, $entity, $alias);
             $this->choices[$key] = array_flip($choices);
         }

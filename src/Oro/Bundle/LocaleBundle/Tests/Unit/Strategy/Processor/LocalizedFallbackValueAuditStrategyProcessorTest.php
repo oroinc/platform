@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Strategy\Processor;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataAuditBundle\Strategy\Processor\EntityAuditStrategyProcessorInterface;
@@ -11,18 +11,14 @@ use Oro\Bundle\LocaleBundle\Entity\Repository\LocalizedFallbackValueRepository;
 use Oro\Bundle\LocaleBundle\Storage\EntityFallbackFieldsStorage;
 use Oro\Bundle\LocaleBundle\Strategy\Processor\LocalizedFallbackValueAuditStrategyProcessor;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Stub\LocalizedFallbackValueParentStub;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\ReflectionUtil;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class LocalizedFallbackValueAuditStrategyProcessorTest extends TestCase
 {
-    use EntityTrait;
-
-    private ManagerRegistry|MockObject $doctrine;
-
-    private EntityFallbackFieldsStorage|MockObject $storage;
-
+    private ManagerRegistry&MockObject $doctrine;
+    private EntityFallbackFieldsStorage&MockObject $storage;
     private EntityAuditStrategyProcessorInterface $strategyProcessor;
 
     #[\Override]
@@ -40,7 +36,8 @@ class LocalizedFallbackValueAuditStrategyProcessorTest extends TestCase
     public function testProcessInverseCollectionsWithLocalizedFallbackValue(): void
     {
         $localizedId = 123;
-        $localizedField = $this->getEntity(LocalizedFallbackValue::class, ['id' => $localizedId]);
+        $localizedField = new LocalizedFallbackValue();
+        ReflectionUtil::setId($localizedField, $localizedId);
 
         $sourceEntityData = [
             'entity_class' => LocalizedFallbackValue::class,
@@ -52,7 +49,7 @@ class LocalizedFallbackValueAuditStrategyProcessorTest extends TestCase
             ->method('getFieldMap')
             ->willReturn([
                 LocalizedFallbackValueParentStub::class => [
-                    "localizedField" => "localizedFields"
+                    'localizedField' => 'localizedFields'
                 ]
             ]);
 
@@ -64,7 +61,7 @@ class LocalizedFallbackValueAuditStrategyProcessorTest extends TestCase
             ->willReturn($repository);
         $repository->expects($this->once())
             ->method('getParentIdByFallbackValue')
-            ->with(LocalizedFallbackValueParentStub::class, "localizedFields", $localizedField)
+            ->with(LocalizedFallbackValueParentStub::class, 'localizedFields', $localizedField)
             ->willReturn($parentId);
 
         $fieldset = $this->strategyProcessor->processInverseCollections($sourceEntityData);
@@ -81,10 +78,10 @@ class LocalizedFallbackValueAuditStrategyProcessorTest extends TestCase
 
     private function getSourceEntity(array $sourceEntityData, LocalizedFallbackValue $entity): void
     {
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityMetaData = $this->createMock(ClassMetadata::class);
         $entityMetaData->associationMappings = [
-            "localizedFields" => ['targetEntity' => LocalizedFallbackValue::class]
+            'localizedFields' => ['targetEntity' => LocalizedFallbackValue::class]
         ];
 
         $this->doctrine->expects($this->atLeastOnce())

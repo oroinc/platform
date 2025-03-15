@@ -5,7 +5,7 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Cache\Normalizer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\RuntimeReflectionService;
@@ -16,37 +16,36 @@ use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\CustomLocalizedFallbackValueStub;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Stub\LocalizationStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LocalizedFallbackValueCollectionNormalizerTest extends \PHPUnit\Framework\TestCase
+class LocalizedFallbackValueCollectionNormalizerTest extends TestCase
 {
-    private EntityManager|\PHPUnit\Framework\MockObject\MockObject $entityManager;
-
+    private EntityManagerInterface&MockObject $entityManager;
     private LocalizedFallbackValueCollectionNormalizer $collectionNormalizer;
 
     #[\Override]
     protected function setUp(): void
     {
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
-        $this->entityManager = $this->createMock(EntityManager::class);
-        $managerRegistry
-            ->expects(self::any())
-            ->method('getManagerForClass')
-            ->willReturn($this->entityManager);
-
-        $normalizer = new LocalizedFallbackValueNormalizer($managerRegistry);
-        $this->collectionNormalizer = new LocalizedFallbackValueCollectionNormalizer($normalizer);
-
-        $this->entityManager
-            ->expects(self::any())
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->entityManager->expects(self::any())
             ->method('getReference')
             ->with(Localization::class)
             ->willReturnCallback(static fn ($class, $id) => new LocalizationStub($id));
+
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getManagerForClass')
+            ->willReturn($this->entityManager);
+
+        $this->collectionNormalizer = new LocalizedFallbackValueCollectionNormalizer(
+            new LocalizedFallbackValueNormalizer($doctrine)
+        );
     }
 
     public function testNormalizeWhenEmpty(): void
     {
-        $this->entityManager
-            ->expects(self::never())
+        $this->entityManager->expects(self::never())
             ->method('getClassMetadata');
 
         self::assertEquals([], $this->collectionNormalizer->normalize(new ArrayCollection()));
@@ -59,8 +58,7 @@ class LocalizedFallbackValueCollectionNormalizerTest extends \PHPUnit\Framework\
     {
         $className = ClassUtils::getRealClass(get_class($localizedFallbackValues[0]));
 
-        $this->entityManager
-            ->expects(self::once())
+        $this->entityManager->expects(self::once())
             ->method('getClassMetadata')
             ->with($className)
             ->willReturn($this->createClassMetadata($className));
@@ -124,8 +122,7 @@ class LocalizedFallbackValueCollectionNormalizerTest extends \PHPUnit\Framework\
 
     public function testDenormalizeWhenEmpty(): void
     {
-        $this->entityManager
-            ->expects(self::never())
+        $this->entityManager->expects(self::never())
             ->method('getClassMetadata');
 
         self::assertEquals(
@@ -142,8 +139,7 @@ class LocalizedFallbackValueCollectionNormalizerTest extends \PHPUnit\Framework\
         string $className,
         Collection $expected
     ): void {
-        $this->entityManager
-            ->expects(self::once())
+        $this->entityManager->expects(self::once())
             ->method('getClassMetadata')
             ->with($className)
             ->willReturn($this->createClassMetadata($className));

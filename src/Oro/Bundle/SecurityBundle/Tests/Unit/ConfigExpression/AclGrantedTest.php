@@ -2,13 +2,15 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\ConfigExpression;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\ConfigExpression\AclGranted;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -17,19 +19,12 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class AclGrantedTest extends \PHPUnit\Framework\TestCase
+class AclGrantedTest extends TestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var AclGranted */
-    private $condition;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private ManagerRegistry&MockObject $doctrine;
+    private AclGranted $condition;
 
     #[\Override]
     protected function setUp(): void
@@ -146,7 +141,7 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
         $context = [];
         $expectedResult = true;
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $uow = $this->createMock(UnitOfWork::class);
         $em->expects(self::once())
             ->method('getUnitOfWork')
@@ -184,7 +179,7 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
         $context = [];
         $expectedResult = true;
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $uow = $this->createMock(UnitOfWork::class);
         $em->expects(self::once())
             ->method('getUnitOfWork')
@@ -220,7 +215,7 @@ class AclGrantedTest extends \PHPUnit\Framework\TestCase
         $context = [];
         $expectedResult = true;
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $uow = $this->createMock(UnitOfWork::class);
         $em->expects(self::once())
             ->method('getUnitOfWork')

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Model\Step;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 
@@ -11,28 +11,27 @@ use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
  */
 class RemoveEntitiesStep implements DependentMergeStepInterface
 {
-    public function __construct(private EntityManager $entityManager, private DoctrineHelper $doctrineHelper)
-    {
+    public function __construct(
+        private ManagerRegistry $doctrine,
+        private DoctrineHelper $doctrineHelper
+    ) {
     }
 
-    /**
-     * Merge fields
-     */
     #[\Override]
-    public function run(EntityData $data)
+    public function run(EntityData $data): void
     {
+        $entityManager = $this->doctrine->getManager();
         $masterEntity = $data->getMasterEntity();
-
         foreach ($data->getEntities() as $entity) {
             if (!$this->doctrineHelper->isEntityEqual($masterEntity, $entity)) {
-                $this->entityManager->remove($entity);
+                $entityManager->remove($entity);
             }
         }
     }
 
     #[\Override]
-    public function getDependentSteps()
+    public function getDependentSteps(): array
     {
-        return array('Oro\\Bundle\\EntityMergeBundle\\Model\\Step\\MergeFieldsStep');
+        return [MergeFieldsStep::class];
     }
 }

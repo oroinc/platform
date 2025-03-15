@@ -2,75 +2,59 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type;
 
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\FormBundle\Form\Type\OroChoiceType;
 use Oro\Bundle\LocaleBundle\Form\Type\LanguageSelectType;
 use Oro\Bundle\LocaleBundle\Provider\LocalizationChoicesProvider;
 use Oro\Bundle\TranslationBundle\Entity\Language;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class LanguageSelectTypeTest extends FormIntegrationTestCase
 {
-    use EntityTrait;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LocalizationChoicesProvider */
-    private $provider;
-
-    /** @var LanguageSelectType */
-    private $formType;
+    private LocalizationChoicesProvider&MockObject $provider;
+    private LanguageSelectType $formType;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->provider = $this->createMock(LocalizationChoicesProvider::class);
 
-        $metadata = $this->createMock(ClassMetadataInfo::class);
-        $metadata->expects($this->any())
-            ->method('getSingleIdentifierFieldName')
-            ->willReturn('id');
-
         $repository = $this->createMock(ObjectRepository::class);
         $repository->expects($this->any())
             ->method('find')
             ->willReturnMap([
-                [42, $this->getEntity(Language::class, ['id' => 42, 'code' => 'en'])]
+                [42, $this->getLanguage(42, 'en')]
             ]);
 
-        $manager = $this->createMock(EntityManager::class);
-        $manager->expects($this->any())
-            ->method('getClassMetadata')
-            ->with(Language::class)
-            ->willReturn($metadata);
-        $manager->expects($this->any())
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
             ->method('getRepository')
             ->with(Language::class)
             ->willReturn($repository);
 
-        $registry = $this->createMock(ManagerRegistry::class);
-        $registry->expects($this->any())
-            ->method('getManagerForClass')
-            ->with(Language::class)
-            ->willReturn($manager);
+        $this->formType = new LanguageSelectType($this->provider, $doctrine);
 
-        $this->formType = new LanguageSelectType($this->provider, $registry);
         parent::setUp();
+    }
+
+    private function getLanguage(int $id, string $code): Language
+    {
+        $language = new Language();
+        ReflectionUtil::setId($language, $id);
+        $language->setCode($code);
+
+        return $language;
     }
 
     public function testGetParent()
     {
         $this->assertEquals(OroChoiceType::class, $this->formType->getParent());
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals(LanguageSelectType::NAME, $this->formType->getName());
     }
 
     public function testBuildForm()
@@ -95,17 +79,15 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
         );
     }
 
-    /**
-     * @dataProvider submitDataProvider
-     */
-    public function testSubmit(string $submittedData, object $expectedData)
+    public function testSubmit()
     {
-        $data =  ['English' => 42, 'Spain' => 2];
+        $submittedData = '42';
+        $expectedData = $this->getLanguage(42, 'en');
 
         $this->provider->expects($this->once())
             ->method('getLanguageChoices')
             ->with(true)
-            ->willReturn($data);
+            ->willReturn(['English' => 42, 'Spain' => 2]);
 
         $form = $this->factory->create(LanguageSelectType::class);
         $form->submit($submittedData);
@@ -120,7 +102,7 @@ class LanguageSelectTypeTest extends FormIntegrationTestCase
         return [
             'language entity' => [
                 'submittedData' => '42',
-                'expectedData' => $this->getEntity(Language::class, ['id' => 42, 'code' => 'en']),
+                'expectedData' => $this->getLanguage(42, 'en')
             ]
         ];
     }

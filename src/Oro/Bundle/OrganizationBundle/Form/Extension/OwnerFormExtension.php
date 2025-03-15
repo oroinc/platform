@@ -3,7 +3,7 @@
 namespace Oro\Bundle\OrganizationBundle\Form\Extension;
 
 use Doctrine\Common\Util\ClassUtils;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
 use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
@@ -48,8 +48,8 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
 {
     use FormExtendedTypeTrait;
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    /** @var ManagerRegistry */
+    protected $doctrine;
 
     /** @var TokenAccessorInterface */
     protected $tokenAccessor;
@@ -82,13 +82,13 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
     protected $oldOwner;
 
     public function __construct(
-        DoctrineHelper $doctrineHelper,
+        ManagerRegistry $doctrine,
         TokenAccessorInterface $tokenAccessor,
         AuthorizationCheckerInterface $authorizationChecker,
         OwnershipMetadataProviderInterface $ownershipMetadataProvider,
         ContainerInterface $container
     ) {
-        $this->doctrineHelper = $doctrineHelper;
+        $this->doctrine = $doctrine;
         $this->tokenAccessor = $tokenAccessor;
         $this->authorizationChecker = $authorizationChecker;
         $this->ownershipMetadataProvider = $ownershipMetadataProvider;
@@ -166,7 +166,7 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
          */
         $builder->addEventSubscriber(
             new OwnerFormSubscriber(
-                $this->doctrineHelper,
+                $this->doctrine,
                 $this->fieldName,
                 $this->fieldLabel,
                 $this->isAssignGranted,
@@ -398,10 +398,7 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
                 // Add hidden input with default owner only during creation process,
                 // current user not able to modify this
                 if ($builder instanceof FormBuilder) {
-                    $transformer  = new EntityToIdTransformer(
-                        $this->doctrineHelper->getEntityManager(BusinessUnit::class),
-                        BusinessUnit::class
-                    );
+                    $transformer  = new EntityToIdTransformer($this->doctrine, BusinessUnit::class);
                     $builder->add(
                         $this->fieldName,
                         HiddenType::class
@@ -511,7 +508,7 @@ class OwnerFormExtension extends AbstractTypeExtension implements ServiceSubscri
         if (is_object($entity)) {
             $entity = ClassUtils::getClass($entity);
         }
-        if (!$this->doctrineHelper->isManageableEntityClass($entity)) {
+        if (null === $this->doctrine->getManagerForClass($entity)) {
             return false;
         }
 

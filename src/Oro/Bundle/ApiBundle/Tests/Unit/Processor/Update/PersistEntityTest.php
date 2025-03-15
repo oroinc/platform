@@ -2,19 +2,17 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Update;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Update\PersistEntity;
 use Oro\Bundle\ApiBundle\Processor\Update\SaveEntity;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class PersistEntityTest extends UpdateProcessorTestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var PersistEntity */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private PersistEntity $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -88,7 +86,7 @@ class PersistEntityTest extends UpdateProcessorTestCase
     {
         $entity = new \stdClass();
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityManager')
@@ -109,7 +107,7 @@ class PersistEntityTest extends UpdateProcessorTestCase
     {
         $entity = new \stdClass();
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
 
         $this->doctrineHelper->expects(self::once())
             ->method('getEntityManager')

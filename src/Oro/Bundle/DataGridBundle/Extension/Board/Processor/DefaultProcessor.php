@@ -4,7 +4,7 @@ namespace Oro\Bundle\DataGridBundle\Extension\Board\Processor;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
@@ -198,7 +198,7 @@ class DefaultProcessor implements BoardProcessorInterface
     }
 
     protected function getChoicesList(
-        EntityManager $em,
+        EntityManagerInterface $em,
         string $targetEntity,
         string $property,
         mixed $boardConfig,
@@ -214,7 +214,8 @@ class DefaultProcessor implements BoardProcessorInterface
             $keyField,
             $labelField,
             $orderBy,
-            whereOptions: $whereOptions
+            false,
+            $whereOptions
         );
         $defaultOption = $this->getDefaultColumn($boardConfig, $result);
 

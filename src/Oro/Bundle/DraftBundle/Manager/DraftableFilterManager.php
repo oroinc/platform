@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DraftBundle\Manager;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DraftBundle\Doctrine\DraftableFilter;
 
@@ -11,20 +11,15 @@ use Oro\Bundle\DraftBundle\Doctrine\DraftableFilter;
  */
 class DraftableFilterManager
 {
-    /**
-     * @var ManagerRegistry
-     */
-    private $managerRegistry;
-
-    public function __construct(ManagerRegistry $managerRegistry)
-    {
-        $this->managerRegistry = $managerRegistry;
+    public function __construct(
+        private ManagerRegistry $doctrine
+    ) {
     }
 
     public function disable(string $className): void
     {
-        /** @var EntityManager $em */
-        $em = $this->managerRegistry->getManagerForClass($className);
+        /** @var EntityManagerInterface $em */
+        $em = $this->doctrine->getManagerForClass($className);
         $filters = $em->getFilters();
         if ($filters->isEnabled(DraftableFilter::FILTER_ID)) {
             $filters->disable(DraftableFilter::FILTER_ID);
@@ -33,8 +28,8 @@ class DraftableFilterManager
 
     public function enable(string $className): void
     {
-        /** @var EntityManager $em */
-        $em = $this->managerRegistry->getManagerForClass($className);
+        /** @var EntityManagerInterface $em */
+        $em = $this->doctrine->getManagerForClass($className);
         $filters = $em->getFilters();
         $filters->enable(DraftableFilter::FILTER_ID);
     }

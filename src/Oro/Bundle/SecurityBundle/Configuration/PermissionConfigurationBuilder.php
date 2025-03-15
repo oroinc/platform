@@ -4,9 +4,8 @@ namespace Oro\Bundle\SecurityBundle\Configuration;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\EntityManager;
-use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
 use Oro\Bundle\SecurityBundle\Exception\MissedRequiredOptionException;
@@ -20,43 +19,22 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class PermissionConfigurationBuilder
 {
-    /**
-     * @var DoctrineHelper
-     */
-    private $doctrineHelper;
-
-    /**
-     * @var ValidatorInterface
-     */
-    private $validator;
-
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
-    /**
-     * @var array
-     */
-    private $processedEntities = [];
+    private array $processedEntities = [];
 
     public function __construct(
-        DoctrineHelper $doctrineHelper,
-        ValidatorInterface $validator,
-        EntityManager $entityManager
+        private ValidatorInterface $validator,
+        private ManagerRegistry $doctrine
     ) {
-        $this->doctrineHelper = $doctrineHelper;
-        $this->validator = $validator;
-        $this->entityManager = $entityManager;
     }
 
     /**
-     * @param array $configuration
-     * @return Permission[]|Collection
+     * @return Collection<int, Permission>
      */
-    public function buildPermissions(array $configuration)
+    public function buildPermissions(array $configuration): Collection
     {
-        $classNames = $this->entityManager->getConfiguration()->getMetadataDriverImpl()->getAllClassNames();
+        /** @var EntityManagerInterface $em */
+        $em = $this->doctrine->getManagerForClass(Permission::class);
+        $classNames = $em->getConfiguration()->getMetadataDriverImpl()->getAllClassNames();
         $permissions = new ArrayCollection();
         foreach ($configuration as $name => $permissionConfiguration) {
             $permission = $this->buildPermission($name, $permissionConfiguration, $classNames);
@@ -74,13 +52,7 @@ class PermissionConfigurationBuilder
         return $permissions;
     }
 
-    /**
-     * @param string $name
-     * @param array $configuration
-     * @param array $classNames
-     * @return Permission
-     */
-    protected function buildPermission($name, array $configuration, array $classNames): Permission
+    private function buildPermission(string $name, array $configuration, array $classNames): Permission
     {
         $this->assertConfigurationOptions($configuration, ['label']);
 
@@ -93,33 +65,30 @@ class PermissionConfigurationBuilder
         }
 
         $permission = new Permission();
-        $permission
-            ->setName($name)
-            ->setLabel($configuration['label'])
-            ->setApplyToAll($this->getConfigurationOption($configuration, 'apply_to_all', true))
-            ->setGroupNames($this->getConfigurationOption($configuration, 'group_names', []))
-            ->setExcludeEntities($this->buildPermissionEntities($excludeEntities))
-            ->setApplyToEntities($this->buildPermissionEntities($applyToEntities))
-            ->setDescription($this->getConfigurationOption($configuration, 'description', ''));
+        $permission->setName($name);
+        $permission->setLabel($configuration['label']);
+        $permission->setApplyToAll($this->getConfigurationOption($configuration, 'apply_to_all', true));
+        $permission->setGroupNames($this->getConfigurationOption($configuration, 'group_names', []));
+        $permission->setExcludeEntities($this->buildPermissionEntities($excludeEntities));
+        $permission->setApplyToEntities($this->buildPermissionEntities($applyToEntities));
+        $permission->setDescription($this->getConfigurationOption($configuration, 'description', ''));
 
         return $permission;
     }
 
     /**
-     * @param array $configuration
-     * @return ArrayCollection|PermissionEntity[]
-     * @throws NotManageableEntityException
+     * @return Collection<int, PermissionEntity>
      */
-    protected function buildPermissionEntities(array $configuration)
+    private function buildPermissionEntities(array $configuration): Collection
     {
-        $repository = $this->doctrineHelper->getEntityRepositoryForClass(PermissionEntity::class);
+        $repository = $this->doctrine->getRepository(PermissionEntity::class);
 
         $entities = new ArrayCollection();
         $configuration = array_unique($configuration);
         foreach ($configuration as $entityName) {
             $entityNameNormalized = strtolower($entityName);
 
-            if (!array_key_exists($entityNameNormalized, $this->processedEntities)) {
+            if (!\array_key_exists($entityNameNormalized, $this->processedEntities)) {
                 $permissionEntity = $repository->findOneBy(['name' => $entityName]);
 
                 if (!$permissionEntity) {
@@ -136,49 +105,39 @@ class PermissionConfigurationBuilder
         return $entities;
     }
 
-    /**
-     * @throws MissedRequiredOptionException
-     */
-    protected function assertConfigurationOptions(array $configuration, array $requiredOptions)
+    private function assertConfigurationOptions(array $configuration, array $requiredOptions): void
     {
         foreach ($requiredOptions as $optionName) {
             if (!isset($configuration[$optionName])) {
-                throw new MissedRequiredOptionException(sprintf('Configuration option "%s" is required', $optionName));
+                throw new MissedRequiredOptionException(
+                    \sprintf('Configuration option "%s" is required', $optionName)
+                );
             }
         }
     }
 
-    /**
-     * @param array $options
-     * @param string $key
-     * @param mixed $default
-     * @return mixed
-     */
-    protected function getConfigurationOption(array $options, $key, $default = null)
+    private function getConfigurationOption(array $options, string $key, mixed $default = null): mixed
     {
-        if (array_key_exists($key, $options)) {
+        if (\array_key_exists($key, $options)) {
             return $options[$key];
         }
 
         return $default;
     }
 
-    /**
-     * @param string $name
-     * @param ConstraintViolationListInterface $violations
-     * @return ValidatorException
-     */
-    protected function createValidationException($name, ConstraintViolationListInterface $violations)
-    {
+    private function createValidationException(
+        string $name,
+        ConstraintViolationListInterface $violations
+    ): ValidatorException {
         $errors = '';
 
         /** @var ConstraintViolationInterface $violation */
         foreach ($violations as $violation) {
-            $errors .= sprintf('    %s%s', $violation->getMessage(), PHP_EOL);
+            $errors .= \sprintf('    %s%s', $violation->getMessage(), PHP_EOL);
         }
 
         return new ValidatorException(
-            sprintf('Configuration of permission %s is invalid:%s%s', $name, PHP_EOL, $errors)
+            \sprintf('Configuration of permission %s is invalid:%s%s', $name, PHP_EOL, $errors)
         );
     }
 

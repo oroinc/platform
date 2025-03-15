@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
 use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Form\Transformer\BusinessUnitTreeTransformer;
 use Symfony\Component\Form\AbstractType;
@@ -16,52 +17,25 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class BusinessUnitSelectAutocomplete extends AbstractType
 {
-    const NAME = 'oro_type_business_unit_select_autocomplete';
-
-    public function getName()
-    {
-        return self::NAME;
-    }
-
-    /** @var EntityManager */
-    protected $entityManager;
-
-    /** @var BusinessUnitManager */
-    protected $businessUnitManager;
-
-    /** @var string */
-    protected $entityClass;
-
-    /**
-     * BusinessUnitSelectAutocomplete constructor.
-     */
     public function __construct(
-        EntityManager $entityManager,
-        $entityClass,
-        BusinessUnitManager $businessUnitManager
+        private ManagerRegistry $doctrine,
+        private BusinessUnitManager $businessUnitManager
     ) {
-        $this->entityManager = $entityManager;
-        $this->entityClass = $entityClass;
-        $this->businessUnitManager = $businessUnitManager;
     }
 
     #[\Override]
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         if (isset($options['configs']['multiple']) &&  $options['configs']['multiple'] === true) {
-            $builder->addModelTransformer(
-                new EntitiesToIdsTransformer($this->entityManager, $this->entityClass)
-            );
+            $builder->addModelTransformer(new EntitiesToIdsTransformer($this->doctrine, BusinessUnit::class));
         } else {
             $builder->resetModelTransformers();
-            $builder->addModelTransformer(
-                new BusinessUnitTreeTransformer($this->businessUnitManager)
-            );
+            $builder->addModelTransformer(new BusinessUnitTreeTransformer($this->businessUnitManager));
         }
     }
 
     #[\Override]
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

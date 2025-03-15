@@ -2,36 +2,24 @@
 
 namespace Oro\Bundle\TagBundle\Provider;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\TagBundle\Entity\Tag;
+use Oro\Bundle\TagBundle\Entity\Tagging;
 use Oro\Bundle\TagBundle\Security\SecurityProvider;
 
+/**
+ * Provides tag statistic.
+ */
 class StatisticProvider
 {
-    /** @var EntityManager */
-    protected $em;
-
-    /** @var SecurityProvider */
-    protected $securityProvider;
-
-    /** @var ConfigProvider */
-    protected $entityConfigProvider;
-
-    /** @var EntityAliasResolver */
-    protected $entityAliasResolver;
-
     public function __construct(
-        EntityManager $entityManager,
-        SecurityProvider $securityProvider,
-        ConfigProvider $configProvider,
-        EntityAliasResolver $entityAliasResolver
+        private ManagerRegistry $doctrine,
+        private SecurityProvider $securityProvider,
+        private ConfigProvider $entityConfigProvider,
+        private EntityAliasResolver $entityAliasResolver
     ) {
-        $this->em                   = $entityManager;
-        $this->securityProvider     = $securityProvider;
-        $this->entityConfigProvider = $configProvider;
-        $this->entityAliasResolver  = $entityAliasResolver;
     }
 
     /**
@@ -39,7 +27,7 @@ class StatisticProvider
      *
      * @return array ['' => [count], $alias => [count, icon, label, class => true]]
      */
-    public function getTagEntitiesStatistic(Tag $tag)
+    public function getTagEntitiesStatistic(Tag $tag): array
     {
         $groupedResult = $this->getGroupedTagEntities($tag);
 
@@ -47,11 +35,11 @@ class StatisticProvider
             $groupedResult,
             function ($result, array $entityResult) {
                 $result['']['count'] += $entityResult['cnt'];
-                $entityClass    = $entityResult['entityClass'];
-                $alias          = $this->entityAliasResolver->getAlias($entityClass);
+                $entityClass = $entityResult['entityClass'];
+                $alias = $this->entityAliasResolver->getAlias($entityClass);
                 $result[$alias] = [
                     'count' => $entityResult['cnt'],
-                    'icon'  => $this->entityConfigProvider->getConfig($entityClass)->get('icon'),
+                    'icon' => $this->entityConfigProvider->getConfig($entityClass)->get('icon'),
                     'label' => $this->entityConfigProvider->getConfig($entityClass)->get('plural_label'),
                     'class' => true
                 ];
@@ -67,11 +55,12 @@ class StatisticProvider
      *
      * @return array [[cnt, entityClass]]
      */
-    protected function getGroupedTagEntities(Tag $tag)
+    private function getGroupedTagEntities(Tag $tag)
     {
-        $queryBuilder = $this->em->createQueryBuilder()
+        $queryBuilder = $this->doctrine->getManagerForClass(Tagging::class)
+            ->createQueryBuilder()
             ->select('COUNT(t.id) AS cnt, t.entityName AS entityClass')
-            ->from('Oro\Bundle\TagBundle\Entity\Tagging', 't')
+            ->from(Tagging::class, 't')
             ->where('t.tag = :tag')
             ->setParameter('tag', $tag)
             ->addGroupBy('t.entityName');

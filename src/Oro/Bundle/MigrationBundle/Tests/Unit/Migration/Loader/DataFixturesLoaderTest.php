@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Loader;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\MigrationBundle\Entity\DataFixture;
 use Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader;
@@ -11,36 +11,30 @@ use Oro\Bundle\MigrationBundle\Migration\UpdateDataFixturesFixture;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test1Bundle\TestPackageTest1Bundle;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test2Bundle\TestPackageTest2Bundle;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Fixture\TestPackage\Test3Bundle\TestPackageTest3Bundle;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
-class DataFixturesLoaderTest extends \PHPUnit\Framework\TestCase
+class DataFixturesLoaderTest extends TestCase
 {
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
-    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $fixtureRepo;
-
-    /** @var DataFixturesLoader */
-    private $loader;
-
-    private Kernel $kernel;
+    private ContainerInterface&MockObject $container;
+    private EntityRepository&MockObject $fixtureRepo;
+    private DataFixturesLoader $loader;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);
         $this->fixtureRepo = $this->createMock(EntityRepository::class);
-        $this->kernel = $this->createMock(Kernel::class);
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->any())
             ->method('getRepository')
             ->with(DataFixture::class)
             ->willReturn($this->fixtureRepo);
 
-        $this->loader = new DataFixturesLoader($em, $this->kernel, $this->container);
+        $this->loader = new DataFixturesLoader($em, $this->container);
     }
 
     /**
@@ -48,7 +42,7 @@ class DataFixturesLoaderTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetFixtures(array $bundles, array $loadedDataFixtureClasses, array $expectedFixtureClasses)
     {
-        /** @var \Symfony\Component\HttpKernel\Bundle\Bundle $bundle */
+        /** @var BundleInterface $bundle */
         foreach ($bundles as $bundle) {
             $this->loader->loadFromDirectory(
                 $bundle->getPath() . '/Migrations/Data/ORM'

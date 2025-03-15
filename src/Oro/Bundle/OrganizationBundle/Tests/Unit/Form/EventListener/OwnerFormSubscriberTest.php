@@ -5,42 +5,35 @@ namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\EventListener;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Form\EventListener\OwnerFormSubscriber;
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
+class OwnerFormSubscriberTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var string */
-    private $fieldName = 'owner';
-
-    /** @var string */
-    private $fieldLabel = 'Owner';
-
-    /** @var User */
-    private $defaultOwner;
-
-    /** @var OwnerFormSubscriber */
-    private $subscriber;
+    private ManagerRegistry&MockObject $doctrine;
+    private string $fieldName = 'owner';
+    private string $fieldLabel = 'Owner';
+    private User $defaultOwner;
+    private OwnerFormSubscriber $subscriber;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
 
         $this->defaultOwner = new User();
 
         $isAssignGranted = true;
         $this->subscriber = new OwnerFormSubscriber(
-            $this->doctrineHelper,
+            $this->doctrine,
             $this->fieldName,
             $this->fieldLabel,
             $isAssignGranted,
@@ -75,8 +68,8 @@ class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('has')
             ->with($this->fieldName)
             ->willReturn(false);
-        $this->doctrineHelper->expects($this->never())
-            ->method('isManageableEntity');
+        $this->doctrine->expects($this->never())
+            ->method('getManagerForClass');
 
         $event = new FormEvent($form, new \DateTime());
         $this->subscriber->postSetData($event);
@@ -92,8 +85,8 @@ class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('has')
             ->with($this->fieldName)
             ->willReturn(true);
-        $this->doctrineHelper->expects($this->never())
-            ->method('isManageableEntity');
+        $this->doctrine->expects($this->never())
+            ->method('getManagerForClass');
 
         $event = new FormEvent($form, [1, 2, 3]);
         $this->subscriber->postSetData($event);
@@ -111,10 +104,10 @@ class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('has')
             ->with($this->fieldName)
             ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntity')
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')
             ->with(get_class($data))
-            ->willReturn(false);
+            ->willReturn(null);
 
         $event = new FormEvent($form, $data);
         $this->subscriber->postSetData($event);
@@ -186,7 +179,7 @@ class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
 
         $isAssignGranted = false;
         $this->subscriber = new OwnerFormSubscriber(
-            $this->doctrineHelper,
+            $this->doctrine,
             $this->fieldName,
             $this->fieldLabel,
             $isAssignGranted, // assign is not granted
@@ -211,12 +204,8 @@ class OwnerFormSubscriberTest extends \PHPUnit\Framework\TestCase
             ->method('getClassMetadata')
             ->with($entityClass)
             ->willReturn($classMetadata);
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntity')
-            ->with($entityClass)
-            ->willReturn(true);
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityManager')
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')
             ->with($entityClass)
             ->willReturn($entityManager);
     }

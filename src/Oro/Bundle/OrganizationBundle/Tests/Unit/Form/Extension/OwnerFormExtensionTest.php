@@ -3,9 +3,9 @@
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\Extension;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Form\EventListener\OwnerFormSubscriber;
@@ -22,7 +22,7 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\Type\UserAclSelectType;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -41,10 +41,8 @@ use Symfony\Component\Validator\Constraints\NotBlank;
  */
 class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
 {
-    use EntityTrait;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    private $doctrineHelper;
+    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
+    private $doctrine;
 
     /** @var \PHPUnit\Framework\MockObject\MockObject|OwnershipMetadataProviderInterface */
     private $ownershipMetadataProvider;
@@ -67,9 +65,6 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var array */
     private $organizations;
 
-    /** @var ArrayCollection */
-    private $businessUnits;
-
     /** @var string */
     private $fieldName;
 
@@ -91,10 +86,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
     #[\Override]
     protected function setUp(): void
     {
-        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $this->doctrineHelper->expects($this->any())
-            ->method('isManageableEntityClass')
-            ->willReturn(true);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
 
         $this->ownershipMetadataProvider = $this->createMock(OwnershipMetadataProviderInterface::class);
         $this->businessUnitManager = $this->createMock(BusinessUnitManager::class);
@@ -107,14 +99,13 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
         $businessUnit->expects($this->any())
             ->method('getOrganization')
             ->willReturn($organization);
-        $this->businessUnits = new ArrayCollection([$businessUnit]);
         $this->user = $this->createMock(User::class);
         $this->user->expects($this->any())
             ->method('getId')
             ->willReturn(1);
         $this->user->expects($this->any())
             ->method('getBusinessUnits')
-            ->willReturn($this->businessUnits);
+            ->willReturn(new ArrayCollection([$businessUnit]));
         $this->organization = new Organization();
         $this->organization->setId(1);
         $this->entityClassName = get_class($this->user);
@@ -158,7 +149,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
             ->getContainer($this);
 
         $this->extension = new OwnerFormExtension(
-            $this->doctrineHelper,
+            $this->doctrine,
             $this->tokenAccessor,
             $this->authorizationChecker,
             $this->ownershipMetadataProvider,
@@ -206,6 +197,10 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
      */
     public function testUserOwnerBuildFormGranted(): void
     {
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->willReturn($this->createMock(EntityManagerInterface::class));
+
         $this->mockConfigs(['is_granted' => true, 'owner_type' => OwnershipType::OWNER_TYPE_USER]);
         $this->builder->expects($this->once())
             ->method('add')
@@ -229,6 +224,10 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
      */
     public function testBusinessUnitOwnerBuildFormGranted(): void
     {
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->willReturn($this->createMock(EntityManagerInterface::class));
+
         $this->mockConfigs(['is_granted' => true, 'owner_type' => OwnershipType::OWNER_TYPE_BUSINESS_UNIT]);
 
         $this->builder->expects($this->once())
@@ -291,13 +290,13 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('getSingleIdentifierFieldName')
             ->willReturn('name');
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->any())
             ->method('getClassMetadata')
             ->willReturn($classMetadata);
 
-        $this->doctrineHelper->expects($this->any())
-            ->method('getEntityManager')
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')
             ->willReturn($em);
 
         $container = TestContainerBuilder::create()
@@ -308,7 +307,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
             ->getContainer($this);
 
         $this->extension = new OwnerFormExtension(
-            $this->doctrineHelper,
+            $this->doctrine,
             $this->tokenAccessor,
             $this->authorizationChecker,
             $this->ownershipMetadataProvider,
@@ -332,6 +331,10 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
      */
     public function testBusinessUnitOwnerBuildFormNotGranted(): void
     {
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->willReturn($this->createMock(EntityManagerInterface::class));
+
         $this->mockConfigs(['is_granted' => false, 'owner_type' => OwnershipType::OWNER_TYPE_BUSINESS_UNIT]);
         $this->builder->expects($this->once())
             ->method('add')
@@ -388,6 +391,10 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
      */
     public function testDefaultOwnerUnavailableBusinessUnit(): void
     {
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->willReturn($this->createMock(EntityManagerInterface::class));
+
         $this->mockConfigs(['is_granted' => true, 'owner_type' => OwnershipType::OWNER_TYPE_BUSINESS_UNIT]);
 
         $businessUnit = $this->createMock(BusinessUnit::class);
@@ -400,7 +407,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('addEventSubscriber')
             ->with(
                 new OwnerFormSubscriber(
-                    $this->doctrineHelper,
+                    $this->doctrine,
                     $this->fieldName,
                     $this->fieldLabel,
                     $isAssignGranted,
@@ -446,7 +453,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
             ->getContainer($this);
 
         $this->extension = new OwnerFormExtension(
-            $this->doctrineHelper,
+            $this->doctrine,
             $this->tokenAccessor,
             $this->authorizationChecker,
             $this->ownershipMetadataProvider,
@@ -456,6 +463,10 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testPreSubmit(): void
     {
+        $this->doctrine->expects($this->atLeastOnce())
+            ->method('getManagerForClass')
+            ->willReturn($this->createMock(EntityManagerInterface::class));
+
         $this->mockConfigs(
             [
                 'is_granted' => true,
@@ -512,6 +523,10 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
 
     public function testPreSetData(): void
     {
+        $this->doctrine->expects($this->atLeastOnce())
+            ->method('getManagerForClass')
+            ->willReturn($this->createMock(EntityManagerInterface::class));
+
         $this->mockConfigs(['is_granted' => true, 'owner_type' => OwnershipType::OWNER_TYPE_USER]);
         $form = $this->createMock(Form::class);
         $form->expects($this->any())
@@ -544,10 +559,17 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
      */
     public function testDefaultOwnerAvailableBusinessUnit(): void
     {
+        $this->doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->willReturn($this->createMock(EntityManagerInterface::class));
+
         $this->mockConfigs(['is_granted' => true, 'owner_type' => OwnershipType::OWNER_TYPE_BUSINESS_UNIT]);
 
-        $organization = $this->getEntity(Organization::class, ['id' => 1]);
-        $businessUnit = $this->getEntity(BusinessUnit::class, ['id' => 1, 'organization' => $organization]);
+        $organization = new Organization();
+        $organization->setId(1);
+        $businessUnit = new BusinessUnit();
+        ReflectionUtil::setId($businessUnit, 1);
+        $businessUnit->setOrganization($organization);
         $this->user->expects($this->any())
             ->method('getOwner')
             ->willReturn($businessUnit);
@@ -557,7 +579,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('addEventSubscriber')
             ->with(
                 new OwnerFormSubscriber(
-                    $this->doctrineHelper,
+                    $this->doctrine,
                     $this->fieldName,
                     $this->fieldLabel,
                     $isAssignGranted,
@@ -576,7 +598,7 @@ class OwnerFormExtensionTest extends \PHPUnit\Framework\TestCase
             ->getContainer($this);
 
         $this->extension = new OwnerFormExtensionStub(
-            $this->doctrineHelper,
+            $this->doctrine,
             $this->tokenAccessor,
             $this->authorizationChecker,
             $this->ownershipMetadataProvider,

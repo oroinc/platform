@@ -12,35 +12,33 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class WidgetBusinessUnitSelectType extends WidgetEntityJquerySelect2HiddenType
 {
-    const NAME = 'oro_type_widget_business_unit_select';
-
     #[\Override]
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
 
         $resolver->setDefaults(
             [
                 'autocomplete_alias' => 'widget_owner_business_units',
-                'configs'            => [
-                    'multiple'    => true,
+                'configs' => [
+                    'multiple' => true,
                     'placeholder' => 'oro.dashboard.form.choose_business_unit',
-                    'allowClear'              => true,
-                    'result_template_twig'    => '@OroOrganization/BusinessUnit/Autocomplete/result.html.twig',
+                    'allowClear' => true,
+                    'result_template_twig' => '@OroOrganization/BusinessUnit/Autocomplete/result.html.twig',
                     'selection_template_twig' => '@OroOrganization/BusinessUnit/Autocomplete/selection.html.twig',
                 ]
             ]
         );
     }
 
-    /**
-     * @param string $entityClass
-     * @param array  $ids
-     *
-     * @return array
-     */
     #[\Override]
-    protected function getEntitiesByIdentifiers($entityClass, array $ids)
+    public function getBlockPrefix(): string
+    {
+        return 'oro_type_widget_business_unit_select';
+    }
+
+    #[\Override]
+    protected function getEntitiesByIdentifiers(string $entityClass, array $ids): array
     {
         $ids = array_filter($ids);
         if (empty($ids)) {
@@ -50,10 +48,10 @@ class WidgetBusinessUnitSelectType extends WidgetEntityJquerySelect2HiddenType
         if ($key !== false) {
             unset($ids[$key]);
         }
-        $result        = [];
-        $identityField = $this->doctrineHelper->getSingleEntityIdentifierFieldName($entityClass);
+        $result = [];
+        $identityField = $this->getSingleEntityIdentifierFieldName($entityClass);
         if ($ids) {
-            $result = $this->entityManager->getRepository($entityClass)->findBy([$identityField => $ids]);
+            $result = $this->doctrine->getRepository($entityClass)->findBy([$identityField => $ids]);
         }
         if ($key !== false) {
             $result[] = [
@@ -61,17 +59,5 @@ class WidgetBusinessUnitSelectType extends WidgetEntityJquerySelect2HiddenType
             ];
         }
         return $result;
-    }
-
-    #[\Override]
-    public function getName()
-    {
-        return $this->getBlockPrefix();
-    }
-
-    #[\Override]
-    public function getBlockPrefix(): string
-    {
-        return self::NAME;
     }
 }

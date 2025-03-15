@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToJsonTransformer;
 use Oro\Bundle\UserBundle\Entity\User;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -12,33 +11,30 @@ use PHPUnit\Framework\TestCase;
 
 class EntitiesToJsonTransformerTest extends TestCase
 {
-    /** @var EntityManager|MockObject */
-    private $entityManager;
-
-    /** @var EntitiesToJsonTransformer */
-    private $transformer;
+    private ManagerRegistry&MockObject $doctrine;
+    private EntitiesToJsonTransformer $transformer;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
 
-        $this->transformer = new EntitiesToJsonTransformer($this->entityManager);
+        $this->transformer = new EntitiesToJsonTransformer($this->doctrine);
     }
 
-    public function testTransformEmptyValue()
+    public function testTransformEmptyValue(): void
     {
-        $this->assertEquals('', $this->transformer->transform([]));
+        self::assertEquals('', $this->transformer->transform([]));
     }
 
-    public function testTransform()
+    public function testTransform(): void
     {
         $user0 = $this->createMock(User::class);
-        $user0->expects($this->once())
+        $user0->expects(self::once())
             ->method('getId')
             ->willReturn(1);
         $user1 = $this->createMock(User::class);
-        $user1->expects($this->once())
+        $user1->expects(self::once())
             ->method('getId')
             ->willReturn(2);
 
@@ -47,15 +43,15 @@ class EntitiesToJsonTransformerTest extends TestCase
             . ';' .
             json_encode(['entityClass' => get_class($user1), 'entityId' => 2], JSON_THROW_ON_ERROR);
 
-        $this->assertEquals($expected, $this->transformer->transform([$user0, $user1]));
+        self::assertEquals($expected, $this->transformer->transform([$user0, $user1]));
     }
 
-    public function testReverseTransformEmptyValue()
+    public function testReverseTransformEmptyValue(): void
     {
-        $this->assertEquals([], $this->transformer->reverseTransform(''));
+        self::assertEquals([], $this->transformer->reverseTransform(''));
     }
 
-    public function testReverseTransform()
+    public function testReverseTransform(): void
     {
         $user0 = $this->createMock(User::class);
         $user1 = $this->createMock(User::class);
@@ -65,21 +61,14 @@ class EntitiesToJsonTransformerTest extends TestCase
             . ';' .
             json_encode(['entityClass' => get_class($user1), 'entityId' => 2], JSON_THROW_ON_ERROR);
 
-        $metadata = $this->createMock(ClassMetadata::class);
-        $metadata->expects($this->exactly(2))
-            ->method('getName')
-            ->willReturn(User::class);
-        $this->entityManager->expects($this->exactly(2))
-            ->method('getClassMetadata')
-            ->willReturn($metadata);
         $repository = $this->createMock(EntityRepository::class);
-        $repository->expects($this->exactly(2))
+        $repository->expects(self::exactly(2))
             ->method('find')
             ->willReturnOnConsecutiveCalls($user0, $user1);
-        $this->entityManager->expects($this->exactly(2))
+        $this->doctrine->expects(self::exactly(2))
             ->method('getRepository')
             ->willReturn($repository);
 
-        $this->assertEquals([$user0, $user1], $this->transformer->reverseTransform($value));
+        self::assertEquals([$user0, $user1], $this->transformer->reverseTransform($value));
     }
 }

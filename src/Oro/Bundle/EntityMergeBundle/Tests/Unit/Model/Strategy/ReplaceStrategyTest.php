@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Strategy;
 
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
@@ -9,19 +10,21 @@ use Oro\Bundle\EntityMergeBundle\Model\Accessor\DefaultAccessor;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 use Oro\Bundle\EntityMergeBundle\Model\Strategy\ReplaceStrategy;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
+use PHPUnit\Framework\TestCase;
 
-class ReplaceStrategyTest extends \PHPUnit\Framework\TestCase
+class ReplaceStrategyTest extends TestCase
 {
-    /** @var ReplaceStrategy */
-    private $strategy;
+    private ReplaceStrategy $strategy;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->strategy = new ReplaceStrategy(new DefaultAccessor());
+        $this->strategy = new ReplaceStrategy(
+            new DefaultAccessor(PropertyAccess::createPropertyAccessor())
+        );
     }
 
-    public function testNotSupports()
+    public function testNotSupports(): void
     {
         $fieldData = $this->createMock(FieldData::class);
         $fieldData->expects($this->once())
@@ -31,7 +34,7 @@ class ReplaceStrategyTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->strategy->supports($fieldData));
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $fieldData = $this->createMock(FieldData::class);
         $fieldData->expects($this->once())
@@ -41,7 +44,7 @@ class ReplaceStrategyTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->strategy->supports($fieldData));
     }
 
-    public function testMerge()
+    public function testMerge(): void
     {
         $masterEntity = new EntityStub(1);
         $sourceEntity = new EntityStub(2);
@@ -76,7 +79,7 @@ class ReplaceStrategyTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($sourceEntity->getId(), $masterEntity->getId());
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals('replace', $this->strategy->getName());
     }

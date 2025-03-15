@@ -43,13 +43,11 @@ services:
             - '@doctrine'
             - '@oro_platform.materialized_view.factory.by_query'
             - '@oro_platform.dbal.schema.materialized_view.manager'
-        calls:
-            - [setLogger, ['@logger']]
+            - '@logger'
 
     oro_platform.materialized_view.remover:
         class: Oro\Bundle\PlatformBundle\MaterializedView\MaterializedViewRemover
         arguments:
             - '@doctrine'
             - '@oro_platform.materialized_view.manager'
-        calls:
-            - [setLogger, ['@logger']]
+            - '@logger'

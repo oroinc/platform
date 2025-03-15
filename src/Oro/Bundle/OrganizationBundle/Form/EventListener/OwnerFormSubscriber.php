@@ -3,7 +3,7 @@
 namespace Oro\Bundle\OrganizationBundle\Form\EventListener;
 
 use Doctrine\Common\Util\ClassUtils;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -16,8 +16,8 @@ use Symfony\Component\Form\FormInterface;
  */
 class OwnerFormSubscriber implements EventSubscriberInterface
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    /** @var ManagerRegistry */
+    protected $doctrine;
 
     /** @var string */
     protected $fieldName;
@@ -32,35 +32,32 @@ class OwnerFormSubscriber implements EventSubscriberInterface
     protected $defaultOwner;
 
     /**
-     * @param DoctrineHelper $doctrineHelper
+     * @param ManagerRegistry $doctrine
      * @param string $fieldName
      * @param string $fieldLabel
      * @param bool $isAssignGranted this parameter is transmitted as link because value can be changed in form class
      * @param null $defaultOwner
      */
     public function __construct(
-        DoctrineHelper $doctrineHelper,
+        ManagerRegistry $doctrine,
         $fieldName,
         $fieldLabel,
         &$isAssignGranted,
         $defaultOwner = null
     ) {
-        $this->doctrineHelper = $doctrineHelper;
+        $this->doctrine = $doctrine;
         $this->fieldName = $fieldName;
         $this->fieldLabel = $fieldLabel;
         $this->isAssignGranted = &$isAssignGranted;
         $this->defaultOwner = $defaultOwner;
     }
 
-    /**
-     * @return array
-     */
     #[\Override]
     public static function getSubscribedEvents(): array
     {
-        return array(
+        return [
             FormEvents::POST_SET_DATA => 'postSetData'
-        );
+        ];
     }
 
     public function postSetData(FormEvent $event)
@@ -78,14 +75,12 @@ class OwnerFormSubscriber implements EventSubscriberInterface
             }
 
             $entityClass = ClassUtils::getClass($entity);
-            if (!$this->doctrineHelper->isManageableEntity($entityClass)) {
+            $em = $this->doctrine->getManagerForClass($entityClass);
+            if (null === $em) {
                 return;
             }
 
-            $entityIdentifier = $this->doctrineHelper
-                ->getEntityManager($entityClass)
-                ->getClassMetadata($entityClass)
-                ->getIdentifierValues($entity);
+            $entityIdentifier = $em->getClassMetadata($entityClass)->getIdentifierValues($entity);
 
             $isEntityExists = !empty($entityIdentifier);
         }
@@ -115,13 +110,13 @@ class OwnerFormSubscriber implements EventSubscriberInterface
         $form->add(
             $this->fieldName,
             TextType::class,
-            array(
+            [
                 'disabled' => true,
                 'data' => $ownerData ?: '',
                 'mapped' => false,
                 'required' => false,
                 'label' => $this->fieldLabel
-            )
+            ]
         );
     }
 

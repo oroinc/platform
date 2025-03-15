@@ -4,27 +4,18 @@ namespace Oro\Bundle\PlatformBundle\MaterializedView;
 
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\PlatformBundle\Entity\MaterializedView;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-use Psr\Log\NullLogger;
+use Psr\Log\LoggerInterface;
 
 /**
  * Deletes materialized views taking into account their updatedAt date.
  */
-class MaterializedViewRemover implements LoggerAwareInterface
+class MaterializedViewRemover
 {
-    use LoggerAwareTrait;
-
-    private ManagerRegistry $managerRegistry;
-
-    private MaterializedViewManager $materializedViewManager;
-
-    public function __construct(ManagerRegistry $managerRegistry, MaterializedViewManager $materializedViewManager)
-    {
-        $this->managerRegistry = $managerRegistry;
-        $this->materializedViewManager = $materializedViewManager;
-
-        $this->logger = new NullLogger();
+    public function __construct(
+        private ManagerRegistry $managerRegistry,
+        private MaterializedViewManager $materializedViewManager,
+        private LoggerInterface $logger
+    ) {
     }
 
     /**

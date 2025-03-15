@@ -3,8 +3,8 @@
 namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Entity\Manager;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
 use Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\BusinessUnit;
@@ -20,43 +20,33 @@ use PHPUnit\Framework\TestCase;
 
 class BusinessUnitManagerTest extends TestCase
 {
-    /** @var MockObject|EntityManager */
-    private $em;
-
-    /** @var MockObject|BusinessUnitRepository */
-    private $buRepo;
-
-    /** @var MockObject|EntityRepository */
-    private $userRepo;
-
-    /** @var MockObject|TokenAccessorInterface */
-    private $tokenAccessor;
-
-    /** @var MockObject|AclHelper */
-    private $aclHelper;
-
-    /** @var BusinessUnitManager */
-    private $businessUnitManager;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private AclHelper&MockObject $aclHelper;
+    private BusinessUnitRepository&MockObject $buRepo;
+    private EntityRepository&MockObject $userRepo;
+    private BusinessUnitManager $businessUnitManager;
 
     #[\Override]
     protected function setUp(): void
     {
+        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
+        $this->aclHelper = $this->createMock(AclHelper::class);
         $this->buRepo = $this->createMock(BusinessUnitRepository::class);
         $this->userRepo = $this->createMock(EntityRepository::class);
 
-        $this->em = $this->createMock(EntityManager::class);
-        $this->em->expects($this->any())
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
             ->method('getRepository')
             ->willReturnMap([
-                [\Oro\Bundle\OrganizationBundle\Entity\BusinessUnit::class, $this->buRepo],
-                [\Oro\Bundle\UserBundle\Entity\User::class, $this->userRepo],
+                [\Oro\Bundle\OrganizationBundle\Entity\BusinessUnit::class, null, $this->buRepo],
+                [\Oro\Bundle\UserBundle\Entity\User::class, null, $this->userRepo],
             ]);
 
-        $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-
-        $this->aclHelper = $this->createMock(AclHelper::class);
-
-        $this->businessUnitManager = new BusinessUnitManager($this->em, $this->tokenAccessor, $this->aclHelper);
+        $this->businessUnitManager = new BusinessUnitManager(
+            $doctrine,
+            $this->tokenAccessor,
+            $this->aclHelper
+        );
     }
 
     public function testGetTreeOptions()
@@ -119,11 +109,8 @@ class BusinessUnitManagerTest extends TestCase
 
     /**
      * @dataProvider getTreeNodesProvider
-     *
-     * @param array $tree
-     * @param int $expectedCount
      */
-    public function testGetTreeNodesCount(array $tree, $expectedCount)
+    public function testGetTreeNodesCount(array $tree, int $expectedCount)
     {
         $this->assertEquals($expectedCount, $this->businessUnitManager->getTreeNodesCount($tree));
     }
@@ -231,7 +218,7 @@ class BusinessUnitManagerTest extends TestCase
         $this->businessUnitManager->getBusinessUnitsTree();
     }
 
-    public function getBusinessUnitIds()
+    public function testGetBusinessUnitIds()
     {
         $this->buRepo->expects($this->once())
             ->method('getBusinessUnitIds');
@@ -525,13 +512,7 @@ class BusinessUnitManagerTest extends TestCase
         ];
     }
 
-    /**
-     * @param int   $id
-     * @param array $organizations
-     * @param array $bUnits
-     * @return User
-     */
-    private function getCurrentUser($id, array $organizations, array $bUnits)
+    private function getCurrentUser(int $id, array $organizations, array $bUnits): User
     {
         $user = new User();
         $user->setId($id);
@@ -541,10 +522,10 @@ class BusinessUnitManagerTest extends TestCase
         return $user;
     }
 
-    private function addUserInfoToTree(OwnerTree $tree, User $user)
+    private function addUserInfoToTree(OwnerTree $tree, User $user): void
     {
         $owner = $user->getOwner();
-        $tree->addUser($user->getId(), $owner ? $owner->getId() : null);
+        $tree->addUser($user->getId(), $owner?->getId());
         foreach ($user->getOrganizations() as $organization) {
             $tree->addUserOrganization($user->getId(), $organization->getId());
             foreach ($user->getBusinessUnits() as $businessUnit) {
@@ -557,10 +538,10 @@ class BusinessUnitManagerTest extends TestCase
         }
     }
 
-    private function addBusinessUnitInfoToTree(OwnerTree $tree, BusinessUnit $businessUnit)
+    private function addBusinessUnitInfoToTree(OwnerTree $tree, BusinessUnit $businessUnit): void
     {
         $owner = $businessUnit->getOwner();
 
-        $tree->addBusinessUnit($businessUnit->getId(), $owner ? $owner->getId() : null);
+        $tree->addBusinessUnit($businessUnit->getId(), $owner?->getId());
     }
 }

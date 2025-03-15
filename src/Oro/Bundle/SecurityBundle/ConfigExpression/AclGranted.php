@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\ConfigExpression;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\SecurityBundle\Authorization\AuthorizationCheckerTrait;
@@ -114,10 +114,10 @@ class AclGranted extends AbstractCondition implements ContextAccessorAwareInterf
         $attributes = $this->resolveValue($context, $this->attributes);
         $object     = $this->resolveValue($context, $this->object);
 
-        if (is_object($object)) {
-            $class         = ClassUtils::getRealClass($object);
+        if (\is_object($object)) {
+            $class = ClassUtils::getRealClass($object);
             $objectManager = $this->doctrine->getManagerForClass($class);
-            if ($objectManager instanceof EntityManager) {
+            if ($objectManager instanceof EntityManagerInterface) {
                 $unitOfWork = $objectManager->getUnitOfWork();
                 if ($unitOfWork->isScheduledForInsert($object) || !$unitOfWork->isInIdentityMap($object)) {
                     $object = 'entity:' . $class;

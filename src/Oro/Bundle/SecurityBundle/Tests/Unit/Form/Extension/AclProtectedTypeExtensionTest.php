@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Form\Extension;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\SecurityBundle\Form\Extension\AclProtectedTypeExtension;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Symfony\Bridge\Doctrine\Form\ChoiceList\DoctrineChoiceLoader;
@@ -17,8 +17,7 @@ class AclProtectedTypeExtensionTest extends \PHPUnit\Framework\TestCase
 {
     private const CLASS_NAME = 'AcmeEntity';
 
-    /** @var AclProtectedTypeExtension */
-    private $extension;
+    private AclProtectedTypeExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -48,7 +47,7 @@ class AclProtectedTypeExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('createQueryBuilder')
             ->willReturn($queryBuilder);
 
-        $entityManager = $this->createMock(ObjectManager::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects(self::once())
             ->method('getRepository')
             ->willReturn($repository);
@@ -85,7 +84,7 @@ class AclProtectedTypeExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('createQueryBuilder')
             ->willReturn($queryBuilder);
 
-        $entityManager = $this->createMock(ObjectManager::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects(self::once())
             ->method('getRepository')
             ->willReturn($repository);

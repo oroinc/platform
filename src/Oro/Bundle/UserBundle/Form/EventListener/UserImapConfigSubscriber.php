@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\UserBundle\Form\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
@@ -17,23 +16,11 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class UserImapConfigSubscriber implements EventSubscriberInterface
 {
-    /** @var EntityManager */
-    protected $entityManager;
-
-    /** @var RequestStack */
-    protected $requestStack;
-
-    /** @var TokenAccessorInterface */
-    protected $tokenAccessor;
-
     public function __construct(
-        EntityManager $entityManager,
-        RequestStack $requestStack,
-        TokenAccessorInterface $tokenAccessor
+        private ManagerRegistry $doctrine,
+        private RequestStack $requestStack,
+        private TokenAccessorInterface $tokenAccessor
     ) {
-        $this->entityManager = $entityManager;
-        $this->requestStack = $requestStack;
-        $this->tokenAccessor = $tokenAccessor;
     }
 
     #[\Override]
@@ -47,7 +34,7 @@ class UserImapConfigSubscriber implements EventSubscriberInterface
 
     public function preSubmit(FormEvent $event)
     {
-        $request = $this->getRequest();
+        $request = $this->requestStack->getCurrentRequest();
         if ($request) {
             $data = $request->get('oro_user_emailsettings');
             if ($data) {
@@ -59,7 +46,7 @@ class UserImapConfigSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * Pass currenlty configured user to the form
+     * Pass currently configured user to the form
      */
     public function preSetData(FormEvent $event)
     {
@@ -71,18 +58,16 @@ class UserImapConfigSubscriber implements EventSubscriberInterface
 
     /**
      * Get configured user
-     *
-     * @return User|null
      */
-    protected function getUser()
+    private function getUser(): ?User
     {
-        $request = $this->getRequest();
+        $request = $this->requestStack->getCurrentRequest();
         $user = null;
         if ($request) {
             $currentRoute = $request->attributes->get('_route');
             if ($currentRoute === 'oro_user_config') {
                 $id = $request->attributes->getInt('id');
-                $user = $this->entityManager->find(User::class, $id);
+                $user = $this->doctrine->getManagerForClass(User::class)->find(User::class, $id);
             } elseif ($currentRoute === 'oro_user_profile_configuration') {
                 $user = $this->tokenAccessor->getUser();
             }
@@ -92,13 +77,5 @@ class UserImapConfigSubscriber implements EventSubscriberInterface
         }
 
         return $user;
-    }
-
-    /**
-     * @return null|Request
-     */
-    protected function getRequest()
-    {
-        return $this->requestStack->getCurrentRequest();
     }
 }

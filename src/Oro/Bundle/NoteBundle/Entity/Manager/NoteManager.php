@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\NoteBundle\Entity\Manager;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
 use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
@@ -19,45 +19,28 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class NoteManager
 {
-    private EntityManager $em;
-
-    private AuthorizationCheckerInterface $authorizationChecker;
-
-    private AclHelper $aclHelper;
-
-    private EntityNameResolver $entityNameResolver;
-
-    private AttachmentProvider $attachmentProvider;
-
-    private PictureSourcesProviderInterface $pictureSourcesProvider;
-
     public function __construct(
-        EntityManager $em,
-        AuthorizationCheckerInterface $authorizationChecker,
-        AclHelper $aclHelper,
-        EntityNameResolver $entityNameResolver,
-        AttachmentProvider $attachmentProvider,
-        PictureSourcesProviderInterface $pictureSourcesProvider
+        private ManagerRegistry $doctrine,
+        private AuthorizationCheckerInterface $authorizationChecker,
+        private AclHelper $aclHelper,
+        private EntityNameResolver $entityNameResolver,
+        private AttachmentProvider $attachmentProvider,
+        private PictureSourcesProviderInterface $pictureSourcesProvider
     ) {
-        $this->em = $em;
-        $this->authorizationChecker = $authorizationChecker;
-        $this->aclHelper = $aclHelper;
-        $this->entityNameResolver = $entityNameResolver;
-        $this->attachmentProvider = $attachmentProvider;
-        $this->pictureSourcesProvider = $pictureSourcesProvider;
     }
 
     /**
      * @param string $entityClass
      * @param int    $entityId
      * @param string $sorting
+     *
      * @return Note[]
      */
     public function getList(string $entityClass, int $entityId, string $sorting)
     {
         /** @var NoteRepository $repo */
-        $repo = $this->em->getRepository(Note::class);
-        $qb   = $repo->getAssociatedNotesQueryBuilder($entityClass, $entityId)
+        $repo = $this->doctrine->getRepository(Note::class);
+        $qb = $repo->getAssociatedNotesQueryBuilder($entityClass, $entityId)
             ->orderBy('note.createdAt', QueryBuilderUtil::getSortOrder($sorting));
 
         $query = $this->aclHelper->apply($qb, BasicPermission::VIEW, [AclHelper::CHECK_RELATIONS => false]);
@@ -67,6 +50,7 @@ class NoteManager
 
     /**
      * @param Note[] $entities
+     *
      * @return array
      */
     public function getEntityViewModels(array $entities): array

@@ -140,10 +140,9 @@ services:
     oro_dashboard.type.widget_jqueryselect2_hidden:
         class: Oro\Bundle\DashboardBundle\Form\Type\WidgetEntityJquerySelect2HiddenType
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@oro_form.autocomplete.search_registry'
             - '@oro_entity_config.provider.form'
-            - '@oro_entity.doctrine_helper'
         tags:
             - { name: form.type, alias: oro_widget_entity_jqueryselect2_hidden }
 

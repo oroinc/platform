@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Fallback;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Form\FieldAclHelper;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
@@ -26,14 +26,14 @@ class AbstractFallbackFieldsFormViewTest extends \PHPUnit\Framework\TestCase
     /** @var BeforeListRenderEvent|\PHPUnit\Framework\MockObject\MockObject */
     protected $event;
 
-    /** @var FallbackFieldsFormViewStub|\PHPUnit\Framework\MockObject\MockObject */
-    protected $fallbackFieldsFormView;
-
     /** @var FieldAclHelper|\PHPUnit\Framework\MockObject\MockObject */
     protected $fieldAclHelper;
 
     /** @var ScrollData|\PHPUnit\Framework\MockObject\MockObject */
     protected $scrollData;
+
+    /** @var FallbackFieldsFormViewStub */
+    protected $fallbackFieldsFormView;
 
     #[\Override]
     protected function setUp(): void
@@ -43,17 +43,15 @@ class AbstractFallbackFieldsFormViewTest extends \PHPUnit\Framework\TestCase
         $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->fieldAclHelper = $this->createMock(FieldAclHelper::class);
+        $this->scrollData = $this->createMock(ScrollData::class);
 
-        $this->translator
-            ->expects($this->any())
+        $this->translator->expects($this->any())
             ->method('trans')
             ->willReturnCallback(fn ($id) => $id . '.trans');
-        $this->fieldAclHelper
-            ->expects($this->any())
+        $this->fieldAclHelper->expects($this->any())
             ->method('isFieldAvailable')
             ->willReturn(true);
-        $this->fieldAclHelper
-            ->expects($this->any())
+        $this->fieldAclHelper->expects($this->any())
             ->method('isFieldViewGranted')
             ->willReturn(true);
 
@@ -63,7 +61,6 @@ class AbstractFallbackFieldsFormViewTest extends \PHPUnit\Framework\TestCase
             $this->translator,
             $this->fieldAclHelper
         );
-        $this->scrollData = $this->createMock(ScrollData::class);
     }
 
     public function testAddBlockToEntityView()
@@ -158,7 +155,7 @@ class AbstractFallbackFieldsFormViewTest extends \PHPUnit\Framework\TestCase
         $this->requestStack->expects($this->once())
             ->method('getCurrentRequest')
             ->willReturn($currentRequest);
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->once())
             ->method('getReference')
             ->willReturn(ProductStub::class);

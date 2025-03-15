@@ -12,35 +12,27 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class WidgetUserSelectType extends WidgetEntityJquerySelect2HiddenType
 {
-    const NAME = 'oro_type_widget_user_select';
-
     #[\Override]
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
 
         $resolver->setDefaults(
             [
                 'autocomplete_alias' => 'widget_owner_users',
-                'configs'            => [
-                    'multiple'                => true,
-                    'placeholder'             => 'oro.user.form.choose_user',
-                    'allowClear'              => true,
-                    'result_template_twig'    => '@OroUser/User/Autocomplete/Widget/result.html.twig',
+                'configs' => [
+                    'multiple' => true,
+                    'placeholder' => 'oro.user.form.choose_user',
+                    'allowClear' => true,
+                    'result_template_twig' => '@OroUser/User/Autocomplete/Widget/result.html.twig',
                     'selection_template_twig' => '@OroUser/User/Autocomplete/Widget/selection.html.twig',
                 ]
             ]
         );
     }
 
-    /**
-     * @param string $entityClass
-     * @param array  $ids
-     *
-     * @return array
-     */
     #[\Override]
-    protected function getEntitiesByIdentifiers($entityClass, array $ids)
+    protected function getEntitiesByIdentifiers(string $entityClass, array $ids): array
     {
         $ids = array_filter($ids);
         if (empty($ids)) {
@@ -52,10 +44,10 @@ class WidgetUserSelectType extends WidgetEntityJquerySelect2HiddenType
             unset($ids[$key]);
         }
 
-        $result        = [];
-        $identityField = $this->doctrineHelper->getSingleEntityIdentifierFieldName($entityClass);
+        $result = [];
+        $identityField = $this->getSingleEntityIdentifierFieldName($entityClass);
         if ($ids) {
-            $result = $this->entityManager->getRepository($entityClass)->findBy([$identityField => $ids]);
+            $result = $this->doctrine->getRepository($entityClass)->findBy([$identityField => $ids]);
         }
 
         if ($key !== false) {
@@ -68,14 +60,8 @@ class WidgetUserSelectType extends WidgetEntityJquerySelect2HiddenType
     }
 
     #[\Override]
-    public function getName()
-    {
-        return $this->getBlockPrefix();
-    }
-
-    #[\Override]
     public function getBlockPrefix(): string
     {
-        return self::NAME;
+        return 'oro_type_widget_user_select';
     }
 }

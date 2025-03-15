@@ -2,47 +2,50 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Step;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Model\Step\RemoveEntitiesStep;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class RemoveEntitiesStepTest extends \PHPUnit\Framework\TestCase
+class RemoveEntitiesStepTest extends TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var RemoveEntitiesStep */
-    private $step;
+    private EntityManagerInterface&MockObject $entityManager;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private RemoveEntitiesStep $step;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
-        $this->step = new RemoveEntitiesStep($this->entityManager, $this->doctrineHelper);
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getManager')
+            ->willReturn($this->entityManager);
+
+        $this->step = new RemoveEntitiesStep($doctrine, $this->doctrineHelper);
     }
 
-    public function testRun()
+    public function testRun(): void
     {
         $foo = new EntityStub(1);
         $bar = new EntityStub(2);
         $baz = new EntityStub(3);
 
         $data = $this->createMock(EntityData::class);
-        $data->expects($this->once())
+        $data->expects(self::once())
             ->method('getMasterEntity')
             ->willReturn($foo);
-        $data->expects($this->once())
+        $data->expects(self::once())
             ->method('getEntities')
             ->willReturn([$foo, $bar, $baz]);
 
-        $this->doctrineHelper->expects($this->exactly(3))
+        $this->doctrineHelper->expects(self::exactly(3))
             ->method('isEntityEqual')
             ->willReturnMap([
                 [$foo, $foo, true],
@@ -50,7 +53,7 @@ class RemoveEntitiesStepTest extends \PHPUnit\Framework\TestCase
                 [$foo, $baz, false]
             ]);
 
-        $this->entityManager->expects($this->exactly(2))
+        $this->entityManager->expects(self::exactly(2))
             ->method('remove')
             ->withConsecutive(
                 [$this->identicalTo($bar)],

@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\OrganizationBundle\Entity\Manager;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
@@ -19,23 +19,11 @@ use Oro\Bundle\UserBundle\Entity\UserInterface;
  */
 class BusinessUnitManager
 {
-    /** @var EntityManager */
-    protected $em;
-
-    /** @var TokenAccessorInterface */
-    protected $tokenAccessor;
-
-    /** @var AclHelper */
-    protected $aclHelper;
-
     public function __construct(
-        EntityManager $em,
-        TokenAccessorInterface $tokenAccessor,
-        AclHelper $aclHelper
+        protected ManagerRegistry $doctrine,
+        protected TokenAccessorInterface $tokenAccessor,
+        protected AclHelper $aclHelper
     ) {
-        $this->em = $em;
-        $this->tokenAccessor = $tokenAccessor;
-        $this->aclHelper = $aclHelper;
     }
 
     /**
@@ -182,7 +170,7 @@ class BusinessUnitManager
      */
     public function getBusinessUnitRepo()
     {
-        return $this->em->getRepository(BusinessUnit::class);
+        return $this->doctrine->getRepository(BusinessUnit::class);
     }
 
     /**
@@ -190,7 +178,7 @@ class BusinessUnitManager
      */
     public function getUserRepo()
     {
-        return $this->em->getRepository(User::class);
+        return $this->doctrine->getRepository(User::class);
     }
 
     /**
@@ -204,7 +192,7 @@ class BusinessUnitManager
     public function getTreeOptions($options, $level = 0)
     {
         $choices = [];
-        $blanks  = str_repeat("&nbsp;&nbsp;&nbsp;", $level);
+        $blanks  = str_repeat('&nbsp;&nbsp;&nbsp;', $level);
         foreach ($options as $option) {
             $choices += [$blanks . htmlspecialchars($option['name']) => $option['id']];
             if (isset($option['children'])) {
@@ -229,16 +217,6 @@ class BusinessUnitManager
             },
             count($tree)
         );
-    }
-
-    /**
-     * @param BusinessUnit $rootBusinessUnit
-     *
-     * @return string
-     */
-    protected function getBusinessUnitName(BusinessUnit $rootBusinessUnit)
-    {
-        return  $rootBusinessUnit->getName();
     }
 
     /**

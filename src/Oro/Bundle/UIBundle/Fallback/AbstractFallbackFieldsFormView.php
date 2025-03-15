@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UIBundle\Fallback;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Form\FieldAclHelper;
 use Oro\Bundle\UIBundle\Event\BeforeListRenderEvent;
@@ -87,7 +87,7 @@ abstract class AbstractFallbackFieldsFormView
             return null;
         }
 
-        /** @var EntityManager $em */
+        /** @var EntityManagerInterface $em */
         $em = $this->doctrine->getManagerForClass($entityPath);
 
         return $em->getReference($entityPath, $entityId);

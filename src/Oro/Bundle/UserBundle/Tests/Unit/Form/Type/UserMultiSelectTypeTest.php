@@ -2,41 +2,38 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Form\Type;
 
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
 use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Form\Type\UserMultiSelectType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class UserMultiSelectTypeTest extends \PHPUnit\Framework\TestCase
+class UserMultiSelectTypeTest extends TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var UserMultiSelectType */
-    private $type;
+    private EntityManagerInterface&MockObject $em;
+    private UserMultiSelectType $type;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManager::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
 
-        $this->type = new UserMultiSelectType($this->em);
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getManagerForClass')
+            ->willReturn($this->em);
+
+        $this->type = new UserMultiSelectType($doctrine);
     }
 
     public function testBuildView()
     {
         $builder = $this->createMock(FormBuilder::class);
-        $metadata = $this->createMock(ClassMetadata::class);
-        $this->em->expects($this->once())
-            ->method('getClassMetadata')
-            ->willReturn($metadata);
-        $metadata->expects($this->once())
-            ->method('getSingleIdentifierFieldName')
-            ->willReturn('id');
 
         $builder->expects($this->once())
             ->method('addModelTransformer')
@@ -57,10 +54,5 @@ class UserMultiSelectTypeTest extends \PHPUnit\Framework\TestCase
     public function testGetParent()
     {
         $this->assertEquals(OroJquerySelect2HiddenType::class, $this->type->getParent());
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_user_multiselect', $this->type->getName());
     }
 }

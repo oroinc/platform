@@ -2,23 +2,20 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Layout\DataProvider;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\SecurityBundle\Layout\DataProvider\AclProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Acl\Util\ClassUtils;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class AclProviderTest extends \PHPUnit\Framework\TestCase
+class AclProviderTest extends TestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var AclProvider */
-    private $provider;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private ManagerRegistry&MockObject $doctrine;
+    private AclProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -118,7 +115,7 @@ class AclProviderTest extends \PHPUnit\Framework\TestCase
         $entity = new \stdClass();
         $expectedResult = true;
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $uow = $this->createMock(UnitOfWork::class);
         $em->expects(self::once())
             ->method('getUnitOfWork')
@@ -151,7 +148,7 @@ class AclProviderTest extends \PHPUnit\Framework\TestCase
         $entity = new \stdClass();
         $expectedResult = true;
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $uow = $this->createMock(UnitOfWork::class);
         $em->expects(self::once())
             ->method('getUnitOfWork')
@@ -182,7 +179,7 @@ class AclProviderTest extends \PHPUnit\Framework\TestCase
         $entity = new \stdClass();
         $expectedResult = true;
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $uow = $this->createMock(UnitOfWork::class);
         $em->expects(self::once())
             ->method('getUnitOfWork')

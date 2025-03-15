@@ -50,7 +50,7 @@ services:
         class: Oro\Bundle\ReportBundle\Entity\Manager\ReportManager
         public: true
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
 
     oro_report.grid.base_configuration_builder:
         class: Oro\Bundle\ReportBundle\Grid\BaseReportConfigurationBuilder

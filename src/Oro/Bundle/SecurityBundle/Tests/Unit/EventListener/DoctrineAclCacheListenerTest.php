@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
@@ -17,9 +17,8 @@ use PHPUnit\Framework\TestCase;
 
 class DoctrineAclCacheListenerTest extends TestCase
 {
-    private DoctrineAclCacheProvider|MockObject $queryCacheProvider;
-    private OwnerTreeProviderInterface|MockObject $ownerTreeProvider;
-
+    private DoctrineAclCacheProvider&MockObject $queryCacheProvider;
+    private OwnerTreeProviderInterface&MockObject $ownerTreeProvider;
     private DoctrineAclCacheListener $listener;
 
     protected function setUp(): void
@@ -37,7 +36,7 @@ class DoctrineAclCacheListenerTest extends TestCase
     public function testOwnerTreeShouldNotBeTriggeredForUpdateNonBusinessUnitEntity(): void
     {
         $uow = $this->createMock(UnitOfWork::class);
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
 
         $entity = new Role();
 
@@ -67,7 +66,7 @@ class DoctrineAclCacheListenerTest extends TestCase
     {
         $ownerTree = $this->createMock(OwnerTree::class);
         $uow = $this->createMock(UnitOfWork::class);
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
 
         $entity = new BusinessUnit();
 
@@ -106,7 +105,7 @@ class DoctrineAclCacheListenerTest extends TestCase
     public function testOwnerTreeShouldNotBeTriggeredForDeleteNonBusinessUnitEntity(): void
     {
         $uow = $this->createMock(UnitOfWork::class);
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
 
         $entity = new Role();
 
@@ -135,7 +134,7 @@ class DoctrineAclCacheListenerTest extends TestCase
     public function testOwnerTreeShouldBeTriggeredForDeleteBusinessUnitEntity(): void
     {
         $uow = $this->createMock(UnitOfWork::class);
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $ownerTree = $this->createMock(OwnerTree::class);
 
         $entity = new BusinessUnit();

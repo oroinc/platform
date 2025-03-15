@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Strategy;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
@@ -11,17 +11,14 @@ use Oro\Bundle\AttachmentBundle\Strategy\AttachmentAuditStrategyProcessor;
 use Oro\Bundle\DataAuditBundle\Strategy\Processor\EntityAuditStrategyProcessorInterface;
 use Oro\Bundle\EntityBundle\Helper\UnidirectionalFieldHelper;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\UserStub;
-use Oro\Component\Testing\Unit\EntityTrait;
+use Oro\Component\Testing\ReflectionUtil;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class AttachmentAuditStrategyProcessorTest extends TestCase
 {
-    use EntityTrait;
-
-    protected ManagerRegistry|MockObject $doctrine;
-
-    protected EntityAuditStrategyProcessorInterface $strategyProcessor;
+    private ManagerRegistry|MockObject $doctrine;
+    private EntityAuditStrategyProcessorInterface $strategyProcessor;
 
     #[\Override]
     protected function setUp(): void
@@ -34,9 +31,10 @@ class AttachmentAuditStrategyProcessorTest extends TestCase
     public function testProcessInverseCollectionsWithDeletedUnidirectionalFieldEntity(): void
     {
         $attachmentId = 123;
-        $attachment = $this->getEntity(Attachment::class, ['id' => $attachmentId]);
+        $attachment = new Attachment();
+        ReflectionUtil::setId($attachment, $attachmentId);
         $userId = 234;
-        $user = $this->getEntity(UserStub::class, ['id' => $userId]);
+        $user = new UserStub($userId);
         $attachment->setOwner($user);
 
         $sourceEntityData = [
@@ -67,11 +65,11 @@ class AttachmentAuditStrategyProcessorTest extends TestCase
 
     private function assertGetSourceEntity(array $sourceEntityData, Attachment $entity): void
     {
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityMetaData = $this->createMock(ClassMetadata::class);
         $entityRepo = $this->createMock(EntityRepository::class);
         $entityMetaData->associationMappings = [
-            "owner" => ['targetEntity' => UserStub::class]
+            'owner' => ['targetEntity' => UserStub::class]
         ];
 
         $this->doctrine->expects(self::once())

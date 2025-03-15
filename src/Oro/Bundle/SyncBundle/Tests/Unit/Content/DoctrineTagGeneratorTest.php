@@ -4,7 +4,6 @@ namespace Oro\Bundle\SyncBundle\Tests\Unit\Content;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Configuration;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
@@ -22,23 +21,18 @@ use Symfony\Component\Form\Form;
 class DoctrineTagGeneratorTest extends TestCase
 {
     private const TEST_ENTITY_NAME = EntityStub::class;
-    private const TEST_ENTITY_ALIAS = \Oro\Bundle\SyncBundle\Entity\EntityStub::class;
+    private const TEST_ENTITY_ALIAS = 'testEntityAlias';
     private const TEST_NEW_ENTITY_NAME = NewEntityStub::class;
     private const TEST_ASSOCIATION_FIELD = 'testField';
 
-    /** @var EntityManager|MockObject */
-    private $em;
-
-    /** @var UnitOfWork|MockObject */
-    private $uow;
-
-    /** @var DoctrineTagGenerator */
-    private $generator;
+    private EntityManagerInterface&MockObject $em;
+    private UnitOfWork&MockObject $uow;
+    private DoctrineTagGenerator $generator;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManager::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
         $this->uow = $this->createMock(UnitOfWork::class);
 
         $this->em->expects($this->any())
@@ -69,6 +63,16 @@ class DoctrineTagGeneratorTest extends TestCase
         $this->generator = new DoctrineTagGenerator($doctrine, $entityClassResolver);
     }
 
+    private function getForm(mixed $data): Form
+    {
+        $form = $this->createMock(Form::class);
+        $form->expects($this->any())
+            ->method('getData')
+            ->willReturn($data);
+
+        return $form;
+    }
+
     /**
      * @dataProvider supportsDataProvider
      */
@@ -82,10 +86,10 @@ class DoctrineTagGeneratorTest extends TestCase
         return [
             'real entity object given'           => [new EntityStub(), true],
             'real entity class name given'       => [self::TEST_ENTITY_NAME, true],
-            'form instance with real data given' => [$this->getFormMock(new EntityStub()), true],
+            'form instance with real data given' => [$this->getForm(new EntityStub()), true],
             'array given'                        => [['someKey' => 'test'], false],
             'some string given'                  => ['testString', false],
-            'form with array given'              => [$this->getFormMock(['someKey' => 'test']), false],
+            'form with array given'              => [$this->getForm(['someKey' => 'test']), false],
         ];
     }
 
@@ -148,13 +152,13 @@ class DoctrineTagGeneratorTest extends TestCase
                 1
             ],
             'Should take data from form and return tags for managed entity'         => [
-                $this->getFormMock(new EntityStub()),
+                $this->getForm(new EntityStub()),
                 true,
                 2,
                 true
             ],
             'Should take data from form and generate collection tag for new entity' => [
-                $this->getFormMock(new NewEntityStub()),
+                $this->getForm(new NewEntityStub()),
                 true,
                 1,
                 false
@@ -167,15 +171,15 @@ class DoctrineTagGeneratorTest extends TestCase
      */
     public function testGenerateFromAlias(string $data, array $expectedResult)
     {
-        $configurationMock = $this->createMock(Configuration::class);
-        $configurationMock->expects(self::any())
+        $configuration = $this->createMock(Configuration::class);
+        $configuration->expects(self::any())
             ->method('getEntityNamespace')
             ->with('OroSyncBundle')
             ->willReturn('Oro\Bundle\SyncBundle\Tests\Unit\Content\Stub');
 
         $this->em->expects(self::any())
             ->method('getConfiguration')
-            ->willReturn($configurationMock);
+            ->willReturn($configuration);
 
         $result = $this->generator->generate($data, true);
         $this->assertEquals($expectedResult, $result);
@@ -224,8 +228,8 @@ class DoctrineTagGeneratorTest extends TestCase
 
     public function collectNestingDataDataProvider(): array
     {
-        $entityManagerMock = $this->createMock(EntityManagerInterface::class);
-        $classMetadataMock = $this->createMock(ClassMetadata::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $classMetadata = $this->createMock(ClassMetadata::class);
 
         return [
             'should not return any data when no association on entity' => [[], [], 0],
@@ -237,8 +241,8 @@ class DoctrineTagGeneratorTest extends TestCase
             'should collect all collection associations using persistent collection' => [
                 [
                     self::TEST_ASSOCIATION_FIELD => new PersistentCollection(
-                        $entityManagerMock,
-                        $classMetadataMock,
+                        $entityManager,
+                        $classMetadata,
                         new ArrayCollection(
                             [
                                 new EntityStub(),
@@ -265,8 +269,8 @@ class DoctrineTagGeneratorTest extends TestCase
             'should process all associated values using persistent collection' => [
                 [
                     self::TEST_ASSOCIATION_FIELD . '_1' => new PersistentCollection(
-                        $entityManagerMock,
-                        $classMetadataMock,
+                        $entityManager,
+                        $classMetadata,
                         new ArrayCollection(
                             [
                                 new EntityStub(),
@@ -299,15 +303,5 @@ class DoctrineTagGeneratorTest extends TestCase
                 3
             ]
         ];
-    }
-
-    private function getFormMock(mixed $data): Form
-    {
-        $form = $this->createMock(Form::class);
-        $form->expects($this->any())
-            ->method('getData')
-            ->willReturn($data);
-
-        return $form;
     }
 }

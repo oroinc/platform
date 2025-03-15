@@ -2,11 +2,8 @@
 
 namespace Oro\Bundle\DashboardBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
-use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
 use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -21,21 +18,8 @@ use Symfony\Component\Form\FormView;
  */
 class WidgetEntityJquerySelect2HiddenType extends OroJquerySelect2HiddenType
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    public function __construct(
-        EntityManager $entityManager,
-        SearchRegistry $registry,
-        ConfigProvider $configProvider,
-        DoctrineHelper $doctrineHelper
-    ) {
-        parent::__construct($entityManager, $registry, $configProvider);
-        $this->doctrineHelper = $doctrineHelper;
-    }
-
     #[\Override]
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventListener(
             FormEvents::POST_SET_DATA,
@@ -50,10 +34,10 @@ class WidgetEntityJquerySelect2HiddenType extends OroJquerySelect2HiddenType
     }
 
     #[\Override]
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function buildView(FormView $view, FormInterface $form, array $options): void
     {
         $vars = [
-            'configs'  => $options['configs'],
+            'configs' => $options['configs'],
             'excluded' => (array)$options['excluded']
         ];
 
@@ -69,12 +53,12 @@ class WidgetEntityJquerySelect2HiddenType extends OroJquerySelect2HiddenType
                 $ids = [$form->getData()];
             }
             $items = $this->getEntitiesByIdentifiers($options['entity_class'], $ids);
-            $identityField = $this->doctrineHelper->getSingleEntityIdentifierFieldName($options['entity_class']);
+            $identityField = $this->getSingleEntityIdentifierFieldName($options['entity_class']);
             $ids = [];
             foreach ($items as $item) {
-                $item     = $converter->convertItem($item);
+                $item = $converter->convertItem($item);
                 $result[] = $item;
-                $ids[]    = $item[$identityField];
+                $ids[] = $item[$identityField];
             }
 
             if (!$multiple && $result) {
@@ -82,7 +66,7 @@ class WidgetEntityJquerySelect2HiddenType extends OroJquerySelect2HiddenType
             }
 
             $vars['value'] = implode(',', $ids);
-            $vars['attr']  = [
+            $vars['attr'] = [
                 'data-selected-data' => json_encode($result)
             ];
         }
@@ -90,33 +74,35 @@ class WidgetEntityJquerySelect2HiddenType extends OroJquerySelect2HiddenType
         $view->vars = array_replace_recursive($view->vars, $vars);
     }
 
-    /**
-     * @param string $entityClass
-     * @param array  $ids
-     *
-     * @return array
-     */
-    protected function getEntitiesByIdentifiers($entityClass, array $ids)
+    #[\Override]
+    public function getBlockPrefix(): string
+    {
+        return 'oro_widget_entity_jqueryselect2_hidden';
+    }
+
+    protected function getEntitiesByIdentifiers(string $entityClass, array $ids): array
     {
         $ids = array_filter($ids);
         if (empty($ids)) {
             return [];
         }
 
-        $identityField = $this->doctrineHelper->getSingleEntityIdentifierFieldName($entityClass);
+        $identityField = $this->getSingleEntityIdentifierFieldName($entityClass);
 
-        return $this->entityManager->getRepository($entityClass)->findBy([$identityField => $ids]);
+        return $this->doctrine->getRepository($entityClass)->findBy([$identityField => $ids]);
     }
 
-    #[\Override]
-    public function getName()
+    protected function getSingleEntityIdentifierFieldName(string $entityClass): string
     {
-        return $this->getBlockPrefix();
-    }
+        $metadata = $this->doctrine->getManagerForClass($entityClass)?->getClassMetadata($entityClass);
+        $fieldNames = null !== $metadata ? $metadata->getIdentifierFieldNames() : [];
+        if (\count($fieldNames) !== 1) {
+            throw new InvalidEntityException(\sprintf(
+                'Can\'t get single identifier field name for "%s" entity.',
+                $entityClass
+            ));
+        }
 
-    #[\Override]
-    public function getBlockPrefix(): string
-    {
-        return 'oro_widget_entity_jqueryselect2_hidden';
+        return reset($fieldNames);
     }
 }

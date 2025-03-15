@@ -11,7 +11,7 @@ services:
         class: Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager
         public: true
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@oro_security.token_accessor'
             - '@oro_security.acl_helper'
 
@@ -92,7 +92,7 @@ services:
         class: Oro\Bundle\OrganizationBundle\Provider\BusinessUnitGridService
         public: true
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
 
     oro_organization.filter.business_unit:
         class: Oro\Bundle\OrganizationBundle\Filter\BusinessUnitChoiceFilter
