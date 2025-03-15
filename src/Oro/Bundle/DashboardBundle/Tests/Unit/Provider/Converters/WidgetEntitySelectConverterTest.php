@@ -3,91 +3,85 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Provider\Converters;
 
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DashboardBundle\Provider\Converters\WidgetEntitySelectConverter;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WidgetEntitySelectConverterTest extends \PHPUnit\Framework\TestCase
+class WidgetEntitySelectConverterTest extends TestCase
 {
-    /** @var AbstractQuery|\PHPUnit\Framework\MockObject\MockObject */
-    private $query;
-
-    /** @var WidgetEntitySelectConverter */
-    private $converter;
+    private AclHelper&MockObject $aclHelper;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private WidgetEntitySelectConverter $converter;
 
     #[\Override]
     protected function setUp(): void
     {
+        $this->aclHelper = $this->createMock(AclHelper::class);
+        $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
+
         $entityNameResolver = $this->createMock(EntityNameResolver::class);
-        $entityNameResolver->expects($this->any())
+        $entityNameResolver->expects(self::any())
             ->method('getName')
             ->willReturnCallback(function (User $object) {
                 return $object->getFirstName() . ' ' . $object->getLastName();
             });
 
-        $doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $this->query = $this->createMock(AbstractQuery::class);
-
-        $aclHelper = $this->createMock(AclHelper::class);
-        $aclHelper->expects($this->any())
-            ->method('apply')
-            ->willReturn($this->query);
-
-        $expr = $this->createMock(Expr::class);
-        $expr->expects($this->any())
-            ->method('in')
-            ->willReturnSelf();
-
-        $queryBuilder = $this->createMock(QueryBuilder::class);
-        $queryBuilder->expects($this->any())
-            ->method('expr')
-            ->willReturn($expr);
-
-        $repository = $this->createMock(EntityRepository::class);
-        $repository->expects($this->any())
-            ->method('createQueryBuilder')
-            ->with('e')
-            ->willReturn($queryBuilder);
-
-        $entityManager = $this->createMock(EntityManager::class);
-        $entityManager->expects($this->any())
-            ->method('getRepository')
-            ->willReturn($repository);
-
         $this->converter = new WidgetEntitySelectConverter(
-            $aclHelper,
+            $this->aclHelper,
             $entityNameResolver,
-            $doctrineHelper,
-            $entityManager,
+            $this->doctrineHelper,
             User::class
         );
     }
 
-    public function testGetViewValueWithoutEntities()
+    public function testGetViewValueWithoutEntities(): void
     {
-        $this->assertNull($this->converter->getViewValue([]));
+        self::assertNull($this->converter->getViewValue([]));
     }
 
-    public function testGetViewValueWithOneEntity()
+    public function testGetViewValueWithOneEntity(): void
     {
         $user1 = new User();
         $user1->setFirstName('Joe');
         $user1->setLastName('Doe');
 
-        $this->query->expects($this->any())
+        $query = $this->createMock(AbstractQuery::class);
+        $query->expects(self::once())
             ->method('getResult')
             ->willReturn([$user1]);
 
-        $this->assertEquals('Joe Doe', $this->converter->getViewValue([1, 2]));
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder->expects(self::once())
+            ->method('where')
+            ->with('e.id IN (:ids)')
+            ->willReturnSelf();
+        $queryBuilder->expects(self::once())
+            ->method('setParameter')
+            ->with('ids')
+            ->willReturnSelf();
+
+        $this->aclHelper->expects(self::once())
+            ->method('apply')
+            ->willReturn($query);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getSingleEntityIdentifierFieldName')
+            ->with(User::class)
+            ->willReturn('id');
+        $this->doctrineHelper->expects(self::once())
+            ->method('createQueryBuilder')
+            ->with(User::class, 'e')
+            ->willReturn($queryBuilder);
+
+        self::assertEquals('Joe Doe', $this->converter->getViewValue([1, 2]));
     }
 
-    public function testGetViewValueWithSeveralEntities()
+    public function testGetViewValueWithSeveralEntities(): void
     {
         $user1 = new User();
         $user1->setFirstName('Joe');
@@ -97,10 +91,34 @@ class WidgetEntitySelectConverterTest extends \PHPUnit\Framework\TestCase
         $user2->setFirstName('Joyce');
         $user2->setLastName('Palmer');
 
-        $this->query->expects($this->any())
+        $query = $this->createMock(AbstractQuery::class);
+        $query->expects(self::once())
             ->method('getResult')
             ->willReturn([$user1, $user2]);
 
-        $this->assertEquals('Joe Doe; Joyce Palmer', $this->converter->getViewValue([1, 2]));
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder->expects(self::once())
+            ->method('where')
+            ->with('e.id IN (:ids)')
+            ->willReturnSelf();
+        $queryBuilder->expects(self::once())
+            ->method('setParameter')
+            ->with('ids')
+            ->willReturnSelf();
+
+        $this->aclHelper->expects(self::once())
+            ->method('apply')
+            ->willReturn($query);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getSingleEntityIdentifierFieldName')
+            ->with(User::class)
+            ->willReturn('id');
+        $this->doctrineHelper->expects(self::once())
+            ->method('createQueryBuilder')
+            ->with(User::class, 'e')
+            ->willReturn($queryBuilder);
+
+        self::assertEquals('Joe Doe; Joyce Palmer', $this->converter->getViewValue([1, 2]));
     }
 }

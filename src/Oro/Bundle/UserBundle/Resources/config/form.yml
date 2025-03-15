@@ -332,13 +332,11 @@ services:
         class: Oro\Bundle\UserBundle\Dashboard\Converters\WidgetUserSelectConverter
         arguments:
             - '@oro_user.dashboard.owner_helper'
+            - '@oro_security.token_accessor'
             - '@oro_security.acl_helper'
             - '@oro_entity.entity_name_resolver'
             - '@oro_entity.doctrine_helper'
-            - '@doctrine.orm.entity_manager'
             - 'Oro\Bundle\UserBundle\Entity\User'
-        calls:
-            - [setTokenAccessor, ['@oro_security.token_accessor']]
         tags:
             - { name: oro_dashboard.value.converter, form_type: Oro\Bundle\UserBundle\Form\Type\WidgetUserSelectType }
 
@@ -348,7 +346,6 @@ services:
             - '@oro_security.acl_helper'
             - '@oro_entity.entity_name_resolver'
             - '@oro_entity.doctrine_helper'
-            - '@doctrine.orm.entity_manager'
             - 'Oro\Bundle\UserBundle\Entity\Role'
         tags:
             - { name: oro_dashboard.value.converter, form_type: Oro\Bundle\UserBundle\Form\Type\WidgetRoleSelectType }

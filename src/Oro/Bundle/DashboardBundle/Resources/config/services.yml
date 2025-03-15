@@ -17,7 +17,7 @@ services:
         arguments:
             - '@oro_dashboard.config_provider'
             - '@oro_dashboard.config_resolver'
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@oro_dashboard.widget_config_value.provider'
             - '@translator'
             - '@event_dispatcher'
@@ -32,7 +32,7 @@ services:
         public: true
         arguments:
             - '@oro_dashboard.factory'
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@oro_security.acl_helper'
             - '@security.token_storage'
 
@@ -58,7 +58,7 @@ services:
     oro_dashboard.manager.state:
         class: Oro\Bundle\DashboardBundle\Model\StateManager
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@oro_security.token_accessor'
 
     Oro\Bundle\DashboardBundle\Model\StateManager:
@@ -242,7 +242,10 @@ services:
 
     oro_dashboard.widget_config_value.previous_date_range.converter:
           class: Oro\Bundle\DashboardBundle\Provider\Converters\PreviousFilterDateRangeConverter
-          parent: oro_dashboard.widget_config_value.date_range.converter
+          arguments:
+              - '@oro_locale.formatter.date_time'
+              - '@oro_filter.expression.date.compiler'
+              - '@translator'
           tags:
               - { name: oro_dashboard.value.converter, form_type: Oro\Bundle\DashboardBundle\Form\Type\WidgetPreviousDateRangeType }
 
@@ -268,20 +271,6 @@ services:
             - '@translator'
         tags:
             - { name: oro_dashboard.value.converter, form_type: Oro\Bundle\DashboardBundle\Form\Type\WidgetSortByType }
-
-    oro_dashboard.widget_config_value.widget_entity_select.converter:
-        class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetEntitySelectConverter
-        abstract: true
-        arguments:
-            - '@oro_security.acl_helper'
-            - '@oro_entity.entity_name_resolver'
-            - '@oro_entity.doctrine_helper'
-            - '@doctrine.orm.entity_manager'
-
-    oro_dashboard.widget_config_value.widget_enum_select.converter:
-        class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetEnumSelectConverter
-        parent: oro_dashboard.widget_config_value.widget_entity_select.converter
-        abstract: true
 
     oro_dashboard.form.type.widget_date:
         class: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateType

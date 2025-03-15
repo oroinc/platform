@@ -4,7 +4,7 @@ namespace Oro\Component\MessageQueue\Tests\Unit\StatusCalculator;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
@@ -38,7 +38,7 @@ class StatusCalculatorResolverTest extends \PHPUnit\Framework\TestCase
     public function testGetQueryCalculatorForPersistentCollection()
     {
         $childJobCollection = new PersistentCollection(
-            $this->createMock(EntityManager::class),
+            $this->createMock(EntityManagerInterface::class),
             $this->createMock(ClassMetadata::class),
             new ArrayCollection()
         );

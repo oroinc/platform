@@ -3,7 +3,7 @@
 namespace Oro\Bundle\DashboardBundle\Model;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DashboardBundle\Entity\ActiveDashboard;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
@@ -19,21 +19,12 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
  */
 class Manager
 {
-    protected Factory $factory;
-    protected EntityManagerInterface $entityManager;
-    protected TokenStorageInterface $tokenStorage;
-    protected AclHelper $aclHelper;
-
     public function __construct(
-        Factory $factory,
-        EntityManager $entityManager,
-        AclHelper $aclHelper,
-        TokenStorageInterface $tokenStorage
+        protected Factory $factory,
+        protected ManagerRegistry $doctrine,
+        protected AclHelper $aclHelper,
+        protected TokenStorageInterface $tokenStorage
     ) {
-        $this->factory = $factory;
-        $this->entityManager = $entityManager;
-        $this->aclHelper = $aclHelper;
-        $this->tokenStorage = $tokenStorage;
     }
 
     /**
@@ -41,8 +32,7 @@ class Manager
      */
     public function findDashboardModel(int $id): ?DashboardModel
     {
-        $entity = $this->entityManager->getRepository(Dashboard::class)->find($id);
-
+        $entity = $this->doctrine->getRepository(Dashboard::class)->find($id);
         if ($entity) {
             return $this->getDashboardModel($entity);
         }
@@ -55,9 +45,7 @@ class Manager
      */
     public function findOneDashboardModelBy(array $criteria, ?array $orderBy = null): ?DashboardModel
     {
-        $entity = $this->entityManager->getRepository(Dashboard::class)
-            ->findOneBy($criteria, $orderBy);
-
+        $entity = $this->doctrine->getRepository(Dashboard::class)->findOneBy($criteria, $orderBy);
         if ($entity) {
             return $this->getDashboardModel($entity);
         }
@@ -70,8 +58,7 @@ class Manager
      */
     public function findWidgetModel(int $id): ?WidgetModel
     {
-        $entity = $this->entityManager->getRepository(Widget::class)->find($id);
-
+        $entity = $this->doctrine->getRepository(Widget::class)->find($id);
         if ($entity) {
             return $this->getWidgetModel($entity);
         }
@@ -137,16 +124,17 @@ class Manager
             $this->copyWidgets($entityModel, $entityModel->getStartDashboard());
         }
 
-        $this->entityManager->persist($entityModel->getEntity());
-
+        /** @var EntityManager $entityManager */
+        $entityManager = $this->doctrine->getManager();
+        $entityManager->persist($entityModel->getEntity());
         if ($flush) {
-            $this->entityManager->flush($entityModel->getEntity());
+            $entityManager->flush($entityModel->getEntity());
         }
     }
 
     public function remove(EntityModelInterface $entityModel): void
     {
-        $this->entityManager->remove($entityModel->getEntity());
+        $this->doctrine->getManager()->remove($entityModel->getEntity());
     }
 
     /**
@@ -154,8 +142,7 @@ class Manager
      */
     public function findUserActiveOrDefaultDashboard(User $user): ?DashboardModel
     {
-        $activeDashboard = $this->findUserActiveDashboard($user);
-        return $activeDashboard ?: $this->findDefaultDashboard();
+        return $this->findUserActiveDashboard($user) ?? $this->findDefaultDashboard();
     }
 
     /**
@@ -166,9 +153,8 @@ class Manager
         /** @var OrganizationAwareTokenInterface $token */
         $token = $this->tokenStorage->getToken();
         $organization = $token->getOrganization();
-        $dashboard = $this->entityManager->getRepository(ActiveDashboard::class)
-            ->findOneBy(array('user' => $user, 'organization' => $organization));
-
+        $dashboard = $this->doctrine->getRepository(ActiveDashboard::class)
+            ->findOneBy(['user' => $user, 'organization' => $organization]);
         if ($dashboard) {
             return $this->getDashboardModel($dashboard->getDashboard());
         }
@@ -184,9 +170,7 @@ class Manager
         /** @var OrganizationAwareTokenInterface $token */
         $token = $this->tokenStorage->getToken();
         $organization = $token->getOrganization();
-        $dashboard = $this->entityManager->getRepository(Dashboard::class)
-            ->findDefaultDashboard($organization);
-
+        $dashboard = $this->doctrine->getRepository(Dashboard::class)->findDefaultDashboard($organization);
         if ($dashboard) {
             return $this->getDashboardModel($dashboard);
         }
@@ -199,7 +183,7 @@ class Manager
      */
     public function findAllowedDashboards(string $permission = 'VIEW', ?int $organizationId = null): array
     {
-        $qb = $this->entityManager->getRepository(Dashboard::class)->createQueryBuilder('dashboard');
+        $qb = $this->doctrine->getRepository(Dashboard::class)->createQueryBuilder('dashboard');
         if ($organizationId) {
             $qb->andWhere($qb->expr()->eq('dashboard.organization', ':organizationId'))
                 ->setParameter('organizationId', $organizationId);
@@ -210,7 +194,7 @@ class Manager
 
     public function findAllowedDashboardsShortenedInfo(string $permission = 'VIEW', ?int $organizationId = null): array
     {
-        $qb = $this->entityManager->getRepository(Dashboard::class)
+        $qb = $this->doctrine->getRepository(Dashboard::class)
             ->createQueryBuilder('dashboard')
             ->select('dashboard.id, dashboard.label');
         if ($organizationId) {
@@ -229,23 +213,24 @@ class Manager
         /** @var OrganizationAwareTokenInterface $token */
         $token = $this->tokenStorage->getToken();
         $organization = $token->getOrganization();
-        $activeDashboard = $this->entityManager
-            ->getRepository(ActiveDashboard::class)
-            ->findOneBy(array('user' => $user, 'organization' => $organization));
+        $activeDashboard = $this->doctrine->getRepository(ActiveDashboard::class)
+            ->findOneBy(['user' => $user, 'organization' => $organization]);
+
+        /** @var EntityManager $entityManager */
+        $entityManager = $this->doctrine->getManager();
 
         if (!$activeDashboard) {
             $activeDashboard = new ActiveDashboard();
-
             $activeDashboard->setUser($user);
             $activeDashboard->setOrganization($organization);
-            $this->entityManager->persist($activeDashboard);
+            $entityManager->persist($activeDashboard);
         }
 
         $entity = $dashboard->getEntity();
         $activeDashboard->setDashboard($entity);
 
         if ($flush) {
-            $this->entityManager->flush($activeDashboard);
+            $entityManager->flush($activeDashboard);
         }
     }
 

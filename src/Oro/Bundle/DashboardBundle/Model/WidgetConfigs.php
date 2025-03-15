@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\DashboardBundle\Model;
 
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Event\WidgetItemsLoadDataEvent;
 use Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\DashboardBundle\Filter\WidgetConfigVisibilityFilter;
-use Oro\Bundle\DashboardBundle\Form\Type\WidgetItemsChoiceType;
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider;
 use Oro\Component\Config\Resolver\ResolverInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -15,65 +14,28 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Dashboard widget configuration model
+ * The dashboard widget configuration model.
  */
 class WidgetConfigs
 {
-    /** @var ConfigProvider */
-    protected $configProvider;
-
-    /** @var ResolverInterface */
-    protected $resolver;
-
-    /** @var EntityManagerInterface */
-    protected $entityManager;
-
-    /** @var RequestStack */
-    protected $requestStack;
-
-    /** @var ConfigValueProvider */
-    protected $valueProvider;
-
-    /** @var TranslatorInterface */
-    protected $translator;
-
-    /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
-
-    /** @var WidgetConfigVisibilityFilter */
-    protected $visibilityFilter;
-
-    /** @var array */
-    protected $widgetOptionsById = [];
+    protected array $widgetOptionsById = [];
 
     public function __construct(
-        ConfigProvider $configProvider,
-        ResolverInterface $resolver,
-        EntityManagerInterface $entityManager,
-        ConfigValueProvider $valueProvider,
-        TranslatorInterface $translator,
-        EventDispatcherInterface $eventDispatcher,
-        WidgetConfigVisibilityFilter $visibilityFilter,
-        RequestStack $requestStack
+        protected ConfigProvider $configProvider,
+        protected ResolverInterface $resolver,
+        protected ManagerRegistry $doctrine,
+        protected ConfigValueProvider $valueProvider,
+        protected TranslatorInterface $translator,
+        protected EventDispatcherInterface $eventDispatcher,
+        protected WidgetConfigVisibilityFilter $visibilityFilter,
+        protected RequestStack $requestStack
     ) {
-        $this->configProvider = $configProvider;
-        $this->resolver = $resolver;
-        $this->entityManager = $entityManager;
-        $this->valueProvider = $valueProvider;
-        $this->translator = $translator;
-        $this->eventDispatcher = $eventDispatcher;
-        $this->visibilityFilter = $visibilityFilter;
-        $this->requestStack = $requestStack;
     }
 
     /**
-     * Returns widget attributes with attribute name converted to use in widget's TWIG template
-     *
-     * @param string $widgetName The name of widget
-     *
-     * @return array
+     * Returns widget attributes with attribute name converted to use in widget's TWIG template.
      */
-    public function getWidgetAttributesForTwig($widgetName)
+    public function getWidgetAttributesForTwig(string $widgetName): array
     {
         $result = [
             'widgetName' => $widgetName
@@ -81,10 +43,7 @@ class WidgetConfigs
 
         $widget = $this->configProvider->getWidgetConfig($widgetName);
         if (isset($widget['data_items'])) {
-            $widget['data_items'] = $this->visibilityFilter->filterConfigs(
-                $widget['data_items'],
-                $widgetName
-            );
+            $widget['data_items'] = $this->visibilityFilter->filterConfigs($widget['data_items'], $widgetName);
         }
         unset($widget['route'], $widget['route_parameters'], $widget['acl'], $widget['items']);
 
@@ -116,15 +75,11 @@ class WidgetConfigs
     }
 
     /**
-     * Add ability to pass widget instance configuration params as grid params
+     * Adds ability to pass widget instance configuration params as grid params
      * so they could be used to bound them to Query parameters,
-     * which allows to filter grid by widget configuration values
-     *
-     * @param array $gridParams
-     *
-     * @return array
+     * which allows to filter grid by widget configuration values.
      */
-    protected function addGridConfigParams(array $gridParams)
+    protected function addGridConfigParams(array $gridParams): array
     {
         $result = [];
         $widgetOptions = $this->getWidgetOptions();
@@ -144,19 +99,15 @@ class WidgetConfigs
 
     /**
      * Returns filtered list of widget configuration
-     * based on applicable flags and acl
-     *
-     * @return array
+     * based on applicable flags and ACL.
      */
-    public function getWidgetConfigs()
+    public function getWidgetConfigs(): array
     {
         return $this->visibilityFilter->filterConfigs($this->configProvider->getWidgetConfigs());
     }
 
     /**
      * Returns widget configuration or null based on applicable flags and ACL.
-     *
-     * @throws InvalidConfigurationException if the widget config was not found and $throwExceptionIfMissing = true
      */
     public function getWidgetConfig(string $widgetName): ?array
     {
@@ -164,6 +115,7 @@ class WidgetConfigs
         if (null === $widgetConfig) {
             return null;
         }
+
         $configs = $this->visibilityFilter->filterConfigs([$widgetName => $widgetConfig]);
         $config = reset($configs);
 
@@ -171,37 +123,26 @@ class WidgetConfigs
     }
 
     /**
-     * Returns a list of items for the given widget
+     * Returns a list of items for the given widget.
      *
-     * @param string $widgetName The name of widget
-     *
-     * @return array
-     * @throws \Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException
+     * @throws InvalidConfigurationException if the widget config was not found
      */
-    public function getWidgetItems($widgetName)
+    public function getWidgetItems(string $widgetName): array
     {
         $widgetConfig = $this->configProvider->getWidgetConfig($widgetName);
 
-        return $this->visibilityFilter->filterConfigs(
-            $widgetConfig['items'] ?? [],
-            $widgetName
-        );
+        return $this->visibilityFilter->filterConfigs($widgetConfig['items'] ?? [], $widgetName);
     }
 
     /**
-     * @param $widgetName
-     * @param $widgetId
-     * @return array
+     * Returns items' data for the given widget.
      */
-    public function getWidgetItemsData($widgetName, $widgetId)
+    public function getWidgetItemsData(string $widgetName, ?int $widgetId): array
     {
-        $widgetConfig  = $this->configProvider->getWidgetConfig($widgetName);
+        $widgetConfig = $this->configProvider->getWidgetConfig($widgetName);
         $widgetOptions = $this->getWidgetOptions($widgetId);
 
-        $items = $this->visibilityFilter->filterConfigs(
-            isset($widgetConfig['data_items']) ? $widgetConfig['data_items'] : [],
-            $widgetName
-        );
+        $items = $this->visibilityFilter->filterConfigs($widgetConfig['data_items'] ?? [], $widgetName);
 
         if ($this->eventDispatcher->hasListeners(WidgetItemsLoadDataEvent::EVENT_NAME)) {
             $event = new WidgetItemsLoadDataEvent($items, $widgetConfig, $widgetOptions);
@@ -210,25 +151,31 @@ class WidgetConfigs
         }
 
         foreach ($items as $itemName => $config) {
-            $items[$itemName]['value'] = $this->resolver->resolve(
+            $resolvedData = $this->resolver->resolve(
                 [$config['data_provider']],
                 ['widgetOptions' => $widgetOptions]
-            )[0];
+            );
+            $items[$itemName]['value'] = $resolvedData[0];
         }
 
         return $items;
     }
 
     /**
-     * Returns a list of options for widget with id $widgetId or current widget if $widgetId is not specified
+     * Returns a list of options for the given widget or for the current widget if the widget ID is not specified.
      *
-     * @throws \Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException
+     * @throws InvalidConfigurationException if the widget config was not found
      */
     public function getWidgetOptions(?int $widgetId = null): WidgetOptionBag
     {
-        $request = $this->requestStack->getCurrentRequest();
-        if ($request && null === $widgetId) {
-            $widgetId = $request->query->get('_widgetId', null);
+        if (null === $widgetId) {
+            $request = $this->requestStack->getCurrentRequest();
+            if (null !== $request) {
+                $widgetIdFromRequest = $request->query->get('_widgetId');
+                if ($widgetIdFromRequest) {
+                    $widgetId = (int)$widgetIdFromRequest;
+                }
+            }
         }
 
         if (!$widgetId) {
@@ -243,6 +190,7 @@ class WidgetConfigs
         if (!$widget) {
             return new WidgetOptionBag();
         }
+
         $widgetConfig = $this->configProvider->getWidgetConfig($widget->getName());
         $options = $widget->getOptions();
 
@@ -262,31 +210,21 @@ class WidgetConfigs
     }
 
     /**
-     * @param Widget $widget
-     * @return array
+     * Returns form values for the given widget.
      */
-    public function getFormValues(Widget $widget)
+    public function getFormValues(Widget $widget): array
     {
-        $options      = $widget->getOptions();
+        $options = $widget->getOptions();
         $widgetConfig = $this->configProvider->getWidgetConfig($widget->getName());
 
         foreach ($widgetConfig['configuration'] as $name => $config) {
-            $value          = isset($options[$name]) ? $options[$name] : null;
-            $options[$name] = $this->valueProvider->getFormValue($config['type'], $config, $value);
+            $options[$name] = $this->valueProvider->getFormValue($config['type'], $config, $options[$name] ?? null);
         }
 
-        $options = $this->loadDefaultValue($options, $widgetConfig);
-
-        return $options;
+        return $this->loadDefaultValue($options, $widgetConfig);
     }
 
-    /**
-     * @param $options
-     * @param $widgetConfig
-     *
-     * @return mixed
-     */
-    protected function loadDefaultValue($options, $widgetConfig)
+    protected function loadDefaultValue(array $options, array $widgetConfig): array
     {
         if (!isset($options['title']) || !$options['title']['title'] || $options['title']['useDefault']) {
             $options['title']['title'] = isset($widgetConfig['label'])
@@ -298,31 +236,8 @@ class WidgetConfigs
         return $options;
     }
 
-    /**
-     * @param int $id
-     *
-     * @return Widget
-     */
-    protected function findWidget($id)
+    protected function findWidget(int $widgetId): ?Widget
     {
-        return $this->entityManager->getRepository(Widget::class)->find($id);
-    }
-
-    /**
-     * @param array           $widgetConfig
-     * @param WidgetOptionBag $widgetOptions
-     * @return array|mixed
-     */
-    protected function getEnabledItems(array $widgetConfig, WidgetOptionBag $widgetOptions)
-    {
-        if (isset($widgetConfig['configuration'])) {
-            foreach ($widgetConfig['configuration'] as $parameterName => $config) {
-                if ($config['type'] === WidgetItemsChoiceType::NAME) {
-                    return $widgetOptions->get($parameterName, []);
-                }
-            }
-        }
-
-        return [];
+        return $this->doctrine->getRepository(Widget::class)->find($widgetId);
     }
 }

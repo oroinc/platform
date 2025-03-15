@@ -2,7 +2,7 @@
 
 namespace Oro\Component\MessageQueue\Tests\Unit\Job;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Component\MessageQueue\Checker\JobStatusChecker;
 use Oro\Component\MessageQueue\Client\Message;
@@ -182,7 +182,7 @@ class RootJobStatusCalculatorTest extends \PHPUnit\Framework\TestCase
 
     private function assertObjectManaged(): void
     {
-        $manager = $this->createMock(EntityManager::class);
+        $manager = $this->createMock(EntityManagerInterface::class);
         $manager->expects($this->any())
             ->method('contains')
             ->willReturn(true);

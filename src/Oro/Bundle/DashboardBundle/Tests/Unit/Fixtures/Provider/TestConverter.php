@@ -7,20 +7,24 @@ use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
 class TestConverter extends ConfigValueConverterAbstract
 {
     #[\Override]
-    public function getConvertedValue(array $widgetConfig, $value = null, array $config = [], array $options = [])
-    {
+    public function getConvertedValue(
+        array $widgetConfig,
+        mixed $value = null,
+        array $config = [],
+        array $options = []
+    ): mixed {
         return 'test value';
     }
 
     #[\Override]
-    public function getViewValue($value)
+    public function getViewValue(mixed $value): mixed
     {
         return 'test view value';
     }
 
     #[\Override]
-    public function getFormValue(array $converterAttributes, $value)
+    public function getFormValue(array $config, mixed $value): mixed
     {
-        return $converterAttributes['value'];
+        return $config['value'];
     }
 }

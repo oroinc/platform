@@ -2,201 +2,168 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
-use Oro\Bundle\DashboardBundle\Entity\Widget;
-use Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DashboardBundle\Filter\WidgetConfigVisibilityFilter;
 use Oro\Bundle\DashboardBundle\Model\ConfigProvider;
 use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
-use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider;
-use Oro\Bundle\SidebarBundle\Entity\Repository\WidgetRepository;
 use Oro\Component\Config\Resolver\ResolverInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WidgetConfigsTest extends TestCase
 {
-    /** @var WidgetRepository|MockObject */
-    private $widgetRepository;
-
-    /** @var EntityManagerInterface|MockObject */
-    private $em;
-
-    /** @var ConfigValueProvider|MockObject */
-    private $valueProvider;
-
-    /** @var ConfigProvider|MockObject */
-    private $configProvider;
-
-    /** @var TranslatorInterface|MockObject */
-    private $translator;
-
-    /** @var EventDispatcherInterface|MockObject */
-    private $eventDispatcher;
-
-    /** @var RequestStack|MockObject */
-    private $requestStack;
-
-    /** @var WidgetConfigs */
-    private $widgetConfigs;
+    private ConfigProvider&MockObject $configProvider;
+    private ResolverInterface&MockObject $resolver;
+    private ManagerRegistry&MockObject $doctrine;
+    private ConfigValueProvider&MockObject $valueProvider;
+    private TranslatorInterface&MockObject $translator;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private WidgetConfigs $widgetConfigs;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->configProvider = $this->createMock(ConfigProvider::class);
-        $resolver = $this->createMock(ResolverInterface::class);
-        $this->em = $this->createMock(EntityManagerInterface::class);
+        $this->resolver = $this->createMock(ResolverInterface::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->valueProvider = $this->createMock(ConfigValueProvider::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+
         $widgetConfigVisibilityFilter = $this->createMock(WidgetConfigVisibilityFilter::class);
-
-        $this->valueProvider->expects(self::any())
-            ->method('getConvertedValue')
-            ->willReturnCallback(fn ($widgetConfig, $type, $value) => $value);
-
-        $widgetConfigVisibilityFilter->expects(self::any())
+        $widgetConfigVisibilityFilter->expects($this->any())
             ->method('filterConfigs')
-            ->willReturnArgument(0);
+            ->willReturnCallback(function (array $configs) {
+                return array_filter(
+                    $configs,
+                    function ($config) {
+                        return (!isset($config['acl']) || $config['acl'] === 'valid_acl') &&
+                            (!isset($config['enabled']) || $config['enabled']) &&
+                            (!isset($config['applicable']) || $config['applicable'] === '@true');
+                    }
+                );
+            });
 
-        $this->requestStack = new RequestStack();
         $this->widgetConfigs = new WidgetConfigs(
             $this->configProvider,
-            $resolver,
-            $this->em,
+            $this->resolver,
+            $this->doctrine,
             $this->valueProvider,
             $this->translator,
             $this->eventDispatcher,
             $widgetConfigVisibilityFilter,
-            $this->requestStack
+            new RequestStack()
         );
-
-        $this->widgetRepository = $this->createMock(EntityRepository::class);
-        $this->em->expects(self::any())
-            ->method('getRepository')
-            ->with(Widget::class)
-            ->willReturn($this->widgetRepository);
     }
 
-    public function testGetWidgetOptionsShouldReturnEmptyOptionsBagIfRequestIsNull()
+    public function testGetWidgetAttributesForTwig(): void
     {
-        self::assertEmpty($this->widgetConfigs->getWidgetOptions()->all());
-    }
-
-    public function testGetWidgetOptionsShouldReturnEmptyOptionsBagIfThereIsNoWidgetIdInRequestQuery()
-    {
-        $this->requestStack->push(new Request());
-
-        self::assertEmpty($this->widgetConfigs->getWidgetOptions()->all());
-    }
-
-    public function testGetWidgetOptionsShouldReturnEmptyOptionsBagIfWidgetDoesNotExist()
-    {
-        $this->requestStack->push(new Request(['_widgetId' => 1]));
-
-        self::assertEmpty($this->widgetConfigs->getWidgetOptions()->all());
-    }
-
-    public function testGetWidgetOptionsShouldReturnOptionsOfWidget()
-    {
-        $request = new Request(['_widgetId' => 1,]);
-        $this->requestStack->push($request);
-
-        $widget = new Widget();
-        $widget->setName('test');
-        $this->widgetRepository->expects(self::once())
-            ->method('find')
-            ->with(1)
-            ->willReturn($widget);
-
-        $options = ['k' => 'v', 'k2' => 'v2'];
-        $widget->setOptions($options);
-
-        $this->configProvider->expects($this->once())
+        $expectedWidgetName = 'widget_name';
+        $configs = [
+            'route' => 'sample route',
+            'route_parameters' => 'sample params',
+            'acl' => 'view_acl',
+            'items' => [],
+            'test-param' => 'param',
+            'configuration' => []
+        ];
+        $expected = [
+            'widgetName' => $expectedWidgetName,
+            'widgetTestParam' => 'param',
+            'widgetConfiguration' => []
+        ];
+        $this->configProvider->expects(self::once())
             ->method('getWidgetConfig')
-            ->willReturn([
-                'configuration' => [
-                    'k'  => ['type' => 'test'],
-                    'k2' => ['type' => 'test'],
-                ]
-            ]);
+            ->with($expectedWidgetName)
+            ->willReturn($configs);
 
-        self::assertEquals(new WidgetOptionBag($options), $this->widgetConfigs->getWidgetOptions());
+        $actual = $this->widgetConfigs->getWidgetAttributesForTwig($expectedWidgetName);
+        self::assertEquals($expected, $actual);
     }
 
-    public function testGetWidgetsShouldReturnOptionsFromLocalCacheOnSubsequentCalls()
+    public function testGetWidgetItems(): void
     {
-        $request = new Request(['_widgetId' => 1,]);
-        $this->requestStack->push($request);
+        $expectedWidgetName = 'widget_name';
+        $notAllowedAcl = 'invalid_acl';
+        $allowedAcl = 'valid_acl';
+        $expectedItem = 'expected_item';
+        $expectedValue = ['label' => 'test label', 'acl' => $allowedAcl, 'enabled' => true];
+        $notGrantedItem = 'not_granted_item';
+        $notGrantedValue = ['label' => 'not granted label', 'acl' => $notAllowedAcl, 'enabled' => true];
+        $applicableItem = 'applicable_item';
+        $applicable = [
+            'label' => 'applicable is set and resolved to true',
+            'applicable' => '@true',
+            'enabled' => true
+        ];
+        $notApplicableItem = 'not_applicable_item';
+        $notApplicable = [
+            'label' => 'applicable is set and resolved to false',
+            'applicable' => '@false',
+            'enabled' => true
+        ];
+        $disabledItem = 'not_applicable_item';
+        $disabled = [
+            'label' => 'applicable is set and resolved to false',
+            'acl' => $allowedAcl,
+            'enabled' => false
+        ];
 
-        $widget = (new Widget())->setName('test');
-        $options = ['k' => 'v', 'k2' => 'v2'];
-        $widget->setOptions($options);
-        $this->widgetRepository->expects(self::once())
-            ->method('find')
-            ->with(1)
-            ->willReturn($widget);
+        $configs = [
+            $expectedItem => $expectedValue,
+            $notGrantedItem => $notGrantedValue,
+            $applicableItem => $applicable,
+            $notApplicableItem => $notApplicable,
+            $disabledItem => $disabled
+        ];
 
         $this->configProvider->expects(self::once())
             ->method('getWidgetConfig')
-            ->willReturn([
-                'configuration' => [
-                    'k'  => ['type' => 'test'],
-                    'k2' => ['type' => 'test'],
-                ]
-            ]);
+            ->with($expectedWidgetName)
+            ->willReturn(['items' => $configs]);
 
-        self::assertEquals(new WidgetOptionBag($options), $this->widgetConfigs->getWidgetOptions());
-        self::assertEquals(new WidgetOptionBag($options), $this->widgetConfigs->getWidgetOptions());
+        $result = $this->widgetConfigs->getWidgetItems($expectedWidgetName);
+        self::assertArrayHasKey($applicableItem, $result);
+        self::assertArrayHasKey($expectedItem, $result);
     }
 
-    public function testGetWidgetOptionsShouldReturnOptionsOfWidgetSpecifiedAsArgument()
+    public function testGetWidgetConfigs(): void
     {
-        $this->requestStack->push(new Request(['_widgetId' => 1,]));
-
-        $widget = new Widget();
-        $widget->setName('test');
-        $this->widgetRepository->expects(self::once())
-            ->method('find')
-            ->with(2)
-            ->willReturn($widget);
-
-        $options = ['k' => 'v', 'k2' => 'v2'];
-        $widget->setOptions($options);
+        $notAllowedAcl = 'invalid_acl';
+        $allowedAcl = 'valid_acl';
+        $expectedItem = 'expected_item';
+        $expectedValue = ['label' => 'test label', 'acl' => $allowedAcl, 'enabled' => true];
+        $notGrantedItem = 'not_granted_item';
+        $notGrantedValue = ['label' => 'not granted label', 'acl' => $notAllowedAcl, 'enabled' => true];
+        $applicableItem = 'applicable_item';
+        $applicable = [
+            'label' => 'applicable is set and resolved to true',
+            'applicable' => '@true',
+            'enabled' => true
+        ];
+        $notApplicableItem = 'not_applicable_item';
+        $notApplicable = [
+            'label' => 'applicable is set and resolved to false',
+            'applicable' => '@false',
+            'enabled' => true
+        ];
+        $configs = [
+            $expectedItem => $expectedValue,
+            $notGrantedItem => $notGrantedValue,
+            $applicableItem => $applicable,
+            $notApplicableItem => $notApplicable
+        ];
 
         $this->configProvider->expects(self::once())
-            ->method('getWidgetConfig')
-            ->willReturn([
-                'configuration' => [
-                    'k'  => ['type' => 'test'],
-                    'k2' => ['type' => 'test'],
-                ]
-            ]);
+            ->method('getWidgetConfigs')
+            ->willReturn($configs);
 
-        self::assertEquals(new WidgetOptionBag($options), $this->widgetConfigs->getWidgetOptions(2));
-    }
-
-    public function testGetWidgetConfigShouldReturnNullIfConfigProviderReturnsNull()
-    {
-        $this->configProvider->expects(self::any())
-            ->method('getWidgetConfig')
-            ->willReturn(null);
-        self::assertNull($this->widgetConfigs->getWidgetConfig('non-existent-widget'));
-    }
-
-    public function testGetWidgetConfigShouldPassThroughConfigProviderException()
-    {
-        $this->configProvider->expects(self::any())
-            ->method('getWidgetConfig')
-            ->willThrowException(new InvalidConfigurationException('non-existent-widget'));
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage("Can't find configuration for: non-existent-widget");
-        $this->widgetConfigs->getWidgetConfig('non-existent-widget');
+        $result = $this->widgetConfigs->getWidgetConfigs();
+        self::assertArrayHasKey($applicableItem, $result);
+        self::assertArrayHasKey($expectedItem, $result);
     }
 }

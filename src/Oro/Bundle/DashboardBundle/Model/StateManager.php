@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\DashboardBundle\Model;
 
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Entity\WidgetState;
 use Oro\Bundle\DashboardBundle\Entity\WidgetStateNullObject;
@@ -15,7 +15,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 class StateManager
 {
     public function __construct(
-        private EntityManagerInterface $entityManager,
+        private ManagerRegistry $doctrine,
         private TokenAccessorInterface $tokenAccessor
     ) {
     }
@@ -30,13 +30,13 @@ class StateManager
             return $state;
         }
 
-        $state = $this->entityManager->getRepository(WidgetState::class)
+        $state = $this->doctrine->getRepository(WidgetState::class)
             ->findOneBy(['owner' => $user, 'widget' => $widget]);
         if (null === $state) {
             $state = new WidgetState();
             $state->setOwner($user);
             $state->setWidget($widget);
-            $this->entityManager->persist($state);
+            $this->doctrine->getManagerForClass(WidgetState::class)->persist($state);
         }
 
         return $state;

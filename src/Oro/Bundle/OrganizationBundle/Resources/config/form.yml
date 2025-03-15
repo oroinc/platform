@@ -159,7 +159,6 @@ services:
             - '@oro_security.acl_helper'
             - '@oro_entity.entity_name_resolver'
             - '@oro_entity.doctrine_helper'
-            - '@doctrine.orm.entity_manager'
             - 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit'
         tags:
             - { name: oro_dashboard.value.converter, form_type: Oro\Bundle\OrganizationBundle\Form\Type\WidgetBusinessUnitSelectType }

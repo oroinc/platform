@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Dashboard\Converters;
 
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\DashboardBundle\Provider\Converters\WidgetEntitySelectConverter;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
@@ -11,50 +10,29 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Dashboard\OwnerHelper;
 
 /**
- * Dashboard configuration converter for User select values.
+ * The dashboard widget configuration converter for select User entity.
  */
 class WidgetUserSelectConverter extends WidgetEntitySelectConverter
 {
-    /** @var OwnerHelper */
-    protected $ownerHelper;
-
-    /** @var TokenAccessorInterface */
-    protected $tokenAccessor;
-
-    /**
-     * @param OwnerHelper        $ownerHelper
-     * @param AclHelper          $aclHelper
-     * @param EntityNameResolver $entityNameResolver
-     * @param DoctrineHelper     $doctrineHelper
-     * @param EntityManager      $entityManager
-     * @param string             $entityClass
-     */
     public function __construct(
-        OwnerHelper $ownerHelper,
+        protected OwnerHelper $ownerHelper,
+        protected TokenAccessorInterface $tokenAccessor,
         AclHelper $aclHelper,
         EntityNameResolver $entityNameResolver,
         DoctrineHelper $doctrineHelper,
-        EntityManager $entityManager,
-        $entityClass
+        string $entityClass
     ) {
-        parent::__construct($aclHelper, $entityNameResolver, $doctrineHelper, $entityManager, $entityClass);
-
-        $this->ownerHelper = $ownerHelper;
+        parent::__construct($aclHelper, $entityNameResolver, $doctrineHelper, $entityClass);
     }
 
-    /**
-     * @param mixed $value
-     *
-     * @return mixed
-     */
     #[\Override]
-    protected function getEntities($value)
+    protected function getEntities(mixed $value): mixed
     {
         if (empty($value)) {
             return [];
         }
 
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
             $value = [$value];
         }
 
@@ -64,21 +42,13 @@ class WidgetUserSelectConverter extends WidgetEntitySelectConverter
 
         $identityField = $this->doctrineHelper->getSingleEntityIdentifierFieldName($this->entityClass);
 
-        $qb = $this->entityManager->getRepository($this->entityClass)->createQueryBuilder('e');
-        $qb->where(
-            $qb->expr()->in(sprintf('e.%s', $identityField), ':ids')
-        );
-        $qb->setParameter('ids', $value);
-
-        $qb->leftJoin('e.organizations', 'org')
+        $qb = $this->doctrineHelper->createQueryBuilder($this->entityClass, 'e')
+            ->leftJoin('e.organizations', 'org')
+            ->where(\sprintf('e.%s IN (:ids)', $identityField))
             ->andWhere('org.id = :org')
+            ->setParameter('ids', $value)
             ->setParameter('org', $this->tokenAccessor->getOrganizationId());
 
         return $qb->getQuery()->getResult();
-    }
-
-    public function setTokenAccessor(TokenAccessorInterface $tokenAccessor)
-    {
-        $this->tokenAccessor = $tokenAccessor;
     }
 }

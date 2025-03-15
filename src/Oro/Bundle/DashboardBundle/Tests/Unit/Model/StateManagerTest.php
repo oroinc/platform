@@ -4,6 +4,7 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DashboardBundle\Entity\Widget;
 use Oro\Bundle\DashboardBundle\Entity\WidgetState;
 use Oro\Bundle\DashboardBundle\Entity\WidgetStateNullObject;
@@ -27,7 +28,17 @@ class StateManagerTest extends TestCase
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->repository = $this->createMock(EntityRepository::class);
 
-        $this->stateManager = new StateManager($this->entityManager, $this->tokenAccessor);
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getManagerForClass')
+            ->with(WidgetState::class)
+            ->willReturn($this->entityManager);
+        $doctrine->expects(self::any())
+            ->method('getRepository')
+            ->with(WidgetState::class)
+            ->willReturn($this->repository);
+
+        $this->stateManager = new StateManager($doctrine, $this->tokenAccessor);
     }
 
     public function testGetWidgetStateNotLoggedUser(): void
@@ -59,10 +70,6 @@ class StateManagerTest extends TestCase
             ->method('getUser')
             ->willReturn($user);
 
-        $this->entityManager->expects(self::once())
-            ->method('getRepository')
-            ->willReturn($this->repository);
-
         $this->repository->expects(self::once())
             ->method('findOneBy')
             ->with(['owner' => $user, 'widget' => $widget])
@@ -79,10 +86,6 @@ class StateManagerTest extends TestCase
         $this->tokenAccessor->expects(self::once())
             ->method('getUser')
             ->willReturn($user);
-
-        $this->entityManager->expects(self::once())
-            ->method('getRepository')
-            ->willReturn($this->repository);
 
         $this->repository->expects(self::once())
             ->method('findOneBy')

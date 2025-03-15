@@ -9,72 +9,59 @@ use Psr\Container\ContainerInterface;
  */
 class ConfigValueProvider
 {
-    /** @var ContainerInterface */
-    private $converters;
-
-    public function __construct(ContainerInterface $converters)
-    {
-        $this->converters = $converters;
+    public function __construct(
+        private ContainerInterface $converters
+    ) {
     }
 
     /**
-     * @param array  $widgetConfig
-     * @param string $formType
-     * @param null   $value
-     * @param array  $config
-     * @param array  $options
-     *
-     * @return string
+     * Returns converted value for the given form type.
      */
-    public function getConvertedValue($widgetConfig, $formType, $value = null, $config = [], $options = [])
-    {
+    public function getConvertedValue(
+        array $widgetConfig,
+        string $formType,
+        mixed $value = null,
+        array $config = [],
+        array $options = []
+    ): mixed {
         $converter = $this->getConverter($formType);
-        if (null !== $converter) {
-            return $converter->getConvertedValue($widgetConfig, $value, $config, $options);
+        if (null === $converter) {
+            return $value;
         }
 
-        return $value;
+        return $converter->getConvertedValue($widgetConfig, $value, $config, $options);
     }
 
     /**
-     * @param string $formType
-     * @param mixed  $value
-     *
-     * @return string
+     * Returns view value for the given form type.
      */
-    public function getViewValue($formType, $value)
+    public function getViewValue(string $formType, mixed $value): mixed
     {
         $converter = $this->getConverter($formType);
-        if (null !== $converter) {
-            return $converter->getViewValue($value);
+        if (null === $converter) {
+            return $value;
         }
 
-        return $value;
+        return $converter->getViewValue($value);
     }
 
     /**
-     * @param string $formType
-     * @param array  $config
-     * @param mixed  $value
-     *
-     * @return mixed
+     * Returns form value for the given form type.
      */
-    public function getFormValue($formType, $config, $value)
+    public function getFormValue(string $formType, array $config, mixed $value): mixed
     {
         $converter = $this->getConverter($formType);
-        if (null !== $converter) {
-            return $converter->getFormValue($config, $value);
+        if (null === $converter) {
+            return $value;
         }
 
-        return $value;
+        return $converter->getFormValue($config, $value);
     }
 
     private function getConverter(string $formType): ?ConfigValueConverterAbstract
     {
-        if (!$this->converters->has($formType)) {
-            return null;
-        }
-
-        return $this->converters->get($formType);
+        return $this->converters->has($formType)
+            ? $this->converters->get($formType)
+            : null;
     }
 }
