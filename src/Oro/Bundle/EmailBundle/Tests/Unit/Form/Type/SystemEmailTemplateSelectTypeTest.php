@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
@@ -16,40 +16,33 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SystemEmailTemplateSelectTypeTest extends TestCase
 {
-    /** @var SystemEmailTemplateSelectType */
-    private $type;
-
-    /** @var EntityManager|MockObject */
-    private $em;
-
-    /** @var EntityRepository|MockObject */
-    private $entityRepository;
-
-    /** @var QueryBuilder|MockObject */
-    private $queryBuilder;
+    private EntityManagerInterface&MockObject $em;
+    private EntityRepository&MockObject $entityRepository;
+    private QueryBuilder&MockObject $queryBuilder;
+    private SystemEmailTemplateSelectType $type;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->queryBuilder = $this->createMock(QueryBuilder::class);
         $this->entityRepository = $this->createMock(EmailTemplateRepository::class);
-        $this->em = $this->createMock(EntityManager::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
 
         $this->type = new SystemEmailTemplateSelectType($this->em);
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
-        $this->entityRepository->expects($this->any())
+        $this->entityRepository->expects(self::any())
             ->method('getSystemTemplatesQueryBuilder')
             ->willReturn($this->queryBuilder);
 
-        $this->em->expects($this->once())
+        $this->em->expects(self::once())
             ->method('getRepository')
             ->willReturn($this->entityRepository);
 
         $resolver = $this->createMock(OptionsResolver::class);
-        $resolver->expects($this->once())
+        $resolver->expects(self::once())
             ->method('setDefaults')
             ->with([
                 'query_builder' => $this->queryBuilder,
@@ -60,10 +53,10 @@ class SystemEmailTemplateSelectTypeTest extends TestCase
         $this->type->configureOptions($resolver);
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $formBuilder = $this->createMock(FormBuilder::class);
-        $formBuilder->expects($this->once())
+        $formBuilder->expects(self::once())
             ->method('addModelTransformer');
 
         $this->type->buildForm($formBuilder, []);
@@ -71,13 +64,13 @@ class SystemEmailTemplateSelectTypeTest extends TestCase
         unset($formBuilder);
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
-        $this->assertEquals(Select2TranslatableEntityType::class, $this->type->getParent());
+        self::assertEquals(Select2TranslatableEntityType::class, $this->type->getParent());
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
-        $this->assertEquals('oro_email_system_template_list', $this->type->getName());
+        self::assertEquals('oro_email_system_template_list', $this->type->getName());
     }
 }

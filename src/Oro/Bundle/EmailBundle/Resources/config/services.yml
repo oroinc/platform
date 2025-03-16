@@ -18,7 +18,6 @@ services:
         class: Oro\Bundle\EmailBundle\Cache\EmailCacheManager
         public: true
         arguments:
-            - '@doctrine.orm.entity_manager'
             - '@event_dispatcher'
             - '@oro_email.email_body_synchronizer'
 
@@ -80,7 +79,6 @@ services:
             - '@oro_entity.entity_name_resolver'
             - '@oro_security.token_accessor'
             - '@oro_email.email.address.manager'
-            - '@doctrine.orm.entity_manager'
             - '@oro_email.email.cache.manager'
             - '@twig'
             - '@oro_email.mailbox.manager'
@@ -100,7 +98,7 @@ services:
         public: true
         arguments:
             - '@oro_email.email.model.builder.helper'
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@oro_config.user'
             - '@oro_email.activity_list.provider'
             - '@oro_email.provider.email_attachment_provider'
@@ -179,7 +177,7 @@ services:
             - { name: doctrine.event_listener, event: postFlush }
             - { name: oro_featuretogle.feature, feature: email }
             - { name: container.service_subscriber }
-            - { name: container.service_subscriber, id: oro_email.autoresponserule_manager }
+            - { name: container.service_subscriber, id: oro_email.autoresponserule_manager, key: Oro\Bundle\EmailBundle\Manager\AutoResponseManager }
 
     oro_email.async.auto_response:
         class: 'Oro\Bundle\EmailBundle\Async\AutoResponseMessageProcessor'
@@ -913,8 +911,7 @@ services:
         class: Oro\Bundle\EmailBundle\Entity\Manager\EmailManager
         public: true
         arguments:
-            - '@doctrine.orm.entity_manager'
-            - '@oro_email.email.thread.manager'
+            - '@doctrine'
             - '@oro_email.email.thread.provider'
             - '@oro_security.token_accessor'
             - '@oro_email.mailbox.manager'

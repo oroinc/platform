@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\ImapBundle\Provider;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\EmailBundle\Provider\EmailFlagManagerInterface;
 use Oro\Bundle\EmailBundle\Provider\EmailFlagManagerLoaderInterface;
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
@@ -14,37 +15,25 @@ use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 
 /**
- * This class allows to get EmailFlagManager based on EmailFolder
+ * Allows to get an IMAP email flag manager.
  */
 class ImapEmailFlagManagerLoader implements EmailFlagManagerLoaderInterface
 {
-    /** @var ImapConnectorFactory */
-    protected $connectorFactory;
-
-    /** @var SymmetricCrypterInterface */
-    protected $encryptor;
-
-    /** @var OAuthManagerRegistry */
-    protected $oauthManagerRegistry;
-
     public function __construct(
-        ImapConnectorFactory $connectorFactory,
-        SymmetricCrypterInterface $encryptor,
-        OAuthManagerRegistry $oauthManagerRegistry
+        private ImapConnectorFactory $connectorFactory,
+        private SymmetricCrypterInterface $encryptor,
+        private OAuthManagerRegistry $oauthManagerRegistry
     ) {
-        $this->connectorFactory = $connectorFactory;
-        $this->encryptor = $encryptor;
-        $this->oauthManagerRegistry = $oauthManagerRegistry;
     }
 
     #[\Override]
-    public function supports(EmailOrigin $origin)
+    public function supports(EmailOrigin $origin): bool
     {
         return $origin instanceof UserEmailOrigin;
     }
 
     #[\Override]
-    public function select(EmailFolder $folder, OroEntityManager $em)
+    public function select(EmailFolder $folder, EntityManagerInterface $em): EmailFlagManagerInterface
     {
         /** @var UserEmailOrigin $origin */
         $origin = $folder->getOrigin();
@@ -58,7 +47,7 @@ class ImapEmailFlagManagerLoader implements EmailFlagManagerLoaderInterface
             $origin->getImapEncryption(),
             $origin->getUser(),
             $this->encryptor->decryptData($origin->getPassword()),
-            $manager ? $manager->getAccessTokenWithCheckingExpiration($origin) : null
+            $manager?->getAccessTokenWithCheckingExpiration($origin)
         );
 
         return new ImapEmailFlagManager(

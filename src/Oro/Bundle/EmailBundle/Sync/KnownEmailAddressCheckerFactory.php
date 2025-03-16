@@ -2,56 +2,30 @@
 
 namespace Oro\Bundle\EmailBundle\Sync;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 
+/**
+ * The factory to create a service that is responsible for checking known email addresses.
+ */
 class KnownEmailAddressCheckerFactory
 {
-    /** @var ManagerRegistry */
-    protected $doctrine;
-
-    /** @var EmailAddressManager */
-    protected $emailAddressManager;
-
-    /** @var EmailAddressHelper */
-    protected $emailAddressHelper;
-
-    /** @var EmailOwnerProviderStorage */
-    protected $emailOwnerProviderStorage;
-
-    /** @var string[] */
-    protected $exclusions;
-
-    /**
-     * @param ManagerRegistry           $doctrine
-     * @param EmailAddressManager       $emailAddressManager
-     * @param EmailAddressHelper        $emailAddressHelper
-     * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
-     * @param string[]                  $exclusions Class names of email address owners which should be excluded
-     */
     public function __construct(
-        ManagerRegistry $doctrine,
-        EmailAddressManager $emailAddressManager,
-        EmailAddressHelper $emailAddressHelper,
-        EmailOwnerProviderStorage $emailOwnerProviderStorage,
-        $exclusions = []
+        private ManagerRegistry $doctrine,
+        private EmailAddressManager $emailAddressManager,
+        private EmailAddressHelper $emailAddressHelper,
+        private EmailOwnerProviderStorage $emailOwnerProviderStorage,
+        private array $exclusions = []
     ) {
-        $this->doctrine                  = $doctrine;
-        $this->emailAddressManager       = $emailAddressManager;
-        $this->emailAddressHelper        = $emailAddressHelper;
-        $this->emailOwnerProviderStorage = $emailOwnerProviderStorage;
-        $this->exclusions                = $exclusions;
     }
 
     /**
-     * Creates new instance of a class responsible for checking known email addresses
-     *
-     * @return KnownEmailAddressCheckerInterface
+     * Creates new instance of a class responsible for checking known email addresses.
      */
-    public function create()
+    public function create(): KnownEmailAddressCheckerInterface
     {
         return new KnownEmailAddressChecker(
             $this->getEntityManager(),
@@ -62,14 +36,9 @@ class KnownEmailAddressCheckerFactory
         );
     }
 
-    /**
-     * Returns default entity manager
-     *
-     * @return EntityManager
-     */
-    protected function getEntityManager()
+    private function getEntityManager(): EntityManagerInterface
     {
-        /** @var EntityManager $em */
+        /** @var EntityManagerInterface $em */
         $em = $this->doctrine->getManager();
         if (!$em->isOpen()) {
             $this->doctrine->resetManager();

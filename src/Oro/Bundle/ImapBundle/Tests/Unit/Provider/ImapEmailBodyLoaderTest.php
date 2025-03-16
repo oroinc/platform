@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Provider;
 
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -24,74 +24,75 @@ use PHPUnit\Framework\TestCase;
 
 class ImapEmailBodyLoaderTest extends TestCase
 {
-    /** @var ImapEmailManagerFactory|MockObject*/
-    private $imapEmailManagerFactory;
-
-    /** @var ConfigManager|MockObject */
-    private $configManager;
-
-    /** @var EntityManager|MockObject */
-    private $entityManager;
-
-    /** @var EmailFolder|MockObject */
-    private $emailFolder;
-
-    /** @var ImapEmailBodyLoader  */
-    private $imapEmailBodyLoader;
-
-    /** @var ImapEmailManager|MockObject */
-    private $imapEmailManager;
+    private ImapEmailManagerFactory&MockObject $imapEmailManagerFactory;
+    private ConfigManager&MockObject $configManager;
+    private EmailFolder&MockObject $emailFolder;
+    private ImapEmailManager&MockObject $imapEmailManager;
+    private EntityManagerInterface&MockObject $entityManager;
+    private EmailDTO&MockObject $emailDTO;
+    private ImapEmailBodyLoader $imapEmailBodyLoader;
 
 
     #[\Override]
     protected function setUp(): void
     {
         $this->imapEmailManagerFactory = $this->createMock(ImapEmailManagerFactory::class);
-        $this->entityManager = $this->createMock(EntityManager::class);
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->emailFolder = $this->createMock(EmailFolder::class);
-        $emailOrigin = $this->createMock(UserEmailOrigin::class);
         $this->imapEmailManager = $this->createMock(ImapEmailManager::class);
-        $imapEmailRepository = $this->createMock(ImapEmailRepository::class);
-        $queryBuilder = $this->createMock(QueryBuilder::class);
-        $query = $this->createMock(AbstractQuery::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->emailDTO = $this->createMock(EmailDTO::class);
 
-        $this->emailFolder->expects($this->once())
+        $emailOrigin = $this->createMock(UserEmailOrigin::class);
+
+        $this->emailFolder->expects(self::once())
             ->method('getOrigin')
             ->willReturn($emailOrigin);
 
-        $this->imapEmailManagerFactory->expects($this->once())
+        $this->imapEmailManagerFactory->expects(self::once())
             ->method('getImapEmailManager')
             ->with($emailOrigin)
             ->willReturn($this->imapEmailManager);
 
-        $this->emailFolder->expects($this->once())
+        $this->emailFolder->expects(self::once())
             ->method('getFullName')
             ->willReturn('INBOX');
 
-        $this->imapEmailManager->expects($this->once())
+        $this->imapEmailManager->expects(self::once())
             ->method('selectFolder')
             ->with('INBOX');
 
-        $this->entityManager->expects($this->once())
-            ->method('getRepository')
-            ->with(ImapEmail::class)
-            ->willReturn($imapEmailRepository);
+        $query = $this->createMock(AbstractQuery::class);
+        $query->expects(self::once())
+            ->method('getSingleScalarResult')
+            ->willReturn('uuid');
 
-        $imapEmailRepository->expects($this->once())
+        $queryBuilder = $this->createMock(QueryBuilder::class);
+        $queryBuilder->expects(self::once())
+            ->method('select')
+            ->willReturn($queryBuilder);
+        $queryBuilder->expects(self::once())
+            ->method('innerJoin')
+            ->willReturn($queryBuilder);
+        $queryBuilder->expects(self::once())
+            ->method('where')
+            ->willReturn($queryBuilder);
+        $queryBuilder->expects(self::exactly(2))
+            ->method('setParameter')
+            ->willReturn($queryBuilder);
+        $queryBuilder->expects(self::once())
+            ->method('getQuery')
+            ->willReturn($query);
+
+        $imapEmailRepository = $this->createMock(ImapEmailRepository::class);
+        $imapEmailRepository->expects(self::once())
             ->method('createQueryBuilder')
             ->willReturn($queryBuilder);
 
-        $queryBuilder->expects($this->once())->method('select')->willReturn($queryBuilder);
-        $queryBuilder->expects($this->once())->method('innerJoin')->willReturn($queryBuilder);
-        $queryBuilder->expects($this->once())->method('where')->willReturn($queryBuilder);
-        $queryBuilder->expects($this->exactly(2))->method('setParameter')->willReturn($queryBuilder);
-        $queryBuilder->expects($this->once())->method('getQuery')->willReturn($query);
-
-        $query->expects($this->once())
-            ->method('getSingleScalarResult')
-            ->willReturn('uuid');
+        $this->entityManager->expects(self::once())
+            ->method('getRepository')
+            ->with(ImapEmail::class)
+            ->willReturn($imapEmailRepository);
 
 
         $this->imapEmailBodyLoader = new ImapEmailBodyLoader(
@@ -100,12 +101,12 @@ class ImapEmailBodyLoaderTest extends TestCase
         );
     }
 
-    public function testLoadEmailBody()
+    public function testLoadEmailBody(): void
     {
         $email = $this->createMock(Email::class);
         $emailBodyDTO = $this->createMock(EmailBodyDTO::class);
 
-        $this->imapEmailManager->expects($this->once())
+        $this->imapEmailManager->expects(self::once())
             ->method('findEmail')
             ->with('uuid')
             ->willReturn($this->emailDTO);
@@ -134,37 +135,37 @@ class ImapEmailBodyLoaderTest extends TestCase
             ->setContentTransferEncoding('base64')
             ->setContentId('12');
 
-        $this->emailDTO->expects($this->once())
+        $this->emailDTO->expects(self::once())
             ->method('getAttachments')
             ->willReturn([$attachment1, $attachment2, $attachment3]);
 
-        $this->emailDTO->expects($this->exactly(2))
+        $this->emailDTO->expects(self::exactly(2))
             ->method('getBody')
             ->willReturn($emailBodyDTO);
 
-        $emailBodyDTO->expects($this->once())
+        $emailBodyDTO->expects(self::once())
             ->method('getContent')
             ->willReturn('some content');
 
-        $emailBodyDTO->expects($this->once())
+        $emailBodyDTO->expects(self::once())
             ->method('getBodyIsText')
             ->willReturn(false);
 
         $emailBody = $this->imapEmailBodyLoader->loadEmailBody($this->emailFolder, $email, $this->entityManager);
-        $this->assertInstanceOf(EmailBody::class, $emailBody);
-        $this->assertEquals(3, count($emailBody->getAttachments()));
-        $this->assertTrue($emailBody->getHasAttachments());
-        $this->assertEquals('some content', $emailBody->getBodyContent());
+        self::assertInstanceOf(EmailBody::class, $emailBody);
+        self::assertCount(3, $emailBody->getAttachments());
+        self::assertTrue($emailBody->getHasAttachments());
+        self::assertEquals('some content', $emailBody->getBodyContent());
     }
 
-    public function testLoadEmailBodyWithException()
+    public function testLoadEmailBodyWithException(): void
     {
         $email = $this->createMock(Email::class);
-        $email->expects($this->once())
+        $email->expects(self::once())
             ->method('getSubject')
             ->willReturn('test@test.com');
 
-        $this->imapEmailManager->expects($this->once())
+        $this->imapEmailManager->expects(self::once())
             ->method('findEmail')
             ->with('uuid')
             ->willReturn(null);

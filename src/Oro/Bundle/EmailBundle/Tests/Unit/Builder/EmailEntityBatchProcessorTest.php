@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Builder;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBatchProcessor;
@@ -23,17 +23,10 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class EmailEntityBatchProcessorTest extends TestCase
 {
-    /** @var EmailAddressManager|MockObject */
-    private $addressManager;
-
-    /** @var EmailOwnerProvider|MockObject */
-    private $ownerProvider;
-
-    /** @var EventDispatcher|MockObject */
-    private $eventDispatcher;
-
-    /** @var EmailEntityBatchProcessor */
-    private $batch;
+    private EmailAddressManager $addressManager;
+    private EmailOwnerProvider&MockObject $ownerProvider;
+    private EventDispatcher&MockObject $eventDispatcher;
+    private EmailEntityBatchProcessor $batch;
 
     #[\Override]
     protected function setUp(): void
@@ -61,50 +54,50 @@ class EmailEntityBatchProcessorTest extends TestCase
         $email->addRecipient($recipient);
     }
 
-    public function testAddEmail()
+    public function testAddEmail(): void
     {
         $this->batch->addEmailUser(new EmailUser());
-        $this->assertCount(1, ReflectionUtil::getPropertyValue($this->batch, 'emailUsers'));
+        self::assertCount(1, ReflectionUtil::getPropertyValue($this->batch, 'emailUsers'));
     }
 
-    public function testAddAddress()
+    public function testAddAddress(): void
     {
         $this->batch->addAddress($this->addressManager->newEmailAddress()->setEmail('Test@example.com'));
-        $this->assertCount(1, ReflectionUtil::getPropertyValue($this->batch, 'addresses'));
+        self::assertCount(1, ReflectionUtil::getPropertyValue($this->batch, 'addresses'));
 
-        $this->assertEquals('Test@example.com', $this->batch->getAddress('TeST@example.com')->getEmail());
-        $this->assertNull($this->batch->getAddress('Another@example.com'));
+        self::assertEquals('Test@example.com', $this->batch->getAddress('TeST@example.com')->getEmail());
+        self::assertNull($this->batch->getAddress('Another@example.com'));
 
         $this->expectException(\LogicException::class);
         $this->batch->addAddress($this->addressManager->newEmailAddress()->setEmail('TEST@example.com'));
     }
 
-    public function testAddFolder()
+    public function testAddFolder(): void
     {
         $folder = new EmailFolder();
         $folder->setType('sent');
         $folder->setName('Test');
         $folder->setFullName('Test');
         $this->batch->addFolder($folder);
-        $this->assertCount(1, ReflectionUtil::getPropertyValue($this->batch, 'folders'));
+        self::assertCount(1, ReflectionUtil::getPropertyValue($this->batch, 'folders'));
 
-        $this->assertEquals('Test', $this->batch->getFolder('sent', 'TeST')->getFullName());
-        $this->assertNull($this->batch->getFolder('sent', 'Another'));
+        self::assertEquals('Test', $this->batch->getFolder('sent', 'TeST')->getFullName());
+        self::assertNull($this->batch->getFolder('sent', 'Another'));
 
         $folder1 = new EmailFolder();
         $folder1->setType('trash');
         $folder1->setName('Test');
         $folder1->setFullName('Test');
         $this->batch->addFolder($folder1);
-        $this->assertCount(2, ReflectionUtil::getPropertyValue($this->batch, 'folders'));
+        self::assertCount(2, ReflectionUtil::getPropertyValue($this->batch, 'folders'));
 
-        $this->assertEquals('Test', $this->batch->getFolder('trash', 'TeST')->getFullName());
-        $this->assertNull($this->batch->getFolder('trash', 'Another'));
+        self::assertEquals('Test', $this->batch->getFolder('trash', 'TeST')->getFullName());
+        self::assertNull($this->batch->getFolder('trash', 'Another'));
 
-        $this->assertSame([$folder, $folder1], $this->batch->getFolders());
+        self::assertSame([$folder, $folder1], $this->batch->getFolders());
     }
 
-    public function testAddFolderWhenItAlreadyExists()
+    public function testAddFolderWhenItAlreadyExists(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The folder "TEST" (type: sent) already exists in the batch.');
@@ -126,10 +119,10 @@ class EmailEntityBatchProcessorTest extends TestCase
      * @dataProvider persistDataProvider
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testPersist(bool $dryRun)
+    public function testPersist(bool $dryRun): void
     {
         $origin = $this->createMock(EmailOrigin::class);
-        $origin->expects($this->any())
+        $origin->expects(self::any())
             ->method('getId')
             ->willReturn(1);
 
@@ -213,11 +206,11 @@ class EmailEntityBatchProcessorTest extends TestCase
         $this->addEmailRecipient($existingEmail, $address);
         $this->addEmailRecipient($existingEmail, $newAddress);
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $folderRepo = $this->createMock(EntityRepository::class);
         $addressRepo = $this->createMock(EntityRepository::class);
         $emailRepo = $this->createMock(EntityRepository::class);
-        $em->expects($this->exactly(3))
+        $em->expects(self::exactly(3))
             ->method('getRepository')
             ->willReturnMap([
                 [EmailFolder::class, $folderRepo],
@@ -225,32 +218,32 @@ class EmailEntityBatchProcessorTest extends TestCase
                 [Email::class, $emailRepo],
             ]);
 
-        $folderRepo->expects($this->exactly(2))
+        $folderRepo->expects(self::exactly(2))
             ->method('findOneBy')
             ->willReturnCallback(function ($c) use (&$dbFolder) {
                 return $c['fullName'] === 'Exist' ? $dbFolder : null;
             });
-        $addressRepo->expects($this->exactly(2))
+        $addressRepo->expects(self::exactly(2))
             ->method('findOneBy')
             ->willReturnCallback(function ($c) use (&$dbAddress) {
                 return $c['email'] === 'Exist' ? $dbAddress : null;
             });
-        $emailRepo->expects($this->once())
+        $emailRepo->expects(self::once())
             ->method('findBy')
             ->with(['messageId' => ['email1', 'email2', 'some_email']])
             ->willReturn([$existingEmail]);
 
         $owner = $this->createMock(EmailOwnerInterface::class);
 
-        $this->ownerProvider->expects($this->any())
+        $this->ownerProvider->expects(self::any())
             ->method('findEmailOwner')
             ->willReturn($owner);
 
         if ($dryRun) {
-            $em->expects($this->never())
+            $em->expects(self::never())
                 ->method('persist');
         } else {
-            $em->expects($this->exactly(6))
+            $em->expects(self::exactly(6))
                 ->method('persist')
                 ->withConsecutive(
                     [$this->identicalTo($newFolder)],
@@ -264,40 +257,40 @@ class EmailEntityBatchProcessorTest extends TestCase
 
         $persistedEntities = $this->batch->persist($em, $dryRun);
 
-        $this->assertSame(
+        self::assertSame(
             [$newFolder, $newAddress, $emailUser1, $emailUser2, $emailUser3, $emailUser4],
             $persistedEntities
         );
 
-        $this->assertCount(1, $email1->getEmailUsers());
-        $this->assertCount(1, $email2->getEmailUsers());
-        $this->assertSame($origin, $emailUser1->getOrigin());
-        $this->assertSame($origin, $emailUser2->getOrigin());
-        $this->assertSame($newFolder, $emailUser2->getFolders()->first());
-        $this->assertSame($dbFolder, $emailUser1->getFolders()->first());
-        $this->assertSame($dbAddress, $email1->getFromEmailAddress());
-        $this->assertNull($email1->getFromEmailAddress()->getOwner());
-        $this->assertSame($newAddress, $email2->getFromEmailAddress());
-        $this->assertSame($owner, $email2->getFromEmailAddress()->getOwner());
+        self::assertCount(1, $email1->getEmailUsers());
+        self::assertCount(1, $email2->getEmailUsers());
+        self::assertSame($origin, $emailUser1->getOrigin());
+        self::assertSame($origin, $emailUser2->getOrigin());
+        self::assertSame($newFolder, $emailUser2->getFolders()->first());
+        self::assertSame($dbFolder, $emailUser1->getFolders()->first());
+        self::assertSame($dbAddress, $email1->getFromEmailAddress());
+        self::assertNull($email1->getFromEmailAddress()->getOwner());
+        self::assertSame($newAddress, $email2->getFromEmailAddress());
+        self::assertSame($owner, $email2->getFromEmailAddress()->getOwner());
         $email1Recipients = $email1->getRecipients();
-        $this->assertSame($dbAddress, $email1Recipients[0]->getEmailAddress());
-        $this->assertNull($email1Recipients[0]->getEmailAddress()->getOwner());
-        $this->assertSame($newAddress, $email1Recipients[1]->getEmailAddress());
-        $this->assertSame($owner, $email1Recipients[1]->getEmailAddress()->getOwner());
+        self::assertSame($dbAddress, $email1Recipients[0]->getEmailAddress());
+        self::assertNull($email1Recipients[0]->getEmailAddress()->getOwner());
+        self::assertSame($newAddress, $email1Recipients[1]->getEmailAddress());
+        self::assertSame($owner, $email1Recipients[1]->getEmailAddress()->getOwner());
         $email2Recipients = $email2->getRecipients();
-        $this->assertSame($dbAddress, $email2Recipients[0]->getEmailAddress());
-        $this->assertNull($email2Recipients[0]->getEmailAddress()->getOwner());
-        $this->assertSame($newAddress, $email2Recipients[1]->getEmailAddress());
-        $this->assertSame($owner, $email2Recipients[1]->getEmailAddress()->getOwner());
+        self::assertSame($dbAddress, $email2Recipients[0]->getEmailAddress());
+        self::assertNull($email2Recipients[0]->getEmailAddress()->getOwner());
+        self::assertSame($newAddress, $email2Recipients[1]->getEmailAddress());
+        self::assertSame($owner, $email2Recipients[1]->getEmailAddress()->getOwner());
 
         $changes = $this->batch->getChanges();
-        $this->assertCount(3, $changes);
-        $this->assertSame($folder, $changes[0]['old']);
-        $this->assertSame($dbFolder, $changes[0]['new']);
-        $this->assertSame($email3, $changes[1]['old']);
-        $this->assertSame($existingEmail, $changes[1]['new']);
-        $this->assertSame($email4, $changes[2]['old']);
-        $this->assertSame($existingEmail, $changes[2]['new']);
+        self::assertCount(3, $changes);
+        self::assertSame($folder, $changes[0]['old']);
+        self::assertSame($dbFolder, $changes[0]['new']);
+        self::assertSame($email3, $changes[1]['old']);
+        self::assertSame($existingEmail, $changes[1]['new']);
+        self::assertSame($email4, $changes[2]['old']);
+        self::assertSame($existingEmail, $changes[2]['new']);
     }
 
     public function persistDataProvider(): array

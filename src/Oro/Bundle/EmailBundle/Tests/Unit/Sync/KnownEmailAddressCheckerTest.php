@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Sync;
 
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
@@ -13,45 +13,36 @@ use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressChecker;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class KnownEmailAddressCheckerTest extends \PHPUnit\Framework\TestCase
+class KnownEmailAddressCheckerTest extends TestCase
 {
     private const EMAIL_ADDRESS_PROXY_CLASS = 'Entity\TestEmailAddress';
     private const TEST_CONTACT_CLASS = 'Entity\TestContact';
     private const USER_CLASS = User::class;
     private const MAILBOX_CLASS = Mailbox::class;
 
-    // @codingStandardsIgnoreStart
-    private const QB_SELECT = 'a.email,IDENTITY(a.userId) AS userId,IDENTITY(a.contactId) AS contactId,IDENTITY(a.mailboxId) AS mailboxId';
-    // @codingStandardsIgnoreStop
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var EmailAddressManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailAddressManager;
-
-    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailAddressRepository;
-
-    /** @var KnownEmailAddressChecker */
-    private $checker;
+    private LoggerInterface&MockObject $logger;
+    private EntityManagerInterface&MockObject $em;
+    private EmailAddressManager&MockObject $emailAddressManager;
+    private EntityRepository&MockObject $emailAddressRepository;
+    private KnownEmailAddressChecker $checker;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->logger = $this->createMock(LoggerInterface::class);
-        $this->em = $this->createMock(EntityManager::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
         $this->emailAddressManager = $this->createMock(EmailAddressManager::class);
         $this->emailAddressRepository = $this->createMock(EntityRepository::class);
-        $this->emailAddressManager->expects($this->any())
+
+        $this->emailAddressManager->expects(self::any())
             ->method('getEmailAddressRepository')
+            ->with(self::identicalTo($this->em))
             ->willReturn($this->emailAddressRepository);
-        $this->emailAddressManager->expects($this->any())
+        $this->emailAddressManager->expects(self::any())
             ->method('getEmailAddressProxyClass')
             ->willReturn(self::EMAIL_ADDRESS_PROXY_CLASS);
 
@@ -65,7 +56,7 @@ class KnownEmailAddressCheckerTest extends \PHPUnit\Framework\TestCase
         $this->checker->setLogger($this->logger);
     }
 
-    public function testCheckEmailAddressWithUserExclusion()
+    public function testCheckEmailAddressWithUserExclusion(): void
     {
         $emailOwnerProviderStorage = $this->getEmailOwnerProviderStorage();
 
@@ -91,23 +82,23 @@ class KnownEmailAddressCheckerTest extends \PHPUnit\Framework\TestCase
                 'user@test.com'    => 'user@test.com'
             ]
         );
-        $queryBuilder->expects($this->never())
+        $queryBuilder->expects(self::never())
             ->method('andWhere');
 
-        $this->emailAddressRepository->expects($this->once())
+        $this->emailAddressRepository->expects(self::once())
             ->method('createQueryBuilder')
             ->with('a')
             ->willReturn($queryBuilder);
 
         $checker->preLoadEmailAddresses(['contact@test.com', 'user@test.com']);
-        $this->assertTrue($checker->isAtLeastOneKnownEmailAddress('contact@test.com'));
-        $this->assertFalse($checker->isAtLeastOneKnownEmailAddress('user@test.com'));
-        $this->assertFalse($checker->isAtLeastOneUserEmailAddress(1, 'contact@test.com'));
-        $this->assertTrue($checker->isAtLeastOneUserEmailAddress(1, 'user@test.com'));
-        $this->assertFalse($checker->isAtLeastOneUserEmailAddress(2, 'user@test.com'));
+        self::assertTrue($checker->isAtLeastOneKnownEmailAddress('contact@test.com'));
+        self::assertFalse($checker->isAtLeastOneKnownEmailAddress('user@test.com'));
+        self::assertFalse($checker->isAtLeastOneUserEmailAddress(1, 'contact@test.com'));
+        self::assertTrue($checker->isAtLeastOneUserEmailAddress(1, 'user@test.com'));
+        self::assertFalse($checker->isAtLeastOneUserEmailAddress(2, 'user@test.com'));
     }
 
-    public function testCheckEmailAddressWithContactExclusion()
+    public function testCheckEmailAddressWithContactExclusion(): void
     {
         $emailOwnerProviderStorage = $this->getEmailOwnerProviderStorage();
 
@@ -132,23 +123,23 @@ class KnownEmailAddressCheckerTest extends \PHPUnit\Framework\TestCase
             ],
             'a.email,IDENTITY(a.userId) AS userId,IDENTITY(a.mailboxId) AS mailboxId'
         );
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(self::once())
             ->method('andWhere')
             ->with('a.contactId IS NULL')
             ->willReturnSelf();
 
-        $this->emailAddressRepository->expects($this->once())
+        $this->emailAddressRepository->expects(self::once())
             ->method('createQueryBuilder')
             ->with('a')
             ->willReturn($queryBuilder);
 
         $checker->preLoadEmailAddresses(['user@test.com']);
-        $this->assertTrue($checker->isAtLeastOneKnownEmailAddress('user@test.com'));
-        $this->assertTrue($checker->isAtLeastOneUserEmailAddress(1, 'user@test.com'));
-        $this->assertFalse($checker->isAtLeastOneUserEmailAddress(2, 'user@test.com'));
+        self::assertTrue($checker->isAtLeastOneKnownEmailAddress('user@test.com'));
+        self::assertTrue($checker->isAtLeastOneUserEmailAddress(1, 'user@test.com'));
+        self::assertFalse($checker->isAtLeastOneUserEmailAddress(2, 'user@test.com'));
     }
 
-    public function testIsAtLeastOneKnownEmailAddressSequence()
+    public function testIsAtLeastOneKnownEmailAddressSequence(): void
     {
         $query1 = $this->getLoadEmailAddressesQuery(
             [
@@ -165,7 +156,7 @@ class KnownEmailAddressCheckerTest extends \PHPUnit\Framework\TestCase
                 '4@test.com' => '4@test.com'
             ]
         );
-        $queryBuilder1->expects($this->never())
+        $queryBuilder1->expects(self::never())
             ->method('andWhere');
 
         $query2 = $this->getLoadEmailAddressesQuery(
@@ -180,33 +171,33 @@ class KnownEmailAddressCheckerTest extends \PHPUnit\Framework\TestCase
                 '11@test.com' => '11@test.com'
             ]
         );
-        $queryBuilder2->expects($this->never())
+        $queryBuilder2->expects(self::never())
             ->method('andWhere');
 
-        $this->emailAddressRepository->expects($this->exactly(2))
+        $this->emailAddressRepository->expects(self::exactly(2))
             ->method('createQueryBuilder')
             ->willReturnOnConsecutiveCalls($queryBuilder1, $queryBuilder2);
 
-        $this->assertTrue(
+        self::assertTrue(
             $this->checker->isAtLeastOneKnownEmailAddress(
                 '1@test.com',
                 ['2@test.com', '3@test.com'],
                 ['2@test.com', '4@test.com']
             )
         );
-        $this->assertTrue(
+        self::assertTrue(
             $this->checker->isAtLeastOneKnownEmailAddress('1@test.com')
         );
-        $this->assertFalse(
+        self::assertFalse(
             $this->checker->isAtLeastOneKnownEmailAddress('2@test.com')
         );
-        $this->assertTrue(
+        self::assertTrue(
             $this->checker->isAtLeastOneKnownEmailAddress('2@test.com', '10@test.com', '11@test.com')
         );
-        $this->assertFalse(
+        self::assertFalse(
             $this->checker->isAtLeastOneKnownEmailAddress('2@test.com', '10@test.com')
         );
-        $this->assertTrue(
+        self::assertTrue(
             $this->checker->isAtLeastOneKnownEmailAddress('2@test.com', '20@test.com', '1@test.com')
         );
     }
@@ -219,7 +210,7 @@ class KnownEmailAddressCheckerTest extends \PHPUnit\Framework\TestCase
         array $emailsToLoad,
         array $queryResult,
         array $expected
-    ) {
+    ): void {
         $query = $this->getLoadEmailAddressesQuery(
             $queryResult
         );
@@ -227,10 +218,10 @@ class KnownEmailAddressCheckerTest extends \PHPUnit\Framework\TestCase
             $query,
             $emailsToLoad
         );
-        $queryBuilder->expects($this->never())
+        $queryBuilder->expects(self::never())
             ->method('andWhere');
 
-        $this->emailAddressRepository->expects($this->once())
+        $this->emailAddressRepository->expects(self::once())
             ->method('createQueryBuilder')
             ->with('a')
             ->willReturn($queryBuilder);
@@ -238,9 +229,9 @@ class KnownEmailAddressCheckerTest extends \PHPUnit\Framework\TestCase
         $this->checker->isAtLeastOneKnownEmailAddress($emailAddress);
 
         foreach ($expected as $email => $expectedResult) {
-            $this->assertSame($expectedResult, $this->checker->isAtLeastOneKnownEmailAddress($email));
+            self::assertSame($expectedResult, $this->checker->isAtLeastOneKnownEmailAddress($email));
             // check that result is cached
-            $this->assertSame($expectedResult, $this->checker->isAtLeastOneKnownEmailAddress($email));
+            self::assertSame($expectedResult, $this->checker->isAtLeastOneKnownEmailAddress($email));
         }
     }
 
@@ -285,7 +276,7 @@ class KnownEmailAddressCheckerTest extends \PHPUnit\Framework\TestCase
         array $emailsToLoad,
         array $queryResult,
         array $expected
-    ) {
+    ): void {
         $query = $this->getLoadEmailAddressesQuery(
             $queryResult
         );
@@ -293,10 +284,10 @@ class KnownEmailAddressCheckerTest extends \PHPUnit\Framework\TestCase
             $query,
             $emailsToLoad
         );
-        $queryBuilder->expects($this->never())
+        $queryBuilder->expects(self::never())
             ->method('andWhere');
 
-        $this->emailAddressRepository->expects($this->once())
+        $this->emailAddressRepository->expects(self::once())
             ->method('createQueryBuilder')
             ->with('a')
             ->willReturn($queryBuilder);
@@ -304,11 +295,11 @@ class KnownEmailAddressCheckerTest extends \PHPUnit\Framework\TestCase
         $this->checker->isAtLeastOneUserEmailAddress(1, $emailAddress);
 
         foreach ($expected as $email => $expectedResult) {
-            $this->assertSame($expectedResult, $this->checker->isAtLeastOneUserEmailAddress(1, $email));
+            self::assertSame($expectedResult, $this->checker->isAtLeastOneUserEmailAddress(1, $email));
             // check that result is cached
-            $this->assertSame($expectedResult, $this->checker->isAtLeastOneUserEmailAddress(1, $email));
+            self::assertSame($expectedResult, $this->checker->isAtLeastOneUserEmailAddress(1, $email));
             // check for other user
-            $this->assertFalse($this->checker->isAtLeastOneUserEmailAddress(2, $email));
+            self::assertFalse($this->checker->isAtLeastOneUserEmailAddress(2, $email));
         }
     }
 
@@ -348,25 +339,25 @@ class KnownEmailAddressCheckerTest extends \PHPUnit\Framework\TestCase
     private function getEmailOwnerProviderStorage(): EmailOwnerProviderStorage
     {
         $userProvider = $this->createMock(EmailOwnerProviderInterface::class);
-        $userProvider->expects($this->any())
+        $userProvider->expects(self::any())
             ->method('getEmailOwnerClass')
             ->willReturn(self::USER_CLASS);
 
         $contactProvider = $this->createMock(EmailOwnerProviderInterface::class);
-        $contactProvider->expects($this->any())
+        $contactProvider->expects(self::any())
             ->method('getEmailOwnerClass')
             ->willReturn(self::TEST_CONTACT_CLASS);
 
         $mailboxProvider = $this->createMock(EmailOwnerProviderInterface::class);
-        $mailboxProvider->expects($this->any())
+        $mailboxProvider->expects(self::any())
             ->method('getEmailOwnerClass')
             ->willReturn(self::MAILBOX_CLASS);
 
         $emailOwnerProviderStorage = $this->createMock(EmailOwnerProviderStorage::class);
-        $emailOwnerProviderStorage->expects($this->any())
+        $emailOwnerProviderStorage->expects(self::any())
             ->method('getProviders')
             ->willReturn([$userProvider, $contactProvider, $mailboxProvider]);
-        $emailOwnerProviderStorage->expects($this->any())
+        $emailOwnerProviderStorage->expects(self::any())
             ->method('getEmailOwnerFieldName')
             ->willReturnMap([
                 [$userProvider, 'userId'],
@@ -377,31 +368,32 @@ class KnownEmailAddressCheckerTest extends \PHPUnit\Framework\TestCase
         return $emailOwnerProviderStorage;
     }
 
-    /**
-     * @return QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
-     */
     private function getLoadEmailAddressesQueryBuilder(
         AbstractQuery $query,
         array $emailsToLoad,
-        string $select = self::QB_SELECT
-    ) {
+        ?string $select = null
+    ): QueryBuilder&MockObject {
+        if (null === $select) {
+            $select = 'a.email,IDENTITY(a.userId) AS userId,'
+                . 'IDENTITY(a.contactId) AS contactId,IDENTITY(a.mailboxId) AS mailboxId';
+        }
         $queryBuilder = $this->createMock(QueryBuilder::class);
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(self::once())
             ->method('select')
             ->with($select)
             ->willReturnSelf();
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(self::once())
             ->method('where')
             ->with('a.hasOwner = :hasOwner AND a.email IN (:emails)')
             ->willReturnSelf();
-        $queryBuilder->expects($this->exactly(2))
+        $queryBuilder->expects(self::exactly(2))
             ->method('setParameter')
             ->withConsecutive(
                 ['hasOwner', true],
                 ['emails', $emailsToLoad]
             )
             ->willReturnSelf();
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(self::once())
             ->method('getQuery')
             ->willReturn($query);
 
@@ -411,7 +403,7 @@ class KnownEmailAddressCheckerTest extends \PHPUnit\Framework\TestCase
     private function getLoadEmailAddressesQuery(array $result): AbstractQuery
     {
         $query = $this->createMock(AbstractQuery::class);
-        $query->expects($this->once())
+        $query->expects(self::once())
             ->method('getArrayResult')
             ->willReturn($result);
 

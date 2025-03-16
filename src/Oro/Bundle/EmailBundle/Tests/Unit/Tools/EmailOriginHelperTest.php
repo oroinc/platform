@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Tools;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
@@ -23,22 +23,15 @@ use PHPUnit\Framework\TestCase;
 
 class EmailOriginHelperTest extends TestCase
 {
-    /** @var EntityManager|MockObject */
-    private $em;
-
-    /** @var Email|MockObject */
-    private $emailModel;
-
-    /** @var EmailOwnerProvider|MockObject */
-    private $emailOwnerProvider;
-
-    /** @var EmailOriginHelper */
-    private $emailOriginHelper;
+    private EntityManagerInterface&MockObject $em;
+    private Email&MockObject $emailModel;
+    private EmailOwnerProvider&MockObject $emailOwnerProvider;
+    private EmailOriginHelper $emailOriginHelper;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManager::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
         $this->emailModel = $this->createMock(Email::class);
         $this->emailOwnerProvider = $this->createMock(EmailOwnerProvider::class);
 
@@ -51,7 +44,7 @@ class EmailOriginHelperTest extends TestCase
         $organization = new Organization();
         $organization->setId(1);
         $tokenAccessor = $this->createMock(TokenAccessorInterface::class);
-        $tokenAccessor->expects($this->any())
+        $tokenAccessor->expects(self::any())
             ->method('getOrganization')
             ->willReturn($organization);
 
@@ -63,7 +56,7 @@ class EmailOriginHelperTest extends TestCase
         );
     }
 
-    public function testGetEmailOriginFromSecurity()
+    public function testGetEmailOriginFromSecurity(): void
     {
         $email = 'test';
         $organization = null;
@@ -71,24 +64,24 @@ class EmailOriginHelperTest extends TestCase
         $expectedOrigin = new \stdClass();
         $owner = $this->createMock(EmailOwnerInterface::class);
 
-        $this->emailOwnerProvider->expects($this->once())
+        $this->emailOwnerProvider->expects(self::once())
             ->method('findEmailOwners')
             ->willReturn([$owner]);
         $entityRepository = $this->createMock(EntityRepository::class);
-        $entityRepository->expects($this->once())
+        $entityRepository->expects(self::once())
             ->method('findOneBy')
             ->willReturn($expectedOrigin);
-        $this->em->expects($this->once())
+        $this->em->expects(self::once())
             ->method('getRepository')
             ->willReturn($entityRepository);
 
-        $this->assertEquals(
+        self::assertEquals(
             $expectedOrigin,
             $this->emailOriginHelper->getEmailOrigin($email, $organization, $originName)
         );
     }
 
-    public function testGetEmailOriginCache()
+    public function testGetEmailOriginCache(): void
     {
         $email = 'test';
         $organization = null;
@@ -96,39 +89,39 @@ class EmailOriginHelperTest extends TestCase
         $expectedOrigin = new \stdClass();
         $owner = $this->createMock(EmailOwnerInterface::class);
 
-        $this->emailOwnerProvider->expects($this->exactly(2))
+        $this->emailOwnerProvider->expects(self::exactly(2))
             ->method('findEmailOwners')
             ->willReturn([$owner]);
         $entityRepository = $this->createMock(EntityRepository::class);
-        $entityRepository->expects($this->exactly(2))
+        $entityRepository->expects(self::exactly(2))
             ->method('findOneBy')
             ->willReturnOnConsecutiveCalls(
                 $expectedOrigin,
                 null
             );
-        $this->em->expects($this->exactly(2))
+        $this->em->expects(self::exactly(2))
             ->method('getRepository')
             ->willReturn($entityRepository);
 
-        $this->assertSame(
+        self::assertSame(
             $expectedOrigin,
             $this->emailOriginHelper->getEmailOrigin($email, $organization, $originName)
         );
 
-        $this->assertInstanceOf(
+        self::assertInstanceOf(
             InternalEmailOrigin::class,
             $this->emailOriginHelper->getEmailOrigin($email, $organization, $originName, false)
         );
     }
 
-    public function testFindEmailOriginForUserOwnerAndWithUseEmailOriginAndOriginIsNotEmpty()
+    public function testFindEmailOriginForUserOwnerAndWithUseEmailOriginAndOriginIsNotEmpty(): void
     {
         $origin = $this->createMock(UserEmailOrigin::class);
         $emailOwner = $this->createMock(User::class);
         $organization = $this->createMock(OrganizationInterface::class);
         $originName = 'origin name';
 
-        $origin->expects($this->once())
+        $origin->expects(self::once())
             ->method('getOrganization')
             ->willReturn($organization);
         $origin->expects(self::once())
@@ -149,14 +142,14 @@ class EmailOriginHelperTest extends TestCase
         );
     }
 
-    public function testFindEmailOriginForMailboxOwnerAndWithUseEmailOriginAndOriginIsNotEmpty()
+    public function testFindEmailOriginForMailboxOwnerAndWithUseEmailOriginAndOriginIsNotEmpty(): void
     {
         $origin = $this->createMock(Mailbox::class);
         $emailOwner = $this->createMock(Mailbox::class);
         $organization = $this->createMock(OrganizationInterface::class);
         $originName = 'origin name';
 
-        $origin->expects($this->never())
+        $origin->expects(self::never())
             ->method('getOrganization');
 
         $emailOwner->expects(self::once())
@@ -170,14 +163,14 @@ class EmailOriginHelperTest extends TestCase
         );
     }
 
-    public function testFindEmailOriginForUserOwnerAndWithUseEmailOriginAndOriginIsEmpty()
+    public function testFindEmailOriginForUserOwnerAndWithUseEmailOriginAndOriginIsEmpty(): void
     {
         $origin = $this->createMock(InternalEmailOrigin::class);
         $emailOwner = $this->createMock(User::class);
         $organization = $this->createMock(OrganizationInterface::class);
         $originName = 'origin name';
 
-        $origin->expects($this->once())
+        $origin->expects(self::once())
             ->method('getOrganization')
             ->willReturn($organization);
 
@@ -192,14 +185,14 @@ class EmailOriginHelperTest extends TestCase
         );
     }
 
-    public function testFindEmailOriginForMailboxOwnerAndWithUseEmailOriginAndOriginIsEmpty()
+    public function testFindEmailOriginForMailboxOwnerAndWithUseEmailOriginAndOriginIsEmpty(): void
     {
         $origin = $this->createMock(Mailbox::class);
         $emailOwner = $this->createMock(Mailbox::class);
         $organization = $this->createMock(OrganizationInterface::class);
         $originName = 'origin name';
 
-        $origin->expects($this->never())
+        $origin->expects(self::never())
             ->method('getOrganization');
 
         $emailOwner->expects(self::once())
@@ -212,14 +205,14 @@ class EmailOriginHelperTest extends TestCase
         );
     }
 
-    public function testFindEmailOriginForUserOwnerAndWithoutUseEmailOriginAndOriginIsNotEmpty()
+    public function testFindEmailOriginForUserOwnerAndWithoutUseEmailOriginAndOriginIsNotEmpty(): void
     {
         $origin = $this->createMock(UserEmailOrigin::class);
         $emailOwner = $this->createMock(User::class);
         $organization = $this->createMock(OrganizationInterface::class);
         $originName = 'origin name';
 
-        $origin->expects($this->once())
+        $origin->expects(self::once())
             ->method('getOrganization')
             ->willReturn($organization);
 
@@ -236,14 +229,14 @@ class EmailOriginHelperTest extends TestCase
         );
     }
 
-    public function testFindEmailOriginForMailboxOwnerAndWithoutUseEmailOriginAndOriginIsNotEmpty()
+    public function testFindEmailOriginForMailboxOwnerAndWithoutUseEmailOriginAndOriginIsNotEmpty(): void
     {
         $origin = $this->createMock(Mailbox::class);
         $emailOwner = $this->createMock(Mailbox::class);
         $organization = $this->createMock(OrganizationInterface::class);
         $originName = 'origin name';
 
-        $origin->expects($this->never())
+        $origin->expects(self::never())
             ->method('getOrganization');
 
         $emailOwner->expects(self::once())
@@ -257,14 +250,14 @@ class EmailOriginHelperTest extends TestCase
         );
     }
 
-    public function testFindEmailOriginForUserOwnerAndWithoutUseEmailOriginAndOriginIsEmpty()
+    public function testFindEmailOriginForUserOwnerAndWithoutUseEmailOriginAndOriginIsEmpty(): void
     {
         $origin = $this->createMock(UserEmailOrigin::class);
         $emailOwner = $this->createMock(User::class);
         $organization = $this->createMock(OrganizationInterface::class);
         $originName = 'origin name';
 
-        $origin->expects($this->once())
+        $origin->expects(self::once())
             ->method('getOrganization')
             ->willReturn($organization);
 
@@ -281,14 +274,14 @@ class EmailOriginHelperTest extends TestCase
         );
     }
 
-    public function testFindEmailOriginForMailboxOwnerAndWithoutUseEmailOriginAndOriginIsEmpty()
+    public function testFindEmailOriginForMailboxOwnerAndWithoutUseEmailOriginAndOriginIsEmpty(): void
     {
         $origin = $this->createMock(Mailbox::class);
         $emailOwner = $this->createMock(Mailbox::class);
         $organization = $this->createMock(OrganizationInterface::class);
         $originName = 'origin name';
 
-        $origin->expects($this->never())
+        $origin->expects(self::never())
             ->method('getOrganization');
 
         $emailOwner->expects(self::once())

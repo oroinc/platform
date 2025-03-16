@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Manager;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Entity\File;
@@ -13,34 +13,23 @@ use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Validator\ConstraintViolationList;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class EmailAttachmentManagerTest extends \PHPUnit\Framework\TestCase
+class EmailAttachmentManagerTest extends TestCase
 {
-    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileManager;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
-
-    /** @var ConfigFileValidator|\PHPUnit\Framework\MockObject\MockObject */
-    private $configFileValidator;
-
-    /** @var AttachmentAssociationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $attachmentAssociationHelper;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var EmailAttachmentManager */
-    private $emailAttachmentManager;
+    private FileManager&MockObject $fileManager;
+    private ManagerRegistry&MockObject $doctrine;
+    private RouterInterface&MockObject $router;
+    private ConfigFileValidator&MockObject $configFileValidator;
+    private AttachmentAssociationHelper&MockObject $attachmentAssociationHelper;
+    private EntityManagerInterface&MockObject $em;
+    private EmailAttachmentManager $emailAttachmentManager;
 
     #[\Override]
     protected function setUp(): void
@@ -50,9 +39,9 @@ class EmailAttachmentManagerTest extends \PHPUnit\Framework\TestCase
         $this->router = $this->createMock(RouterInterface::class);
         $this->configFileValidator = $this->createMock(ConfigFileValidator::class);
         $this->attachmentAssociationHelper = $this->createMock(AttachmentAssociationHelper::class);
-        $this->em = $this->createMock(EntityManager::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
 
-        $this->doctrine->expects($this->any())
+        $this->doctrine->expects(self::any())
             ->method('getManagerForClass')
             ->with(Attachment::class)
             ->willReturn($this->em);
@@ -69,10 +58,10 @@ class EmailAttachmentManagerTest extends \PHPUnit\Framework\TestCase
     private function getContentMock()
     {
         $content = $this->createMock(EmailAttachmentContent::class);
-        $content->expects($this->any())
+        $content->expects(self::any())
             ->method('getContent')
             ->willReturn('content');
-        $content->expects($this->any())
+        $content->expects(self::any())
             ->method('getContentTransferEncoding')
             ->willReturn('base64');
 
@@ -85,44 +74,44 @@ class EmailAttachmentManagerTest extends \PHPUnit\Framework\TestCase
             ->onlyMethods(['getContent', 'setFile', 'getFile', 'getId'])
             ->disableOriginalConstructor()
             ->getMock();
-        $emailAttachment->expects($this->any())
+        $emailAttachment->expects(self::any())
             ->method('getContent')
             ->willReturn($this->getContentMock());
-        $emailAttachment->expects($this->any())
+        $emailAttachment->expects(self::any())
             ->method('getId')
             ->willReturn(1);
 
         return $emailAttachment;
     }
 
-    public function testLinkEmailAttachmentToTargetEntityNotValid()
+    public function testLinkEmailAttachmentToTargetEntityNotValid(): void
     {
         $file = $this->getMockBuilder(File::class)
             ->onlyMethods(['getFilename'])
             ->getMock();
         $countable = $this->createMock(ConstraintViolationList::class);
-        $countable->expects($this->never())
+        $countable->expects(self::never())
             ->method('count')
             ->willReturn(2);
 
-        $this->configFileValidator->expects($this->never())
+        $this->configFileValidator->expects(self::never())
             ->method('validate')
             ->willReturn($countable);
 
         $emailAttachment = $this->getEmailAttachment();
 
-        $emailAttachment->expects($this->any())
+        $emailAttachment->expects(self::any())
             ->method('getFile')
             ->willReturn($file);
 
         $this->emailAttachmentManager->linkEmailAttachmentToTargetEntity($emailAttachment, new SomeEntity());
     }
 
-    public function testGetResizedImageUrl()
+    public function testGetResizedImageUrl(): void
     {
         $emailAttachment = $this->getEmailAttachment();
 
-        $this->router->expects($this->once())
+        $this->router->expects(self::once())
             ->method('generate')
             ->with(
                 'oro_resize_email_attachment',

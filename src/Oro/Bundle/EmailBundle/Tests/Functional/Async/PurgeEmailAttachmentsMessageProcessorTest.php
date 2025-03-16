@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional\Async;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EmailBundle\Async\PurgeEmailAttachmentsMessageProcessor;
 use Oro\Bundle\EmailBundle\Async\Topic\PurgeEmailAttachmentsTopic;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
@@ -18,38 +17,7 @@ class PurgeEmailAttachmentsMessageProcessorTest extends WebTestCase
     #[\Override]
     protected function setUp(): void
     {
-        $this->initClient([], $this->generateBasicAuthHeader());
-    }
-
-    public function testCouldBeConstructedByContainer()
-    {
-        $service = $this->getContainer()->get('oro_email.async.purge_email_attachments');
-
-        $this->assertInstanceOf(PurgeEmailAttachmentsMessageProcessor::class, $service);
-    }
-
-    public function testShouldPurgeAllEmailAttachments()
-    {
-        $this->createEmailAttachmentWithContent('a');
-        $this->createEmailAttachmentWithContent('aa');
-        $this->createEmailAttachmentWithContent('aaa');
-
-        $allAttachments = $this->getEntityManager()->getRepository(EmailAttachment::class)->findAll();
-        $this->assertCount(3, $allAttachments);
-
-        $this->ajaxRequest('POST', $this->getUrl('oro_email_purge_emails_attachments'));
-
-        self::assertEquals(200, $this->client->getResponse()->getStatusCode());
-
-        self::consume();
-
-        $processedMessages = self::getProcessedMessagesByTopic(PurgeEmailAttachmentsTopic::getName());
-
-        self::assertNotEmpty($processedMessages);
-
-        foreach ($processedMessages as $processedMessage) {
-            $this->assertEquals(MessageProcessorInterface::ACK, $processedMessage['context']->getStatus());
-        }
+        $this->initClient([], self::generateBasicAuthHeader());
     }
 
     private function createEmailAttachmentWithContent(string $content): EmailAttachment
@@ -63,14 +31,41 @@ class PurgeEmailAttachmentsMessageProcessorTest extends WebTestCase
         $attachment->setFileName('filename');
         $attachment->setContentType('content-type');
 
-        $this->getEntityManager()->persist($attachment);
-        $this->getEntityManager()->flush();
+        $em = self::getContainer()->get('doctrine')->getManagerForClass(EmailAttachment::class);
+        $em->persist($attachment);
+        $em->flush();
 
         return $attachment;
     }
 
-    private function getEntityManager(): EntityManagerInterface
+    public function testCouldBeConstructedByContainer(): void
     {
-        return $this->getContainer()->get('doctrine')->getManagerForClass(EmailAttachment::class);
+        $service = self::getContainer()->get('oro_email.async.purge_email_attachments');
+
+        self::assertInstanceOf(PurgeEmailAttachmentsMessageProcessor::class, $service);
+    }
+
+    public function testShouldPurgeAllEmailAttachments(): void
+    {
+        $this->createEmailAttachmentWithContent('a');
+        $this->createEmailAttachmentWithContent('aa');
+        $this->createEmailAttachmentWithContent('aaa');
+
+        $allAttachments = self::getContainer()->get('doctrine')->getRepository(EmailAttachment::class)->findAll();
+        self::assertCount(3, $allAttachments);
+
+        $this->ajaxRequest('POST', $this->getUrl('oro_email_purge_emails_attachments'));
+
+        self::assertEquals(200, $this->client->getResponse()->getStatusCode());
+
+        self::consume();
+
+        $processedMessages = self::getProcessedMessagesByTopic(PurgeEmailAttachmentsTopic::getName());
+
+        self::assertNotEmpty($processedMessages);
+
+        foreach ($processedMessages as $processedMessage) {
+            self::assertEquals(MessageProcessorInterface::ACK, $processedMessage['context']->getStatus());
+        }
     }
 }

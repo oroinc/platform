@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Provider;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
@@ -21,65 +21,57 @@ use PHPUnit\Framework\TestCase;
 
 class ImapEmailAttachmentLoaderTest extends TestCase
 {
-    /** @var ImapEmailManagerFactory|MockObject*/
-    private $imapEmailManagerFactory;
-
-    /** @var EntityManager|MockObject */
-    private $entityManager;
-
-    /** @var EmailDTO|MockObject */
-    private $emailDTO;
-
-    /** @var ImapEmailAttachmentLoader  */
-    private $imapEmailAttachmentLoader;
+    private ImapEmailManagerFactory&MockObject $imapEmailManagerFactory;
+    private ManagerRegistry&MockObject $doctrine;
+    private ImapEmailAttachmentLoader $imapEmailAttachmentLoader;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->imapEmailManagerFactory = $this->createMock(ImapEmailManagerFactory::class);
-        $this->entityManager = $this->createMock(EntityManager::class);
-        $imapEmailRepository = $this->createMock(ImapEmailRepository::class);
-        $imapEmail = $this->createMock(ImapEmail::class);
-        $this->emailDTO = $this->createMock(EmailDTO::class);
-        $imapEmailManager = $this->createMock(ImapEmailManager::class);
-        $imapEmailFolder = $this->createMock(ImapEmailFolder::class);
-        $emailFolder = $this->createMock(EmailFolder::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+
+        $emailDTO = $this->createMock(EmailDTO::class);
         $emailOrigin = $this->createMock(UserEmailOrigin::class);
 
-        $this->entityManager->expects($this->once())
+        $emailFolder = $this->createMock(EmailFolder::class);
+        $emailFolder->expects(self::once())
+            ->method('getOrigin')
+            ->willReturn($emailOrigin);
+
+        $imapEmailFolder = $this->createMock(ImapEmailFolder::class);
+        $imapEmailFolder->expects(self::once())
+            ->method('getFolder')
+            ->willReturn($emailFolder);
+
+        $imapEmail = $this->createMock(ImapEmail::class);
+        $imapEmail->expects(self::once())
+            ->method('getUid')
+            ->willReturn('uuid');
+        $imapEmail->expects(self::once())
+            ->method('getImapFolder')
+            ->willReturn($imapEmailFolder);
+
+        $imapEmailRepository = $this->createMock(ImapEmailRepository::class);
+        $imapEmailRepository->expects(self::once())
+            ->method('findOneBy')
+            ->willReturn($imapEmail);
+
+        $this->doctrine->expects(self::once())
             ->method('getRepository')
             ->with(ImapEmail::class)
             ->willReturn($imapEmailRepository);
 
-        $imapEmailRepository->expects($this->once())
-            ->method('findOneBy')
-            ->willReturn($imapEmail);
+        $imapEmailManager = $this->createMock(ImapEmailManager::class);
+        $imapEmailManager->expects(self::once())
+            ->method('findEmail')
+            ->with('uuid')
+            ->willReturn($emailDTO);
 
-        $imapEmail->expects($this->once())
-            ->method('getImapFolder')
-            ->willReturn($imapEmailFolder);
-
-        $imapEmail->expects($this->once())
-            ->method('getUid')
-            ->willReturn('uuid');
-
-        $imapEmailFolder->expects($this->once())
-            ->method('getFolder')
-            ->willReturn($emailFolder);
-
-        $emailFolder->expects($this->once())
-            ->method('getOrigin')
-            ->willReturn($emailOrigin);
-
-        $this->imapEmailManagerFactory->expects($this->once())
+        $this->imapEmailManagerFactory->expects(self::once())
             ->method('getImapEmailManager')
             ->with($emailOrigin)
             ->willReturn($imapEmailManager);
-
-        $imapEmailManager->expects($this->once())
-            ->method('findEmail')
-            ->with('uuid')
-            ->willReturn($this->emailDTO);
 
         $attachment1 = new EmailAttachmentDTO();
         $attachment1->setFileName('fileName1')
@@ -105,35 +97,35 @@ class ImapEmailAttachmentLoaderTest extends TestCase
             ->setContentTransferEncoding('base64')
             ->setContentId('12');
 
-        $this->emailDTO->expects($this->exactly(2))
+        $emailDTO->expects(self::exactly(2))
             ->method('getAttachments')
             ->willReturn([$attachment1, $attachment2, $attachment3]);
 
         $this->imapEmailAttachmentLoader = new ImapEmailAttachmentLoader(
             $this->imapEmailManagerFactory,
-            $this->entityManager,
+            $this->doctrine
         );
     }
 
-    public function testLoadEmailAttachments()
+    public function testLoadEmailAttachments(): void
     {
         $emailBody = new EmailBody();
         $emailBody->setEmail(new Email());
 
         $emailAttachments = $this->imapEmailAttachmentLoader->loadEmailAttachments($emailBody);
-        $this->assertEquals(3, count($emailAttachments));
-        $this->assertEquals('fileName1', $emailAttachments[0]->getFileName());
-        $this->assertEquals('fileName2', $emailAttachments[1]->getFileName());
-        $this->assertEquals('fileName3', $emailAttachments[2]->getFileName());
+        self::assertCount(3, $emailAttachments);
+        self::assertEquals('fileName1', $emailAttachments[0]->getFileName());
+        self::assertEquals('fileName2', $emailAttachments[1]->getFileName());
+        self::assertEquals('fileName3', $emailAttachments[2]->getFileName());
     }
 
-    public function testLoadEmailAttachment()
+    public function testLoadEmailAttachment(): void
     {
         $emailBody = new EmailBody();
         $emailBody->setEmail(new Email());
 
         $emailAttachment = $this->imapEmailAttachmentLoader->loadEmailAttachment($emailBody, 'fileName1');
-        $this->assertInstanceOf(EmailAttachment::class, $emailAttachment);
-        $this->assertEquals('fileName1', $emailAttachment->getFileName());
+        self::assertInstanceOf(EmailAttachment::class, $emailAttachment);
+        self::assertEquals('fileName1', $emailAttachment->getFileName());
     }
 }

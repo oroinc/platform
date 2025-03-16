@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
@@ -24,32 +24,19 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\ORM\Mocks\UnitOfWorkMock;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityListenerTest extends \PHPUnit\Framework\TestCase
+class EntityListenerTest extends TestCase
 {
-    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $producer;
-
-    /** @var EmailOwnerManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailOwnerManager;
-
-    /** @var EmailThreadManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailThreadManager;
-
-    /** @var EmailActivityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailActivityManager;
-
-    /** @var EmailOwnersProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailOwnersProvider;
-
-    /** @var EmailAddressVisibilityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailAddressVisibilityManager;
-
-    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityRepository;
-
-    /** @var EntityListener */
-    private $listener;
+    private MessageProducerInterface&MockObject $producer;
+    private EmailOwnerManager&MockObject $emailOwnerManager;
+    private EmailThreadManager&MockObject $emailThreadManager;
+    private EmailActivityManager&MockObject $emailActivityManager;
+    private EmailOwnersProvider&MockObject $emailOwnersProvider;
+    private EmailAddressVisibilityManager&MockObject $emailAddressVisibilityManager;
+    private EntityRepository&MockObject $entityRepository;
+    private EntityListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -149,7 +136,7 @@ class EntityListenerTest extends \PHPUnit\Framework\TestCase
             ->willReturn([$updatedEmailAddresses, $createdEmailAddresses, $processedAddresses]);
 
         $metadata = $this->createMock(ClassMetadata::class);
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::exactly(2))
             ->method('getClassMetadata')
             ->willReturn($metadata);
@@ -206,7 +193,7 @@ class EntityListenerTest extends \PHPUnit\Framework\TestCase
         $this->addUpdates($uow, $updatedEmails);
 
         $metadata = $this->createMock(ClassMetadata::class);
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::once())
             ->method('getClassMetadata')
             ->willReturn($metadata);
@@ -270,7 +257,7 @@ class EntityListenerTest extends \PHPUnit\Framework\TestCase
             ->getMock();
 
         $metadata = $this->createMock(ClassMetadata::class);
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::exactly(2))
             ->method('getClassMetadata')
             ->willReturn($metadata);

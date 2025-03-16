@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
@@ -12,23 +12,16 @@ use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 use Oro\Bundle\EmailBundle\Provider\EmailAttachmentProvider;
 use Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EmailAttachmentProviderTest extends \PHPUnit\Framework\TestCase
+class EmailAttachmentProviderTest extends TestCase
 {
-    /** @var EmailThreadProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailThreadProvider;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var AttachmentProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $attachmentProvider;
-
-    /** @var EmailAttachmentTransformer|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailAttachmentTransformer;
-
-    /** @var EmailAttachmentProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailAttachmentProvider;
+    private EmailThreadProvider&MockObject $emailThreadProvider;
+    private ManagerRegistry&MockObject $doctrine;
+    private AttachmentProvider&MockObject $attachmentProvider;
+    private EmailAttachmentTransformer&MockObject $emailAttachmentTransformer;
+    private EmailAttachmentProvider $emailAttachmentProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -59,25 +52,25 @@ class EmailAttachmentProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider threadEmailsProvider
      */
-    public function testGetThreadAttachments(array $threadEmails, int $transformationCalls)
+    public function testGetThreadAttachments(array $threadEmails, int $transformationCalls): void
     {
         $emailEntity = $this->createMock(Email::class);
 
-        $em = $this->createMock(EntityManager::class);
-        $this->doctrine->expects($this->once())
+        $em = $this->createMock(EntityManagerInterface::class);
+        $this->doctrine->expects(self::once())
             ->method('getManager')
             ->willReturn($em);
 
-        $this->emailThreadProvider->expects($this->once())
+        $this->emailThreadProvider->expects(self::once())
             ->method('getThreadEmails')
             ->with($em, $emailEntity)
             ->willReturn($threadEmails);
 
-        $this->emailAttachmentTransformer->expects($this->exactly($transformationCalls))
+        $this->emailAttachmentTransformer->expects(self::exactly($transformationCalls))
             ->method('entityToModel');
 
         $result = $this->emailAttachmentProvider->getThreadAttachments($emailEntity);
-        $this->assertCount($transformationCalls, $result);
+        self::assertCount($transformationCalls, $result);
     }
 
     public function threadEmailsProvider(): array
@@ -87,19 +80,19 @@ class EmailAttachmentProviderTest extends \PHPUnit\Framework\TestCase
         $threadEmailCount = 3;
         for ($i = 0; $i < $threadEmailCount; $i++) {
             $emailBody = $this->createMock(EmailBody::class);
-            $emailBody->expects($this->once())
+            $emailBody->expects(self::once())
                 ->method('getHasAttachments')
                 ->willReturn(true);
 
             $attachments = $this->getAttachments($i + 1);
             $transformationCalls += $i + 1;
 
-            $emailBody->expects($this->once())
+            $emailBody->expects(self::once())
                 ->method('getAttachments')
                 ->willReturn($attachments);
 
             $threadEmail = $this->createMock(Email::class);
-            $threadEmail->expects($this->exactly($threadEmailCount))
+            $threadEmail->expects(self::exactly($threadEmailCount))
                 ->method('getEmailBody')
                 ->willReturn($emailBody);
 
@@ -114,7 +107,7 @@ class EmailAttachmentProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetScopeEntityAttachments()
+    public function testGetScopeEntityAttachments(): void
     {
         $entity = $this->createMock(\stdClass::class);
 
@@ -123,15 +116,15 @@ class EmailAttachmentProviderTest extends \PHPUnit\Framework\TestCase
             $attachments[] = $this->createMock(Attachment::class);
         }
 
-        $this->attachmentProvider->expects($this->once())
+        $this->attachmentProvider->expects(self::once())
             ->method('getEntityAttachments')
             ->with($entity)
             ->willReturn($attachments);
 
-        $this->emailAttachmentTransformer->expects($this->exactly(count($attachments)))
+        $this->emailAttachmentTransformer->expects(self::exactly(count($attachments)))
             ->method('attachmentEntityToModel');
 
         $result = $this->emailAttachmentProvider->getScopeEntityAttachments($entity);
-        $this->assertCount(count($attachments), $result);
+        self::assertCount(count($attachments), $result);
     }
 }

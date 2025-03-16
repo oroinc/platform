@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\EmailBundle\Sync\EmailSyncNotificationAlert;
@@ -17,17 +17,15 @@ use Oro\Bundle\NotificationBundle\NotificationAlert\NotificationAlertManager;
  */
 class UserEmailOriginListener
 {
-    private NotificationAlertManager $notificationAlertManager;
-
-    public function __construct(NotificationAlertManager $notificationAlertManager)
-    {
-        $this->notificationAlertManager = $notificationAlertManager;
+    public function __construct(
+        private NotificationAlertManager $notificationAlertManager
+    ) {
     }
 
     /**
      * Create ImapEmailFolder instances for each newly created EmailFolder related to UserEmailOrigin
      */
-    public function prePersist(UserEmailOrigin $origin, LifecycleEventArgs $event)
+    public function prePersist(UserEmailOrigin $origin, LifecycleEventArgs $event): void
     {
         if (!$origin->getFolders()->isEmpty()) {
             $folders = $origin->getRootFolders();
@@ -58,7 +56,7 @@ class UserEmailOriginListener
         }
     }
 
-    protected function createImapEmailFolders(iterable $folders, EntityManager $em): void
+    private function createImapEmailFolders(iterable $folders, EntityManagerInterface $em): void
     {
         foreach ($folders as $folder) {
             if ($folder->getId() === null) {

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Builder;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Builder\EmailEntityBatchProcessor;
@@ -19,24 +19,19 @@ use Oro\Bundle\EmailBundle\Exception\EmailAddressParseException;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailAddressProxy;
 use Oro\Bundle\EmailBundle\Tests\Unit\Stub\EmailBodyStub;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
+class EmailEntityBuilderTest extends TestCase
 {
-    /** @var EmailEntityBatchProcessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $batch;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var EmailEntityBuilder */
-    private $builder;
+    private EmailEntityBatchProcessor&MockObject $batch;
+    private ManagerRegistry&MockObject $doctrine;
+    private LoggerInterface&MockObject $logger;
+    private EmailEntityBuilder $builder;
 
     #[\Override]
     protected function setUp(): void
@@ -220,7 +215,7 @@ class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
             ->method('getFieldMapping')
             ->with('name')
             ->willReturn(['length' => 100]);
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::once())
             ->method('getClassMetadata')
             ->with(EmailRecipient::class)
@@ -261,7 +256,7 @@ class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
             ->method('getFieldMapping')
             ->with('name')
             ->willReturn(['length' => 100]);
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::once())
             ->method('getClassMetadata')
             ->with(EmailRecipient::class)
@@ -286,7 +281,7 @@ class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
             ->method('getFieldMapping')
             ->with('name')
             ->willReturn(['length' => 100]);
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::once())
             ->method('getClassMetadata')
             ->with(EmailRecipient::class)
@@ -475,7 +470,7 @@ class EmailEntityBuilderTest extends \PHPUnit\Framework\TestCase
             ->method('getFieldMapping')
             ->with('name')
             ->willReturn(['length' => 100]);
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::exactly(2))
             ->method('getClassMetadata')
             ->willReturnMap([

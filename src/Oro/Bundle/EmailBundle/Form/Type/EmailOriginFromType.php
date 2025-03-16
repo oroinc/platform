@@ -7,7 +7,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
 use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 use Oro\Bundle\EmailBundle\Form\DataTransformer\OriginTransformer;
-use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
 use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
 use Oro\Bundle\FormBundle\Form\Type\Select2ChoiceType;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
@@ -18,53 +17,25 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The from type for EmailOrigin entity.
+ */
 class EmailOriginFromType extends AbstractType
 {
-    const NAME = 'oro_email_email_origin_from';
-
-    /** @var TokenAccessorInterface */
-    protected $tokenAccessor;
-
-    /** @var EmailModelBuilderHelper */
-    protected $helper;
-
-    /** @var RelatedEmailsProvider */
-    protected $relatedEmailsProvider;
-
-    /** @var MailboxManager */
-    protected $mailboxManager;
-
-    /** @var ManagerRegistry */
-    protected $registry;
-
-    /** @var EmailOriginHelper */
-    protected $emailOriginHelper;
-
     public function __construct(
-        TokenAccessorInterface $tokenAccessor,
-        RelatedEmailsProvider $relatedEmailsProvider,
-        EmailModelBuilderHelper $helper,
-        MailboxManager $mailboxManager,
-        ManagerRegistry $registry,
-        EmailOriginHelper $emailOriginHelper
+        private TokenAccessorInterface $tokenAccessor,
+        private EmailModelBuilderHelper $helper,
+        private MailboxManager $mailboxManager,
+        private ManagerRegistry $doctrine,
+        private EmailOriginHelper $emailOriginHelper
     ) {
-        $this->tokenAccessor = $tokenAccessor;
-        $this->relatedEmailsProvider = $relatedEmailsProvider;
-        $this->helper = $helper;
-        $this->mailboxManager = $mailboxManager;
-        $this->registry = $registry;
-        $this->emailOriginHelper = $emailOriginHelper;
     }
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addModelTransformer(
-            new OriginTransformer(
-                $this->registry->getManager(),
-                $this->tokenAccessor,
-                $this->emailOriginHelper
-            )
+            new OriginTransformer($this->doctrine, $this->tokenAccessor, $this->emailOriginHelper)
         );
     }
 
@@ -84,74 +55,48 @@ class EmailOriginFromType extends AbstractType
         });
     }
 
-    /**
-     * @return array
-     */
-    protected function createChoices()
-    {
-        $user = $this->tokenAccessor->getUser();
-        if (!$user instanceof User) {
-            return [];
-        }
-        $origins = [];
-        $origins = $this->fillUserOrigins($user, $origins);
-        if (count($origins) === 0) {
-            $origins = $this->fillUserEmails($user, $origins);
-        }
-        $origins = $this->fillMailboxOrigins($user, $origins);
-
-        return $origins;
-    }
-
     #[\Override]
     public function getParent(): ?string
     {
         return Select2ChoiceType::class;
     }
 
-    public function getName()
-    {
-        return $this->getBlockPrefix();
-    }
-
     #[\Override]
     public function getBlockPrefix(): string
     {
-        return static::NAME;
+        return 'oro_email_email_origin_from';
     }
 
-    /**
-     * @param User $user
-     * @param array $origins
-     *
-     * @return array
-     */
-    protected function fillUserOrigins(User $user, $origins)
+    private function createChoices(): array
     {
+        $user = $this->tokenAccessor->getUser();
+        if (!$user instanceof User) {
+            return [];
+        }
+
+        return $this->fillMailboxOrigins($user, $this->fillUserOrigins($user) ?: $this->fillUserEmails($user));
+    }
+
+    private function fillUserOrigins(User $user): array
+    {
+        $origins = [];
         $userOrigins = $user->getEmailOrigins();
         foreach ($userOrigins as $origin) {
-            if ($origin instanceof UserEmailOrigin) {
-                if ($origin->isActive()) {
-                    $owner = $origin->getOwner();
-                    $email = $origin->getOwner()->getEmail();
-                    $this->helper->preciseFullEmailAddress($email, ClassUtils::getClass($owner), $owner->getId());
-                    $origins[$email] = $origin->getId() . '|' . $origin->getOwner()->getEmail();
-                }
+            if (($origin instanceof UserEmailOrigin) && $origin->isActive()) {
+                $owner = $origin->getOwner();
+                $email = $origin->getOwner()->getEmail();
+                $this->helper->preciseFullEmailAddress($email, ClassUtils::getClass($owner), $owner->getId());
+                $origins[$email] = $origin->getId() . '|' . $origin->getOwner()->getEmail();
             }
         }
+
         return $origins;
     }
 
-    /**
-     * @param User $user
-     * @param array $origins
-     * @return array
-     */
-    protected function fillUserEmails(User $user, $origins)
+    private function fillUserEmails(User $user): array
     {
         $email = $user->getEmail();
-        $origins = $this->processFillUserEmail($email, $origins, $user);
-
+        $origins = $this->processFillUserEmail($email, [], $user);
         $userEmails = $user->getEmails();
         foreach ($userEmails as $email) {
             $email = $email->getEmail();
@@ -161,17 +106,10 @@ class EmailOriginFromType extends AbstractType
         return $origins;
     }
 
-    /**
-     * @param string $email
-     * @param array $origins
-     * @param $owner
-     *
-     * @return mixed
-     */
-    protected function processFillUserEmail($email, $origins, $owner = null)
+    private function processFillUserEmail($email, array $origins, ?User  $owner = null): array
     {
         $key = '0|' . $email;
-        if (!array_key_exists($key, $origins)) {
+        if (!\array_key_exists($key, $origins)) {
             if ($owner) {
                 $this->helper->preciseFullEmailAddress($email, ClassUtils::getClass($owner), $owner->getId());
             } else {
@@ -183,13 +121,7 @@ class EmailOriginFromType extends AbstractType
         return $origins;
     }
 
-    /**
-     * @param User $user
-     * @param array $origins
-     *
-     * @return mixed
-     */
-    protected function fillMailboxOrigins(User $user, $origins)
+    private function fillMailboxOrigins(User $user, array $origins): array
     {
         $mailboxes = $this->mailboxManager->findAvailableMailboxes($user, $this->tokenAccessor->getOrganization());
         foreach ($mailboxes as $mailbox) {

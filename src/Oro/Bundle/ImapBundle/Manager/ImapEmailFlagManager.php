@@ -2,38 +2,29 @@
 
 namespace Oro\Bundle\ImapBundle\Manager;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Provider\EmailFlagManagerInterface;
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 use Oro\Bundle\ImapBundle\Connector\ImapConnector;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 
 /**
  * Provides a set of methods to manage flags for IMAP email messages.
- *
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class ImapEmailFlagManager implements EmailFlagManagerInterface
 {
-    const FLAG_UNSEEN = 'UNSEEN';
-    const FLAG_SEEN = '\Seen';
+    public const string FLAG_UNSEEN = 'UNSEEN';
+    public const string FLAG_SEEN = '\Seen';
 
-    /** @var ImapConnector */
-    protected $connector;
-
-    /** @var EntityManager */
-    protected $em;
-
-    public function __construct(ImapConnector $connector, OroEntityManager $em)
-    {
-        $this->connector = $connector;
-        $this->em = $em;
+    public function __construct(
+        private ImapConnector $connector,
+        private EntityManagerInterface $em
+    ) {
     }
 
     #[\Override]
-    public function setFlags(EmailFolder $folder, Email $email, $flags)
+    public function setFlags(EmailFolder $folder, Email $email, array $flags): void
     {
         $repoImapEmail = $this->em->getRepository(ImapEmail::class);
         $uid = $repoImapEmail->getUid($folder->getId(), $email->getId());
@@ -42,13 +33,13 @@ class ImapEmailFlagManager implements EmailFlagManagerInterface
     }
 
     #[\Override]
-    public function setUnseen(EmailFolder $folder, Email $email)
+    public function setUnseen(EmailFolder $folder, Email $email): void
     {
         $this->setFlags($folder, $email, [self::FLAG_UNSEEN]);
     }
 
     #[\Override]
-    public function setSeen(EmailFolder $folder, Email $email)
+    public function setSeen(EmailFolder $folder, Email $email): void
     {
         $this->setFlags($folder, $email, [self::FLAG_SEEN]);
     }

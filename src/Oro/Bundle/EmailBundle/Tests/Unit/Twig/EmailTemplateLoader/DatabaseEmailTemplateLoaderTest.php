@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Twig\EmailTemplateLoader;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate as EmailTemplateEntity;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailTemplateRepository;
@@ -21,42 +21,37 @@ class DatabaseEmailTemplateLoaderTest extends TestCase
 {
     private const LOCALIZATION_ID = 42;
 
-    private TranslatedEmailTemplateProvider $translatedEmailTemplateProvider;
-
+    private TranslatedEmailTemplateProvider&MockObject $translatedEmailTemplateProvider;
+    private EmailTemplateRepository&MockObject $emailTemplateRepo;
+    private EntityManagerInterface&MockObject $entityManager;
     private DatabaseEmailTemplateLoader $loader;
-
-    private EmailTemplateRepository|MockObject $emailTemplateRepo;
 
     #[\Override]
     protected function setUp(): void
     {
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->translatedEmailTemplateProvider = $this->createMock(TranslatedEmailTemplateProvider::class);
-
-        $this->loader = new DatabaseEmailTemplateLoader(
-            $managerRegistry,
-            $this->translatedEmailTemplateProvider
-        );
-
         $this->emailTemplateRepo = $this->createMock(EmailTemplateRepository::class);
-        $managerRegistry
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
             ->method('getRepository')
             ->with(EmailTemplateEntity::class)
             ->willReturn($this->emailTemplateRepo);
-
-        $this->entityManager = $this->createMock(EntityManager::class);
-        $managerRegistry
+        $doctrine->expects(self::any())
             ->method('getManagerForClass')
             ->with(Localization::class)
             ->willReturn($this->entityManager);
+
+        $this->loader = new DatabaseEmailTemplateLoader(
+            $doctrine,
+            $this->translatedEmailTemplateProvider
+        );
     }
 
     public function testExistsWhenNotSupportedNamespace(): void
     {
-        $emailTemplateRepo = $this->createMock(EmailTemplateRepository::class);
-
-        $emailTemplateRepo
-            ->expects(self::never())
+        $this->emailTemplateRepo->expects(self::never())
             ->method('isExist');
 
         self::assertFalse($this->loader->exists('@sample_namespace/sample_name'));
@@ -66,8 +61,7 @@ class DatabaseEmailTemplateLoaderTest extends TestCase
     {
         $name = 'sample_name';
 
-        $this->emailTemplateRepo
-            ->expects(self::once())
+        $this->emailTemplateRepo->expects(self::once())
             ->method('isExist')
             ->with(new EmailTemplateCriteria($name))
             ->willReturn(true);
@@ -80,8 +74,7 @@ class DatabaseEmailTemplateLoaderTest extends TestCase
         $templateName = 'base';
         $name = '@db:/' . $templateName;
 
-        $this->emailTemplateRepo
-            ->expects(self::once())
+        $this->emailTemplateRepo->expects(self::once())
             ->method('isExist')
             ->with(new EmailTemplateCriteria($templateName))
             ->willReturn(true);
@@ -94,8 +87,7 @@ class DatabaseEmailTemplateLoaderTest extends TestCase
         $templateName = 'sample_name';
         $name = '@db:entityName=Acme\Bundle\Entity\SampleEntity&sample_key=sample_value/' . $templateName;
 
-        $this->emailTemplateRepo
-            ->expects(self::once())
+        $this->emailTemplateRepo->expects(self::once())
             ->method('isExist')
             ->with(
                 new EmailTemplateCriteria(
@@ -114,8 +106,7 @@ class DatabaseEmailTemplateLoaderTest extends TestCase
         $templateName = 'sample_name';
         $name = '@db:entityName=Acme\Bundle\Entity\SampleEntity/' . $templateName;
 
-        $this->emailTemplateRepo
-            ->expects(self::once())
+        $this->emailTemplateRepo->expects(self::once())
             ->method('findWithLocalizations')
             ->with(new EmailTemplateCriteria($templateName, 'Acme\Bundle\Entity\SampleEntity'), [])
             ->willReturn(null);
@@ -132,15 +123,13 @@ class DatabaseEmailTemplateLoaderTest extends TestCase
             . self::LOCALIZATION_ID . '/' . $templateName;
 
         $localization = new LocalizationStub(self::LOCALIZATION_ID);
-        $this->entityManager
-            ->expects(self::once())
+        $this->entityManager->expects(self::once())
             ->method('getReference')
             ->with(Localization::class, self::LOCALIZATION_ID)
             ->willReturn($localization);
 
         $emailTemplateEntity = new EmailTemplateEntity();
-        $this->emailTemplateRepo
-            ->expects(self::once())
+        $this->emailTemplateRepo->expects(self::once())
             ->method('findWithLocalizations')
             ->with(
                 new EmailTemplateCriteria(
@@ -152,8 +141,7 @@ class DatabaseEmailTemplateLoaderTest extends TestCase
             ->willReturn($emailTemplateEntity);
 
         $emailTemplateModel = new EmailTemplateModel();
-        $this->translatedEmailTemplateProvider
-            ->expects(self::once())
+        $this->translatedEmailTemplateProvider->expects(self::once())
             ->method('getTranslatedEmailTemplate')
             ->with($emailTemplateEntity, $localization)
             ->willReturn($emailTemplateModel);
@@ -166,8 +154,7 @@ class DatabaseEmailTemplateLoaderTest extends TestCase
         $templateName = 'sample_name';
         $name = '@db:entityName=Acme\Bundle\Entity\SampleEntity/' . $templateName;
 
-        $this->emailTemplateRepo
-            ->expects(self::once())
+        $this->emailTemplateRepo->expects(self::once())
             ->method('findWithLocalizations')
             ->with(new EmailTemplateCriteria($templateName, 'Acme\Bundle\Entity\SampleEntity'), [])
             ->willReturn(null);
@@ -184,15 +171,13 @@ class DatabaseEmailTemplateLoaderTest extends TestCase
             . self::LOCALIZATION_ID . '/' . $templateName;
 
         $localization = new LocalizationStub(self::LOCALIZATION_ID);
-        $this->entityManager
-            ->expects(self::once())
+        $this->entityManager->expects(self::once())
             ->method('getReference')
             ->with(Localization::class, self::LOCALIZATION_ID)
             ->willReturn($localization);
 
         $emailTemplateEntity = new EmailTemplateEntity();
-        $this->emailTemplateRepo
-            ->expects(self::once())
+        $this->emailTemplateRepo->expects(self::once())
             ->method('findWithLocalizations')
             ->with(
                 new EmailTemplateCriteria($templateName, 'Acme\Bundle\Entity\SampleEntity'),
@@ -202,8 +187,7 @@ class DatabaseEmailTemplateLoaderTest extends TestCase
 
         $emailTemplateModel = (new EmailTemplateModel())
             ->setContent('sample_content');
-        $this->translatedEmailTemplateProvider
-            ->expects(self::once())
+        $this->translatedEmailTemplateProvider->expects(self::once())
             ->method('getTranslatedEmailTemplate')
             ->with($emailTemplateEntity, $localization)
             ->willReturn($emailTemplateModel);

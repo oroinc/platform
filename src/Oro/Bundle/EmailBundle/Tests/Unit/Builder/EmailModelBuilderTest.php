@@ -3,8 +3,8 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Builder;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\AttachmentBundle\DependencyInjection\Configuration as AttachmentConfiguration;
 use Oro\Bundle\AttachmentBundle\Provider\FileConstraintsProvider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -21,46 +21,29 @@ use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\EmailBundle\Provider\EmailAttachmentProvider;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
+class EmailModelBuilderTest extends TestCase
 {
-    /** @var EmailModelBuilderHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $helper;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var EmailActivityListProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $activityListProvider;
-
-    /** @var EmailAttachmentProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailAttachmentProvider;
-
-    /** @var RequestStack */
-    private $requestStack;
-
-    /** @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $htmlTagHelper;
-
-    /** @var FileConstraintsProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileConstraintsProvider;
-
-    /** @var Email|\PHPUnit\Framework\MockObject\MockObject */
-    private $email;
-
-    /** @var EmailModelBuilder */
-    private $emailModelBuilder;
+    private EmailModelBuilderHelper&MockObject $helper;
+    private ManagerRegistry&MockObject $doctrine;
+    private ConfigManager&MockObject $configManager;
+    private EmailActivityListProvider&MockObject $activityListProvider;
+    private EmailAttachmentProvider&MockObject $emailAttachmentProvider;
+    private RequestStack $requestStack;
+    private HtmlTagHelper&MockObject $htmlTagHelper;
+    private FileConstraintsProvider&MockObject $fileConstraintsProvider;
+    private Email&MockObject $email;
+    private EmailModelBuilder $emailModelBuilder;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->helper = $this->createMock(EmailModelBuilderHelper::class);
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->activityListProvider = $this->createMock(EmailActivityListProvider::class);
         $this->emailAttachmentProvider = $this->createMock(EmailAttachmentProvider::class);
@@ -69,17 +52,17 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
         $this->fileConstraintsProvider = $this->createMock(FileConstraintsProvider::class);
         $this->email = $this->createMock(Email::class);
 
-        $this->emailAttachmentProvider->expects($this->any())
+        $this->emailAttachmentProvider->expects(self::any())
             ->method('getThreadAttachments')
             ->willReturn([]);
 
-        $this->email->expects($this->any())
+        $this->email->expects(self::any())
             ->method('getActivityTargets')
             ->willReturn([]);
 
         $this->emailModelBuilder = new EmailModelBuilder(
             $this->helper,
-            $this->entityManager,
+            $this->doctrine,
             $this->configManager,
             $this->activityListProvider,
             $this->emailAttachmentProvider,
@@ -90,36 +73,36 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateEmailModelWithEmptyData()
+    public function testCreateEmailModelWithEmptyData(): void
     {
         $request = new Request();
         $request->setMethod('GET');
         $this->requestStack->push($request);
 
-        $this->helper->expects($this->never())
+        $this->helper->expects(self::never())
             ->method('decodeClassName');
 
-        $this->entityManager->expects($this->never())
+        $this->doctrine->expects(self::never())
             ->method('getRepository');
 
-        $this->helper->expects($this->never())
+        $this->helper->expects(self::never())
             ->method('preciseFullEmailAddress');
 
-        $this->helper->expects($this->once())
+        $this->helper->expects(self::once())
             ->method('getUser')
             ->willReturn($this->createMock(User::class));
 
-        $this->helper->expects($this->once())
+        $this->helper->expects(self::once())
             ->method('buildFullEmailAddress');
 
         $this->helper->expects(self::never())
             ->method('getTargetEntity');
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('get')
             ->with('oro_email.signature')
             ->willReturn('Signature');
-        $this->htmlTagHelper->expects($this->once())
+        $this->htmlTagHelper->expects(self::once())
             ->method('sanitize')
             ->with('Signature')
             ->willReturn('Sanitized Signature');
@@ -127,20 +110,20 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
         $emailModel = new EmailModel();
         $result = $this->emailModelBuilder->createEmailModel($emailModel);
 
-        $this->assertSame($emailModel, $result);
-        $this->assertNull($result->getEntityClass());
-        $this->assertNull($result->getEntityId());
-        $this->assertNull($result->getSubject());
-        $this->assertNull($result->getFrom());
-        $this->assertSame([], $result->getTo());
-        $this->assertSame([], $result->getCc());
-        $this->assertSame([], $result->getBcc());
-        $this->assertEquals('Sanitized Signature', $result->getSignature());
-        $this->assertSame([], array_values($result->getAttachmentsAvailable()));
-        $this->assertCount(0, $result->getContexts());
+        self::assertSame($emailModel, $result);
+        self::assertNull($result->getEntityClass());
+        self::assertNull($result->getEntityId());
+        self::assertNull($result->getSubject());
+        self::assertNull($result->getFrom());
+        self::assertSame([], $result->getTo());
+        self::assertSame([], $result->getCc());
+        self::assertSame([], $result->getBcc());
+        self::assertEquals('Sanitized Signature', $result->getSignature());
+        self::assertSame([], array_values($result->getAttachmentsAvailable()));
+        self::assertCount(0, $result->getContexts());
     }
 
-    public function testCreateEmailModel()
+    public function testCreateEmailModel(): void
     {
         $entityClass = User::class;
         $entityId = 1;
@@ -159,12 +142,12 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
         $request->query->set('subject', $subject);
         $this->requestStack->push($request);
 
-        $this->helper->expects($this->once())
+        $this->helper->expects(self::once())
             ->method('decodeClassName')
             ->willReturn($entityClass);
 
         $repository = $this->createMock(EntityRepository::class);
-        $this->entityManager->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getRepository')
             ->willReturn($repository);
 
@@ -181,29 +164,29 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
         $allowedAttachment->setMimeType('image/jpeg');
         $allowedAttachment->setFileSize(2 * AttachmentConfiguration::BYTES_MULTIPLIER);
         $scopeEntity = new User();
-        $repository->expects($this->once())
+        $repository->expects(self::once())
             ->method('find')
             ->with($entityId)
             ->willReturn($scopeEntity);
-        $this->emailAttachmentProvider->expects($this->once())
+        $this->emailAttachmentProvider->expects(self::once())
             ->method('getScopeEntityAttachments')
             ->with($scopeEntity)
             ->willReturn([$bigAttachment, $unsupportedMimeTypeAttachment, $allowedAttachment]);
-        $this->fileConstraintsProvider->expects($this->any())
+        $this->fileConstraintsProvider->expects(self::any())
             ->method('getMaxSizeByConfigPath')
             ->with('oro_email.attachment_max_size')
             ->willReturn(10 * AttachmentConfiguration::BYTES_MULTIPLIER);
-        $this->fileConstraintsProvider->expects($this->any())
+        $this->fileConstraintsProvider->expects(self::any())
             ->method('getMimeTypes')
             ->willReturn(['image/jpeg']);
 
-        $this->helper->expects($this->exactly(4))
+        $this->helper->expects(self::exactly(4))
             ->method('preciseFullEmailAddress');
 
-        $this->helper->expects($this->never())
+        $this->helper->expects(self::never())
             ->method('getUser');
 
-        $this->helper->expects($this->never())
+        $this->helper->expects(self::never())
             ->method('buildFullEmailAddress');
 
         $contextEntity = $this->createMock($entityClass);
@@ -212,11 +195,11 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
             ->with($entityClass, $entityId)
             ->willReturn($contextEntity);
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('get')
             ->with('oro_email.signature')
             ->willReturn('Signature');
-        $this->htmlTagHelper->expects($this->once())
+        $this->htmlTagHelper->expects(self::once())
             ->method('sanitize')
             ->with('Signature')
             ->willReturn('Sanitized Signature');
@@ -224,21 +207,21 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
         $emailModel = new EmailModel();
         $result = $this->emailModelBuilder->createEmailModel($emailModel);
 
-        $this->assertSame($emailModel, $result);
-        $this->assertEquals($entityClass, $result->getEntityClass());
-        $this->assertEquals($entityId, $result->getEntityId());
-        $this->assertEquals($subject, $result->getSubject());
-        $this->assertEquals($from, $result->getFrom());
-        $this->assertEquals([$to], $result->getTo());
-        $this->assertEquals([$to], $result->getCc());
-        $this->assertEquals([$to], $result->getBcc());
-        $this->assertEquals('Sanitized Signature', $result->getSignature());
-        $this->assertEquals([$allowedAttachment], array_values($result->getAttachmentsAvailable()));
-        $this->assertCount(1, $result->getContexts());
-        $this->assertSame($contextEntity, $result->getContexts()->first());
+        self::assertSame($emailModel, $result);
+        self::assertEquals($entityClass, $result->getEntityClass());
+        self::assertEquals($entityId, $result->getEntityId());
+        self::assertEquals($subject, $result->getSubject());
+        self::assertEquals($from, $result->getFrom());
+        self::assertEquals([$to], $result->getTo());
+        self::assertEquals([$to], $result->getCc());
+        self::assertEquals([$to], $result->getBcc());
+        self::assertEquals('Sanitized Signature', $result->getSignature());
+        self::assertEquals([$allowedAttachment], array_values($result->getAttachmentsAvailable()));
+        self::assertCount(1, $result->getContexts());
+        self::assertSame($contextEntity, $result->getContexts()->first());
     }
 
-    public function testCreateEmailModelWhenEmptyContextsRequested()
+    public function testCreateEmailModelWhenEmptyContextsRequested(): void
     {
         $entityClass = User::class;
         $entityId = 1;
@@ -258,12 +241,12 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
         $request->query->set('subject', $subject);
         $this->requestStack->push($request);
 
-        $this->helper->expects($this->once())
+        $this->helper->expects(self::once())
             ->method('decodeClassName')
             ->willReturn($entityClass);
 
         $repository = $this->createMock(EntityRepository::class);
-        $this->entityManager->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getRepository')
             ->willReturn($repository);
 
@@ -280,39 +263,39 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
         $allowedAttachment->setMimeType('image/jpeg');
         $allowedAttachment->setFileSize(2 * AttachmentConfiguration::BYTES_MULTIPLIER);
         $scopeEntity = new User();
-        $repository->expects($this->once())
+        $repository->expects(self::once())
             ->method('find')
             ->with($entityId)
             ->willReturn($scopeEntity);
-        $this->emailAttachmentProvider->expects($this->once())
+        $this->emailAttachmentProvider->expects(self::once())
             ->method('getScopeEntityAttachments')
             ->with($scopeEntity)
             ->willReturn([$bigAttachment, $unsupportedMimeTypeAttachment, $allowedAttachment]);
-        $this->fileConstraintsProvider->expects($this->any())
+        $this->fileConstraintsProvider->expects(self::any())
             ->method('getMaxSizeByConfigPath')
             ->with('oro_email.attachment_max_size')
             ->willReturn(10 * AttachmentConfiguration::BYTES_MULTIPLIER);
-        $this->fileConstraintsProvider->expects($this->any())
+        $this->fileConstraintsProvider->expects(self::any())
             ->method('getMimeTypes')
             ->willReturn(['image/jpeg']);
 
-        $this->helper->expects($this->exactly(4))
+        $this->helper->expects(self::exactly(4))
             ->method('preciseFullEmailAddress');
 
-        $this->helper->expects($this->never())
+        $this->helper->expects(self::never())
             ->method('getUser');
 
-        $this->helper->expects($this->never())
+        $this->helper->expects(self::never())
             ->method('buildFullEmailAddress');
 
         $this->helper->expects(self::never())
             ->method('getTargetEntity');
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('get')
             ->with('oro_email.signature')
             ->willReturn('Signature');
-        $this->htmlTagHelper->expects($this->once())
+        $this->htmlTagHelper->expects(self::once())
             ->method('sanitize')
             ->with('Signature')
             ->willReturn('Sanitized Signature');
@@ -320,73 +303,73 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
         $emailModel = new EmailModel();
         $result = $this->emailModelBuilder->createEmailModel($emailModel);
 
-        $this->assertSame($emailModel, $result);
-        $this->assertEquals($entityClass, $result->getEntityClass());
-        $this->assertEquals($entityId, $result->getEntityId());
-        $this->assertEquals($subject, $result->getSubject());
-        $this->assertEquals($from, $result->getFrom());
-        $this->assertEquals([$to], $result->getTo());
-        $this->assertEquals([$to], $result->getCc());
-        $this->assertEquals([$to], $result->getBcc());
-        $this->assertEquals('Sanitized Signature', $result->getSignature());
-        $this->assertEquals([$allowedAttachment], array_values($result->getAttachmentsAvailable()));
-        $this->assertCount(0, $result->getContexts());
+        self::assertSame($emailModel, $result);
+        self::assertEquals($entityClass, $result->getEntityClass());
+        self::assertEquals($entityId, $result->getEntityId());
+        self::assertEquals($subject, $result->getSubject());
+        self::assertEquals($from, $result->getFrom());
+        self::assertEquals([$to], $result->getTo());
+        self::assertEquals([$to], $result->getCc());
+        self::assertEquals([$to], $result->getBcc());
+        self::assertEquals('Sanitized Signature', $result->getSignature());
+        self::assertEquals([$allowedAttachment], array_values($result->getAttachmentsAvailable()));
+        self::assertCount(0, $result->getContexts());
     }
 
     /**
      * @dataProvider createReplyEmailModelProvider
      */
-    public function testCreateReplyEmailModel(object $getOwnerResult, object $getUserResult, int $getToCalls)
+    public function testCreateReplyEmailModel(object $getOwnerResult, object $getUserResult, int $getToCalls): void
     {
         $fromEmailAddress = $this->createMock(EmailAddress::class);
 
-        $fromEmailAddress->expects($this->once())
+        $fromEmailAddress->expects(self::once())
             ->method('getOwner')
             ->willReturn($getOwnerResult);
 
-        $this->helper->expects($this->any())
+        $this->helper->expects(self::any())
             ->method('getUser')
             ->willReturn($getUserResult);
 
-        $getUserResult->expects($this->any())
+        $getUserResult->expects(self::any())
             ->method('getEmails')
             ->willReturn([]);
 
-        $this->email->expects($this->once())
+        $this->email->expects(self::once())
             ->method('getFromEmailAddress')
             ->willReturn($fromEmailAddress);
 
-        $this->email->expects($this->any())
+        $this->email->expects(self::any())
             ->method('getId');
 
         $emailAddress = $this->createMock(EmailAddress::class);
-        $emailAddress->expects($this->exactly($getToCalls))
+        $emailAddress->expects(self::exactly($getToCalls))
             ->method('getEmail')
             ->willReturn(null);
 
         $emailRecipient = $this->createMock(EmailRecipient::class);
-        $emailRecipient->expects($this->exactly($getToCalls))
+        $emailRecipient->expects(self::exactly($getToCalls))
             ->method('getEmailAddress')
             ->willReturn($emailAddress);
 
         $to = new ArrayCollection();
         $to->add($emailRecipient);
 
-        $this->email->expects($this->exactly($getToCalls))
+        $this->email->expects(self::exactly($getToCalls))
             ->method('getTo')
             ->willReturn($to);
 
-        $this->helper->expects($this->once())
+        $this->helper->expects(self::once())
             ->method('prependWith');
 
-        $this->helper->expects($this->once())
+        $this->helper->expects(self::once())
             ->method('getEmailBody');
-        $this->activityListProvider->expects($this->once())
+        $this->activityListProvider->expects(self::once())
             ->method('getTargetEntities')
             ->willReturn([]);
 
         $result = $this->emailModelBuilder->createReplyEmailModel($this->email);
-        $this->assertInstanceOf(EmailModel::class, $result);
+        self::assertInstanceOf(EmailModel::class, $result);
     }
 
     public function createReplyEmailModelProvider(): array
@@ -402,93 +385,93 @@ class EmailModelBuilderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testCreateForwardEmailModel()
+    public function testCreateForwardEmailModel(): void
     {
         $request = new Request();
         $this->emailModelBuilder->setRequest($request);
 
-        $this->helper->expects($this->once())
+        $this->helper->expects(self::once())
             ->method('prependWith');
 
         $emailBody = $this->createMock(EmailBody::class);
-        $emailBody->expects($this->once())
+        $emailBody->expects(self::once())
             ->method('getAttachments')
             ->willReturn([]);
 
-        $this->email->expects($this->once())
+        $this->email->expects(self::once())
             ->method('getEmailBody')
             ->willReturn($emailBody);
 
         $result = $this->emailModelBuilder->createForwardEmailModel($this->email);
-        $this->assertInstanceOf(EmailModel::class, $result);
+        self::assertInstanceOf(EmailModel::class, $result);
     }
 
     /**
      * @dataProvider createReplyEmailModelProvider
      */
-    public function testCreateReplyAllEmailModel(object $getOwnerResult, object $getUserResult, int $getToCalls)
+    public function testCreateReplyAllEmailModel(object $getOwnerResult, object $getUserResult, int $getToCalls): void
     {
         $fromEmailAddress = $this->createMock(EmailAddress::class);
         $fromCcEmailAddress = $this->createMock(EmailAddress::class);
 
-        $fromEmailAddress->expects($this->once())
+        $fromEmailAddress->expects(self::once())
             ->method('getOwner')
             ->willReturn($getOwnerResult);
 
-        $this->helper->expects($this->any())
+        $this->helper->expects(self::any())
             ->method('getUser')
             ->willReturn($getUserResult);
 
-        $getUserResult->expects($this->any())
+        $getUserResult->expects(self::any())
             ->method('getEmails')
             ->willReturn([]);
 
-        $this->email->expects($this->once())
+        $this->email->expects(self::once())
             ->method('getFromEmailAddress')
             ->willReturn($fromEmailAddress);
 
-        $this->email->expects($this->any())
+        $this->email->expects(self::any())
             ->method('getId');
 
         $emailAddress = $this->createMock(EmailAddress::class);
-        $emailAddress->expects($this->exactly($getToCalls))
+        $emailAddress->expects(self::exactly($getToCalls))
             ->method('getEmail')
             ->willReturn(null);
 
         $emailRecipient = $this->createMock(EmailRecipient::class);
-        $emailRecipient->expects($this->exactly($getToCalls))
+        $emailRecipient->expects(self::exactly($getToCalls))
             ->method('getEmailAddress')
             ->willReturn($emailAddress);
 
         $to = new ArrayCollection();
         $to->add($emailRecipient);
 
-        $this->email->expects($this->exactly($getToCalls))
+        $this->email->expects(self::exactly($getToCalls))
             ->method('getTo')
             ->willReturn($to);
 
         $emailCcRecipient = $this->createMock(EmailRecipient::class);
-        $emailCcRecipient->expects($this->once())
+        $emailCcRecipient->expects(self::once())
             ->method('getEmailAddress')
             ->willReturn($fromCcEmailAddress);
 
         $cc = new ArrayCollection();
         $cc->add($emailCcRecipient);
 
-        $this->email->expects($this->exactly($getToCalls))
+        $this->email->expects(self::exactly($getToCalls))
             ->method('getCc')
             ->willReturn($cc);
 
-        $this->helper->expects($this->once())
+        $this->helper->expects(self::once())
             ->method('prependWith');
 
-        $this->helper->expects($this->once())
+        $this->helper->expects(self::once())
             ->method('getEmailBody');
-        $this->activityListProvider->expects($this->once())
+        $this->activityListProvider->expects(self::once())
             ->method('getTargetEntities')
             ->willReturn([]);
 
         $result = $this->emailModelBuilder->createReplyAllEmailModel($this->email);
-        $this->assertInstanceOf(EmailModel::class, $result);
+        self::assertInstanceOf(EmailModel::class, $result);
     }
 }

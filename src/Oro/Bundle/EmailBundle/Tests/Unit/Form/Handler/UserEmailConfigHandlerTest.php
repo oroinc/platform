@@ -2,37 +2,30 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Handler;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigChangeSet;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Form\Handler\UserEmailConfigHandler;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 
-class UserEmailConfigHandlerTest extends \PHPUnit\Framework\TestCase
+class UserEmailConfigHandlerTest extends TestCase
 {
     private const FORM_FIELD_NAME = 'oro_email___user_mailbox';
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var ConfigChangeSet|\PHPUnit\Framework\MockObject\MockObject */
-    private $changeSet;
-
-    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $form;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var UserEmailConfigHandler */
-    private $handler;
+    private ConfigManager&MockObject $configManager;
+    private ConfigChangeSet&MockObject $changeSet;
+    private FormInterface&MockObject $form;
+    private EntityManagerInterface&MockObject $entityManager;
+    private UserEmailConfigHandler $handler;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->changeSet = $this->createMock(ConfigChangeSet::class);
         $this->form = $this->createMock(FormInterface::class);

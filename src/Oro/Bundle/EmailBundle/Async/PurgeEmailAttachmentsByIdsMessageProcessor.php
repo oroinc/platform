@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Async;
 
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedIdentityQueryResultIterator;
 use Oro\Bundle\EmailBundle\Async\Topic\PurgeEmailAttachmentsByIdsTopic;
@@ -19,31 +17,21 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
  */
 class PurgeEmailAttachmentsByIdsMessageProcessor implements MessageProcessorInterface, TopicSubscriberInterface
 {
-    const LIMIT = 100;
+    private const int LIMIT = 100;
 
-    /**
-     * @var ManagerRegistry
-     */
-    private $doctrine;
-
-    /**
-     * @var JobRunner
-     */
-    private $jobRunner;
-
-    public function __construct(ManagerRegistry $doctrine, JobRunner $jobRunner)
-    {
-        $this->doctrine = $doctrine;
-        $this->jobRunner = $jobRunner;
+    public function __construct(
+        private ManagerRegistry $doctrine,
+        private JobRunner $jobRunner
+    ) {
     }
 
     #[\Override]
-    public function process(MessageInterface $message, SessionInterface $session)
+    public function process(MessageInterface $message, SessionInterface $session): string
     {
         $body = $message->getBody();
 
         $result = $this->jobRunner->runDelayed($body['jobId'], function () use ($body) {
-            $em = $this->getEntityManager();
+            $em = $this->doctrine->getManagerForClass(EmailAttachment::class);
             $emailAttachments = $this->getEmailAttachments($body['ids']);
 
             foreach ($emailAttachments as $attachment) {
@@ -62,52 +50,28 @@ class PurgeEmailAttachmentsByIdsMessageProcessor implements MessageProcessorInte
     }
 
     #[\Override]
-    public static function getSubscribedTopics()
+    public static function getSubscribedTopics(): array
     {
         return [PurgeEmailAttachmentsByIdsTopic::getName()];
     }
 
-    /**
-     * @param int[] $ids
-     *
-     * @return BufferedIdentityQueryResultIterator
-     */
-    private function getEmailAttachments($ids)
+    private function getEmailAttachments(array $ids): BufferedIdentityQueryResultIterator
     {
-        $qb = $this->getEmailAttachmentRepository()
+        $qb = $this->doctrine->getRepository(EmailAttachment::class)
             ->createQueryBuilder('a')
             ->join('a.attachmentContent', 'attachment_content')
             ->where('a.id IN (:ids)')
-            ->setParameter('ids', $ids)
-        ;
+            ->setParameter('ids', $ids);
 
-        $em = $this->getEntityManager();
+        $em = $this->doctrine->getManagerForClass(EmailAttachment::class);
 
-        $emailAttachments = (new BufferedIdentityQueryResultIterator($qb))
-            ->setBufferSize(static::LIMIT)
-            ->setPageCallback(
-                function () use ($em) {
-                    $em->flush();
-                    $em->clear();
-                }
-            );
+        $emailAttachments = new BufferedIdentityQueryResultIterator($qb);
+        $emailAttachments->setBufferSize(static::LIMIT);
+        $emailAttachments->setPageCallback(function () use ($em) {
+            $em->flush();
+            $em->clear();
+        });
 
         return $emailAttachments;
-    }
-
-    /**
-     * @return EntityRepository
-     */
-    private function getEmailAttachmentRepository()
-    {
-        return $this->doctrine->getRepository(EmailAttachment::class);
-    }
-
-    /**
-     * @return EntityManager
-     */
-    private function getEntityManager()
-    {
-        return $this->doctrine->getManagerForClass(EmailAttachment::class);
     }
 }

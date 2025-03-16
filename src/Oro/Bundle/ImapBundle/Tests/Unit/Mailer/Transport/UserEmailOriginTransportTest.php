@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Mailer\Transport;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Mailer\Transport\DsnFromUserEmailOriginFactory;
 use Oro\Bundle\ImapBundle\Mailer\Transport\UserEmailOriginTransport;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\TransportException;
@@ -18,37 +20,31 @@ use Symfony\Component\Mime\Address as SymfonyAddress;
 use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\RawMessage;
 
-class UserEmailOriginTransportTest extends \PHPUnit\Framework\TestCase
+class UserEmailOriginTransportTest extends TestCase
 {
     private const ENTITY_ID = 42;
 
-    /** @var Transport|\PHPUnit\Framework\MockObject\MockObject */
-    private $transportFactory;
-
-    /** @var DsnFromUserEmailOriginFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $dsnFromUserEmailOriginFactory;
-
-    /** @var UserEmailOrigin|\PHPUnit\Framework\MockObject\MockObject */
-    private $userEmailOrigin;
-
-    /** @var UserEmailOriginTransport */
-    private $transport;
-    private TransportFactoryInterface $transportFactoryBase;
+    private TransportFactoryInterface&MockObject $transportFactoryBase;
+    private DsnFromUserEmailOriginFactory&MockObject $dsnFromUserEmailOriginFactory;
+    private UserEmailOrigin&MockObject $userEmailOrigin;
+    private UserEmailOriginTransport $transport;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->transportFactoryBase = $this->createMock(TransportFactoryInterface::class);
-        $this->transportFactory = new Transport([$this->transportFactoryBase]);
         $this->dsnFromUserEmailOriginFactory = $this->createMock(DsnFromUserEmailOriginFactory::class);
         $this->userEmailOrigin = $this->createMock(UserEmailOrigin::class);
 
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects(self::any())
             ->method('find')
-            ->willReturnMap([
-                [UserEmailOrigin::class, self::ENTITY_ID, null, null, $this->userEmailOrigin],
-            ]);
+            ->with(UserEmailOrigin::class)
+            ->willReturnCallback(function ($className, $id) {
+                return self::ENTITY_ID === $id
+                    ? $this->userEmailOrigin
+                    : null;
+            });
 
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects(self::any())
@@ -57,7 +53,7 @@ class UserEmailOriginTransportTest extends \PHPUnit\Framework\TestCase
             ->willReturn($entityManager);
 
         $this->transport = new UserEmailOriginTransport(
-            $this->transportFactory,
+            new Transport([$this->transportFactoryBase]),
             $doctrine,
             $this->dsnFromUserEmailOriginFactory,
             new RequestStack()

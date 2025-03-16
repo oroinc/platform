@@ -31,14 +31,14 @@ class AssociationManagerTest extends WebTestCase
         $this->initClient();
         $this->loadFixtures([LoadEmailData::class]);
 
-        $this->getContainer()->get('event_dispatcher')->addListener(
+        self::getContainer()->get('event_dispatcher')->addListener(
             Events::ADD_ACTIVITY,
             function (ActivityEvent $event) {
                 $this->dispatched[] = sprintf('%d-%d', $event->getActivity()->getId(), $event->getTarget()->getId());
             }
         );
 
-        $this->manager = $this->getContainer()->get('oro_email.async.manager.association_manager');
+        $this->manager = self::getContainer()->get('oro_email.async.manager.association_manager');
     }
 
     #[\Override]
@@ -47,111 +47,14 @@ class AssociationManagerTest extends WebTestCase
         $this->dispatched = [];
     }
 
-    public function testProcessUpdateAllEmailOwnersAsync()
+    private function getActivityManager(): ActivityManager
     {
-        $this->manager->processUpdateAllEmailOwners();
-
-        /* @var User $user */
-        $owner = $this->getReference('simple_user');
-
-        $this->assertMessageSent(
-            UpdateEmailOwnerAssociationsTopic::getName(),
-            [
-                'ownerClass' => User::class,
-                'ownerIds' => [$owner->getId()],
-            ]
-        );
-
-        $this->assertDispatchedEvents([]);
+        return self::getContainer()->get('oro_activity.manager');
     }
 
-    public function testProcessUpdateAllEmailOwnersSync()
+    private function getManagerForClass(string $className): EntityManagerInterface
     {
-        $this->manager->setQueued(false);
-
-        /* @var User $user */
-        $owner = $this->getReference('simple_user');
-
-        $activityManager = $this->getActivityManager();
-        foreach ($this->getTestEmails() as $email) {
-            $activityManager->removeActivityTarget($email, $owner);
-        }
-        $this->getManagerForClass(Email::class)->flush();
-
-        $this->manager->processUpdateAllEmailOwners();
-
-        $expected = [];
-        foreach ($this->getTestEmails() as $email) {
-            $expected[] = sprintf('%d-%d', $email->getId(), $owner->getId());
-        }
-
-        $this->assertDispatchedEvents($expected);
-
-        $this->dispatched = [];
-        $this->manager->processUpdateAllEmailOwners();
-
-        $this->assertDispatchedEvents([]);
-
-        $this->assertMessagesEmpty(UpdateEmailOwnerAssociationsTopic::getName());
-    }
-
-    public function testProcessUpdateEmailOwnerAsync()
-    {
-        /* @var User $user */
-        $owner = $this->getReference('simple_user');
-
-        $ids = [];
-        for ($i = 1; $i <= 10; $i++) {
-            $ids[] = $this->getReference('email_' . $i)->getId();
-        }
-
-        $this->manager->processUpdateEmailOwner(User::class, [$owner->getId()]);
-
-        $this->assertMessageSent(
-            AddEmailAssociationsTopic::getName(),
-            [
-                'targetClass' => User::class,
-                'targetId' => $owner->getId(),
-                'emailIds' => $ids,
-            ]
-        );
-
-        $this->assertDispatchedEvents([]);
-    }
-
-    public function testProcessUpdateEmailOwnerSync()
-    {
-        $this->manager->setQueued(false);
-
-        /* @var User $user */
-        $owner = $this->getReference('simple_user');
-
-        $activityManager = $this->getActivityManager();
-        foreach ($this->getTestEmails() as $email) {
-            $activityManager->removeActivityTarget($email, $owner);
-        }
-        $this->getManagerForClass(Email::class)->flush();
-
-        $this->manager->processUpdateEmailOwner(User::class, [$owner->getId()]);
-
-        $expected = [];
-        foreach ($this->getTestEmails() as $email) {
-            $expected[] = sprintf('%d-%d', $email->getId(), $owner->getId());
-        }
-
-        $this->assertDispatchedEvents($expected);
-
-        $this->dispatched = [];
-        $this->manager->processUpdateEmailOwner(User::class, [$owner->getId()]);
-
-        $this->assertDispatchedEvents([]);
-
-        $this->assertMessagesEmpty(AddEmailAssociationsTopic::getName());
-    }
-
-    private function assertDispatchedEvents(array $expected)
-    {
-        self::assertEqualsCanonicalizing($expected, $this->dispatched);
+        return self::getContainer()->get('doctrine')->getManagerForClass($className);
     }
 
     /**
@@ -167,13 +70,110 @@ class AssociationManagerTest extends WebTestCase
         return $emails;
     }
 
-    private function getActivityManager(): ActivityManager
+    private function assertDispatchedEvents(array $expected): void
     {
-        return $this->getContainer()->get('oro_activity.manager');
+        self::assertEqualsCanonicalizing($expected, $this->dispatched);
     }
 
-    private function getManagerForClass(string $className): EntityManagerInterface
+    public function testProcessUpdateAllEmailOwnersAsync(): void
     {
-        return $this->getContainer()->get('doctrine')->getManagerForClass($className);
+        $this->manager->processUpdateAllEmailOwners();
+
+        /* @var User $user */
+        $owner = $this->getReference('simple_user');
+
+        self::assertMessageSent(
+            UpdateEmailOwnerAssociationsTopic::getName(),
+            [
+                'ownerClass' => User::class,
+                'ownerIds' => [$owner->getId()],
+            ]
+        );
+
+        $this->assertDispatchedEvents([]);
+    }
+
+    public function testProcessUpdateAllEmailOwnersSync(): void
+    {
+        $this->manager->setQueued(false);
+
+        /* @var User $user */
+        $owner = $this->getReference('simple_user');
+
+        $activityManager = $this->getActivityManager();
+        foreach ($this->getTestEmails() as $email) {
+            $activityManager->removeActivityTarget($email, $owner);
+        }
+        $this->getManagerForClass(Email::class)->flush();
+
+        $this->manager->processUpdateAllEmailOwners();
+
+        $expected = [];
+        foreach ($this->getTestEmails() as $email) {
+            $expected[] = sprintf('%d-%d', $email->getId(), $owner->getId());
+        }
+
+        $this->assertDispatchedEvents($expected);
+
+        $this->dispatched = [];
+        $this->manager->processUpdateAllEmailOwners();
+
+        $this->assertDispatchedEvents([]);
+
+        self::assertMessagesEmpty(UpdateEmailOwnerAssociationsTopic::getName());
+    }
+
+    public function testProcessUpdateEmailOwnerAsync(): void
+    {
+        /* @var User $user */
+        $owner = $this->getReference('simple_user');
+
+        $ids = [];
+        for ($i = 1; $i <= 10; $i++) {
+            $ids[] = $this->getReference('email_' . $i)->getId();
+        }
+
+        $this->manager->processUpdateEmailOwner(User::class, [$owner->getId()]);
+
+        self::assertMessageSent(
+            AddEmailAssociationsTopic::getName(),
+            [
+                'targetClass' => User::class,
+                'targetId' => $owner->getId(),
+                'emailIds' => $ids,
+            ]
+        );
+
+        $this->assertDispatchedEvents([]);
+    }
+
+    public function testProcessUpdateEmailOwnerSync(): void
+    {
+        $this->manager->setQueued(false);
+
+        /* @var User $user */
+        $owner = $this->getReference('simple_user');
+
+        $activityManager = $this->getActivityManager();
+        foreach ($this->getTestEmails() as $email) {
+            $activityManager->removeActivityTarget($email, $owner);
+        }
+        $this->getManagerForClass(Email::class)->flush();
+
+        $this->manager->processUpdateEmailOwner(User::class, [$owner->getId()]);
+
+        $expected = [];
+        foreach ($this->getTestEmails() as $email) {
+            $expected[] = sprintf('%d-%d', $email->getId(), $owner->getId());
+        }
+
+        $this->assertDispatchedEvents($expected);
+
+        $this->dispatched = [];
+        $this->manager->processUpdateEmailOwner(User::class, [$owner->getId()]);
+
+        $this->assertDispatchedEvents([]);
+
+        self::assertMessagesEmpty(AddEmailAssociationsTopic::getName());
     }
 }

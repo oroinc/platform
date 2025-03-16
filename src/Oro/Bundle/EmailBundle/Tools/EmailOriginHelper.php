@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tools;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
@@ -31,7 +31,7 @@ class EmailOriginHelper
     /** @var EmailModel */
     protected $emailModel;
 
-    /** @var EntityManager */
+    /** @var EntityManagerInterface */
     protected $em;
 
     /** @var DoctrineHelper */
@@ -325,10 +325,7 @@ class EmailOriginHelper
         return $origin;
     }
 
-    /**
-     * @return EntityManager
-     */
-    protected function getEntityManager()
+    protected function getEntityManager(): EntityManagerInterface
     {
         if (null === $this->em) {
             $this->em = $this->doctrineHelper->getEntityManager(Email::class);

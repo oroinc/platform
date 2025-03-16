@@ -5,11 +5,11 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Manager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Manager\InternalEmailFlagManager;
+use PHPUnit\Framework\TestCase;
 
-class InternalEmailFlagManagerTest extends \PHPUnit\Framework\TestCase
+class InternalEmailFlagManagerTest extends TestCase
 {
-    /** @var InternalEmailFlagManager */
-    private $flagManager;
+    private InternalEmailFlagManager $flagManager;
 
     #[\Override]
     protected function setUp(): void
@@ -17,7 +17,7 @@ class InternalEmailFlagManagerTest extends \PHPUnit\Framework\TestCase
         $this->flagManager = new InternalEmailFlagManager();
     }
 
-    public function testSetSeen()
+    public function testSetSeen(): void
     {
         $emailFolder = $this->createMock(EmailFolder::class);
         $email = $this->createMock(Email::class);
@@ -25,7 +25,7 @@ class InternalEmailFlagManagerTest extends \PHPUnit\Framework\TestCase
         $this->flagManager->setSeen($emailFolder, $email);
     }
 
-    public function testSetUnseen()
+    public function testSetUnseen(): void
     {
         $emailFolder = $this->createMock(EmailFolder::class);
         $email = $this->createMock(Email::class);

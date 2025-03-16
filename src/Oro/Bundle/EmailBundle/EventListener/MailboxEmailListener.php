@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
@@ -52,12 +52,12 @@ abstract class MailboxEmailListener
     }
 
     /**
-     * @param EntityManager $em
+     * @param EntityManagerInterface $em
      * @param Email[] $emails
      *
      * @return Email[]
      */
-    protected function filterEmailsWithNewlyBoundMailboxes(EntityManager $em, array $emails)
+    protected function filterEmailsWithNewlyBoundMailboxes(EntityManagerInterface $em, array $emails): array
     {
         $qb = $em->getRepository(EmailUser::class)->createQueryBuilder('eu');
         $emailIdsWithAlreadyBoundMailboxesResult = $qb->select('e.id')

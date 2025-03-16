@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Async\Manager;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EmailBundle\Async\Manager\AssociationManager;
@@ -11,26 +11,17 @@ use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
 use Oro\Bundle\EmailBundle\Provider\EmailOwnersProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AssociationManagerTest extends \PHPUnit\Framework\TestCase
+class AssociationManagerTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var ActivityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $activityManager;
-
-    /** @var EmailOwnersProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailOwnersProvider;
-
-    /** @var EmailManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailManager;
-
-    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $producer;
-
-    /** @var AssociationManager */
-    private $associationManager;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private ActivityManager&MockObject $activityManager;
+    private EmailOwnersProvider&MockObject $emailOwnersProvider;
+    private EmailManager&MockObject $emailManager;
+    private MessageProducerInterface&MockObject $producer;
+    private AssociationManager $associationManager;
 
     #[\Override]
     protected function setUp(): void
@@ -59,10 +50,10 @@ class AssociationManagerTest extends \PHPUnit\Framework\TestCase
         int $targetId,
         int $expectedCountAssociation,
         bool $addAssociation
-    ) {
+    ): void {
         $owner = new \stdClass();
         $entityRepository = $this->createMock(EntityRepository::class);
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
 
         $entityRepository->expects(self::once())
             ->method('find')

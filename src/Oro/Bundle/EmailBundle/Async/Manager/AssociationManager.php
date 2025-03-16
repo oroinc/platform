@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Async\Manager;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
@@ -22,59 +22,29 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
  */
 class AssociationManager
 {
-    const EMAIL_BUFFER_SIZE = 100;
-    const OWNER_IDS_BUFFER_SIZE = 500;
+    private const int EMAIL_BUFFER_SIZE = 100;
+    private const int OWNER_IDS_BUFFER_SIZE = 500;
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var ActivityManager */
-    protected $activityManager;
-
-    /** @var EmailOwnersProvider */
-    protected $emailOwnersProvider;
-
-    /** @var EmailManager */
-    protected $emailManager;
-
-    /** @var MessageProducerInterface */
-    protected $producer;
-
-    /** @var bool */
-    protected $queued = true;
+    private bool $queued = true;
 
     public function __construct(
-        DoctrineHelper $doctrineHelper,
-        ActivityManager $activityManager,
-        EmailOwnersProvider $emailOwnersProvider,
-        EmailManager $emailManager,
-        MessageProducerInterface $producer
+        private DoctrineHelper $doctrineHelper,
+        private ActivityManager $activityManager,
+        private EmailOwnersProvider $emailOwnersProvider,
+        private EmailManager $emailManager,
+        private MessageProducerInterface $producer
     ) {
-        $this->doctrineHelper = $doctrineHelper;
-        $this->activityManager = $activityManager;
-        $this->emailOwnersProvider = $emailOwnersProvider;
-        $this->emailManager = $emailManager;
-        $this->producer = $producer;
     }
 
-    /**
-     * @param bool $queued
-     */
-    public function setQueued($queued)
+    public function setQueued(bool $queued): void
     {
         $this->queued = $queued;
     }
 
     /**
-     * Add association to email
-     *
-     * @param int[] $ids
-     * @param string $targetClass
-     * @param int $targetId
-     *
-     * @return int
+     * Adds an association to emails.
      */
-    public function processAddAssociation($ids, $targetClass, $targetId)
+    public function processAddAssociation(array $ids, string $targetClass, mixed $targetId): int
     {
         $target = $this->doctrineHelper->getEntityRepository($targetClass)->find($targetId);
         $countNewAssociations = 0;
@@ -92,9 +62,9 @@ class AssociationManager
     }
 
     /**
-     * Makes sure that all email owners have assigned their emails
+     * Makes sure that all email owners have assigned their emails.
      */
-    public function processUpdateAllEmailOwners()
+    public function processUpdateAllEmailOwners(): void
     {
         $emailOwnerClassNames = $this->emailOwnersProvider->getSupportedEmailOwnerClassNames();
         foreach ($emailOwnerClassNames as $emailOwnerClassName) {
@@ -103,30 +73,28 @@ class AssociationManager
                 continue;
             }
 
-            $ownerIdsQb = $this->doctrineHelper
-                ->getEntityRepository(Email::class)
-                ->getOwnerIdsWithEmailsQb(
-                    $emailOwnerClassName,
-                    $this->doctrineHelper->getSingleEntityIdentifierFieldName($emailOwnerClassName),
-                    $ownerColumnName
-                );
+            $ownerIdsQb = $this->doctrineHelper->getEntityRepository(Email::class)->getOwnerIdsWithEmailsQb(
+                $emailOwnerClassName,
+                $this->doctrineHelper->getSingleEntityIdentifierFieldName($emailOwnerClassName),
+                $ownerColumnName
+            );
 
-            $ownerIds = (new BufferedIdentityQueryResultIterator($ownerIdsQb))
-                ->setBufferSize(self::OWNER_IDS_BUFFER_SIZE)
-                ->setPageLoadedCallback(function (array $rows) use ($emailOwnerClassName) {
-                    $ownerIds = array_map('current', $rows);
-                    if ($this->queued) {
-                        $this->producer->send(
-                            UpdateEmailOwnerAssociationsTopic::getName(),
-                            [
-                                'ownerClass' => $emailOwnerClassName,
-                                'ownerIds' => $ownerIds,
-                            ]
-                        );
-                    } else {
-                        $this->processUpdateEmailOwner($emailOwnerClassName, $ownerIds);
-                    }
-                });
+            $ownerIds = new BufferedIdentityQueryResultIterator($ownerIdsQb);
+            $ownerIds->setBufferSize(self::OWNER_IDS_BUFFER_SIZE);
+            $ownerIds->setPageLoadedCallback(function (array $rows) use ($emailOwnerClassName) {
+                $ownerIds = array_map('current', $rows);
+                if ($this->queued) {
+                    $this->producer->send(
+                        UpdateEmailOwnerAssociationsTopic::getName(),
+                        [
+                            'ownerClass' => $emailOwnerClassName,
+                            'ownerIds' => $ownerIds,
+                        ]
+                    );
+                } else {
+                    $this->processUpdateEmailOwner($emailOwnerClassName, $ownerIds);
+                }
+            });
 
             // iterate through ownerIds to call pageLoadedCallback
             foreach ($ownerIds as $ownerId) {
@@ -135,14 +103,9 @@ class AssociationManager
     }
 
     /**
-     * Update email owner association.
-     *
-     * @param string $ownerClassName
-     * @param array $ownerIds
-     *
-     * @return int
+     * Updates email owner association.
      */
-    public function processUpdateEmailOwner($ownerClassName, array $ownerIds)
+    public function processUpdateEmailOwner(string $ownerClassName, array $ownerIds): int
     {
         $ownerQb = $this->createOwnerQb($ownerClassName, $ownerIds);
         $owners = $this->getOwnerIterator($ownerQb);
@@ -153,32 +116,27 @@ class AssociationManager
             /** @var QueryBuilder $emailQB */
             foreach ($emailsQB as $emailQB) {
                 $emailIds = [];
-                $emails = (new BufferedIdentityQueryResultIterator($emailQB))
-                    ->setBufferSize(self::EMAIL_BUFFER_SIZE)
-                    ->setPageCallback(function () use (
-                        &$owner,
-                        &$emailIds,
-                        &$ownerClassName,
-                        &$countNewMessages
-                    ) {
-                        $this->clear();
+                $emails = new BufferedIdentityQueryResultIterator($emailQB);
+                $emails->setBufferSize(self::EMAIL_BUFFER_SIZE);
+                $emails->setPageCallback(function () use ($owner, &$emailIds, $ownerClassName, &$countNewMessages) {
+                    $this->clear();
 
-                        if ($this->queued) {
-                            $this->producer->send(
-                                AddEmailAssociationsTopic::getName(),
-                                [
-                                    'emailIds' => $emailIds,
-                                    'targetClass' => $ownerClassName,
-                                    'targetId' => $owner->getId(),
-                                ]
-                            );
-                        } else {
-                            $this->processAddAssociation($emailIds, $ownerClassName, $owner->getId());
-                        }
+                    if ($this->queued) {
+                        $this->producer->send(
+                            AddEmailAssociationsTopic::getName(),
+                            [
+                                'emailIds' => $emailIds,
+                                'targetClass' => $ownerClassName,
+                                'targetId' => $owner->getId(),
+                            ]
+                        );
+                    } else {
+                        $this->processAddAssociation($emailIds, $ownerClassName, $owner->getId());
+                    }
 
-                        $emailIds = [];
-                        $countNewMessages++;
-                    });
+                    $emailIds = [];
+                    $countNewMessages++;
+                });
 
                 foreach ($emails as $email) {
                     $emailIds[] = $email->getId();
@@ -192,7 +150,7 @@ class AssociationManager
     /**
      * Clear UnitOfWork cache
      */
-    protected function clear()
+    private function clear(): void
     {
         $clearClass = [
             Email::class,
@@ -200,50 +158,38 @@ class AssociationManager
             ActivityList::class,
             EmailThread::class
         ];
-
         foreach ($clearClass as $item) {
             $this->getEmailEntityManager()->clear($item);
         }
     }
 
-    /**
-     * @param string $class
-     * @param array $ids
-     *
-     * @return QueryBuilder
-     */
-    protected function createOwnerQb($class, array $ids)
+    private function createOwnerQb(string $class, array $ids): QueryBuilder
     {
         $qb = $this->doctrineHelper->getEntityRepositoryForClass($class)
             ->createQueryBuilder('o');
 
         return $qb
             ->andWhere($qb->expr()->in(
-                sprintf('o.%s', $this->doctrineHelper->getSingleEntityIdentifierFieldName($class)),
+                \sprintf('o.%s', $this->doctrineHelper->getSingleEntityIdentifierFieldName($class)),
                 ':ids'
             ))
             ->setParameter('ids', $ids);
     }
 
-    /**
-     * @param QueryBuilder $ownerQb
-     *
-     * @return \Iterator
-     */
-    protected function getOwnerIterator(QueryBuilder $ownerQb)
+    private function getOwnerIterator(QueryBuilder $ownerQb): \Iterator
     {
-        return (new BufferedIdentityQueryResultIterator($ownerQb))
-            ->setBufferSize(1)
-            ->setPageCallback(function () {
-                $this->getEmailEntityManager()->flush();
-                $this->getEmailEntityManager()->clear();
-            });
+        $iterator = new BufferedIdentityQueryResultIterator($ownerQb);
+
+        $iterator->setBufferSize(1);
+        $iterator->setPageCallback(function () {
+            $this->getEmailEntityManager()->flush();
+            $this->getEmailEntityManager()->clear();
+        });
+
+        return $iterator;
     }
 
-    /**
-     * @return EntityManager
-     */
-    protected function getEmailEntityManager()
+    private function getEmailEntityManager(): EntityManagerInterface
     {
         return $this->doctrineHelper->getEntityManagerForClass(Email::class);
     }

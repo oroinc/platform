@@ -32,7 +32,7 @@ services:
         class: Oro\Bundle\ImapBundle\Provider\ImapEmailAttachmentLoader
         arguments:
             - '@oro_imap.imap_email_manager_factory'
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
         tags:
             - { name: oro_email.email_attachment_loader }
 

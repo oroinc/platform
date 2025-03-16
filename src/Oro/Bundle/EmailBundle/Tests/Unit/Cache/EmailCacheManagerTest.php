@@ -2,58 +2,57 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Cache;
 
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
+use Oro\Bundle\EmailBundle\Event\EmailBodyLoaded;
 use Oro\Bundle\EmailBundle\Sync\EmailBodySynchronizer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class EmailCacheManagerTest extends \PHPUnit\Framework\TestCase
+class EmailCacheManagerTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $dispatcher;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $emailBodySynchronizer;
-
-    /** @var EmailCacheManager */
-    private $manager;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private EmailBodySynchronizer&MockObject $emailBodySynchronizer;
+    private EmailCacheManager $manager;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManager::class);
-        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->emailBodySynchronizer = $this->createMock(EmailBodySynchronizer::class);
 
         $this->manager = new EmailCacheManager(
-            $this->em,
-            $this->dispatcher,
+            $this->eventDispatcher,
             $this->emailBodySynchronizer
         );
     }
 
-    public function testEnsureEmailBodyCachedForAlreadyCached()
+    public function testEnsureEmailBodyCachedForAlreadyCached(): void
     {
         $email = new Email();
         $email->setEmailBody(new EmailBody());
 
-        $this->emailBodySynchronizer->expects($this->never())
+        $this->emailBodySynchronizer->expects(self::never())
             ->method('syncOneEmailBody');
+        $this->eventDispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with(self::isInstanceOf(EmailBodyLoaded::class), EmailBodyLoaded::NAME);
 
         $this->manager->ensureEmailBodyCached($email);
     }
 
-    public function testEnsureEmailBodyCached()
+    public function testEnsureEmailBodyCached(): void
     {
         $email = new Email();
 
-        $this->emailBodySynchronizer->expects($this->once())
-            ->method('syncOneEmailBody');
+        $this->emailBodySynchronizer->expects(self::once())
+            ->method('syncOneEmailBody')
+            ->with(self::identicalTo($email), true);
+        $this->eventDispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with(self::isInstanceOf(EmailBodyLoaded::class), EmailBodyLoaded::NAME);
 
         $this->manager->ensureEmailBodyCached($email);
     }

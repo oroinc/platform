@@ -2,38 +2,27 @@
 
 namespace Oro\Bundle\EmailBundle\Cache;
 
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Event\EmailBodyLoaded;
 use Oro\Bundle\EmailBundle\Sync\EmailBodySynchronizer;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Provides a way to check that an email body is cached.
+ */
 class EmailCacheManager
 {
-    /** @var EntityManager */
-    protected $em;
-
-    /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
-
-    /** @var EmailBodySynchronizer */
-    protected $emailBodySynchronizer;
-
     public function __construct(
-        EntityManager $em,
-        EventDispatcherInterface $eventDispatcher,
-        EmailBodySynchronizer $emailBodySynchronizer
+        private EventDispatcherInterface $eventDispatcher,
+        private EmailBodySynchronizer $emailBodySynchronizer
     ) {
-        $this->em                    = $em;
-        $this->eventDispatcher       = $eventDispatcher;
-        $this->emailBodySynchronizer = $emailBodySynchronizer;
     }
 
     /**
-     * Check that email body is cached.
+     * Check that an email body is cached.
      * If do not, load it using appropriate email extension add it to a cache.
      */
-    public function ensureEmailBodyCached(Email $email)
+    public function ensureEmailBodyCached(Email $email): void
     {
         if ($email->getEmailBody() === null) {
             // Additional load attempt, which is performed only on UI email expanding.

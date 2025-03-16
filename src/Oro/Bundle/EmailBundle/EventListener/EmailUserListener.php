@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
@@ -72,7 +72,7 @@ class EmailUserListener implements ServiceSubscriberInterface
         }
     }
 
-    private function determineOwners(EmailUser $entity, EntityManager $em): array
+    private function determineOwners(EmailUser $entity, EntityManagerInterface $em): array
     {
         $ownerIds = [];
         if ($entity->getOwner() !== null) {

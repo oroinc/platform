@@ -20,24 +20,21 @@ class AutoResponseListener extends MailboxEmailListener implements
 {
     use FeatureCheckerHolderTrait;
 
-    /** @var ContainerInterface */
-    private $container;
-
-    public function __construct(ContainerInterface $container)
-    {
-        $this->container = $container;
+    public function __construct(
+        private ContainerInterface $container
+    ) {
     }
 
     #[\Override]
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_email.autoresponserule_manager' => AutoResponseManager::class,
+            AutoResponseManager::class,
             MessageProducerInterface::class
         ];
     }
 
-    public function postFlush(PostFlushEventArgs $args)
+    public function postFlush(PostFlushEventArgs $args): void
     {
         if (!$this->isFeaturesEnabled()) {
             return;
@@ -53,15 +50,12 @@ class AutoResponseListener extends MailboxEmailListener implements
         $producer->send(SendAutoResponsesTopic::getName(), ['ids' => $emailIds]);
     }
 
-    /**
-     * @return array
-     */
-    protected function popEmailIds()
+    protected function popEmailIds(): array
     {
         $emailIds = [];
         if (!empty($this->emailBodies)) {
             /** @var AutoResponseManager $autoResponseManager */
-            $autoResponseManager = $this->container->get('oro_email.autoresponserule_manager');
+            $autoResponseManager = $this->container->get(AutoResponseManager::class);
             foreach ($this->emailBodies as $emailBody) {
                 $email = $emailBody->getEmail();
                 if ($autoResponseManager->hasAutoResponses($email)) {

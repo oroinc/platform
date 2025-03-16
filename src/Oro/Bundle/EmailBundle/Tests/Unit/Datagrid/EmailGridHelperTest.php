@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Datagrid;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
@@ -13,23 +13,17 @@ use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Sync\EmailSynchronizationManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EmailGridHelperTest extends \PHPUnit\Framework\TestCase
+class EmailGridHelperTest extends TestCase
 {
-    /** @var EmailGridHelper */
-    private $helper;
+    private const string USER_CLASS = 'Test\User';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $emailSyncManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $activityManager;
-
-    /** @var string */
-    private $userClass;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EmailSynchronizationManager&MockObject $emailSyncManager;
+    private ActivityManager&MockObject $activityManager;
+    private EmailGridHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -37,96 +31,118 @@ class EmailGridHelperTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->emailSyncManager = $this->createMock(EmailSynchronizationManager::class);
         $this->activityManager = $this->createMock(ActivityManager::class);
-        $this->userClass = 'Test\User';
 
         $this->helper = new EmailGridHelper(
             $this->doctrineHelper,
             $this->emailSyncManager,
             $this->activityManager,
-            $this->userClass
+            self::USER_CLASS
         );
     }
 
-    public function testIsUserEntity()
+    private function setGetEmailOriginsExpectations(int $userId, array $emailOrigins): void
     {
-        $this->assertTrue(
-            $this->helper->isUserEntity($this->userClass)
+        $user = $this->createMock(User::class);
+        $em = $this->createMock(EntityManagerInterface::class);
+        $repo = $this->createMock(EntityRepository::class);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityManager')
+            ->with(self::USER_CLASS)
+            ->willReturn($em);
+        $em->expects(self::once())
+            ->method('getRepository')
+            ->with(self::USER_CLASS)
+            ->willReturn($repo);
+        $repo->expects(self::once())
+            ->method('find')
+            ->with($userId)
+            ->willReturn($user);
+        $user->expects(self::once())
+            ->method('getEmailOrigins')
+            ->willReturn($emailOrigins);
+    }
+
+    public function testIsUserEntity(): void
+    {
+        self::assertTrue(
+            $this->helper->isUserEntity(self::USER_CLASS)
         );
-        $this->assertFalse(
+        self::assertFalse(
             $this->helper->isUserEntity('Test\Entity')
         );
     }
 
-    public function testGetEmailOrigins()
+    public function testGetEmailOrigins(): void
     {
-        $userId     = 123;
+        $userId = 123;
         $emailOrigins = [new InternalEmailOrigin()];
 
         $this->setGetEmailOriginsExpectations($userId, $emailOrigins);
 
-        $this->assertSame(
+        self::assertSame(
             $emailOrigins,
             $this->helper->getEmailOrigins($userId)
         );
         // call one more time to check the result is cached
-        $this->assertSame(
+        self::assertSame(
             $emailOrigins,
             $this->helper->getEmailOrigins($userId)
         );
     }
 
-    public function testHandleRefreshNoRefreshParameter()
+    public function testHandleRefreshNoRefreshParameter(): void
     {
-        $userId     = 123;
+        $userId = 123;
         $parameters = new ParameterBag();
 
-        $this->doctrineHelper->expects($this->never())
+        $this->doctrineHelper->expects(self::never())
             ->method('getEntityManager');
-        $this->emailSyncManager->expects($this->never())
+        $this->emailSyncManager->expects(self::never())
             ->method('syncOrigins');
 
         $this->helper->handleRefresh($parameters, $userId);
     }
 
-    public function testHandleRefreshNoEmailOrigins()
+    public function testHandleRefreshNoEmailOrigins(): void
     {
-        $userId     = 123;
+        $userId = 123;
         $parameters = new ParameterBag([ParameterBag::ADDITIONAL_PARAMETERS => ['refresh' => true]]);
 
         $this->setGetEmailOriginsExpectations($userId, []);
-        $this->emailSyncManager->expects($this->never())
+        $this->emailSyncManager->expects(self::never())
             ->method('syncOrigins');
 
         $this->helper->handleRefresh($parameters, $userId);
     }
 
-    public function testHandleRefresh()
+    public function testHandleRefresh(): void
     {
-        $userId     = 123;
+        $userId = 123;
         $parameters = new ParameterBag([ParameterBag::ADDITIONAL_PARAMETERS => ['refresh' => true]]);
 
         $emailOrigins = [new InternalEmailOrigin()];
 
         $this->setGetEmailOriginsExpectations($userId, $emailOrigins);
-        $this->emailSyncManager->expects($this->once())
+        $this->emailSyncManager->expects(self::once())
             ->method('syncOrigins')
             ->with($this->identicalTo($emailOrigins));
 
         $this->helper->handleRefresh($parameters, $userId);
     }
 
-    public function testUpdateDatasource()
+    public function testUpdateDatasource(): void
     {
         $entityId = 123;
         $entityClass = 'Test\Entity';
 
         $qb = $this->createMock(QueryBuilder::class);
         $datasource = $this->createMock(OrmDatasource::class);
-        $datasource->expects($this->any())
+        $datasource->expects(self::any())
             ->method('getQueryBuilder')
             ->willReturn($qb);
 
-        $this->activityManager->expects($this->any())
+        $this->activityManager->expects(self::any())
             ->method('addFilterByTargetEntity')
             ->with(
                 $this->identicalTo($qb),
@@ -137,66 +153,35 @@ class EmailGridHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper->updateDatasource($datasource, $entityId, $entityClass);
     }
 
-    public function testUpdateDatasourceNoEntityClass()
+    public function testUpdateDatasourceNoEntityClass(): void
     {
         $entityId = 123;
 
         $qb = $this->createMock(QueryBuilder::class);
         $datasource = $this->createMock(OrmDatasource::class);
-        $datasource->expects($this->any())
+        $datasource->expects(self::any())
             ->method('getQueryBuilder')
             ->willReturn($qb);
 
-        $this->activityManager->expects($this->any())
+        $this->activityManager->expects(self::any())
             ->method('addFilterByTargetEntity')
-            ->with(
-                $this->identicalTo($qb),
-                $this->userClass,
-                $entityId
-            );
+            ->with($this->identicalTo($qb), self::USER_CLASS, $entityId);
 
         $this->helper->updateDatasource($datasource, $entityId);
     }
 
-    public function testUpdateDatasourceNoEntityId()
+    public function testUpdateDatasourceNoEntityId(): void
     {
         $qb = $this->createMock(QueryBuilder::class);
         $datasource = $this->createMock(OrmDatasource::class);
-        $datasource->expects($this->any())
+        $datasource->expects(self::any())
             ->method('getQueryBuilder')
             ->willReturn($qb);
 
-        $this->activityManager->expects($this->any())
+        $this->activityManager->expects(self::any())
             ->method('addFilterByTargetEntity')
-            ->with(
-                $this->identicalTo($qb),
-                $this->userClass,
-                -1
-            );
+            ->with($this->identicalTo($qb), self::USER_CLASS, -1);
 
         $this->helper->updateDatasource($datasource, null);
-    }
-
-    protected function setGetEmailOriginsExpectations($userId, $emailOrigins)
-    {
-        $user = $this->createMock(User::class);
-        $em = $this->createMock(EntityManager::class);
-        $repo = $this->createMock(EntityRepository::class);
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityManager')
-            ->with($this->userClass)
-            ->willReturn($em);
-        $em->expects($this->once())
-            ->method('getRepository')
-            ->with($this->userClass)
-            ->willReturn($repo);
-        $repo->expects($this->once())
-            ->method('find')
-            ->with($userId)
-            ->willReturn($user);
-        $user->expects($this->once())
-            ->method('getEmailOrigins')
-            ->willReturn($emailOrigins);
     }
 }

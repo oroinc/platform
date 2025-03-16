@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
@@ -16,36 +17,12 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class EmailManager
 {
-    /** @var EmailThreadManager */
-    protected $emailThreadManager;
-
-    /** @var EmailThreadProvider */
-    protected $emailThreadProvider;
-
-    /** @var EntityManager */
-    protected $em;
-
-    /** @var TokenAccessorInterface */
-    protected $tokenAccessor;
-
-    /** @var MailboxManager */
-    protected $mailboxManager;
-
-    /**
-     * Constructor
-     */
     public function __construct(
-        EntityManager $em,
-        EmailThreadManager $emailThreadManager,
-        EmailThreadProvider $emailThreadProvider,
-        TokenAccessorInterface $tokenAccessor,
-        MailboxManager $mailboxManager
+        private ManagerRegistry $doctrine,
+        private EmailThreadProvider $emailThreadProvider,
+        private TokenAccessorInterface $tokenAccessor,
+        private MailboxManager $mailboxManager
     ) {
-        $this->em = $em;
-        $this->emailThreadManager = $emailThreadManager;
-        $this->emailThreadProvider = $emailThreadProvider;
-        $this->tokenAccessor = $tokenAccessor;
-        $this->mailboxManager = $mailboxManager;
     }
 
     /**
@@ -60,7 +37,7 @@ class EmailManager
         if ($entity->isSeen() !== $isSeen) {
             $entity->setSeen($isSeen);
             if ($flush) {
-                $this->em->flush();
+                $this->getEntityManager()->flush();
             }
         }
     }
@@ -83,7 +60,7 @@ class EmailManager
             $this->setEmailUserSeen($emailUser, $isSeen);
         }
 
-        $this->em->flush();
+        $this->getEntityManager()->flush();
     }
 
     /**
@@ -93,22 +70,21 @@ class EmailManager
     {
         $seen = !$entity->isSeen();
         $this->setEmailUserSeen($entity, $seen);
-        $this->em->persist($entity);
+        $em = $this->getEntityManager();
+        $em->persist($entity);
 
         if ($entity->getEmail()->getThread() && $entity->getOwner()) {
-            $threadedEmailUserBuilder = $this
-                ->em
-                ->getRepository(EmailUser::class)
+            $threadedEmailUserBuilder = $this->getEmailUserRepository()
                 ->getEmailUserByThreadId([$entity->getEmail()->getThread()->getId()], $entity->getOwner());
 
             $threadedEmailUserList = $threadedEmailUserBuilder->getQuery()->getResult();
             foreach ($threadedEmailUserList as $threadedEmailUser) {
                 $this->setEmailUserSeen($threadedEmailUser, $seen);
-                $this->em->persist($threadedEmailUser);
+                $em->persist($threadedEmailUser);
             }
         }
 
-        $this->em->flush();
+        $em->flush();
     }
 
     /**
@@ -124,9 +100,7 @@ class EmailManager
     {
         $mailboxIds = $this->mailboxManager->findAvailableMailboxIds($user, $organization);
 
-        $emailUserQueryBuilder = $this
-            ->em
-            ->getRepository(EmailUser::class)
+        $emailUserQueryBuilder = $this->getEmailUserRepository()
             ->findUnseenUserEmail($user, $organization, $ids, $mailboxIds);
         $unseenUserEmails = $emailUserQueryBuilder->getQuery()->getResult();
 
@@ -138,29 +112,31 @@ class EmailManager
             $this->setEmailUserSeen($userEmail);
         }
 
-        $this->em->flush();
+        $this->getEntityManager()->flush();
 
         return true;
     }
 
     public function addContextToEmailThread(Email $entity, $target)
     {
-        $relatedEmails = $this->emailThreadProvider->getThreadEmails($this->em, $entity);
+        $em = $this->getEntityManager();
+        $relatedEmails = $this->emailThreadProvider->getThreadEmails($em, $entity);
         foreach ($relatedEmails as $relatedEmail) {
             $relatedEmail->addActivityTarget($target);
         }
-        $this->em->persist($entity);
-        $this->em->flush();
+        $em->persist($entity);
+        $em->flush();
     }
 
     public function deleteContextFromEmailThread(Email $entity, $target)
     {
-        $relatedEmails = $this->emailThreadProvider->getThreadEmails($this->em, $entity);
+        $em = $this->getEntityManager();
+        $relatedEmails = $this->emailThreadProvider->getThreadEmails($em, $entity);
         foreach ($relatedEmails as $relatedEmail) {
             $relatedEmail->removeActivityTarget($target);
         }
-        $this->em->persist($entity);
-        $this->em->flush();
+        $em->persist($entity);
+        $em->flush();
     }
 
     /**
@@ -172,35 +148,16 @@ class EmailManager
      */
     public function findEmailsByIds($ids)
     {
-        return $this->em->getRepository(Email::class)->findEmailsByIds($ids);
+        return $this->getEntityManager()->getRepository(Email::class)->findEmailsByIds($ids);
     }
 
-    /**
-     * Prepare emails to set status. If need get all from thread
-     *
-     * @param Email $entity
-     * @param bool  $checkThread Get threaded emails
-     *
-     * @return Email[]
-     */
-    protected function prepareFlaggedEmailEntities(Email $entity, $checkThread)
+    private function getEntityManager(): EntityManagerInterface
     {
-        $thread = $entity->getThread();
-        $emails = [$entity];
-        if ($checkThread && $thread) {
-            $emails = $thread->getEmails();
-
-            return $emails->toArray();
-        }
-
-        return $emails;
+        return $this->doctrine->getManagerForClass(EmailUser::class);
     }
 
-    /**
-     * @return EmailUserRepository
-     */
-    protected function getEmailUserRepository()
+    private function getEmailUserRepository(): EmailUserRepository
     {
-        return $this->em->getRepository(EmailUser::class);
+        return $this->getEntityManager()->getRepository(EmailUser::class);
     }
 }

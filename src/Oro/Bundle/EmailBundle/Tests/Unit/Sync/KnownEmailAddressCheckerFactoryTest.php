@@ -2,32 +2,33 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Sync;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressChecker;
 use Oro\Bundle\EmailBundle\Sync\KnownEmailAddressCheckerFactory;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
+use PHPUnit\Framework\TestCase;
 
-class KnownEmailAddressCheckerFactoryTest extends \PHPUnit\Framework\TestCase
+class KnownEmailAddressCheckerFactoryTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
-        $em = $this->createMock(EntityManager::class);
         $doctrine = $this->createMock(ManagerRegistry::class);
         $emailAddressManager = $this->createMock(EmailAddressManager::class);
         $emailAddressHelper = $this->createMock(EmailAddressHelper::class);
         $emailOwnerProviderStorage = $this->createMock(EmailOwnerProviderStorage::class);
 
-        $doctrine->expects($this->exactly(2))
+        $em = $this->createMock(EntityManagerInterface::class);
+        $doctrine->expects(self::exactly(2))
             ->method('getManager')
             ->with(null)
             ->willReturn($em);
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('isOpen')
             ->willReturn(false);
-        $doctrine->expects($this->once())
+        $doctrine->expects(self::once())
             ->method('resetManager');
 
         $factory = new KnownEmailAddressCheckerFactory(
@@ -39,6 +40,6 @@ class KnownEmailAddressCheckerFactoryTest extends \PHPUnit\Framework\TestCase
         );
 
         $result = $factory->create();
-        $this->assertInstanceOf(KnownEmailAddressChecker::class, $result);
+        self::assertInstanceOf(KnownEmailAddressChecker::class, $result);
     }
 }

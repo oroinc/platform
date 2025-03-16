@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Provider;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
@@ -22,7 +22,7 @@ class ImapEmailAttachmentLoader implements EmailAttachmentLoaderInterface
 {
     public function __construct(
         private ImapEmailManagerFactory $emailManagerFactory,
-        private EntityManager $entityManager
+        private ManagerRegistry $doctrine
     ) {
     }
 
@@ -77,7 +77,7 @@ class ImapEmailAttachmentLoader implements EmailAttachmentLoaderInterface
 
     private function imapLoadEmailData(EmailBody $emailBody): EmailDTO
     {
-        $imapEmailRepository = $this->entityManager->getRepository(ImapEmail::class);
+        $imapEmailRepository = $this->doctrine->getRepository(ImapEmail::class);
         $imapEmail = $imapEmailRepository->findOneBy(['email' => $emailBody->getEmail()]);
         $folder = $imapEmail->getImapFolder()->getFolder();
 

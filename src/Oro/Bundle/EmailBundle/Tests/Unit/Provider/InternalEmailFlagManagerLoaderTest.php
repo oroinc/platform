@@ -2,18 +2,18 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Manager\InternalEmailFlagManager;
 use Oro\Bundle\EmailBundle\Provider\InternalEmailFlagManagerLoader;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
+use PHPUnit\Framework\TestCase;
 
-class InternalEmailFlagManagerLoaderTest extends \PHPUnit\Framework\TestCase
+class InternalEmailFlagManagerLoaderTest extends TestCase
 {
-    /** @var InternalEmailFlagManagerLoader */
-    private $loader;
+    private InternalEmailFlagManagerLoader $loader;
 
     #[\Override]
     protected function setUp(): void
@@ -24,9 +24,9 @@ class InternalEmailFlagManagerLoaderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getSupportsDataProvider
      */
-    public function testSupports(bool $expectedIsSupports, EmailOrigin $origin)
+    public function testSupports(bool $expectedIsSupports, EmailOrigin $origin): void
     {
-        $this->assertEquals($expectedIsSupports, $this->loader->supports($origin));
+        self::assertEquals($expectedIsSupports, $this->loader->supports($origin));
     }
 
     public function getSupportsDataProvider(): array
@@ -43,11 +43,11 @@ class InternalEmailFlagManagerLoaderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testSelect()
+    public function testSelect(): void
     {
         $emailFolder = $this->createMock(EmailFolder::class);
-        $em = $this->createMock(OroEntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
 
-        $this->assertInstanceOf(InternalEmailFlagManager::class, $this->loader->select($emailFolder, $em));
+        self::assertInstanceOf(InternalEmailFlagManager::class, $this->loader->select($emailFolder, $em));
     }
 }

@@ -7,15 +7,15 @@ use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Provider\EmailFlagManagerInterface;
 
 /**
- * Set flags SEEN\UNSEEN for InternalEmailOrigin
+ * Provides a set of methods to manage flags for internal email messages.
  */
 class InternalEmailFlagManager implements EmailFlagManagerInterface
 {
-    const FLAG_UNSEEN = 'UNSEEN';
-    const FLAG_SEEN = 'SEEN';
+    private const string FLAG_UNSEEN = 'UNSEEN';
+    private const string FLAG_SEEN = 'SEEN';
 
     #[\Override]
-    public function setFlags(EmailFolder $folder, Email $email, $flags)
+    public function setFlags(EmailFolder $folder, Email $email, array $flags): void
     {
         /**
          * Do nothing, because we do not need any additional actions
@@ -24,13 +24,13 @@ class InternalEmailFlagManager implements EmailFlagManagerInterface
     }
 
     #[\Override]
-    public function setUnseen(EmailFolder $folder, Email $email)
+    public function setUnseen(EmailFolder $folder, Email $email): void
     {
         $this->setFlags($folder, $email, [self::FLAG_UNSEEN]);
     }
 
     #[\Override]
-    public function setSeen(EmailFolder $folder, Email $email)
+    public function setSeen(EmailFolder $folder, Email $email): void
     {
         $this->setFlags($folder, $email, [self::FLAG_SEEN]);
     }

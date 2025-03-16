@@ -2,25 +2,25 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Manager\InternalEmailFlagManager;
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 
 /**
- * Loads internal email flag manager to load an email body from the internal email origin
+ * Allows to get an email flag manager for internal emails.
  */
 class InternalEmailFlagManagerLoader implements EmailFlagManagerLoaderInterface
 {
     #[\Override]
-    public function supports(EmailOrigin $origin)
+    public function supports(EmailOrigin $origin): bool
     {
         return $origin instanceof InternalEmailOrigin;
     }
 
     #[\Override]
-    public function select(EmailFolder $folder, OroEntityManager $em)
+    public function select(EmailFolder $folder, EntityManagerInterface $em): EmailFlagManagerInterface
     {
         return new InternalEmailFlagManager();
     }
