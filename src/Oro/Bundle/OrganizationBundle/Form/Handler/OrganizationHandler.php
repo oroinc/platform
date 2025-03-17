@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\OrganizationBundle\Form\Handler;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FormBundle\Form\Handler\RequestHandlerTrait;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Component\Form\FormInterface;
@@ -15,34 +15,18 @@ class OrganizationHandler
 {
     use RequestHandlerTrait;
 
-    /** @var FormInterface */
-    protected $form;
-
-    /** @var RequestStack */
-    protected $requestStack;
-
-    /** @var EntityManager */
-    protected $manager;
-
-    public function __construct(RequestStack $requestStack, EntityManager $manager)
-    {
-        $this->requestStack = $requestStack;
-        $this->manager = $manager;
+    public function __construct(
+        protected RequestStack $requestStack,
+        protected ManagerRegistry $doctrine
+    ) {
     }
 
-    /**
-     * Process form
-     *
-     * @param  Organization $entity
-     * @param FormInterface $form
-     * @return bool True on successful processing, false otherwise
-     */
-    public function process(Organization $entity, FormInterface $form)
+    public function process(Organization $entity, FormInterface $form): bool
     {
         $form->setData($entity);
 
         $request = $this->requestStack->getCurrentRequest();
-        if (in_array($request->getMethod(), ['POST', 'PUT'], true)) {
+        if (\in_array($request->getMethod(), ['POST', 'PUT'], true)) {
             $this->submitPostPutRequest($form, $request);
             if ($form->isValid()) {
                 $this->onSuccess($entity);
@@ -53,9 +37,10 @@ class OrganizationHandler
         return false;
     }
 
-    protected function onSuccess(Organization $entity)
+    protected function onSuccess(Organization $entity): void
     {
-        $this->manager->persist($entity);
-        $this->manager->flush();
+        $em = $this->doctrine->getManagerForClass(Organization::class);
+        $em->persist($entity);
+        $em->flush();
     }
 }

@@ -21,7 +21,7 @@ services:
         class: Oro\Bundle\EmailBundle\Datagrid\Extension\MassAction\MarkMassActionHandler
         public: true
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@translator'
             - '@security.authorization_checker'
             - '@oro_security.token_accessor'

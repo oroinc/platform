@@ -3,7 +3,7 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Autocomplete;
 
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
@@ -84,7 +84,7 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
             ->with(self::TEST_ENTITY_CLASS)
             ->willReturn($metadata);
 
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects($this->once())
             ->method('getRepository')
             ->willReturn($this->entityRepository);

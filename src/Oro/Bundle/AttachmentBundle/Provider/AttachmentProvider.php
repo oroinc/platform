@@ -3,86 +3,56 @@
 namespace Oro\Bundle\AttachmentBundle\Provider;
 
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper;
-use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Component\PhpUtils\Formatter\BytesFormatter;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Provides attachments linked to an entity.
  */
 class AttachmentProvider
 {
-    /** @var EntityManagerInterface */
-    protected $em;
-
-    /** @var AttachmentAssociationHelper */
-    protected $attachmentAssociationHelper;
-
-    /** @var AttachmentManager */
-    private $attachmentManager;
-
-    /** @var PictureSourcesProviderInterface */
-    private $pictureSourcesProvider;
-
     public function __construct(
-        EntityManagerInterface $em,
-        AttachmentAssociationHelper $attachmentAssociationHelper,
-        AttachmentManager $attachmentManager,
-        PictureSourcesProviderInterface $pictureSourcesProvider
+        private ManagerRegistry $doctrine,
+        private AttachmentAssociationHelper $attachmentAssociationHelper,
+        private AttachmentManager $attachmentManager,
+        private PictureSourcesProviderInterface $pictureSourcesProvider,
+        private PropertyAccessorInterface $propertyAccessor
     ) {
-        $this->em = $em;
-        $this->attachmentAssociationHelper = $attachmentAssociationHelper;
-        $this->attachmentManager = $attachmentManager;
-        $this->pictureSourcesProvider = $pictureSourcesProvider;
     }
 
     /**
-     * @param object $entity
-     *
      * @return Attachment[]
      */
-    public function getEntityAttachments($entity)
+    public function getEntityAttachments(object $entity): array
     {
         $entityClass = ClassUtils::getClass($entity);
-        if ($this->attachmentAssociationHelper->isAttachmentAssociationEnabled($entityClass)) {
-            $fieldName = ExtendHelper::buildAssociationName($entityClass);
-            $repo = $this->em->getRepository(Attachment::class);
-
-            $qb = $repo->createQueryBuilder('a');
-            $qb->leftJoin('a.' . $fieldName, 'entity')
-                ->where('entity.id = :entityId')
-                ->setParameter('entityId', $entity->getId());
-
-            return $qb->getQuery()->getResult();
+        if (!$this->attachmentAssociationHelper->isAttachmentAssociationEnabled($entityClass)) {
+            return [];
         }
 
-        return [];
+        /** @var EntityRepository $repo */
+        $repo = $this->doctrine->getRepository(Attachment::class);
+
+        return $repo->createQueryBuilder('a')
+            ->leftJoin('a.' . ExtendHelper::buildAssociationName($entityClass), 'entity')
+            ->where('entity.id = :entityId')
+            ->setParameter('entityId', $entity->getId())
+            ->getQuery()
+            ->getResult();
     }
 
-    /**
-     * @param $entity
-     *
-     * @return File
-     */
-    private function getAttachmentByEntity($entity)
+    public function getAttachmentInfo(object $entity): array
     {
-        return (PropertyAccess::createPropertyAccessor())->getValue($entity, 'attachment');
-    }
-
-    /**
-     * @param $entity
-     *
-     * @return array
-     */
-    public function getAttachmentInfo($entity)
-    {
-        $result     = [];
-        $attachment = $this->getAttachmentByEntity($entity);
+        $result = [];
+        /** @var File|null $attachment */
+        $attachment = $this->propertyAccessor->getValue($entity, 'attachment');
         if ($attachment && $attachment->getId()) {
             $thumbnail = '';
             $thumbnailSources = [];
@@ -102,16 +72,15 @@ class AttachmentProvider
                 'attachmentURL' => [
                     'url' => $attachmentPictureSources['src'],
                     'sources' => $attachmentPictureSources['sources'],
-                    'downloadUrl' => $this->attachmentManager
-                        ->getFileUrl($attachment, FileUrlProviderInterface::FILE_ACTION_DOWNLOAD),
+                    'downloadUrl' => $this->attachmentManager->getFileUrl(
+                        $attachment,
+                        FileUrlProviderInterface::FILE_ACTION_DOWNLOAD
+                    )
                 ],
                 'attachmentSize' => BytesFormatter::format($attachment->getFileSize()),
                 'attachmentFileName' => $attachment->getOriginalFilename() ?: $attachment->getFilename(),
                 'attachmentIcon' => $this->attachmentManager->getAttachmentIconClass($attachment),
-                'attachmentThumbnailPicture' => [
-                    'src' => $thumbnail,
-                    'sources' => $thumbnailSources,
-                ],
+                'attachmentThumbnailPicture' => ['src' => $thumbnail, 'sources' => $thumbnailSources]
             ];
         }
 

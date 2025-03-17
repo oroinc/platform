@@ -5,39 +5,26 @@ namespace Oro\Bundle\ActivityBundle\Form\DataTransformer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Form\DataTransformerInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Transforms activity contexts to the form view format
+ * Transforms activity contexts to the form view format.
  */
 class ContextsToViewTransformer implements DataTransformerInterface
 {
-    const SEPARATOR = '-|-';
+    public const string SEPARATOR = '-|-';
 
-    /** @var EntityManagerInterface */
-    protected $entityManager;
-
-    /** @var TranslatorInterface */
-    protected $translator;
-
-    /** @var bool */
-    protected $collectionModel;
-
-    /** @var string */
-    protected $separator = self::SEPARATOR;
+    protected string $separator = self::SEPARATOR;
 
     /**
-     * @param EntityManagerInterface $entityManager
-     * @param bool                   $collectionModel True if result should be Collection instead of array
+     * @param ManagerRegistry $doctrine
+     * @param bool            $collectionModel True if result should be Collection instead of array
      */
     public function __construct(
-        EntityManagerInterface $entityManager,
-        $collectionModel = false
+        protected ManagerRegistry $doctrine,
+        protected bool $collectionModel = false
     ) {
-        $this->entityManager = $entityManager;
-        $this->collectionModel = $collectionModel;
     }
 
     /**
@@ -96,11 +83,8 @@ class ContextsToViewTransformer implements DataTransformerInterface
         }
 
         foreach ($filters as $entityClass => $ids) {
-            $metadata = $this->entityManager->getClassMetadata($entityClass);
-            $entities = $this->entityManager->getRepository($metadata->getName())->findBy(
-                ['id' => $ids]
-            );
-            $result   = array_merge($result, $entities);
+            $entities = $this->doctrine->getRepository($entityClass)->findBy(['id' => $ids]);
+            $result = array_merge($result, $entities);
         }
 
         if ($this->collectionModel) {

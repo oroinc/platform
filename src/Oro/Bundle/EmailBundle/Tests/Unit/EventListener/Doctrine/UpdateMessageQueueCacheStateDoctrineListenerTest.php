@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener\Doctrine;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate as EmailTemplateEntity;
@@ -15,32 +15,27 @@ use PHPUnit\Framework\TestCase;
 
 class UpdateMessageQueueCacheStateDoctrineListenerTest extends TestCase
 {
-    private CacheState|MockObject $cacheState;
-
+    private CacheState&MockObject $cacheState;
+    private UnitOfWork&MockObject $unitOfWork;
+    private OnFlushEventArgs&MockObject $event;
     private UpdateMessageQueueCacheStateDoctrineListener $listener;
-
-    private OnFlushEventArgs|MockObject $event;
-
-    private UnitOfWork|MockObject $unitOfWork;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->cacheState = $this->createMock(CacheState::class);
-
-        $this->listener = new UpdateMessageQueueCacheStateDoctrineListener($this->cacheState);
-
-        $entityManager = $this->createMock(EntityManager::class);
         $this->unitOfWork = $this->createMock(UnitOfWork::class);
-        $entityManager
-            ->expects(self::once())
+        $this->event = $this->createMock(OnFlushEventArgs::class);
+
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::once())
             ->method('getUnitOfWork')
             ->willReturn($this->unitOfWork);
-        $this->event = $this->createMock(OnFlushEventArgs::class);
-        $this->event
-            ->expects(self::once())
+        $this->event->expects(self::once())
             ->method('getObjectManager')
             ->willReturn($entityManager);
+
+        $this->listener = new UpdateMessageQueueCacheStateDoctrineListener($this->cacheState);
     }
 
     /**
@@ -48,38 +43,36 @@ class UpdateMessageQueueCacheStateDoctrineListenerTest extends TestCase
      */
     public function testWhenNoScheduledEmailTemplates(array $insertions, array $updates, $deletions): void
     {
-        $this->unitOfWork
+        $this->unitOfWork->expects(self::once())
             ->method('getScheduledEntityInsertions')
             ->willReturn($insertions);
-
-        $this->unitOfWork
+        $this->unitOfWork->expects(self::once())
             ->method('getScheduledEntityUpdates')
             ->willReturn($updates);
-
-        $this->unitOfWork
+        $this->unitOfWork->expects(self::once())
             ->method('getScheduledEntityDeletions')
             ->willReturn($deletions);
 
-        $this->cacheState
-            ->expects(self::never())
+        $this->cacheState->expects(self::never())
             ->method(self::anything());
 
         $this->listener->onFlush($this->event);
         $this->listener->postFlush();
     }
 
-    public function noScheduledEmailTemplatesDataProvider(): \Generator
+    public function noScheduledEmailTemplatesDataProvider(): array
     {
-        yield 'no scheduled changes' => [
-            'insertions' => [],
-            'updates' => [],
-            'deletions' => [],
-        ];
-
-        yield 'no scheduled email templates' => [
-            'insertions' => [new \stdClass()],
-            'updates' => [new \stdClass()],
-            'deletions' => [new \stdClass()],
+        return [
+            'no scheduled changes' => [
+                'insertions' => [],
+                'updates' => [],
+                'deletions' => []
+            ],
+            'no scheduled email templates' => [
+                'insertions' => [new \stdClass()],
+                'updates' => [new \stdClass()],
+                'deletions' => [new \stdClass()]
+            ]
         ];
     }
 
@@ -88,20 +81,17 @@ class UpdateMessageQueueCacheStateDoctrineListenerTest extends TestCase
      */
     public function testWhenHasScheduledEmailTemplates(array $insertions, array $updates, $deletions): void
     {
-        $this->unitOfWork
+        $this->unitOfWork->expects(self::any())
             ->method('getScheduledEntityInsertions')
             ->willReturn($insertions);
-
-        $this->unitOfWork
+        $this->unitOfWork->expects(self::any())
             ->method('getScheduledEntityUpdates')
             ->willReturn($updates);
-
-        $this->unitOfWork
+        $this->unitOfWork->expects(self::any())
             ->method('getScheduledEntityDeletions')
             ->willReturn($deletions);
 
-        $this->cacheState
-            ->expects(self::once())
+        $this->cacheState->expects(self::once())
             ->method('renewChangeDate');
 
         $this->listener->onFlush($this->event);
@@ -111,24 +101,24 @@ class UpdateMessageQueueCacheStateDoctrineListenerTest extends TestCase
         $this->listener->postFlush();
     }
 
-    public function hasScheduledEmailTemplatesDataProvider(): \Generator
+    public function hasScheduledEmailTemplatesDataProvider(): array
     {
-        yield 'has scheduled email template insertion' => [
-            'insertions' => [new EmailTemplateEntity()],
-            'updates' => [new \stdClass()],
-            'deletions' => [new \stdClass()],
-        ];
-
-        yield 'has scheduled email template update' => [
-            'insertions' => [new \stdClass()],
-            'updates' => [new EmailTemplateEntity()],
-            'deletions' => [new \stdClass()],
-        ];
-
-        yield 'has scheduled email template deletion' => [
-            'insertions' => [new \stdClass()],
-            'updates' => [new \stdClass()],
-            'deletions' => [new EmailTemplateEntity()],
+        return [
+            'has scheduled email template insertion' => [
+                'insertions' => [new EmailTemplateEntity()],
+                'updates' => [new \stdClass()],
+                'deletions' => [new \stdClass()]
+            ],
+            'has scheduled email template update' => [
+                'insertions' => [new \stdClass()],
+                'updates' => [new EmailTemplateEntity()],
+                'deletions' => [new \stdClass()]
+            ],
+                'has scheduled email template deletion' => [
+                'insertions' => [new \stdClass()],
+                'updates' => [new \stdClass()],
+                'deletions' => [new EmailTemplateEntity()]
+            ]
         ];
     }
 }

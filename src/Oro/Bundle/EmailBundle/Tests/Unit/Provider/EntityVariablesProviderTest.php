@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
 use Doctrine\Inflector\Rules\English\InflectorFactory;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Provider\EntityVariablesProvider;
@@ -16,35 +16,26 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\UIBundle\Formatter\FormatterManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
+class EntityVariablesProviderTest extends TestCase
 {
     private const TEST_ENTITY_NAME = TestEntityForVariableProvider::class;
 
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailConfigProvider;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfigProvider;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $extendConfigProvider;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var FormatterManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $formatterManager;
-
-    /** @var EntityVariablesProvider */
-    private $provider;
+    private ConfigProvider&MockObject $emailConfigProvider;
+    private ConfigProvider&MockObject $entityConfigProvider;
+    private ConfigProvider&MockObject $extendConfigProvider;
+    private ManagerRegistry&MockObject $doctrine;
+    private FormatterManager&MockObject $formatterManager;
+    private EntityVariablesProvider $provider;
 
     #[\Override]
     protected function setUp(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);
-        $translator->expects($this->any())
+        $translator->expects(self::any())
             ->method('trans')
             ->willReturnArgument(0);
 
@@ -55,7 +46,7 @@ class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
         $this->formatterManager = $this->createMock(FormatterManager::class);
 
         $configManager = $this->createMock(ConfigManager::class);
-        $configManager->expects($this->any())
+        $configManager->expects(self::any())
             ->method('getProvider')
             ->willReturnMap([
                 ['entity', $this->entityConfigProvider],
@@ -72,13 +63,13 @@ class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetVariableDefinitions()
+    public function testGetVariableDefinitions(): void
     {
         $this->assertClassMetadataCalls();
         $this->assertEmailConfigProviderCalls();
         $this->assertFormatterCalls();
 
-        $this->entityConfigProvider->expects($this->once())
+        $this->entityConfigProvider->expects(self::once())
             ->method('getIds')
             ->willReturn(
                 [
@@ -86,11 +77,11 @@ class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
                     new EntityConfigId('entity', TestUser::class),
                 ]
             );
-        $this->entityConfigProvider->expects($this->once())
+        $this->entityConfigProvider->expects(self::once())
             ->method('hasConfig')
             ->with(\stdClass::class)
             ->willReturn(true);
-        $this->extendConfigProvider->expects($this->exactly(2))
+        $this->extendConfigProvider->expects(self::exactly(2))
             ->method('hasConfig')
             ->willReturnMap([
                 [self::TEST_ENTITY_NAME, null, true],
@@ -102,7 +93,7 @@ class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
 
         $entity2ExtendConfig = new Config(new EntityConfigId('extend', TestUser::class));
         $entity2ExtendConfig->set('is_extend', true);
-        $this->extendConfigProvider->expects($this->exactly(2))
+        $this->extendConfigProvider->expects(self::exactly(2))
             ->method('getConfig')
             ->willReturnMap([
                 [self::TEST_ENTITY_NAME, null, $entity1ExtendConfig],
@@ -120,7 +111,7 @@ class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
 
         $entity2field1EntityConfig = new Config(new FieldConfigId('entity', TestUser::class, 'email', 'string'));
         $entity2field1EntityConfig->set('label', 'email_label');
-        $this->entityConfigProvider->expects($this->exactly(3))
+        $this->entityConfigProvider->expects(self::exactly(3))
             ->method('getConfig')
             ->willReturnMap([
                 [self::TEST_ENTITY_NAME, 'field1', $entity1field1EntityConfig],
@@ -129,7 +120,7 @@ class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $result = $this->provider->getVariableDefinitions();
-        $this->assertEquals(
+        self::assertEquals(
             [
                 self::TEST_ENTITY_NAME => [
                     'field1' => [
@@ -151,7 +142,7 @@ class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetVariableGetters()
+    public function testGetVariableGetters(): void
     {
         $entity1ExtendConfig = new Config(new EntityConfigId('extend', self::TEST_ENTITY_NAME));
         $entity1ExtendConfig->set('is_extend', true);
@@ -173,7 +164,7 @@ class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEmailConfigProviderCalls();
         $this->assertFormatterCalls();
 
-        $this->entityConfigProvider->expects($this->once())
+        $this->entityConfigProvider->expects(self::once())
             ->method('getIds')
             ->willReturn(
                 [
@@ -184,7 +175,7 @@ class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $this->extendConfigProvider->expects($this->exactly(4))
+        $this->extendConfigProvider->expects(self::exactly(4))
             ->method('hasConfig')
             ->willReturnMap([
                 [self::TEST_ENTITY_NAME, null, true],
@@ -192,7 +183,7 @@ class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
                 [$entity3Class, null, true],
                 [$entity4Class, null, true],
             ]);
-        $this->extendConfigProvider->expects($this->exactly(4))
+        $this->extendConfigProvider->expects(self::exactly(4))
             ->method('getConfig')
             ->willReturnMap([
                 [self::TEST_ENTITY_NAME, null, $entity1ExtendConfig],
@@ -202,7 +193,7 @@ class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
             ]);
 
         $result = $this->provider->getVariableGetters();
-        $this->assertEquals(
+        self::assertEquals(
             [
                 self::TEST_ENTITY_NAME => [
                     'field1' => [
@@ -222,7 +213,7 @@ class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetVariableProcessors()
+    public function testGetVariableProcessors(): void
     {
         self::assertSame([], $this->provider->getVariableProcessors(self::TEST_ENTITY_NAME));
     }
@@ -230,24 +221,24 @@ class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
     private function assertClassMetadataCalls(): void
     {
         $classMetadata1 = $this->createMock(ClassMetadata::class);
-        $classMetadata1->expects($this->exactly(2))
+        $classMetadata1->expects(self::exactly(2))
             ->method('hasAssociation')
             ->willReturnMap([
                 ['field1', false],
                 ['field2', true],
             ]);
-        $classMetadata1->expects($this->once())
+        $classMetadata1->expects(self::once())
             ->method('getAssociationTargetClass')
             ->willReturn(\stdClass::class);
         $classMetadata2 = $this->createMock(ClassMetadata::class);
-        $em = $this->createMock(EntityManager::class);
-        $em->expects($this->exactly(2))
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects(self::exactly(2))
             ->method('getClassMetadata')
             ->willReturnMap([
                 [self::TEST_ENTITY_NAME, $classMetadata1],
                 [TestUser::class, $classMetadata2],
             ]);
-        $this->doctrine->expects($this->exactly(2))
+        $this->doctrine->expects(self::exactly(2))
             ->method('getManagerForClass')
             ->willReturn($em);
     }
@@ -261,7 +252,7 @@ class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
 
         $entity2field1Config = new Config(new FieldConfigId('email', TestUser::class, 'email', 'string'));
         $entity2field1Config->set('available_in_template', true);
-        $this->emailConfigProvider->expects($this->exactly(2))
+        $this->emailConfigProvider->expects(self::exactly(2))
             ->method('getConfigs')
             ->willReturnMap([
                 [self::TEST_ENTITY_NAME, false, [$entity1field1Config, $entity1field2Config]],
@@ -271,7 +262,7 @@ class EntityVariablesProviderTest extends \PHPUnit\Framework\TestCase
 
     private function assertFormatterCalls(): void
     {
-        $this->formatterManager->expects($this->any())
+        $this->formatterManager->expects(self::any())
             ->method('guessFormatter')
             ->willReturnMap([
                 ['datetime', 'format_date'],

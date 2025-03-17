@@ -3,43 +3,44 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid;
 
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\WorkflowBundle\Datagrid\GridEntityNameProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class GridEntityNameProviderTest extends \PHPUnit\Framework\TestCase
+class GridEntityNameProviderTest extends TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var GridEntityNameProvider */
-    private $provider;
+    private EntityManagerInterface&MockObject $em;
+    private ConfigProvider&MockObject $configProvider;
+    private TranslatorInterface&MockObject $translator;
+    private GridEntityNameProvider $provider;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManager::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
         $this->configProvider = $this->createMock(ConfigProvider::class);
         $this->translator = $this->createMock(TranslatorInterface::class);
 
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getManager')
+            ->willReturn($this->em);
+
         $this->provider = new GridEntityNameProvider(
             $this->configProvider,
-            $this->em,
+            $doctrine,
             $this->translator
         );
         $this->provider->setEntityName('test');
     }
 
-    public function testGetRelatedEntitiesChoiceConfigurable()
+    public function testGetRelatedEntitiesChoiceConfigurable(): void
     {
         $entity = \stdClass::class;
         $label = 'Test';
@@ -47,79 +48,76 @@ class GridEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         $result = [['relatedEntity' => $entity]];
 
         $qb = $this->assertResultCall($result);
-        $this->em->expects($this->once())
+        $this->em->expects(self::once())
             ->method('createQueryBuilder')
             ->willReturn($qb);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('hasConfig')
             ->with($entity)
             ->willReturn(true);
 
         $config = $this->createMock(ConfigInterface::class);
-        $config->expects($this->once())
+        $config->expects(self::once())
             ->method('get')
             ->with('label')
             ->willReturn('untranslated.label');
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with($entity)
             ->willReturn($config);
-        $this->translator->expects($this->once())
+        $this->translator->expects(self::once())
             ->method('trans')
             ->with('untranslated.label')
             ->willReturn($label);
 
         $expected = [$label => $entity];
-        $this->assertEquals($expected, $this->provider->getRelatedEntitiesChoice());
+        self::assertEquals($expected, $this->provider->getRelatedEntitiesChoice());
     }
 
-    public function testGetRelatedEntitiesChoiceNotConfigurable()
+    public function testGetRelatedEntitiesChoiceNotConfigurable(): void
     {
         $entity = \stdClass::class;
 
         $result = [['relatedEntity' => $entity]];
 
         $qb = $this->assertResultCall($result);
-        $this->em->expects($this->once())
+        $this->em->expects(self::once())
             ->method('createQueryBuilder')
             ->willReturn($qb);
 
-        $this->configProvider->expects($this->once())
+        $this->configProvider->expects(self::once())
             ->method('hasConfig')
             ->with($entity)
             ->willReturn(false);
 
-        $this->configProvider->expects($this->never())
+        $this->configProvider->expects(self::never())
             ->method('getConfig');
-        $this->translator->expects($this->never())
+        $this->translator->expects(self::never())
             ->method('trans');
 
         $expected = [$entity => $entity];
-        $this->assertEquals($expected, $this->provider->getRelatedEntitiesChoice());
+        self::assertEquals($expected, $this->provider->getRelatedEntitiesChoice());
     }
 
-    /**
-     * @return QueryBuilder|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function assertResultCall(array $result)
+    private function assertResultCall(array $result): QueryBuilder&MockObject
     {
         $query = $this->createMock(AbstractQuery::class);
-        $query->expects($this->once())
+        $query->expects(self::once())
             ->method('getArrayResult')
             ->willReturn($result);
 
         $qb = $this->createMock(QueryBuilder::class);
-        $qb->expects($this->once())
+        $qb->expects(self::once())
             ->method('select')
             ->willReturnSelf();
-        $qb->expects($this->once())
+        $qb->expects(self::once())
             ->method('from')
             ->willReturnSelf();
-        $qb->expects($this->once())
+        $qb->expects(self::once())
             ->method('distinct')
             ->willReturnSelf();
-        $qb->expects($this->once())
+        $qb->expects(self::once())
             ->method('getQuery')
             ->willReturn($query);
 

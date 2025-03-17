@@ -5,33 +5,13 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Async;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Async\PurgeEmailAttachmentsMessageProcessor;
-use Oro\Bundle\EmailBundle\Async\Topic\PurgeEmailAttachmentsTopic;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class PurgeEmailAttachmentsMessageProcessorTest extends TestCase
 {
-    public function testCouldBeConstructedWithRequiredArguments()
-    {
-        $this->expectNotToPerformAssertions();
-
-        new PurgeEmailAttachmentsMessageProcessor(
-            $this->createMock(ManagerRegistry::class),
-            $this->createMock(MessageProducerInterface::class),
-            $this->createMock(JobRunner::class),
-            $this->createMock(ConfigManager::class)
-        );
-    }
-
-    public function testShouldReturnSubscribedTopics()
-    {
-        $this->assertEquals(
-            [PurgeEmailAttachmentsTopic::getName()],
-            PurgeEmailAttachmentsMessageProcessor::getSubscribedTopics()
-        );
-    }
-
     /**
      * @dataProvider getSizeDataProvider
      */
@@ -39,9 +19,9 @@ class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit\Framework\TestC
         array $payload,
         int $parameterSize,
         int $expectedResult
-    ) {
+    ): void {
         $configManager = $this->createMock(ConfigManager::class);
-        $configManager->expects($this->any())
+        $configManager->expects(self::any())
             ->method('get')
             ->with('oro_email.attachment_sync_max_size')
             ->willReturn($parameterSize);
@@ -55,7 +35,7 @@ class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit\Framework\TestC
 
         $actualResult = ReflectionUtil::callMethod($processor, 'getSize', [$payload]);
 
-        $this->assertEquals($expectedResult, $actualResult);
+        self::assertEquals($expectedResult, $actualResult);
     }
 
     public function getSizeDataProvider(): array
@@ -64,18 +44,18 @@ class PurgeEmailAttachmentsMessageProcessorTest extends \PHPUnit\Framework\TestC
             [
                 'payload' => ['size' => null, 'all' => true],
                 'parameterSize' => 10,
-                'result' => 0,
+                'result' => 0
             ],
             [
                 'payload' => ['size' => 2, 'all' => false],
                 'parameterSize' => 10,
-                'result' => 2000000,
+                'result' => 2000000
             ],
             [
                 'payload' => ['size' => null, 'all' => false],
                 'parameterSize' => 3,
-                'result' => 3000000,
-            ],
+                'result' => 3000000
+            ]
         ];
     }
 }

@@ -2,61 +2,69 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Form\WorkflowVariableDataTransformer;
 use Oro\Bundle\WorkflowBundle\Model\Variable;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowVariableDataTransformerTest extends \PHPUnit\Framework\TestCase
+class WorkflowVariableDataTransformerTest extends TestCase
 {
-    /**
-     * @param array $options
-     *
-     * @return WorkflowVariableDataTransformer
-     */
-    private function createTransformer(array $options = [])
+    private function createTransformer(array $options = []): WorkflowVariableDataTransformer
     {
         if (array_key_exists('classMetadata', $options)) {
             $classMetadata = $options['classMetadata'];
         } else {
             $classMetadata = $this->createMock(ClassMetadataInfo::class);
-            $classMetadata->expects($this->any())
+            $classMetadata->expects(self::any())
                 ->method('getIdentifierFieldNames')
                 ->willReturn(['id']);
         }
 
-        $entityManager = $this->createMock(EntityManager::class);
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $doctrine = $this->createMock(ManagerRegistry::class);
 
-        $entityManager->expects($this->any())
+        $entityManager->expects(self::any())
             ->method('getClassMetadata')
             ->willReturn($classMetadata);
-        $managerRegistry->expects($this->any())
+        $doctrine->expects(self::any())
             ->method('getManagerForClass')
             ->willReturn($entityManager);
 
         $variable = $options['variable'] ?? null;
 
-        return new WorkflowVariableDataTransformer($managerRegistry, $variable);
+        return new WorkflowVariableDataTransformer($doctrine, $variable);
     }
 
-    public function testTransform()
+    private function createVariable(string $name, string $type, array $options = [], ?string $value = null): Variable
+    {
+        $variable = new Variable();
+        $variable->setName($name);
+        $variable->setType($type);
+        $variable->setOptions($options);
+        $variable->setValue($value);
+        $variable->setLabel($name);
+
+        return $variable;
+    }
+
+    public function testTransform(): void
     {
         $expected = new \stdClass();
         $expected->public_property = 1;
 
         $transformer = $this->createTransformer();
-        $this->assertSame($expected, $transformer->transform($expected));
+        self::assertSame($expected, $transformer->transform($expected));
     }
 
     /**
      * @dataProvider reverseTransformProvider
      */
-    public function testReverseTransform($expected, $entity, array $transformerOptions = [])
+    public function testReverseTransform($expected, $entity, array $transformerOptions = []): void
     {
         $transformer = $this->createTransformer($transformerOptions);
-        $this->assertSame($expected, $transformer->reverseTransform($entity));
+        self::assertSame($expected, $transformer->reverseTransform($entity));
     }
 
     public function reverseTransformProvider(): array
@@ -113,26 +121,5 @@ class WorkflowVariableDataTransformerTest extends \PHPUnit\Framework\TestCase
                 ]
             ]
         ];
-    }
-
-    /**
-     * @param string $name
-     * @param string $type
-     * @param array  $options
-     * @param string $value
-     *
-     * @return Variable
-     */
-    private function createVariable($name, $type, array $options = [], $value = null)
-    {
-        $variable = new Variable();
-        $variable
-            ->setName($name)
-            ->setType($type)
-            ->setOptions($options)
-            ->setValue($value)
-            ->setLabel($name);
-
-        return $variable;
     }
 }

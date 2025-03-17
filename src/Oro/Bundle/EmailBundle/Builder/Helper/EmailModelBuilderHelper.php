@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Builder\Helper;
 
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Entity\Email as EmailEntity;
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerAwareInterface;
@@ -29,53 +28,16 @@ use Twig\Environment;
  */
 class EmailModelBuilderHelper
 {
-    /** @var EntityRoutingHelper */
-    protected $entityRoutingHelper;
-
-    /** @var EmailAddressHelper */
-    protected $emailAddressHelper;
-
-    /** @var EntityNameResolver */
-    protected $entityNameResolver;
-
-    /** @var TokenAccessorInterface */
-    protected $tokenAccessor;
-
-    /** @var EmailAddressManager */
-    protected $emailAddressManager;
-
-    /** @var EntityManager */
-    protected $entityManager;
-
-    /** @var EmailCacheManager */
-    protected $emailCacheManager;
-
-    /** @var Environment */
-    protected $twig;
-
-    /** @var MailboxManager */
-    protected $mailboxManager;
-
     public function __construct(
-        EntityRoutingHelper $entityRoutingHelper,
-        EmailAddressHelper $emailAddressHelper,
-        EntityNameResolver $entityNameResolver,
-        TokenAccessorInterface $tokenAccessor,
-        EmailAddressManager $emailAddressManager,
-        EntityManager $entityManager,
-        EmailCacheManager $emailCacheManager,
-        Environment $twig,
-        MailboxManager $mailboxManager
+        protected EntityRoutingHelper $entityRoutingHelper,
+        protected EmailAddressHelper $emailAddressHelper,
+        protected EntityNameResolver $entityNameResolver,
+        protected TokenAccessorInterface $tokenAccessor,
+        protected EmailAddressManager $emailAddressManager,
+        protected EmailCacheManager $emailCacheManager,
+        protected Environment $twig,
+        protected MailboxManager $mailboxManager
     ) {
-        $this->entityRoutingHelper = $entityRoutingHelper;
-        $this->emailAddressHelper = $emailAddressHelper;
-        $this->entityNameResolver = $entityNameResolver;
-        $this->tokenAccessor = $tokenAccessor;
-        $this->emailAddressManager = $emailAddressManager;
-        $this->entityManager = $entityManager;
-        $this->emailCacheManager = $emailCacheManager;
-        $this->twig = $twig;
-        $this->mailboxManager = $mailboxManager;
     }
 
     /**
@@ -110,8 +72,8 @@ class EmailModelBuilderHelper
                     }
                 }
             }
-            $repo            = $this->emailAddressManager->getEmailAddressRepository($this->entityManager);
-            $emailAddressObj = $repo->findOneBy(array('email' => $emailAddress));
+            $repo = $this->emailAddressManager->getEmailAddressRepository();
+            $emailAddressObj = $repo->findOneBy(['email' => $emailAddress]);
             if ($emailAddressObj) {
                 $owner = $emailAddressObj->getOwner();
                 if ($owner) {

@@ -3,55 +3,41 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Duplicator\Extension;
 
 use DeepCopy\Filter\Doctrine\DoctrineCollectionFilter;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DraftBundle\Duplicator\DraftContext;
 use Oro\Bundle\DraftBundle\Duplicator\Matcher\PropertiesNameMatcher;
-use Oro\Bundle\DraftBundle\Entity\DraftableInterface;
 use Oro\Bundle\DraftBundle\Tests\Unit\Stub\DraftableEntityStub;
 use Oro\Bundle\LocaleBundle\Duplicator\Extension\LocalizedFallBackValueExtension;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
-use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\TestCase;
 
-class LocalizedFallBackValueExtensionExtensionTest extends \PHPUnit\Framework\TestCase
+class LocalizedFallBackValueExtensionExtensionTest extends TestCase
 {
-    use EntityTrait;
-
-    /** @var LocalizedFallBackValueExtension */
-    private $extension;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
+    private LocalizedFallBackValueExtension $extension;
 
     #[\Override]
     protected function setUp(): void
     {
-        $classMetaData = $this->getEntity(
-            ClassMetadataInfo::class,
-            [
-                'associationMappings' => [
-                    'field1' => [
-                        'targetEntity' => LocalizedFallbackValue::class
-                    ]
-                ]
-            ],
-            [
-                $this->getEntity(DraftableEntityStub::class)
+        $classMetaData = new ClassMetadataInfo(DraftableEntityStub::class);
+        $classMetaData->associationMappings = [
+            'field1' => [
+                'targetEntity' => LocalizedFallbackValue::class
             ]
-        );
-        $entityManager = $this->createMock(EntityManager::class);
-        $entityManager
-            ->expects($this->any())
+        ];
+
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects($this->any())
             ->method('getClassMetadata')
             ->willReturn($classMetaData);
-        $this->registry = $this->createMock(ManagerRegistry::class);
-        $this->registry
-            ->expects($this->any())
+
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
             ->method('getManager')
             ->willReturn($entityManager);
 
-        $this->extension = new LocalizedFallBackValueExtension($this->registry);
+        $this->extension = new LocalizedFallBackValueExtension($doctrine);
     }
 
     public function testGetFilter(): void
@@ -62,15 +48,14 @@ class LocalizedFallBackValueExtensionExtensionTest extends \PHPUnit\Framework\Te
     public function testGetMatcher(): void
     {
         $context = new DraftContext();
-        $context->offsetSet('source', $this->getEntity(DraftableEntityStub::class));
+        $context->offsetSet('source', new DraftableEntityStub());
         $this->extension->setContext($context);
         $this->assertEquals(new PropertiesNameMatcher(['field1']), $this->extension->getMatcher());
     }
 
     public function testIsSupport(): void
     {
-        /** @var DraftableInterface $source */
-        $source = $this->getEntity(DraftableEntityStub::class);
+        $source = new DraftableEntityStub();
         $this->assertTrue($this->extension->isSupport($source));
     }
 }

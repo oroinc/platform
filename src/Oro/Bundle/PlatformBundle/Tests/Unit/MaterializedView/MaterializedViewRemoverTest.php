@@ -7,36 +7,35 @@ use Oro\Bundle\PlatformBundle\Entity\MaterializedView as MaterializedViewEntity;
 use Oro\Bundle\PlatformBundle\Entity\Repository\MaterializedViewEntityRepository;
 use Oro\Bundle\PlatformBundle\MaterializedView\MaterializedViewManager;
 use Oro\Bundle\PlatformBundle\MaterializedView\MaterializedViewRemover;
-use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
-class MaterializedViewRemoverTest extends \PHPUnit\Framework\TestCase
+class MaterializedViewRemoverTest extends TestCase
 {
-    use LoggerAwareTraitTestTrait;
-
-    /** @var MaterializedViewManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $materializedViewManager;
-
-    /** @var MaterializedViewEntityRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
-
-    /** @var MaterializedViewRemover */
-    private $remover;
+    private MaterializedViewManager&MockObject $materializedViewManager;
+    private MaterializedViewEntityRepository&MockObject $repository;
+    private LoggerInterface&MockObject $logger;
+    private MaterializedViewRemover $remover;
 
     #[\Override]
     protected function setUp(): void
     {
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->materializedViewManager = $this->createMock(MaterializedViewManager::class);
-
-        $this->remover = new MaterializedViewRemover($managerRegistry, $this->materializedViewManager);
-
-        $this->setUpLoggerMock($this->remover);
-
         $this->repository = $this->createMock(MaterializedViewEntityRepository::class);
-        $managerRegistry->expects(self::any())
+        $this->logger = $this->createMock(LoggerInterface::class);
+
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
             ->method('getRepository')
             ->with(MaterializedViewEntity::class)
             ->willReturn($this->repository);
+
+        $this->remover = new MaterializedViewRemover(
+            $doctrine,
+            $this->materializedViewManager,
+            $this->logger
+        );
     }
 
     public function testRemoveOlderThanWhenNothingToRemove(): void
@@ -51,7 +50,7 @@ class MaterializedViewRemoverTest extends \PHPUnit\Framework\TestCase
         $this->materializedViewManager->expects(self::never())
             ->method(self::anything());
 
-        $this->loggerMock->expects(self::once())
+        $this->logger->expects(self::once())
             ->method('info')
             ->with(
                 'Found {count} materialized view older than {daysOld} days for removal.',
@@ -79,7 +78,7 @@ class MaterializedViewRemoverTest extends \PHPUnit\Framework\TestCase
             ->method('delete')
             ->withConsecutive([$materializedViewNames[0]], [$materializedViewNames[1]]);
 
-        $this->loggerMock->expects(self::once())
+        $this->logger->expects(self::once())
             ->method('info')
             ->with(
                 'Found {count} materialized view older than {daysOld} days for removal.',

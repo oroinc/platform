@@ -6,36 +6,26 @@ use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
- * Resolves the "owners" option in widget configuration.
+ * The dashboard widget configuration converter for select "owners",
+ * like a user, a business unit, and a role.
  */
 class WidgetDefaultOwnersConverter extends ConfigValueConverterAbstract
 {
-    /** @var TranslatorInterface */
-    protected $translator;
-
     /** @var array [field name => ['converter' => ConfigValueConverterAbstract, 'label' => string], ...] */
-    protected $converters = [];
+    protected array $converters = [];
 
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        protected TranslatorInterface $translator
+    ) {
     }
 
-    /**
-     * @param ConfigValueConverterAbstract $converter
-     * @param string                       $field
-     * @param string                       $label
-     */
-    public function setConverter(ConfigValueConverterAbstract $converter, $field, $label)
+    public function setConverter(ConfigValueConverterAbstract $converter, string $field, string $label): void
     {
-        $this->converters[$field] = [
-            'converter' => $converter,
-            'label'     => $label
-        ];
+        $this->converters[$field] = ['converter' => $converter, 'label' => $label];
     }
 
     #[\Override]
-    public function getViewValue($value)
+    public function getViewValue(mixed $value): mixed
     {
         $data = [];
         if ($value && \is_array($value)) {
@@ -60,9 +50,13 @@ class WidgetDefaultOwnersConverter extends ConfigValueConverterAbstract
     }
 
     #[\Override]
-    public function getConvertedValue(array $widgetConfig, $value = null, array $config = [], array $options = [])
-    {
-        if ($value === null) {
+    public function getConvertedValue(
+        array $widgetConfig,
+        mixed $value = null,
+        array $config = [],
+        array $options = []
+    ): mixed {
+        if (null === $value) {
             return $this->getDefaultChoices($config);
         }
 
@@ -70,21 +64,16 @@ class WidgetDefaultOwnersConverter extends ConfigValueConverterAbstract
     }
 
     #[\Override]
-    public function getFormValue(array $config, $value)
+    public function getFormValue(array $config, mixed $value): mixed
     {
-        if ($value === null) {
+        if (null === $value) {
             return $this->getDefaultChoices($config);
         }
 
         return parent::getFormValue($config, $value);
     }
 
-    /**
-     * @param array $config
-     *
-     * @return array
-     */
-    protected function getDefaultChoices(array $config)
+    protected function getDefaultChoices(array $config): mixed
     {
         return $config['converter_attributes']['default_selected'] ?? [];
     }

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Datagrid;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\WorkflowBundle\Exception\MissedRequiredOptionException;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -12,60 +12,34 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class GridEntityNameProvider
 {
-    /**
-     * @var EntityManager
-     */
-    protected $entityManager;
-    /**
-     * @var array
-     */
-    protected $relatedEntities = array();
-
-    /**
-     * @var ConfigProvider
-     */
-    protected $configProvider;
-
-    /**
-     * @var string
-     */
-    protected $entityName;
-
-    /**
-     * @var TranslatorInterface
-     */
-    protected $translator;
+    private array $relatedEntities = [];
+    private ?string $entityName = null;
 
     public function __construct(
-        ConfigProvider $configProvider,
-        EntityManager $entityManager,
-        TranslatorInterface $translator
+        private ConfigProvider $configProvider,
+        private ManagerRegistry $doctrine,
+        private TranslatorInterface $translator
     ) {
-        $this->configProvider = $configProvider;
-        $this->entityManager = $entityManager;
-        $this->translator = $translator;
     }
 
     /**
-     * Get workflow definition related entities.
+     * Gets workflow definition related entities.
      *
      * @throws MissedRequiredOptionException
-     * @return array
      */
-    public function getRelatedEntitiesChoice()
+    public function getRelatedEntitiesChoice(): array
     {
         if (!$this->entityName) {
             throw new MissedRequiredOptionException('Entity name is required.');
         }
 
         if (empty($this->relatedEntities)) {
-            $qb = $this->entityManager->createQueryBuilder();
+            $qb = $this->doctrine->getManager()->createQueryBuilder();
             $qb->select('entity.relatedEntity')
                 ->from($this->entityName, 'entity')
                 ->distinct('entity.relatedEntity');
 
             $result = (array)$qb->getQuery()->getArrayResult();
-
             foreach ($result as $value) {
                 $className = $value['relatedEntity'];
                 $label = $className;
@@ -81,10 +55,7 @@ class GridEntityNameProvider
         return $this->relatedEntities;
     }
 
-    /**
-     * @param string $tableName
-     */
-    public function setEntityName($tableName)
+    public function setEntityName(string $tableName): void
     {
         $this->entityName = $tableName;
     }

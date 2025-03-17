@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Mapping\ClassMetadataFactory;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -13,30 +13,23 @@ use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
 use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
 use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
 use Oro\Bundle\FormBundle\Form\Type\OroEntitySelectOrCreateInlineType;
+use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
+use Oro\Bundle\FormBundle\Form\Type\Select2Type;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var SearchRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $searchRegistry;
-
-    /** @var ConfigInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $config;
-
-    /** @var OroEntitySelectOrCreateInlineType|\PHPUnit\Framework\MockObject\MockObject */
-    private $formType;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private FeatureChecker&MockObject $featureChecker;
+    private EntityManagerInterface&MockObject $entityManager;
+    private SearchRegistry&MockObject $searchRegistry;
+    private ConfigInterface&MockObject $config;
+    private OroEntitySelectOrCreateInlineType $formType;
 
     #[\Override]
     protected function setUp(): void
@@ -53,23 +46,20 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
             ->method('getEntityConfig')
             ->willReturn($this->config);
 
-        $metadataFactory = $this->createMock(ClassMetadataFactory::class);
-        $metadataFactory->expects($this->any())
-            ->method('hasMetadataFor')
-            ->willReturn(true);
-
         $metadata = $this->createMock(ClassMetadata::class);
         $metadata->expects($this->any())
             ->method('getSingleIdentifierFieldName')
             ->willReturn('id');
 
-        $this->entityManager = $this->createMock(EntityManager::class);
-        $this->entityManager->expects($this->any())
-            ->method('getMetadataFactory')
-            ->willReturn($metadataFactory);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->entityManager->expects($this->any())
             ->method('getClassMetadata')
             ->willReturn($metadata);
+
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturn($this->entityManager);
 
         $searchHandler = $this->createMock(SearchHandlerInterface::class);
         $searchHandler->expects($this->any())
@@ -85,7 +75,7 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
             $this->authorizationChecker,
             $this->featureChecker,
             $configManager,
-            $this->entityManager,
+            $doctrine,
             $this->searchRegistry
         );
 
@@ -95,6 +85,11 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
     #[\Override]
     protected function getExtensions(): array
     {
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturn($this->entityManager);
+
         $config = $this->createMock(ConfigInterface::class);
         $config->expects($this->any())
             ->method('get')
@@ -106,11 +101,13 @@ class OroEntitySelectOrCreateInlineTypeTest extends FormIntegrationTestCase
             ->willReturn($config);
 
         return [
-            new PreloadedExtension([$this->formType], []),
-            new EntitySelectOrCreateInlineFormExtension(
-                $this->entityManager,
-                $this->searchRegistry,
-                $configProvider
+            new PreloadedExtension(
+                [
+                    $this->formType,
+                    new OroJquerySelect2HiddenType($doctrine, $this->searchRegistry, $configProvider),
+                    new Select2Type(HiddenType::class, 'oro_select2_hidden')
+                ],
+                []
             )
         ];
     }

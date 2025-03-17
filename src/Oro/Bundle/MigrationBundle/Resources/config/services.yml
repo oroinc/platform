@@ -14,10 +14,8 @@ services:
 
     oro_migration.data_fixtures.loader:
         class: Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader
-        public: false
         arguments:
             - '@doctrine.orm.entity_manager'
-            - '@kernel'
             - '@oro_migration.service_container'
 
     oro_migration.data_fixtures.executor:

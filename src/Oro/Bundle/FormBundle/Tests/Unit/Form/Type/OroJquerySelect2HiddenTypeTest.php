@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
@@ -12,6 +12,7 @@ use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
 use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
@@ -20,20 +21,11 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
 {
-    /** @var SearchRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $searchRegistry;
-
-    /** @var ConverterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $converter;
-
-    /** @var SearchHandlerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $searchHandler;
-
-    /** @var EntityToIdTransformer|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityToIdTransformer;
-
-    /** @var OroJquerySelect2HiddenType */
-    private $type;
+    private SearchRegistry&MockObject $searchRegistry;
+    private ConverterInterface&MockObject $converter;
+    private SearchHandlerInterface&MockObject $searchHandler;
+    private EntityToIdTransformer&MockObject $entityToIdTransformer;
+    private OroJquerySelect2HiddenType $type;
 
     #[\Override]
     protected function setUp(): void
@@ -51,7 +43,7 @@ class OroJquerySelect2HiddenTypeTest extends FormIntegrationTestCase
         $this->type = $this->getMockBuilder(OroJquerySelect2HiddenType::class)
             ->onlyMethods(['createDefaultTransformer'])
             ->setConstructorArgs([
-                $this->createMock(EntityManager::class),
+                $this->createMock(ManagerRegistry::class),
                 $this->searchRegistry,
                 $configProvider
             ])

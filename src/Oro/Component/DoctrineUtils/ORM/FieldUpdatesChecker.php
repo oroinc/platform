@@ -3,7 +3,7 @@
 namespace Oro\Component\DoctrineUtils\ORM;
 
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -55,7 +55,7 @@ class FieldUpdatesChecker
      */
     private function getUnitOfWork()
     {
-        /** @var EntityManager $entityManager */
+        /** @var EntityManagerInterface $entityManager */
         $entityManager = $this->managerRegistry->getManager();
 
         return $entityManager->getUnitOfWork();

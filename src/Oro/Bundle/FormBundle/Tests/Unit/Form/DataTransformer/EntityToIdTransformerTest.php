@@ -3,37 +3,62 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
 use Oro\Bundle\FormBundle\Form\Exception\FormException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EntityToIdTransformerTest extends \PHPUnit\Framework\TestCase
+class EntityToIdTransformerTest extends TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
+    private ManagerRegistry&MockObject $doctrine;
+    private EntityManagerInterface&MockObject $em;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
+
+        $this->doctrine->expects(self::any())
+            ->method('getManagerForClass')
+            ->willReturn($this->em);
+    }
+
+    private function getTransformer(?string $property, mixed $queryBuilderCallback): EntityToIdTransformer
+    {
+        return new EntityToIdTransformer($this->doctrine, 'TestClass', $property, $queryBuilderCallback);
+    }
+
+    private function createEntity(int $id): \stdClass
+    {
+        $result = $this->getMockBuilder(\stdClass::class)
+            ->addMethods(['getId'])
+            ->getMock();
+        $result->expects(self::any())
+            ->method('getId')
+            ->willReturn($id);
+
+        return $result;
     }
 
     /**
      * @dataProvider transformDataProvider
      */
-    public function testTransform(string $property, ?object $value, ?int $expectedValue)
+    public function testTransform(string $property, ?object $value, ?int $expectedValue): void
     {
-        $transformer = new EntityToIdTransformer($this->entityManager, 'TestClass', $property, null);
-        $this->assertEquals($expectedValue, $transformer->transform($value));
+        $transformer = $this->getTransformer($property, null);
+        self::assertEquals($expectedValue, $transformer->transform($value));
     }
 
     public function transformDataProvider(): array
@@ -52,63 +77,61 @@ class EntityToIdTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testTransformFailsWhenValueInNotAnArray()
+    public function testTransformFailsWhenValueInNotAnArray(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "object", "string" given');
 
-        $transformer = new EntityToIdTransformer($this->entityManager, 'TestClass', 'id', null);
+        $transformer = $this->getTransformer('id', null);
         $transformer->transform('invalid value');
     }
 
-    public function testReverseTransformEmpty()
+    public function testReverseTransformEmpty(): void
     {
-        $transformer = new EntityToIdTransformer($this->entityManager, 'TestClass', 'id', null);
-        $this->assertNull($transformer->reverseTransform(''));
+        $transformer = $this->getTransformer('id', null);
+        self::assertNull($transformer->reverseTransform(''));
     }
 
-    public function testReverseTransform()
+    public function testReverseTransform(): void
     {
         $entity = $this->createEntity(1);
 
         $repository = $this->createMock(EntityRepository::class);
-        $repository->expects($this->once())
+        $repository->expects(self::once())
             ->method('find')
             ->with(1)
             ->willReturn($entity);
 
-        $em = $this->createMock(EntityManager::class);
-        $em->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getRepository')
             ->with('TestClass')
             ->willReturn($repository);
 
-        $transformer = new EntityToIdTransformer($em, 'TestClass', 'id', null);
-        $this->assertEquals($entity, $transformer->reverseTransform(1));
+        $transformer = $this->getTransformer('id', null);
+        self::assertEquals($entity, $transformer->reverseTransform(1));
     }
 
-    public function testReverseTransformFailsNotFindEntity()
+    public function testReverseTransformFailsNotFindEntity(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('The value "1" does not exist or not unique.');
 
         $repository = $this->createMock(EntityRepository::class);
-        $repository->expects($this->once())
+        $repository->expects(self::once())
             ->method('find')
             ->with(1)
             ->willReturn(null);
 
-        $em = $this->createMock(EntityManager::class);
-        $em->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getRepository')
             ->with('TestClass')
             ->willReturn($repository);
 
-        $transformer = new EntityToIdTransformer($em, 'TestClass', 'id', null);
+        $transformer = $this->getTransformer('id', null);
         $transformer->reverseTransform(1);
     }
 
-    public function testReverseTransformQueryBuilder()
+    public function testReverseTransformQueryBuilder(): void
     {
         $entity = $this->createEntity(1);
 
@@ -132,17 +155,16 @@ class EntityToIdTransformerTest extends \PHPUnit\Framework\TestCase
             return $qb;
         };
 
-        $em = $this->createMock(EntityManager::class);
-        $em->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getRepository')
             ->with('TestClass')
             ->willReturn($repository);
 
-        $transformer = new EntityToIdTransformer($em, 'TestClass', 'id', $callback);
-        $this->assertEquals($entity, $transformer->reverseTransform(1));
+        $transformer = $this->getTransformer('id', $callback);
+        self::assertEquals($entity, $transformer->reverseTransform(1));
     }
 
-    public function testReverseTransformTransformationFailedException()
+    public function testReverseTransformTransformationFailedException(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('The value "1" does not exist or not unique.');
@@ -165,17 +187,16 @@ class EntityToIdTransformerTest extends \PHPUnit\Framework\TestCase
             return $qb;
         };
 
-        $em = $this->createMock(EntityManager::class);
-        $em->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getRepository')
             ->with('TestClass')
             ->willReturn($repository);
 
-        $transformer = new EntityToIdTransformer($em, 'TestClass', 'id', $callback, true);
+        $transformer = $this->getTransformer('id', $callback, true);
         $transformer->reverseTransform(1);
     }
 
-    public function testReverseTransformQueryBuilderUnexpectedTypeException()
+    public function testReverseTransformQueryBuilderUnexpectedTypeException(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "Doctrine\ORM\QueryBuilder", "null" given');
@@ -188,66 +209,51 @@ class EntityToIdTransformerTest extends \PHPUnit\Framework\TestCase
             return null;
         };
 
-        $em = $this->createMock(EntityManager::class);
-        $em->expects($this->once())
+        $this->doctrine->expects(self::once())
             ->method('getRepository')
             ->with('TestClass')
             ->willReturn($repository);
 
-        $transformer = new EntityToIdTransformer($em, 'TestClass', 'id', $callback);
-        $this->assertEquals($entity, $transformer->reverseTransform(1));
+        $transformer = $this->getTransformer('id', $callback);
+        self::assertEquals($entity, $transformer->reverseTransform(1));
     }
 
-    public function testPropertyConstruction()
+    public function testPropertyConstruction(): void
     {
-        $em = $this->createMock(EntityManager::class);
-
         $metadata = $this->createMock(ClassMetadata::class);
-        $metadata->expects($this->once())
+        $metadata->expects(self::once())
             ->method('getSingleIdentifierFieldName')
             ->willReturn('id');
-        $em->expects($this->once())
+        $this->em->expects(self::once())
             ->method('getClassMetadata')
             ->willReturn($metadata);
 
-        new EntityToIdTransformer($em, 'TestClass', null, null);
+        $transformer = $this->getTransformer(null, null);
+        self::assertEquals(1, $transformer->transform($this->createEntity(1)));
     }
 
-    public function testPropertyConstructionException()
+    public function testPropertyConstructionException(): void
     {
         $this->expectException(FormException::class);
         $this->expectExceptionMessage('Cannot get id property path of entity. "TestClass" has composite primary key.');
 
-        $em = $this->createMock(EntityManager::class);
-
         $metadata = $this->createMock(ClassMetadata::class);
-        $metadata->expects($this->once())
+        $metadata->expects(self::once())
             ->method('getSingleIdentifierFieldName')
             ->willThrowException(new MappingException('Exception'));
-        $em->expects($this->once())
+        $this->em->expects(self::once())
             ->method('getClassMetadata')
             ->willReturn($metadata);
 
-        new EntityToIdTransformer($em, 'TestClass', null, null);
+        $transformer = $this->getTransformer(null, null);
+        $transformer->transform(new \stdClass());
     }
 
-    public function testCallbackException()
+    public function testCallbackException(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "callable", "string" given');
 
-        new EntityToIdTransformer($this->entityManager, 'TestClass', 'id', 'uncallable');
-    }
-
-    private function createEntity(int $id): \stdClass
-    {
-        $result = $this->getMockBuilder(\stdClass::class)
-            ->addMethods(['getId'])
-            ->getMock();
-        $result->expects($this->any())
-            ->method('getId')
-            ->willReturn($id);
-
-        return $result;
+        $this->getTransformer('id', 'uncallable');
     }
 }

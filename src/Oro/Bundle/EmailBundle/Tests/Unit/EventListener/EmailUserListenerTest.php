@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
@@ -11,29 +11,24 @@ use Oro\Bundle\EmailBundle\EventListener\EmailUserListener;
 use Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EmailUserListenerTest extends \PHPUnit\Framework\TestCase
+class EmailUserListenerTest extends TestCase
 {
-    /** @var WebSocketSendProcessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $webSocketSendProcessor;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var UnitOfWork|\PHPUnit\Framework\MockObject\MockObject */
-    private $uow;
-
-    /** @var EmailUserListener */
-    private $listener;
+    private WebSocketSendProcessor&MockObject $webSocketSendProcessor;
+    private EntityManagerInterface&MockObject $em;
+    private UnitOfWork&MockObject $uow;
+    private EmailUserListener $listener;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->webSocketSendProcessor = $this->createMock(WebSocketSendProcessor::class);
-        $this->em = $this->createMock(EntityManager::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
         $this->uow = $this->createMock(UnitOfWork::class);
 
-        $this->em->expects($this->any())
+        $this->em->expects(self::any())
             ->method('getUnitOfWork')
             ->willReturn($this->uow);
 
@@ -44,7 +39,7 @@ class EmailUserListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new EmailUserListener($container);
     }
 
-    public function testFlush()
+    public function testFlush(): void
     {
         $changeSetAnswer = ['seen' => true];
 
@@ -60,20 +55,19 @@ class EmailUserListenerTest extends \PHPUnit\Framework\TestCase
         $emailUserArray = [$emailUser1, $emailUser2, $emailUser1];
 
         $onFlushEventArgs = $this->createMock(OnFlushEventArgs::class);
-        $onFlushEventArgs->expects($this->once())
+        $onFlushEventArgs->expects(self::once())
             ->method('getObjectManager')
             ->willReturn($this->em);
-        $this->uow->expects($this->any())
+        $this->uow->expects(self::any())
             ->method('getEntityChangeSet')
             ->willReturn($changeSetAnswer);
-        $this->uow->expects($this->any())
+        $this->uow->expects(self::any())
             ->method('getScheduledEntityInsertions')
             ->willReturn($emailUserArray);
-        $this->uow->expects($this->any())
+        $this->uow->expects(self::any())
             ->method('getScheduledEntityUpdates')
             ->willReturn($emailUserArray);
-        $this->webSocketSendProcessor
-            ->expects($this->once())
+        $this->webSocketSendProcessor->expects(self::once())
             ->method('send')
             ->with(
                 [
@@ -83,7 +77,7 @@ class EmailUserListenerTest extends \PHPUnit\Framework\TestCase
             );
 
         $postFlushEventArgs = $this->createMock(PostFlushEventArgs::class);
-        $postFlushEventArgs->expects($this->any())
+        $postFlushEventArgs->expects(self::any())
             ->method('getObjectManager')
             ->willReturn($this->em);
 

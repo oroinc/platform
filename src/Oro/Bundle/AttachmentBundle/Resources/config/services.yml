@@ -261,10 +261,11 @@ services:
         class: Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider
         public: true
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@oro_attachment.association_helper'
             - '@oro_attachment.manager'
             - '@oro_attachment.provider.picture_sources'
+            - '@property_accessor'
 
     oro_attachment.exclusion_provider:
         class: Oro\Bundle\AttachmentBundle\Provider\AttachmentExclusionProvider

@@ -2,46 +2,42 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Entity\Manager;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\UserBundle\Entity\Manager\RoleManager;
+use Oro\Bundle\UserBundle\Entity\Repository\RoleRepository;
 use Oro\Bundle\UserBundle\Entity\Role;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class RoleManagerTest extends \PHPUnit\Framework\TestCase
+class RoleManagerTest extends TestCase
 {
-    /** @var \Oro\Bundle\UserBundle\Entity\Manager\RoleManager */
-    private $manager;
-
-    private $em;
-
-    private $repository;
-
-    private $role;
+    private ManagerRegistry&MockObject $doctrine;
+    private RoleManager $manager;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManager::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
 
-        $this->repository = $this->getMockBuilder(\Doctrine\Persistence\ObjectRepository::class)
-            ->onlyMethods(['find', 'findAll', 'findBy', 'findOneBy', 'getClassName'])
-            ->addMethods(['getUserQueryBuilder'])
-            ->getMock();
-
-        $this->em->expects($this->any())
-            ->method('getRepository')
-            ->willReturn($this->repository);
-
-        $this->manager = new RoleManager($this->em);
-        $this->role = $this->createMock(Role::class);
+        $this->manager = new RoleManager($this->doctrine);
     }
 
-    public function testGetUserQueryBuilder()
+    public function testGetUserQueryBuilder(): void
     {
-        $this->repository->expects($this->once())
-            ->method('getUserQueryBuilder')
-            ->with($this->role)
-            ->willReturn([]);
+        $role = $this->createMock(Role::class);
+        $queryBuilder = $this->createMock(QueryBuilder::class);
 
-        $this->manager->getUserQueryBuilder($this->role);
+        $repository = $this->createMock(RoleRepository::class);
+        $repository->expects(self::once())
+            ->method('getUserQueryBuilder')
+            ->with(self::identicalTo($role))
+            ->willReturn($queryBuilder);
+
+        $this->doctrine->expects(self::once())
+            ->method('getRepository')
+            ->willReturn($repository);
+
+        self::assertSame($queryBuilder, $this->manager->getUserQueryBuilder($role));
     }
 }

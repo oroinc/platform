@@ -3,7 +3,7 @@
 namespace Oro\Component\DoctrineUtils\Tests\Unit\ORM;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
@@ -137,7 +137,7 @@ class FieldUpdatesCheckerTest extends \PHPUnit\Framework\TestCase
             ->method('getScheduledEntityDeletions')
             ->willReturn($deletedEntities);
 
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects($this->any())
             ->method('getUnitOfWork')
             ->willReturn($uow);

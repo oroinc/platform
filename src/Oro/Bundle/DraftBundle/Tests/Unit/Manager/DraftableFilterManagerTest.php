@@ -2,43 +2,52 @@
 
 namespace Oro\Bundle\DraftBundle\Tests\Unit\Manager;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\FilterCollection;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DraftBundle\Doctrine\DraftableFilter;
 use Oro\Bundle\DraftBundle\Manager\DraftableFilterManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DraftableFilterManagerTest extends \PHPUnit\Framework\TestCase
+class DraftableFilterManagerTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $managerRegistry;
-
-    /** @var DraftableFilterManager */
-    private $manager;
+    private ManagerRegistry&MockObject $doctrine;
+    private DraftableFilterManager $manager;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->managerRegistry = $this->createMock(ManagerRegistry::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
 
-        $this->manager = new DraftableFilterManager(
-            $this->managerRegistry
-        );
+        $this->manager = new DraftableFilterManager($this->doctrine);
+    }
+
+    private function expectGetFilters(FilterCollection $filters, string $className): void
+    {
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::once())
+            ->method('getFilters')
+            ->willReturn($filters);
+
+        $this->doctrine->expects(self::once())
+            ->method('getManagerForClass')
+            ->with($className)
+            ->willReturn($entityManager);
     }
 
     public function testDisableFilterDisabled(): void
     {
         $className = 'className';
-        /** @var FilterCollection|\PHPUnit\Framework\MockObject\MockObject $filters */
         $filters = $this->createMock(FilterCollection::class);
-        $filters->expects($this->once())
+        $filters->expects(self::once())
             ->method('isEnabled')
             ->with(DraftableFilter::FILTER_ID)
             ->willReturn(false);
-        $filters->expects($this->never())
+        $filters->expects(self::never())
             ->method('disable');
 
-        $this->mockManagerRegistry($filters, $className);
+        $this->expectGetFilters($filters, $className);
 
         $this->manager->disable($className);
     }
@@ -46,17 +55,16 @@ class DraftableFilterManagerTest extends \PHPUnit\Framework\TestCase
     public function testDisableFilterEnabled(): void
     {
         $className = 'className';
-        /** @var FilterCollection|\PHPUnit\Framework\MockObject\MockObject $filters */
         $filters = $this->createMock(FilterCollection::class);
-        $filters->expects($this->once())
+        $filters->expects(self::once())
             ->method('isEnabled')
             ->with(DraftableFilter::FILTER_ID)
             ->willReturn(true);
-        $filters->expects($this->once())
+        $filters->expects(self::once())
             ->method('disable')
             ->with(DraftableFilter::FILTER_ID);
 
-        $this->mockManagerRegistry($filters, $className);
+        $this->expectGetFilters($filters, $className);
 
         $this->manager->disable($className);
     }
@@ -64,27 +72,13 @@ class DraftableFilterManagerTest extends \PHPUnit\Framework\TestCase
     public function testEnableFilter(): void
     {
         $className = 'className';
-        /** @var FilterCollection|\PHPUnit\Framework\MockObject\MockObject $filters */
         $filters = $this->createMock(FilterCollection::class);
-        $filters->expects($this->once())
+        $filters->expects(self::once())
             ->method('enable')
             ->with(DraftableFilter::FILTER_ID);
 
-        $this->mockManagerRegistry($filters, $className);
+        $this->expectGetFilters($filters, $className);
 
         $this->manager->enable($className);
-    }
-
-    private function mockManagerRegistry(FilterCollection $filters, string $className): void
-    {
-        $entityManager = $this->createMock(EntityManager::class);
-        $entityManager->expects($this->once())
-            ->method('getFilters')
-            ->willReturn($filters);
-
-        $this->managerRegistry->expects($this->once())
-            ->method('getManagerForClass')
-            ->with($className)
-            ->willReturn($entityManager);
     }
 }

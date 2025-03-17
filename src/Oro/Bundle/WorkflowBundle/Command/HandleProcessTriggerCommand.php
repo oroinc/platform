@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\WorkflowBundle\Command;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
@@ -22,15 +22,11 @@ class HandleProcessTriggerCommand extends Command
     /** @var string */
     protected static $defaultName = 'oro:process:handle-trigger';
 
-    private ManagerRegistry $registry;
-    private ProcessHandler $processHandler;
-
-    public function __construct(ManagerRegistry $registry, ProcessHandler $processHandler)
-    {
+    public function __construct(
+        private ManagerRegistry $doctrine,
+        private ProcessHandler $processHandler
+    ) {
         parent::__construct();
-
-        $this->registry = $registry;
-        $this->processHandler = $processHandler;
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
@@ -67,7 +63,7 @@ HELP
         }
 
         /** @var ProcessTrigger $processTrigger */
-        $processTrigger = $this->registry->getRepository(ProcessTrigger::class)->find($triggerId);
+        $processTrigger = $this->doctrine->getRepository(ProcessTrigger::class)->find($triggerId);
         if (!$processTrigger) {
             $output->writeln('<error>Process trigger not found</error>');
 
@@ -83,10 +79,9 @@ HELP
 
         $processData = new ProcessData();
 
-        /** @var EntityManager $entityManager */
-        $entityManager = $this->registry->getManager();
+        /** @var EntityManagerInterface $entityManager */
+        $entityManager = $this->doctrine->getManager();
         $entityManager->beginTransaction();
-
         try {
             $start = microtime(true);
 

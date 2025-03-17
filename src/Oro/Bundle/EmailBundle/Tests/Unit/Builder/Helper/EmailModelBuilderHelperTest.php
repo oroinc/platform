@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Builder\Helper;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
@@ -17,36 +16,22 @@ use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Twig\Environment;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
+class EmailModelBuilderHelperTest extends TestCase
 {
-    /** @var EntityRoutingHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityRoutingHelper;
-
-    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityNameResolver;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var EmailAddressManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailAddressManager;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var EmailCacheManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailCacheManager;
-
-    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
-    private $twig;
-
-    /** @var EmailModelBuilderHelper */
-    private $helper;
+    private EntityRoutingHelper&MockObject $entityRoutingHelper;
+    private EntityNameResolver&MockObject $entityNameResolver;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private EmailAddressManager&MockObject $emailAddressManager;
+    private EmailCacheManager&MockObject $emailCacheManager;
+    private Environment&MockObject $twig;
+    private EmailModelBuilderHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -55,7 +40,6 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
         $this->entityNameResolver = $this->createMock(EntityNameResolver::class);
         $this->tokenAccessor = $this->createMock(TokenAccessorInterface::class);
         $this->emailAddressManager = $this->createMock(EmailAddressManager::class);
-        $this->entityManager = $this->createMock(EntityManager::class);
         $this->emailCacheManager = $this->createMock(EmailCacheManager::class);
         $this->twig = $this->createMock(Environment::class);
         $mailboxManager = $this->createMock(MailboxManager::class);
@@ -66,7 +50,6 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
             $this->entityNameResolver,
             $this->tokenAccessor,
             $this->emailAddressManager,
-            $this->entityManager,
             $this->emailCacheManager,
             $this->twig,
             $mailboxManager
@@ -189,7 +172,6 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->emailAddressManager->expects(self::once())
             ->method('getEmailAddressRepository')
-            ->with($this->entityManager)
             ->willReturn($repo);
 
         $this->entityNameResolver->expects(self::once())
@@ -222,7 +204,6 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->emailAddressManager->expects(self::once())
             ->method('getEmailAddressRepository')
-            ->with($this->entityManager)
             ->willReturn($repo);
 
         $this->tokenAccessor->expects(self::once())
@@ -254,7 +235,6 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
             });
         $this->emailAddressManager->expects(self::any())
             ->method('getEmailAddressRepository')
-            ->with($this->identicalTo($this->entityManager))
             ->willReturn($emailAddressRepository);
 
         $this->entityNameResolver->expects(self::any())
@@ -318,7 +298,6 @@ class EmailModelBuilderHelperTest extends \PHPUnit\Framework\TestCase
 
         $this->emailAddressManager->expects(self::once())
             ->method('getEmailAddressRepository')
-            ->with($this->entityManager)
             ->willReturn($repo);
 
         $this->entityNameResolver->expects(self::never())

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
@@ -25,29 +25,13 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class OroEntitySelectOrCreateInlineType extends AbstractType
 {
-    private AuthorizationCheckerInterface $authorizationChecker;
-    private FeatureChecker $featureChecker;
-    private ConfigManager $configManager;
-    private EntityManager $entityManager;
-    private SearchRegistry $searchRegistry;
-
     public function __construct(
-        AuthorizationCheckerInterface $authorizationChecker,
-        FeatureChecker $featureChecker,
-        ConfigManager $configManager,
-        EntityManager $entityManager,
-        SearchRegistry $searchRegistry
+        private AuthorizationCheckerInterface $authorizationChecker,
+        private FeatureChecker $featureChecker,
+        private ConfigManager $configManager,
+        private ManagerRegistry $doctrine,
+        private SearchRegistry $searchRegistry
     ) {
-        $this->authorizationChecker = $authorizationChecker;
-        $this->featureChecker = $featureChecker;
-        $this->configManager = $configManager;
-        $this->entityManager = $entityManager;
-        $this->searchRegistry = $searchRegistry;
-    }
-
-    public function getName()
-    {
-        return $this->getBlockPrefix();
     }
 
     #[\Override]
@@ -240,7 +224,7 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
         bool $isCreateGranted = true
     ): DataTransformerInterface {
         if ($newItemPropertyName && $isCreateGranted) {
-            $transformer = new EntityCreationTransformer($this->entityManager, $entityClass);
+            $transformer = new EntityCreationTransformer($this->doctrine, $entityClass);
             $transformer->setNewEntityPropertyName($newItemPropertyName);
             $transformer->setAllowEmptyProperty($newItemAllowEmptyProperty);
             $transformer->setValuePath($newItemValuePath);
@@ -248,11 +232,11 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
             return $transformer;
         }
 
-        return new EntityToIdTransformer($this->entityManager, $entityClass);
+        return new EntityToIdTransformer($this->doctrine, $entityClass);
     }
 
     private function isManageableEntity(string $entityClass): bool
     {
-        return $this->entityManager->getMetadataFactory()->hasMetadataFor($entityClass);
+        return null !== $this->doctrine->getManagerForClass($entityClass);
     }
 }

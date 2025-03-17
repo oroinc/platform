@@ -2,51 +2,58 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreationTransformer;
 use Oro\Bundle\FormBundle\Tests\Unit\Fixtures\Entity\TestCreationEntity;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
-class EntityCreationTransformerTest extends \PHPUnit\Framework\TestCase
+class EntityCreationTransformerTest extends TestCase
 {
-    /** @var EntityCreationTransformer */
-    private $transformer;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
+    private ManagerRegistry&MockObject $doctrine;
+    private EntityCreationTransformer $transformer;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManager::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
 
         $meta = $this->createMock(ClassMetadata::class);
-        $meta->expects($this->any())
+        $meta->expects(self::any())
             ->method('getSingleIdentifierFieldName')
             ->willReturn('id');
-        $this->em->expects($this->any())
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects(self::any())
             ->method('getClassMetadata')
             ->with(TestCreationEntity::class)
             ->willReturn($meta);
 
-        $this->transformer = new EntityCreationTransformer($this->em, TestCreationEntity::class);
+        $this->doctrine->expects(self::any())
+            ->method('getManagerForClass')
+            ->with(TestCreationEntity::class)
+            ->willReturn($em);
+
+        $this->transformer = new EntityCreationTransformer($this->doctrine, TestCreationEntity::class);
     }
 
     /**
      * @dataProvider reverseTransformDataProvider
      */
     public function testReverseTransform(
-        $value,
+        mixed $value,
         ?TestCreationEntity $expected,
         ?string $valuePath = 'value',
         bool $allowEmptyProperty = false,
         string $newEntityPropertyName = 'name',
         ?\Exception $exception = null,
         bool $loadEntity = false
-    ) {
+    ): void {
         $this->transformer->setValuePath($valuePath);
         $this->transformer->setAllowEmptyProperty($allowEmptyProperty);
         $this->transformer->setNewEntityPropertyName($newEntityPropertyName);
@@ -56,18 +63,18 @@ class EntityCreationTransformerTest extends \PHPUnit\Framework\TestCase
         }
         if ($loadEntity) {
             $repo = $this->createMock(EntityRepository::class);
-            $repo->expects($this->once())
+            $repo->expects(self::once())
                 ->method('find')
                 ->with($expected->getId())
                 ->willReturn($expected);
-            $this->em->expects($this->once())
+            $this->doctrine->expects(self::once())
                 ->method('getRepository')
                 ->with(TestCreationEntity::class)
                 ->willReturn($repo);
         }
         $entity = $this->transformer->reverseTransform($value);
 
-        $this->assertEquals($expected, $entity);
+        self::assertEquals($expected, $entity);
     }
 
     public function reverseTransformDataProvider(): array
@@ -138,7 +145,7 @@ class EntityCreationTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testReverseTransformUnexpectedType()
+    public function testReverseTransformUnexpectedType(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('json encoded string, array or scalar value');

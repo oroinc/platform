@@ -245,7 +245,6 @@ services:
         class: Oro\Bundle\EmailBundle\Form\Type\EmailOriginFromType
         arguments:
             - '@oro_security.token_accessor'
-            - '@oro_email.related_emails.provider'
             - '@oro_email.email.model.builder.helper'
             - '@oro_email.mailbox.manager'
             - '@doctrine'

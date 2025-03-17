@@ -180,7 +180,7 @@ services:
     oro_security.acl.permission_manager:
         class: Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager
         arguments:
-            - '@oro_entity.doctrine_helper'
+            - '@doctrine'
             - '@oro_security.cache.provider.permission'
 
     oro_security.acl.configurable_permission_provider:
@@ -608,9 +608,8 @@ services:
     oro_security.configuration.builder.permission_configuration:
         class: Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder
         arguments:
-            - '@oro_entity.doctrine_helper'
             - '@validator'
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
 
     oro_security.layout.data_provider.acl:
         class: Oro\Bundle\SecurityBundle\Layout\DataProvider\AclProvider

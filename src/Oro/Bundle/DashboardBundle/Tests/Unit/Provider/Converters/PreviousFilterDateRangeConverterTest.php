@@ -6,21 +6,16 @@ use Oro\Bundle\DashboardBundle\Provider\Converters\PreviousFilterDateRangeConver
 use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class PreviousFilterDateRangeConverterTest extends \PHPUnit\Framework\TestCase
+class PreviousFilterDateRangeConverterTest extends TestCase
 {
-    /** @var DateTimeFormatterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formatter;
-
-    /** @var Compiler|\PHPUnit\Framework\MockObject\MockObject */
-    private $dateCompiler;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var PreviousFilterDateRangeConverter */
-    private $converter;
+    private DateTimeFormatterInterface&MockObject $formatter;
+    private Compiler&MockObject $dateCompiler;
+    private TranslatorInterface&MockObject $translator;
+    private PreviousFilterDateRangeConverter $converter;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +31,7 @@ class PreviousFilterDateRangeConverterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetConvertedValueBetween()
+    public function testGetConvertedValueBetween(): void
     {
         $start = new \DateTime('2014-01-01', new \DateTimeZone('UTC'));
         $end = new \DateTime('2014-12-31', new \DateTimeZone('UTC'));
@@ -53,14 +48,14 @@ class PreviousFilterDateRangeConverterTest extends \PHPUnit\Framework\TestCase
                 'dateRange' => [
                     'value' => [
                         'start' => $start,
-                        'end'   => $end
+                        'end' => $end
                     ],
-                    'type'  => AbstractDateFilterType::TYPE_BETWEEN
+                    'type' => AbstractDateFilterType::TYPE_BETWEEN
                 ]
             ]
         );
 
-        $this->assertEquals('2013-01-01', $result['start']->format('Y-m-d'));
-        $this->assertEquals('2014-01-01', $result['end']->format('Y-m-d'));
+        self::assertEquals('2013-01-01', $result['start']->format('Y-m-d'));
+        self::assertEquals('2014-01-01', $result['end']->format('Y-m-d'));
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional\Async;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EmailBundle\Async\PurgeEmailAttachmentsByIdsMessageProcessor;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
@@ -23,21 +22,37 @@ class PurgeEmailAttachmentsByIdsMessageProcessorTest extends WebTestCase
         $this->initClient();
     }
 
-    public function testCouldBeConstructedByContainer()
+    private function createEmailAttachmentWithContent(string $content): void
     {
-        $service = $this->getContainer()->get('oro_email.async.purge_email_attachments_by_ids');
+        $attachmentContent = new EmailAttachmentContent();
+        $attachmentContent->setContent($content);
+        $attachmentContent->setContentTransferEncoding('encoding');
 
-        $this->assertInstanceOf(PurgeEmailAttachmentsByIdsMessageProcessor::class, $service);
+        $attachment = new EmailAttachment();
+        $attachment->setContent($attachmentContent);
+        $attachment->setFileName('filename');
+        $attachment->setContentType('content-type');
+
+        $em = self::getContainer()->get('doctrine')->getManagerForClass(EmailAttachment::class);
+        $em->persist($attachment);
+        $em->flush();
     }
 
-    public function testShouldPurgeAttachmentsByIds()
+    public function testCouldBeConstructedByContainer(): void
+    {
+        $service = self::getContainer()->get('oro_email.async.purge_email_attachments_by_ids');
+
+        self::assertInstanceOf(PurgeEmailAttachmentsByIdsMessageProcessor::class, $service);
+    }
+
+    public function testShouldPurgeAttachmentsByIds(): void
     {
         $this->createEmailAttachmentWithContent('a');
         $this->createEmailAttachmentWithContent('aa');
         $this->createEmailAttachmentWithContent('aaa');
 
-        $allAttachments = $this->getEntityManager()->getRepository(EmailAttachment::class)->findAll();
-        $this->assertCount(3, $allAttachments);
+        $allAttachments = self::getContainer()->get('doctrine')->getRepository(EmailAttachment::class)->findAll();
+        self::assertCount(3, $allAttachments);
 
         $ids = array_map(function ($attachment) {
             return $attachment->getId();
@@ -54,7 +69,7 @@ class PurgeEmailAttachmentsByIdsMessageProcessorTest extends WebTestCase
         $subJob->setCreatedAt(new \DateTime());
         $subJob->setRootJob($rootJob);
 
-        $jobEm = $this->getEntityManager(Job::class);
+        $jobEm = self::getContainer()->get('doctrine')->getManagerForClass(Job::class);
         $jobEm->persist($rootJob);
         $jobEm->persist($subJob);
         $jobEm->flush();
@@ -65,21 +80,21 @@ class PurgeEmailAttachmentsByIdsMessageProcessorTest extends WebTestCase
         $processor = $this->getContainer()->get('oro_email.async.purge_email_attachments_by_ids');
 
         $result = $processor->process($message, $this->createMock(SessionInterface::class));
-        $this->assertEquals(MessageProcessorInterface::ACK, $result);
+        self::assertEquals(MessageProcessorInterface::ACK, $result);
 
-        $allAttachments = $this->getEntityManager()->getRepository(EmailAttachment::class)->findAll();
-        $this->assertCount(1, $allAttachments);
-        $this->assertEquals($expectedId, $allAttachments[0]->getId());
+        $allAttachments = self::getContainer()->get('doctrine')->getRepository(EmailAttachment::class)->findAll();
+        self::assertCount(1, $allAttachments);
+        self::assertEquals($expectedId, $allAttachments[0]->getId());
     }
 
-    public function testShouldPurgeAttachmentsByIdsAndSize()
+    public function testShouldPurgeAttachmentsByIdsAndSize(): void
     {
         $this->createEmailAttachmentWithContent('a');
         $this->createEmailAttachmentWithContent('aa');
         $this->createEmailAttachmentWithContent('aaa');
 
-        $allAttachments = $this->getEntityManager()->getRepository(EmailAttachment::class)->findAll();
-        $this->assertCount(3, $allAttachments);
+        $allAttachments = self::getContainer()->get('doctrine')->getRepository(EmailAttachment::class)->findAll();
+        self::assertCount(3, $allAttachments);
 
         $ids = array_map(function ($attachment) {
             return $attachment->getId();
@@ -95,7 +110,7 @@ class PurgeEmailAttachmentsByIdsMessageProcessorTest extends WebTestCase
         $subJob->setCreatedAt(new \DateTime());
         $subJob->setRootJob($rootJob);
 
-        $jobEm = $this->getEntityManager(Job::class);
+        $jobEm = self::getContainer()->get('doctrine')->getManagerForClass(Job::class);
         $jobEm->persist($rootJob);
         $jobEm->persist($subJob);
         $jobEm->flush();
@@ -106,32 +121,11 @@ class PurgeEmailAttachmentsByIdsMessageProcessorTest extends WebTestCase
         $processor = $this->getContainer()->get('oro_email.async.purge_email_attachments_by_ids');
 
         $result = $processor->process($message, $this->createMock(SessionInterface::class));
-        $this->assertEquals(MessageProcessorInterface::ACK, $result);
+        self::assertEquals(MessageProcessorInterface::ACK, $result);
 
-        $allAttachments = $this->getEntityManager()->getRepository(EmailAttachment::class)->findAll();
-        $this->assertCount(2, $allAttachments);
-        $this->assertLessThan(3, $allAttachments[0]->getSize());
-        $this->assertLessThan(3, $allAttachments[1]->getSize());
-    }
-
-    private function createEmailAttachmentWithContent(string $content): void
-    {
-        $attachmentContent = new EmailAttachmentContent();
-        $attachmentContent->setContent($content);
-        $attachmentContent->setContentTransferEncoding('encoding');
-
-        $attachment = new EmailAttachment();
-        $attachment->setContent($attachmentContent);
-        $attachment->setFileName('filename');
-        $attachment->setContentType('content-type');
-
-        $em = $this->getEntityManager();
-        $em->persist($attachment);
-        $em->flush();
-    }
-
-    private function getEntityManager(string $entityClass = EmailAttachment::class): EntityManagerInterface
-    {
-        return $this->getContainer()->get('doctrine')->getManagerForClass($entityClass);
+        $allAttachments = self::getContainer()->get('doctrine')->getRepository(EmailAttachment::class)->findAll();
+        self::assertCount(2, $allAttachments);
+        self::assertLessThan(3, $allAttachments[0]->getSize());
+        self::assertLessThan(3, $allAttachments[1]->getSize());
     }
 }

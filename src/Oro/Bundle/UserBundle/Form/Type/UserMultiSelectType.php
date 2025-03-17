@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
 use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
 use Symfony\Component\Form\AbstractType;
@@ -14,40 +14,31 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class UserMultiSelectType extends AbstractType
 {
-    const NAME = 'oro_user_multiselect';
-
-    /**
-     * @var EntityManager
-     */
-    protected $entityManager;
-
-    public function __construct(EntityManager $entityManager)
-    {
-        $this->entityManager = $entityManager;
+    public function __construct(
+        protected ManagerRegistry $doctrine
+    ) {
     }
 
     #[\Override]
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->addModelTransformer(
-            new EntitiesToIdsTransformer($this->entityManager, $options['entity_class'])
-        );
+        $builder->addModelTransformer(new EntitiesToIdsTransformer($this->doctrine, $options['entity_class']));
     }
 
     #[\Override]
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
-            array(
-                'autocomplete_alias'  => 'users',
-                'configs'             => array(
-                    'multiple'                   => true,
-                    'placeholder'                => 'oro.user.form.choose_user',
-                    'allowClear'                 => true,
-                    'result_template_twig'       => '@OroUser/User/Autocomplete/result.html.twig',
-                    'selection_template_twig'    => '@OroUser/User/Autocomplete/selection.html.twig',
-                )
-            )
+            [
+                'autocomplete_alias' => 'users',
+                'configs' => [
+                    'multiple' => true,
+                    'placeholder' => 'oro.user.form.choose_user',
+                    'allowClear' => true,
+                    'result_template_twig' => '@OroUser/User/Autocomplete/result.html.twig',
+                    'selection_template_twig' => '@OroUser/User/Autocomplete/selection.html.twig',
+                ]
+            ]
         );
     }
 
@@ -57,14 +48,9 @@ class UserMultiSelectType extends AbstractType
         return OroJquerySelect2HiddenType::class;
     }
 
-    public function getName()
-    {
-        return $this->getBlockPrefix();
-    }
-
     #[\Override]
     public function getBlockPrefix(): string
     {
-        return self::NAME;
+        return 'oro_user_multiselect';
     }
 }

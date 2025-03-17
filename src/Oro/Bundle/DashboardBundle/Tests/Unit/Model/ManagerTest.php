@@ -7,6 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DashboardBundle\Entity\ActiveDashboard;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 use Oro\Bundle\DashboardBundle\Entity\Repository\DashboardRepository;
@@ -20,38 +21,25 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ManagerTest extends \PHPUnit\Framework\TestCase
+class ManagerTest extends TestCase
 {
-    /** @var Factory|\PHPUnit\Framework\MockObject\MockObject */
-    private $factory;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclHelper;
-
-    /** @var DashboardRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $dashboardRepository;
-
-    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $widgetRepository;
-
-    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $activeDashboardRepository;
-
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenStorage;
-
-    /** @var Manager */
-    private $manager;
+    private Factory&MockObject $factory;
+    private EntityManager&MockObject $entityManager;
+    private AclHelper&MockObject $aclHelper;
+    private DashboardRepository&MockObject $dashboardRepository;
+    private EntityRepository&MockObject $widgetRepository;
+    private EntityRepository&MockObject $activeDashboardRepository;
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private Manager $manager;
 
     #[\Override]
     protected function setUp(): void
@@ -64,17 +52,21 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
         $this->aclHelper = $this->createMock(AclHelper::class);
         $this->tokenStorage = $this->createMock(TokenStorageInterface::class);
 
-        $this->entityManager->expects(self::any())
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getManager')
+            ->willReturn($this->entityManager);
+        $doctrine->expects(self::any())
             ->method('getRepository')
             ->willReturnMap([
-                [Dashboard::class, $this->dashboardRepository],
-                [Widget::class, $this->widgetRepository],
-                [ActiveDashboard::class, $this->activeDashboardRepository],
+                [Dashboard::class, null, $this->dashboardRepository],
+                [Widget::class, null, $this->widgetRepository],
+                [ActiveDashboard::class, null, $this->activeDashboardRepository],
             ]);
 
         $this->manager = new Manager(
             $this->factory,
-            $this->entityManager,
+            $doctrine,
             $this->aclHelper,
             $this->tokenStorage
         );
@@ -206,12 +198,10 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testGetDashboardModels(): void
     {
-        /** @var Dashboard[]|\PHPUnit\Framework\MockObject\MockObject[] $entities */
         $entities = [
             $this->createMock(Dashboard::class),
             $this->createMock(Dashboard::class)
         ];
-        /** @var DashboardModel[]|\PHPUnit\Framework\MockObject\MockObject[] $dashboardModels */
         $dashboardModels = [
             $this->createMock(DashboardModel::class),
             $this->createMock(DashboardModel::class)
@@ -351,17 +341,17 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
 
         $startDashboardEntity = $this->createMock(Dashboard::class);
         $dashboardEntity = $this->createMock(Dashboard::class);
-        /** @var Widget[]|\PHPUnit\Framework\MockObject\MockObject[] $startDashboardWidgets */
+        /** @var Widget[]&MockObject[] $startDashboardWidgets */
         $startDashboardWidgets = [
             $this->createMock(Widget::class),
             $this->createMock(Widget::class),
         ];
-        /** @var Widget[]|\PHPUnit\Framework\MockObject\MockObject[] $copyWidgets */
+        /** @var Widget[]&MockObject[] $copyWidgets */
         $copyWidgets = [
             $this->createMock(Widget::class),
             $this->createMock(Widget::class),
         ];
-        /** @var WidgetModel[]|\PHPUnit\Framework\MockObject\MockObject[] $copyWidgetModels */
+        /** @var WidgetModel[]&MockObject[] $copyWidgetModels */
         $copyWidgetModels = [
             $this->createMock(WidgetModel::class),
             $this->createMock(WidgetModel::class)
@@ -568,7 +558,6 @@ class ManagerTest extends \PHPUnit\Framework\TestCase
     {
         $permission = 'EDIT';
         $expectedEntities = [$this->createMock(Dashboard::class)];
-        /** @var DashboardModel[]|\PHPUnit\Framework\MockObject\MockObject[] $expectedModels */
         $expectedModels = [
             $this->createMock(DashboardModel::class)
         ];

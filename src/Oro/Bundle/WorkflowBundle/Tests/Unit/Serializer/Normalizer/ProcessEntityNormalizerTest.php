@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Normalizer;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -11,30 +11,25 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\ProcessEntityNormalizer;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Normalizer\Stub\Entity;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Serializer;
 
-class ProcessEntityNormalizerTest extends \PHPUnit\Framework\TestCase
+class ProcessEntityNormalizerTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var Serializer|\PHPUnit\Framework\MockObject\MockObject */
-    private $serializer;
-
-    /** @var ProcessEntityNormalizer */
-    private $normalizer;
+    private ManagerRegistry&MockObject $doctrine;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private Serializer&MockObject $serializer;
+    private ProcessEntityNormalizer $normalizer;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->registry = $this->createMock(ManagerRegistry::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
         $this->serializer = $this->createMock(Serializer::class);
 
-        $this->normalizer = new ProcessEntityNormalizer($this->registry, $this->doctrineHelper);
+        $this->normalizer = new ProcessEntityNormalizer($this->doctrine, $this->doctrineHelper);
         $this->normalizer->setSerializer($this->serializer);
     }
 
@@ -82,13 +77,13 @@ class ProcessEntityNormalizerTest extends \PHPUnit\Framework\TestCase
         $entityId = 1;
         $className = get_class($entity);
 
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects(self::once())
             ->method('find')
             ->with($className, $entityId)
             ->willReturn($entity);
 
-        $this->registry->expects(self::any())
+        $this->doctrine->expects(self::any())
             ->method('getManagerForClass')
             ->with($className)
             ->willReturn($entityManager);
@@ -142,13 +137,13 @@ class ProcessEntityNormalizerTest extends \PHPUnit\Framework\TestCase
                 return new \ReflectionProperty($className, $name);
             });
 
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects(self::any())
             ->method('getClassMetadata')
             ->with($className)
             ->willReturn($metadata);
 
-        $this->registry->expects(self::any())
+        $this->doctrine->expects(self::any())
             ->method('getManagerForClass')
             ->with($className)
             ->willReturn($entityManager);

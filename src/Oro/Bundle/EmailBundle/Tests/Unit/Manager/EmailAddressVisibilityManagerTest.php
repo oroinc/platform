@@ -6,7 +6,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQL100Platform;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Async\Topic\RecalculateEmailVisibilityTopic;
@@ -20,31 +20,22 @@ use Oro\Bundle\EmailBundle\Entity\Provider\PublicEmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\EmailAddress;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EmailAddressVisibilityManagerTest extends \PHPUnit\Framework\TestCase
+class EmailAddressVisibilityManagerTest extends TestCase
 {
-    /** @var EmailOwnerProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailOwnerProvider;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
-
-    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $producer;
-
-    /** @var PublicEmailOwnerProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $publicEmailOwnerProvider;
-
-    /** @var EmailAddressVisibilityManager */
-    private $manager;
+    private EmailOwnerProvider&MockObject $emailOwnerProvider;
+    private EntityManagerInterface&MockObject $em;
+    private Connection&MockObject $connection;
+    private MessageProducerInterface&MockObject $producer;
+    private PublicEmailOwnerProvider&MockObject $publicEmailOwnerProvider;
+    private EmailAddressVisibilityManager $manager;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManager::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
         $this->connection = $this->createMock(Connection::class);
         $this->emailOwnerProvider = $this->createMock(EmailOwnerProvider::class);
         $this->producer = $this->createMock(MessageProducerInterface::class);

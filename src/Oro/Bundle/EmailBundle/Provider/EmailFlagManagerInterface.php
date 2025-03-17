@@ -6,39 +6,22 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 
 /**
- * Interface EmailFlagManagerInterface
- * @package Oro\Bundle\EmailBundle\Provider
+ * Represents a service to manage flags for email messages.
  */
 interface EmailFlagManagerInterface
 {
     /**
-     * Set flags for message by EmailFolder and  Email
-     *
-     * @param EmailFolder $folder
-     * @param Email $email
-     * @param $flags
-     *
-     * @return void
+     * Sets flags for message by EmailFolder and Email.
      */
-    public function setFlags(EmailFolder $folder, Email $email, $flags);
+    public function setFlags(EmailFolder $folder, Email $email, array $flags): void;
 
     /**
-     * Set flag UNSEEN for message by EmailFolder and Email
-     *
-     * @param EmailFolder $folder
-     * @param Email $email
-     *
-     * @return void
+     * Sets flag UNSEEN for message by EmailFolder and Email.
      */
-    public function setUnseen(EmailFolder $folder, Email $email);
+    public function setUnseen(EmailFolder $folder, Email $email): void;
 
     /**
-     * Set flag SEEN for message by EmailFolder and Email
-     *
-     * @param EmailFolder $folder
-     * @param Email $email
-     *
-     * @return void
+     * Sets flag SEEN for message by EmailFolder and Email.
      */
-    public function setSeen(EmailFolder $folder, Email $email);
+    public function setSeen(EmailFolder $folder, Email $email): void;
 }

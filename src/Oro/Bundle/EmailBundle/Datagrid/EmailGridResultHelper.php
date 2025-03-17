@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Datagrid;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
@@ -22,35 +22,19 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class EmailGridResultHelper
 {
-    /** @var ManagerRegistry */
-    private $doctrine;
-
-    /** @var EmailOwnerProviderStorage */
-    private $emailOwnerProviderStorage;
-
-    /** @var MailboxNameHelper */
-    private $mailboxNameHelper;
-
-    /** @var EmailAddressManager */
-    private $emailAddressManager;
-
     public function __construct(
-        ManagerRegistry $doctrine,
-        EmailOwnerProviderStorage $emailOwnerProviderStorage,
-        MailboxNameHelper $mailboxNameHelper,
-        EmailAddressManager $emailAddressManager
+        private ManagerRegistry $doctrine,
+        private EmailOwnerProviderStorage $emailOwnerProviderStorage,
+        private MailboxNameHelper $mailboxNameHelper,
+        private EmailAddressManager $emailAddressManager
     ) {
-        $this->doctrine = $doctrine;
-        $this->emailOwnerProviderStorage = $emailOwnerProviderStorage;
-        $this->mailboxNameHelper = $mailboxNameHelper;
-        $this->emailAddressManager = $emailAddressManager;
     }
 
     /**
      * @param ResultRecord[] $records
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function addEmailDirections(array $records)
+    public function addEmailDirections(array $records): void
     {
         $emailUserFolderTypes = $this->loadEmailUserFolderTypes($this->getEmailUserIds($records));
         $fromEmailAddressIds = [];
@@ -62,10 +46,10 @@ class EmailGridResultHelper
                 /** @var string[] $folderTypes */
                 $folderTypes = $emailUserFolderTypes[$emailUserId];
                 foreach ($folderTypes as $folderType) {
-                    if (in_array($folderType, FolderType::incomingTypes(), true)) {
+                    if (\in_array($folderType, FolderType::incomingTypes(), true)) {
                         $incoming = true;
                     }
-                    if (in_array($folderType, FolderType::outgoingTypes(), true)) {
+                    if (\in_array($folderType, FolderType::outgoingTypes(), true)) {
                         $outgoing = true;
                     }
                 }
@@ -85,7 +69,7 @@ class EmailGridResultHelper
     /**
      * @param ResultRecord[] $records
      */
-    public function addEmailMailboxNames(array $records)
+    public function addEmailMailboxNames(array $records): void
     {
         $mailboxNames = $this->loadEmailMailboxNames($this->getEmailOriginIds($records));
         foreach ($records as $record) {
@@ -101,7 +85,7 @@ class EmailGridResultHelper
     /**
      * @param ResultRecord[] $records
      */
-    public function addEmailRecipients(array $records)
+    public function addEmailRecipients(array $records): void
     {
         $emailRecipients = $this->loadEmailRecipients($this->getEmailAndThreadIds($records));
         foreach ($records as $record) {
@@ -119,7 +103,7 @@ class EmailGridResultHelper
      *
      * @return array [email user id => [folder type, ...], ...]
      */
-    private function loadEmailUserFolderTypes(array $emailUserIds)
+    private function loadEmailUserFolderTypes(array $emailUserIds): array
     {
         if (empty($emailUserIds)) {
             return [];
@@ -151,7 +135,7 @@ class EmailGridResultHelper
      *
      * @return array [origin id => mailbox name, ...]
      */
-    private function loadEmailMailboxNames(array $originIds)
+    private function loadEmailMailboxNames(array $originIds): array
     {
         if (empty($originIds)) {
             return [];
@@ -179,7 +163,7 @@ class EmailGridResultHelper
      *
      * @return array [email id => [recipient, ...], ...]
      */
-    private function loadEmailRecipients(array $emailAndThreadIds)
+    private function loadEmailRecipients(array $emailAndThreadIds): array
     {
         if (empty($emailAndThreadIds)) {
             return [];
@@ -211,7 +195,7 @@ class EmailGridResultHelper
      *
      * @return array [email id => [recipient, ...], ...]
      */
-    private function loadEmailRecipientsByEmailIds(array $emailIds)
+    private function loadEmailRecipientsByEmailIds(array $emailIds): array
     {
         if (empty($emailIds)) {
             return [];
@@ -240,7 +224,7 @@ class EmailGridResultHelper
      *
      * @return array [thread id => [recipient, ...], ...]
      */
-    private function loadEmailRecipientsByThreadIds(array $threadIds)
+    private function loadEmailRecipientsByThreadIds(array $threadIds): array
     {
         if (empty($threadIds)) {
             return [];
@@ -277,7 +261,7 @@ class EmailGridResultHelper
      * @param ResultRecord[] $records
      * @param int[]          $fromEmailAddressIds
      */
-    private function addUnknownEmailDirections(array $records, array $fromEmailAddressIds)
+    private function addUnknownEmailDirections(array $records, array $fromEmailAddressIds): void
     {
         $fromEmailAddressOwners = $this->loadEmailAddressOwners($fromEmailAddressIds);
         foreach ($records as $record) {
@@ -299,7 +283,7 @@ class EmailGridResultHelper
      *
      * @return array [email address id => owner id, ...]
      */
-    private function loadEmailAddressOwners(array $emailAddressIds)
+    private function loadEmailAddressOwners(array $emailAddressIds): array
     {
         if (empty($emailAddressIds)) {
             return [];
@@ -325,11 +309,7 @@ class EmailGridResultHelper
         return $result;
     }
 
-    /**
-     * @param QueryBuilder $qb
-     * @param string       $emailAddressAlias
-     */
-    private function bindEmailAddressOwners(QueryBuilder $qb, $emailAddressAlias)
+    private function bindEmailAddressOwners(QueryBuilder $qb, string $emailAddressAlias): void
     {
         foreach ($this->emailOwnerProviderStorage->getProviders() as $provider) {
             $ownerFieldName = $this->emailOwnerProviderStorage->getEmailOwnerFieldName($provider);
@@ -344,7 +324,7 @@ class EmailGridResultHelper
      *
      * @return int[]
      */
-    private function getEmailUserIds(array $records)
+    private function getEmailUserIds(array $records): array
     {
         return $this->getIds($records, 'id');
     }
@@ -354,7 +334,7 @@ class EmailGridResultHelper
      *
      * @return array [email id => thread id, ...]
      */
-    private function getEmailAndThreadIds(array $records)
+    private function getEmailAndThreadIds(array $records): array
     {
         $result = [];
         foreach ($records as $record) {
@@ -375,7 +355,7 @@ class EmailGridResultHelper
      *
      * @return int[]
      */
-    private function getEmailOriginIds(array $records)
+    private function getEmailOriginIds(array $records): array
     {
         return $this->getIds($records, 'originId', true);
     }
@@ -388,7 +368,7 @@ class EmailGridResultHelper
      *
      * @return int[]
      */
-    private function getIds(array $records, $propertyName, $unique = false, $filter = null)
+    private function getIds(array $records, string $propertyName, bool $unique = false, ?callable $filter = null): array
     {
         $result = [];
         foreach ($records as $record) {
@@ -404,33 +384,19 @@ class EmailGridResultHelper
         return $result;
     }
 
-    /**
-     * @param string $entityClass
-     *
-     * @return EntityManager
-     */
-    private function getEntityManager($entityClass)
+    private function getEntityManager(string $entityClass): EntityManagerInterface
     {
         return $this->doctrine->getManagerForClass($entityClass);
     }
 
-    /**
-     * @param string $entityClass
-     * @param string $alias
-     *
-     * @return QueryBuilder
-     */
-    private function createQueryBuilder($entityClass, $alias)
+    private function createQueryBuilder(string $entityClass, string $alias): QueryBuilder
     {
         return $this->getEntityManager($entityClass)
             ->getRepository($entityClass)
             ->createQueryBuilder($alias);
     }
 
-    /**
-     * @return string
-     */
-    private function getEmailAddressClass()
+    private function getEmailAddressClass(): string
     {
         return $this->emailAddressManager->getEmailAddressProxyClass();
     }

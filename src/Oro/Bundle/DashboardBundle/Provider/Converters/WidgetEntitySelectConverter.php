@@ -2,59 +2,29 @@
 
 namespace Oro\Bundle\DashboardBundle\Provider\Converters;
 
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 /**
- * Dashboard configuration converter for entity select values.
+ * The dashboard widget configuration converter for select an entity.
  */
 class WidgetEntitySelectConverter extends ConfigValueConverterAbstract
 {
-    /** @var AclHelper */
-    protected $aclHelper;
-
-    /** @var EntityNameResolver */
-    protected $entityNameResolver;
-
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var EntityManager */
-    protected $entityManager;
-
-    /** @var string */
-    protected $entityClass;
-
-    /**
-     * @param AclHelper          $aclHelper
-     * @param EntityNameResolver $entityNameResolver
-     * @param DoctrineHelper     $doctrineHelper
-     * @param EntityManager      $entityManager
-     * @param string             $entityClass
-     */
     public function __construct(
-        AclHelper $aclHelper,
-        EntityNameResolver $entityNameResolver,
-        DoctrineHelper $doctrineHelper,
-        EntityManager $entityManager,
-        $entityClass
+        protected AclHelper $aclHelper,
+        protected EntityNameResolver $entityNameResolver,
+        protected DoctrineHelper $doctrineHelper,
+        protected string $entityClass
     ) {
-        $this->aclHelper          = $aclHelper;
-        $this->entityNameResolver = $entityNameResolver;
-        $this->doctrineHelper     = $doctrineHelper;
-        $this->entityManager      = $entityManager;
-        $this->entityClass        = $entityClass;
     }
 
     #[\Override]
-    public function getViewValue($value)
+    public function getViewValue(mixed $value): mixed
     {
-        $entities = $this->getEntities($value);
-
         $names = [];
+        $entities = $this->getEntities($value);
         foreach ($entities as $entity) {
             $names[] = $this->entityNameResolver->getName($entity);
         }
@@ -62,18 +32,13 @@ class WidgetEntitySelectConverter extends ConfigValueConverterAbstract
         return empty($names) ? null : implode('; ', $names);
     }
 
-    /**
-     * @param mixed $value
-     *
-     * @return mixed
-     */
-    protected function getEntities($value)
+    protected function getEntities(mixed $value): mixed
     {
         if (empty($value)) {
             return [];
         }
 
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
             $value = [$value];
         }
 
@@ -81,19 +46,21 @@ class WidgetEntitySelectConverter extends ConfigValueConverterAbstract
 
         $identityField = $this->doctrineHelper->getSingleEntityIdentifierFieldName($this->entityClass);
 
-        $qb = $this->entityManager->getRepository($this->entityClass)->createQueryBuilder('e');
-        $qb->where(
-            $qb->expr()->in(sprintf('e.%s', $identityField), ':ids')
-        );
-        $qb->setParameter('ids', $value);
+        $qb = $this->doctrineHelper->createQueryBuilder($this->entityClass, 'e')
+            ->where(\sprintf('e.%s IN (:ids)', $identityField))
+            ->setParameter('ids', $value);
 
         return $this->aclHelper->apply($qb)->getResult();
     }
 
     #[\Override]
-    public function getConvertedValue(array $widgetConfig, $value = null, array $config = [], array $options = [])
-    {
-        if ($value === null) {
+    public function getConvertedValue(
+        array $widgetConfig,
+        mixed $value = null,
+        array $config = [],
+        array $options = []
+    ): mixed {
+        if (null === $value) {
             return $this->getDefaultChoices($config);
         }
 
@@ -101,28 +68,17 @@ class WidgetEntitySelectConverter extends ConfigValueConverterAbstract
     }
 
     #[\Override]
-    public function getFormValue(array $config, $value)
+    public function getFormValue(array $config, mixed $value): mixed
     {
-        if ($value === null) {
+        if (null === $value) {
             return $this->getDefaultChoices($config);
         }
 
         return parent::getFormValue($config, $value);
     }
 
-    /**
-     * @param array $config
-     *
-     * @return array
-     */
-    protected function getDefaultChoices(array $config)
+    protected function getDefaultChoices(array $config): mixed
     {
-        $values = [];
-
-        if (isset($config['converter_attributes']['default_selected'])) {
-            $values = $config['converter_attributes']['default_selected'];
-        }
-
-        return $values;
+        return $config['converter_attributes']['default_selected'] ?? [];
     }
 }

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Security;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -11,24 +11,17 @@ use Oro\Bundle\UserBundle\Entity\UserLoginAttempt;
 use Oro\Bundle\UserBundle\Provider\UserLoggingInfoProviderInterface;
 use Oro\Bundle\UserBundle\Security\UserLoginAttemptLogger;
 use Oro\Component\Testing\Logger\BufferingLogger;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class UserLoginAttemptLoggerTest extends \PHPUnit\Framework\TestCase
+class UserLoginAttemptLoggerTest extends TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
-
-    /** @var UserLoggingInfoProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $userInfoProvider;
-
-    /** @var BufferingLogger */
-    private $logger;
-
-    /** @var UserLoginAttemptLogger */
-    private $attemptlogger;
+    private EntityManagerInterface&MockObject $em;
+    private Connection&MockObject $connection;
+    private UserLoggingInfoProviderInterface&MockObject $userInfoProvider;
+    private BufferingLogger $logger;
+    private UserLoginAttemptLogger $attemptlogger;
 
     #[\Override]
     protected function setUp(): void
@@ -41,7 +34,7 @@ class UserLoginAttemptLoggerTest extends \PHPUnit\Framework\TestCase
             'impersonation' => ['label' => 'impersonation_label', 'code' => 10],
         ];
 
-        $this->em = $this->createMock(EntityManager::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
         $this->connection = $this->createMock(Connection::class);
 
         $doctrine = $this->createMock(ManagerRegistry::class);

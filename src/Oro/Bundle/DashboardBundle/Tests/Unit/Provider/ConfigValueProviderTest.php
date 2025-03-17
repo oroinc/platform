@@ -5,11 +5,11 @@ namespace Oro\Bundle\DashboardBundle\Tests\Unit\Provider;
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider;
 use Oro\Bundle\DashboardBundle\Tests\Unit\Fixtures\Provider\TestConverter;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\TestCase;
 
-class ConfigValueProviderTest extends \PHPUnit\Framework\TestCase
+class ConfigValueProviderTest extends TestCase
 {
-    /** @var ConfigValueProvider */
-    private $provider;
+    private ConfigValueProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -23,42 +23,43 @@ class ConfigValueProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new ConfigValueProvider($container);
     }
 
-    public function testGetConvertedValueUnsupported()
+    public function testGetConvertedValueUnsupported(): void
     {
         $value = 'test';
-        $this->assertSame($value, $this->provider->getConvertedValue([], 'unsupported', $value));
+        self::assertSame($value, $this->provider->getConvertedValue([], 'unsupported', $value));
     }
 
-    public function testGetConvertedValue()
+    public function testGetConvertedValue(): void
     {
         $value = 'test value';
-        $this->assertSame('test value', $this->provider->getConvertedValue([], 'test_form_type', $value));
+        self::assertSame('test value', $this->provider->getConvertedValue([], 'test_form_type', $value));
     }
 
-    public function testGetViewValueUnsupported()
+    public function testGetViewValueUnsupported(): void
     {
         $value = 'test';
-        $this->assertSame($value, $this->provider->getViewValue('unsupported', $value));
+        self::assertSame($value, $this->provider->getViewValue('unsupported', $value));
     }
 
-    public function testGetViewValue()
+    public function testGetViewValue(): void
     {
         $value = 'test';
-        $this->assertSame('test view value', $this->provider->getViewValue('test_form_type', $value));
+        self::assertSame('test view value', $this->provider->getViewValue('test_form_type', $value));
     }
 
-    public function testGetFormValue()
+    public function testGetFormValueUnsupported(): void
+    {
+        $value = 'test';
+        $this->assertSame($value, $this->provider->getFormValue('unsupported', [], $value));
+    }
+
+    public function testGetFormValue(): void
     {
         $value = 'test';
         $convertedValue = 'converted';
-        $this->assertSame(
+        self::assertSame(
             $convertedValue,
-            $this->provider->getFormValue(
-                'test_form_type',
-                ['value' => $convertedValue],
-                $value
-            )
+            $this->provider->getFormValue('test_form_type', ['value' => $convertedValue], $value)
         );
-        $this->assertSame($value, $this->provider->getFormValue('unsupported', [], $value));
     }
 }

@@ -4,7 +4,7 @@ namespace Oro\Bundle\EmailBundle\Builder;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\AttachmentBundle\Provider\FileConstraintsProvider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Builder\Helper\EmailModelBuilderHelper;
@@ -28,76 +28,19 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class EmailModelBuilder
 {
-    /**
-     * @var EmailModelBuilderHelper
-     */
-    protected $helper;
-
-    /**
-     * @var Request
-     */
-    protected $request;
-
-    /**
-     * @var RequestStack
-     */
-    protected $requestStack;
-
-    /**
-     * @var EntityManager
-     */
-    protected $entityManager;
-
-    /**
-     * @var ConfigManager
-     */
-    protected $configManager;
-
-    /**
-     * @var EmailAttachmentProvider
-     */
-    protected $emailAttachmentProvider;
-
-    /**
-     * @var EmailActivityListProvider
-     */
-    protected $activityListProvider;
-
-    /**
-     * @var Factory
-     */
-    protected $factory;
-
-    /**
-     * @var HtmlTagHelper
-     */
-    private $htmlTagHelper;
-
-    /**
-     * @var FileConstraintsProvider
-     */
-    private $fileConstraintsProvider;
+    protected ?Request $request = null;
 
     public function __construct(
-        EmailModelBuilderHelper $emailModelBuilderHelper,
-        EntityManager $entityManager,
-        ConfigManager $configManager,
-        EmailActivityListProvider $activityListProvider,
-        EmailAttachmentProvider $emailAttachmentProvider,
-        Factory $factory,
-        RequestStack $requestStack,
-        HtmlTagHelper $htmlTagHelper,
-        FileConstraintsProvider $fileConstraintsProvider
+        protected EmailModelBuilderHelper $helper,
+        protected ManagerRegistry $doctrine,
+        protected ConfigManager $configManager,
+        protected EmailActivityListProvider $activityListProvider,
+        protected EmailAttachmentProvider $emailAttachmentProvider,
+        protected Factory $factory,
+        protected RequestStack $requestStack,
+        protected HtmlTagHelper $htmlTagHelper,
+        protected FileConstraintsProvider $fileConstraintsProvider
     ) {
-        $this->helper = $emailModelBuilderHelper;
-        $this->entityManager = $entityManager;
-        $this->configManager = $configManager;
-        $this->activityListProvider = $activityListProvider;
-        $this->emailAttachmentProvider = $emailAttachmentProvider;
-        $this->factory = $factory;
-        $this->requestStack = $requestStack;
-        $this->htmlTagHelper = $htmlTagHelper;
-        $this->fileConstraintsProvider = $fileConstraintsProvider;
     }
 
     /**
@@ -314,7 +257,7 @@ class EmailModelBuilder
         }
         if (!$emailModel->getEntityClass() || !$emailModel->getEntityId()) {
             if ($emailModel->getParentEmailId()) {
-                $parentEmail = $this->entityManager->getRepository(EmailEntity::class)
+                $parentEmail = $this->doctrine->getRepository(EmailEntity::class)
                     ->find($emailModel->getParentEmailId());
                 $this->applyEntityDataFromEmail($emailModel, $parentEmail);
             }
@@ -426,14 +369,14 @@ class EmailModelBuilder
         $attachments = [];
 
         if ($emailModel->getParentEmailId()) {
-            $parentEmail = $this->entityManager->getRepository(EmailEntity::class)
+            $parentEmail = $this->doctrine->getRepository(EmailEntity::class)
                 ->find($emailModel->getParentEmailId());
             $threadAttachments = $this->emailAttachmentProvider->getThreadAttachments($parentEmail);
             $threadAttachments = $this->filterAttachmentsByName($threadAttachments);
             $attachments = $threadAttachments;
         }
         if ($emailModel->getEntityClass() && $emailModel->getEntityId()) {
-            $scopeEntity = $this->entityManager->getRepository($emailModel->getEntityClass())
+            $scopeEntity = $this->doctrine->getRepository($emailModel->getEntityClass())
                 ->find($emailModel->getEntityId());
 
             if ($scopeEntity) {

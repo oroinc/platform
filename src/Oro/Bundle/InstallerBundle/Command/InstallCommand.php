@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
@@ -336,8 +336,8 @@ HELP
         if ($input->getOption('drop-database')) {
             $output->writeln('<info>Drop schema.</info>');
             $managers = $this->doctrine->getManagers();
-            foreach ($managers as $name => $manager) {
-                if ($manager instanceof EntityManager) {
+            foreach ($managers as $manager) {
+                if ($manager instanceof EntityManagerInterface) {
                     $tool = new SchemaTool($manager);
                     $tool->dropDatabase();
                 }

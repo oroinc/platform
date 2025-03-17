@@ -3,7 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Cache\Normalizer;
 
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\RuntimeReflectionService;
@@ -14,30 +14,29 @@ use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Model\FallbackType;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Form\Type\Stub\CustomLocalizedFallbackValueStub;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Stub\LocalizationStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LocalizedFallbackValueNormalizerTest extends \PHPUnit\Framework\TestCase
+class LocalizedFallbackValueNormalizerTest extends TestCase
 {
-    private EntityManager|\PHPUnit\Framework\MockObject\MockObject $entityManager;
-
+    private EntityManagerInterface&MockObject $entityManager;
     private LocalizedFallbackValueNormalizer $normalizer;
 
     #[\Override]
     protected function setUp(): void
     {
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
-        $this->entityManager = $this->createMock(EntityManager::class);
-        $managerRegistry
-            ->expects(self::any())
-            ->method('getManagerForClass')
-            ->willReturn($this->entityManager);
-
-        $this->normalizer = new LocalizedFallbackValueNormalizer($managerRegistry);
-
-        $this->entityManager
-            ->expects(self::any())
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->entityManager->expects(self::any())
             ->method('getReference')
             ->with(Localization::class)
             ->willReturnCallback(static fn ($class, $id) => new LocalizationStub($id));
+
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
+            ->method('getManagerForClass')
+            ->willReturn($this->entityManager);
+
+        $this->normalizer = new LocalizedFallbackValueNormalizer($doctrine);
     }
 
     /**
@@ -47,8 +46,7 @@ class LocalizedFallbackValueNormalizerTest extends \PHPUnit\Framework\TestCase
     {
         $className = ClassUtils::getRealClass(get_class($localizedFallbackValue));
 
-        $this->entityManager
-            ->expects(self::once())
+        $this->entityManager->expects(self::once())
             ->method('getClassMetadata')
             ->with($className)
             ->willReturn($this->createClassMetadata($className));
@@ -106,8 +104,7 @@ class LocalizedFallbackValueNormalizerTest extends \PHPUnit\Framework\TestCase
         string $className,
         AbstractLocalizedFallbackValue $expected
     ): void {
-        $this->entityManager
-            ->expects(self::once())
+        $this->entityManager->expects(self::once())
             ->method('getClassMetadata')
             ->with($className)
             ->willReturn($this->createClassMetadata($className));

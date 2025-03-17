@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Entity\Config;
@@ -10,17 +10,14 @@ use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
 use Oro\Bundle\ConfigBundle\Entity\Repository\ConfigValueRepository;
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
 use Oro\Bundle\LocaleBundle\EventListener\LocalizationChangeListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LocalizationChangeListenerTest extends \PHPUnit\Framework\TestCase
+class LocalizationChangeListenerTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var ConfigValueRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
-
-    /** @var LocalizationChangeListener */
-    private $listener;
+    private ConfigManager&MockObject $configManager;
+    private ConfigValueRepository&MockObject $repository;
+    private LocalizationChangeListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -32,18 +29,17 @@ class LocalizationChangeListenerTest extends \PHPUnit\Framework\TestCase
 
         $this->repository = $this->createMock(ConfigValueRepository::class);
 
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects($this->any())
             ->method('getRepository')
             ->willReturn($this->repository);
 
-        /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $managerRegistry */
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
-        $managerRegistry->expects($this->any())
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
             ->method('getManagerForClass')
             ->willReturn($entityManager);
 
-        $this->listener = new LocalizationChangeListener($this->configManager, $managerRegistry);
+        $this->listener = new LocalizationChangeListener($this->configManager, $doctrine);
     }
 
     public function testOnConfigUpdate(): void

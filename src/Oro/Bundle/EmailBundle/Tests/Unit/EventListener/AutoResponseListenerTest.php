@@ -12,17 +12,14 @@ use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AutoResponseListenerTest extends \PHPUnit\Framework\TestCase
+class AutoResponseListenerTest extends TestCase
 {
-    /** @var AutoResponseManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $autoResponseManager;
-
-    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $producer;
-
-    /** @var AutoResponseListener */
-    private $listener;
+    private AutoResponseManager&MockObject $autoResponseManager;
+    private MessageProducerInterface&MockObject $producer;
+    private AutoResponseListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -31,20 +28,20 @@ class AutoResponseListenerTest extends \PHPUnit\Framework\TestCase
         $this->producer = $this->createMock(MessageProducerInterface::class);
 
         $container = TestContainerBuilder::create()
-            ->add('oro_email.autoresponserule_manager', $this->autoResponseManager)
+            ->add(AutoResponseManager::class, $this->autoResponseManager)
             ->add(MessageProducerInterface::class, $this->producer)
             ->getContainer($this);
 
         $this->listener = new AutoResponseListener($container);
     }
 
-    public function testShouldPublishEmailIdsIfTheyHasAutoResponse()
+    public function testShouldPublishEmailIdsIfTheyHasAutoResponse(): void
     {
-        $this->autoResponseManager->expects($this->exactly(2))
+        $this->autoResponseManager->expects(self::exactly(2))
             ->method('hasAutoResponses')
             ->willReturn(true);
 
-        $this->producer->expects($this->once())
+        $this->producer->expects(self::once())
             ->method('send')
             ->with(SendAutoResponsesTopic::getName(), ['ids' => [123, 12345]]);
 
@@ -65,18 +62,18 @@ class AutoResponseListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->postFlush($this->createMock(PostFlushEventArgs::class));
     }
 
-    public function testShouldNotPublishEmailIdsIfThereIsNotEmailBodies()
+    public function testShouldNotPublishEmailIdsIfThereIsNotEmailBodies(): void
     {
-        $this->autoResponseManager->expects($this->never())
+        $this->autoResponseManager->expects(self::never())
             ->method('hasAutoResponses');
 
-        $this->producer->expects($this->never())
+        $this->producer->expects(self::never())
             ->method('send');
 
         $this->listener->postFlush($this->createMock(PostFlushEventArgs::class));
     }
 
-    public function testShouldFilterOutEmailsWhichHasNoAutoResponse()
+    public function testShouldFilterOutEmailsWhichHasNoAutoResponse(): void
     {
         $email1 = new Email();
         ReflectionUtil::setId($email1, 123);
@@ -92,28 +89,28 @@ class AutoResponseListenerTest extends \PHPUnit\Framework\TestCase
 
         ReflectionUtil::setPropertyValue($this->listener, 'emailBodies', [$emailBody1, $emailBody2]);
 
-        $this->autoResponseManager->expects($this->exactly(2))
+        $this->autoResponseManager->expects(self::exactly(2))
             ->method('hasAutoResponses')
             ->willReturnOnConsecutiveCalls(false, true);
 
-        $this->producer->expects($this->once())
+        $this->producer->expects(self::once())
             ->method('send')
             ->with(SendAutoResponsesTopic::getName(), ['ids' => [12345]]);
 
         $this->listener->postFlush($this->createMock(PostFlushEventArgs::class));
     }
 
-    public function testShouldNotPublishEmailIdsIfEmailFeatureIsTurnedOff()
+    public function testShouldNotPublishEmailIdsIfEmailFeatureIsTurnedOff(): void
     {
-        $this->autoResponseManager->expects($this->never())
+        $this->autoResponseManager->expects(self::never())
             ->method('hasAutoResponses');
 
-        $this->producer->expects($this->never())
+        $this->producer->expects(self::never())
             ->method('send')
             ->with($this->anything());
 
         $featureChecker = $this->createMock(FeatureChecker::class);
-        $featureChecker->expects($this->once())
+        $featureChecker->expects(self::once())
             ->method('isFeatureEnabled')
             ->with($this->anything())
             ->willReturn(false);

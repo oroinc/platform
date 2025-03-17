@@ -6,18 +6,18 @@ use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
+/**
+ * Filters workflow definitions by the current application.
+ */
 class WorkflowDefinitionApplicationsRegistryFilter implements WorkflowDefinitionFilterInterface
 {
-    /** @var CurrentApplicationProviderInterface */
-    private $currentApplicationProvider;
-
-    public function __construct(CurrentApplicationProviderInterface $currentApplicationProvider)
-    {
-        $this->currentApplicationProvider = $currentApplicationProvider;
+    public function __construct(
+        private CurrentApplicationProviderInterface $currentApplicationProvider
+    ) {
     }
 
     #[\Override]
-    public function filter(Collection $workflowDefinitions)
+    public function filter(Collection $workflowDefinitions): Collection
     {
         $currentApplication = $this->currentApplicationProvider->getCurrentApplication();
         if (null === $currentApplication) {
@@ -25,7 +25,7 @@ class WorkflowDefinitionApplicationsRegistryFilter implements WorkflowDefinition
         }
         /** @var WorkflowDefinition $workflowDefinition */
         foreach ($workflowDefinitions as $key => $workflowDefinition) {
-            if (!in_array($currentApplication, $workflowDefinition->getApplications(), true)) {
+            if (!\in_array($currentApplication, $workflowDefinition->getApplications(), true)) {
                 $workflowDefinitions->remove($key);
             }
         }

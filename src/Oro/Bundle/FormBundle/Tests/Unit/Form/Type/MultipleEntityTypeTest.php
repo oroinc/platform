@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -35,7 +35,7 @@ class MultipleEntityTypeTest extends FormIntegrationTestCase
         $metadata = new ClassMetadataInfo(\stdClass::class);
         $metadata->identifier[] = 'id';
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects($this->any())
             ->method('getClassMetadata')
             ->willReturnMap([[\stdClass::class, $metadata]]);

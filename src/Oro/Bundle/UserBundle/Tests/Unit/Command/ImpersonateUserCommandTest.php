@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Unit\Command;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
@@ -134,10 +134,9 @@ class ImpersonateUserCommandTest extends \PHPUnit\Framework\TestCase
             ->method('findUserByUsername')
             ->willReturn($userStub);
 
-        $managerStub = $this->createMock(EntityManager::class);
         $this->managerRegistry->expects(self::any())
             ->method('getManagerForClass')
-            ->willReturn($managerStub);
+            ->willReturn($this->createMock(EntityManagerInterface::class));
     }
 
     private function executeCommand(): CommandTester

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Sync;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
@@ -18,49 +18,24 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
 {
     use LoggerAwareTrait;
 
-    /** @var EntityManager */
-    protected $em;
+    protected EntityManagerInterface $em;
+    protected EmailAddressManager $emailAddressManager;
+    protected EmailAddressHelper $emailAddressHelper;
+    protected EmailOwnerProviderStorage $emailOwnerProviderStorage;
+    protected array $exclusions;
+    /** @var array [email address => ['known' => true/false, 'user' => user id], ...] */
+    protected array $emails = [];
 
-    /** @var EmailAddressManager */
-    protected $emailAddressManager;
-
-    /** @var EmailAddressHelper */
-    protected $emailAddressHelper;
-
-    /** @var EmailOwnerProviderStorage */
-    protected $emailOwnerProviderStorage;
-
-    /** @var array */
-    protected $exclusions;
-
-    /**
-     * @var array
-     *  key   = email address
-     *  value = array
-     *      known => true/false
-     *      user  => user id
-     */
-    protected $emails = [];
-
-    /**
-     * Constructor
-     *
-     * @param EntityManager             $em
-     * @param EmailAddressManager       $emailAddressManager
-     * @param EmailAddressHelper        $emailAddressHelper
-     * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
-     * @param string[]                  $exclusions Class names of email address owners which should be excluded
-     */
     public function __construct(
-        EntityManager $em,
+        EntityManagerInterface $em,
         EmailAddressManager $emailAddressManager,
         EmailAddressHelper $emailAddressHelper,
         EmailOwnerProviderStorage $emailOwnerProviderStorage,
         array $exclusions = []
     ) {
-        $this->em                        = $em;
-        $this->emailAddressManager       = $emailAddressManager;
-        $this->emailAddressHelper        = $emailAddressHelper;
+        $this->em = $em;
+        $this->emailAddressManager = $emailAddressManager;
+        $this->emailAddressHelper = $emailAddressHelper;
         $this->emailOwnerProviderStorage = $emailOwnerProviderStorage;
 
         $this->exclusions = [];
@@ -227,9 +202,7 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
         $emails = $this->getKnownEmailAddresses($emailsToLoad);
 
         foreach ($emailsToLoad as $email) {
-            $this->emails[$email] = isset($emails[$email])
-                ? $emails[$email]
-                : ['known' => false];
+            $this->emails[$email] = $emails[$email] ?? ['known' => false];
         }
 
         $this->logger->info(sprintf('Loaded %d email address(es).', count($emails)));
@@ -249,20 +222,20 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
     protected function getKnownEmailAddresses(array $emailsToLoad)
     {
         $repo = $this->emailAddressManager->getEmailAddressRepository($this->em);
-        $qb   = $repo->createQueryBuilder('a')
+        $qb = $repo->createQueryBuilder('a')
             ->where('a.hasOwner = :hasOwner AND a.email IN (:emails)')
             ->setParameter('hasOwner', true)
             ->setParameter('emails', $emailsToLoad);
 
-        $select         = 'a.email';
-        $userIdField    = null;
+        $select = 'a.email';
+        $userIdField = null;
         $mailboxIdField = null;
-        $ownerIdFields  = [];
+        $ownerIdFields = [];
         foreach ($this->emailOwnerProviderStorage->getProviders() as $provider) {
             $ownerClass = $provider->getEmailOwnerClass();
-            $isUser     = $ownerClass === 'Oro\Bundle\UserBundle\Entity\User';
-            $isMailbox  = $ownerClass === 'Oro\Bundle\EmailBundle\Entity\Mailbox';
-            $field      = $this->emailOwnerProviderStorage->getEmailOwnerFieldName($provider);
+            $isUser = $ownerClass === 'Oro\Bundle\UserBundle\Entity\User';
+            $isMailbox = $ownerClass === 'Oro\Bundle\EmailBundle\Entity\Mailbox';
+            $field = $this->emailOwnerProviderStorage->getEmailOwnerFieldName($provider);
             if ($isUser) {
                 $userIdField = $field;
             }
@@ -282,7 +255,7 @@ class KnownEmailAddressChecker implements KnownEmailAddressCheckerInterface, Log
         }
         $qb->select($select);
 
-        $data   = $qb->getQuery()->getArrayResult();
+        $data = $qb->getQuery()->getArrayResult();
         $result = $this->prepareKnownEmailAddressesData($data, $ownerIdFields, $userIdField, $mailboxIdField);
 
         return $result;

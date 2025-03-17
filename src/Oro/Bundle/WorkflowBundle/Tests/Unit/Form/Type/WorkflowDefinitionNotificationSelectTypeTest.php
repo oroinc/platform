@@ -2,32 +2,28 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\FormBundle\Form\Type\Select2EntityType;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowDefinitionNotificationSelectType;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
-use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\Form\Type\Stub\EntityTypeStub;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class WorkflowDefinitionNotificationSelectTypeTest extends FormIntegrationTestCase
 {
-    use EntityTrait;
-
     private const WORKFLOW_NAME = 'test_workflow';
 
-    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowRegistry;
+    private WorkflowRegistry&MockObject $workflowRegistry;
+    private WorkflowDefinitionNotificationSelectType $type;
 
     /** @var WorkflowDefinition[] */
-    private $definitions = [];
-
-    /** @var WorkflowDefinitionNotificationSelectType */
-    private $type;
+    private array $definitions = [];
 
     #[\Override]
     protected function setUp(): void
@@ -35,17 +31,18 @@ class WorkflowDefinitionNotificationSelectTypeTest extends FormIntegrationTestCa
         $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
 
         $this->type = new WorkflowDefinitionNotificationSelectType($this->workflowRegistry);
+
         parent::setUp();
     }
 
-    public function testSubmit()
+    public function testSubmit(): void
     {
         $workflows = $this->getWorkflows($this->getDefinitions());
         $workflow = reset($workflows);
 
-        $this->workflowRegistry->expects($this->once())
+        $this->workflowRegistry->expects(self::once())
             ->method('getWorkflowsByEntityClass')
-            ->willReturn($workflows);
+            ->willReturn(new ArrayCollection($workflows));
 
         $form = $this->factory->create(
             WorkflowDefinitionNotificationSelectType::class,
@@ -54,40 +51,40 @@ class WorkflowDefinitionNotificationSelectTypeTest extends FormIntegrationTestCa
         );
 
         $this->assertFormOptionEqual($this->getDefinitions(), 'choices', $form);
-        $this->assertNull($form->getData());
+        self::assertNull($form->getData());
 
         $form->submit($workflow->getName());
 
-        $this->assertTrue($form->isValid());
-        $this->assertTrue($form->isSynchronized());
-        $this->assertEquals($workflow->getDefinition(), $form->getData());
+        self::assertTrue($form->isValid());
+        self::assertTrue($form->isSynchronized());
+        self::assertEquals($workflow->getDefinition(), $form->getData());
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
-        $resolver->expects($this->once())
+        $resolver->expects(self::once())
             ->method('setDefined')
             ->with('entityClass');
-        $resolver->expects($this->once())
+        $resolver->expects(self::once())
             ->method('setAllowedTypes')
             ->with('entityClass', ['string']);
-        $resolver->expects($this->once())
+        $resolver->expects(self::once())
             ->method('setNormalizer')
             ->with('choices');
 
         $this->type->configureOptions($resolver);
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
-        $this->assertEquals(Select2EntityType::class, $this->type->getParent());
+        self::assertEquals(Select2EntityType::class, $this->type->getParent());
     }
 
     /**
      * @dataProvider incorrectOptionsDataProvider
      */
-    public function testNormalizersException(array $options, string $exceptionMessage)
+    public function testNormalizersException(array $options, string $exceptionMessage): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage($exceptionMessage);
@@ -130,15 +127,15 @@ class WorkflowDefinitionNotificationSelectTypeTest extends FormIntegrationTestCa
     private function getDefinitions(): array
     {
         if (!$this->definitions) {
+            $workflowDefinition = new WorkflowDefinition();
+            $workflowDefinition->setName(self::WORKFLOW_NAME);
+            $workflowDefinition->setLabel('workflow_label');
+            $otherWorkflowDefinition = new WorkflowDefinition();
+            $otherWorkflowDefinition->setName('other_workflow_name');
+            $otherWorkflowDefinition->setLabel('other_workflow_label');
             $this->definitions = [
-                self::WORKFLOW_NAME => $this->getEntity(
-                    WorkflowDefinition::class,
-                    ['name' => self::WORKFLOW_NAME, 'label' => 'workflow_label']
-                ),
-                'other_workflow_name' => $this->getEntity(
-                    WorkflowDefinition::class,
-                    ['name' => 'other_workflow_name', 'label' => 'other_workflow_label']
-                )
+                self::WORKFLOW_NAME => $workflowDefinition,
+                'other_workflow_name' => $otherWorkflowDefinition
             ];
         }
 
@@ -155,13 +152,13 @@ class WorkflowDefinitionNotificationSelectTypeTest extends FormIntegrationTestCa
         $workflows = [];
         foreach ($definitions as $definition) {
             $workflow = $this->createMock(Workflow::class);
-            $workflow->expects($this->any())
+            $workflow->expects(self::any())
                 ->method('getName')
                 ->willReturn($definition->getName());
-            $workflow->expects($this->any())
+            $workflow->expects(self::any())
                 ->method('getLabel')
                 ->willReturn($definition->getLabel());
-            $workflow->expects($this->any())
+            $workflow->expects(self::any())
                 ->method('getDefinition')
                 ->willReturn($definition);
             $workflows[] = $workflow;

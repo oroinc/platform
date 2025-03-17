@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Tests\Unit\Model\Strategy;
 
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use Doctrine\Persistence\ObjectRepository;
+use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper;
@@ -17,10 +18,11 @@ use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
 use Oro\Bundle\EntityMergeBundle\Model\Strategy\UniteStrategy;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\CollectionItemStub;
 use Oro\Bundle\EntityMergeBundle\Tests\Unit\Stub\EntityStub;
+use PHPUnit\Framework\TestCase;
 
-class UniteStrategyTest extends \PHPUnit\Framework\TestCase
+class UniteStrategyTest extends TestCase
 {
-    public function testNotSupports()
+    public function testNotSupports(): void
     {
         $fieldData = $this->createFieldData(
             $this->createEntityData(),
@@ -32,7 +34,7 @@ class UniteStrategyTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($strategy->supports($fieldData));
     }
 
-    public function testMergeManyToOne()
+    public function testMergeManyToOne(): void
     {
         $masterEntity = new EntityStub(1);
         $sourceEntity = new EntityStub(2);
@@ -42,6 +44,7 @@ class UniteStrategyTest extends \PHPUnit\Framework\TestCase
         $item2->setEntityStub($sourceEntity);
 
         $doctrineMetadata = [
+            'sourceEntity' => 'Test\SourceEntity',
             'fieldName' => 'entityStub',
             'targetEntity' => EntityStub::class,
             'type' => ClassMetadataInfo::MANY_TO_ONE,
@@ -70,7 +73,7 @@ class UniteStrategyTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($masterEntity, $item2->getEntityStub());
     }
 
-    public function testMergeOneToMany()
+    public function testMergeOneToMany(): void
     {
         $masterEntity = new EntityStub(1);
         $sourceEntity = new EntityStub(2);
@@ -112,7 +115,7 @@ class UniteStrategyTest extends \PHPUnit\Framework\TestCase
         $this->assertNotSame($collection[1], $collectionItem2);
     }
 
-    public function testMergeManyToMany()
+    public function testMergeManyToMany(): void
     {
         $masterEntity = new EntityStub(1);
         $sourceEntity = new EntityStub(2);
@@ -153,7 +156,7 @@ class UniteStrategyTest extends \PHPUnit\Framework\TestCase
 
     private function getStrategy(array $relatedEntities): UniteStrategy
     {
-        $repository = $this->createMock(ObjectRepository::class);
+        $repository = $this->createMock(EntityRepository::class);
 
         $repository->expects($this->any())
             ->method('findBy')
@@ -175,9 +178,10 @@ class UniteStrategyTest extends \PHPUnit\Framework\TestCase
             ->method('getEntityRepository')
             ->willReturn($repository);
 
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
         $accessor = new DelegateAccessor([
-            new InverseAssociationAccessor($doctrineHelper),
-            new DefaultAccessor(),
+            new InverseAssociationAccessor($propertyAccessor, $doctrineHelper),
+            new DefaultAccessor($propertyAccessor),
         ]);
 
         return new UniteStrategy($accessor, $doctrineHelper);

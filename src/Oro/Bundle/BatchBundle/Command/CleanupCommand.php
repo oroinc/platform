@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Oro\Bundle\BatchBundle\Command;
 
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\BatchBundle\Entity\JobInstance;
@@ -32,7 +31,6 @@ class CleanupCommand extends Command implements
     protected static $defaultName = 'oro:cron:batch:cleanup';
 
     private DoctrineJobRepository $doctrineJobRepository;
-
     private string $batchCleanupInterval;
 
     public function __construct(DoctrineJobRepository $doctrineJobRepository, string $batchCleanupInterval)
@@ -121,9 +119,9 @@ HELP
     /**
      * Subtract given interval from current date time
      */
-    protected function prepareDateInterval(?string $intervalString = null): \DateTime
+    private function prepareDateInterval(?string $intervalString = null): \DateTime
     {
-        $date           = new \DateTime('now', new \DateTimeZone('UTC'));
+        $date = new \DateTime('now', new \DateTimeZone('UTC'));
         $intervalString = $intervalString ?: $this->batchCleanupInterval;
         $date->sub(\DateInterval::createFromDateString($intervalString));
 
@@ -131,11 +129,9 @@ HELP
     }
 
     /**
-     * Delete records using iterator
-     *
-     * @throws \Exception
+     * Delete records using iterator.
      */
-    protected function deleteRecords(BufferedIdentityQueryResultIterator $iterator, string $fqcn): void
+    private function deleteRecords(BufferedIdentityQueryResultIterator $iterator, string $fqcn): void
     {
         $iteration = 0;
 
@@ -153,9 +149,9 @@ HELP
         }
     }
 
-    protected function processBatch(array $ids, string $className): void
+    private function processBatch(array $ids, string $className): void
     {
-        $this->getEntityManager()
+        $this->doctrineJobRepository->getJobManager()
             ->getRepository($className)
             ->createQueryBuilder('entity')
             ->delete($className, 'entity')
@@ -166,34 +162,19 @@ HELP
     }
 
     /**
-     * Find job instances where job executions created before the given date time
-     *
-     * @param $endTime
-     *
-     * @return QueryBuilder
+     * Finds job instances where job executions created before the given date time.
      */
-    protected function getObsoleteJobInstancesQueryBuilder($endTime)
+    private function getObsoleteJobInstancesQueryBuilder(\DateTime $endTime): QueryBuilder
     {
-        $repository = $this->getEntityManager()->getRepository(JobInstance::class);
-
-        return $repository->createQueryBuilder('ji')
+        return $this->doctrineJobRepository->getJobManager()
+            ->getRepository(JobInstance::class)
+            ->createQueryBuilder('ji')
             ->resetDQLPart('select')
             ->select('ji.id')
             ->leftJoin('ji.jobExecutions', 'je')
             ->where('je.status NOT IN (:statuses)')
             ->andWhere('je.createTime < (:endTime)')
-            ->setParameter(
-                'statuses',
-                [BatchStatus::STARTING, BatchStatus::STARTED]
-            )
+            ->setParameter('statuses', [BatchStatus::STARTING, BatchStatus::STARTED])
             ->setParameter('endTime', $endTime, Types::DATETIME_MUTABLE);
-    }
-
-    /**
-     * @return EntityManager
-     */
-    protected function getEntityManager()
-    {
-        return $this->doctrineJobRepository->getJobManager();
     }
 }

@@ -70,8 +70,7 @@ services:
     oro_organization.form.type.business_unit_select_autocomplete:
         class: Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitSelectAutocomplete
         arguments:
-            - '@doctrine.orm.entity_manager'
-            - 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit'
+            - '@doctrine'
             - '@oro_organization.business_unit_manager'
         tags:
             - { name: form.type, alias: "oro_type_business_unit_select_autocomplete" }
@@ -87,7 +86,7 @@ services:
         class: Oro\Bundle\OrganizationBundle\Form\Handler\OrganizationHandler
         arguments:
             - '@request_stack'
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
 
     Oro\Bundle\OrganizationBundle\Form\Handler\OrganizationHandler:
         alias: oro_organization.form.handler.organization
@@ -108,7 +107,7 @@ services:
     oro_organization.form.extension.owner:
         class: Oro\Bundle\OrganizationBundle\Form\Extension\OwnerFormExtension
         arguments:
-            - '@oro_entity.doctrine_helper'
+            - '@doctrine'
             - '@oro_security.token_accessor'
             - '@security.authorization_checker'
             - '@oro_security.owner.ownership_metadata_provider'
@@ -147,10 +146,9 @@ services:
     oro_organization.form.type.widget_business_unit_select:
         class: Oro\Bundle\OrganizationBundle\Form\Type\WidgetBusinessUnitSelectType
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@oro_form.autocomplete.search_registry'
             - '@oro_entity_config.provider.form'
-            - '@oro_entity.doctrine_helper'
         tags:
             - { name: form.type, alias: 'oro_type_widget_business_unit_select' }
 
@@ -161,7 +159,6 @@ services:
             - '@oro_security.acl_helper'
             - '@oro_entity.entity_name_resolver'
             - '@oro_entity.doctrine_helper'
-            - '@doctrine.orm.entity_manager'
             - 'Oro\Bundle\OrganizationBundle\Entity\BusinessUnit'
         tags:
             - { name: oro_dashboard.value.converter, form_type: Oro\Bundle\OrganizationBundle\Form\Type\WidgetBusinessUnitSelectType }

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Button;
 
-use Doctrine\ORM\EntityManager;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
@@ -13,34 +12,35 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefiniti
  */
 class ButtonTest extends WebTestCase
 {
-    /** @var WorkflowManager */
-    private $workflowManager;
-
-    /** @var WorkflowAwareEntity */
-    private $entity;
-
-    /** @var EntityManager */
-    private $entityManager;
-
     #[\Override]
     protected function setUp(): void
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->loadFixtures([LoadWorkflowDefinitions::class]);
-        $this->entityManager = $this->client->getContainer()->get('doctrine')
-            ->getManagerForClass(WorkflowAwareEntity::class);
-        $this->workflowManager = $this->client->getContainer()->get('oro_workflow.manager');
-        $this->workflowManager->activateWorkflow(LoadWorkflowDefinitions::MULTISTEP);
-        $this->workflowManager->activateWorkflow(LoadWorkflowDefinitions::WITH_START_STEP);
-        $this->workflowManager->activateWorkflow(LoadWorkflowDefinitions::WITH_INIT_OPTION);
-        $this->workflowManager->activateWorkflow(LoadWorkflowDefinitions::WITH_DATAGRIDS);
-        $this->entity = $this->createNewEntity();
+
+        /** @var WorkflowManager $workflowManager */
+        $workflowManager = $this->client->getContainer()->get('oro_workflow.manager');
+        $workflowManager->activateWorkflow(LoadWorkflowDefinitions::MULTISTEP);
+        $workflowManager->activateWorkflow(LoadWorkflowDefinitions::WITH_START_STEP);
+        $workflowManager->activateWorkflow(LoadWorkflowDefinitions::WITH_INIT_OPTION);
+        $workflowManager->activateWorkflow(LoadWorkflowDefinitions::WITH_DATAGRIDS);
+    }
+
+    private function createNewEntity(): WorkflowAwareEntity
+    {
+        $testEntity = new WorkflowAwareEntity();
+        $testEntity->setName('test_' . uniqid('test', true));
+        $entityManager = self::getContainer()->get('doctrine')->getManagerForClass(WorkflowAwareEntity::class);
+        $entityManager->persist($testEntity);
+        $entityManager->flush();
+
+        return $testEntity;
     }
 
     /**
      * @dataProvider displayButtonsDataProvider
      */
-    public function testDisplayButtons(array $context, array $expected = [])
+    public function testDisplayButtons(array $context, array $expected = []): void
     {
         $allItems = [
             'transition-test_start_init_option-start_transition_from_routes"',
@@ -54,16 +54,19 @@ class ButtonTest extends WebTestCase
             'GET',
             $this->getUrl(
                 'oro_action_widget_buttons',
-                array_merge(['_widgetContainer' => 'dialog', 'entityId'  => $this->entity->getId()], $context)
+                array_merge(
+                    ['_widgetContainer' => 'dialog', 'entityId' => $this->createNewEntity()->getId()],
+                    $context
+                )
             ),
             [],
             [],
             $this->generateBasicAuthHeader()
         );
         $response = $this->client->getResponse();
-        $this->assertHtmlResponseStatusCodeEquals($response, 200);
+        self::assertHtmlResponseStatusCodeEquals($response, 200);
         if (0 === count($expected)) {
-            $this->assertEmpty($response->getContent());
+            self::assertEmpty($response->getContent());
             $notExpected = [];
         } else {
             $notExpected = array_diff($allItems, $expected);
@@ -120,15 +123,5 @@ class ButtonTest extends WebTestCase
                 'expected' => [],
             ],
         ];
-    }
-
-    private function createNewEntity(): WorkflowAwareEntity
-    {
-        $testEntity = new WorkflowAwareEntity();
-        $testEntity->setName('test_' . uniqid('test', true));
-        $this->entityManager->persist($testEntity);
-        $this->entityManager->flush($testEntity);
-
-        return $testEntity;
     }
 }

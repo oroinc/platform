@@ -2,63 +2,60 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Cache;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectRepository;
 use Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
-class EventTriggerCacheTest extends \PHPUnit\Framework\TestCase
+class EventTriggerCacheTest extends TestCase
 {
     private const TRIGGER_CLASS_NAME = 'stdClass';
     private const DATA = 'data';
     private const BUILT = 'built';
 
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
+    private ManagerRegistry&MockObject $doctrine;
+    private EventTriggerCache $cache;
 
-    /** @var EventTriggerCache */
-    private $cache;
-
-    /** @var array */
-    private $testTriggerData = [
+    private array $testTriggerData = [
         'FirstEntity'  => [ProcessTrigger::EVENT_CREATE, ProcessTrigger::EVENT_UPDATE],
         'SecondEntity' => [ProcessTrigger::EVENT_DELETE],
     ];
 
-    /** @var CacheItemPoolInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $cacheProvider;
+    private CacheItemPoolInterface&MockObject $cacheProvider;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->registry = $this->createMock(ManagerRegistry::class);
-        $this->cache = new EventTriggerCache($this->registry);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->cache = new EventTriggerCache($this->doctrine);
         $this->cache->setTriggerClassName(self::TRIGGER_CLASS_NAME);
         $this->cacheProvider = $this->createMock(CacheItemPoolInterface::class);
     }
 
-    public function testBuild()
+    public function testBuild(): void
     {
         $cacheItem1 = $this->createMock(CacheItemInterface::class);
         $cacheItem2 = $this->createMock(CacheItemInterface::class);
         $this->cacheProvider->expects(self::once())
             ->method('clear');
-        $this->cacheProvider->expects($this->exactly(2))
+        $this->cacheProvider->expects(self::exactly(2))
             ->method('getItem')
             ->withConsecutive(
                 [self::DATA],
                 [self::BUILT]
             )->willReturnOnConsecutiveCalls($cacheItem1, $cacheItem2);
-        $cacheItem1->expects($this->once())
+        $cacheItem1->expects(self::once())
             ->method('set')
             ->with($this->testTriggerData)
             ->willReturn($cacheItem1);
-        $cacheItem2->expects($this->once())
+        $cacheItem2->expects(self::once())
             ->method('set')
             ->with(true)
             ->willReturn($cacheItem2);
@@ -69,10 +66,10 @@ class EventTriggerCacheTest extends \PHPUnit\Framework\TestCase
         $this->prepareRegistryForBuild($this->testTriggerData);
         $this->cache->setProvider($this->cacheProvider);
 
-        $this->assertEquals($this->testTriggerData, $this->cache->build());
+        self::assertEquals($this->testTriggerData, $this->cache->build());
     }
 
-    public function testBuildNoProvider()
+    public function testBuildNoProvider(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Event trigger cache provider is not defined');
@@ -80,7 +77,7 @@ class EventTriggerCacheTest extends \PHPUnit\Framework\TestCase
         $this->cache->build();
     }
 
-    public function testHasTrigger()
+    public function testHasTrigger(): void
     {
         $cacheItem1 = $this->createMock(CacheItemInterface::class);
         $cacheItem2 = $this->createMock(CacheItemInterface::class);
@@ -129,11 +126,11 @@ class EventTriggerCacheTest extends \PHPUnit\Framework\TestCase
         $this->prepareRegistryForBuild($this->testTriggerData);
         $this->cache->setProvider($this->cacheProvider);
 
-        $this->assertTrue($this->cache->hasTrigger('FirstEntity', ProcessTrigger::EVENT_CREATE));
-        $this->assertFalse($this->cache->hasTrigger('UnknownEntity', ProcessTrigger::EVENT_DELETE));
+        self::assertTrue($this->cache->hasTrigger('FirstEntity', ProcessTrigger::EVENT_CREATE));
+        self::assertFalse($this->cache->hasTrigger('UnknownEntity', ProcessTrigger::EVENT_DELETE));
     }
 
-    public function testHasTriggerBuiltCached()
+    public function testHasTriggerBuiltCached(): void
     {
         $cacheItem1 = $this->createMock(CacheItemInterface::class);
         $cacheItem2 = $this->createMock(CacheItemInterface::class);
@@ -163,10 +160,10 @@ class EventTriggerCacheTest extends \PHPUnit\Framework\TestCase
         $this->prepareRegistryForBuild($this->testTriggerData);
         $this->cache->setProvider($this->cacheProvider);
 
-        $this->assertTrue($this->cache->hasTrigger('FirstEntity', ProcessTrigger::EVENT_CREATE));
+        self::assertTrue($this->cache->hasTrigger('FirstEntity', ProcessTrigger::EVENT_CREATE));
     }
 
-    public function testHasTriggerNoProvider()
+    public function testHasTriggerNoProvider(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Event trigger cache provider is not defined');
@@ -174,7 +171,7 @@ class EventTriggerCacheTest extends \PHPUnit\Framework\TestCase
         $this->cache->hasTrigger('UnknownEntity', ProcessTrigger::EVENT_DELETE);
     }
 
-    public function testNoTriggerClassNameException()
+    public function testNoTriggerClassNameException(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Event trigger class name is not defined');
@@ -185,7 +182,7 @@ class EventTriggerCacheTest extends \PHPUnit\Framework\TestCase
         $this->cache->build();
     }
 
-    public function testInvalidTriggerRepository()
+    public function testInvalidTriggerRepository(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Invalid repository');
@@ -195,13 +192,13 @@ class EventTriggerCacheTest extends \PHPUnit\Framework\TestCase
 
         $repository = $this->createMock(ObjectRepository::class);
 
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects(self::any())
             ->method('getRepository')
             ->with(self::TRIGGER_CLASS_NAME)
             ->willReturn($repository);
 
-        $this->registry->expects(self::any())
+        $this->doctrine->expects(self::any())
             ->method('getManagerForClass')
             ->with(self::TRIGGER_CLASS_NAME)
             ->willReturn($entityManager);
@@ -209,7 +206,7 @@ class EventTriggerCacheTest extends \PHPUnit\Framework\TestCase
         $this->cache->build();
     }
 
-    private function prepareRegistryForBuild(array $data)
+    private function prepareRegistryForBuild(array $data): void
     {
         // generate triggers
         $triggers = [];
@@ -232,13 +229,13 @@ class EventTriggerCacheTest extends \PHPUnit\Framework\TestCase
             ->method('getAvailableEventTriggers')
             ->willReturn($triggers);
 
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects(self::any())
             ->method('getRepository')
             ->with(self::TRIGGER_CLASS_NAME)
             ->willReturn($repository);
 
-        $this->registry->expects(self::any())
+        $this->doctrine->expects(self::any())
             ->method('getManagerForClass')
             ->with(self::TRIGGER_CLASS_NAME)
             ->willReturn($entityManager);

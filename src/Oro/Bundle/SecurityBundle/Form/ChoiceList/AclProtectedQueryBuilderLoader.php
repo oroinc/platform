@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\Form\ChoiceList;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
@@ -15,53 +15,33 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
  */
 class AclProtectedQueryBuilderLoader implements EntityLoaderInterface
 {
-    /** @var AclHelper */
-    protected $aclHelper;
+    protected AclHelper $aclHelper;
+    protected QueryBuilder $queryBuilder;
+    protected string $permission;
+    protected array $options = [];
 
-    /** @var QueryBuilder */
-    protected $queryBuilder;
-
-    /** @var string */
-    protected $permission;
-
-    /** @var array */
-    protected $options = [];
-
-    /**
-     * @param AclHelper $aclHelper
-     * @param           $queryBuilder
-     * @param null      $manager
-     * @param null      $class
-     * @param string    $permission
-     * @param array     $options
-     */
     public function __construct(
         AclHelper $aclHelper,
-        $queryBuilder,
-        $manager = null,
-        $class = null,
-        $permission = 'VIEW',
-        $options = []
+        QueryBuilder|\Closure $queryBuilder,
+        ?EntityManagerInterface $em = null,
+        ?string $class = null,
+        string $permission = 'VIEW',
+        array $options = []
     ) {
-        if (!($queryBuilder instanceof QueryBuilder || $queryBuilder instanceof \Closure)) {
-            throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder or \Closure');
-        }
-
         if ($queryBuilder instanceof \Closure) {
-            if (!$manager instanceof EntityManager) {
-                throw new UnexpectedTypeException($manager, 'Doctrine\ORM\EntityManager');
+            if (!$em instanceof EntityManagerInterface) {
+                throw new UnexpectedTypeException($em, EntityManagerInterface::class);
             }
 
-            $queryBuilder = $queryBuilder($manager->getRepository($class));
-
+            $queryBuilder = $queryBuilder($em->getRepository($class));
             if (!$queryBuilder instanceof QueryBuilder) {
-                throw new UnexpectedTypeException($queryBuilder, 'Doctrine\ORM\QueryBuilder');
+                throw new UnexpectedTypeException($queryBuilder, QueryBuilder::class);
             }
         }
 
-        $this->queryBuilder   = $queryBuilder;
-        $this->aclHelper      = $aclHelper;
-        $this->permission     = $permission;
+        $this->queryBuilder = $queryBuilder;
+        $this->aclHelper = $aclHelper;
+        $this->permission = $permission;
         $this->options = $options;
     }
 
@@ -77,10 +57,10 @@ class AclProtectedQueryBuilderLoader implements EntityLoaderInterface
     public function getEntitiesByIds($identifier, array $values): array
     {
         QueryBuilderUtil::checkIdentifier($identifier);
-        $qb        = clone ($this->queryBuilder);
-        $alias     = current($qb->getRootAliases());
+        $qb = clone($this->queryBuilder);
+        $alias = current($qb->getRootAliases());
         $parameter = 'ORMQueryBuilderLoader_getEntitiesByIds_' . $identifier;
-        $where     = $qb->expr()->in($alias . '.' . $identifier, ':' . $parameter);
+        $where = $qb->expr()->in($alias . '.' . $identifier, ':' . $parameter);
 
         // Guess type
         $entity   = current($qb->getRootEntities());

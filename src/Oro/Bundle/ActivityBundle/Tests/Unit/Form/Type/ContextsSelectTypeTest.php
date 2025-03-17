@@ -2,14 +2,14 @@
 
 namespace Oro\Bundle\ActivityBundle\Tests\Unit\Form\Type;
 
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityBundle\Form\DataTransformer\ContextsToViewTransformer;
 use Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FormBundle\Form\Type\Select2HiddenType;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -17,37 +17,24 @@ use Symfony\Component\Translation\DataCollectorTranslator;
 
 class ContextsSelectTypeTest extends TypeTestCase
 {
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var DataCollectorTranslator|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /* @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $dispatcher;
-
-    /* @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityTitleResolver;
-
-    /* @var ContextsSelectType */
-    private $type;
+    private ManagerRegistry&MockObject $doctrine;
+    private ConfigManager&MockObject $configManager;
+    private DataCollectorTranslator&MockObject $translator;
+    private EntityNameResolver&MockObject $entityTitleResolver;
+    private ContextsSelectType $type;
 
     #[\Override]
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->em = $this->createMock(EntityManagerInterface::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->translator = $this->createMock(DataCollectorTranslator::class);
-        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->entityTitleResolver = $this->createMock(EntityNameResolver::class);
 
         $this->type = new ContextsSelectType(
-            $this->em,
+            $this->doctrine,
             $this->configManager,
             $this->translator,
             $this->dispatcher,
@@ -97,10 +84,5 @@ class ContextsSelectTypeTest extends TypeTestCase
     public function testGetParent()
     {
         $this->assertEquals(Select2HiddenType::class, $this->type->getParent());
-    }
-
-    public function testGetName()
-    {
-        $this->assertEquals('oro_activity_contexts_select', $this->type->getName());
     }
 }

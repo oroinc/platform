@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
@@ -17,26 +16,17 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class EnumIdChoiceType extends AbstractType
 {
-    const NAME = 'oro_enum_id_choice';
-
-    /** @var ManagerRegistry */
-    protected $registry;
-
-    public function __construct(ManagerRegistry $registry)
-    {
-        $this->registry = $registry;
+    public function __construct(
+        private ManagerRegistry $doctrine
+    ) {
     }
 
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $className = EnumOption::class;
-        /** @var EntityManager $em */
-        $em = $this->registry->getManagerForClass($className);
-
         $transformer = $options['multiple']
-            ? new EntitiesToIdsTransformer($em, $className)
-            : new EntityToIdTransformer($em, $className);
+            ? new EntitiesToIdsTransformer($this->doctrine, EnumOption::class)
+            : new EntityToIdTransformer($this->doctrine, EnumOption::class);
 
         $builder->addModelTransformer(new ReversedTransformer($transformer));
     }
@@ -54,14 +44,9 @@ class EnumIdChoiceType extends AbstractType
         return EnumChoiceType::class;
     }
 
-    public function getName()
-    {
-        return $this->getBlockPrefix();
-    }
-
     #[\Override]
     public function getBlockPrefix(): string
     {
-        return static::NAME;
+        return 'oro_enum_id_choice';
     }
 }

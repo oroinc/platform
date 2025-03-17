@@ -11,17 +11,10 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 class WidgetControllerTest extends WebTestCase
 {
-    /** @var EntityManagerInterface */
-    private $em;
-
-    /** @var Widget */
-    private $widget;
-
-    /** @var ConfigProvider */
-    private $configProvider;
-
-    /** @var Manager */
-    private $dashboardManager;
+    private EntityManagerInterface $em;
+    private ConfigProvider $configProvider;
+    private Manager $dashboardManager;
+    private Widget $widget;
 
     #[\Override]
     protected function setUp(): void

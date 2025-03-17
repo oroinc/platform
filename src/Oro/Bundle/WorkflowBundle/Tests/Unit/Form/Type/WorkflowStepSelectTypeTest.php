@@ -4,7 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -26,17 +26,10 @@ use Symfony\Component\Translation\MessageCatalogueInterface;
 
 class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
 {
-    /** @var WorkflowRegistry|MockObject */
-    private $workflowRegistry;
-
-    /** @var EntityRepository|MockObject */
-    private $repository;
-
-    /** @var MessageCatalogueInterface|MockObject */
-    private $translatorCatalogue;
-
-    /** @var WorkflowStepSelectType */
-    private $type;
+    private WorkflowRegistry&MockObject $workflowRegistry;
+    private EntityRepository&MockObject $repository;
+    private MessageCatalogueInterface&MockObject $translatorCatalogue;
+    private WorkflowStepSelectType $type;
 
     #[\Override]
     protected function setUp(): void
@@ -46,10 +39,10 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
         $this->translatorCatalogue = $this->createMock(MessageCatalogueInterface::class);
 
         $translator = $this->createMock(Translator::class);
-        $translator->expects($this->any())
+        $translator->expects(self::any())
             ->method('getCatalogue')
             ->willReturn($this->translatorCatalogue);
-        $translator->expects($this->any())
+        $translator->expects(self::any())
             ->method('trans')
             ->willReturnCallback(function ($label) {
                 return 'translated_' . $label;
@@ -64,26 +57,26 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
     protected function getExtensions(): array
     {
         $classMetadata = $this->createMock(ClassMetadata::class);
-        $classMetadata->expects($this->any())
+        $classMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
-        $classMetadata->expects($this->any())
+        $classMetadata->expects(self::any())
             ->method('getTypeOfField')
             ->willReturn('integer');
-        $classMetadata->expects($this->any())
+        $classMetadata->expects(self::any())
             ->method('getName')
             ->willReturn(WorkflowStep::class);
 
-        $em = $this->createMock(EntityManager::class);
-        $em->expects($this->any())
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects(self::any())
             ->method('getRepository')
             ->willReturn($this->repository);
-        $em->expects($this->any())
+        $em->expects(self::any())
             ->method('getClassMetadata')
             ->willReturn($classMetadata);
 
         $doctrine = $this->createMock(ManagerRegistry::class);
-        $doctrine->expects($this->any())
+        $doctrine->expects(self::any())
             ->method('getManagerForClass')
             ->willReturn($em);
 
@@ -98,20 +91,20 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
         ];
     }
 
-    public function testGetBlockPrefix()
+    public function testGetBlockPrefix(): void
     {
-        $this->assertEquals('oro_workflow_step_select', $this->type->getBlockPrefix());
+        self::assertEquals('oro_workflow_step_select', $this->type->getBlockPrefix());
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
-        $this->assertEquals(EntityType::class, $this->type->getParent());
+        self::assertEquals(EntityType::class, $this->type->getParent());
     }
 
     /**
      * @dataProvider incorrectOptionsDataProvider
      */
-    public function testNormalizersException(array $options)
+    public function testNormalizersException(array $options): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Either "workflow_name" or "workflow_entity_class" must be set');
@@ -119,12 +112,12 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
         $this->factory->create(WorkflowStepSelectType::class, null, $options);
     }
 
-    public function testNormalizersByWorkflowName()
+    public function testNormalizersByWorkflowName(): void
     {
         $options = ['workflow_name' => 'test'];
         $workflow = $this->getWorkflowDefinitionAwareClass(Workflow::class);
 
-        $this->workflowRegistry->expects($this->once())
+        $this->workflowRegistry->expects(self::once())
             ->method('getWorkflow')
             ->with('test')
             ->willReturn($workflow);
@@ -134,12 +127,12 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
         $this->factory->create(WorkflowStepSelectType::class, null, $options);
     }
 
-    public function testNormalizersByEntityClass()
+    public function testNormalizersByEntityClass(): void
     {
-        $options = ['workflow_entity_class' => \stdClass::class];
+        $options = ['workflow_entity_class' => Workflow::class];
         $workflow = $this->getWorkflowDefinitionAwareClass(Workflow::class);
 
-        $this->workflowRegistry->expects($this->once())
+        $this->workflowRegistry->expects(self::once())
             ->method('getActiveWorkflowsByEntityClass')
             ->with($options['workflow_entity_class'])
             ->willReturn(new ArrayCollection([$workflow]));
@@ -149,7 +142,7 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
         $this->factory->create(WorkflowStepSelectType::class, null, $options);
     }
 
-    public function testFinishViewWithOneWorkflow()
+    public function testFinishViewWithOneWorkflow(): void
     {
         $step1 = $this->getWorkflowDefinitionAwareClass(WorkflowStep::class);
         $step3 = $this->getWorkflowDefinitionAwareClass(WorkflowStep::class);
@@ -160,18 +153,18 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
             new ChoiceView($step3, 'step2', 'step2label')
         ];
 
-        $this->workflowRegistry->expects($this->once())
+        $this->workflowRegistry->expects(self::once())
             ->method('getWorkflow')
             ->with('test')
-            ->willReturn(new \stdClass());
+            ->willReturn($this->createMock(Workflow::class));
 
         $this->type->finishView($view, $this->createMock(FormInterface::class), ['workflow_name' => 'test']);
 
-        $this->assertEquals('translated_step1label', $view->vars['choices'][0]->label);
-        $this->assertEquals('translated_step2label', $view->vars['choices'][1]->label);
+        self::assertEquals('translated_step1label', $view->vars['choices'][0]->label);
+        self::assertEquals('translated_step2label', $view->vars['choices'][1]->label);
     }
 
-    public function testFinishViewWithMoreThanOneWorkflow()
+    public function testFinishViewWithMoreThanOneWorkflow(): void
     {
         $step1 = $this->getWorkflowDefinitionAwareClass(WorkflowStep::class, 'wf_l1');
         $step2 = $this->getWorkflowDefinitionAwareClass(WorkflowStep::class, 'wf_l2');
@@ -182,29 +175,32 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
             new ChoiceView($step2, 'step2', 'step2label'),
         ];
 
-        $this->workflowRegistry->expects($this->once())
+        $this->workflowRegistry->expects(self::once())
             ->method('getActiveWorkflowsByEntityClass')
-            ->with(\stdClass::class)
-            ->willReturn(new ArrayCollection([new \stdClass(), new \stdClass()]));
+            ->with(Workflow::class)
+            ->willReturn(new ArrayCollection([
+                $this->createMock(Workflow::class),
+                $this->createMock(Workflow::class)
+            ]));
 
         $this->type->finishView(
             $view,
-            $this->createMock(\Symfony\Component\Form\Test\FormInterface::class),
-            ['workflow_entity_class' => \stdClass::class]
+            $this->createMock(FormInterface::class),
+            ['workflow_entity_class' => Workflow::class]
         );
 
-        $this->assertEquals('translated_wf_l1: translated_step1label', $view->vars['choices'][0]->label);
-        $this->assertEquals('translated_wf_l2: translated_step2label', $view->vars['choices'][1]->label);
+        self::assertEquals('translated_wf_l1: translated_step1label', $view->vars['choices'][0]->label);
+        self::assertEquals('translated_wf_l2: translated_step2label', $view->vars['choices'][1]->label);
     }
 
-    public function testFinishViewException()
+    public function testFinishViewException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Either "workflow_name" or "workflow_entity_class" must be set');
 
         $this->type->finishView(
             new FormView(),
-            $this->createMock(\Symfony\Component\Form\Test\FormInterface::class),
+            $this->createMock(FormInterface::class),
             []
         );
     }
@@ -214,45 +210,45 @@ class WorkflowStepSelectTypeTest extends FormIntegrationTestCase
         ?string $definitionLabel = null
     ): Workflow|WorkflowStep {
         $definition = $this->createMock(WorkflowDefinition::class);
-        $definition->expects($this->any())
+        $definition->expects(self::any())
             ->method('getLabel')
             ->willReturn($definitionLabel);
 
         $object = $this->createMock($class);
-        $object->expects($this->any())
+        $object->expects(self::any())
             ->method('getDefinition')
             ->willReturn($definition);
 
         return $object;
     }
 
-    private function assertQueryBuilderCalled()
+    private function assertQueryBuilderCalled(): void
     {
         $qb = $this->createMock(QueryBuilder::class);
-        $qb->expects($this->once())
+        $qb->expects(self::once())
             ->method('getParameters')
             ->willReturn(new ArrayCollection());
-        $qb->expects($this->once())
+        $qb->expects(self::once())
             ->method('where')
             ->with('ws.definition IN (:workflowDefinitions)')
             ->willReturnSelf();
-        $qb->expects($this->once())
+        $qb->expects(self::once())
             ->method('setParameter')
             ->with('workflowDefinitions', $this->isType('array'))
             ->willReturnSelf();
-        $qb->expects($this->exactly(3))
+        $qb->expects(self::exactly(3))
             ->method('orderBy')
             ->willReturnSelf();
 
         $query = $this->createMock(AbstractQuery::class);
-        $query->expects($this->once())
+        $query->expects(self::once())
             ->method('getSQL')
             ->willReturn('SQL QUERY');
-        $qb->expects($this->once())
+        $qb->expects(self::once())
             ->method('getQuery')
             ->willReturn($query);
 
-        $this->repository->expects($this->once())
+        $this->repository->expects(self::once())
             ->method('createQueryBuilder')
             ->with('ws')
             ->willReturn($qb);

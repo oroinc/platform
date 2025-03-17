@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
@@ -13,17 +13,16 @@ use Oro\Bundle\WorkflowBundle\EventListener\ProcessDataSerializeListener;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\SerializerInterface;
 
-class ProcessDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
+class ProcessDataSerializeListenerTest extends TestCase
 {
     private const TEST_CLASS = 'Test\Class';
 
-    /** @var SerializerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $serializer;
-
-    /** @var ProcessDataSerializeListener */
-    private $listener;
+    private SerializerInterface&MockObject $serializer;
+    private ProcessDataSerializeListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +39,7 @@ class ProcessDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider onFlushProvider
      */
-    public function testOnFlush(array $entities, array $expected)
+    public function testOnFlush(array $entities, array $expected): void
     {
         $unitOfWork = $this->createMock(UnitOfWork::class);
         $unitOfWork->expects(self::once())
@@ -50,7 +49,7 @@ class ProcessDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getScheduledEntityUpdates')
             ->willReturn($entities);
 
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects(self::once())
             ->method('getUnitOfWork')
             ->willReturn($unitOfWork);
@@ -81,7 +80,7 @@ class ProcessDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testPostFlush()
+    public function testPostFlush(): void
     {
         $serializedData = 'serializedData';
         $processDefinition = new ProcessDefinition();
@@ -105,7 +104,7 @@ class ProcessDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getScheduledEntityUpdates')
             ->willReturn([$processJob]);
 
-        $entityId  = 1;
+        $entityId = 1;
         $entityHash = ProcessJob::generateEntityHash(self::TEST_CLASS, $entityId);
 
         $this->serializer->expects(self::exactly(2))
@@ -117,7 +116,7 @@ class ProcessDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
                 return $serializedData;
             });
 
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects(self::any())
             ->method('getUnitOfWork')
             ->willReturn($unitOfWork);
@@ -133,7 +132,7 @@ class ProcessDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($processJob->getData()->isModified());
     }
 
-    public function testPostLoad()
+    public function testPostLoad(): void
     {
         $entity = $this->createMock(ProcessJob::class);
 

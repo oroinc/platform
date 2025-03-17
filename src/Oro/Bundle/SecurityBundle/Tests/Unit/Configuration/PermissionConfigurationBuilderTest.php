@@ -4,53 +4,47 @@ namespace Oro\Bundle\SecurityBundle\Tests\Unit\Configuration;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Configuration;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\Mapping\Driver\MappingDriver;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Configuration\PermissionConfigurationBuilder;
 use Oro\Bundle\SecurityBundle\Entity\Permission;
 use Oro\Bundle\SecurityBundle\Entity\PermissionEntity;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\StubEntity;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\StubInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class PermissionConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
+class PermissionConfigurationBuilderTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ValidatorInterface */
-    private $validator;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var PermissionConfigurationBuilder */
-    private $builder;
+    private ValidatorInterface&MockObject $validator;
+    private EntityManagerInterface&MockObject $entityManager;
+    private EntityRepository&MockObject $entityRepository;
+    private PermissionConfigurationBuilder $builder;
 
     #[\Override]
     protected function setUp(): void
     {
-        $repository = $this->createMock(EntityRepository::class);
-
-        $doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $doctrineHelper->expects($this->any())
-            ->method('getEntityRepositoryForClass')
-            ->with(PermissionEntity::class)
-            ->willReturn($repository);
-        $doctrineHelper->expects($this->any())
-            ->method('isManageableEntityClass')
-            ->willReturnMap([
-                ['Entity1', true],
-                ['Entity2', true],
-                ['EntityNotManageable', false],
-            ]);
-
         $this->validator = $this->createMock(ValidatorInterface::class);
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->entityRepository = $this->createMock(EntityRepository::class);
 
-        $this->builder = new PermissionConfigurationBuilder($doctrineHelper, $this->validator, $this->entityManager);
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects($this->any())
+            ->method('getManagerForClass')
+            ->with(Permission::class)
+            ->willReturn($this->entityManager);
+        $doctrine->expects($this->any())
+            ->method('getRepository')
+            ->with(PermissionEntity::class)
+            ->willReturn($this->entityRepository);
+
+        $this->builder = new PermissionConfigurationBuilder($this->validator, $doctrine);
     }
 
     private function assertDefinitionConfiguration(array $expected, Permission $definition): void
@@ -92,13 +86,9 @@ class PermissionConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
         $this->validator->expects($this->once())
             ->method('validate')
             ->with($this->isInstanceOf(Permission::class))
-            ->willReturn(
-                new ConstraintViolationList(
-                    [
-                        new ConstraintViolation('Test message', 'Test template', [], 'root', 'name', 'data')
-                    ]
-                )
-            );
+            ->willReturn(new ConstraintViolationList([
+                new ConstraintViolation('Test message', 'Test template', [], 'root', 'name', 'data')
+            ]));
 
         $this->expectException(ValidatorException::class);
         $this->expectExceptionMessage(
@@ -155,9 +145,7 @@ class PermissionConfigurationBuilderTest extends \PHPUnit\Framework\TestCase
                         'apply_to_all' => false,
                         'group_names' => ['frontend', 'default'],
                         'exclude_entities' => new ArrayCollection([$permissionEntity1]),
-                        'apply_to_entities' => new ArrayCollection(
-                            [$permissionEntity2, $permissionEntityByInterface]
-                        ),
+                        'apply_to_entities' => new ArrayCollection([$permissionEntity2, $permissionEntityByInterface]),
                         'description' => 'Test description',
                     ],
                 ]

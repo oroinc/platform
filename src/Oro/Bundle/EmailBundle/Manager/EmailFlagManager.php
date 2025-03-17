@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Manager;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Provider\EmailFlagManagerInterface;
@@ -11,91 +11,60 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 
 /**
- * Responsible for setting flags SEEN|UNSEEN
+ * Responsible for setting SEEN/UNSEEN flags for email messages.
  */
 class EmailFlagManager implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    /** @var EntityManager */
-    protected $em;
-
-    /** @var EmailFlagManagerLoaderSelector */
-    protected $selectorEmailFlagManager;
-
     public function __construct(
-        EmailFlagManagerLoaderSelector $selectorEmailTagManager,
-        EntityManager $em
+        private EmailFlagManagerLoaderSelector $selectorEmailFlagManager,
+        private EntityManagerInterface $em
     ) {
-        $this->selectorEmailFlagManager = $selectorEmailTagManager;
-        $this->em = $em;
     }
 
     /**
-     * Set flag UNSEEN
-     *
-     * @param EmailUser $emailUser - EmailUser entity
-     *
-     * @return void
+     * Sets UNSEEN flag.
      */
-    public function setUnseen(EmailUser $emailUser)
+    public function setUnseen(EmailUser $emailUser): void
     {
-        $emailFlagManager = $this->selectEmailFlagManager($emailUser);
-
-        if ($emailFlagManager instanceof EmailFlagManagerInterface) {
-            $emailFlagManager->setUnseen($emailUser->getFolders()->first(), $emailUser->getEmail());
-        }
+        $this->selectEmailFlagManager($emailUser)?->setUnseen(
+            $emailUser->getFolders()->first(),
+            $emailUser->getEmail()
+        );
     }
 
     /**
-     * Set flag SEEN
-     *
-     * @param EmailUser $emailUser - EmailUser entity
-     *
-     * @return void
+     * Sets SEEN flag.
      */
-    public function setSeen(EmailUser $emailUser)
+    public function setSeen(EmailUser $emailUser): void
     {
-        $emailFlagManager = $this->selectEmailFlagManager($emailUser);
-
-        if ($emailFlagManager instanceof EmailFlagManagerInterface) {
-            $emailFlagManager->setSeen($emailUser->getFolders()->first(), $emailUser->getEmail());
-        }
+        $this->selectEmailFlagManager($emailUser)?->setSeen(
+            $emailUser->getFolders()->first(),
+            $emailUser->getEmail()
+        );
     }
 
     /**
-     * Set flags SEEN|UNSEEN
-     *
-     * @param EmailUser $entity - EmailUser entity
-     * @param bool      $toSeen - It defines how change status.
-     * if $toSeen is true then will set flag SEEN else UNSEEN
-     *
-     * @return void
+     * Sets SEEN/UNSEEN flags.
      */
-    public function changeStatusSeen(EmailUser $entity, $toSeen)
+    public function changeStatusSeen(EmailUser $entity, bool $seen): void
     {
         try {
-            if ($toSeen) {
+            if ($seen) {
                 $this->setSeen($entity);
             } else {
                 $this->setUnseen($entity);
             }
         } catch (\Exception $ex) {
             $this->logger->info(
-                sprintf('Set email flag failed. EmailUser id: %d. Error: %s.', $entity->getId(), $ex->getMessage()),
+                \sprintf('Set email flag failed. EmailUser id: %d. Error: %s.', $entity->getId(), $ex->getMessage()),
                 ['exception' => $ex]
             );
         }
     }
 
-    /**
-     * Select email flag manager by entity EmailUser
-     *
-     * @param EmailUser $emailUser - EmailUser
-     *
-     * @return EmailFlagManagerInterface|null
-     */
-    protected function selectEmailFlagManager(EmailUser $emailUser)
+    private function selectEmailFlagManager(EmailUser $emailUser): ?EmailFlagManagerInterface
     {
         $folder = $emailUser->getFolders()->first();
         if (!$folder instanceof EmailFolder) {
@@ -105,8 +74,7 @@ class EmailFlagManager implements LoggerAwareInterface
         if (!$origin || !$origin->isActive()) {
             return null;
         }
-        $emailFlagManagerLoader = $this->selectorEmailFlagManager->select($origin);
 
-        return $emailFlagManagerLoader->select($folder, $this->em);
+        return $this->selectorEmailFlagManager->select($origin)->select($folder, $this->em);
     }
 }

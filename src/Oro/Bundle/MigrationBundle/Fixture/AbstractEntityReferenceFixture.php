@@ -3,25 +3,23 @@
 namespace Oro\Bundle\MigrationBundle\Fixture;
 
 use Doctrine\Common\DataFixtures\AbstractFixture;
-use Doctrine\Common\DataFixtures\FixtureInterface;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ObjectManager;
 
-abstract class AbstractEntityReferenceFixture extends AbstractFixture implements FixtureInterface
+/**
+ * The base class for fixtures that need to get entity references.
+ */
+abstract class AbstractEntityReferenceFixture extends AbstractFixture
 {
     /**
-     * Returns array of object references.
+     * Returns array of entity references.
      *
-     * @param ObjectManager $objectManager
-     * @param string $className
-     * @return array
-     * @see getObjectReferencesByIds
+     * @return object[]
      */
-    protected function getObjectReferences(ObjectManager $objectManager, $className)
+    protected function getObjectReferences(ObjectManager $objectManager, string $className): array
     {
         $identifier = $objectManager->getClassMetadata($className)->getIdentifier();
-        $idField    = reset($identifier);
+        $idField = reset($identifier);
 
         /** @var EntityRepository $objectRepository */
         $objectRepository = $objectManager->getRepository($className);
@@ -41,20 +39,15 @@ abstract class AbstractEntityReferenceFixture extends AbstractFixture implements
     }
 
     /**
-     * Returns array of object references by their ids. It's useful when ids are known and objects are used as
+     * Returns array of entity references by their ids. It's useful when ids are known and entities are used as
      * other entities' relation.
      *
-     * @param ObjectManager $objectManager
-     * @param string $className
-     * @param array $ids
-     * @return array
+     * @return object[]
      */
-    protected function getObjectReferencesByIds(ObjectManager $objectManager, $className, array $ids)
+    protected function getObjectReferencesByIds(ObjectManager $objectManager, string $className, array $ids): array
     {
         $entities = [];
-
         foreach ($ids as $id) {
-            /** @var EntityManager $objectManager */
             $entities[] = $objectManager->getReference($className, $id);
         }
 

@@ -9,22 +9,19 @@ use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Scope\WorkflowScopeManager;
 
+/**
+ * Filters workflow definitions by scopes.
+ */
 class WorkflowDefinitionScopesRegistryFilter implements WorkflowDefinitionFilterInterface
 {
-    /** @var ScopeManager */
-    private $scopeManager;
-
-    /** @var ManagerRegistry */
-    private $managerRegistry;
-
-    public function __construct(ScopeManager $scopeManager, ManagerRegistry $managerRegistry)
-    {
-        $this->scopeManager = $scopeManager;
-        $this->managerRegistry = $managerRegistry;
+    public function __construct(
+        private ScopeManager $scopeManager,
+        private ManagerRegistry $doctrine
+    ) {
     }
 
     #[\Override]
-    public function filter(Collection $workflowDefinitions)
+    public function filter(Collection $workflowDefinitions): Collection
     {
         $scopeAwareDefinitions = $workflowDefinitions->filter(
             function (WorkflowDefinition $workflowDefinition) {
@@ -40,7 +37,7 @@ class WorkflowDefinitionScopesRegistryFilter implements WorkflowDefinitionFilter
 
         foreach ($workflowDefinitions as $key => $workflowDefinition) {
             $name = $workflowDefinition->getName();
-            if ($scopeAwareDefinitions->contains($workflowDefinition) && !in_array($name, $scopeMatches, true)) {
+            if ($scopeAwareDefinitions->contains($workflowDefinition) && !\in_array($name, $scopeMatches, true)) {
                 $workflowDefinitions->remove($key);
             }
         }
@@ -48,11 +45,7 @@ class WorkflowDefinitionScopesRegistryFilter implements WorkflowDefinitionFilter
         return $workflowDefinitions;
     }
 
-    /**
-     * @param array $workflowDefinitions
-     * @return array
-     */
-    private function getScopeMatches(array $workflowDefinitions)
+    private function getScopeMatches(array $workflowDefinitions): array
     {
         $scopeDefinitions = $this->getWorkflowDefinitionRepository()->getScopedByNames(
             $this->getNames($workflowDefinitions),
@@ -62,11 +55,7 @@ class WorkflowDefinitionScopesRegistryFilter implements WorkflowDefinitionFilter
         return $this->getNames($scopeDefinitions);
     }
 
-    /**
-     * @param array $workflowDefinitions
-     * @return array|string[]
-     */
-    private function getNames(array $workflowDefinitions)
+    private function getNames(array $workflowDefinitions): array
     {
         return array_map(
             function (WorkflowDefinition $workflowDefinition) {
@@ -76,13 +65,8 @@ class WorkflowDefinitionScopesRegistryFilter implements WorkflowDefinitionFilter
         );
     }
 
-    /**
-     * @return WorkflowDefinitionRepository
-     */
-    private function getWorkflowDefinitionRepository()
+    private function getWorkflowDefinitionRepository(): WorkflowDefinitionRepository
     {
-        return $this->managerRegistry
-            ->getManagerForClass(WorkflowDefinition::class)
-            ->getRepository(WorkflowDefinition::class);
+        return $this->doctrine->getRepository(WorkflowDefinition::class);
     }
 }

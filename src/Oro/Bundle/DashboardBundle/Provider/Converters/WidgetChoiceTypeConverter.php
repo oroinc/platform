@@ -4,14 +4,21 @@ namespace Oro\Bundle\DashboardBundle\Provider\Converters;
 
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
 
+/**
+ * The dashboard widget configuration converter for choice a value from a list of predefined values.
+ */
 class WidgetChoiceTypeConverter extends ConfigValueConverterAbstract
 {
-    const ALL_ITEMS = 'all';
+    private const string ALL_ITEMS = 'all';
 
     #[\Override]
-    public function getConvertedValue(array $widgetConfig, $value = null, array $config = [], array $options = [])
-    {
-        if ($value === null) {
+    public function getConvertedValue(
+        array $widgetConfig,
+        mixed $value = null,
+        array $config = [],
+        array $options = []
+    ): mixed {
+        if (null === $value) {
             return $this->getDefaultChoices($config);
         }
 
@@ -19,9 +26,9 @@ class WidgetChoiceTypeConverter extends ConfigValueConverterAbstract
     }
 
     #[\Override]
-    public function getFormValue(array $config, $value)
+    public function getFormValue(array $config, mixed $value): mixed
     {
-        if ($value === null) {
+        if (null === $value) {
             return $this->getDefaultChoices($config);
         }
 
@@ -29,25 +36,20 @@ class WidgetChoiceTypeConverter extends ConfigValueConverterAbstract
     }
 
     #[\Override]
-    public function getViewValue($value)
+    public function getViewValue(mixed $value): mixed
     {
         return implode(',', (array)$value);
     }
 
-    /**
-     * @param array $config
-     *
-     * @return array
-     */
-    protected function getDefaultChoices(array $config)
+    protected function getDefaultChoices(array $config): mixed
     {
-        if ($config['converter_attributes']['default_selected'] === self::ALL_ITEMS) {
+        if (self::ALL_ITEMS === $config['converter_attributes']['default_selected']) {
             $values = [];
             foreach ($config['options']['choices'] as $option) {
-                $values = array_merge($values, array_values($option));
+                $values[] = array_values($option);
             }
 
-            return $values;
+            return array_merge(...$values);
         }
 
         return $config['converter_attributes']['default_selected'];

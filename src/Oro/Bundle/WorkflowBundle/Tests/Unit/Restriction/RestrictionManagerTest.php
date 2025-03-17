@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Restriction;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowRestrictionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowRestriction;
@@ -13,17 +14,10 @@ use PHPUnit\Framework\TestCase;
 
 class RestrictionManagerTest extends TestCase
 {
-    /** @var WorkflowRegistry|MockObject */
-    private $workflowRegistry;
-
-    /** @var DoctrineHelper|MockObject */
-    private $doctrineHelper;
-
-    /** @var RestrictionManager */
-    private $restrictionManager;
-
-    /** @var WorkflowRestrictionRepository|MockObject */
-    private $repository;
+    private WorkflowRegistry&MockObject $workflowRegistry;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private WorkflowRestrictionRepository&MockObject $repository;
+    private RestrictionManager $restrictionManager;
 
     #[\Override]
     protected function setUp(): void
@@ -38,15 +32,15 @@ class RestrictionManagerTest extends TestCase
         );
     }
 
-    public function testHasEntityClassRestrictionsWithoutActiveWorkflows()
+    public function testHasEntityClassRestrictionsWithoutActiveWorkflows(): void
     {
         $class = 'stdClass';
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityRepositoryForClass')
             ->with(WorkflowRestriction::class)
             ->willReturn($this->repository);
 
-        $this->repository->expects($this->once())
+        $this->repository->expects(self::once())
             ->method('getClassRestrictions')
             ->with($class)
             ->willReturn([
@@ -58,15 +52,15 @@ class RestrictionManagerTest extends TestCase
             ]);
 
         $workflow = $this->createMock(Workflow::class);
-        $workflow->expects($this->once())
+        $workflow->expects(self::once())
             ->method('getName')
             ->willReturn('test_workflow');
 
-        $this->workflowRegistry->expects($this->once())
+        $this->workflowRegistry->expects(self::once())
             ->method('getActiveWorkflowsByEntityClass')
             ->with('DateTime')
-            ->willReturn([$workflow]);
+            ->willReturn(new ArrayCollection([$workflow]));
 
-        $this->assertTrue($this->restrictionManager->hasEntityClassRestrictions($class));
+        self::assertTrue($this->restrictionManager->hasEntityClassRestrictions($class));
     }
 }

@@ -7,32 +7,27 @@ namespace Oro\Bundle\MigrationBundle\Tests\Unit\Migration;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 use Oro\Bundle\MigrationBundle\Event\MigrationEvents;
 use Oro\Bundle\MigrationBundle\Migration\DataFixturesExecutor;
 use Oro\Bundle\MigrationBundle\Tests\Unit\Migration\Fixtures\LocalizedDataFixture;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class DataFixturesExecutorTest extends \PHPUnit\Framework\TestCase
+class DataFixturesExecutorTest extends TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var DataFixturesExecutor */
-    private $dataFixturesExecutor;
+    private EntityManagerInterface&MockObject $em;
+    private Connection&MockObject $connection;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private DataFixturesExecutor $dataFixturesExecutor;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManager::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
         $this->connection = $this->createMock(Connection::class);
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 

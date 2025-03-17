@@ -2,83 +2,56 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Doctrine;
 
-use Doctrine\Common\Util\ClassUtils as DoctrineClassUtils;
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadataFactory;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityBundle\ORM\Mapping\AdditionalMetadataProvider;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
-use Symfony\Component\Security\Acl\Util\ClassUtils;
 
 /**
  * Doctrine helper methods for EntityMerge
  */
 class DoctrineHelper
 {
-    /** @var EntityManager */
-    private $entityManager;
-
-    /** @var AdditionalMetadataProvider */
-    protected $additionalMetadataProvider;
-
-    public function __construct(EntityManager $entityManager, AdditionalMetadataProvider $additionalMetadataProvider)
-    {
-        $this->entityManager = $entityManager;
-        $this->additionalMetadataProvider = $additionalMetadataProvider;
+    public function __construct(
+        private ManagerRegistry $doctrine,
+        private AdditionalMetadataProvider $additionalMetadataProvider
+    ) {
     }
 
     /**
-     * Get entities by ids
-     *
-     * @param string $className
-     * @param array $entityIds
      * @return object[]
      */
-    public function getEntitiesByIds($className, array $entityIds)
+    public function getEntitiesByIds(string $className, array $entityIds): array
     {
         if (!$entityIds) {
-            return array();
+            return [];
         }
 
-        $repository = $this->getEntityRepository($className);
-        $queryBuilder = $repository->createQueryBuilder('entity');
-        $entityIdentifier = $this->getSingleIdentifierFieldName($className);
-        $identifierExpression = sprintf('entity.%s', $entityIdentifier);
-        $queryBuilder->where($queryBuilder->expr()->in($identifierExpression, ':entityIds'));
-        $queryBuilder->setParameter('entityIds', $entityIds);
-        $entities = $queryBuilder->getQuery()->execute();
-
-        return $entities;
+        return $this->getEntityRepository($className)
+            ->createQueryBuilder('entity')
+            ->where(\sprintf('entity.%s IN (:entityIds)', $this->getSingleIdentifierFieldName($className)))
+            ->setParameter('entityIds', $entityIds)
+            ->getQuery()
+            ->execute();
     }
 
-    /**
-     * @param string $entityName
-     * @return EntityRepository
-     */
-    public function getEntityRepository($entityName)
+    public function getEntityRepository(string $entityName): EntityRepository
     {
-        return $this->entityManager->getRepository($entityName);
+        return $this->getEntityManager()->getRepository($entityName);
     }
 
-    /**
-     * @param string $className
-     * @return string
-     */
-    public function getSingleIdentifierFieldName($className)
+    public function getSingleIdentifierFieldName(string $className): string
     {
-        return $this->entityManager->getClassMetadata($className)->getSingleIdentifierFieldName();
+        return $this->getEntityManager()->getClassMetadata($className)->getSingleIdentifierFieldName();
     }
 
-    /**
-     * Get list of entities ids
-     *
-     * @param array $entities
-     * @return array
-     */
-    public function getEntityIds(array $entities)
+    public function getEntityIds(array $entities): array
     {
-        $result = array();
-
+        $result = [];
         foreach ($entities as $entity) {
             $result[] = $this->getEntityIdentifierValue($entity);
         }
@@ -86,66 +59,32 @@ class DoctrineHelper
         return $result;
     }
 
-    /**
-     * @param object $entity
-     * @return string
-     * @throws InvalidArgumentException
-     */
-    public function getEntityIdentifierValue($entity)
+    public function getEntityIdentifierValue(object $entity): mixed
     {
-        $idValues = $this->getMetadataFor(DoctrineClassUtils::getClass($entity))->getIdentifierValues($entity);
-        if (count($idValues) > 1) {
-            throw new InvalidArgumentException(
-                "Multiple id is not supported."
-            );
+        $idValues = $this->getMetadataFor(ClassUtils::getClass($entity))->getIdentifierValues($entity);
+        if (\count($idValues) > 1) {
+            throw new InvalidArgumentException(\sprintf(
+                'An entity with composite ID is not supported. Entity: %s.',
+                ClassUtils::getClass($entity)
+            ));
         }
+
         return current($idValues);
     }
 
-    /**
-     * Checks if entities are equal
-     *
-     * @param object $entity
-     * @param object $other
-     * @return bool
-     * @throws InvalidArgumentException
-     */
-    public function isEntityEqual($entity, $other)
+    public function isEntityEqual(object $entity, object $other): bool
     {
-        if (!is_object($entity)) {
-            throw new InvalidArgumentException(
-                sprintf('$entity argument must be an object, "%s" given.', gettype($entity))
-            );
-        }
-
-        if (!is_object($other)) {
-            throw new InvalidArgumentException(
-                sprintf('$other argument must be an object, "%s" given.', gettype($other))
-            );
-        }
-
-        $firstClass = ClassUtils::getRealClass($entity);
-        $secondClass = ClassUtils::getRealClass($other);
-
         return
-            $firstClass == $secondClass &&
-            $this->getEntityIdentifierValue($entity) == $this->getEntityIdentifierValue($other);
+            ClassUtils::getClass($entity) === ClassUtils::getClass($other)
+            && $this->getEntityIdentifierValue($entity) == $this->getEntityIdentifierValue($other);
     }
 
-    /**
-     * @param string $className
-     * @return array
-     */
-    public function getInversedUnidirectionalAssociationMappings($className)
+    public function getInversedUnidirectionalAssociationMappings(string $className): array
     {
         return $this->additionalMetadataProvider->getInversedUnidirectionalAssociationMappings($className);
     }
 
-    /**
-     * @param string $className
-     * @return ClassMetadata
-     */
-    public function getMetadataFor($className)
+    public function getMetadataFor(string $className): ClassMetadata
     {
         return $this->getMetadataFactory()->getMetadataFor($className);
     }
@@ -153,20 +92,18 @@ class DoctrineHelper
     /**
      * @return ClassMetadata[]
      */
-    public function getAllMetadata()
+    public function getAllMetadata(): array
     {
-        return $this
-            ->getMetadataFactory()
-            ->getAllMetadata();
+        return $this->getMetadataFactory()->getAllMetadata();
     }
 
-    /**
-     * @return \Doctrine\ORM\Mapping\ClassMetadataFactory
-     */
-    protected function getMetadataFactory()
+    private function getMetadataFactory(): ClassMetadataFactory
     {
-        return $this
-            ->entityManager
-            ->getMetadataFactory();
+        return $this->getEntityManager()->getMetadataFactory();
+    }
+
+    private function getEntityManager(): EntityManagerInterface
+    {
+        return $this->doctrine->getManager();
     }
 }

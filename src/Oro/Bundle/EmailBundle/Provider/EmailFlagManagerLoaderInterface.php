@@ -2,32 +2,22 @@
 
 namespace Oro\Bundle\EmailBundle\Provider;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
-use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
 
 /**
- * Interface EmailFlagManagerLoaderInterface
- * @package Oro\Bundle\EmailBundle\Provider
+ * Represents a service that allows to get an email flag manager.
  */
 interface EmailFlagManagerLoaderInterface
 {
     /**
      * Checks if this loader can be used to load an email body from the given origin.
-     *
-     * @param EmailOrigin $origin
-     *
-     * @return bool
      */
-    public function supports(EmailOrigin $origin);
+    public function supports(EmailOrigin $origin): bool;
 
     /**
-     * Loads email flag manager
-     *
-     * @param EmailFolder      $folder
-     * @param OroEntityManager $em
-     *
-     * @return EmailFlagManagerInterface
+     * Loads an email flag manager.
      */
-    public function select(EmailFolder $folder, OroEntityManager $em);
+    public function select(EmailFolder $folder, EntityManagerInterface $em): EmailFlagManagerInterface;
 }

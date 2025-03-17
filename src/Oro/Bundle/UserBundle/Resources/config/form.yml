@@ -155,21 +155,21 @@ services:
     oro_user.form.type.user_multiselect:
         class: Oro\Bundle\UserBundle\Form\Type\UserMultiSelectType
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
         tags:
             - { name: form.type, alias: oro_user_multiselect }
 
     oro_user.form.type.role_multiselect:
         class: Oro\Bundle\UserBundle\Form\Type\RoleMultiSelectType
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
         tags:
             - { name: form.type, alias: oro_role_multiselect }
 
     oro_user.form.type.organization_user_multiselect:
         class: Oro\Bundle\UserBundle\Form\Type\OrganizationUserAclMultiSelectType
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
         tags:
             - { name: form.type, alias: oro_user_organization_acl_multiselect }
 
@@ -317,10 +317,9 @@ services:
     oro_user.form.type.widget_user_multiselect:
         class: Oro\Bundle\UserBundle\Form\Type\WidgetUserSelectType
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@oro_form.autocomplete.search_registry'
             - '@oro_entity_config.provider.form'
-            - '@oro_entity.doctrine_helper'
         tags:
             - { name: form.type, alias: 'oro_type_widget_user_select' }
 
@@ -333,13 +332,11 @@ services:
         class: Oro\Bundle\UserBundle\Dashboard\Converters\WidgetUserSelectConverter
         arguments:
             - '@oro_user.dashboard.owner_helper'
+            - '@oro_security.token_accessor'
             - '@oro_security.acl_helper'
             - '@oro_entity.entity_name_resolver'
             - '@oro_entity.doctrine_helper'
-            - '@doctrine.orm.entity_manager'
             - 'Oro\Bundle\UserBundle\Entity\User'
-        calls:
-            - [setTokenAccessor, ['@oro_security.token_accessor']]
         tags:
             - { name: oro_dashboard.value.converter, form_type: Oro\Bundle\UserBundle\Form\Type\WidgetUserSelectType }
 
@@ -349,7 +346,6 @@ services:
             - '@oro_security.acl_helper'
             - '@oro_entity.entity_name_resolver'
             - '@oro_entity.doctrine_helper'
-            - '@doctrine.orm.entity_manager'
             - 'Oro\Bundle\UserBundle\Entity\Role'
         tags:
             - { name: oro_dashboard.value.converter, form_type: Oro\Bundle\UserBundle\Form\Type\WidgetRoleSelectType }

@@ -15,15 +15,13 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
 /**
- * Adds "unboundRules" hidden field to {@see \Oro\Bundle\EmailBundle\Form\Type\MailboxType} form type.
+ * Adds "unboundRules" hidden field to {@see MailboxType} form type.
  */
 class MailboxUnboudRulesExtension extends AbstractTypeExtension
 {
-    private ManagerRegistry $doctrine;
-
-    public function __construct(ManagerRegistry $doctrine)
-    {
-        $this->doctrine = $doctrine;
+    public function __construct(
+        private ManagerRegistry $doctrine
+    ) {
     }
 
     #[\Override]
@@ -34,10 +32,7 @@ class MailboxUnboudRulesExtension extends AbstractTypeExtension
         ]);
 
         $transformers = [
-            new EntitiesToIdsTransformer(
-                $this->doctrine->getManagerForClass(AutoResponseRule::class),
-                AutoResponseRule::class
-            ),
+            new EntitiesToIdsTransformer($this->doctrine, AutoResponseRule::class),
             new ArrayToStringTransformer(',', true),
         ];
 

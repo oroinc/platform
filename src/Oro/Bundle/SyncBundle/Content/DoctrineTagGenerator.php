@@ -3,7 +3,7 @@
 namespace Oro\Bundle\SyncBundle\Content;
 
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
@@ -73,8 +73,8 @@ class DoctrineTagGenerator implements TagGeneratorInterface
 
         if (is_object($data)) {
             $class = ClassUtils::getClass($data);
-            /** @var EntityManager $em */
-            $em  = $this->doctrine->getManagerForClass($class);
+            /** @var EntityManagerInterface $em */
+            $em = $this->doctrine->getManagerForClass($class);
             $uow = $em->getUnitOfWork();
             // tag only in case if it's not a new object
             if ($this->isNewEntity($data, $uow)) {

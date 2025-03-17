@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Form\Type;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
 use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
 use Symfony\Component\Form\AbstractType;
@@ -14,26 +14,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class RoleMultiSelectType extends AbstractType
 {
-    /**
-     * @var EntityManager
-     */
-    protected $entityManager;
-
-    public function __construct(EntityManager $entityManager)
-    {
-        $this->entityManager = $entityManager;
+    public function __construct(
+        private ManagerRegistry $doctrine
+    ) {
     }
 
     #[\Override]
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->addModelTransformer(
-            new EntitiesToIdsTransformer($this->entityManager, $options['entity_class'])
-        );
+        $builder->addModelTransformer(new EntitiesToIdsTransformer($this->doctrine, $options['entity_class']));
     }
 
     #[\Override]
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -51,11 +44,6 @@ class RoleMultiSelectType extends AbstractType
     public function getParent(): ?string
     {
         return OroJquerySelect2HiddenType::class;
-    }
-
-    public function getName()
-    {
-        return $this->getBlockPrefix();
     }
 
     #[\Override]

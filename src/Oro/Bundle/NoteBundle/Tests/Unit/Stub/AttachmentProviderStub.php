@@ -6,13 +6,8 @@ use Oro\Bundle\AttachmentBundle\Provider\AttachmentProvider;
 
 class AttachmentProviderStub extends AttachmentProvider
 {
-    /**
-     * @param $entity
-     *
-     * @return array
-     */
     #[\Override]
-    public function getAttachmentInfo($entity)
+    public function getAttachmentInfo(object $entity): array
     {
         return [];
     }

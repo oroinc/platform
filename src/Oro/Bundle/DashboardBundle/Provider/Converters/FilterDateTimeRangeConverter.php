@@ -7,88 +7,72 @@ use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Component\Config\Resolver\SystemAwareResolver;
 
+/**
+ * The dashboard widget configuration converter for enter a date time range value.
+ */
 class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
 {
-    /** @var FilterDateRangeConverter */
-    protected $converter;
-
-    /** @var SystemAwareResolver */
-    protected $resolver;
-
-    /** @var DateHelper */
-    protected $dateHelper;
-
     public function __construct(
-        FilterDateRangeConverter $converter,
-        SystemAwareResolver $resolver,
-        DateHelper $dateHelper
+        protected FilterDateRangeConverter $converter,
+        protected SystemAwareResolver $resolver,
+        protected DateHelper $dateHelper
     ) {
-        $this->converter  = $converter;
-        $this->resolver   = $resolver;
-        $this->dateHelper = $dateHelper;
     }
 
     #[\Override]
-    public function getViewValue($value)
+    public function getViewValue(mixed $value): mixed
     {
-        $convertedValue = $this->converter->getConvertedValue([], $value);
-
-        return $this->converter->getViewValue($convertedValue);
+        return $this->converter->getViewValue($this->converter->getConvertedValue([], $value));
     }
 
     #[\Override]
-    public function getConvertedValue(array $widgetConfig, $value = null, array $config = [], array $options = [])
-    {
-        if (null === $value &&
-            isset($config['converter_attributes']['default_selected']) &&
-            is_array($config['converter_attributes']['default_selected'])
+    public function getConvertedValue(
+        array $widgetConfig,
+        mixed $value = null,
+        array $config = [],
+        array $options = []
+    ): mixed {
+        if (null === $value
+            && isset($config['converter_attributes']['default_selected'])
+            && \is_array($config['converter_attributes']['default_selected'])
         ) {
-            $default = $this->getDefaultValues($config['converter_attributes']['default_selected']);
-
-            return $default;
+            return $this->getDefaultValues($config['converter_attributes']['default_selected']);
         }
         $value['part'] = DateModifierInterface::PART_VALUE;
         if (!isset($value['value']['start']) && !isset($value['value']['end'])) {
             /** @var \DateTime $start */
             /** @var \DateTime $end */
-            list($start, $end) = $this->dateHelper->getDateTimeInterval();
+            [$start, $end] = $this->dateHelper->getDateTimeInterval();
 
             $value['value']['start'] = $start->format('Y-m-d H:i:s');
-            $value['value']['end']   = $end->format('Y-m-d H:i:s');
+            $value['value']['end'] = $end->format('Y-m-d H:i:s');
         }
 
-        if (isset($value['value']['start']) && isset($value['value']['end'])) {
-            if ($value['value']['start'] > $value['value']['end']) {
-                $end = $value['value']['end'];
-                $value['value']['end'] = $value['value']['start'];
-                $value['value']['start'] = $end;
-            }
+        if (isset($value['value']['start'], $value['value']['end'])
+            && $value['value']['start'] > $value['value']['end']
+        ) {
+            $end = $value['value']['end'];
+            $value['value']['end'] = $value['value']['start'];
+            $value['value']['start'] = $end;
         }
 
         return parent::getConvertedValue($widgetConfig, $value);
     }
 
     #[\Override]
-    public function getFormValue(array $converterAttributes, $value)
+    public function getFormValue(array $config, mixed $value): mixed
     {
-        if (null === $value &&
-            isset($converterAttributes['converter_attributes']['default_selected']) &&
-            is_array($converterAttributes['converter_attributes']['default_selected'])
+        if (null === $value
+            && isset($config['converter_attributes']['default_selected'])
+            && \is_array($config['converter_attributes']['default_selected'])
         ) {
-            $default = $this->getDefaultValues($converterAttributes['converter_attributes']['default_selected']);
-
-            return $default;
+            return $this->getDefaultValues($config['converter_attributes']['default_selected']);
         }
 
-        return parent::getFormValue($converterAttributes, $value);
+        return parent::getFormValue($config, $value);
     }
 
-    /**
-     * @param array $config
-     *
-     * @return array
-     */
-    protected function getDefaultValues(array $config)
+    protected function getDefaultValues(array $config): array
     {
         $default = $this->resolver->resolve($config);
         if (isset($default['value']['start'])) {

@@ -8,17 +8,18 @@ use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Repository\ActivityListRepository;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Model\Accessor\DefaultAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * The entity data accessor for activity entities.
  */
 class ActivityAccessor extends DefaultAccessor
 {
-    private ManagerRegistry $doctrine;
-
-    public function __construct(ManagerRegistry $doctrine)
-    {
-        $this->doctrine = $doctrine;
+    public function __construct(
+        PropertyAccessorInterface $propertyAccessor,
+        private ManagerRegistry $doctrine
+    ) {
+        parent::__construct($propertyAccessor);
     }
 
     #[\Override]
@@ -43,7 +44,6 @@ class ActivityAccessor extends DefaultAccessor
 
     private function getRepository(): ActivityListRepository
     {
-        return $this->doctrine->getManagerForClass(ActivityList::class)
-            ->getRepository(ActivityList::class);
+        return $this->doctrine->getRepository(ActivityList::class);
     }
 }

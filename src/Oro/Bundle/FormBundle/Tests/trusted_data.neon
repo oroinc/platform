@@ -7,3 +7,6 @@ trusted_data:
         Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer:
             loadEntitiesByIds:
                 propertyPath: true
+    safe_methods:
+        Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer:
+            getProperty: true

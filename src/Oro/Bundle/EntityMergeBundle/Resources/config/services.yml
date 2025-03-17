@@ -2,7 +2,7 @@ services:
     oro_entity_merge.doctrine_helper:
         class: Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@oro_entity.orm.mapping.additional_metadata_provider'
 
     Oro\Bundle\EntityMergeBundle\Doctrine\DoctrineHelper:
@@ -63,7 +63,7 @@ services:
     oro_entity_merge.step.remove_entities:
         class: Oro\Bundle\EntityMergeBundle\Model\Step\RemoveEntitiesStep
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@oro_entity_merge.doctrine_helper'
         tags:
             - { name: oro_entity_merge.step }
@@ -76,12 +76,15 @@ services:
 
     oro_entity_merge.accessor.default:
         class: Oro\Bundle\EntityMergeBundle\Model\Accessor\DefaultAccessor
+        arguments:
+            - '@property_accessor'
         tags:
             - { name: oro_entity_merge.accessor }
 
     oro_entity_merge.accessor.inverse_association:
         class: Oro\Bundle\EntityMergeBundle\Model\Accessor\InverseAssociationAccessor
         arguments:
+            - '@property_accessor'
             - '@oro_entity_merge.doctrine_helper'
         tags:
             - { name: oro_entity_merge.accessor }

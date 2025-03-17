@@ -11,35 +11,25 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * The form type to select a language.
+ */
 class LanguageSelectType extends AbstractType
 {
-    const NAME = 'oro_language_select';
-
-    /** @var LocalizationChoicesProvider */
-    private $provider;
-
-    /** @var ManagerRegistry */
-    private $registry;
-
-    public function __construct(LocalizationChoicesProvider $provider, ManagerRegistry $registry)
-    {
-        $this->provider = $provider;
-        $this->registry = $registry;
+    public function __construct(
+        private LocalizationChoicesProvider $provider,
+        private ManagerRegistry $doctrine
+    ) {
     }
 
     #[\Override]
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->addModelTransformer(
-            new EntityToIdTransformer(
-                $this->registry->getManagerForClass(Language::class),
-                Language::class
-            )
-        );
+        $builder->addModelTransformer(new EntityToIdTransformer($this->doctrine, Language::class));
     }
 
     #[\Override]
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'placeholder' => '',
@@ -57,14 +47,9 @@ class LanguageSelectType extends AbstractType
         return OroChoiceType::class;
     }
 
-    public function getName()
-    {
-        return $this->getBlockPrefix();
-    }
-
     #[\Override]
     public function getBlockPrefix(): string
     {
-        return static::NAME;
+        return 'oro_language_select';
     }
 }

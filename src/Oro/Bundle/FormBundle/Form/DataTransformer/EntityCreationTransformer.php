@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\FormBundle\Form\DataTransformer;
 
-use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
@@ -13,45 +12,30 @@ class EntityCreationTransformer extends EntityToIdTransformer
 {
     /**
      * Property of created entity that will be set with provided value
-     *
-     * @var string
      */
-    protected $newEntityPropertyName;
+    protected string $newEntityPropertyName;
 
     /**
      * Path where the value for new entity is stored in passed data
-     *
-     * @var string|null
      */
-    protected $valuePath;
+    protected ?string $valuePath = null;
 
     /**
      * If true, allow to create new entity with empty data
-     *
-     * @var bool
      */
-    protected $allowEmptyProperty = false;
+    protected bool $allowEmptyProperty = false;
 
-    /**
-     * @param string $newEntityPropertyName
-     */
-    public function setNewEntityPropertyName($newEntityPropertyName)
+    public function setNewEntityPropertyName(string $newEntityPropertyName): void
     {
         $this->newEntityPropertyName = $newEntityPropertyName;
     }
 
-    /**
-     * @param string $valuePath
-     */
-    public function setValuePath($valuePath)
+    public function setValuePath(?string $valuePath): void
     {
         $this->valuePath = $valuePath;
     }
 
-    /**
-     * @param bool $allowEmptyProperty
-     */
-    public function setAllowEmptyProperty($allowEmptyProperty)
+    public function setAllowEmptyProperty(bool $allowEmptyProperty): void
     {
         $this->allowEmptyProperty = $allowEmptyProperty;
     }
@@ -61,68 +45,53 @@ class EntityCreationTransformer extends EntityToIdTransformer
     {
         if (!$value) {
             return null;
-        } else {
-            $data = $this->getData($value);
-            $id = null;
-            if ($this->propertyAccessor->isReadable($data, $this->propertyPath)) {
-                $id = $this->propertyAccessor->getValue($data, $this->propertyPath);
-            }
-
-            return $id ? parent::reverseTransform($id) : $this->createNewEntity($data);
         }
+
+        $data = $this->getData($value);
+        $id = null;
+        if ($this->getPropertyAccessor()->isReadable($data, $this->getPropertyPath())) {
+            $id = $this->getPropertyAccessor()->getValue($data, $this->getPropertyPath());
+        }
+
+        return $id ? parent::reverseTransform($id) : $this->createNewEntity($data);
     }
 
-    #[\Override]
-    protected function createPropertyAccessor()
-    {
-        $this->propertyAccessor = PropertyAccess::createPropertyAccessorWithDotSyntax();
-    }
-
-    /**
-     * @param array $data
-     *
-     * @return object
-     */
-    protected function createNewEntity(array $data)
+    protected function createNewEntity(array $data): object
     {
         if (!$this->valuePath && !$this->allowEmptyProperty) {
             throw new InvalidConfigurationException(
                 'Property "valuePath" should be not empty or property "allowEmptyProperty" should be true.'
             );
         }
-        $newEntityPropertyValue = $this->propertyAccessor->getValue($data, sprintf('[%s]', $this->valuePath));
+        $newEntityPropertyValue = $this->getPropertyAccessor()->getValue($data, \sprintf('[%s]', $this->valuePath));
 
         if (!$newEntityPropertyValue && !$this->allowEmptyProperty) {
-            throw new InvalidConfigurationException(
-                'No data provided for new entity property.'
-            );
+            throw new InvalidConfigurationException('No data provided for new entity property.');
         }
 
         $object = new $this->className();
         if ($newEntityPropertyValue) {
-            $this->propertyAccessor->setValue($object, $this->newEntityPropertyName, $newEntityPropertyValue);
+            $this->getPropertyAccessor()->setValue($object, $this->newEntityPropertyName, $newEntityPropertyValue);
         }
 
         return $object;
     }
 
-    /**
-     * @param array|int|string $value
-     *
-     * @return array
-     */
-    protected function getData($value)
+    protected function getData(mixed $value): array
     {
         // supported $value types:
         // json encoded array ['value' => $valueForPropertyOfNewEntity]
         // scalar types will be treated as ids
-        if (!is_scalar($value) && !is_array($value)) {
+        if (!\is_scalar($value) && !\is_array($value)) {
             throw new UnexpectedTypeException($value, 'json encoded string, array or scalar value');
         }
-        $data = is_scalar($value)
+
+        $data = \is_scalar($value)
             ? json_decode($value, true)
             : $value;
-        $data = is_array($data) ? $data : [$this->property => $value];
+        if (!\is_array($data)) {
+            $data = [$this->getProperty() => $value];
+        }
 
         return $data;
     }

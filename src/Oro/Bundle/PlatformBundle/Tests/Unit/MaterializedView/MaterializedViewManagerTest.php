@@ -3,7 +3,7 @@
 namespace Oro\Bundle\PlatformBundle\Tests\Unit\MaterializedView;
 
 use Doctrine\ORM\Configuration;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\ManagerRegistry;
@@ -12,30 +12,21 @@ use Oro\Bundle\PlatformBundle\Entity\Repository\MaterializedViewEntityRepository
 use Oro\Bundle\PlatformBundle\MaterializedView\Exception\MaterializedViewAlreadyExistsException;
 use Oro\Bundle\PlatformBundle\MaterializedView\Exception\MaterializedViewDoesNotExistException;
 use Oro\Bundle\PlatformBundle\MaterializedView\MaterializedViewManager;
-use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use Oro\Component\DoctrineUtils\DBAL\Schema\MaterializedView;
 use Oro\Component\DoctrineUtils\DBAL\Schema\MaterializedViewSchemaManager;
 use Oro\Component\DoctrineUtils\MaterializedView\MaterializedViewByQueryFactory;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
-class MaterializedViewManagerTest extends \PHPUnit\Framework\TestCase
+class MaterializedViewManagerTest extends TestCase
 {
-    use LoggerAwareTraitTestTrait;
-
-    /** @var MaterializedViewByQueryFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $materializedViewByQueryFactory;
-
-    /** @var MaterializedViewSchemaManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $materializedViewSchemaManager;
-
-    /** @var MaterializedViewEntityRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityRepository;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var UnitOfWork|\PHPUnit\Framework\MockObject\MockObject */
-    private $unitOfWork;
-
+    private MaterializedViewByQueryFactory&MockObject $materializedViewByQueryFactory;
+    private MaterializedViewSchemaManager&MockObject $materializedViewSchemaManager;
+    private LoggerInterface&MockObject $logger;
+    private MaterializedViewEntityRepository&MockObject $entityRepository;
+    private EntityManagerInterface&MockObject $entityManager;
+    private UnitOfWork&MockObject $unitOfWork;
     private MaterializedViewManager $manager;
 
     #[\Override]
@@ -43,26 +34,18 @@ class MaterializedViewManagerTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
         $this->materializedViewByQueryFactory = $this->createMock(MaterializedViewByQueryFactory::class);
         $this->materializedViewSchemaManager = $this->createMock(MaterializedViewSchemaManager::class);
-
-        $this->manager = new MaterializedViewManager(
-            $managerRegistry,
-            $this->materializedViewByQueryFactory,
-            $this->materializedViewSchemaManager
-        );
-
-        $this->setUpLoggerMock($this->manager);
-
+        $this->logger = $this->createMock(LoggerInterface::class);
         $this->entityRepository = $this->createMock(MaterializedViewEntityRepository::class);
-        $this->entityManager = $this->createMock(EntityManager::class);
-        $managerRegistry->expects(self::any())
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->expects(self::any())
             ->method('getManagerForClass')
             ->with(MaterializedViewEntity::class)
             ->willReturn($this->entityManager);
-
-        $managerRegistry->expects(self::any())
+        $doctrine->expects(self::any())
             ->method('getRepository')
             ->with(MaterializedViewEntity::class)
             ->willReturn($this->entityRepository);
@@ -83,6 +66,13 @@ class MaterializedViewManagerTest extends \PHPUnit\Framework\TestCase
         $this->entityManager->expects(self::any())
             ->method('getUnitOfWork')
             ->willReturn($this->unitOfWork);
+
+        $this->manager = new MaterializedViewManager(
+            $doctrine,
+            $this->materializedViewByQueryFactory,
+            $this->materializedViewSchemaManager,
+            $this->logger
+        );
     }
 
     public function testCreateByQueryWhenAlreadyExists(): void
@@ -120,7 +110,7 @@ class MaterializedViewManagerTest extends \PHPUnit\Framework\TestCase
                     ->method('create')
                     ->with($materializedViewModel);
 
-                $this->loggerMock->expects(self::once())
+                $this->logger->expects(self::once())
                     ->method('info')
                     ->with(
                         'Created materialized view {name} (with data: {withData}) from ORM query.',
@@ -192,7 +182,7 @@ class MaterializedViewManagerTest extends \PHPUnit\Framework\TestCase
             ->method('commit')
             ->with($materializedViewEntity);
 
-        $this->loggerMock->expects(self::once())
+        $this->logger->expects(self::once())
             ->method('info')
             ->with('Deleted materialized view {name}', ['name' => $name]);
 
@@ -240,7 +230,7 @@ class MaterializedViewManagerTest extends \PHPUnit\Framework\TestCase
             ->method('commit')
             ->with(self::isInstanceOf(MaterializedViewEntity::class));
 
-        $this->loggerMock->expects(self::once())
+        $this->logger->expects(self::once())
             ->method('info')
             ->with('Refreshed materialized view {name} (with data: {withData})', [
                 'name' => $name,

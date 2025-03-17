@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Manager;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
@@ -173,10 +173,7 @@ class ImapClearManager implements LoggerAwareInterface
         }
     }
 
-    /**
-     * @return EntityManager
-     */
-    protected function getEntityManager()
+    protected function getEntityManager(): EntityManagerInterface
     {
         return $this->doctrineHelper->getEntityManagerForClass(UserEmailOrigin::class);
     }

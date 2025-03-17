@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\DashboardBundle\Provider\Converters;
 
+use Oro\Bundle\DashboardBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 
 /**
- * Converts a date range configuration of a dashboard widget
- * to a representation that can be used to filter data by previous date interval.
+ * The dashboard widget configuration converter for enter a previous date interval.
  */
 class PreviousFilterDateRangeConverter extends FilterDateRangeConverter
 {
@@ -14,13 +14,17 @@ class PreviousFilterDateRangeConverter extends FilterDateRangeConverter
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     #[\Override]
-    public function getConvertedValue(array $widgetConfig, $value = null, array $config = [], array $options = [])
-    {
+    public function getConvertedValue(
+        array $widgetConfig,
+        mixed $value = null,
+        array $config = [],
+        array $options = []
+    ): mixed {
         $result = [];
 
-        if (($value === null && $config['converter_attributes']['default_checked'] === true) || $value) {
+        if ($value || (null === $value && true === $config['converter_attributes']['default_checked'])) {
             if (!isset($config['converter_attributes']['dateRangeField'])) {
-                throw new \Exception(
+                throw new InvalidConfigurationException(
                     'Previous date range configuration parameter should have dateRangeField attribute'
                 );
             }
@@ -35,7 +39,7 @@ class PreviousFilterDateRangeConverter extends FilterDateRangeConverter
                 );
             }
 
-            if ($currentDateRange['type'] !== AbstractDateFilterType::TYPE_LESS_THAN
+            if (AbstractDateFilterType::TYPE_LESS_THAN !== $currentDateRange['type']
                 && $currentDateRange['start']
                 && $currentDateRange['end']
             ) {
@@ -43,7 +47,7 @@ class PreviousFilterDateRangeConverter extends FilterDateRangeConverter
                 $start = clone $currentDateRange['start'];
                 /** @var \DateTime $end */
                 $end = clone $currentDateRange['end'];
-                if (in_array(
+                if (\in_array(
                     $currentDateRange['type'],
                     [
                         AbstractDateFilterType::TYPE_THIS_MONTH,
@@ -52,13 +56,13 @@ class PreviousFilterDateRangeConverter extends FilterDateRangeConverter
                     ],
                     true
                 )) {
-                    if ($currentDateRange['type'] == AbstractDateFilterType::TYPE_THIS_MONTH) {
+                    if (AbstractDateFilterType::TYPE_THIS_MONTH == $currentDateRange['type']) {
                         $start->modify('first day of previous month');
                         $end->modify('last day of previous month');
-                    } elseif ($currentDateRange['type'] == AbstractDateFilterType::TYPE_THIS_YEAR) {
+                    } elseif (AbstractDateFilterType::TYPE_THIS_YEAR == $currentDateRange['type']) {
                         $start->modify('first day of previous year');
                         $end->modify('last day of previous year');
-                    } elseif ($currentDateRange['type'] == AbstractDateFilterType::TYPE_THIS_QUARTER) {
+                    } elseif (AbstractDateFilterType::TYPE_THIS_QUARTER == $currentDateRange['type']) {
                         $start->modify('first day of - 3 month');
                         $end->modify('last day of - 3 month');
                     }
@@ -70,11 +74,8 @@ class PreviousFilterDateRangeConverter extends FilterDateRangeConverter
                 }
 
                 $result['start'] = $start;
-                $result['end']   = $end;
-                $type            = AbstractDateFilterType::TYPE_BETWEEN;
-                if (isset($currentDateRange['type'])) {
-                    $type = $currentDateRange['type'];
-                }
+                $result['end'] = $end;
+                $type = $currentDateRange['type'] ?? AbstractDateFilterType::TYPE_BETWEEN;
                 $result['type'] = $type;
             }
         }
@@ -83,7 +84,7 @@ class PreviousFilterDateRangeConverter extends FilterDateRangeConverter
     }
 
     #[\Override]
-    public function getViewValue($value)
+    public function getViewValue(mixed $value): mixed
     {
         if (!empty($value)) {
             return parent::getViewValue($value);
@@ -93,9 +94,9 @@ class PreviousFilterDateRangeConverter extends FilterDateRangeConverter
     }
 
     #[\Override]
-    public function getFormValue(array $config, $value)
+    public function getFormValue(array $config, mixed $value): mixed
     {
-        if ($value === null && $config['converter_attributes']['default_checked'] === true) {
+        if (null === $value && true === $config['converter_attributes']['default_checked']) {
             return true;
         }
 

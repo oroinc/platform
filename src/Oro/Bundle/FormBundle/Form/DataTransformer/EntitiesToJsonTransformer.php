@@ -3,19 +3,17 @@
 namespace Oro\Bundle\FormBundle\Form\DataTransformer;
 
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Form\DataTransformerInterface;
 
+/**
+ * Transforms between a list of entities and its JSON representation.
+ */
 class EntitiesToJsonTransformer implements DataTransformerInterface
 {
-    /**
-     * @var EntityManager
-     */
-    protected $entityManager;
-
-    public function __construct(EntityManager $entityManager)
-    {
-        $this->entityManager = $entityManager;
+    public function __construct(
+        private ManagerRegistry $doctrine
+    ) {
     }
 
     #[\Override]
@@ -25,14 +23,14 @@ class EntitiesToJsonTransformer implements DataTransformerInterface
             return '';
         }
 
-        if (is_array($value)) {
+        if (\is_array($value)) {
+            $result = [];
             foreach ($value as $target) {
                 $result[] = json_encode([
                     'entityClass' => ClassUtils::getClass($target),
-                    'entityId'    => $target->getId(),
-                ]);
+                    'entityId' => $target->getId()
+                ], JSON_THROW_ON_ERROR);
             }
-
             $value = implode(';', $result);
         }
 
@@ -49,9 +47,8 @@ class EntitiesToJsonTransformer implements DataTransformerInterface
         $targets = explode(';', $value);
         $result = [];
         foreach ($targets as $target) {
-            $target = json_decode($target, true);
-            $metadata = $this->entityManager->getClassMetadata($target['entityClass']);
-            $result[] = $this->entityManager->getRepository($metadata->getName())->find($target['entityId']);
+            $target = json_decode($target, true, 512, JSON_THROW_ON_ERROR);
+            $result[] = $this->doctrine->getRepository($target['entityClass'])->find($target['entityId']);
         }
 
         return $result;

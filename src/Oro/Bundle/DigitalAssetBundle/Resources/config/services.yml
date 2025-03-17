@@ -63,7 +63,7 @@ services:
     oro_digital_asset.form.transformer.digital_asset_to_id:
         class: Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer
         arguments:
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - Oro\Bundle\DigitalAssetBundle\Entity\DigitalAsset
             - id
 

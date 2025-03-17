@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Form\DataTransformer;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
@@ -11,36 +11,15 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
- * Transforms between entity and id
+ * Transforms between EmailOrigin entity and its ID.
  */
 class OriginTransformer implements DataTransformerInterface
 {
-    /** @var EntityManager */
-    protected $em;
-
-    /** @var string */
-    protected $className;
-
-    /** @var TokenAccessorInterface */
-    protected $tokenAccessor;
-
-    /** @var EmailOriginHelper */
-    protected $emailOriginHelper;
-
-    /**
-     * OriginTransformer constructor.
-     *
-     * @throws UnexpectedTypeException When $queryBuilderCallback is set and not callable
-     */
     public function __construct(
-        EntityManager $em,
-        TokenAccessorInterface $tokenAccessor,
-        EmailOriginHelper $emailOriginHelper
+        private ManagerRegistry $doctrine,
+        private TokenAccessorInterface $tokenAccessor,
+        private EmailOriginHelper $emailOriginHelper
     ) {
-        $this->em = $em;
-        $this->tokenAccessor = $tokenAccessor;
-        $this->emailOriginHelper = $emailOriginHelper;
-        $this->className = EmailOrigin::class;
     }
 
     #[\Override]
@@ -50,8 +29,8 @@ class OriginTransformer implements DataTransformerInterface
             return null;
         }
 
-        if (!is_object($value)) {
-            throw new UnexpectedTypeException($value, 'object');
+        if (!$value instanceof EmailOrigin) {
+            throw new UnexpectedTypeException($value, EmailOrigin::class);
         }
 
         return $value->getId();
@@ -63,10 +42,10 @@ class OriginTransformer implements DataTransformerInterface
         if (!$value) {
             return null;
         }
-        list($id, $email) =  array_pad(explode('|', $value), 2, null);
+
+        [$id, $email] = array_pad(explode('|', $value), 2, null);
         if (!$id) {
             $origin = $this->findByOwner($this->tokenAccessor->getUser());
-
             if (!$origin) {
                 $origin = $this->createInternalOrigin($email);
             }
@@ -74,45 +53,25 @@ class OriginTransformer implements DataTransformerInterface
             return $origin;
         }
 
-        return $this->loadEntityById($id);
+        return $this->loadEntityById((int)$id);
     }
 
-    /**
-     * Load entity by id
-     *
-     * @param mixed $id
-     * @return object
-     * @throws UnexpectedTypeException if query builder callback returns invalid type
-     * @throws TransformationFailedException if value not matched given $id
-     */
-    protected function loadEntityById($id)
+    private function loadEntityById(int $id): EmailOrigin
     {
-        $result = $this->em->find($this->className, $id);
+        $result = $this->doctrine->getManagerForClass(EmailOrigin::class)->find(EmailOrigin::class, $id);
         if (!$result) {
-            throw new TransformationFailedException(sprintf('The value "%s" does not exist or not unique.', $id));
+            throw new TransformationFailedException(\sprintf('The value "%s" does not exist or not unique.', $id));
         }
 
         return $result;
     }
 
-    /**
-     * @param $owner
-     *
-     * @return null|object
-     */
-    protected function findByOwner($owner)
+    private function findByOwner(object $owner): ?EmailOrigin
     {
-        $repository = $this->em->getRepository($this->className);
-
-        return $repository->findOneBy(['owner' => $owner]);
+        return $this->doctrine->getRepository(EmailOrigin::class)->findOneBy(['owner' => $owner]);
     }
 
-    /**
-     * @param string $email
-     *
-     * @return EmailOrigin
-     */
-    protected function createInternalOrigin($email)
+    private function createInternalOrigin(string $email): EmailOrigin
     {
         return $this->emailOriginHelper->getEmailOrigin($email);
     }

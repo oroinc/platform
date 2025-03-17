@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\EventListener\Datagrid;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
@@ -98,7 +98,7 @@ class MailboxGridListener implements FeatureToggleableInterface
      */
     protected function getAuthorisedOrganizationIds()
     {
-        /** @var EntityManager $manager */
+        /** @var EntityManagerInterface $manager */
         $manager = $this->doctrine->getManagerForClass(Organization::class);
 
         $qb = $manager->createQueryBuilder();

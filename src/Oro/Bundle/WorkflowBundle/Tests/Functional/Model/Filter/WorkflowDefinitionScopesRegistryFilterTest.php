@@ -16,8 +16,7 @@ class WorkflowDefinitionScopesRegistryFilterTest extends WorkflowTestCase
 {
     private const WORKFLOW_SCOPES_CONFIG_DIR = '/Tests/Functional/DataFixtures/WithScopesAndWithout';
 
-    /** @var TestActivityScopeProvider */
-    private $activityScopeProvider;
+    private TestActivityScopeProvider $activityScopeProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -34,10 +33,10 @@ class WorkflowDefinitionScopesRegistryFilterTest extends WorkflowTestCase
         $this->activityScopeProvider->setCurrentTestActivity(null);
     }
 
-    public function testFilter()
+    public function testFilter(): void
     {
         $this->updateUserSecurityToken(self::AUTH_USER);
-        $this->getContainer()->get('request_stack')->push(new Request());
+        self::getContainer()->get('request_stack')->push(new Request());
 
         /** @var TestActivity $initialActivity */
         $initialActivity = $this->getReference('test_activity_1');
@@ -69,16 +68,16 @@ class WorkflowDefinitionScopesRegistryFilterTest extends WorkflowTestCase
 
         $expectedWorkflows = ['test_flow_with_scopes', 'test_flow_without_scopes'];
 
-        $this->assertEmpty(array_diff($expectedWorkflows, $workflows));
+        self::assertEmpty(array_diff($expectedWorkflows, $workflows));
 
-        //changing context
+        // changing context
         $this->activityScopeProvider->setCurrentTestActivity($this->getReference('test_activity_2'));
 
         $workflows = array_keys($manager->getApplicableWorkflows(WorkflowAwareEntity::class));
 
         $expectedWorkflows = ['test_flow_without_scopes'];
 
-        $this->assertEmpty(array_diff($expectedWorkflows, $workflows));
-        $this->assertNotContains('test_flow_with_scopes', $workflows);
+        self::assertEmpty(array_diff($expectedWorkflows, $workflows));
+        self::assertNotContains('test_flow_with_scopes', $workflows);
     }
 }

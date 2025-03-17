@@ -3,11 +3,11 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Provider\Converters;
 
 use Oro\Bundle\DashboardBundle\Provider\Converters\WidgetItemsChoiceTypeConverter;
+use PHPUnit\Framework\TestCase;
 
-class WidgetItemsChoiceTypeConverterTest extends \PHPUnit\Framework\TestCase
+class WidgetItemsChoiceTypeConverterTest extends TestCase
 {
-    /** @var WidgetItemsChoiceTypeConverter */
-    private $converter;
+    private WidgetItemsChoiceTypeConverter $converter;
 
     #[\Override]
     protected function setUp(): void
@@ -15,20 +15,20 @@ class WidgetItemsChoiceTypeConverterTest extends \PHPUnit\Framework\TestCase
         $this->converter = new WidgetItemsChoiceTypeConverter();
     }
 
-    public function testGetConvertedValue()
+    public function testGetConvertedValue(): void
     {
         $value = 'test';
-        $this->assertEquals($value, $this->converter->getConvertedValue([], $value));
-        $this->assertEquals($value, $this->converter->getFormValue([], $value));
+        self::assertEquals($value, $this->converter->getConvertedValue([], $value));
+        self::assertEquals($value, $this->converter->getFormValue([], $value));
     }
 
-    public function testGetDefaultValue()
+    public function testGetDefaultValue(): void
     {
         $config = [
             'converter_attributes' => [
                 'default_selected' => 'all'
             ],
-            'options'              => [
+            'options' => [
                 'choices' => [
                     ['first' => 1],
                     ['second' => 2]
@@ -36,18 +36,18 @@ class WidgetItemsChoiceTypeConverterTest extends \PHPUnit\Framework\TestCase
             ]
         ];
 
-        $this->assertEquals([1, 2], $this->converter->getConvertedValue([], null, $config));
-        $this->assertEquals([1, 2], $this->converter->getFormValue($config, null));
+        self::assertEquals([1, 2], $this->converter->getConvertedValue([], null, $config));
+        self::assertEquals([1, 2], $this->converter->getFormValue($config, null));
 
         $config['converter_attributes']['default_selected'] = [1];
 
-        $this->assertEquals([1], $this->converter->getConvertedValue([], null, $config));
-        $this->assertEquals([1], $this->converter->getFormValue($config, null));
+        self::assertEquals([1], $this->converter->getConvertedValue([], null, $config));
+        self::assertEquals([1], $this->converter->getFormValue($config, null));
     }
 
-    public function testGetViewValue()
+    public function testGetViewValue(): void
     {
         $value = ['first', 'second'];
-        $this->assertEquals(implode(',', $value), $this->converter->getViewValue($value));
+        self::assertEquals(implode(',', $value), $this->converter->getViewValue($value));
     }
 }

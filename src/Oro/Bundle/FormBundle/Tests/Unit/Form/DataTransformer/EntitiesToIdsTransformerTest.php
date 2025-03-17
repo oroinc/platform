@@ -3,57 +3,56 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
 use Oro\Bundle\FormBundle\Form\Exception\FormException;
 use Oro\Bundle\FormBundle\Tests\Unit\Fixtures\Entity\TestEntity;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EntitiesToIdsTransformerTest extends \PHPUnit\Framework\TestCase
+class EntitiesToIdsTransformerTest extends TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
-    private $classMetadata;
-
-    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
+    private ManagerRegistry&MockObject $doctrine;
+    private EntityManagerInterface&MockObject $em;
+    private ClassMetadata&MockObject $classMetadata;
+    private EntityRepository&MockObject $repository;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->doctrine = $this->createMock(ManagerRegistry::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
         $this->classMetadata = $this->createMock(ClassMetadata::class);
         $this->repository = $this->createMock(EntityRepository::class);
 
-        $this->entityManager->expects($this->any())
+        $this->em->expects(self::any())
             ->method('getClassMetadata')
             ->with(TestEntity::class)
             ->willReturn($this->classMetadata);
-        $this->entityManager->expects($this->any())
+
+        $this->doctrine->expects(self::any())
+            ->method('getManagerForClass')
+            ->willReturn($this->em);
+        $this->doctrine->expects(self::any())
             ->method('getRepository')
             ->with(TestEntity::class)
             ->willReturn($this->repository);
     }
 
-    private function getTransformer($property, $queryBuilderCallback): EntitiesToIdsTransformer
+    private function getTransformer(?string $property, mixed $queryBuilderCallback): EntitiesToIdsTransformer
     {
-        return new EntitiesToIdsTransformer(
-            $this->entityManager,
-            TestEntity::class,
-            $property,
-            $queryBuilderCallback
-        );
+        return new EntitiesToIdsTransformer($this->doctrine, TestEntity::class, $property, $queryBuilderCallback);
     }
 
     private function createEntityList(string $property, array $values): array
@@ -72,10 +71,10 @@ class EntitiesToIdsTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider transformDataProvider
      */
-    public function testTransform(string $property, array $value, array $expectedValue)
+    public function testTransform(string $property, array $value, array $expectedValue): void
     {
         $transformer = $this->getTransformer($property, null);
-        $this->assertEquals($expectedValue, $transformer->transform($value));
+        self::assertEquals($expectedValue, $transformer->transform($value));
     }
 
     public function transformDataProvider(): array
@@ -99,7 +98,7 @@ class EntitiesToIdsTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testTransformFailsWhenValueInNotAnArray()
+    public function testTransformFailsWhenValueInNotAnArray(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "array", "string" given');
@@ -108,13 +107,13 @@ class EntitiesToIdsTransformerTest extends \PHPUnit\Framework\TestCase
         $transformer->transform('invalid value');
     }
 
-    public function testReverseTransformForEmptyArray()
+    public function testReverseTransformForEmptyArray(): void
     {
         $transformer = $this->getTransformer('id', null);
-        $this->assertSame([], $transformer->reverseTransform([]));
+        self::assertSame([], $transformer->reverseTransform([]));
     }
 
-    public function testReverseTransformDefault()
+    public function testReverseTransformDefault(): void
     {
         $value = [1, 2, 3, 4];
         $expectedValue = $this->createEntityList('id', [1, 2, 3, 4]);
@@ -122,36 +121,36 @@ class EntitiesToIdsTransformerTest extends \PHPUnit\Framework\TestCase
         $query = $this->createMock(AbstractQuery::class);
         $queryBuilder = $this->createMock(QueryBuilder::class);
 
-        $this->classMetadata->expects($this->once())
+        $this->classMetadata->expects(self::once())
             ->method('getSingleIdentifierFieldName')
             ->willReturn('id');
 
-        $this->repository->expects($this->once())
+        $this->repository->expects(self::once())
             ->method('createQueryBuilder')
             ->with('e')
             ->willReturn($queryBuilder);
 
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(self::once())
             ->method('where')
             ->with('e.id IN (:ids)')
             ->willReturnSelf();
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(self::once())
             ->method('setParameter')
             ->with('ids', $value)
             ->willReturnSelf();
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(self::once())
             ->method('getQuery')
             ->willReturn($query);
 
-        $query->expects($this->once())
+        $query->expects(self::once())
             ->method('execute')
             ->willReturn($expectedValue);
 
         $transformer = $this->getTransformer(null, null);
-        $this->assertEquals($expectedValue, $transformer->reverseTransform($value));
+        self::assertEquals($expectedValue, $transformer->reverseTransform($value));
     }
 
-    public function testReverseTransformWithCustomProperty()
+    public function testReverseTransformWithCustomProperty(): void
     {
         $value = ['a', 'b', 'c'];
         $expectedValue = $this->createEntityList('name', ['a', 'b', 'c']);
@@ -159,35 +158,35 @@ class EntitiesToIdsTransformerTest extends \PHPUnit\Framework\TestCase
         $query = $this->createMock(AbstractQuery::class);
         $queryBuilder = $this->createMock(QueryBuilder::class);
 
-        $this->classMetadata->expects($this->never())
+        $this->classMetadata->expects(self::never())
             ->method('getSingleIdentifierFieldName');
 
-        $this->repository->expects($this->once())
+        $this->repository->expects(self::once())
             ->method('createQueryBuilder')
             ->with('e')
             ->willReturn($queryBuilder);
 
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(self::once())
             ->method('where')
             ->with('e.name IN (:ids)')
             ->willReturnSelf();
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(self::once())
             ->method('setParameter')
             ->with('ids', $value)
             ->willReturnSelf();
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(self::once())
             ->method('getQuery')
             ->willReturn($query);
 
-        $query->expects($this->once())
+        $query->expects(self::once())
             ->method('execute')
             ->willReturn($expectedValue);
 
         $transformer = $this->getTransformer('name', null);
-        $this->assertEquals($expectedValue, $transformer->reverseTransform($value));
+        self::assertEquals($expectedValue, $transformer->reverseTransform($value));
     }
 
-    public function testReverseTransformWithCustomQueryBuilderCallback()
+    public function testReverseTransformWithCustomQueryBuilderCallback(): void
     {
         $value = [1, 2, 3, 4];
         $expectedValue = $this->createEntityList('id', [1, 2, 3, 4]);
@@ -195,28 +194,24 @@ class EntitiesToIdsTransformerTest extends \PHPUnit\Framework\TestCase
         $query = $this->createMock(AbstractQuery::class);
         $queryBuilder = $this->createMock(QueryBuilder::class);
 
-        $this->classMetadata->expects($this->once())
-            ->method('getSingleIdentifierFieldName')
-            ->willReturn('id');
-
-        $this->repository->expects($this->once())
+        $this->repository->expects(self::once())
             ->method('createQueryBuilder')
             ->with('o')
             ->willReturn($queryBuilder);
 
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(self::once())
             ->method('where')
             ->with('o.id IN (:values)')
             ->willReturnSelf();
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(self::once())
             ->method('setParameter')
             ->with('values', $value)
             ->willReturnSelf();
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(self::once())
             ->method('getQuery')
             ->willReturn($query);
 
-        $query->expects($this->once())
+        $query->expects(self::once())
             ->method('execute')
             ->willReturn($expectedValue);
 
@@ -228,10 +223,10 @@ class EntitiesToIdsTransformerTest extends \PHPUnit\Framework\TestCase
 
             return $result;
         });
-        $this->assertEquals($expectedValue, $transformer->reverseTransform($value));
+        self::assertEquals($expectedValue, $transformer->reverseTransform($value));
     }
 
-    public function testReverseTransformForNotArray()
+    public function testReverseTransformForNotArray(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "array", "string" given');
@@ -240,7 +235,7 @@ class EntitiesToIdsTransformerTest extends \PHPUnit\Framework\TestCase
         $transformer->reverseTransform('1,2,3,4,5');
     }
 
-    public function testReverseTransformWhenEntitiesCountMismatchIdsCount()
+    public function testReverseTransformWhenEntitiesCountMismatchIdsCount(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('Could not find all entities for the given IDs');
@@ -251,28 +246,28 @@ class EntitiesToIdsTransformerTest extends \PHPUnit\Framework\TestCase
         $query = $this->createMock(AbstractQuery::class);
         $queryBuilder = $this->createMock(QueryBuilder::class);
 
-        $this->classMetadata->expects($this->once())
+        $this->classMetadata->expects(self::once())
             ->method('getSingleIdentifierFieldName')
             ->willReturn('id');
 
-        $this->repository->expects($this->once())
+        $this->repository->expects(self::once())
             ->method('createQueryBuilder')
             ->with('e')
             ->willReturn($queryBuilder);
 
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(self::once())
             ->method('where')
             ->with('e.id IN (:ids)')
             ->willReturnSelf();
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(self::once())
             ->method('setParameter')
             ->with('ids', $value)
             ->willReturnSelf();
-        $queryBuilder->expects($this->once())
+        $queryBuilder->expects(self::once())
             ->method('getQuery')
             ->willReturn($query);
 
-        $query->expects($this->once())
+        $query->expects(self::once())
             ->method('execute')
             ->willReturn($loadedEntities);
 
@@ -280,14 +275,10 @@ class EntitiesToIdsTransformerTest extends \PHPUnit\Framework\TestCase
         $transformer->reverseTransform($value);
     }
 
-    public function testReverseTransformWithInvalidQueryBuilderCallback()
+    public function testReverseTransformWithInvalidQueryBuilderCallback(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "Doctrine\ORM\QueryBuilder", "stdClass" given');
-
-        $this->classMetadata->expects($this->once())
-            ->method('getSingleIdentifierFieldName')
-            ->willReturn('id');
 
         $transformer = $this->getTransformer(null, function () {
             return new \stdClass();
@@ -295,7 +286,7 @@ class EntitiesToIdsTransformerTest extends \PHPUnit\Framework\TestCase
         $transformer->reverseTransform([1, 2, 3, 4]);
     }
 
-    public function testCreateFailsWhenCannotGetIdProperty()
+    public function testCreateFailsWhenCannotGetIdProperty(): void
     {
         $this->expectException(FormException::class);
         $this->expectExceptionMessage(sprintf(
@@ -303,19 +294,20 @@ class EntitiesToIdsTransformerTest extends \PHPUnit\Framework\TestCase
             TestEntity::class
         ));
 
-        $this->classMetadata->expects($this->once())
+        $this->classMetadata->expects(self::once())
             ->method('getSingleIdentifierFieldName')
             ->willThrowException(new MappingException());
 
-        $this->entityManager->expects($this->once())
+        $this->em->expects(self::once())
             ->method('getClassMetadata')
             ->with(TestEntity::class)
             ->willReturn($this->classMetadata);
 
-        $this->getTransformer(null, null);
+        $transformer = $this->getTransformer(null, null);
+        $transformer->transform($this->createEntityList('id', [1, 2, 3, 4]));
     }
 
-    public function testCreateFailsWhenQueryBuilderCallbackIsNotCallable()
+    public function testCreateFailsWhenQueryBuilderCallbackIsNotCallable(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "callable", "array" given');

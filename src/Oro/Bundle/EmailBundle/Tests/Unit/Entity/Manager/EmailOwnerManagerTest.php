@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\Manager;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailOwnerManager;
@@ -13,20 +13,15 @@ use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmail;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwner;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity;
 use Oro\Component\Testing\Unit\ORM\Mocks\UnitOfWorkMock;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EmailOwnerManagerTest extends \PHPUnit\Framework\TestCase
+class EmailOwnerManagerTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EmailOwnerProviderStorage */
-    private $emailOwnerProviderStorage;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EmailAddressManager */
-    private $emailAddressManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EmailOwnerManager */
-    private $emailOwnerManager;
-
-    /** @var array */
-    private $fixtures;
+    private array $fixtures;
+    private EmailOwnerProviderStorage&MockObject $emailOwnerProviderStorage;
+    private EmailAddressManager&MockObject $emailAddressManager;
+    private EmailOwnerManager$emailOwnerManager;
 
     #[\Override]
     protected function setUp(): void
@@ -47,25 +42,25 @@ class EmailOwnerManagerTest extends \PHPUnit\Framework\TestCase
         ];
 
         $emailOwnerProvider = $this->createMock(EmailOwnerProviderInterface::class);
-        $emailOwnerProvider->expects($this->any())
+        $emailOwnerProvider->expects(self::any())
             ->method('getEmailOwnerClass')
             ->willReturn(TestEmailOwner::class);
 
         $this->emailOwnerProviderStorage = $this->createMock(EmailOwnerProviderStorage::class);
-        $this->emailOwnerProviderStorage->expects($this->any())
+        $this->emailOwnerProviderStorage->expects(self::any())
             ->method('getProviders')
             ->willReturn([$emailOwnerProvider, $emailOwnerProvider]);
-        $this->emailOwnerProviderStorage->expects($this->any())
+        $this->emailOwnerProviderStorage->expects(self::any())
             ->method('getEmailOwnerFieldName')
             ->willReturnOnConsecutiveCalls('primaryEmail', 'homeEmail');
 
         $emailAddressRepository = $this->createMock(EntityRepository::class);
-        $emailAddressRepository->expects($this->any())
+        $emailAddressRepository->expects(self::any())
             ->method('findOneBy')
             ->willReturnCallback(function (array $criteria) {
                 return $this->findEmailAddressBy($criteria['email']);
             });
-        $emailAddressRepository->expects($this->any())
+        $emailAddressRepository->expects(self::any())
             ->method('findBy')
             ->willReturnCallback(function (array $criteria) {
                 $keys = array_keys($criteria);
@@ -79,16 +74,16 @@ class EmailOwnerManagerTest extends \PHPUnit\Framework\TestCase
                 return [];
             });
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
 
         $this->emailAddressManager = $this->createMock(EmailAddressManager::class);
-        $this->emailAddressManager->expects($this->any())
+        $this->emailAddressManager->expects(self::any())
             ->method('getEmailAddressRepository')
             ->willReturn($emailAddressRepository);
-        $this->emailAddressManager->expects($this->any())
+        $this->emailAddressManager->expects(self::any())
             ->method('newEmailAddress')
             ->willReturn(new EmailAddress());
-        $this->emailAddressManager->expects($this->any())
+        $this->emailAddressManager->expects(self::any())
             ->method('getEntityManager')
             ->willReturn($em);
 
@@ -101,9 +96,9 @@ class EmailOwnerManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider handleChangedAddressesDataProvider
      */
-    public function testHandleChangedAddresses(array $emailAddressData, $expectedResult)
+    public function testHandleChangedAddresses(array $emailAddressData, string|array $expectedResult): void
     {
-        $this->assertEquals($expectedResult, $this->emailOwnerManager->handleChangedAddresses($emailAddressData));
+        self::assertEquals($expectedResult, $this->emailOwnerManager->handleChangedAddresses($emailAddressData));
     }
 
     public function handleChangedAddressesDataProvider(): array
@@ -157,9 +152,9 @@ class EmailOwnerManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider createEmailAddressDataProvider
      */
-    public function testCreateEmailAddressData(UnitOfWorkMock $uow, $result)
+    public function testCreateEmailAddressData(UnitOfWorkMock $uow, array $result): void
     {
-        $this->assertEquals($result, $this->emailOwnerManager->createEmailAddressData($uow));
+        self::assertEquals($result, $this->emailOwnerManager->createEmailAddressData($uow));
     }
 
     public function createEmailAddressDataProvider(): array

@@ -11,7 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class OrganizationUserAclMultiSelectType extends UserMultiSelectType
 {
     #[\Override]
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -35,12 +35,6 @@ class OrganizationUserAclMultiSelectType extends UserMultiSelectType
     public function getParent(): ?string
     {
         return OroJquerySelect2HiddenType::class;
-    }
-
-    #[\Override]
-    public function getName()
-    {
-        return $this->getBlockPrefix();
     }
 
     #[\Override]

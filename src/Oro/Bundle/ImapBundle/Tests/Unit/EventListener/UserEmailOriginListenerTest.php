@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\UnitOfWork;
@@ -13,24 +13,21 @@ use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\EventListener\UserEmailOriginListener;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class UserEmailOriginListenerTest extends \PHPUnit\Framework\TestCase
+class UserEmailOriginListenerTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var NotificationAlertManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $notificationAlertManager;
-
-    /** UserEmailOriginListener */
-    private $listener;
+    private EntityManagerInterface&MockObject $em;
+    private NotificationAlertManager&MockObject $notificationAlertManager;
+    private UserEmailOriginListener $listener;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManager::class);
+        $this->em = $this->createMock(EntityManagerInterface::class);
         $this->notificationAlertManager = $this->createMock(NotificationAlertManager::class);
 
         $this->listener = new UserEmailOriginListener($this->notificationAlertManager);

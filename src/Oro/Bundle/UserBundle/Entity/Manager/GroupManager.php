@@ -2,42 +2,28 @@
 
 namespace Oro\Bundle\UserBundle\Entity\Manager;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Repository\GroupRepository;
 
 /**
- * Manager for the Group Entity
+ * Manager for the Group entity.
  */
 class GroupManager
 {
-    /**
-     * @var EntityManager
-     */
-    private $em;
-
-    public function __construct(EntityManager $em)
-    {
-        $this->em = $em;
+    public function __construct(
+        private ManagerRegistry $doctrine
+    ) {
     }
 
-    /**
-     * Get user query builder
-     *
-     * @param Group $group
-     * @return QueryBuilder
-     */
-    public function getUserQueryBuilder(Group $group)
+    public function getUserQueryBuilder(Group $group): QueryBuilder
     {
         return $this->getGroupRepo()->getUserQueryBuilder($group);
     }
 
-    /**
-     * @return GroupRepository
-     */
-    protected function getGroupRepo()
+    private function getGroupRepo(): GroupRepository
     {
-        return $this->em->getRepository(Group::class);
+        return $this->doctrine->getRepository(Group::class);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Manager;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
@@ -21,36 +21,17 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ConnectionControllerManager
 {
-    private FormFactoryInterface $formFactory;
-    private SymmetricCrypterInterface $crypter;
-    private ManagerRegistry $doctrine;
-    private ImapConnectorFactory $imapConnectorFactory;
-    private OAuthManagerRegistry $oauthManagerRegistry;
-    private string $userFormName;
-    private string $userFormType;
-    private string $emailMailboxFormName;
-    private string $emailMailboxFormType;
-
     public function __construct(
-        FormFactoryInterface $formFactory,
-        SymmetricCrypterInterface $crypter,
-        ManagerRegistry $doctrine,
-        ImapConnectorFactory $imapConnectorFactory,
-        OAuthManagerRegistry $oauthManagerRegistry,
-        string $userFormName,
-        string $userFormType,
-        string $emailMailboxFormName,
-        string $emailMailboxFormType
+        private FormFactoryInterface $formFactory,
+        private SymmetricCrypterInterface $crypter,
+        private ManagerRegistry $doctrine,
+        private ImapConnectorFactory $imapConnectorFactory,
+        private OAuthManagerRegistry $oauthManagerRegistry,
+        private string $userFormName,
+        private string $userFormType,
+        private string $emailMailboxFormName,
+        private string $emailMailboxFormType
     ) {
-        $this->formFactory = $formFactory;
-        $this->crypter = $crypter;
-        $this->doctrine = $doctrine;
-        $this->imapConnectorFactory = $imapConnectorFactory;
-        $this->oauthManagerRegistry = $oauthManagerRegistry;
-        $this->userFormName = $userFormName;
-        $this->userFormType = $userFormType;
-        $this->emailMailboxFormName = $emailMailboxFormName;
-        $this->emailMailboxFormType = $emailMailboxFormType;
     }
 
     /**
@@ -90,7 +71,7 @@ class ConnectionControllerManager
         );
 
         $connector = $this->imapConnectorFactory->createImapConnector($config);
-        /** @var EntityManager $entityManager */
+        /** @var EntityManagerInterface $entityManager */
         $entityManager = $this->doctrine->getManager();
         $manager = new ImapEmailFolderManager($connector, $entityManager, $origin);
 
@@ -138,12 +119,7 @@ class ConnectionControllerManager
         return $this->prepareForm($formParentName, $accountTypeModel);
     }
 
-    /**
-     * @param $formParentName
-     * @param $accountTypeModel
-     * @return FormInterface|null
-     */
-    private function prepareForm($formParentName, $accountTypeModel)
+    private function prepareForm(string $formParentName, AccountTypeModel $accountTypeModel): ?FormInterface
     {
         $form = null;
         if ($formParentName === $this->userFormName || $formParentName === 'value') {
@@ -171,12 +147,7 @@ class ConnectionControllerManager
         return $form;
     }
 
-    /**
-     * @param $type
-     * @param $oauthEmailOrigin
-     * @return AccountTypeModel
-     */
-    private function createAccountModel($type, $oauthEmailOrigin)
+    private function createAccountModel(string $type, UserEmailOrigin $oauthEmailOrigin): AccountTypeModel
     {
         $accountTypeModel = new AccountTypeModel();
         $accountTypeModel->setAccountType($type);

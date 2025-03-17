@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -13,29 +13,22 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowEntityConnector;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManagerRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowItemListenerTest extends \PHPUnit\Framework\TestCase
+class WorkflowItemListenerTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var WorkflowManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $systemWorkflowManager;
-
-    /** @var WorkflowEntityConnector|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConnector;
-
-    /** @var WorkflowAwareCache|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowAwareCache;
-
-    /** @var WorkflowItemListener */
-    private $listener;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private WorkflowManager&MockObject $systemWorkflowManager;
+    private WorkflowEntityConnector&MockObject $entityConnector;
+    private WorkflowAwareCache&MockObject $workflowAwareCache;
+    private WorkflowItemListener $listener;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $this->doctrineHelper->expects($this->any())
+        $this->doctrineHelper->expects(self::any())
             ->method('getEntityClass')
             ->willReturnCallback(function ($object) {
                 return get_class($object);
@@ -44,7 +37,7 @@ class WorkflowItemListenerTest extends \PHPUnit\Framework\TestCase
         $this->systemWorkflowManager = $this->createMock(WorkflowManager::class);
 
         $workflowManagerRegistry = $this->createMock(WorkflowManagerRegistry::class);
-        $workflowManagerRegistry->expects($this->any())
+        $workflowManagerRegistry->expects(self::any())
             ->method('getManager')
             ->with('system')
             ->willReturn($this->systemWorkflowManager);
@@ -60,58 +53,58 @@ class WorkflowItemListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPostPersistScheduleExtraUpdate()
+    public function testPostPersistScheduleExtraUpdate(): void
     {
         $entity = new \stdClass();
         $entityId = 1;
         $entityClass = 'stdClass';
 
         $workflowItem = $this->createMock(WorkflowItem::class);
-        $workflowItem->expects($this->once())
+        $workflowItem->expects(self::once())
             ->method('getEntity')
             ->willReturn($entity);
-        $workflowItem->expects($this->once())
+        $workflowItem->expects(self::once())
             ->method('setEntityId')
             ->with($entityId);
-        $workflowItem->expects($this->once())
+        $workflowItem->expects(self::once())
             ->method('setEntityClass')
             ->with($entityClass);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getSingleEntityIdentifier')
             ->with($entity)
             ->willReturn($entityId);
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityClass')
             ->with($entity)
             ->willReturn($entityClass);
 
         $uow = $this->createMock(UnitOfWork::class);
-        $uow->expects($this->once())
+        $uow->expects(self::once())
             ->method('scheduleExtraUpdate')
             ->with($workflowItem, ['entityId' => [null, $entityId], 'entityClass' => [null, $entityClass]]);
 
-        $em = $this->createMock(EntityManager::class);
-        $em->expects($this->once())
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects(self::once())
             ->method('getUnitOfWork')
             ->willReturn($uow);
 
         $this->listener->postPersist($workflowItem, $this->getEvent($workflowItem, $em));
     }
 
-    public function testUpdateWorkflowItemEntityRelationException()
+    public function testUpdateWorkflowItemEntityRelationException(): void
     {
         $this->expectException(WorkflowException::class);
         $this->expectExceptionMessage('Workflow item does not contain related entity');
 
         $workflowItem = $this->createMock(WorkflowItem::class);
-        $workflowItem->expects($this->once())
+        $workflowItem->expects(self::once())
             ->method('getEntity');
 
         $this->listener->postPersist($workflowItem, $this->getEvent($workflowItem));
     }
 
-    public function testUpdateWorkflowItemNoEntityRelationIdException()
+    public function testUpdateWorkflowItemNoEntityRelationIdException(): void
     {
         $this->expectException(WorkflowException::class);
         $this->expectExceptionMessage(
@@ -119,10 +112,10 @@ class WorkflowItemListenerTest extends \PHPUnit\Framework\TestCase
         );
 
         $workflowItem = $this->createMock(WorkflowItem::class);
-        $workflowItem->expects($this->once())
+        $workflowItem->expects(self::once())
             ->method('getWorkflowName')
             ->willReturn('test_workflow');
-        $workflowItem->expects($this->once())
+        $workflowItem->expects(self::once())
             ->method('getEntity')
             ->willReturn(new \stdClass());
 
@@ -132,30 +125,30 @@ class WorkflowItemListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider preRemoveDataProvider
      */
-    public function testPreRemove(bool $hasWorkflowItems = false)
+    public function testPreRemove(bool $hasWorkflowItems = false): void
     {
         $entity = new \stdClass();
         $workflowItem = new WorkflowItem();
 
-        $this->entityConnector->expects($this->once())
+        $this->entityConnector->expects(self::once())
             ->method('isApplicableEntity')
             ->with($entity)
             ->willReturn(true);
 
-        $this->workflowAwareCache->expects($this->once())
+        $this->workflowAwareCache->expects(self::once())
             ->method('hasRelatedWorkflows')
             ->with($entity)
             ->willReturn(true);
 
-        $this->systemWorkflowManager->expects($this->once())
+        $this->systemWorkflowManager->expects(self::once())
             ->method('getWorkflowItemsByEntity')
             ->with($entity)
             ->willReturn($hasWorkflowItems ? [$workflowItem] : []);
 
         $entityManager = null;
         if ($hasWorkflowItems) {
-            $entityManager = $this->createMock(EntityManager::class);
-            $entityManager->expects($this->once())
+            $entityManager = $this->createMock(EntityManagerInterface::class);
+            $entityManager->expects(self::once())
                 ->method('remove')
                 ->with($workflowItem);
         }
@@ -173,47 +166,47 @@ class WorkflowItemListenerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testPreRemoveWithUnsupportedEntity()
+    public function testPreRemoveWithUnsupportedEntity(): void
     {
         $entity = new \DateTime();
 
-        $this->entityConnector->expects($this->once())
+        $this->entityConnector->expects(self::once())
             ->method('isApplicableEntity')
             ->with($entity)
             ->willReturn(false);
 
-        $this->workflowAwareCache->expects($this->never())
-            ->method($this->anything());
+        $this->workflowAwareCache->expects(self::never())
+            ->method(self::anything());
 
         $this->listener->preRemove($this->getEvent($entity));
     }
 
-    public function testPreRemoveWithEntityNotInWorkflow()
+    public function testPreRemoveWithEntityNotInWorkflow(): void
     {
         $entity = new \stdClass();
 
-        $this->entityConnector->expects($this->once())
+        $this->entityConnector->expects(self::once())
             ->method('isApplicableEntity')
             ->with($entity)
             ->willReturn(true);
 
-        $this->workflowAwareCache->expects($this->once())
+        $this->workflowAwareCache->expects(self::once())
             ->method('hasRelatedWorkflows')
             ->willReturn(false);
 
-        $this->systemWorkflowManager->expects($this->never())
-            ->method($this->anything());
+        $this->systemWorkflowManager->expects(self::never())
+            ->method(self::anything());
 
         $this->listener->preRemove($this->getEvent($entity));
     }
 
-    private function getEvent(object $entity, ?EntityManager $entityManager = null): LifecycleEventArgs
+    private function getEvent(object $entity, ?EntityManagerInterface $entityManager = null): LifecycleEventArgs
     {
         $event = $this->createMock(LifecycleEventArgs::class);
-        $event->expects($this->any())
+        $event->expects(self::any())
             ->method('getObject')
             ->willReturn($entity);
-        $event->expects($this->exactly($entityManager ? 1 : 0))
+        $event->expects(self::exactly($entityManager ? 1 : 0))
             ->method('getObjectManager')
             ->willReturn($entityManager);
 

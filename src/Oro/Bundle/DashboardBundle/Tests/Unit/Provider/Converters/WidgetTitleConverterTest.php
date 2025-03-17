@@ -3,20 +3,38 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Provider\Converters;
 
 use Oro\Bundle\DashboardBundle\Provider\Converters\WidgetTitleConverter;
+use PHPUnit\Framework\TestCase;
 
-class WidgetTitleConverterTest extends \PHPUnit\Framework\TestCase
+class WidgetTitleConverterTest extends TestCase
 {
-    public function testGetConvertedValue()
+    private WidgetTitleConverter $converter;
+
+    #[\Override]
+    protected function setUp(): void
     {
-        $converter = new WidgetTitleConverter();
-        $label = 'widget label';
-        $config['label'] = $label;
+        $this->converter = new WidgetTitleConverter();
+    }
 
-        $this->assertSame($label, $converter->getConvertedValue($config, []));
+    public function testGetConvertedValueWhenValueIsEmpty(): void
+    {
+        $widgetConfig = ['label' => 'widget label'];
 
-        $value['useDefault'] = false;
-        $value['title'] = 'test label';
+        self::assertSame('widget label', $this->converter->getConvertedValue($widgetConfig, []));
+    }
 
-        $this->assertEquals('test label', $converter->getConvertedValue($config, $value));
+    public function testGetConvertedValueWhenUseDefaultTurnedOn(): void
+    {
+        $widgetConfig = ['label' => 'widget label'];
+        $value = ['useDefault' => true, 'title' => 'test label'];
+
+        self::assertEquals('widget label', $this->converter->getConvertedValue($widgetConfig, $value));
+    }
+
+    public function testGetConvertedValueWhenUseDefaultTurnedOff(): void
+    {
+        $widgetConfig = ['label' => 'widget label'];
+        $value = ['useDefault' => false, 'title' => 'test label'];
+
+        self::assertEquals('test label', $this->converter->getConvertedValue($widgetConfig, $value));
     }
 }

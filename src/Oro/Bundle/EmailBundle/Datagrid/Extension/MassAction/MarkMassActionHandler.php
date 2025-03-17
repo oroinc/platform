@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\EmailBundle\Datagrid\Extension\MassAction;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerArgs;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionHandlerInterface;
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionResponse;
@@ -19,43 +20,20 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class MarkMassActionHandler implements MassActionHandlerInterface
 {
-    const MARK_READ = 1;
-    const MARK_UNREAD = 2;
-    const FLUSH_BATCH_SIZE = 100;
+    public const int MARK_READ = 1;
+    public const int MARK_UNREAD = 2;
+    public const int  FLUSH_BATCH_SIZE = 100;
 
-    /** @var EntityManager */
-    protected $entityManager;
-
-    /** @var TranslatorInterface */
-    protected $translator;
-
-    /** @var AuthorizationCheckerInterface */
-    protected $authorizationChecker;
-
-    /** @var TokenAccessorInterface */
-    protected $tokenAccessor;
-
-    /** @var array */
-    protected $needToProcessThreadIds = [];
-
-    /** @var string */
-    protected $responseMessage = 'oro.email.datagrid.mark.success_message';
-
-    /** @var EmailManager */
-    protected $emailManager;
+    protected array $needToProcessThreadIds = [];
+    protected string $responseMessage = 'oro.email.datagrid.mark.success_message';
 
     public function __construct(
-        EntityManager $entityManager,
-        TranslatorInterface $translator,
-        AuthorizationCheckerInterface $authorizationChecker,
-        TokenAccessorInterface $tokenAccessor,
-        EmailManager $emailManager
+        protected ManagerRegistry $doctrine,
+        protected TranslatorInterface $translator,
+        protected AuthorizationCheckerInterface $authorizationChecker,
+        protected TokenAccessorInterface $tokenAccessor,
+        protected EmailManager $emailManager
     ) {
-        $this->entityManager = $entityManager;
-        $this->translator = $translator;
-        $this->authorizationChecker = $authorizationChecker;
-        $this->tokenAccessor = $tokenAccessor;
-        $this->emailManager = $emailManager;
     }
 
     #[\Override]
@@ -65,14 +43,15 @@ class MarkMassActionHandler implements MassActionHandlerInterface
 
         $massAction = $args->getMassAction();
         $options = $massAction->getOptions()->toArray();
-        $this->entityManager->beginTransaction();
+        $entityManager = $this->getEntityManager();
+        $entityManager->beginTransaction();
         try {
             set_time_limit(0);
             $iteration = $this->handleHeadEmails($options, $data);
             $this->handleThreadEmails($options);
-            $this->entityManager->commit();
+            $entityManager->commit();
         } catch (\Exception $e) {
-            $this->entityManager->rollback();
+            $entityManager->rollback();
             throw $e;
         }
 
@@ -101,9 +80,7 @@ class MarkMassActionHandler implements MassActionHandlerInterface
                 $folderType = $data['filters']['folder']['value'];
             }
 
-            $queryBuilder = $this
-                ->entityManager
-                ->getRepository(EmailUser::class)
+            $queryBuilder = $this->getEntityManager()->getRepository(EmailUser::class)
                 ->getEmailUserBuilderForMassAction(
                     $emailUserIds,
                     $this->tokenAccessor->getUser(),
@@ -129,9 +106,8 @@ class MarkMassActionHandler implements MassActionHandlerInterface
             return;
         }
 
-        $queryBuilder = $this
-            ->entityManager
-            ->getRepository(EmailUser::class)
+        $entityManager = $this->getEntityManager();
+        $queryBuilder = $entityManager->getRepository(EmailUser::class)
             ->getEmailUserByThreadId($this->needToProcessThreadIds, $this->tokenAccessor->getUser());
 
         $result = $queryBuilder->getQuery()->iterate();
@@ -141,15 +117,15 @@ class MarkMassActionHandler implements MassActionHandlerInterface
             if ($this->authorizationChecker->isGranted('EDIT', $entity)) {
                 $this->emailManager->setEmailUserSeen($entity, $markType === self::MARK_READ);
             }
-            $this->entityManager->persist($entity);
+            $entityManager->persist($entity);
 
             if (($iteration % self::FLUSH_BATCH_SIZE) === 0) {
-                $this->entityManager->flush();
-                $this->entityManager->clear();
+                $entityManager->flush();
+                $entityManager->clear();
             }
             $iteration++;
         }
-        $this->entityManager->flush();
+        $entityManager->flush();
     }
 
     /**
@@ -169,12 +145,12 @@ class MarkMassActionHandler implements MassActionHandlerInterface
      */
     protected function getResponse(MassActionHandlerArgs $args, $entitiesCount = 0)
     {
-        $massAction      = $args->getMassAction();
+        $massAction = $args->getMassAction();
         $responseMessage = (string) $massAction->getOptions()
             ->offsetGetByPath('[messages][success]', $this->responseMessage);
 
         $successful = $entitiesCount > 0;
-        $options    = ['count' => $entitiesCount];
+        $options = ['count' => $entitiesCount];
 
         return new MassActionResponse(
             $successful,
@@ -194,8 +170,8 @@ class MarkMassActionHandler implements MassActionHandlerInterface
      */
     protected function process($queryBuilder, $markType, $iteration)
     {
+        $entityManager = $this->getEntityManager();
         $result = $queryBuilder->getQuery()->iterate();
-
         foreach ($result as $entity) {
             /** @var EmailUser $entity */
             $entity = $entity[0];
@@ -207,16 +183,21 @@ class MarkMassActionHandler implements MassActionHandlerInterface
                 $this->needToProcessThreadIds[] = $entity->getEmail()->getThread()->getId();
             }
 
-            $this->entityManager->persist($entity);
+            $entityManager->persist($entity);
 
             if (($iteration % self::FLUSH_BATCH_SIZE) === 0) {
-                $this->entityManager->flush();
-                $this->entityManager->clear();
+                $entityManager->flush();
+                $entityManager->clear();
             }
             $iteration++;
         }
-        $this->entityManager->flush();
+        $entityManager->flush();
 
         return $iteration;
+    }
+
+    protected function getEntityManager(): EntityManagerInterface
+    {
+        return $this->doctrine->getManager();
     }
 }

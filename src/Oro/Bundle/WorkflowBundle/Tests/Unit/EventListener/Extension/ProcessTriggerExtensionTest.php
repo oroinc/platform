@@ -19,6 +19,7 @@ use Oro\Bundle\WorkflowBundle\Model\ProcessSchedulePolicy;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -27,20 +28,12 @@ class ProcessTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
 {
     use MessageQueueExtension;
 
-    /** @var ProcessTriggerRepository|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var ProcessTriggerRepository&MockObject */
     protected $repository;
-
-    /** @var ProcessJobRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $processJobRepository;
-
-    /** @var ProcessHandler|\PHPUnit\Framework\MockObject\MockObject */
-    private $handler;
-
-    /** @var ProcessLogger|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var ProcessSchedulePolicy|\PHPUnit\Framework\MockObject\MockObject */
-    private $schedulePolicy;
+    private ProcessJobRepository&MockObject $processJobRepository;
+    private ProcessHandler&MockObject $handler;
+    private ProcessLogger&MockObject $logger;
+    private ProcessSchedulePolicy&MockObject $schedulePolicy;
 
     #[\Override]
     protected function setUp(): void

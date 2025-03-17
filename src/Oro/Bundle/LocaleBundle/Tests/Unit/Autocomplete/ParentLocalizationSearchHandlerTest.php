@@ -3,7 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Autocomplete;
 
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataFactory;
@@ -18,19 +18,16 @@ use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ParentLocalizationSearchHandlerTest extends \PHPUnit\Framework\TestCase
+class ParentLocalizationSearchHandlerTest extends TestCase
 {
     private const TEST_ENTITY_CLASS = 'stdClass';
 
-    /** @var Indexer|\PHPUnit\Framework\MockObject\MockObject */
-    private $indexer;
-
-    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityRepository;
-
-    /** @var ParentLocalizationSearchHandler */
-    private $searchHandler;
+    private Indexer&MockObject $indexer;
+    private EntityRepository&MockObject $entityRepository;
+    private ParentLocalizationSearchHandler $searchHandler;
 
     #[\Override]
     protected function setUp(): void
@@ -240,7 +237,7 @@ class ParentLocalizationSearchHandlerTest extends \PHPUnit\Framework\TestCase
 
     private function getManagerRegistry(): ManagerRegistry
     {
-        $entityManager = $this->createMock(EntityManager::class);
+        $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects($this->once())
             ->method('getMetadataFactory')
             ->willReturn($this->getMetadataFactory());

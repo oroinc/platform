@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Form\Handler;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Event\MailboxSaved;
@@ -19,54 +18,24 @@ use Symfony\Component\HttpFoundation\RequestStack;
  */
 class MailboxHandler implements FormAwareInterface
 {
-    const FORM = MailboxType::class;
-
-    /** @var ManagerRegistry */
-    protected $doctrine;
-
-    /** @var FormInterface */
-    protected $form;
-
-    /** @var MailboxProcessStorage */
-    protected $mailboxProcessStorage;
-
-    /** @var RequestStack */
-    protected $requestStack;
-
-    /** @var FormFactoryInterface */
-    private $formFactory;
-
-    /** @var EventDispatcherInterface */
-    protected $dispatcher;
+    protected FormInterface $form;
 
     public function __construct(
-        FormFactoryInterface $formFactory,
-        RequestStack $requestStack,
-        ManagerRegistry $doctrine,
-        MailboxProcessStorage $mailboxProcessStorage,
-        EventDispatcherInterface $dispatcher
+        protected FormFactoryInterface $formFactory,
+        protected RequestStack $requestStack,
+        protected ManagerRegistry $doctrine,
+        protected MailboxProcessStorage $mailboxProcessStorage,
+        protected EventDispatcherInterface $dispatcher
     ) {
-        $this->doctrine              = $doctrine;
-        $this->formFactory           = $formFactory;
-        $this->form                  = $this->formFactory->create(self::FORM);
-        $this->requestStack          = $requestStack;
-        $this->mailboxProcessStorage = $mailboxProcessStorage;
-        $this->dispatcher            = $dispatcher;
+        $this->form = $this->formFactory->create(MailboxType::class);
     }
 
-    /**
-     * Process form.
-     *
-     * @param Mailbox $mailbox
-     *
-     * @return bool True on success.
-     */
-    public function process(Mailbox $mailbox)
+    public function process(Mailbox $mailbox): bool
     {
         $this->form->setData($mailbox);
 
         $request = $this->requestStack->getCurrentRequest();
-        if (in_array($request->getMethod(), ['POST', 'PUT'], true)) {
+        if (\in_array($request->getMethod(), ['POST', 'PUT'], true)) {
             // If this request is marked as reload, process as reload.
             if ($request->get(MailboxType::RELOAD_MARKER, false)) {
                 $this->processReload();
@@ -86,12 +55,13 @@ class MailboxHandler implements FormAwareInterface
     /**
      * Form validated and can be processed.
      */
-    protected function onSuccess()
+    protected function onSuccess(): void
     {
         /** @var Mailbox $mailbox */
         $mailbox = $this->form->getData();
-        $this->getEntityManager()->persist($mailbox);
-        $this->getEntityManager()->flush();
+        $em = $this->doctrine->getManager();
+        $em->persist($mailbox);
+        $em->flush();
 
         if ($this->dispatcher->hasListeners(MailboxSaved::NAME)) {
             $this->dispatcher->dispatch(new MailboxSaved($mailbox), MailboxSaved::NAME);
@@ -101,7 +71,7 @@ class MailboxHandler implements FormAwareInterface
     /**
      * Processing of form reload.
      */
-    protected function processReload()
+    protected function processReload(): void
     {
         $this->form->handleRequest($this->requestStack->getCurrentRequest());
 
@@ -116,20 +86,12 @@ class MailboxHandler implements FormAwareInterface
             $data->setProcessSettings(null);
         }
 
-        $this->form = $this->formFactory->create(self::FORM, $data);
+        $this->form = $this->formFactory->create(MailboxType::class, $data);
     }
 
     #[\Override]
     public function getForm()
     {
         return $this->form;
-    }
-
-    /**
-     * @return EntityManager
-     */
-    protected function getEntityManager()
-    {
-        return $this->doctrine->getManager();
     }
 }

@@ -8,9 +8,11 @@ use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class FilterDateRangeConverterTest extends \PHPUnit\Framework\TestCase
+class FilterDateRangeConverterTest extends TestCase
 {
     private static array $valueTypesStartVarsMap = [
         AbstractDateFilterType::TYPE_TODAY => [
@@ -40,20 +42,16 @@ class FilterDateRangeConverterTest extends \PHPUnit\Framework\TestCase
         ],
     ];
 
-    /** @var DateTimeFormatterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formatter;
-
-    /** @var Compiler|\PHPUnit\Framework\MockObject\MockObject */
-    private $dateCompiler;
-
-    /** @var FilterDateRangeConverter */
-    private $converter;
+    private DateTimeFormatterInterface&MockObject $formatter;
+    private Compiler&MockObject $dateCompiler;
+    private FilterDateRangeConverter $converter;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->formatter = $this->createMock(DateTimeFormatterInterface::class);
         $this->dateCompiler = $this->createMock(Compiler::class);
+
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects(self::any())
             ->method('trans')
@@ -68,10 +66,11 @@ class FilterDateRangeConverterTest extends \PHPUnit\Framework\TestCase
 
     public function testGetConvertedValueDefaultValuesWithValueTypes(): void
     {
-        $this->dateCompiler->expects($this->once())
+        $this->dateCompiler->expects(self::once())
             ->method('compile')
             ->with('{{4}}')
             ->willReturn(new \DateTime('01-01-2016 00:00:00'));
+
         $result = $this->converter->getConvertedValue([], null, ['options' => ['value_types' => true]]);
 
         self::assertEquals('2016-01-01 00:00:00', $result['start']->format('Y-m-d H:i:s'));
@@ -391,7 +390,7 @@ class FilterDateRangeConverterTest extends \PHPUnit\Framework\TestCase
     ): void {
         $today = new \DateTime(FilterDateRangeConverter::TODAY, new \DateTimeZone('UTC'));
         if (array_key_exists($value['type'], self::$valueTypesStartVarsMap)) {
-            $this->dateCompiler->expects($this->once())
+            $this->dateCompiler->expects(self::once())
                 ->method('compile')
                 ->with('{{' . self::$valueTypesStartVarsMap[$value['type']]['var_start'] . '}}')
                 ->willReturn($today);
@@ -401,10 +400,10 @@ class FilterDateRangeConverterTest extends \PHPUnit\Framework\TestCase
         $expectedEndDate->setTime(0, 0)->add($lastSecondModifier);
 
         $expectedResult = [
-            'start' => $value['type'] === AbstractDateFilterType::TYPE_ALL_TIME ? null : $today,
+            'start' => AbstractDateFilterType::TYPE_ALL_TIME === $value['type'] ? null : $today,
             'end' => $expectedEndDate,
             'type' => $value['type'],
-            'part' => $value['type'] === AbstractDateFilterType::TYPE_ALL_TIME
+            'part' => AbstractDateFilterType::TYPE_ALL_TIME === $value['type']
                 ? DateModifierInterface::PART_ALL_TIME
                 : null,
             'last_second_modifier' => \DateInterval::createFromDateString('1 day'),
@@ -584,7 +583,7 @@ class FilterDateRangeConverterTest extends \PHPUnit\Framework\TestCase
      */
     public function testGetViewValue(array $dateData, string $expectedResult): void
     {
-        $this->formatter->expects($this->exactly(2))
+        $this->formatter->expects(self::exactly(2))
             ->method('formatDate')
             ->willReturnCallback(function ($input) {
                 return $input->format('Y-m-d');
@@ -624,11 +623,11 @@ class FilterDateRangeConverterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getFormValueDataProvider
      */
-    public function testGetFormValue(array $converterAttributes, $value, ?array $expectedValue): void
+    public function testGetFormValue(array $config, $value, ?array $expectedValue): void
     {
         self::assertEquals(
             $expectedValue,
-            $this->converter->getFormValue($converterAttributes, $value)
+            $this->converter->getFormValue($config, $value)
         );
     }
 
@@ -654,17 +653,17 @@ class FilterDateRangeConverterTest extends \PHPUnit\Framework\TestCase
 
         return [
             'as is' => [
-                'converterAttributes' => [],
+                'config' => [],
                 'value' => $value,
                 'expectedValue' => $value,
             ],
             'value === null and no default value' => [
-                'converterAttributes' => [],
+                'config' => [],
                 'value' => null,
                 'expectedValue' => null,
             ],
             'value === null and default value' => [
-                'converterAttributes' => [
+                'config' => [
                     'converter_attributes' => [
                         'default_selected' => $defaultSelectedType,
                     ],
