@@ -259,14 +259,11 @@ services:
         arguments:
             - '@oro_workflow.changes.event.dispatcher'
             - '@doctrine'
-            - '@oro_workflow.manager'
 
     oro_workflow.handler.workflow_variables:
         class: 'Oro\Bundle\WorkflowBundle\Handler\WorkflowVariablesHandler'
         arguments:
-            - '@oro_workflow.changes.event.dispatcher'
             - '@doctrine'
-            - '@oro_workflow.manager'
 
     Oro\Bundle\WorkflowBundle\Handler\WorkflowVariablesHandler:
         alias: oro_workflow.handler.workflow_variables

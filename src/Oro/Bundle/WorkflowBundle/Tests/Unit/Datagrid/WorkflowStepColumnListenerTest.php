@@ -3,7 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Datagrid;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\Parameter;
@@ -46,29 +46,14 @@ class WorkflowStepColumnListenerTest extends TestCase
     private const ALIAS = 'testEntity';
     private const COLUMN = 'workflowStepLabel';
 
-    /** @var DoctrineHelper|MockObject */
-    private $doctrineHelper;
-
-    /** @var EntityClassResolver|MockObject */
-    private $entityClassResolver;
-
-    /** @var ConfigProvider|MockObject */
-    private $configProvider;
-
-    /** @var WorkflowManager|MockObject */
-    private $workflowManager;
-
-    /** @var WorkflowManagerRegistry|MockObject */
-    private $workflowManagerRegistry;
-
-    /** @var DatagridInterface|MockObject */
-    private $datagrid;
-
-    /** @var DatagridStateProviderInterface|MockObject */
-    private $filtersStateProvider;
-
-    /** @var WorkflowStepColumnListener */
-    private $listener;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EntityClassResolver&MockObject $entityClassResolver;
+    private ConfigProvider&MockObject $configProvider;
+    private WorkflowManager&MockObject $workflowManager;
+    private WorkflowManagerRegistry&MockObject $workflowManagerRegistry;
+    private DatagridInterface&MockObject $datagrid;
+    private DatagridStateProviderInterface&MockObject $filtersStateProvider;
+    private WorkflowStepColumnListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -90,7 +75,7 @@ class WorkflowStepColumnListenerTest extends TestCase
         );
     }
 
-    public function testAddWorkflowStepColumn()
+    public function testAddWorkflowStepColumn(): void
     {
         self::assertEquals(
             [WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN],
@@ -115,7 +100,7 @@ class WorkflowStepColumnListenerTest extends TestCase
         bool $hasWorkflow = true,
         bool $hasConfig = true,
         bool $isShowStep = true
-    ) {
+    ): void {
         $this->setUpEntityManagerMock(self::ENTITY, self::ENTITY);
         $this->setUpWorkflowManagerMock(self::ENTITY, $hasWorkflow);
         $this->setUpConfigProviderMock(self::ENTITY, $hasConfig, $isShowStep);
@@ -124,7 +109,7 @@ class WorkflowStepColumnListenerTest extends TestCase
 
         $event = $this->createBuildBeforeEvent($config);
         $this->listener->onBuildBefore($event);
-        $this->assertEquals($config, $event->getConfig()->toArray());
+        self::assertEquals($config, $event->getConfig()->toArray());
     }
 
     public function buildBeforeNoUpdateDataProvider(): array
@@ -205,18 +190,18 @@ class WorkflowStepColumnListenerTest extends TestCase
         array $expectedConfig,
         bool $multiWorkflows = true,
         string $datagridName = 'test_datagrid_name'
-    ) {
+    ): void {
         $this->setUpEntityManagerMock(self::ENTITY, self::ENTITY_FULL_NAME);
         $this->setUpWorkflowManagerMock(self::ENTITY_FULL_NAME, true, $multiWorkflows);
         $this->setUpConfigProviderMock(self::ENTITY_FULL_NAME);
 
-        $this->datagrid->expects($this->any())
+        $this->datagrid->expects(self::any())
             ->method('getName')
             ->willReturn($datagridName);
 
         $event = $this->createBuildBeforeEvent($inputConfig);
         $this->listener->onBuildBefore($event);
-        $this->assertEquals($expectedConfig, $event->getConfig()->toArray());
+        self::assertEquals($expectedConfig, $event->getConfig()->toArray());
     }
 
     /**
@@ -530,19 +515,19 @@ class WorkflowStepColumnListenerTest extends TestCase
     /**
      * @dataProvider buildBeforeRemoveColumnDataProvider
      */
-    public function testBuildBeforeRemoveColumn(array $inputConfig, array $expectedConfig)
+    public function testBuildBeforeRemoveColumn(array $inputConfig, array $expectedConfig): void
     {
         $this->setUpEntityManagerMock(self::ENTITY, self::ENTITY_FULL_NAME);
         $this->setUpWorkflowManagerMock(self::ENTITY_FULL_NAME);
         $this->setUpConfigProviderMock(self::ENTITY_FULL_NAME, true, false);
 
-        $this->datagrid->expects($this->any())
+        $this->datagrid->expects(self::any())
             ->method('getName')
             ->willReturn('test_datagrid_name');
 
         $event = $this->createBuildBeforeEvent($inputConfig);
         $this->listener->onBuildBefore($event);
-        $this->assertEquals($expectedConfig, $event->getConfig()->toArray());
+        self::assertEquals($expectedConfig, $event->getConfig()->toArray());
     }
 
     public function buildBeforeRemoveColumnDataProvider(): array
@@ -636,21 +621,22 @@ class WorkflowStepColumnListenerTest extends TestCase
     /**
      * @dataProvider buildAfterNoUpdateDataProvider
      */
-    public function testOnBuildAfterNoUpdate(DatasourceInterface $datasource, DatagridConfiguration $inputConfig)
-    {
-        /** @var DatasourceInterface|MockObject $datasource */
-        $datasource->expects($this->never())
-            ->method($this->anything());
+    public function testOnBuildAfterNoUpdate(
+        DatasourceInterface&MockObject $datasource,
+        DatagridConfiguration $inputConfig
+    ): void {
+        $datasource->expects(self::never())
+            ->method(self::anything());
 
         $event = $this->createBuildAfterEvent($datasource, $inputConfig);
 
-        /** @var DatagridInterface|MockObject $datagrid */
+        /** @var DatagridInterface&MockObject $datagrid */
         $datagrid = $event->getDatagrid();
-        $datagrid->expects($this->any())
+        $datagrid->expects(self::any())
             ->method('getParameters')
             ->willReturn(new ParameterBag());
 
-        $this->filtersStateProvider->expects($this->any())
+        $this->filtersStateProvider->expects(self::any())
             ->method('getStateFromParameters')
             ->willReturn([]);
 
@@ -681,22 +667,22 @@ class WorkflowStepColumnListenerTest extends TestCase
         ];
     }
 
-    public function testOnBuildAfter()
+    public function testOnBuildAfter(): void
     {
         $this->setUpEntityManagerMock(self::ENTITY, self::ENTITY_FULL_NAME);
 
         $repository = $this->setUpWorkflowItemRepository();
-        $repository->expects($this->once())
+        $repository->expects(self::once())
             ->method('getEntityIdsByEntityClassAndWorkflowNames')
             ->with(self::ENTITY_FULL_NAME, ['workflow_filter_value'])
             ->willReturn([42, 100]);
-        $repository->expects($this->once())
+        $repository->expects(self::once())
             ->method('getEntityIdsByEntityClassAndWorkflowStepIds')
             ->with(self::ENTITY_FULL_NAME, ['workflow_step_filter_value'])
             ->willReturn([42]);
 
         $expr = $this->createMock(Expr::class);
-        $expr->expects($this->once())
+        $expr->expects(self::once())
             ->method('in')
             ->with(self::ALIAS, ':filteredWorkflowItemIds')
             ->willReturnSelf();
@@ -704,21 +690,21 @@ class WorkflowStepColumnListenerTest extends TestCase
         $qParameter = new Parameter('filteredWorkflowItemIds', [42, 100]);
 
         $qb = $this->createMock(QueryBuilder::class);
-        $qb->expects($this->once())
+        $qb->expects(self::once())
             ->method('expr')
             ->willReturn($expr);
-        $qb->expects($this->once())
+        $qb->expects(self::once())
             ->method('andWhere')
             ->with($expr)
             ->willReturnSelf();
-        $qb->expects($this->exactly(2))
+        $qb->expects(self::exactly(2))
             ->method('getParameter')
             ->with('filteredWorkflowItemIds')
             ->willReturnOnConsecutiveCalls(
                 null,
                 $qParameter
             );
-        $qb->expects($this->exactly(2))
+        $qb->expects(self::exactly(2))
             ->method('setParameter')
             ->withConsecutive(
                 ['filteredWorkflowItemIds', [42, 100]],
@@ -726,7 +712,7 @@ class WorkflowStepColumnListenerTest extends TestCase
             );
 
         $datasource = $this->createMock(OrmDatasource::class);
-        $datasource->expects($this->exactly(2))
+        $datasource->expects(self::exactly(2))
             ->method('getQueryBuilder')
             ->willReturn($qb);
 
@@ -751,13 +737,13 @@ class WorkflowStepColumnListenerTest extends TestCase
             )
         );
 
-        /** @var DatagridInterface|MockObject $datagrid */
+        /** @var DatagridInterface&MockObject $datagrid */
         $datagrid = $event->getDatagrid();
-        $datagrid->expects($this->exactly(2))
+        $datagrid->expects(self::exactly(2))
             ->method('getParameters')
             ->willReturn(new ParameterBag());
 
-        $this->filtersStateProvider->expects($this->exactly(2))
+        $this->filtersStateProvider->expects(self::exactly(2))
             ->method('getStateFromParameters')
             ->willReturn([
                 WorkflowStepColumnListener::WORKFLOW_FILTER => ['value' => 'workflow_filter_value'],
@@ -767,20 +753,20 @@ class WorkflowStepColumnListenerTest extends TestCase
         $this->listener->onBuildAfter($event);
     }
 
-    public function testOnResultAfterNoUpdate()
+    public function testOnResultAfterNoUpdate(): void
     {
         $event = $this->createResultAfterEvent(DatagridConfiguration::create([]));
-        $event->expects($this->never())
+        $event->expects(self::never())
             ->method('getRecords');
 
         $repository = $this->setUpWorkflowItemRepository();
-        $repository->expects($this->never())
-            ->method($this->anything());
+        $repository->expects(self::never())
+            ->method(self::anything());
 
         $this->listener->onResultAfter($event);
     }
 
-    public function testOnResultAfter()
+    public function testOnResultAfter(): void
     {
         $this->setUpEntityManagerMock(self::ENTITY, self::ENTITY_FULL_NAME);
 
@@ -806,7 +792,7 @@ class WorkflowStepColumnListenerTest extends TestCase
                 ]
             )
         );
-        $event->expects($this->once())
+        $event->expects(self::once())
             ->method('getRecords')
             ->willReturn([$recordOne, $recordTwo]);
 
@@ -816,18 +802,18 @@ class WorkflowStepColumnListenerTest extends TestCase
         ];
 
         $repository = $this->setUpWorkflowItemRepository();
-        $repository->expects($this->once())
+        $repository->expects(self::once())
             ->method('getGroupedWorkflowNameAndWorkflowStepName')
             ->with(self::ENTITY_FULL_NAME, [42, 100], true, ['test1', 'test2'])
             ->willReturn([42 => $data]);
 
-        $this->workflowManagerRegistry->expects($this->once())
+        $this->workflowManagerRegistry->expects(self::once())
             ->method('getManager')
             ->willReturn($this->workflowManager);
 
-        $this->workflowManager->expects($this->once())
+        $this->workflowManager->expects(self::once())
             ->method('getApplicableWorkflows')
-            ->with(WorkflowStepColumnListenerTest::ENTITY_FULL_NAME)
+            ->with(self::ENTITY_FULL_NAME)
             ->willReturn([
                 'test1' => $this->createMock(Workflow::class),
                 'test2' => $this->createMock(Workflow::class),
@@ -835,42 +821,39 @@ class WorkflowStepColumnListenerTest extends TestCase
 
         $this->listener->onResultAfter($event);
 
-        $this->assertEquals($data, $recordOne->getValue(WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN));
-        $this->assertEquals([], $recordTwo->getValue(WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN));
+        self::assertEquals($data, $recordOne->getValue(WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN));
+        self::assertEquals([], $recordTwo->getValue(WorkflowStepColumnListener::WORKFLOW_STEP_COLUMN));
     }
 
     private function setUpEntityManagerMock(string $entity, string $entityFullName): void
     {
         $metadata = $this->createMock(ClassMetadata::class);
-        $metadata->expects($this->any())
+        $metadata->expects(self::any())
             ->method('getName')
             ->willReturn($entityFullName);
 
-        $entityManager = $this->createMock(EntityManager::class);
-        $entityManager->expects($this->any())
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::any())
             ->method('getClassMetadata')
             ->with($entity)
             ->willReturn($metadata);
 
-        $this->doctrineHelper->expects($this->any())
+        $this->doctrineHelper->expects(self::any())
             ->method('getEntityManager')
             ->with($entity)
             ->willReturn($entityManager);
 
-        $this->entityClassResolver->expects($this->any())
+        $this->entityClassResolver->expects(self::any())
             ->method('getEntityClass')
             ->with(self::ENTITY)
             ->willReturn(self::ENTITY_FULL_NAME);
     }
 
-    /**
-     * @return WorkflowItemRepository|MockObject
-     */
-    private function setUpWorkflowItemRepository()
+    private function setUpWorkflowItemRepository(): WorkflowItemRepository&MockObject
     {
         $repository = $this->createMock(WorkflowItemRepository::class);
 
-        $this->doctrineHelper->expects($this->any())
+        $this->doctrineHelper->expects(self::any())
             ->method('getEntityRepository')
             ->with(WorkflowItem::class)
             ->willReturn($repository);
@@ -880,28 +863,28 @@ class WorkflowStepColumnListenerTest extends TestCase
 
     private function setUpConfigProviderMock(string $entity, bool $hasConfig = true, bool $isShowStep = true): void
     {
-        $this->configProvider->expects($this->any())
+        $this->configProvider->expects(self::any())
             ->method('hasConfig')
             ->with($entity)
             ->willReturn($hasConfig);
 
         if ($hasConfig) {
             $config = $this->createMock(ConfigInterface::class);
-            $config->expects($this->any())
+            $config->expects(self::any())
                 ->method('has')
                 ->with('show_step_in_grid')
                 ->willReturn(true);
-            $config->expects($this->any())
+            $config->expects(self::any())
                 ->method('is')
                 ->with('show_step_in_grid')
                 ->willReturn($isShowStep);
 
-            $this->configProvider->expects($this->any())
+            $this->configProvider->expects(self::any())
                 ->method('getConfig')
                 ->with($entity)
                 ->willReturn($config);
         } else {
-            $this->configProvider->expects($this->never())
+            $this->configProvider->expects(self::never())
                 ->method('getConfig');
         }
     }
@@ -920,11 +903,11 @@ class WorkflowStepColumnListenerTest extends TestCase
             }
         }
 
-        $this->workflowManagerRegistry->expects($this->any())
+        $this->workflowManagerRegistry->expects(self::any())
             ->method('getManager')
             ->willReturn($this->workflowManager);
 
-        $this->workflowManager->expects($this->any())
+        $this->workflowManager->expects(self::any())
             ->method('getApplicableWorkflows')
             ->with($entityClass)
             ->willReturn($workflows);
@@ -935,10 +918,10 @@ class WorkflowStepColumnListenerTest extends TestCase
         $datagridConfiguration = DatagridConfiguration::create($configuration);
 
         $event = $this->createMock(BuildBefore::class);
-        $event->expects($this->any())
+        $event->expects(self::any())
             ->method('getConfig')
             ->willReturn($datagridConfiguration);
-        $event->expects($this->any())
+        $event->expects(self::any())
             ->method('getDatagrid')
             ->willReturn($this->datagrid);
 
@@ -950,33 +933,30 @@ class WorkflowStepColumnListenerTest extends TestCase
         DatagridConfiguration $configuration
     ): BuildAfter {
         $datagrid = $this->createMock(DatagridInterface::class);
-        $datagrid->expects($this->any())
+        $datagrid->expects(self::any())
             ->method('getDatasource')
             ->willReturn($datasource);
-        $datagrid->expects($this->any())
+        $datagrid->expects(self::any())
             ->method('getConfig')
             ->willReturn($configuration);
 
         $event = $this->createMock(BuildAfter::class);
-        $event->expects($this->any())
+        $event->expects(self::any())
             ->method('getDatagrid')
             ->willReturn($datagrid);
 
         return $event;
     }
 
-    /**
-     * @return OrmResultAfter|MockObject
-     */
-    private function createResultAfterEvent(DatagridConfiguration $configuration)
+    private function createResultAfterEvent(DatagridConfiguration $configuration): OrmResultAfter&MockObject
     {
         $datagrid = $this->createMock(DatagridInterface::class);
-        $datagrid->expects($this->any())
+        $datagrid->expects(self::any())
             ->method('getConfig')
             ->willReturn($configuration);
 
         $event = $this->createMock(OrmResultAfter::class);
-        $event->expects($this->any())
+        $event->expects(self::any())
             ->method('getDatagrid')
             ->willReturn($datagrid);
 

@@ -6,14 +6,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionApplicationsRegistryFilter;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowDefinitionApplicationsRegistryFilterTest extends \PHPUnit\Framework\TestCase
+class WorkflowDefinitionApplicationsRegistryFilterTest extends TestCase
 {
-    /** @var CurrentApplicationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $currentApplicationProvider;
-
-    /** @var WorkflowDefinitionApplicationsRegistryFilter */
-    private $filter;
+    private CurrentApplicationProviderInterface&MockObject $currentApplicationProvider;
+    private WorkflowDefinitionApplicationsRegistryFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -26,13 +25,13 @@ class WorkflowDefinitionApplicationsRegistryFilterTest extends \PHPUnit\Framewor
     /**
      * @dataProvider filterDataProvider
      */
-    public function testFilter(ArrayCollection $definitions, ?string $currentApplication, array $expected)
+    public function testFilter(ArrayCollection $definitions, ?string $currentApplication, array $expected): void
     {
-        $this->currentApplicationProvider->expects($this->once())
+        $this->currentApplicationProvider->expects(self::once())
             ->method('getCurrentApplication')
             ->willReturn($currentApplication);
 
-        $this->assertEquals($expected, $this->filter->filter($definitions)->toArray());
+        self::assertEquals($expected, $this->filter->filter($definitions)->toArray());
     }
 
     public function filterDataProvider(): array

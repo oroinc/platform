@@ -11,7 +11,7 @@ services:
         abstract: true
         arguments:
             - '@oro_entity_config.provider.entity'
-            - '@doctrine.orm.entity_manager'
+            - '@doctrine'
             - '@translator'
 
     oro_workflow.datagrid.process_definition_entity_name_provider:

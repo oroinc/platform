@@ -2,31 +2,30 @@
 
 namespace Oro\Bundle\WorkflowBundle\Helper;
 
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
+/**
+ * Provides a way to fetch workflow aware entities.
+ */
 class WorkflowAwareEntityFetcher
 {
     use WorkflowQueryTrait;
 
-    /** @var ManagerRegistry */
-    private $registry;
-
-    public function __construct(ManagerRegistry $registry)
-    {
-        $this->registry = $registry;
+    public function __construct(
+        private ManagerRegistry $doctrine
+    ) {
     }
 
-    /**
-     * @param WorkflowDefinition $workflow
-     * @param string $dqlFilter
-     * @return array|object[]
-     */
-    public function getEntitiesWithoutWorkflowItem(WorkflowDefinition $workflow, $dqlFilter = '')
+    public function getEntitiesWithoutWorkflowItem(WorkflowDefinition $workflow, string $dqlFilter = ''): array
     {
-        $qb = $this->getQueryBuilder($workflow->getRelatedEntity());
+        $entityClass = $workflow->getRelatedEntity();
+        /** @var EntityManagerInterface $manager */
+        $em = $this->doctrine->getManagerForClass($entityClass);
+        $qb = $em->createQueryBuilder()
+            ->select('e')
+            ->from($entityClass, 'e');
 
         $this->joinWorkflowItem($qb, 'wi')->where('wi.id IS NULL');
 
@@ -35,17 +34,5 @@ class WorkflowAwareEntityFetcher
         }
 
         return $qb->getQuery()->getResult();
-    }
-
-    /**
-     * @param string $entityClass
-     * @return QueryBuilder
-     */
-    protected function getQueryBuilder($entityClass)
-    {
-        /** @var EntityManager $manager */
-        $manager = $this->registry->getManagerForClass($entityClass);
-
-        return $manager->createQueryBuilder()->select('e')->from($entityClass, 'e');
     }
 }

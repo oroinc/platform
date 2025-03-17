@@ -3,66 +3,63 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Helper;
 
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Helper\WorkflowQueryTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowQueryTraitTest extends \PHPUnit\Framework\TestCase
+class WorkflowQueryTraitTest extends TestCase
 {
     use WorkflowQueryTrait;
 
     private const ENTITY_CLASS = 'SomeEntityClass';
 
-    /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $queryBuilder;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var ClassMetadata|\PHPUnit\Framework\MockObject\MockObject */
-    private $classMetadata;
+    private QueryBuilder&MockObject $queryBuilder;
+    private EntityManagerInterface&MockObject $entityManager;
+    private ClassMetadata&MockObject $classMetadata;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->queryBuilder = $this->createMock(QueryBuilder::class);
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->classMetadata = $this->createMock(ClassMetadata::class);
     }
 
     // joinWorkflowItem call tested implicitly
-    public function testJoinWorkflowStepOnDry()
+    public function testJoinWorkflowStepOnDry(): void
     {
-        //when no workflowItem alias comes
-        $this->queryBuilder->expects($this->once())
+        // when no workflowItem alias comes
+        $this->queryBuilder->expects(self::once())
             ->method('getAllAliases')
             ->willReturn(['entityClass1']);
 
-        $this->entityManager->expects($this->once())
+        $this->entityManager->expects(self::once())
             ->method('getClassMetadata')
             ->with('entityClass1')
             ->willReturn($this->classMetadata);
 
-        $this->classMetadata->expects($this->once())
+        $this->classMetadata->expects(self::once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['ident1', 'ident2']);
 
-        $this->queryBuilder->expects($this->once())
+        $this->queryBuilder->expects(self::once())
             ->method('getRootEntities')
             ->willReturn(['entityClass1', 'entityClass2']);
 
-        $this->queryBuilder->expects($this->once())
+        $this->queryBuilder->expects(self::once())
             ->method('getEntityManager')
             ->willReturn($this->entityManager);
 
-        $this->queryBuilder->expects($this->once())
+        $this->queryBuilder->expects(self::once())
             ->method('getRootAliases')
             ->willReturn(['rootAlias']);
 
-        $this->queryBuilder->expects($this->exactly(2))
+        $this->queryBuilder->expects(self::exactly(2))
             ->method('leftJoin')
             ->withConsecutive(
                 [
@@ -79,37 +76,37 @@ class WorkflowQueryTraitTest extends \PHPUnit\Framework\TestCase
             )
             ->willReturn($this->queryBuilder);
 
-        $this->assertSame(
+        self::assertSame(
             $this->queryBuilder,
             $this->joinWorkflowStep($this->queryBuilder, 'stepAlias', 'itemAlias')
         );
     }
 
-    public function testJoinWorkflowStepOnWet()
+    public function testJoinWorkflowStepOnWet(): void
     {
-        //when workflowItem was already joined to an alias provided
-        $this->queryBuilder->expects($this->once())
+        // when workflowItem was already joined to an alias provided
+        $this->queryBuilder->expects(self::once())
             ->method('getAllAliases')
             ->willReturn(['entityClass1', 'itemAlias']);
 
-        $this->queryBuilder->expects($this->once())
+        $this->queryBuilder->expects(self::once())
             ->method('leftJoin')
             ->with('itemAlias.currentStep', 'stepAlias')->willReturn($this->queryBuilder);
 
-        $this->assertSame(
+        self::assertSame(
             $this->queryBuilder,
             $this->joinWorkflowStep($this->queryBuilder, 'stepAlias', 'itemAlias')
         );
     }
 
-    public function testAddDatagridQuery()
+    public function testAddDatagridQuery(): void
     {
         $query = [
             'var1' => 'value1',
             'join' => ['left' => ['join1']],
         ];
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'var1' => 'value1',
                 'join' => [
@@ -149,32 +146,32 @@ class WorkflowQueryTraitTest extends \PHPUnit\Framework\TestCase
         string $entityAlias,
         string $itemAlias,
         string $expectedCondition
-    ) {
+    ): void {
         $trait = $this->getMockForTrait(WorkflowQueryTrait::class);
 
-        $this->classMetadata->expects($this->any())
+        $this->classMetadata->expects(self::any())
             ->method('getIdentifierFieldNames')
             ->willReturn([$identifierFieldName]);
-        $this->classMetadata->expects($this->any())
+        $this->classMetadata->expects(self::any())
             ->method('getTypeOfField')
             ->with($identifierFieldName)
             ->willReturn($identifierFieldType);
 
-        $this->entityManager->expects($this->any())
+        $this->entityManager->expects(self::any())
             ->method('getClassMetadata')
             ->with(self::ENTITY_CLASS)
             ->willReturn($this->classMetadata);
 
-        $this->queryBuilder->expects($this->any())
+        $this->queryBuilder->expects(self::any())
             ->method('getRootEntities')
             ->willReturn([self::ENTITY_CLASS]);
-        $this->queryBuilder->expects($this->any())
+        $this->queryBuilder->expects(self::any())
             ->method('getRootAliases')
             ->willReturn([$entityAlias]);
-        $this->queryBuilder->expects($this->any())
+        $this->queryBuilder->expects(self::any())
             ->method('getEntityManager')
             ->willReturn($this->entityManager);
-        $this->queryBuilder->expects($this->once())
+        $this->queryBuilder->expects(self::once())
             ->method('leftJoin')
             ->with(
                 WorkflowItem::class,

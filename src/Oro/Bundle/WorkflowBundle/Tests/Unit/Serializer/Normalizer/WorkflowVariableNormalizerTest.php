@@ -3,7 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Serializer\Normalizer;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\Persistence\ManagerRegistry;
@@ -21,23 +21,15 @@ use Oro\Bundle\WorkflowBundle\Restriction\RestrictionManager;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\AttributeNormalizer;
 use Oro\Bundle\WorkflowBundle\Serializer\Normalizer\WorkflowVariableNormalizer;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
+class WorkflowVariableNormalizerTest extends TestCase
 {
-    /** @var AttributeNormalizer|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeNormalizer;
-
-    /** @var WorkflowAwareSerializer|\PHPUnit\Framework\MockObject\MockObject */
-    private $serializer;
-
-    /** @var Workflow|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflow;
-
-    /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeManager;
-
-    /** @var WorkflowVariableNormalizer */
-    private $normalizer;
+    private AttributeNormalizer&MockObject $attributeNormalizer;
+    private WorkflowAwareSerializer&MockObject $serializer;
+    private Workflow&MockObject $workflow;
+    private AttributeManager&MockObject $attributeManager;
 
     #[\Override]
     protected function setUp(): void
@@ -62,21 +54,19 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
             ])->getMock();
 
         $workflowDefinition = $this->createMock(WorkflowDefinition::class);
-        $workflowDefinition->expects($this->any())
+        $workflowDefinition->expects(self::any())
             ->method('getConfiguration')
             ->willReturn([]);
 
-        $this->workflow->expects($this->any())
+        $this->workflow->expects(self::any())
             ->method('getVariables')
             ->willReturn(new ArrayCollection());
-        $this->workflow->expects($this->any())
+        $this->workflow->expects(self::any())
             ->method('getDefinition')
             ->willReturn($workflowDefinition);
-
-        $this->normalizer = $this->getMockNormalizer();
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $variableName = 'test_variable';
         $denormalizedValue = 'denormalized_value';
@@ -86,25 +76,28 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
         $data = new WorkflowData();
         $data->set($variableName, $denormalizedValue);
 
-        $this->normalizer->setSerializer($this->serializer);
+        $normalizer = $this->getNormalizer();
+        $normalizer->setSerializer($this->serializer);
 
-        $this->serializer->expects($this->any())
+        $this->serializer->expects(self::any())
             ->method('getWorkflow')
             ->willReturn($this->workflow);
 
-        $this->attributeNormalizer->expects($this->once())
+        $this->attributeNormalizer->expects(self::once())
             ->method('supportsNormalization')
             ->with($this->workflow, $variable, $data->get($variableName))
             ->willReturn(true);
 
-        $this->attributeNormalizer->expects($this->once())
+        $this->attributeNormalizer->expects(self::once())
             ->method('normalize')
             ->with($this->workflow, $variable, $data->get($variableName))
             ->willReturn($normalizedValue);
 
-        $this->assertEquals(
+        $normalizer = $this->getNormalizer();
+
+        self::assertEquals(
             $normalizedValue,
-            $this->normalizer->normalizeVariable($this->workflow, $variable, ['value' => $denormalizedValue])
+            $normalizer->normalizeVariable($this->workflow, $variable, ['value' => $denormalizedValue])
         );
     }
 
@@ -117,23 +110,23 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
         $expected,
         array $normalized,
         array $options = []
-    ) {
+    ): void {
         $expectedData = new WorkflowData();
         $expectedData->set($variableName, $expected);
 
-        $normalizer = $this->getMockNormalizer($variable, $options);
+        $normalizer = $this->getNormalizer($variable, $options);
         $normalizer->setSerializer($this->serializer);
 
-        $this->serializer->expects($this->any())
+        $this->serializer->expects(self::any())
             ->method('getWorkflow')
             ->willReturn($this->workflow);
 
-        $this->attributeNormalizer->expects($this->any())
+        $this->attributeNormalizer->expects(self::any())
             ->method('supportsDenormalization')
             ->with($this->workflow, $variable, $normalized[$variableName])
             ->willReturn(true);
 
-        $this->attributeNormalizer->expects($this->any())
+        $this->attributeNormalizer->expects(self::any())
             ->method('denormalize')
             ->with($this->workflow, $variable, $normalized[$variableName])
             ->willReturn($expectedData->get($variableName));
@@ -143,7 +136,7 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
             'options' => $variable->getOptions(),
             'property_path' => $variable->getPropertyPath()
         ]);
-        $this->assertEquals($expected, $denormalized);
+        self::assertEquals($expected, $denormalized);
     }
 
     public function denormalizeProvider(): array
@@ -218,25 +211,25 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
         string $variableName,
         $expected,
         array $options = []
-    ) {
+    ): void {
         $this->expectException($exception);
         $this->expectExceptionMessage($message);
 
         $expectedData = new WorkflowData();
         $expectedData->set($variableName, $expected);
 
-        $normalizer = $this->getMockNormalizer($variable, $options);
+        $normalizer = $this->getNormalizer($variable, $options);
         $normalizer->setSerializer($this->serializer);
 
-        $this->serializer->expects($this->any())
+        $this->serializer->expects(self::any())
             ->method('getWorkflow')
             ->willReturn($this->workflow);
 
-        $this->attributeNormalizer->expects($this->any())
+        $this->attributeNormalizer->expects(self::any())
             ->method('supportsDenormalization')
             ->willReturn(true);
 
-        $this->attributeNormalizer->expects($this->any())
+        $this->attributeNormalizer->expects(self::any())
             ->method('denormalize')
             ->willReturn($expectedData->get($variableName));
 
@@ -308,9 +301,11 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsNormalizationDataProvider
      */
-    public function testSupportsNormalization(mixed $data, bool $expected)
+    public function testSupportsNormalization(mixed $data, bool $expected): void
     {
-        $this->assertEquals($expected, $this->normalizer->supportsNormalization($data, 'any_value'));
+        $normalizer = $this->getNormalizer();
+
+        self::assertEquals($expected, $normalizer->supportsNormalization($data, 'any_value'));
     }
 
     public function supportsNormalizationDataProvider(): array
@@ -327,9 +322,11 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsDenormalizationDataProvider
      */
-    public function testSupportsDenormalization(?string $type, bool $expected)
+    public function testSupportsDenormalization(?string $type, bool $expected): void
     {
-        $this->assertEquals($expected, $this->normalizer->supportsDenormalization('any_value', $type));
+        $normalizer = $this->getNormalizer();
+
+        self::assertEquals($expected, $normalizer->supportsDenormalization('any_value', $type));
     }
 
     public function supportsDenormalizationDataProvider(): array
@@ -343,14 +340,6 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function normalizeDirectionDataProvider(): array
-    {
-        return [
-            ['normalization'],
-            ['denormalization'],
-        ];
-    }
-
     private function createVariable(
         string $name,
         string $type,
@@ -359,22 +348,21 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
         ?string $propertyPath = null
     ): Variable {
         $variable = new Variable();
-        $variable
-            ->setName($name)
-            ->setType($type)
-            ->setOptions($options)
-            ->setPropertyPath($propertyPath)
-            ->setValue($value)
-            ->setLabel($name);
+        $variable->setName($name);
+        $variable->setType($type);
+        $variable->setOptions($options);
+        $variable->setValue($value);
+        $variable->setLabel($name);
+        $variable->setPropertyPath($propertyPath);
 
         return $variable;
     }
 
-    private function getMockNormalizer(?Variable $expected = null, array $options = []): WorkflowVariableNormalizer
+    private function getNormalizer(?Variable $expected = null, array $options = []): WorkflowVariableNormalizer
     {
         if (!$expected instanceof Variable || 'entity' !== $expected->getType()) {
             $doctrine = $this->createMock(ManagerRegistry::class);
-            $doctrine->expects($this->any())
+            $doctrine->expects(self::any())
                 ->method('getManagerForClass')
                 ->willReturn($this->createMock(ObjectManager::class));
 
@@ -383,23 +371,23 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
 
         $classMetadata = $this->createMock(ClassMetadataInfo::class);
         $classMetadata->isIdentifierComposite = $options['isIdentifierComposite'];
-        $classMetadata->expects($this->any())
+        $classMetadata->expects(self::any())
             ->method('getIdentifier')
             ->willReturn($options['identifier']);
-        $classMetadata->expects($this->any())
+        $classMetadata->expects(self::any())
             ->method('isUniqueField')
             ->willReturn($options['isUniqueField']);
 
         $fakeRepository = $this->createMock(EntityRepository::class);
-        $fakeRepository->expects($this->any())
+        $fakeRepository->expects(self::any())
             ->method('findOneBy')
             ->willReturn($expected->getValue());
 
-        $entityManager = $this->createMock(EntityManager::class);
-        $entityManager->expects($this->any())
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::any())
             ->method('getClassMetadata')
             ->willReturn($classMetadata);
-        $entityManager->expects($this->any())
+        $entityManager->expects(self::any())
             ->method('getRepository')
             ->willReturn($fakeRepository);
 
@@ -407,7 +395,7 @@ class WorkflowVariableNormalizerTest extends \PHPUnit\Framework\TestCase
         $managerForClass = $getManagerForClass ? $entityManager : null;
 
         $doctrine = $this->createMock(ManagerRegistry::class);
-        $doctrine->expects($this->any())
+        $doctrine->expects(self::any())
             ->method('getManagerForClass')
             ->willReturn($managerForClass);
 

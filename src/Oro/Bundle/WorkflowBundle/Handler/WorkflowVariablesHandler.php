@@ -2,19 +2,22 @@
 
 namespace Oro\Bundle\WorkflowBundle\Handler;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 
-class WorkflowVariablesHandler extends WorkflowDefinitionHandler
+/**
+ * The handler for updating workflow variables.
+ */
+class WorkflowVariablesHandler
 {
-    /**
-     * @param WorkflowDefinition $definition
-     * @param WorkflowData $data
-     *
-     * @return WorkflowDefinition
-     */
-    public function updateWorkflowVariables(WorkflowDefinition $definition, WorkflowData $data)
+    public function __construct(
+        private ManagerRegistry $doctrine
+    ) {
+    }
+
+    public function updateWorkflowVariables(WorkflowDefinition $definition, WorkflowData $data): WorkflowDefinition
     {
         $workflowConfig = $definition->getConfiguration();
         $variableDefinitionsConfig = $workflowConfig[WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS];
@@ -30,7 +33,17 @@ class WorkflowVariablesHandler extends WorkflowDefinitionHandler
         $variableDefinitionsConfig[WorkflowConfiguration::NODE_VARIABLES] = $variablesConfig;
         $workflowConfig[WorkflowConfiguration::NODE_VARIABLE_DEFINITIONS] = $variableDefinitionsConfig;
         $definition->setConfiguration($workflowConfig);
-        $this->process($definition);
+
+        $em = $this->doctrine->getManagerForClass(WorkflowDefinition::class);
+        $em->persist($definition);
+        $em->beginTransaction();
+        try {
+            $em->flush();
+            $em->commit();
+        } catch (\Exception $exception) {
+            $em->rollback();
+            throw $exception;
+        }
 
         return $definition;
     }

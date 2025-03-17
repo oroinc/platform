@@ -16,33 +16,33 @@ class WorkflowAwareEntityFetcherTest extends WebTestCase
         $this->loadFixtures([LoadWorkflowDefinitions::class]);
     }
 
-    public function testGetEntitiesWithoutWorkflowItem()
+    public function testGetEntitiesWithoutWorkflowItem(): void
     {
         $workflowManager = $this->getContainer()->get('oro_workflow.manager');
 
         $entity1 = $this->createWorkflowAwareEntity('test1');
         $entity2 = $this->createWorkflowAwareEntity('test2');
 
-        $this->assertNull($workflowManager->getWorkflowItem($entity1, LoadWorkflowDefinitions::WITH_GROUPS1));
-        $this->assertNull($workflowManager->getWorkflowItem($entity2, LoadWorkflowDefinitions::WITH_GROUPS1));
+        self::assertNull($workflowManager->getWorkflowItem($entity1, LoadWorkflowDefinitions::WITH_GROUPS1));
+        self::assertNull($workflowManager->getWorkflowItem($entity2, LoadWorkflowDefinitions::WITH_GROUPS1));
 
         $workflow = $workflowManager->getWorkflow(LoadWorkflowDefinitions::WITH_GROUPS1);
-        $this->assertNotNull($workflow);
+        self::assertNotNull($workflow);
 
         $helper = $this->getContainer()->get('oro_workflow.helper.workflow_aware_entity_fetcher');
 
         $result = $helper->getEntitiesWithoutWorkflowItem($workflow->getDefinition());
 
-        $this->assertCount(2, $result);
-        $this->assertContains($entity1, $result);
-        $this->assertContains($entity2, $result);
+        self::assertCount(2, $result);
+        self::assertContains($entity1, $result);
+        self::assertContains($entity2, $result);
 
-        $this->assertEquals(
+        self::assertEquals(
             [$entity1],
             $helper->getEntitiesWithoutWorkflowItem($workflow->getDefinition(), "e.name = 'test1'")
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             [],
             $helper->getEntitiesWithoutWorkflowItem($workflow->getDefinition(), "e.name = 'test'")
         );

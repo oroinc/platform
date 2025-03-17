@@ -2,33 +2,24 @@
 
 namespace Oro\Bundle\WorkflowBundle\Serializer\Normalizer;
 
-use Doctrine\ORM\EntityManager;
-use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ActionBundle\Model\ParameterInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Exception\SerializerException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
+/**
+ * Normalizes multiple entity attributes.
+ */
 class MultipleEntityAttributeNormalizer implements AttributeNormalizer
 {
-    /**
-     * @var ManagerRegistry
-     */
-    protected $registry;
-
-    /**
-     * @var DoctrineHelper
-     */
-    protected $doctrineHelper;
-
-    public function __construct(ManagerRegistry $registry, DoctrineHelper $doctrineHelper)
-    {
-        $this->registry = $registry;
-        $this->doctrineHelper = $doctrineHelper;
+    public function __construct(
+        protected DoctrineHelper $doctrineHelper
+    ) {
     }
 
     #[\Override]
-    public function normalize(Workflow $workflow, ParameterInterface $attribute, $attributeValue)
+    public function normalize(Workflow $workflow, ParameterInterface $attribute, $attributeValue): ?array
     {
         if (null === $attributeValue) {
             return null;
@@ -45,9 +36,9 @@ class MultipleEntityAttributeNormalizer implements AttributeNormalizer
     }
 
     #[\Override]
-    public function denormalize(Workflow $workflow, ParameterInterface $attribute, $attributeValue)
+    public function denormalize(Workflow $workflow, ParameterInterface $attribute, $attributeValue): ?array
     {
-        if (null === $attributeValue || !is_array($attributeValue)) {
+        if (!\is_array($attributeValue)) {
             return null;
         }
 
@@ -62,75 +53,56 @@ class MultipleEntityAttributeNormalizer implements AttributeNormalizer
     }
 
     #[\Override]
-    public function supportsNormalization(Workflow $workflow, ParameterInterface $attribute, $attributeValue)
+    public function supportsNormalization(Workflow $workflow, ParameterInterface $attribute, $attributeValue): bool
     {
-        return $attribute->getType() == 'entity' && $attribute->getOption('multiple');
+        return $attribute->getType() === 'entity' && $attribute->getOption('multiple');
     }
 
     #[\Override]
-    public function supportsDenormalization(Workflow $workflow, ParameterInterface $attribute, $attributeValue)
+    public function supportsDenormalization(Workflow $workflow, ParameterInterface $attribute, $attributeValue): bool
     {
-        return $attribute->getType() == 'entity' && $attribute->getOption('multiple');
+        return $attribute->getType() === 'entity' && $attribute->getOption('multiple');
     }
 
-    /**
-     * Returns EntityManager for entity.
-     *
-     * @param Workflow $workflow
-     * @param ParameterInterface $attribute
-     * @param mixed $attributeValue
-     * @throws SerializerException
-     */
-    protected function validateAttributeValue(Workflow $workflow, ParameterInterface $attribute, $attributeValue)
-    {
-        if (!is_array($attributeValue) && !$attributeValue instanceof \Traversable) {
-            throw new SerializerException(
-                sprintf(
-                    'Attribute "%s" of workflow "%s" must be a collection or an array, but "%s" given',
-                    $attribute->getName(),
-                    $workflow->getName(),
-                    is_object($attributeValue) ? get_class($attributeValue) : gettype($attributeValue)
-                )
-            );
+    protected function validateAttributeValue(
+        Workflow $workflow,
+        ParameterInterface $attribute,
+        mixed $attributeValue
+    ): void {
+        if (!\is_array($attributeValue) && !$attributeValue instanceof \Traversable) {
+            throw new SerializerException(\sprintf(
+                'Attribute "%s" of workflow "%s" must be a collection or an array, but "%s" given',
+                $attribute->getName(),
+                $workflow->getName(),
+                get_debug_type($attributeValue)
+            ));
         }
 
         $expectedType = $attribute->getOption('class');
         foreach ($attributeValue as $value) {
             if (!$value instanceof $expectedType) {
-                throw new SerializerException(
-                    sprintf(
-                        'Each value of attribute "%s" of workflow "%s" must be an instance of "%s", but "%s" found',
-                        $attribute->getName(),
-                        $workflow->getName(),
-                        $expectedType,
-                        is_object($value) ? get_class($value) : gettype($value)
-                    )
-                );
+                throw new SerializerException(\sprintf(
+                    'Each value of attribute "%s" of workflow "%s" must be an instance of "%s", but "%s" found',
+                    $attribute->getName(),
+                    $workflow->getName(),
+                    $expectedType,
+                    get_debug_type($value)
+                ));
             }
         }
     }
 
-    /**
-     * Returns EntityManager for entity.
-     *
-     * @param Workflow $workflow
-     * @param ParameterInterface $attribute
-     * @return EntityManager
-     * @throws SerializerException
-     */
-    protected function getEntityManager(Workflow $workflow, ParameterInterface $attribute)
+    protected function getEntityManager(Workflow $workflow, ParameterInterface $attribute): EntityManagerInterface
     {
         $entityClass = $attribute->getOption('class');
-        $result = $this->registry->getManagerForClass($entityClass);
+        $result = $this->doctrineHelper->getEntityManagerForClass($entityClass);
         if (!$result) {
-            throw new SerializerException(
-                sprintf(
-                    'Attribute "%s" of workflow "%s" contains object of "%s", but it\'s not managed entity class',
-                    $attribute->getName(),
-                    $workflow->getName(),
-                    $entityClass
-                )
-            );
+            throw new SerializerException(\sprintf(
+                'Attribute "%s" of workflow "%s" contains object of "%s", but it\'s not managed entity class',
+                $attribute->getName(),
+                $workflow->getName(),
+                $entityClass
+            ));
         }
 
         return $result;

@@ -2,26 +2,22 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Processor\Transition;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\UnitOfWork;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\DefaultFormStartHandleProcessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class DefaultFormStartHandleProcessorTest extends \PHPUnit\Framework\TestCase
+class DefaultFormStartHandleProcessorTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var DefaultFormStartHandleProcessor */
-    private $processor;
-
-    /** @var Request|\PHPUnit\Framework\MockObject\MockObject */
-    private $request;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private DefaultFormStartHandleProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -29,17 +25,15 @@ class DefaultFormStartHandleProcessorTest extends \PHPUnit\Framework\TestCase
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
 
         $this->processor = new DefaultFormStartHandleProcessor($this->doctrineHelper);
-
-        $this->request = $this->createMock(Request::class);
     }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessSavedTrue()
+    public function testProcessSavedTrue(): void
     {
         $transition = $this->createMock(Transition::class);
-        $transition->expects($this->once())
+        $transition->expects(self::once())
             ->method('getFormOptions')
             ->willReturn(
                 [
@@ -53,7 +47,8 @@ class DefaultFormStartHandleProcessorTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
-        $this->request->expects($this->once())
+        $request = $this->createMock(Request::class);
+        $request->expects(self::once())
             ->method('isMethod')
             ->with('POST')
             ->willReturn(true);
@@ -72,37 +67,37 @@ class DefaultFormStartHandleProcessorTest extends \PHPUnit\Framework\TestCase
         ]);
 
         $form = $this->createMock(FormInterface::class);
-        $form->expects($this->once())
+        $form->expects(self::once())
             ->method('handleRequest')
-            ->with($this->request);
-        $form->expects($this->once())
+            ->with($request);
+        $form->expects(self::once())
             ->method('isSubmitted')
             ->willReturn(true);
-        $form->expects($this->once())
+        $form->expects(self::once())
             ->method('isValid')
             ->willReturn(true);
-        $form->expects($this->once())
+        $form->expects(self::once())
             ->method('getData')
             ->willReturn($workflowData);
 
         $context = new TransitionContext();
-        $context->setRequest($this->request);
+        $context->setRequest($request);
         $context->setTransition($transition);
         $context->setForm($form);
 
         $unitOfWork = $this->createMock(UnitOfWork::class);
 
-        $entityManager = $this->createMock(EntityManager::class);
-        $entityManager->expects($this->any())
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::any())
             ->method('getUnitOfWork')
             ->willReturn($unitOfWork);
 
-        $this->doctrineHelper->expects($this->any())
+        $this->doctrineHelper->expects(self::any())
             ->method('getEntityManager')
             ->willReturn($entityManager);
 
-        //not object will be filtered
-        $this->doctrineHelper->expects($this->exactly(4))
+        // not object will be filtered
+        $this->doctrineHelper->expects(self::exactly(4))
             ->method('isManageableEntity')
             ->withConsecutive(
                 [$toPersist],
@@ -113,42 +108,43 @@ class DefaultFormStartHandleProcessorTest extends \PHPUnit\Framework\TestCase
             ->willReturnOnConsecutiveCalls(true, false, true, true);
 
         // not manageable entities will be filtered
-        $unitOfWork->expects($this->exactly(3))
+        $unitOfWork->expects(self::exactly(3))
             ->method('isInIdentityMap')
             ->withConsecutive([$toPersist], [$notInIdentity], [$notScheduledForInsert])
             ->willReturnOnConsecutiveCalls(true, false, true);
 
-        //those who in identity would not be checked as isScheduledForInsert
-        $unitOfWork->expects($this->exactly(2))
+        // those who in identity would not be checked as isScheduledForInsert
+        $unitOfWork->expects(self::exactly(2))
             ->method('isScheduledForInsert')
             ->withConsecutive([$toPersist], [$notScheduledForInsert])
             ->willReturnOnConsecutiveCalls(true, false);
 
-        //one entity scheduled for insert and one not in identity will be flushed
-        $entityManager->expects($this->exactly(2))
+        // one entity scheduled for insert and one not in identity will be flushed
+        $entityManager->expects(self::exactly(2))
             ->method('persist')
             ->withConsecutive([$toPersist], [$notInIdentity]);
-        $entityManager->expects($this->exactly(2))
+        $entityManager->expects(self::exactly(2))
             ->method('flush')
             ->withConsecutive([$toPersist], [$notInIdentity]);
 
         $this->processor->process($context);
 
-        $this->assertTrue($context->isSaved());
+        self::assertTrue($context->isSaved());
     }
 
-    public function testSkipRequestMethodsOtherThanPost()
+    public function testSkipRequestMethodsOtherThanPost(): void
     {
-        $context = new TransitionContext();
-        $context->setRequest($this->request);
-
-        $this->request->expects($this->once())
+        $request = $this->createMock(Request::class);
+        $request->expects(self::once())
             ->method('isMethod')
             ->with('POST')
             ->willReturn(false);
 
+        $context = new TransitionContext();
+        $context->setRequest($request);
+
         $this->processor->process($context);
 
-        $this->assertFalse($context->isSaved());
+        self::assertFalse($context->isSaved());
     }
 }

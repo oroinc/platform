@@ -43,7 +43,6 @@ services:
     oro_workflow.serializer.data.attribute_normalizer.entity:
         class: Oro\Bundle\WorkflowBundle\Serializer\Normalizer\EntityAttributeNormalizer
         arguments:
-            - '@doctrine'
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: oro_workflow.attribute_normalizer }
@@ -51,7 +50,6 @@ services:
     oro_workflow.serializer.data.attribute_normalizer.multiple_entity:
         class: Oro\Bundle\WorkflowBundle\Serializer\Normalizer\MultipleEntityAttributeNormalizer
         arguments:
-            - '@doctrine'
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: oro_workflow.attribute_normalizer }

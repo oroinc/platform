@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Handler;
 
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMInvalidArgumentException;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowChangesEvent;
@@ -12,25 +9,21 @@ use Oro\Bundle\WorkflowBundle\Event\WorkflowEvents;
 use Oro\Bundle\WorkflowBundle\Handler\Helper\WorkflowDefinitionCloner;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * Handles workflow definition changes.
+ */
 class WorkflowDefinitionHandler
 {
-    /** @var ManagerRegistry */
-    protected $registry;
-
-    /** @var EventDispatcherInterface */
-    private $eventDispatcher;
-
-    public function __construct(EventDispatcherInterface $eventDispatcher, ManagerRegistry $registry)
-    {
-        $this->eventDispatcher = $eventDispatcher;
-        $this->registry = $registry;
+    public function __construct(
+        protected EventDispatcherInterface $eventDispatcher,
+        protected ManagerRegistry $doctrine
+    ) {
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function updateWorkflowDefinition(WorkflowDefinition $existingDefinition, WorkflowDefinition $newDefinition)
-    {
+    public function updateWorkflowDefinition(
+        WorkflowDefinition $existingDefinition,
+        WorkflowDefinition $newDefinition
+    ): void {
         $originalDefinition = WorkflowDefinitionCloner::cloneDefinition($existingDefinition);
 
         WorkflowDefinitionCloner::mergeDefinition($existingDefinition, $newDefinition);
@@ -48,10 +41,7 @@ class WorkflowDefinitionHandler
         );
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function createWorkflowDefinition(WorkflowDefinition $workflowDefinition)
+    public function createWorkflowDefinition(WorkflowDefinition $workflowDefinition): void
     {
         $this->eventDispatcher->dispatch(
             new WorkflowChangesEvent($workflowDefinition),
@@ -66,19 +56,13 @@ class WorkflowDefinitionHandler
         );
     }
 
-    /**
-     * @param WorkflowDefinition $workflowDefinition
-     * @return bool
-     * @throws OptimisticLockException
-     * @throws ORMInvalidArgumentException
-     */
-    public function deleteWorkflowDefinition(WorkflowDefinition $workflowDefinition)
+    public function deleteWorkflowDefinition(WorkflowDefinition $workflowDefinition): bool
     {
         if ($workflowDefinition->isSystem()) {
             return false;
         }
 
-        $em = $this->getEntityManager();
+        $em = $this->doctrine->getManagerForClass(WorkflowDefinition::class);
         $em->remove($workflowDefinition);
         $em->flush();
 
@@ -90,15 +74,11 @@ class WorkflowDefinitionHandler
         return true;
     }
 
-    /**
-     * @throws \Exception
-     */
-    protected function process(WorkflowDefinition $workflowDefinition)
+    protected function process(WorkflowDefinition $workflowDefinition): void
     {
-        $em = $this->getEntityManager();
+        $em = $this->doctrine->getManagerForClass(WorkflowDefinition::class);
         $em->persist($workflowDefinition);
         $em->beginTransaction();
-
         try {
             $em->flush();
             $em->commit();
@@ -106,13 +86,5 @@ class WorkflowDefinitionHandler
             $em->rollback();
             throw $exception;
         }
-    }
-
-    /**
-     * @return EntityManager
-     */
-    private function getEntityManager()
-    {
-        return $this->registry->getManagerForClass(WorkflowDefinition::class);
     }
 }

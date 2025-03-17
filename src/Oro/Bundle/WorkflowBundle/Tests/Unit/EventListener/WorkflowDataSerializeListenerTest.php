@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\UnitOfWork;
@@ -15,18 +15,15 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use PHPUnit\Framework\TestCase;
 
-class WorkflowDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
+class WorkflowDataSerializeListenerTest extends TestCase
 {
-    /** @var WorkflowAwareSerializer|\PHPUnit\Framework\MockObject\MockObject */
-    private $serializer;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var WorkflowDataSerializeListener */
-    private $listener;
+    private WorkflowAwareSerializer&MockObject $serializer;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private WorkflowDataSerializeListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -51,9 +48,9 @@ class WorkflowDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
         return ReflectionUtil::getPropertyValue($entity, 'serializedData');
     }
 
-    public function testPostLoad()
+    public function testPostLoad(): void
     {
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
 
         $definition = $this->createMock(WorkflowDefinition::class);
         $definition->expects(self::once())
@@ -78,7 +75,7 @@ class WorkflowDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testOnFlushAndPostFlush()
+    public function testOnFlushAndPostFlush(): void
     {
         $definition = $this->createMock(WorkflowDefinition::class);
         $definition->expects(self::any())
@@ -124,7 +121,7 @@ class WorkflowDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
         $expectedSerializedData2 = 'serialized_data_2';
         $expectedSerializedData4 = 'serialized_data_4';
 
-        $this->serializer->expects($this->never())
+        $this->serializer->expects(self::never())
             ->method('deserialize');
 
         $this->serializer->expects(self::exactly(3))
@@ -164,7 +161,7 @@ class WorkflowDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getScheduledEntityUpdates')
             ->willReturn([$entity4, $entity5, $entity6]);
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::any())
             ->method('getUnitOfWork')
             ->willReturn($uow);
@@ -185,7 +182,7 @@ class WorkflowDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($entity5->getData()->isModified());
     }
 
-    public function testOnFlushAndPostFlushWithAttributesThatShouldBeRemoved()
+    public function testOnFlushAndPostFlushWithAttributesThatShouldBeRemoved(): void
     {
         $virtualAttributes = [
             'virtual_attr' => [],
@@ -226,7 +223,7 @@ class WorkflowDataSerializeListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getScheduledEntityUpdates')
             ->willReturn([]);
 
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $em->expects(self::once())
             ->method('getUnitOfWork')
             ->willReturn($uow);

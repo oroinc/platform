@@ -7,11 +7,8 @@ use Oro\Bundle\WorkflowBundle\Model\Filter\WorkflowDefinitionFilterInterface;
 
 class DefaultDefinitionFilter implements WorkflowDefinitionFilterInterface
 {
-    /**
-     * {@iheritdoc}
-     */
     #[\Override]
-    public function filter(Collection $workflowDefinitions)
+    public function filter(Collection $workflowDefinitions): Collection
     {
         return $workflowDefinitions;
     }

@@ -2,24 +2,21 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Processor\Transition;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Bundle\WorkflowBundle\Processor\Transition\DefaultFormProcessor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class DefaultFormProcessorTest extends \PHPUnit\Framework\TestCase
+class DefaultFormProcessorTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var Request|\PHPUnit\Framework\MockObject\MockObject */
-    private $request;
-
-    /** @var DefaultFormProcessor */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private Request&MockObject $request;
+    private DefaultFormProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -30,47 +27,47 @@ class DefaultFormProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor = new DefaultFormProcessor($this->doctrineHelper);
     }
 
-    public function testFormSubmit()
+    public function testFormSubmit(): void
     {
         $form = $this->createMock(FormInterface::class);
-        $form->expects($this->once())
+        $form->expects(self::once())
             ->method('handleRequest')
             ->with($this->request);
-        $form->expects($this->once())
+        $form->expects(self::once())
             ->method('isSubmitted')
             ->willReturn(true);
-        $form->expects($this->once())
+        $form->expects(self::once())
             ->method('isValid')
             ->willReturn(true);
 
         $workflowItem = $this->createMock(WorkflowItem::class);
-        $workflowItem->expects($this->once())
+        $workflowItem->expects(self::once())
             ->method('setUpdated');
 
         $context = $this->createMock(TransitionContext::class);
-        $context->expects($this->once())
+        $context->expects(self::once())
             ->method('getRequest')
             ->willReturn($this->request);
-        $context->expects($this->once())
+        $context->expects(self::once())
             ->method('getForm')
             ->willReturn($form);
-        $context->expects($this->once())
+        $context->expects(self::once())
             ->method('getWorkflowItem')
             ->willReturn($workflowItem);
-        $context->expects($this->exactly(2))
+        $context->expects(self::exactly(2))
             ->method('setSaved')
             ->withConsecutive([false], [true]);
 
-        $entityManager = $this->createMock(EntityManager::class);
-        $entityManager->expects($this->once())
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::once())
             ->method('flush');
 
-        $this->request->expects($this->once())
+        $this->request->expects(self::once())
             ->method('isMethod')
             ->with('POST')
             ->willReturn(true);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityManager')
             ->with(WorkflowItem::class)
             ->willReturn($entityManager);
@@ -78,19 +75,19 @@ class DefaultFormProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($context);
     }
 
-    public function testEnsureSavedFalse()
+    public function testEnsureSavedFalse(): void
     {
         $context = $this->createMock(TransitionContext::class);
-        $context->expects($this->once())
+        $context->expects(self::once())
             ->method('getRequest')
             ->willReturn($this->request);
-        $context->expects($this->once())
+        $context->expects(self::once())
             ->method('setSaved')
             ->with(false);
-        $context->expects($this->never())
+        $context->expects(self::never())
             ->method('getForm');
 
-        $this->request->expects($this->once())
+        $this->request->expects(self::once())
             ->method('isMethod')
             ->with('POST')
             ->willReturn(false);
@@ -98,21 +95,21 @@ class DefaultFormProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($context);
     }
 
-    public function testSavedFalseOnInvalidForm()
+    public function testSavedFalseOnInvalidForm(): void
     {
-        $this->request->expects($this->once())
+        $this->request->expects(self::once())
             ->method('isMethod')
             ->with('POST')
             ->willReturn(true);
 
         $form = $this->createMock(FormInterface::class);
-        $form->expects($this->once())
+        $form->expects(self::once())
             ->method('handleRequest')
             ->with($this->request);
-        $form->expects($this->once())
+        $form->expects(self::once())
             ->method('isSubmitted')
             ->willReturn(true);
-        $form->expects($this->once())
+        $form->expects(self::once())
             ->method('isValid')
             ->willReturn(false);
 
@@ -120,11 +117,11 @@ class DefaultFormProcessorTest extends \PHPUnit\Framework\TestCase
         $context->setRequest($this->request);
         $context->setForm($form);
 
-        $this->doctrineHelper->expects($this->never())
+        $this->doctrineHelper->expects(self::never())
             ->method('getEntityManager');
 
         $this->processor->process($context);
 
-        $this->assertFalse($context->isSaved());
+        self::assertFalse($context->isSaved());
     }
 }

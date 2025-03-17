@@ -15,6 +15,7 @@ use Oro\Bundle\WorkflowBundle\Handler\TransitionEventTriggerHandler;
 use Oro\Bundle\WorkflowBundle\Helper\TransitionEventTriggerHelper;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\EventListener\Stubs\WorkflowAwareEntityProxyStub;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionTestCase
 {
@@ -22,12 +23,10 @@ class TransitionEventTriggerExtensionTest extends AbstractEventTriggerExtensionT
 
     protected const ENTITY_CLASS = WorkflowAwareEntityProxyStub::class;
 
-    /** @var TransitionEventTriggerRepository|\PHPUnit\Framework\MockObject\MockObject */
+    /** @var TransitionEventTriggerRepository&MockObject */
     protected $repository;
-
-    private TransitionEventTriggerHelper|\PHPUnit\Framework\MockObject\MockObject $helper;
-
-    private TransitionEventTriggerHandler|\PHPUnit\Framework\MockObject\MockObject $handler;
+    private TransitionEventTriggerHelper&MockObject $helper;
+    private TransitionEventTriggerHandler&MockObject $handler;
 
     #[\Override]
     protected function setUp(): void

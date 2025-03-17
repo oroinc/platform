@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\TransitionTrigger;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache;
@@ -14,23 +14,16 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggersUpdateDecider;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TransitionTriggersUpdater;
 use Oro\Bundle\WorkflowBundle\Model\TransitionTrigger\TriggersBag;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class TransitionTriggersUpdaterTest extends \PHPUnit\Framework\TestCase
+class TransitionTriggersUpdaterTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /**@var TransitionTriggersUpdateDecider|\PHPUnit\Framework\MockObject\MockObject */
-    private $updateDecider;
-
-    /** @var TransitionTriggerCronScheduler|\PHPUnit\Framework\MockObject\MockObject */
-    private $cronScheduler;
-
-    /** @var EventTriggerCache|\PHPUnit\Framework\MockObject\MockObject */
-    private $cache;
-
-    /** @var TransitionTriggersUpdater */
-    private $updater;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private TransitionTriggersUpdateDecider&MockObject $updateDecider;
+    private TransitionTriggerCronScheduler&MockObject $cronScheduler;
+    private EventTriggerCache&MockObject $cache;
+    private TransitionTriggersUpdater $updater;
 
     #[\Override]
     protected function setUp(): void
@@ -48,7 +41,7 @@ class TransitionTriggersUpdaterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testUpdateTriggers()
+    public function testUpdateTriggers(): void
     {
         $definition = (new WorkflowDefinition())->setName('workflow');
         $newCronTrigger1 = (new TransitionCronTrigger())->setCron('1 * * * *');
@@ -87,36 +80,36 @@ class TransitionTriggersUpdaterTest extends \PHPUnit\Framework\TestCase
                 [$storedCronTrigger1, $storedEventTrigger2]
             ]);
 
-        $em = $this->createMock(EntityManager::class);
-        $this->doctrineHelper->expects($this->any())
+        $em = $this->createMock(EntityManagerInterface::class);
+        $this->doctrineHelper->expects(self::any())
             ->method('getEntityManagerForClass')
             ->with(BaseTransitionTrigger::class)
             ->willReturn($em);
 
-        $em->expects($this->exactly(2))
+        $em->expects(self::exactly(2))
             ->method('persist')
             ->withConsecutive([$newCronTrigger1], [$newEventTrigger2]);
-        $em->expects($this->exactly(2))
+        $em->expects(self::exactly(2))
             ->method('remove')
             ->withConsecutive([$storedCronTrigger1], [$storedEventTrigger2]);
-        $this->cronScheduler->expects($this->once())
+        $this->cronScheduler->expects(self::once())
             ->method('removeSchedule')
             ->with($storedCronTrigger1);
-        $this->cronScheduler->expects($this->once())
+        $this->cronScheduler->expects(self::once())
             ->method('addSchedule')
             ->with($newCronTrigger1);
 
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('flush');
         $this->cronScheduler->expects(self::exactly(2))
             ->method('flush');
-        $this->cache->expects($this->once())
+        $this->cache->expects(self::once())
             ->method('build');
 
         $this->updater->updateTriggers($triggersBag);
     }
 
-    public function testUpdateTriggersNoActionsForTriggersButUpdateCronSchedule()
+    public function testUpdateTriggersNoActionsForTriggersButUpdateCronSchedule(): void
     {
         $definition = (new WorkflowDefinition())->setName('workflow');
         $newTrigger1 = (new TransitionCronTrigger())->setCron('1 * * * *');
@@ -144,7 +137,7 @@ class TransitionTriggersUpdaterTest extends \PHPUnit\Framework\TestCase
             ->withConsecutive([BaseTransitionTrigger::class], [TransitionCronTrigger::class])
             ->willReturnOnConsecutiveCalls($repository, $cronTriggerRepository);
 
-        $this->updateDecider->expects($this->once())
+        $this->updateDecider->expects(self::once())
             ->method('decide')
             ->with([$storedTrigger1, $storedTrigger2], $triggersBag->getTriggers())
             ->willReturn([[], []]); //all abstain by decider
@@ -156,68 +149,66 @@ class TransitionTriggersUpdaterTest extends \PHPUnit\Framework\TestCase
         $this->cronScheduler->expects(self::once())
             ->method('flush');
 
-        //no em actions
-        $this->cache->expects($this->never())
+        $this->cache->expects(self::never())
             ->method('build');
 
         $this->updater->updateTriggers($triggersBag);
     }
 
-    public function testRemoveTriggers()
+    public function testRemoveTriggers(): void
     {
         $definition = (new WorkflowDefinition())->setName('workflow');
 
         $repository = $this->createMock(EntityRepository::class);
-        $this->doctrineHelper->expects($this->any())
+        $this->doctrineHelper->expects(self::any())
             ->method('getEntityRepositoryForClass')
             ->with(BaseTransitionTrigger::class)
             ->willReturn($repository);
 
         $trigger = new TransitionCronTrigger();
-        $repository->expects($this->once())
+        $repository->expects(self::once())
             ->method('findBy')
             ->with(['workflowDefinition' => $definition->getName()])
             ->willReturn([$trigger]);
 
-        $em = $this->createMock(EntityManager::class);
-        $this->doctrineHelper->expects($this->any())
+        $em = $this->createMock(EntityManagerInterface::class);
+        $this->doctrineHelper->expects(self::any())
             ->method('getEntityManagerForClass')
             ->with(BaseTransitionTrigger::class)
             ->willReturn($em);
 
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('remove')
             ->with($trigger);
-        $this->cronScheduler->expects($this->once())
+        $this->cronScheduler->expects(self::once())
             ->method('removeSchedule')
             ->with($trigger);
-        $em->expects($this->once())
+        $em->expects(self::once())
             ->method('flush');
-        $this->cronScheduler->expects($this->once())
+        $this->cronScheduler->expects(self::once())
             ->method('flush');
-        $this->cache->expects($this->once())
+        $this->cache->expects(self::once())
             ->method('build');
 
         $this->updater->removeTriggers($definition);
     }
 
-    public function testRemoveTriggersDry()
+    public function testRemoveTriggersDry(): void
     {
         $definition = (new WorkflowDefinition())->setName('workflow');
 
         $repository = $this->createMock(EntityRepository::class);
-        $this->doctrineHelper->expects($this->any())
+        $this->doctrineHelper->expects(self::any())
             ->method('getEntityRepositoryForClass')
             ->with(BaseTransitionTrigger::class)
             ->willReturn($repository);
 
-        $repository->expects($this->once())
+        $repository->expects(self::once())
             ->method('findBy')
             ->with(['workflowDefinition' => $definition->getName()])
             ->willReturn([]);
 
-        //no em actions
-        $this->cache->expects($this->never())
+        $this->cache->expects(self::never())
             ->method('build');
 
         $this->updater->removeTriggers($definition);

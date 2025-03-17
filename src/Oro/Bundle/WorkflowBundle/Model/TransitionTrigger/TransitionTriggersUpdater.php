@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\TransitionTrigger;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Cache\EventTriggerCache;
 use Oro\Bundle\WorkflowBundle\Cron\TransitionTriggerCronScheduler;
@@ -10,51 +10,46 @@ use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
+/**
+ * Provides methods to update and remove transition triggers.
+ */
 class TransitionTriggersUpdater
 {
-    /** @var EntityManager */
-    private $em;
-
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var TransitionTriggersUpdateDecider */
-    private $updateDecider;
-
-    /** @var TransitionTriggerCronScheduler */
-    private $cronScheduler;
-
-    /** @var EventTriggerCache */
-    private $cache;
-
     public function __construct(
-        DoctrineHelper $doctrineHelper,
-        TransitionTriggersUpdateDecider $decider,
-        TransitionTriggerCronScheduler $cronScheduler,
-        EventTriggerCache $cache
+        private DoctrineHelper $doctrineHelper,
+        private TransitionTriggersUpdateDecider $updateDecider,
+        private TransitionTriggerCronScheduler $cronScheduler,
+        private EventTriggerCache $cache
     ) {
-        $this->doctrineHelper = $doctrineHelper;
-        $this->updateDecider = $decider;
-        $this->cronScheduler = $cronScheduler;
-        $this->cache = $cache;
     }
 
     /**
      * Overrides triggers by TriggersBag. Flushes data into database.
      */
-    public function updateTriggers(TriggersBag $triggersBag)
+    public function updateTriggers(TriggersBag $triggersBag): void
     {
         $this->updateTransitionTriggers($triggersBag);
         $this->updateCronSchedules($triggersBag->getDefinition());
     }
 
-    private function updateTransitionTriggers(TriggersBag $triggersBag)
+    public function removeTriggers(WorkflowDefinition $workflowDefinition): void
+    {
+        $triggers = $this->getStoredDefinitionTriggers($workflowDefinition);
+        if (\count($triggers) !== 0) {
+            foreach ($triggers as $trigger) {
+                $this->remove($trigger);
+            }
+            $this->flush();
+        }
+    }
+
+    private function updateTransitionTriggers(TriggersBag $triggersBag): void
     {
         $existingTriggers = $this->getStoredDefinitionTriggers($triggersBag->getDefinition());
 
-        list($add, $remove) = $this->updateDecider->decide($existingTriggers, $triggersBag->getTriggers());
+        [$add, $remove] = $this->updateDecider->decide($existingTriggers, $triggersBag->getTriggers());
 
-        if (count($remove) !== 0 || count($add) !== 0) {
+        if (\count($remove) !== 0 || \count($add) !== 0) {
             foreach ($remove as $trashTrigger) {
                 $this->remove($trashTrigger);
             }
@@ -67,7 +62,7 @@ class TransitionTriggersUpdater
         }
     }
 
-    private function updateCronSchedules(WorkflowDefinition $definition)
+    private function updateCronSchedules(WorkflowDefinition $definition): void
     {
         $cronTriggers = $this->getStoredDefinitionCronTriggers($definition);
         if (empty($cronTriggers)) {
@@ -81,76 +76,48 @@ class TransitionTriggersUpdater
         $this->cronScheduler->flush();
     }
 
-    private function persist(BaseTransitionTrigger $trigger)
+    private function persist(BaseTransitionTrigger $trigger): void
     {
         $this->getEntityManager()->persist($trigger);
     }
 
-    private function remove(BaseTransitionTrigger $trigger)
+    private function remove(BaseTransitionTrigger $trigger): void
     {
         $this->getEntityManager()->remove($trigger);
-
         if ($trigger instanceof TransitionCronTrigger) {
             $this->cronScheduler->removeSchedule($trigger);
         }
     }
 
-    /**
-     * @return void
-     */
-    private function flush()
+    private function flush(): void
     {
         $this->getEntityManager()->flush();
         $this->cronScheduler->flush();
         $this->cache->build();
     }
 
-    public function removeTriggers(WorkflowDefinition $workflowDefinition)
+    /**
+     * @return BaseTransitionTrigger[]
+     */
+    private function getStoredDefinitionTriggers(WorkflowDefinition $workflowDefinition): array
     {
-        $triggers = $this->getStoredDefinitionTriggers($workflowDefinition);
-        if (count($triggers) !== 0) {
-            foreach ($triggers as $trigger) {
-                $this->remove($trigger);
-            }
-            $this->flush();
-        }
+        return $this->doctrineHelper->getEntityRepositoryForClass(BaseTransitionTrigger::class)->findBy([
+            'workflowDefinition' => $workflowDefinition->getName()
+        ]);
     }
 
     /**
-     * @param WorkflowDefinition $workflowDefinition
-     * @return array|BaseTransitionTrigger[]
+     * @return BaseTransitionTrigger[]
      */
-    private function getStoredDefinitionTriggers(WorkflowDefinition $workflowDefinition)
+    private function getStoredDefinitionCronTriggers(WorkflowDefinition $workflowDefinition): array
     {
-        return $this->doctrineHelper->getEntityRepositoryForClass(BaseTransitionTrigger::class)->findBy(
-            [
-                'workflowDefinition' => $workflowDefinition->getName()
-            ]
-        );
+        return $this->doctrineHelper->getEntityRepositoryForClass(TransitionCronTrigger::class)->findBy([
+            'workflowDefinition' => $workflowDefinition->getName(),
+        ]);
     }
 
-    /**
-     * @param WorkflowDefinition $workflowDefinition
-     * @return array|BaseTransitionTrigger[]
-     */
-    private function getStoredDefinitionCronTriggers(WorkflowDefinition $workflowDefinition)
+    private function getEntityManager(): EntityManagerInterface
     {
-        return $this->doctrineHelper->getEntityRepositoryForClass(TransitionCronTrigger::class)->findBy(
-            [
-                'workflowDefinition' => $workflowDefinition->getName(),
-            ]
-        );
-    }
-
-    /**
-     * @return EntityManager
-     */
-    private function getEntityManager()
-    {
-        if (!$this->em) {
-            $this->em = $this->doctrineHelper->getEntityManagerForClass(BaseTransitionTrigger::class);
-        }
-
-        return $this->em;
+        return $this->doctrineHelper->getEntityManagerForClass(BaseTransitionTrigger::class);
     }
 }

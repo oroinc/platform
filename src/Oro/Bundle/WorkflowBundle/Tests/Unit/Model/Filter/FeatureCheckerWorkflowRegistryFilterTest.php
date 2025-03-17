@@ -6,14 +6,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Filter\FeatureCheckerWorkflowRegistryFilter;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FeatureCheckerWorkflowRegistryFilterTest extends \PHPUnit\Framework\TestCase
+class FeatureCheckerWorkflowRegistryFilterTest extends TestCase
 {
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /** @var FeatureCheckerWorkflowRegistryFilter */
-    private $filter;
+    private FeatureChecker&MockObject $featureChecker;
+    private FeatureCheckerWorkflowRegistryFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -23,13 +22,13 @@ class FeatureCheckerWorkflowRegistryFilterTest extends \PHPUnit\Framework\TestCa
         $this->filter = new FeatureCheckerWorkflowRegistryFilter($this->featureChecker);
     }
 
-    public function testFilter()
+    public function testFilter(): void
     {
         $wd1 = (new WorkflowDefinition())->setName('wd1');
         $wd2 = (new WorkflowDefinition())->setName('wd2');
         $collection = new ArrayCollection(['wd1' => $wd1, 'wd2' => $wd2]);
 
-        $this->featureChecker->expects($this->exactly(2))
+        $this->featureChecker->expects(self::exactly(2))
             ->method('isResourceEnabled')
             ->willReturnMap([
                 ['wd1', 'workflows', null, false],
@@ -38,16 +37,16 @@ class FeatureCheckerWorkflowRegistryFilterTest extends \PHPUnit\Framework\TestCa
 
         $result = $this->filter->filter($collection);
 
-        $this->assertEquals(['wd2' => $wd2], $result->toArray());
+        self::assertEquals(['wd2' => $wd2], $result->toArray());
     }
 
-    public function testFilterCachesResult()
+    public function testFilterCachesResult(): void
     {
         $wd1 = (new WorkflowDefinition())->setName('wd1');
         $wd2 = (new WorkflowDefinition())->setName('wd2');
         $collection = new ArrayCollection(['wd1' => $wd1, 'wd2' => $wd2]);
 
-        $this->featureChecker->expects($this->exactly(2))
+        $this->featureChecker->expects(self::exactly(2))
             ->method('isResourceEnabled')
             ->willReturnMap([
                 ['wd1', 'workflows', null, false],
@@ -55,8 +54,8 @@ class FeatureCheckerWorkflowRegistryFilterTest extends \PHPUnit\Framework\TestCa
             ]);
 
         $result1 = $this->filter->filter($collection);
-        $this->assertEquals(['wd2' => $wd2], $result1->toArray());
+        self::assertEquals(['wd2' => $wd2], $result1->toArray());
         $result2 = $this->filter->filter($collection);
-        $this->assertEquals(['wd2' => $wd2], $result2->toArray());
+        self::assertEquals(['wd2' => $wd2], $result2->toArray());
     }
 }

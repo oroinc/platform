@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Acl\Extension;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SecurityBundle\Metadata\FieldSecurityMetadata;
@@ -12,20 +12,17 @@ use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowAclMetadataProvider;
 use Oro\Bundle\WorkflowBundle\Acl\Extension\WorkflowLabel;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\WorkflowDefinitionRepository;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
+class WorkflowAclMetadataProviderTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /** @var WorkflowAclMetadataProvider */
-    private $workflowAclMetadataProvider;
+    private ManagerRegistry&MockObject $doctrine;
+    private FeatureChecker&MockObject $featureChecker;
+    private WorkflowAclMetadataProvider $workflowAclMetadataProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -39,9 +36,9 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function assertGetWorkflowDefinitionsConfigsCall(array $result)
+    private function assertGetWorkflowDefinitionsConfigsCall(array $result): void
     {
-        $em = $this->createMock(EntityManager::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $repo = $this->createMock(WorkflowDefinitionRepository::class);
         $this->doctrine->expects(self::once())
             ->method('getManagerForClass')
@@ -56,7 +53,7 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
             ->willReturn(new \ArrayIterator($result));
     }
 
-    public function testGetMetadata()
+    public function testGetMetadata(): void
     {
         $workflowName = 'workflow1';
         $workflowConfiguration = [
@@ -116,7 +113,7 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetMetadataForStepWithoutTransitions()
+    public function testGetMetadataForStepWithoutTransitions(): void
     {
         $workflowName = 'workflow1';
         $workflowConfiguration = [
@@ -153,7 +150,7 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetMetadataForStartTransition()
+    public function testGetMetadataForStartTransition(): void
     {
         $workflowName = 'workflow1';
         $workflowConfiguration = [
@@ -194,7 +191,7 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetMetadataForStartTransitionWithPredefinedName()
+    public function testGetMetadataForStartTransitionWithPredefinedName(): void
     {
         $workflowName = 'workflow1';
         $workflowConfiguration = [
@@ -234,7 +231,7 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetMetadataWhenTransitionDoesNotExist()
+    public function testGetMetadataWhenTransitionDoesNotExist(): void
     {
         $workflowName = 'workflow1';
         $workflowConfiguration = [
@@ -268,7 +265,7 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetMetadataWhenToStepDoesNotExist()
+    public function testGetMetadataWhenToStepDoesNotExist(): void
     {
         $workflowName = 'workflow1';
         $workflowConfiguration = [
@@ -308,7 +305,7 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetMetadataWhenTransitionDoesNotHaveStepTo()
+    public function testGetMetadataWhenTransitionDoesNotHaveStepTo(): void
     {
         $workflowName = 'workflow1';
         $workflowConfiguration = [
@@ -348,7 +345,7 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetMetadataWhenWorkflowIsDisabled()
+    public function testGetMetadataWhenWorkflowIsDisabled(): void
     {
         $workflowName = 'workflow1';
         $workflowConfiguration = [
@@ -375,7 +372,7 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetMetadataForWorkflowWithoutTransitions()
+    public function testGetMetadataForWorkflowWithoutTransitions(): void
     {
         $workflowName = 'workflow1';
         $workflowConfiguration = [];
@@ -404,7 +401,7 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testStartTransitionShouldNotDuplicateAnotherTransition()
+    public function testStartTransitionShouldNotDuplicateAnotherTransition(): void
     {
         $workflowName = 'workflow1';
         $workflowConfiguration = [
@@ -455,7 +452,7 @@ class WorkflowAclMetadataProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSortingOfTransitions()
+    public function testSortingOfTransitions(): void
     {
         $workflowName = 'workflow1';
         $workflowConfiguration = [
