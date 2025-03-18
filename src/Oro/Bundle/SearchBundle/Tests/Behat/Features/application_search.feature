@@ -9,7 +9,6 @@ Feature: Application search
 
   Scenario: Search all
     Given I login as administrator
-    And I click "Search"
     And type "Common" in "search"
     And I should see 2 search suggestions
     When I click "Search Submit"
@@ -26,8 +25,7 @@ Feature: Application search
       | Common Business Unit | Business Unit |
 
   Scenario: Search in search page
-    Given I click "Search"
-    And type "Alice" in "search"
+    Given type "Alice" in "search"
     When I click "Search Submit"
     Then I should see following search entity types:
       | Type            | N | isSelected |
@@ -42,8 +40,7 @@ Feature: Application search
     And records in current grid should be 5
 
   Scenario: Search by Business Units
-    Given I click "Search"
-    And I select "Business Unit" from search types
+    Given I select "Business Unit" from search types
     And I type "Common" in "search"
     And I should see 1 search suggestion
     When I click "Search Submit"
@@ -62,16 +59,14 @@ Feature: Application search
     Then I should be on Business Unit View page
 
   Scenario: View entity from search suggestion
-    Given I click "Search"
-    And I clear search type select
+    Given I clear search type select
     And I type "Alice2" in "search"
     And I should see 1 search suggestion
     And I follow "Alice2 Williams2"
     And I should be on User View page
 
   Scenario: No results search
-    Given I click "Search"
-    And I type "Unsearchable" in "search"
+    Given I type "Unsearchable" in "search"
     When I click "Search Submit"
     Then I should see "No results were found to match your search."
     And I should see "Try modifying your search criteria or creating a new"

@@ -3,8 +3,12 @@
 @use 'sass:color';
 
 .datagrid-settings {
+    &:not(:first-child) {
+        margin-left: $content-padding-medium;
+    }
+
     &:not(:last-child) {
-        margin-right: 4px;
+        margin-right: $content-padding-medium;
     }
 
     a.action.btn.dropdown-toggle {

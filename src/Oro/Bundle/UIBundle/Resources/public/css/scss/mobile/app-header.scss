@@ -158,15 +158,14 @@
             line-height: $app-header-height;
             height: $app-header-height;
             white-space: nowrap;
-            max-width: 100%;
+            max-width: $app-header-max-width;
 
             .organization-name {
                 color: inherit;
                 text-transform: uppercase;
                 display: inline-block;
-                max-width: $app-header-max-width;
 
-                @include text-line-truncate($app-header-max-width, true);
+                @include text-line-truncate(100%, true);
             }
 
             &.dropdown-toggle {

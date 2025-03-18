@@ -382,7 +382,7 @@
 
     {% set togglerId = 'dropdown-'|uniqid %}
     <div class="btn-group">
-        <a href="#" role="button" id="{{ togglerId }}" class="btn dropdown-toggle" data-toggle="dropdown"
+        <a href="#" role="button" id="{{ togglerId }}" class="btn dropdown-toggle {{ parameters.bCss is defined? parameters.bCss : '' }}" data-toggle="dropdown"
            aria-haspopup="true" aria-expanded="false" data-placement="{{ parameters.placement is defined ? parameters.placement : 'bottom-end' }}"
            data-inherit-parent-width="loosely"
         >
@@ -467,7 +467,7 @@
         'groupKey': 'saveButtons',
         'options': {
             'moreButtonAttrs': {
-                'class': 'btn-success'
+                'class': 'btn-primary'
             }
         }
     }|merge(parameters|default({})) %}
@@ -1012,7 +1012,7 @@
     {% import _self as UIMacro %}
 
     {% set defaultParameters = {
-        'class': 'btn-success',
+        'class': 'btn-primary',
         'label': 'Save and Close'|trans,
         'action': 'save_and_close'
     } %}
@@ -1063,7 +1063,7 @@
     {% import _self as UIMacro %}
 
     {% set defaultParameters = {
-        'class': 'btn-success',
+        'class': 'btn-primary',
         'label': 'Save and Return'|trans,
         'action': 'save_and_return'
     } %}
@@ -1096,7 +1096,7 @@
 
     {% set defaultParameters = {
         'type' : 'submit',
-        'class': 'btn-success main-group',
+        'class': 'btn-primary main-group',
         'label': 'Save'|trans,
     } %}
 

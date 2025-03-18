@@ -188,7 +188,7 @@ define(function(require) {
             });
             // Proxy events to original window
             const buttons = ['close', 'maximize', 'restore'];
-            for (const i = 0; i < buttons.length; i++) {
+            for (let i = 0; i < buttons.length; i++) {
                 const btnClass = '.ui-dialog-titlebar-' + buttons[i];
                 this.minimizedEl.find(btnClass).on('click',
                     function(btnClass) {

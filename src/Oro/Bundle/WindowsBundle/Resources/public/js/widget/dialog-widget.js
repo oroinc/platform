@@ -17,7 +17,7 @@ define(function(require, exports, module) {
     const MOBILE_WIDTH = 375;
     const config = _.extend({
         type: 'dialog',
-        limitTo: tools.isMobile() ? 'body' : '#container',
+        limitTo: tools.isMobile() ? 'body' : '#app-content',
         stateEnabled: true,
         incrementalPosition: true,
         preventModelRemoval: false,

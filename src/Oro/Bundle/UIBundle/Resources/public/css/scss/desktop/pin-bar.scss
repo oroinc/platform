@@ -7,6 +7,9 @@
     flex-grow: 1;
     flex-basis: 0;
     min-width: $pin-item-show-more-menu-width;
+    grid-area: pinbar;
+    margin-bottom: 24px;
+    position: relative;
 
     .pin-holder {
         position: relative;
@@ -24,7 +27,7 @@
         .btn-close {
             position: absolute;
             top: 50%;
-            right: 6px;
+            right: 14px;
             width: 14px;
             height: 14px;
             display: block;
@@ -55,7 +58,6 @@
         a {
             display: inline-block;
             margin: 2px 10px;
-            color: inherit;
             font-size: 12px;
             line-height: 20px;
             white-space: nowrap;
@@ -63,6 +65,11 @@
             max-width: 100%;
             overflow: hidden;
             vertical-align: middle;
+            text-decoration: underline;
+
+            &:hover {
+                text-decoration: none;
+            }
         }
 
         .dropdown-menu {
@@ -109,6 +116,7 @@
     display: none;
     position: absolute;
     top: 0;
+    right: $content-padding-medium;
     margin-left: -$pin-item-show-more-menu-width;
     height: 100%;
 
@@ -122,6 +130,10 @@
         width: 32px;
         background-image: $pin-show-more-gradient;
         pointer-events: none;
+
+        [dir='rtl'] & {
+            background-image: $pin-show-more-rtl-gradient;
+        }
     }
 
     .dropdown-toggle {
@@ -136,16 +148,6 @@
         &:hover {
             cursor: pointer;
             color: $pin-item-close-hover-color;
-        }
-    }
-
-    .dropdown-menu {
-        left: auto;
-        right: $pin-item-show-more-menu-offset;
-
-        &::before {
-            left: auto;
-            right: $pin-item-show-more-menu-arrow-end;
         }
     }
 
@@ -169,7 +171,7 @@
         }
 
         a {
-            padding: 7px 26px 7px 13px;
+            padding: 7px 34px 7px 13px;
         }
     }
 }
@@ -179,8 +181,9 @@
     flex-basis: 100%;
 
     ul {
-        margin: 0;
+        margin: 0 36px 0 0;
         padding: 0;
+        overflow: hidden;
         list-style: none;
         display: block;
         white-space: nowrap;
@@ -195,10 +198,11 @@
         text-align: left;
         line-height: inherit;
         position: relative;
-        padding: 0 22px 0 8px;
+        padding: 0 30px 0 0;
 
         &.active {
             background-color: $pin-item-active-bg-color;
+            text-decoration: underline;
         }
 
         a {

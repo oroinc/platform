@@ -10,18 +10,18 @@ $oro-datagrid-caret-descending-icon: $fa-var-long-arrow-up !default;
 
 $oro-grid-first-cell-offset: 16px !default;
 $oro-datagrid-action-cell-color: $primary-400 !default;
-$oro-datagrid-action-cell-color-hover: $primary-100 !default;
+$oro-datagrid-action-cell-color-hover: $text-primary !default;
 
 $oro-datagrid-label-offset: 10px !default;
 $oro-datagrid-label-line-height: 25px !default;
-$oro-datagrid-label-color: $primary-inverse !default;
-$oro-datagrid-label-active-color: $extra-100 !default;
+$oro-datagrid-label-color: $text-primary !default;
+$oro-datagrid-label-active-color: $primary-main !default;
 
-$oro-datagrid-cell-border-color: $primary-800 !default;
+$oro-datagrid-cell-border-color: $neutral-grey-3 !default;
 $oro-datagrid-cell-background-hover: $primary-900 !default;
 
-$oro-datagrid-header-background: $primary-200 !default;
-$oro-datagrid-header-cell-highlight: $extra-dark !default;
+$oro-datagrid-header-background: $neutral-grey-2 !default;
+$oro-datagrid-header-cell-highlight: $neutral-grey-3 !default;
 $oro-datagrid-header-cell-inner-offset: 11px 8px !default;
 $oro-datagrid-header-cell-radius: 2px !default;
 
@@ -50,8 +50,8 @@ $oro-datagrid-body-cell-line-height: 1.6 !default;
 
 $oro-datagrid-footer-cell-font-weight: font-weight('bold') !default;
 $oro-datagrid-footer-cell-numeric-font-size: $base-font-size !default;
-$oro-datagrid-footer-cell-background-color: $primary-800 !default;
-$oro-datagrid-footer-cell-color: $primary-200 !default;
+$oro-datagrid-footer-cell-background-color: $neutral-grey-2 !default;
+$oro-datagrid-footer-cell-color: $text-secondary !default;
 $oro-datagrid-footer-cell-inner-offset: 0 8px !default;
 $oro-datagrid-footer-cell-outer-inner-offset: 8px !default;
 
@@ -59,12 +59,13 @@ $oro-datagrid-row-selected: $extra-300 !default;
 $oro-datagrid-row-disabled-opacity: .4 !default;
 
 $oro-datagrid-action-inner-offset: 8px 18px 7px 8px !default;
-$oro-datagrid-action-color: $primary-830 !default;
-$oro-datagrid-action-active-bg-color: $primary-500 !default;
+$oro-datagrid-action-color: $text-primary !default;
+$oro-datagrid-action-active-bg-color: $secondary-secondary-4 !default;
+$oro-datagrid-action-active-color: $primary-inverse !default;
 $oro-datagrid-action-size: 32px !default;
 $oro-datagrid-action-min-size: 16px !default;
 $oro-datagrid-action-font-size: 16px !default;
-$oro-datagrid-action-column-radius: 50% !default;
+$oro-datagrid-action-column-radius: $border-radius !default;
 $oro-datagrid-action-cell-offset: 0 18px 0 8px !default;
 
 $oro-datagrid-font-size: 14px !default;
@@ -76,7 +77,7 @@ $oro-datagrid-all-header-cell-toggle-offset: 8px !default;
 $oro-datagrid-all-header-cell-icon-offset: 6px !default;
 $oro-datagrid-all-header-cell-icon: $fa-var-caret-down !default;
 
-$oro-datagrid-sticky-shadow: 0 6px 6px -4px rgba(0, 0, 0, .5) !default;
+$oro-datagrid-sticky-shadow: 0 6px 6px -4px rgba(0, 0, 0, .2) !default;
 $oro-datagrid-highlight-bg: $extra-300 !default;
 
 // board view

@@ -13,11 +13,11 @@
 }
 
 .container-fluid.page-title {
-    padding-right: 0;
+    padding-right: $content-padding;
     padding-left: $content-padding;
 
     .navbar-extra {
-        margin-bottom: 10px;
+        margin-bottom: $content-padding-small;
     }
 
     .navbar-extra > .row {
@@ -104,5 +104,11 @@
                 order: 2;
             }
         }
+    }
+}
+
+.dashboard-container-wrapper {
+    .container-fluid.page-title {
+        padding-inline: 0;
     }
 }

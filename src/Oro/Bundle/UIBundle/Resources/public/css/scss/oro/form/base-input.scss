@@ -6,7 +6,7 @@
     color: $input-disabled-color;
     resize: $input-disabled-resize;
     // override for user agent's styles for disabled elements
-    opacity: 1;
+    opacity: .5;
 }
 
 %base-input {

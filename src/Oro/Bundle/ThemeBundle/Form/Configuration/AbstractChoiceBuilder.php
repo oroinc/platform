@@ -21,7 +21,7 @@ abstract class AbstractChoiceBuilder extends AbstractConfigurationChildBuilder
         $options = [
             'choice_attr' => function ($choice, string $key, mixed $value) use ($option) {
                 $choiceAttr = [];
-                if (array_key_exists('previews', $option) && !empty($option['previews'])) {
+                if (\array_key_exists('previews', $option) && !empty($option['previews'])) {
                     $preview = $this->getOptionPreview($option, $value);
                     if ($preview) {
                         $choiceAttr['data-preview'] = $preview;
@@ -32,10 +32,10 @@ abstract class AbstractChoiceBuilder extends AbstractConfigurationChildBuilder
             }
         ];
 
-        if (array_key_exists('values', $option) && !empty($option['values'])) {
-            $options['choices'] = array_flip($option['values']);
+        if (\array_key_exists('values', $option) && !empty($option['values'])) {
+            $options['choices'] = \array_flip($option['values']);
         }
 
-        return array_merge(parent::getConfiguredOptions($option), $options);
+        return \array_merge(parent::getConfiguredOptions($option), $options);
     }
 }

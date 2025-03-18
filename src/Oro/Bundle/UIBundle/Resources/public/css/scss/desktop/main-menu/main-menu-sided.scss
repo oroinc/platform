@@ -6,9 +6,15 @@
     float: left;
     width: $menu-side-width;
     height: 100%;
-    padding-bottom: 45px;
+    padding-block: 10px 80px;
+    border-radius: 10px 10px 0 0;
 
     background-color: $menu-background-color;
+    box-shadow: $menu-box-shadow;
+
+    &:has(.side-menu-overlay.open) {
+        border-start-end-radius: 0;
+    }
 
     .accordion {
         margin: 0;
@@ -78,7 +84,7 @@
                 padding: 8px 15px;
 
                 &:hover {
-                    background-color: $menu-background-color-active;
+                    background-color: $menu-background-color-hover;
                 }
 
                 $menu-title-offset: 0;
@@ -119,17 +125,19 @@
     // First level
     .accordion-toggle.title-level-1 {
         position: relative;
-        padding: 12px 22px 12px 24px;
+        padding: 16px 24px;
 
         background-color: $menu-dropdown-background-color-active;
         color: $menu-item-first-level-text-color;
 
         .menu-icon {
-            min-width: 16px;
-            margin-right: 8px;
-            margin-left: 0;
-
+            font-size: 24px;
+            color: $primary-accent;
+            width: 24px;
+            height: 24px;
             text-align: center;
+            margin-inline-end: 12px;
+            vertical-align: middle;
         }
 
         &.collapsed {
@@ -166,6 +174,7 @@
 
             font-size: 11px;
             line-height: 1.2;
+            font-weight: font-weight('medium');
 
             color: $menu-item-first-level-text-color;
 
@@ -176,6 +185,7 @@
                 width: 100%;
                 margin: 0 0 5px;
                 font-size: 24px;
+                color: $menu-item-first-level-icon-color;
             }
         }
 
@@ -202,8 +212,39 @@
 
                 .title-level-1 {
                     color: $menu-minimized-item-first-level-text-color-active;
+                    font-weight: font-weight('semi-bold');
                 }
             }
         }
+    }
+}
+
+.app-page {
+    &:before {
+        content: '';
+        position: absolute;
+        inset: 0;
+
+        background-color: $side-menu-overlay-ui-fill-background-color;
+
+        z-index: $zindex-dropdown - 3;
+
+        visibility: hidden;
+        pointer-events: none;
+
+        opacity: 0;
+
+        transition: $menu-animation;
+    }
+
+    &:has(.side-menu-overlay.open) {
+        &:before {
+            visibility: visible;
+            opacity: 1;
+        }
+    }
+
+    &__content-side {
+        z-index: $zindex-dropdown - 2;
     }
 }

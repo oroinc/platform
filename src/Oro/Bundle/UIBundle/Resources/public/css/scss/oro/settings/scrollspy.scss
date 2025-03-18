@@ -3,9 +3,9 @@
 $scrollspy-position: relative !default;
 $scrollspy-overflow: auto !default;
 
-$scrollspy-nav-background: $primary-860 !default;
+$scrollspy-nav-background: $neutral-grey-1 !default;
 $scrollspy-nav-offset: null !default;
-$scrollspy-nav-border-radius: 16px !default;
+$scrollspy-nav-border-radius: 10px !default;
 $scrollspy-nav-position: relative !default;
 $scrollspy-nav-z-index: 2 !default;
 
@@ -15,22 +15,28 @@ $scrollspy-nav-gradient-height: 16px !default;
 $scrollspy-nav-target-height: 20px !default;
 
 $scrollspy-nav-navbar-inner-nav-link-inner-offset: 6px 16px !default;
-$scrollspy-nav-navbar-inner-nav-link-color: $primary-100 !default;
-$scrollspy-nav-navbar-inner-nav-link-border-radius: 16px !default;
-$scrollspy-nav-navbar-inner-nav-link-background-color: $primary-860 !default;
-$scrollspy-nav-navbar-inner-nav-link-active-background-color: $primary-800 !default;
-$scrollspy-nav-navbar-inner-nav-link-active-font-weight: font-weight('bold') !default;
+$scrollspy-nav-navbar-inner-nav-link-color: $text-secondary !default;
+$scrollspy-nav-navbar-inner-nav-link-border-radius: $scrollspy-nav-border-radius - $content-padding-xs !default;
+$scrollspy-nav-navbar-inner-nav-link-background-color: null !default;
+$scrollspy-nav-navbar-inner-nav-link-font-weight: font-weight('medium') !default;
+$scrollspy-nav-navbar-inner-nav-link-active-background-color: $neutral-white !default;
+$scrollspy-nav-navbar-inner-nav-link-active-color: $text-primary !default;
+$scrollspy-nav-navbar-inner-nav-link-active-box-shadow:
+    0 1px 2px -1px rgba(10, 13, 18, .1),
+    0 1px 3px 0 rgba(10, 13, 18, .1) !default;
+$scrollspy-nav-navbar-inner-nav-link-active-font-weight: font-weight('semi-bold') !default;
 
-$scrollspy-title-background: $primary-860 !default;
+$scrollspy-title-background: $neutral-grey-1 !default;
+$scrollspy-title-border: 1px solid $neutral-grey-3 !default;
 $scrollspy-title-font-size: $base-font-size !default;
-$scrollspy-title-font-weight: font-weight('bold') !default;
-$scrollspy-title-color: $primary-100 !default;
+$scrollspy-title-font-weight: font-weight('semi-bold') !default;
+$scrollspy-title-color: $text-primary !default;
 $scrollspy-title-offset: 0 !default;
-$scrollspy-title-inner-offset: 8px 16px !default;
+$scrollspy-title-inner-offset: 12px 16px !default;
 $scrollspy-title-border-radius: 4px !default;
 
 $scrollspy-data-scroll-focus-outline: 0 none !default;
 
 $scrollspy-datagrid-sticky-shadow:
-    0 6px 6px -4px rgba(0, 0, 0, .5),
+    0 6px 6px -4px rgba(0, 0, 0, .2),
     0 -8px #fff !default;

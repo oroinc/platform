@@ -162,7 +162,9 @@ oro_form:
                         - sizes
                 sub: ~
                 sup: ~
-                time: ~
+                time:
+                    attributes:
+                        - datetime
                 tfoot: ~
                 var: ~
                 video:

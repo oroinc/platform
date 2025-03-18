@@ -75,7 +75,9 @@
     // Includes Shortcuts and Search
     &__search-and-shortcuts {
         .dropdown {
-            float: left;
+            display: inline-flex;
+            align-items: center;
+            height: 100%;
 
             .nav-header {
                 font-weight: $header-dropdown-menu-header-font-weight;
@@ -105,6 +107,10 @@
                         display: flex;
                         flex-wrap: nowrap;
                         align-items: stretch;
+
+                        select[name='from'] {
+                            display: none;
+                        }
 
                         .search-field-container {
                             position: relative;
@@ -143,6 +149,10 @@
                             overflow-y: auto;
                             overflow-x: hidden;
                             box-shadow: $header-search-suggestion-list-shadow;
+
+                            &:has(.loading:only-child:not(.loading--show)) {
+                                box-shadow: none;
+                            }
 
                             li {
                                 border-top:
@@ -281,6 +291,10 @@
 
         .select2-container {
             box-sizing: border-box;
+
+            &.select2-container-active {
+                box-shadow: none;
+            }
         }
     } /* Ends .top-search */
 }

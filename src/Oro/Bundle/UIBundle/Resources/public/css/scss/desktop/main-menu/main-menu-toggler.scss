@@ -2,14 +2,14 @@
 
 .main-menu-toggler {
     position: absolute;
-    bottom: 0;
-    right: 0;
+    inset: auto 24px 24px auto;
 
-    width: 48px;
-    padding-top: 14px;
-    padding-bottom: 14px;
+    width: 32px;
+    height: 32px;
 
-    background-color: transparent;
+    background-color: $primary-main-light;
+
+    border-radius: 4px;
 
     @extend %main-menu-trigger;
 
@@ -20,14 +20,12 @@
 
     &:hover,
     &:focus {
-        background-color: $menu-dropdown-background-color-active;
+        background-color: $primary-main-light;
     }
 }
 
 .minimized {
     .main-menu-toggler {
-        width: 100%;
-
         &::before {
             transform: rotate($menu-icon-toggler-transform-active);
         }

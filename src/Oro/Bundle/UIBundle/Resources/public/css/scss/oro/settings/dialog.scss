@@ -1,6 +1,6 @@
 /* @theme: admin.oro; */
 
-$dialog-border-radius: 4px !default;
+$dialog-border-radius: 10px !default;
 $dialog-box-shadow: 1px 1px 9px 3px rgba(0 0 0 / 8%) !default;
 $dialog-background: none !default;
 $dialog-z-index: $zindex-fixed !default;
@@ -47,7 +47,7 @@ $dialog-minimized-box-shadow: none !default;
 $dialog-minimized-titlebar-inner-offset: 3px 11px 3px 12px !default;
 $dialog-minimized-titlebar-outer-bottom-offset: 0 !default;
 
-$dialog-title-font-weight: font-weight('bold') !default;
+$dialog-title-font-weight: font-weight('semi-bold') !default;
 $dialog-title-display: block !default;
 $dialog-title-white-space: nowrap !default;
 $dialog-title-overflow: hidden !default;
@@ -117,7 +117,7 @@ $dialog-resizable-se-presudo-db-top: 10px !default;
 
 $dialog-widget-actions-outer-offset: 0 !default;
 $dialog-widget-actions-inner-offset: 14px 24px !default;
-$dialog-widget-actions-border: none !default;
+$dialog-widget-actions-border: 1px solid $neutral-grey-4 !default;
 
 $dialog-bottom-action-overflow: hidden !default;
 
@@ -132,7 +132,7 @@ $dialog-buttons-inner-cursor: pointer !default;
 $dialog-buttons-inner-border: 0 !default;
 
 $ui-widget-overlay-z-index: 150 !default;
-$ui-widget-overlay-background-color: rgba(255 255 255 / 50%) !default;
+$ui-widget-overlay-background-color: rgba(178, 183, 188, .3) !default;
 
 $dialog-sticky-offset: 8px !default;
 $dialog-datagrid-sticky-shadow:

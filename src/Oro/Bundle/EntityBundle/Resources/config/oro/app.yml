@@ -16,6 +16,7 @@ doctrine:
                 timestamp:      Oro\ORM\Query\AST\Functions\SimpleFunction
                 convert_tz:     Oro\ORM\Query\AST\Functions\DateTime\ConvertTz
                 isoyear:        Oro\Bundle\EntityBundle\ORM\Query\AST\Functions\IsoYear
+                date_trunc:     Oro\Bundle\EntityBundle\DoctrineExtensions\ORM\DateTrunc
             numeric_functions:
                 timestampdiff:  Oro\ORM\Query\AST\Functions\Numeric\TimestampDiff
                 dayofyear:      Oro\ORM\Query\AST\Functions\SimpleFunction

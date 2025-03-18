@@ -18,7 +18,7 @@
 
 .tox .tox-edit-area::before {
     // stylelint-disable-next-line declaration-no-important
-    border-color: $input-invalid-focus-border-color !important;
+    border-color: $input-focus-border-color !important;
     // stylelint-disable-next-line declaration-no-important
     border-radius: $input-field-border-radius !important;
 }

@@ -12,24 +12,30 @@
 .app-header {
     font-size: $app-header-font-size;
     color: $app-header-text-color;
-    background-color: $app-header-bg-color;
     position: relative;
     z-index: $desktop-app-header-z-index;
+    grid-area: header;
 
     &__inner {
-        padding: 0 $app-header-h-padding;
+        background-color: $neutral-white;
+        border-radius: 10px;
+        box-shadow: $app-header-container-panelbox-shadow;
     }
 
     &__container {
-        display: flex;
+        background-color: transparent;
+        display: grid;
         position: relative;
-        line-height: $app-header-height;
-        height: $app-header-height;
+        gap: 24px 0;
     }
 
-    &.thick .app-header__container {
-        line-height: $app-header-thick-height;
-        height: $app-header-thick-height;
+    &__container-panel {
+        padding: 24px;
+        display: grid;
+        grid-template-areas: 'start center end';
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        gap: 0 16px;
+        align-items: center;
     }
 
     &.thick {
@@ -49,7 +55,10 @@
     }
 
     .organization-logo-wrapper {
-        overflow: hidden;
+        display: flex;
+        align-items: center;
+        grid-area: start;
+        height: 100%;
     }
 
     .app-logo {
@@ -63,26 +72,29 @@
         margin-left: 0;
         margin-right: $app-header-logo-wrapper-margin-end;
         flex-wrap: nowrap;
+        align-items: center;
         // necessary for showing menu outside of overflow hidden block
-        position: static;
+        position: relative;
         height: 100%;
+        max-width: 100%;
     }
 
     .logo {
         color: $app-header-logo-text-color;
-        font-weight: font-weight('bold');
+        font-weight: font-weight('medium');
         font-size: $app-header-logo-font-size;
         line-height: inherit;
         margin: 0;
-        display: inline-block;
-
-        @include text-line-truncate($app-header-max-width, true);
+        display: inline-flex;
+        align-items: center;
+        max-width: $app-header-max-width;
 
         a {
             color: inherit;
             text-transform: uppercase;
             display: inline-block;
-            max-width: $app-header-max-width;
+
+            @include text-line-truncate(100%, true);
 
             [class^='fa-'] {
                 font-size: $app-header-logo-link-font-size;
@@ -90,18 +102,61 @@
         }
     }
 
+    .dropdown-organization-switcher {
+        max-width: $app-header-max-width;
+
+        .dropdown-item-text,
+        .dropdown-item {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
     &__search-and-shortcuts {
         padding: $app-header-search-and-shortcuts-container-padding;
         margin: 0;
         flex-shrink: 0;
+        height: 100%;
         order: 0;
+        grid-area: center;
 
-        > .dropdown {
-            margin: $app-header-search-and-shortcuts-margin;
+        .header-dropdown-shortcut {
+            &::before {
+                content: '';
+                display: inline-block;
+                border-left: $app-header-divider-width solid $app-header-divider-color;
+                height: 24px;
+                margin-right: 8px;
+            }
         }
 
-        .header-dropdown-search .dropdown-menu {
-            padding: $desktop-app-header-search-dropdown-menu-padding;
+        .header-dropdown-search {
+            padding: 5px 6px;
+            border-radius: 36px;
+            border: 1px solid $neutral-grey-4;
+
+            &:focus-within,
+            &:has(.select2-dropdown-open) {
+                border-color: $secondary-focus;
+                box-shadow: inset 0 0 0 1px $secondary-focus;
+            }
+
+            .dropdown-toggle {
+                display: none;
+            }
+
+            .dropdown-menu {
+                background: transparent;
+                min-width: 332px;
+                display: block;
+                padding: 0;
+                position: static;
+                box-shadow: none;
+            }
+
+            .btn-search {
+                border-radius: 24px;
+            }
         }
 
         .dropdown-toggle {
@@ -145,7 +200,10 @@
         .select2-container {
             width: auto;
             max-width: $app-header-search-select-max-width;
-            height: $field-size;
+            height: auto;
+            border: none;
+            box-shadow: none;
+            align-self: center;
         }
 
         .select2-container-active {
@@ -156,6 +214,11 @@
         .search-field-container {
             min-width: $app-header-search-input-min-width;
             margin-left: -$input-border-width;
+
+            input.search {
+                border: none;
+                box-shadow: none;
+            }
         }
 
         .search-suggestion-list {
@@ -179,12 +242,14 @@
 
     .user-menu {
         display: flex;
+        align-items: center;
+        justify-content: end;
         order: 1;
         flex-shrink: 0;
         float: none;
         background-color: inherit;
-        margin-left: $desktop-app-header-user-menu-margin-start;
         height: 100%;
+        grid-area: end;
 
         .avatar {
             display: none;
@@ -192,11 +257,10 @@
 
         > li {
             line-height: inherit;
+            display: inline-flex;
+            align-items: center;
+            height: 100%;
             margin: $desktop-app-header-user-menu-item-margin;
-
-            &:last-of-type {
-                margin-right: $desktop-app-header-user-menu-last-item-margin-end;
-            }
 
             > .dropdown-toggle,
             > .help {
@@ -242,11 +306,12 @@
             content: '';
             display: inline-block;
             border-left: $app-header-divider-width solid $app-header-divider-color;
-            height: $app-header-font-size;
+            height: 24px;
         }
 
         > .dropdown-toggle {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
             margin-left: $desktop-app-header-user-menu-margin-start;
         }
 
@@ -259,6 +324,15 @@
             &::before {
                 margin-right: -1px;
             }
+        }
+    }
+}
+
+@media only screen and (max-width: 1300px) {
+    .app-header {
+        .logo,
+        .dropdown-organization-switcher {
+            max-width: 120px;
         }
     }
 }

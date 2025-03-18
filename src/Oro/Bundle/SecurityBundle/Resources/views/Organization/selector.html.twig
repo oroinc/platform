@@ -23,7 +23,7 @@
             {{ UI.app_logo(organization_name) }}
             {{ organizationSelector.organization_name_and_logo(organization_name) }}
             {% set togglerId = 'dropdown-'|uniqid %}
-            <span id="{{ togglerId }}" class="dropdown-toggle btn-organization-switcher" data-toggle="dropdown"
+            <span id="{{ togglerId }}" class="dropdown-toggle btn-organization-switcher" data-toggle="dropdown" data-inherit-parent-width="strictly"
                   role="button" aria-label="{{ 'oro.security.organization.switch'|trans }}" aria-haspopup="true" aria-expanded="false"></span>
             <ul class="dropdown-menu dropdown-organization-switcher" role="menu" aria-labelledby="{{ togglerId }}">
                 {% for organization in organizations %}

@@ -12,9 +12,13 @@ define(function(require) {
      * @exports orochart/app/components/base-chart-component
      */
     const BaseChartComponent = BaseComponent.extend({
+        chartContainerClass: '',
+
         template: _.template(chartTemplate),
 
         NARROW_SCREEN_WIDTH: 520,
+
+        CHART_HEIGHT: 350,
 
         narrowScreen: false,
 
@@ -72,7 +76,7 @@ define(function(require) {
         },
 
         renderBaseLayout: function() {
-            this.$el.html(this.template());
+            this.$el.html(this.template({chartContainerClass: this.chartContainerClass}));
             this.$chart = this.$el.find('.chart-content');
             this.$legend = this.$el.find('.chart-legend');
             this.$container = this.$el.find('.chart-container');
@@ -97,6 +101,13 @@ define(function(require) {
         },
 
         /**
+         * @returns {number}
+         */
+        getChartHeight() {
+            return this.CHART_HEIGHT;
+        },
+
+        /**
          * Set size of chart
          *
          * @returns {boolean}
@@ -104,7 +115,7 @@ define(function(require) {
         setChartSize: function() {
             const $chart = this.$chart;
             const chartWidth = this.calcChartWidth();
-            const chartHeight = Math.min(Math.round(chartWidth * this.aspectRatio), 350);
+            const chartHeight = Math.min(Math.round(chartWidth * this.aspectRatio), this.getChartHeight());
 
             if (chartWidth > 0 && chartWidth !== $chart.width() || chartHeight !== parseInt($chart.css('height'))) {
                 $chart.width(chartWidth);

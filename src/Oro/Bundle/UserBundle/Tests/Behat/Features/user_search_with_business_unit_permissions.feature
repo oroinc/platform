@@ -9,7 +9,6 @@ Feature: User search with business unit permissions
 
   Scenario: Search admin user with admin user
     Given I login as administrator
-    And I click "Search"
     Then type "admin" in "search"
     When I click "Search Submit"
     Then I should be on Search Result page
@@ -33,7 +32,6 @@ Feature: User search with business unit permissions
   Scenario: Search admin user with role permissions 'View:Business Unit'
     and with business that equals to owner of searching entity
     Given I login as "charlie" user
-    And I click "Search"
     And type "admin" in "search"
     When I click "Search Submit"
     Then I should be on Search Result page
@@ -46,7 +44,6 @@ Feature: User search with business unit permissions
 
   Scenario: Search admin user with role permissions 'View:Business Unit' for User entity and without business unit
     Given I login as "test" user
-    And I click "Search"
     And type "admin" in "search"
     When I click "Search Submit"
     Then I should be on Search Result page

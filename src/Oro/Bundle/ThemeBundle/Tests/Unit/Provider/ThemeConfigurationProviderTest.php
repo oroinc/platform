@@ -2,68 +2,46 @@
 
 namespace Oro\Bundle\ThemeBundle\Tests\Unit\Provider;
 
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfiguration as LayoutThemeConfiguration;
 use Oro\Bundle\ThemeBundle\DependencyInjection\Configuration;
+use Oro\Bundle\ThemeBundle\Entity\Repository\ThemeConfigurationRepository;
 use Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration;
 use Oro\Bundle\ThemeBundle\Provider\ThemeConfigurationProvider;
+use Oro\Component\Layout\Extension\Theme\Model\ThemeDefinitionBagInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 final class ThemeConfigurationProviderTest extends TestCase
 {
-    private ConfigManager|MockObject $configManager;
-    private EntityManagerInterface|MockObject $em;
+    private ConfigManager&MockObject $configManager;
+    private ThemeDefinitionBagInterface&MockObject $configurationProvider;
+    private ThemeConfigurationRepository&MockObject $repository;
+
     private ThemeConfigurationProvider $provider;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->configManager = $this->createMock(ConfigManager::class);
-        $this->em = $this->createMock(EntityManagerInterface::class);
+        $this->configurationProvider = $this->createMock(ThemeDefinitionBagInterface::class);
+        $this->repository = $this->createMock(ThemeConfigurationRepository::class);
 
         $doctrine = $this->createMock(ManagerRegistry::class);
         $doctrine->expects(self::any())
-            ->method('getManagerForClass')
+            ->method('getRepository')
             ->with(ThemeConfiguration::class)
-            ->willReturn($this->em);
+            ->willReturn($this->repository);
 
-        $this->provider = new ThemeConfigurationProvider($this->configManager, $doctrine);
-    }
-
-    private function expectsLoadValue(int $themeConfigurationId, string $fieldName, array $rows): void
-    {
-        $qb = $this->createMock(QueryBuilder::class);
-        $query = $this->createMock(AbstractQuery::class);
-        $this->em->expects(self::once())
-            ->method('createQueryBuilder')
-            ->willReturn($qb);
-        $qb->expects(self::once())
-            ->method('from')
-            ->with(ThemeConfiguration::class, 'e')
-            ->willReturnSelf();
-        $qb->expects(self::once())
-            ->method('select')
-            ->with('e.' . $fieldName)
-            ->willReturnSelf();
-        $qb->expects(self::once())
-            ->method('where')
-            ->with('e.id = :id')
-            ->willReturnSelf();
-        $qb->expects(self::once())
-            ->method('setParameter')
-            ->with('id', $themeConfigurationId, Types::INTEGER)
-            ->willReturnSelf();
-        $qb->expects(self::once())
-            ->method('getQuery')
-            ->willReturn($query);
-        $query->expects(self::once())
-            ->method('getArrayResult')
-            ->willReturn($rows);
+        $this->provider = new ThemeConfigurationProvider(
+            $this->configManager,
+            $doctrine,
+            $this->configurationProvider
+        );
     }
 
     public function testGetThemeConfigurationOptionsWhenThemeConfigurationNotSet(): void
@@ -73,8 +51,8 @@ final class ThemeConfigurationProviderTest extends TestCase
             ->with(Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION))
             ->willReturn(null);
 
-        $this->em->expects(self::never())
-            ->method('createQueryBuilder');
+        $this->repository->expects(self::never())
+            ->method('getFieldValue');
 
         self::assertSame([], $this->provider->getThemeConfigurationOptions());
     }
@@ -83,12 +61,18 @@ final class ThemeConfigurationProviderTest extends TestCase
     {
         $themeConfigurationId = 1;
 
-        $this->configManager->expects(self::once())
+        $this->configManager->expects(self::exactly(2))
             ->method('get')
             ->with(Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION))
             ->willReturn($themeConfigurationId);
 
-        $this->expectsLoadValue($themeConfigurationId, 'configuration', []);
+        $this->repository->expects(self::exactly(2))
+            ->method('getFieldValue')
+            ->withConsecutive(
+                [$themeConfigurationId, 'configuration'],
+                [$themeConfigurationId, 'theme']
+            )
+            ->willReturnOnConsecutiveCalls([], null);
 
         self::assertSame([], $this->provider->getThemeConfigurationOptions());
     }
@@ -100,7 +84,7 @@ final class ThemeConfigurationProviderTest extends TestCase
     {
         $themeConfigurationId = 1;
 
-        $this->configManager->expects(self::exactly(2))
+        $this->configManager->expects(self::exactly(3))
             ->method('get')
             ->with(
                 Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION),
@@ -110,7 +94,13 @@ final class ThemeConfigurationProviderTest extends TestCase
             )
             ->willReturn($themeConfigurationId);
 
-        $this->expectsLoadValue($themeConfigurationId, 'configuration', [['configuration' => $expectedOptions]]);
+        $this->repository->expects(self::exactly(2))
+            ->method('getFieldValue')
+            ->withConsecutive(
+                [$themeConfigurationId, 'configuration'],
+                [$themeConfigurationId, 'theme']
+            )
+            ->willReturn($expectedOptions, 'test_theme');
 
         self::assertEquals(
             $expectedOptions,
@@ -138,6 +128,50 @@ final class ThemeConfigurationProviderTest extends TestCase
         ];
     }
 
+    public function testGetThemeConfigurationOptionsWithDefaultOptions(): void
+    {
+        $themeConfigurationId = 1;
+        $expectedOptions = [
+            'test_option' => 'test_value',
+            LayoutThemeConfiguration::buildOptionKey('header', 'show_title') => true,
+            LayoutThemeConfiguration::buildOptionKey('header', 'language') => 'en',
+            LayoutThemeConfiguration::buildOptionKey('main', 'show_datagrid') => false,
+        ];
+
+        $this->configManager->expects(self::exactly(3))
+            ->method('get')
+            ->with(
+                Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION),
+                false,
+                false,
+                null
+            )
+            ->willReturn($themeConfigurationId);
+
+        $this->repository->expects(self::exactly(2))
+            ->method('getFieldValue')
+            ->withConsecutive(
+                [$themeConfigurationId, 'configuration'],
+                [$themeConfigurationId, 'theme']
+            )
+            ->willReturn(['test_option' => 'test_value'], 'test_theme');
+
+        $this->configurationProvider->expects(self::once())
+            ->method('getThemeDefinition')
+            ->with('test_theme')
+            ->willReturn($this->getThemeDefinition());
+
+        self::assertEquals(
+            $expectedOptions,
+            $this->provider->getThemeConfigurationOptions()
+        );
+        // test memory cache
+        self::assertEquals(
+            $expectedOptions,
+            $this->provider->getThemeConfigurationOptions()
+        );
+    }
+
     public function testGetThemeConfigurationOptionWhenThemeConfigurationNotSet(): void
     {
         $this->configManager->expects(self::once())
@@ -145,8 +179,8 @@ final class ThemeConfigurationProviderTest extends TestCase
             ->with(Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION))
             ->willReturn(null);
 
-        $this->em->expects(self::never())
-            ->method('createQueryBuilder');
+        $this->repository->expects(self::never())
+            ->method('getFieldValue');
 
         self::assertNull($this->provider->getThemeConfigurationOption('some_option'));
     }
@@ -155,12 +189,18 @@ final class ThemeConfigurationProviderTest extends TestCase
     {
         $themeConfigurationId = 1;
 
-        $this->configManager->expects(self::once())
+        $this->configManager->expects(self::exactly(2))
             ->method('get')
             ->with(Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION))
             ->willReturn($themeConfigurationId);
 
-        $this->expectsLoadValue($themeConfigurationId, 'configuration', []);
+        $this->repository->expects(self::exactly(2))
+            ->method('getFieldValue')
+            ->withConsecutive(
+                [$themeConfigurationId, 'configuration'],
+                [$themeConfigurationId, 'theme']
+            )
+            ->willReturn([], 'test_theme');
 
         self::assertNull($this->provider->getThemeConfigurationOption('some_option'));
     }
@@ -169,12 +209,18 @@ final class ThemeConfigurationProviderTest extends TestCase
     {
         $themeConfigurationId = 1;
 
-        $this->configManager->expects(self::once())
+        $this->configManager->expects(self::exactly(2))
             ->method('get')
             ->with(Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION))
             ->willReturn($themeConfigurationId);
 
-        $this->expectsLoadValue($themeConfigurationId, 'configuration', [['configuration' => []]]);
+        $this->repository->expects(self::exactly(2))
+            ->method('getFieldValue')
+            ->withConsecutive(
+                [$themeConfigurationId, 'configuration'],
+                [$themeConfigurationId, 'theme']
+            )
+            ->willReturn([], 'test_theme');
 
         self::assertNull($this->provider->getThemeConfigurationOption('some_option'));
     }
@@ -198,7 +244,7 @@ final class ThemeConfigurationProviderTest extends TestCase
             'object' => new \stdClass(),
         ];
 
-        $this->configManager->expects(self::exactly(2))
+        $this->configManager->expects(self::exactly(3))
             ->method('get')
             ->with(
                 Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION),
@@ -208,7 +254,13 @@ final class ThemeConfigurationProviderTest extends TestCase
             )
             ->willReturn($themeConfigurationId);
 
-        $this->expectsLoadValue($themeConfigurationId, 'configuration', [['configuration' => $options]]);
+        $this->repository->expects(self::exactly(2))
+            ->method('getFieldValue')
+            ->withConsecutive(
+                [$themeConfigurationId, 'configuration'],
+                [$themeConfigurationId, 'theme']
+            )
+            ->willReturn($options, 'test_theme');
 
         self::assertEquals(
             $expectedOptionValue,
@@ -259,7 +311,7 @@ final class ThemeConfigurationProviderTest extends TestCase
             'string' => 'some_option_value',
         ];
 
-        $this->configManager->expects(self::exactly(2))
+        $this->configManager->expects(self::exactly(3))
             ->method('get')
             ->with(
                 Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION),
@@ -269,7 +321,13 @@ final class ThemeConfigurationProviderTest extends TestCase
             )
             ->willReturn($themeConfigurationId);
 
-        $this->expectsLoadValue($themeConfigurationId, 'configuration', [['configuration' => $options]]);
+        $this->repository->expects(self::exactly(2))
+            ->method('getFieldValue')
+            ->withConsecutive(
+                [$themeConfigurationId, 'configuration'],
+                [$themeConfigurationId, 'theme']
+            )
+            ->willReturn($options, 'test_theme');
 
         self::assertEquals(
             $expectedResult,
@@ -306,8 +364,8 @@ final class ThemeConfigurationProviderTest extends TestCase
             ->with(Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION))
             ->willReturn(null);
 
-        $this->em->expects(self::never())
-            ->method('createQueryBuilder');
+        $this->repository->expects(self::never())
+            ->method('getFieldValue');
 
         self::assertNull($this->provider->getThemeName());
     }
@@ -329,7 +387,10 @@ final class ThemeConfigurationProviderTest extends TestCase
             )
             ->willReturn($themeConfigurationId);
 
-        $this->expectsLoadValue($themeConfigurationId, 'theme', [['theme' => $expectedName]]);
+        $this->repository->expects(self::once())
+            ->method('getFieldValue')
+            ->with($themeConfigurationId, 'theme')
+            ->willReturn($expectedName);
 
         self::assertEquals(
             $expectedName,
@@ -354,6 +415,89 @@ final class ThemeConfigurationProviderTest extends TestCase
             // scope identifier as id
             [$idScopeIdentifier, null],
             [$idScopeIdentifier, 'test_name'],
+        ];
+    }
+
+    public function testGetThemeConfigurationOptionsNamesByTypeNoTheme(): void
+    {
+        $this->configManager->expects(self::once())
+            ->method('get')
+            ->with(
+                Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION),
+                false,
+                false,
+                null
+            )
+            ->willReturn(null);
+
+        self::assertEquals([], $this->provider->getThemeConfigurationOptionsNamesByType('checkbox'));
+    }
+
+    public function testGetThemeConfigurationOptionsNamesByType(): void
+    {
+        $themeConfigurationId = 1;
+
+        $this->configManager->expects(self::once())
+            ->method('get')
+            ->with(
+                Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION),
+                false,
+                false,
+                null
+            )
+            ->willReturn($themeConfigurationId);
+
+        $this->repository->expects(self::once())
+            ->method('getFieldValue')
+            ->with($themeConfigurationId, 'theme')
+            ->willReturn('test_name');
+
+        $config = ['configuration' => ['sections' => ['header' => ['options' => ['menu' => ['type' => 'checkbox']]]]]];
+        $this->configurationProvider->expects(self::once())
+            ->method('getThemeDefinition')
+            ->with('test_name')
+            ->willReturn($config);
+
+        self::assertEquals(
+            [LayoutThemeConfiguration::buildOptionKey('header', 'menu')],
+            $this->provider->getThemeConfigurationOptionsNamesByType('checkbox')
+        );
+    }
+
+    private function getThemeDefinition(): array
+    {
+        return [
+            'configuration' => [
+                'sections' => [
+                    'header' => [
+                        'options' => [
+                            'show_title' => [
+                                'type' => 'checkbox',
+                                'default' => 'checked'
+                            ],
+                            'language' => [
+                                'type' => 'select',
+                                'default' => 'en',
+                                'values' => ['en' => 'en', 'ua' => 'ua']
+                            ]
+                        ]
+                    ],
+                    'main' => [
+                        'options' => [
+                            'show_datagrid' => [
+                                'type' => 'checkbox',
+                                'default' => 'unchecked'
+                            ],
+                            'show_chart' => [
+                                'type' => 'checkbox'
+                            ],
+                            'promo_text' => [
+                                'type' => 'text'
+                            ]
+                        ]
+                    ]
+                ]
+            ]
         ];
     }
 }

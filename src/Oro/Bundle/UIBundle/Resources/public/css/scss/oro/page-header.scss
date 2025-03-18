@@ -30,7 +30,7 @@
         // stylelint-disable-next-line declaration-no-important
         float: none !important;
         font-size: $base-font-size--xl;
-        font-weight: font-weight('light');
+        font-weight: font-weight('semi-bold');
         margin-right: 2px;
         margin-bottom: 0;
         line-height: $content-title-line-height;
@@ -41,11 +41,12 @@
     }
 
     &__entity-title-wrapper,
-    &__status {
+    &__status,
+    &__internalStatus {
         display: inline;
         vertical-align: middle;
+        font-weight: font-weight('semi-bold');
         font-size: $base-font-size--xl;
-        line-height: $content-title-line-height;
     }
 
     &__icon {
@@ -84,14 +85,14 @@
         margin: 0;
         padding: 0;
 
-        color: $primary-550;
+        color: $text-secondary;
         list-style: none;
 
         li {
             padding: 0 8px 0 0;
             margin: 0 2px 2px 0;
             border-right: 1px solid $primary-700;
-            font-size: $base-font-size--s;
+            font-size: $base-font-size;
             line-height: 14px;
             display: inline-block;
 
@@ -113,7 +114,7 @@
 
     .title-buttons-container {
         .btn-group {
-            margin-left: $content-padding-small;
+            margin-left: $content-padding-medium;
 
             .btn-group {
                 margin-left: 0;

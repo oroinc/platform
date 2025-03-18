@@ -22,11 +22,14 @@
 .dependent-fields-container {
     max-width: $form-container-control-group-max-width;
 
-    border-radius: $border-radius;
+    border-radius: $border-radius-md;
 
-    background-color: $primary-900;
+    background-color: $neutral-grey-1;
+    border: 1px solid $neutral-grey-3;
     padding-top: $content-padding-medium;
     padding-bottom: $content-padding-large;
+    padding-left: $content-padding-small;
+    margin-left: -#{$content-padding-small};
 }
 
 .form-horizontal {
@@ -68,6 +71,10 @@
             text-align: left;
             flex-grow: 1;
             min-width: $field-width;
+
+            &:has(.select2-offscreen) {
+                position: relative;
+            }
 
             .controls {
                 min-width: 0;
@@ -286,7 +293,7 @@ label {
         position: relative;
 
         em {
-            color: $danger-dark;
+            color: $secondary-secondary-3;
             font-size: 21px;
             font-style: normal;
             position: absolute;

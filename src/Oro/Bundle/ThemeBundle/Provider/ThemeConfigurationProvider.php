@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace Oro\Bundle\ThemeBundle\Provider;
 
-use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfiguration as LayoutThemeConfiguration;
 use Oro\Bundle\ThemeBundle\DependencyInjection\Configuration;
 use Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration;
-use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
+use Oro\Component\Layout\Extension\Theme\Model\ThemeDefinitionBagInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -20,10 +19,12 @@ class ThemeConfigurationProvider implements ResetInterface
 {
     private array $configurationCache = [];
     private array $nameCache = [];
+    private array $optionsNamesCache = [];
 
     public function __construct(
         private ConfigManager $configManager,
-        private ManagerRegistry $doctrine
+        private ManagerRegistry $doctrine,
+        private ThemeDefinitionBagInterface $configurationProvider
     ) {
     }
 
@@ -32,6 +33,7 @@ class ThemeConfigurationProvider implements ResetInterface
     {
         $this->configurationCache = [];
         $this->nameCache = [];
+        $this->optionsNamesCache = [];
     }
 
     public function getThemeConfigurationOptions(object|int|null $scopeIdentifier = null): array
@@ -42,7 +44,10 @@ class ThemeConfigurationProvider implements ResetInterface
         }
 
         if (!\array_key_exists($themeConfigId, $this->configurationCache)) {
-            $this->configurationCache[$themeConfigId] = $this->loadValue($themeConfigId, 'configuration') ?? [];
+            $this->configurationCache[$themeConfigId] = $this->loadThemeConfigurationValues(
+                $scopeIdentifier,
+                $themeConfigId
+            );
         }
 
         return $this->configurationCache[$themeConfigId];
@@ -76,6 +81,22 @@ class ThemeConfigurationProvider implements ResetInterface
         return $this->nameCache[$themeConfigId];
     }
 
+    public function getThemeConfigurationOptionsNamesByType(
+        string $type,
+        object|int|null $scopeIdentifier = null
+    ): array {
+        $themeName = $this->getThemeName($scopeIdentifier);
+        if (!$themeName) {
+            return [];
+        }
+
+        if (!\array_key_exists($type, $this->optionsNamesCache)) {
+            $this->optionsNamesCache[$type] = $this->loadOptionsNamesByType($type, $themeName);
+        }
+
+        return $this->optionsNamesCache[$type];
+    }
+
     private function getThemeConfigId(object|int|null $scopeIdentifier = null): ?int
     {
         return $this->configManager->get(
@@ -86,22 +107,56 @@ class ThemeConfigurationProvider implements ResetInterface
         );
     }
 
-    private function loadValue(int $themeConfigId, string $fieldName): mixed
+    private function loadOptionsNamesByType(string $type, string $themeName): array
     {
-        /** @var EntityManagerInterface $em */
-        $em = $this->doctrine->getManagerForClass(ThemeConfiguration::class);
-        QueryBuilderUtil::checkField($fieldName);
-        $rows = $em->createQueryBuilder()
-            ->from(ThemeConfiguration::class, 'e')
-            ->select(QueryBuilderUtil::sprintf('e.%s', $fieldName))
-            ->where('e.id = :id')
-            ->setParameter('id', $themeConfigId, Types::INTEGER)
-            ->getQuery()
-            ->getArrayResult();
-        if (!$rows) {
-            return null;
+        $optionsNames = [];
+        $config = $this->configurationProvider->getThemeDefinition($themeName);
+        foreach ($config['configuration']['sections'] ?? [] as $sKey => $section) {
+            foreach ($section['options'] as $oKey => $option) {
+                if ($type === $option['type']) {
+                    $optionsNames[] = LayoutThemeConfiguration::buildOptionKey($sKey, $oKey);
+                }
+            }
         }
 
-        return $rows[0][$fieldName];
+        return $optionsNames;
+    }
+
+    private function loadThemeConfigurationValues(object|int|null $scopeIdentifier = null, int $themeConfigId): array
+    {
+        $savedConfig = $this->loadValue($themeConfigId, 'configuration') ?? [];
+        $themeName = $this->nameCache[$themeConfigId] ?? $this->getThemeName($scopeIdentifier);
+
+        if ($themeName) {
+            $this->loadDefaultDefinedOptions($themeName, $savedConfig);
+        }
+
+        return $savedConfig;
+    }
+
+    private function loadDefaultDefinedOptions(string $themeName, array &$savedConfig): void
+    {
+        $config = $this->configurationProvider->getThemeDefinition($themeName);
+        foreach ($config['configuration']['sections'] ?? [] as $sKey => $section) {
+            foreach ($section['options'] as $oKey => $option) {
+                $optionKey = LayoutThemeConfiguration::buildOptionKey($sKey, $oKey);
+
+                if (isset($option['default']) && !\array_key_exists($optionKey, $savedConfig)) {
+                    $value = $option['default'];
+                    if ($option['type'] === 'checkbox') {
+                        $value = $option['default'] === 'checked';
+                    }
+
+                    $savedConfig[$optionKey] = $value;
+                }
+            }
+        }
+    }
+
+    private function loadValue(int $themeConfigId, string $fieldName): mixed
+    {
+        return $this->doctrine
+            ->getRepository(ThemeConfiguration::class)
+            ->getFieldValue($themeConfigId, $fieldName);
     }
 }

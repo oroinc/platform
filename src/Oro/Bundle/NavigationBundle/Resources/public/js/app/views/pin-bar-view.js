@@ -35,9 +35,10 @@ define(function(require) {
             if (!itemView) {
                 return false;
             }
+
             return _.isRTL()
                 ? this.el.offsetLeft <= itemView.el.offsetLeft
-                : this.el.offsetLeft + this.el.offsetWidth >= itemView.el.offsetLeft + itemView.el.offsetWidth;
+                : this.el.offsetWidth >= itemView.el.offsetLeft + itemView.el.offsetWidth;
         }
     });
 

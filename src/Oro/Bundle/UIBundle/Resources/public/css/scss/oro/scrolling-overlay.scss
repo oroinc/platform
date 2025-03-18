@@ -28,6 +28,11 @@
     }
 
     &-btn {
+        font-size: 16px;
+        line-height: 1;
+        color: $neutral-white;
+
+        border: 0;
         position: absolute;
         left: 0;
         z-index: 1;
@@ -35,15 +40,17 @@
         width: 100%;
         height: 17px;
 
-        background-color: $primary-500;
+        background-color: $neutral-grey-4;
 
-        opacity: .85;
+        opacity: .8;
 
-        @extend %main-menu-trigger;
+        &::before {
+            transition: all 200ms linear;
+        }
 
         &:hover,
         &:focus {
-            background-color: $primary-700;
+            background-color: $neutral-grey-4;
 
             opacity: 1;
         }

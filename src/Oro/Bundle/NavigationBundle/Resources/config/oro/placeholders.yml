@@ -6,6 +6,18 @@ placeholders:
                     order: 100
         navbar:
             items:
+                search_shortcuts:
+                    order: 100
+        search_shortcuts:
+            items:
+                shortcuts:
+                    order: 100
+        organization_selector:
+            items:
+                organization_shortcuts:
+                    order: 300
+        organization_shortcuts:
+            items:
                 shortcuts:
                     order: 100
         application_menu:
@@ -47,6 +59,12 @@ placeholders:
             template: '@@OroNavigation/user_login_js_modules_config.html.twig'
             data:
                 js_routing_filename_prefix: '%oro_navigation.js_routing_filename_prefix%'
+        organization_shortcuts:
+            template: '@@OroNavigation/Shortcut/organization_shortcuts.html.twig'
+            applicable: '@oro_user.placeholder.filter->isUserApplicable()'
+        search_shortcuts:
+            template: '@@OroNavigation/Shortcut/search_shortcuts.html.twig'
+            applicable: '@oro_user.placeholder.filter->isUserApplicable()'
         shortcuts:
             template: '@@OroNavigation/Shortcut/shortcuts.html.twig'
             applicable: '@oro_user.placeholder.filter->isUserApplicable()'

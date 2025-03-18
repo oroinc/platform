@@ -9,7 +9,6 @@
         <span class="fa-user-circle" aria-hidden="true"></span>
     {% else %}
         {% set user_name = app.user|oro_format_name %}
-        {{ user_name }}
         {% if app.user.avatar is defined %}
             {% include '@OroAttachment/Twig/picture.html.twig' with {
                 file: app.user.avatar,
@@ -17,6 +16,7 @@
                 img_attrs: { alt: user_name, class: 'avatar' },
             } %}
         {%  endif %}
+        {{ user_name }}
     {% endif %}
 </button>
 {% set options = options|merge({togglerId: togglerId}) %}

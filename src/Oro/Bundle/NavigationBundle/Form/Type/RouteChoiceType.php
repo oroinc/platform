@@ -169,7 +169,7 @@ class RouteChoiceType extends AbstractType
         $titles = [];
         foreach ($routes as $routeName) {
             $title = $this->readerRegistry->getTitleByRoute($routeName);
-            if ($title) {
+            if ($title !== null) {
                 $titles[$routeName] = $this->titleTranslator
                     ->trans($this->titleService->createTitle($routeName, $title, $menuName));
             }

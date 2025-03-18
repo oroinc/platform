@@ -9,6 +9,7 @@ use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 use Oro\Bundle\EntityConfigBundle\Metadata\Attribute\Config;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Ownership\AuditableBusinessUnitAwareTrait;
+use Oro\Bundle\ThemeBundle\Entity\Repository\ThemeConfigurationRepository;
 use Oro\Bundle\ThemeBundle\Form\Type\ThemeConfigurationType as ThemeConfigurationFormType;
 
 /**
@@ -43,7 +44,7 @@ use Oro\Bundle\ThemeBundle\Form\Type\ThemeConfigurationType as ThemeConfiguratio
       ]
     ]
 )]
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: ThemeConfigurationRepository::class)]
 #[ORM\Table(name: 'oro_theme_configuration')]
 #[ORM\HasLifecycleCallbacks]
 class ThemeConfiguration implements DatesAwareInterface, OrganizationAwareInterface

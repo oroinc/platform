@@ -56,6 +56,7 @@ services:
         arguments:
             - '@oro_config.manager'
             - '@doctrine'
+            - '@oro_layout.theme_extension.configuration.provider'
 
     oro_theme.provider.theme_configuration_type:
         class: Oro\Bundle\ThemeBundle\Provider\ThemeConfigurationTypeProvider
@@ -72,3 +73,14 @@ services:
             - '@oro_entity.doctrine_helper'
         tags:
             - { name: security.voter }
+
+    # Doctrine
+    oro_theme.repository.theme_configuration:
+        alias: Oro\Bundle\ThemeBundle\Entity\Repository\ThemeConfigurationRepository
+
+    Oro\Bundle\ThemeBundle\Entity\Repository\ThemeConfigurationRepository:
+        parent: oro_entity.abstract_repository
+        arguments:
+            - 'Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration'
+        tags:
+            - { name: doctrine.repository_service }

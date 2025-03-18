@@ -1,5 +1,13 @@
-define(function(require) {
+define(function(require, exports, module) {
     'use strict';
+
+    const _ = require('underscore');
+    const tools = require('oroui/js/tools');
+
+    const config = _.extend({
+        limitTo: tools.isMobile() ? 'body' : '#app-content'
+    }, require('module-config').default(module.id));
+
     function DialogManager() {
         this.dialogs = [];
     }
@@ -65,7 +73,7 @@ define(function(require) {
             return {
                 my: 'center',
                 at: 'center+' + offsetLeft + ' center+' + offsetTop,
-                of: '#container'
+                of: config.limitTo
             };
         },
 

@@ -92,7 +92,9 @@ oro_behat_extension:
       selector: '#oro_dashboard_index_anchor'
 
     Create Menu Item DropDown:
-      selector: '.navigation .pull-right.pinned-dropdown .btn-primary.dropdown-toggle'
+      selector:
+        type: xpath
+        locator: '//*[contains(@class, "navigation")]//*[contains(@class, "pinned-dropdown")][count(.//*[contains(@class, "back")]) > 0]//*[contains(@class, "btn-more-actions")][contains(@class, "dropdown-toggle")]'
 
     JS Tree item:
       selector: '.jstree-node > .jstree-anchor'

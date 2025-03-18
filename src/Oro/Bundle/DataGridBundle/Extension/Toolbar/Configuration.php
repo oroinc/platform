@@ -58,7 +58,13 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->arrayNode('datagridSettings')
                     ->children()
-                    ->scalarNode('minVisibleColumnsQuantity')->end()
+                        ->scalarNode('minVisibleColumnsQuantity')->end()
+                    ->end()
+                ->end()
+                ->arrayNode('itemsCounter')
+                    ->children()
+                        ->scalarNode('transTemplate')->end()
+                    ->end()
                 ->end()
             ->end();
 

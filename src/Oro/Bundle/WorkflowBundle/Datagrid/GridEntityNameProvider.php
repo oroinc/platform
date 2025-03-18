@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Datagrid;
 
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\WorkflowBundle\Exception\MissedRequiredOptionException;
@@ -34,6 +35,7 @@ class GridEntityNameProvider
         }
 
         if (empty($this->relatedEntities)) {
+            /** @var QueryBuilder $qb */
             $qb = $this->doctrine->getManager()->createQueryBuilder();
             $qb->select('entity.relatedEntity')
                 ->from($this->entityName, 'entity')

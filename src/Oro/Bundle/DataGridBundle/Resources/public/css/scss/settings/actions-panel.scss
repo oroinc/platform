@@ -1,9 +1,8 @@
 /* @theme: admin.oro; */
 
-@use 'sass:color';
+$oro-datagrid-actions-panel-offset: $content-padding-medium !default;
+$oro-datagrid-actions-panel-action-offset: $content-padding-medium !default;
 
-$oro-datagrid-actions-panel-offset: 8px !default;
-$oro-datagrid-actions-panel-action-offset: 4px !default;
-
-$oro-datagrid-actions-panel-action-pressed-background-color: color.adjust($primary-830, $lightness: -8%);
-$oro-datagrid-actions-panel-action-pressed-box-shadow: inset 0 2px 3px 2px rgba(0 0 0 / 21%) !default;
+$oro-datagrid-actions-panel-action-pressed-background-color: $secondary-secondary-4;
+$oro-datagrid-actions-panel-action-pressed-color: $neutral-white;
+$oro-datagrid-actions-panel-action-pressed-box-shadow: null !default;

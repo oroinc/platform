@@ -113,6 +113,8 @@
         line-height: $oro-datagrid-label-line-height;
 
         color: $oro-datagrid-label-color;
+
+        font-weight: font-weight('semi-bold');
     }
 
     &__link,

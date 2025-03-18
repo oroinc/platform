@@ -47,6 +47,12 @@
 
             + .value-field-frame {
                 margin-left: $filter-box-criteria-btn-group-value-field-frame-offset-left;
+
+                input[type=text],
+                .select2-container {
+                    border-start-start-radius: 0;
+                    border-end-start-radius: 0;
+                }
             }
 
             [class^='fa-'] {
@@ -256,6 +262,10 @@
 
             .select2-container {
                 margin-bottom: $choice-tree-filter-select2-container-offset-bottom;
+
+                &.select2-container-active {
+                    box-shadow: none;
+                }
             }
 
             .choice-tree-filter-search {
@@ -325,6 +335,12 @@
                 top: 50%;
                 margin-top: -2px;
             }
+
+            .filter-default-value {
+                &::after {
+                    color: $filter-criteria-selector-after-color;
+                }
+            }
         }
 
         &.open-filter {
@@ -351,8 +367,9 @@
                 z-index: $open-filter-after-z-index + 3;
             }
 
-            .filter-criteria-selector {
+            .filter-criteria-selector.filter-default-value {
                 background-color: $open-filter-filter-criteria-selector-background-color;
+                color: $open-filter-filter-criteria-selector-color;
                 box-shadow: $open-filter-filter-criteria-selector-box-shadow;
             }
         }
@@ -380,10 +397,17 @@
             text-transform: $filter-item-btn-text-transform;
             border: $filter-item-btn-border;
             background-color: $filter-item-btn-background-color;
+            color: $filter-item-btn-color;
             display: $filter-item-btn-display;
 
-            &:hover {
-                background-color: $filter-item-btn-hover-background-color;
+            &.filter-default-value:not(.active) {
+                &:hover {
+                    background-color: $filter-item-btn-hover-background-color;
+                }
+
+                &:active {
+                    color: $filter-item-btn-active-color;
+                }
             }
         }
     }
@@ -408,7 +432,8 @@
         }
 
         &:not(.filter-default-value) {
-            background-color: $extra-300;
+            background-color: $secondary-secondary-4;
+            color: $neutral-white;
         }
     }
 }
@@ -457,7 +482,7 @@
 
     &:focus {
         box-shadow: map.get($btn-theme, 'focus-box-shadow');
-        border-width: 0;
+        border-width: 1px;
         outline: 0;
     }
 

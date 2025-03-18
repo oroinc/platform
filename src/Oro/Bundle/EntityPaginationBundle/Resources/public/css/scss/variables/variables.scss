@@ -2,10 +2,14 @@
 
 $entity-pagination-line-height: 29px !default;
 $entity-pagination-page-link-padding: 2px 3px !default;
+$entity-pagination-page-link-color: $text-primary !default;
+$entity-pagination-page-link-decoration: underline !default;
 $entity-pagination-arrow-icon-padding: 0 4px !default;
 $entity-pagination-arrow-icon-font-size: 14px !default;
 $entity-pagination-page-current-width: 18px !default;
-$entity-pagination-page-current-color: $primary-200 !default;
-$entity-pagination-total-color: $primary-550 !default;
-$entity-pagination-total-font-size: 12px !default;
+$entity-pagination-page-current-color: $text-primary !default;
+$entity-pagination-total-color: $text-primary !default;
+$entity-pagination-total-font-size: $base-font-size !default;
 $entity-pagination-total-margin-start: 6px !default;
+
+$entity-pagination-page-link-hover-decoration: none !default;

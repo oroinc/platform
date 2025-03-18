@@ -3,20 +3,20 @@
 @use 'sass:map';
 
 $btn-group-divider-width: 1px;
-$btn-group-divider-color: $primary-inverse;
+$btn-group-divider-color: null;
 
 $btn-group-divider-keys: () !default;
 $btn-group-divider-keys: map.merge(
     (
         'light': transparent,
         'lighter': transparent,
-        'primary': rgba($primary-inverse, .4),
-        'info': rgba($primary-inverse, .4),
+        'primary': rgba($primary-inverse, 1),
+        'info': rgba($primary-inverse, 1),
         'success': #a5c387,
-        'warning': rgba($primary-inverse, .4),
-        'danger': rgba($primary-inverse, .4),
-        'dark': rgba($primary-inverse, .4),
-        'inverse': rgba($primary-inverse, .4)
+        'warning': rgba($primary-inverse, 1),
+        'danger': rgba($primary-inverse, 1),
+        'dark': rgba($primary-inverse, 1),
+        'inverse': rgba($primary-inverse, 1)
     ),
     $btn-group-divider-keys
 );

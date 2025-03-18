@@ -220,8 +220,16 @@ select[multiple] {
         border-color: $input-focus-border-color;
     }
 
+    &.disabled {
+        opacity: .5;
+    }
+
     &.readonly,
     &.disabled {
+        border-color: $input-disabled-border-color;
+        background-color: $input-disabled-background-color;
+        color: $input-disabled-color;
+
         span {
             cursor: $input-disabled-cursor;
             border-color: $input-disabled-border-color;
@@ -239,6 +247,7 @@ select[multiple] {
             border-color: $input-disabled-border-color;
             background-color: $input-disabled-background-color;
             color: $input-disabled-color;
+            box-shadow: none;
         }
     }
 }
@@ -271,11 +280,19 @@ select[multiple] {
         &:first-child,
         &:first-of-type {
             border-radius: $add-on-first-child-border-radius;
+
+            &:has(+ .entity-create-btn) {
+                border-radius: 0 $border-radius $border-radius 0;
+            }
         }
 
         &:last-child,
         &:last-of-type {
             border-radius: $add-on-last-child-border-radius;
+        }
+
+        &:only-child {
+            border-radius: $add-on-only-child-border-radius;
         }
 
         &:disabled {
@@ -299,6 +316,8 @@ select[multiple] {
 
         &:not(:first-of-type) {
             margin-left: $add-on-append-outer-offset-left;
+            border-top-left-radius: $border-radius;
+            border-bottom-left-radius: $border-radius;
         }
 
         &:first-child {
@@ -330,7 +349,8 @@ select[multiple] {
 
     .btn {
         &:focus {
-            border-color: $secondary-100;
+            border-color: $secondary-focus;
+            box-shadow: inset 0 0 0 1px $secondary-focus;
         }
     }
 
@@ -351,6 +371,10 @@ select[multiple] {
 
         &:first-child {
             border-radius: $add-on-first-child-border-radius;
+        }
+
+        &:only-child {
+            border-radius: $add-on-only-child-border-radius;
         }
     }
 }
@@ -385,6 +409,7 @@ select[multiple] {
 
     .control-group {
         margin: 0;
+        padding-left: 0;
         max-width: $form-container-control-group-max-width;
 
         &--column {

@@ -3,7 +3,7 @@
 @use 'sass:color';
 
 $tree-link-color: $primary-200 !default;
-$tree-link-bg-color: $extra-200 !default;
+$tree-link-bg-color: $extra-100 !default;
 $tree-icon-color: $primary-400 !default;
 $tree-icon-color-hover: color.adjust($tree-icon-color, $lightness: -10%) !default;
 
@@ -35,7 +35,8 @@ $jstree-icon-font-size: 16px !default;
 $jstree-icon-line-height: $jstree-icon-height !default;
 
 $jstree-wholerow-hovered-height: 35px !default;
-$jstree-wholerow-hovered-background: $tree-link-bg-color !default;
+$jstree-wholerow-hovered-background: $primary-main-light !default;
+$jstree-wholerow-clicked-background: $secondary-secondary-6 !default;
 $jstree-wholerow-disabled-background: #efefef !default;
 $jstree-wholerow-disabled-clicked-background: color.adjust(
     $jstree-wholerow-disabled-background, $lightness: -10%

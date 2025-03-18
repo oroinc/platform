@@ -93,7 +93,7 @@
 
                     <div class="pull-right title-buttons-container">
                         {% if allowEdit %}
-                            <a href="#" class="dashboard-widgets-add btn main-group">
+                            <a href="#" class="dashboard-widgets-add btn btn-inverse main-group">
                                 <span class="fa-plus"></span>
                                 {{- 'oro.dashboard.add_dashboard_widgets.add_widget'|trans|trim -}}
                             </a>
@@ -137,6 +137,7 @@
                                 'label': 'oro.dashboard.tools_dropdown.label'|trans,
                                 'iCss': 'fa-cog',
                                 'aCss': 'pull-right',
+                                'bCss': 'btn-inverse',
                                 'html': html
                             }) }}
                         {% endif %}

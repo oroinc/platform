@@ -16,8 +16,8 @@ define([
             explode: 5,
             marginX: 250,
             marginY: 20,
-            colors: ['#ACD39C', '#BE9DE2', '#6598DA', '#ECC87E', '#A4A2F6', '#6487BF',
-                '#65BC87', '#8985C2', '#ECB574', '#84A377']
+            colors: ['#B5D8DA', '#E6CFE3', '#CEDFF6', '#EFD7A7', '#CAB0B0', '#A2B4D2',
+                '#BDD4B3', '#8985C2', '#ECB574', '#84A377']
         },
         allSeries: [],
         shapes: [],

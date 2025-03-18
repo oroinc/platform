@@ -13,6 +13,10 @@
         padding: $datagrid-body-cell-sm-offset;
     }
 
+    .table-xs & {
+        padding: $datagrid-body-cell-xs-offset;
+    }
+
     .table-bordered & {
         border-width: $datagrid-body-cell-border-width;
     }

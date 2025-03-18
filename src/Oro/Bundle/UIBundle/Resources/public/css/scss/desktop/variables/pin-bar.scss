@@ -2,8 +2,8 @@
 
 @use 'sass:color';
 
-$pin-item-active-bg-color: $extra-200 !default;
-$pin-item-close-color: $primary-700 !default;
+$pin-item-active-bg-color: null !default;
+$pin-item-close-color: $primary-200 !default;
 $pin-item-close-hover-color: color.adjust($pin-item-close-color, $lightness: -8%) !default;
 $pin-item-outdated-color: $warning-dark !default;
 $pin-item-outdated-hover-color: color.adjust($pin-item-outdated-color, $lightness: -8%) !default;
@@ -12,4 +12,5 @@ $pin-item-show-more-menu-width: 20px !default;
 $pin-item-show-more-menu-offset: -8px !default;
 $pin-item-show-more-menu-arrow-end: 12px !default;
 
-$pin-show-more-gradient: linear-gradient(to left, $primary-900, rgba($primary-900, 0)) !default;
+$pin-show-more-gradient: linear-gradient(to left, #ede6d9, rgba(#ede6d9, 0)) !default;
+$pin-show-more-rtl-gradient: linear-gradient(to left, #f3f2ee, rgba(#f3f2ee, 0)) !default;

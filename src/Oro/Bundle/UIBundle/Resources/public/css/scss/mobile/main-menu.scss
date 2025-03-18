@@ -115,7 +115,7 @@
                 padding: 10px 15px;
 
                 &:hover {
-                    background-color: $menu-background-color-active;
+                    background-color: $menu-background-color-hover;
                 }
 
                 @for $i from 1 through 5 {

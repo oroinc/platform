@@ -66,11 +66,14 @@
         }
 
         &-header {
+            align-items: center;
+
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             border-radius: 0;
+            border: none;
             z-index: 1;
             padding: 11px 18px 11px 20px;
             transition: $oro-modal-image-preview-transition;
@@ -84,7 +87,7 @@
                 width: 50px;
                 height: 32px;
                 font-size: 24px;
-                color: $primary-550;
+                color: $primary-inverse;
                 transition: color .2s linear;
                 appearance: none;
                 font-weight: 700;
@@ -101,7 +104,7 @@
                 }
 
                 &:hover {
-                    color: $primary-inverse;
+                    color: $neutral-grey-4;
                 }
             }
         }
@@ -120,6 +123,7 @@
 
         &-content {
             background: none;
+            border-width: 0;
         }
     }
 
@@ -168,7 +172,7 @@
 
     .counter {
         font-size: 16px;
-        color: $primary-550;
+        color: $primary-inverse;
     }
 }
 

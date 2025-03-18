@@ -149,7 +149,7 @@ define(function(require) {
                         launcherOptions: {
                             label: __('oro_datagrid.action.refresh'),
                             ariaLabel: __('oro_datagrid.action.refresh.aria_label'),
-                            className: 'btn refresh-action',
+                            className: 'btn btn-primary-light refresh-action',
                             icon: 'repeat',
                             launcherMode: 'icon-only'
                         }
@@ -158,7 +158,7 @@ define(function(require) {
                         launcherOptions: {
                             label: __('oro_datagrid.action.reset'),
                             ariaLabel: __('oro_datagrid.action.reset.aria_label'),
-                            className: 'btn reset-action',
+                            className: 'btn btn-primary-light reset-action',
                             icon: 'refresh',
                             launcherMode: 'icon-only'
                         }
@@ -647,6 +647,7 @@ define(function(require) {
                 // Skip to add specific attributes if this cell has an empty value.
                 notMarkAsBlank: true
             });
+
             return column;
         },
 
@@ -769,7 +770,7 @@ define(function(require) {
                         attributes: {
                             'data-placement': 'bottom-end'
                         },
-                        className: 'btn btn-icon data-appearance-selector'
+                        className: 'btn btn-primary-light btn-icon data-appearance-selector'
                     },
                     order: 700
                 });
@@ -913,7 +914,7 @@ define(function(require) {
                     launcherOptions: {
                         label: __('oro.datagrid.extension.export.label'),
                         title: __('oro.datagrid.extension.export.tooltip'),
-                        className: 'btn',
+                        className: 'btn btn-primary-light',
                         iconClassName: 'fa-upload',
                         links: links
                     }

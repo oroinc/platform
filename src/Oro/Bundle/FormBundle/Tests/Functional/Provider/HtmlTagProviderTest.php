@@ -80,7 +80,7 @@ class HtmlTagProviderTest extends WebTestCase
         'source[srcset|type|media|sizes]',
         'sub',
         'sup',
-        'time',
+        'time[datetime]',
         'tfoot',
         'var',
         'video[allowfullscreen|autoplay|loop|poster|src|controls]',

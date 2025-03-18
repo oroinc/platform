@@ -105,6 +105,7 @@ dynamic-imports:
         - orodatagrid/js/appearance/builder
         - orodatagrid/js/cell-links/builder
         - orodatagrid/js/datagrid/builder/html-templates-preloader
+        - orodatagrid/js/datagrid/builder/items-count-external
         - orodatagrid/js/datagrid/listener/action-form-listener
         - orodatagrid/js/datagrid/listener/callback-listener
         - orodatagrid/js/datagrid/listener/change-editable-cell-listener

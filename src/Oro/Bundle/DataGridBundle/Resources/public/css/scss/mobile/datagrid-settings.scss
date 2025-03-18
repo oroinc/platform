@@ -1,6 +1,14 @@
 /* @theme: admin.oro; */
 
 .datagrid-settings {
+    &:not(:first-child) {
+        margin-left: $content-padding-xs;
+    }
+
+    &:not(:last-child) {
+        margin-right: $content-padding-xs;
+    }
+
     a.action.btn.dropdown-toggle {
         // stylelint-disable-next-line declaration-no-important
         display: inline-block !important;

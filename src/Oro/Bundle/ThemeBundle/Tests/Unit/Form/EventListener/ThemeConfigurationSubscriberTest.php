@@ -3,9 +3,9 @@
 namespace Oro\Bundle\ThemeBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfiguration as LayoutThemeConfiguration;
-use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfigurationProvider;
 use Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration;
 use Oro\Bundle\ThemeBundle\Form\EventListener\ThemeConfigurationSubscriber;
+use Oro\Component\Layout\Extension\Theme\Model\ThemeDefinitionBagInterface;
 use Oro\Component\Testing\ReflectionUtil;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -16,9 +16,9 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 
-class ThemeConfigurationSubscriberTest extends TestCase
+final class ThemeConfigurationSubscriberTest extends TestCase
 {
-    private ThemeConfigurationProvider|MockObject $provider;
+    private ThemeDefinitionBagInterface&MockObject $provider;
 
     private ThemeConfigurationSubscriber $subscriber;
 
@@ -43,7 +43,7 @@ class ThemeConfigurationSubscriberTest extends TestCase
     #[\Override]
     protected function setUp(): void
     {
-        $this->provider = $this->createMock(ThemeConfigurationProvider::class);
+        $this->provider = $this->createMock(ThemeDefinitionBagInterface::class);
 
         $this->subscriber = new ThemeConfigurationSubscriber($this->provider);
     }

@@ -2,70 +2,109 @@
 
 @use 'sass:color';
 
-// Base Colors
+// new palette
+$primary-main: #355477 !default;
+$primary-main-light: #dfebf8 !default;
+$primary-accent: #b48c50 !default;
+$primary-accent-light: #f0e8dc !default;
+$primary-accent-extra-light: #fff8ee !default;
+$primary-accent-gradient: radial-gradient(
+    100% 136.05% at 73.28% 0%,
+    #ede6d9 0%,
+    #edeae5 47.74%,
+    #fafaf7 100%
+) !default;
+
+$secondary-secondary-1: #2138cd !default;
+$secondary-secondary-2: #13a367 !default;
+$secondary-secondary-3: #b2454c !default;
+$secondary-secondary-4: #4c77a9 !default;
+$secondary-secondary-5: #2d4663 !default;
+$secondary-secondary-6: #c7d3e1 !default;
+$secondary-focus: #006fff !default;
+
+$text-primary: #181d27 !default;
+$text-secondary: #474c54 !default;
+$text-disabled: #62666f !default;
+$text-inverse: #fff !default;
+
+$neutral-white: #fefdfd !default;
+$neutral-grey-1: #f8f9fa !default;
+$neutral-grey-2: #f1f4f8 !default;
+$neutral-grey-3: #ebedf1 !default;
+$neutral-grey-4: #9da5b6 !default;
+$neutral-dark: #181d27 !default;
+
+$primary-box-shadow: 0 2px 4px -2px rgba(10, 13, 18, .06), 0 4px 6px -1px rgba(10, 13, 18, .1) !default;
+
+// base colors
 $primary: #404041 !default;
 $primary-100: color.adjust($primary, $lightness: 4%) !default;  /* #4a4a4a */
-$primary-200: color.adjust($primary, $lightness: 8%) !default;  /* #545456 */
+$primary-200: $text-primary !default;
 $primary-300: color.adjust($primary, $lightness: 12%) !default; /* #5e5e60 */
 $primary-400: color.adjust($primary, $lightness: 16%) !default; /* #68686a */
 $primary-500: color.adjust($primary, $lightness: 24%) !default; /* #7d7d7f */
-$primary-550: color.adjust($primary, $lightness: 28%) !default; /* #878789 */
+$primary-550: $text-secondary !default;
 $primary-600: color.adjust($primary, $lightness: 32%) !default; /* #919193 */
 $primary-700: color.adjust($primary, $lightness: 48%) !default; /* #bababb */
-$primary-750: color.adjust($primary, $lightness: 60%) !default; /* #d9d9da */
+$primary-750: $neutral-grey-4 !default;
 $primary-800: color.adjust($primary, $lightness: 64%) !default; /* #e3e3e4 */
 $primary-830: color.adjust($primary, $lightness: 68%) !default; /* #eeeeee */
 $primary-860: color.adjust($primary, $lightness: 70%) !default; /* #f3f3f3 */
 $primary-900: color.adjust($primary, $lightness: 72%) !default; /* #f8f8f8 */
 $primary-inverse: #fff !default;
 
-$secondary: #0c809e !default;
-$secondary-100: color.adjust($secondary, $lightness: 6%) !default;  /* #0e97ba */
-$secondary-150: color.adjust($secondary, $lightness: 40%) !default; /* #81ddf5 */
-$secondary-200: color.adjust($secondary, $lightness: 60%) !default; /* #dff7fd */
-$secondary-300: color.adjust($secondary, $lightness: 62%) !default; /* #e9f9fd */
-$secondary-dark: color.adjust($secondary, $lightness: -8%) !default;  /* #096178 */
+$secondary: $primary-main !default;
+$secondary-100: color.adjust($secondary, $lightness: 6%) !default;  /* #3e638c */
+/* @info: never used in oro code */
+$secondary-150: color.adjust($secondary, $lightness: 40%) !default; /* #3e638c */
+$secondary-200: color.adjust($secondary, $lightness: 60%) !default; /* #e9eff5 */
+$secondary-300: color.adjust($secondary, $lightness: 62%) !default; /* #f0f4f8 */
+$secondary-dark: color.adjust($secondary, $lightness: -8%) !default;  /* #28405b */
 
-$extra: #f9b700 !default;
-$extra-100: color.adjust($extra, $lightness: 22%) !default;     /* #ffd86a */
-$extra-200: color.adjust($extra, $lightness: 40%) !default;     /* #fff0c6 */
-$extra-300: color.adjust($extra, $lightness: 48%) !default;     /* #fffbef */
-$extra-dark: color.adjust($extra, $saturation: -96%) !default; /* #817f78 */
+$extra: $primary-accent !default;
+$extra-100: $primary-accent-light !default;
+$extra-200: $primary-accent-extra-light !default;
+$extra-300: $primary-accent-extra-light !default;
+$extra-dark: $primary-accent !default;
 
-/* UI Colors */
-$danger: #e62600 !default;
-$danger-light: color.adjust($danger, $lightness: 24%) !default;         /* #ff7b61 */
-$danger-lighten: color.adjust($danger, $lightness: 40%) !default;       /* #ffc0b3 */
-$danger-ultra-light: color.adjust($danger, $lightness: 44%) !default;   /* #ffd1c7 */
-$danger-dark: color.adjust($danger, $lightness: -12%) !default;           /* #a91c00 */
-$danger-darken: color.adjust($danger, $saturation: -24%) !default;     /* #ca381c */
-$danger-ultra-dark: color.adjust($danger, $lightness: -28%) !default;     /* #570e00 */
+/* ui colors */
+$danger: #9c0000 !default;
+$danger-light: #fff5f6 !default;
+$danger-lighten: #f8d8db !default;
+$danger-ultra-light: $danger-lighten !default;
+$danger-dark: $danger !default;
+$danger-darken: $danger-dark !default;
+$danger-ultra-dark: $danger-dark !default;
 
-$warning: #f9b700 !default;
-$warning-light: color.adjust($warning, $lightness: 48%) !default;     /* #fffbef */
-$warning-dark: color.adjust($warning, $saturation: -24%) !default;   /* #dba91e */
-$warning-darken: color.adjust($warning, $lightness: -28%) !default;     /* #6a4e00 */
+$warning: #8f3700 !default;
+$warning-light: #f2dab1 !default;
+$warning-dark: $warning !default;
+$warning-darken: $warning-dark !default;
 
-$info: #36acca !default;
-$info-light: color.adjust($info, $lightness: 24%) !default;     /* #97d4e4 */
-$info-lighten: color.adjust($info, $lightness: 44%) !default;   /* #e8f5f9 */
-$info-dark: color.adjust($info, $saturation: -24%) !default;   /* #549aac */
-$info-darken: color.adjust($info, $lightness: -8%) !default;      /* #2d91aa */
-$info-ultra-dark: color.adjust($info, $lightness: -20%) !default; /* #20687a */
+$info: #00489c !default;
+$info-light: #f0f5fc !default;
+$info-lighten: #d3e4f9 !default;
+$info-dark: $info !default;
+/* @info: never used in oro code */
+$info-darken: $info-dark !default;
+$info-ultra-dark: $info-dark !default;
 
-$success: #478507 !default;
-$success-light: color.adjust($success, $lightness: 4%) !default;           /* #519808 */
-$success-lighten: color.adjust($success, $lightness: 10%) !default;        /* #61b50a */
-$success-extra-light: color.adjust($success, $lightness: 45%) !default;    /* #baf87a */
-$success-extra-lighten: color.adjust($success, $lightness: 54%) !default;  /* #d0faa5 */
-$success-ultra-light: color.adjust($success, $lightness: 58%) !default;    /* #dafbb9 */
-$success-dark: color.adjust($success, $lightness: -8%) !default;             /* #325e05 */
-$success-darken: color.adjust($success, $saturation: -54%) !default;      /* #465f2d */
+$success: #08590d !default;
+$success-light: #d5e6cf !default;
+$success-lighten: $success-light !default;
+/* @info: never used in oro code */
+$success-extra-light: $success-lighten !default;
+$success-extra-lighten: $success-lighten !default;
+$success-ultra-light: $success-lighten !default;
+$success-dark: $success !default;
+$success-darken: $success !default;
 
 $additional: #5c5c5c !default;
+/* @info: never used in oro code */
 $additional-light: color.adjust($additional, $lightness: 26%) !default;          /* #9e9e9e */
 $additional-lighten: color.adjust($additional, $lightness: 38%) !default;        /* #bdbdbd */
 $additional-extra-light: color.adjust($additional, $lightness: 50%) !default;    /* #dbdbdb */
 $additional-extra-lighten: color.adjust($additional, $lightness: 54%) !default;  /* #e6e6e6 */
-$additional-ultra-light: color.adjust($additional, $lightness: 56%) !default;    /* #ebebeb */
+$additional-ultra-light: $neutral-grey-4 !default;
 $additional-dark: color.adjust($additional, $lightness: -12%) !default;            /* #3d3d3d */

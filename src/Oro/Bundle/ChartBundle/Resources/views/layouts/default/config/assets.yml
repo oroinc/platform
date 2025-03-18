@@ -1,0 +1,8 @@
+styles:
+    inputs:
+        - 'bundles/orochart/default/scss/variables/flotr-hint-config.scss'
+        - 'bundles/orochart/default/scss/variables/chart-container-config.scss'
+
+        - 'bundles/orochart/default/scss/components/flotr-hint.scss'
+        - 'bundles/orochart/default/scss/components/flotr-grid-label.scss'
+        - 'bundles/orochart/default/scss/components/chart-container.scss'

@@ -6,12 +6,14 @@
     .action {
         margin-right: $oro-datagrid-actions-panel-action-offset;
 
-        &:last-child {
+        &:last-child,
+        &:last-of-type {
             margin-right: 0;
         }
 
         &.pressed {
             background-color: $oro-datagrid-actions-panel-action-pressed-background-color;
+            color: $oro-datagrid-actions-panel-action-pressed-color;
             box-shadow: $oro-datagrid-actions-panel-action-pressed-box-shadow;
         }
     }

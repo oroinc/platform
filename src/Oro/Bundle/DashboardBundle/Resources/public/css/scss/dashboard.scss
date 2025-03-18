@@ -38,13 +38,6 @@
 }
 
 .dashboard-container-wrapper {
-    background-color: $dashboard-wrapper-bg;
-
-    .page-title {
-        background-color: $dashboard-container-title-background-color;
-        border-bottom: $dashboard-container-border;
-    }
-
     .responsive-section:not(.responsive-small) {
         .dashboard-column {
             &:first-child {
@@ -58,19 +51,9 @@
     }
 
     .dashboard-container {
-        padding-top: $content-padding;
-        background: $dashboard-wrapper-bg;
-
         .dashboard-column > div:not(:last-child) {
             margin-bottom: $offset-block;
         }
-    }
-
-    .scrollable-container {
-        background: $dashboard-wrapper-bg;
-
-        @include safe-area-property-left(padding-left, $content-padding, false);
-        @include safe-area-property-right(padding-right, $content-padding, false);
     }
 
     .dashboard-widget.editable {
@@ -86,7 +69,7 @@
     .dashboard-widget {
         background-color: $primary-inverse;
         position: relative;
-        border-radius: 1px;
+        border-radius: 10px;
         box-shadow: $dashboard-widget-box-shadow;
 
         .widget-header {
@@ -138,7 +121,8 @@
             padding: 0;
 
             color: $dashboard-widget-title-color;
-            font-size: 18px;
+            font-size: 16px;
+            font-weight: font-weight('semi-bold');
             line-height: normal;
             text-overflow: ellipsis;
             white-space: nowrap;

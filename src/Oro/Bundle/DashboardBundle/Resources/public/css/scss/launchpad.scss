@@ -21,10 +21,18 @@
         vertical-align: top;
     }
 
+    &__link {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
     &__icon {
-        width: 64px;
-        height: 64px;
-        padding-top: 16px;
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
         color: $dashboard-launchpad-icon-color;
         font-size: 32px;
@@ -32,7 +40,7 @@
 
         background: $dashboard-launchpad-icon-bg;
 
-        border-radius: 32px;
+        border-radius: $dashboard-launchpad-icon-border-radius;
     }
 
     &__label {
@@ -45,14 +53,7 @@
     }
 
     &__link:hover &__icon {
-        width: 72px;
-        height: 72px;
-        margin: -4px;
-        padding-top: 20px;
-
         color: $dashboard-launchpad-icon-active-color;
-
-        border-radius: 36px;
     }
 
     &__link:hover &__label {

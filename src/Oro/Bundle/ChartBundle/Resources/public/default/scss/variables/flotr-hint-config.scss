@@ -1,0 +1,7 @@
+/* @theme: default; */
+
+$flotr-hint-color: get-var-color('neutral', 'white-100') !default;
+$flotr-hint-background-color: get-var-color('neutral', 'dark') !default;
+$flotr-hint-offset: 14px spacing('sm') !default;
+
+$flotr-hint-arrow-size: 7px !default;

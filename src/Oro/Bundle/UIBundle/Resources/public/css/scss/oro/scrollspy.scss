@@ -11,8 +11,12 @@
         background: $scrollspy-nav-background;
         border-radius: $scrollspy-nav-border-radius;
 
+        border: 1px solid $neutral-grey-3;
+
         position: $scrollspy-nav-position;
         z-index: $scrollspy-nav-z-index;
+
+        padding: $content-padding-xs;
 
         @include clearfix();
 
@@ -20,7 +24,7 @@
             content: '';
             position: absolute;
             pointer-events: none;
-            bottom: -$scrollspy-nav-gradient-height;
+            bottom: -$scrollspy-nav-gradient-height - 1;
             left: 0;
             right: 0;
             height: $scrollspy-nav-gradient-height;
@@ -40,14 +44,19 @@
             border-radius: $scrollspy-nav-navbar-inner-nav-link-border-radius;
             color: $scrollspy-nav-navbar-inner-nav-link-color;
 
+            font-weight: $scrollspy-nav-navbar-inner-nav-link-font-weight;
+
             &:hover {
                 background: $scrollspy-nav-navbar-inner-nav-link-background-color;
             }
 
             &.active {
+                color: $scrollspy-nav-navbar-inner-nav-link-active-color;
                 font-weight: $scrollspy-nav-navbar-inner-nav-link-active-font-weight;
 
                 background-color: $scrollspy-nav-navbar-inner-nav-link-active-background-color;
+
+                box-shadow: $scrollspy-nav-navbar-inner-nav-link-active-box-shadow;
             }
         }
     }
@@ -60,6 +69,7 @@
         font-weight: $scrollspy-title-font-weight;
 
         background: $scrollspy-title-background;
+        border: $scrollspy-title-border;
         border-radius: $scrollspy-title-border-radius;
         color: $scrollspy-title-color;
 
