@@ -10,9 +10,10 @@ Parameters - array:
 {% macro status(parameters) %}
     {% apply spaceless %}
         {% set label = parameters.label|default('') %}
-        {% set code = parameters.code|default([]) %}
-        {% set map = parameters.map|default('') %}
-        {% set classes = attribute(map, code) is defined ? ' status-label--' ~ map[code] : '' %}
+        {% set code = parameters.code|default('') %}
+        {% set map = parameters.map|default([]) %}
+        {% set codeKey = code is iterable ? '' : code %}
+        {% set classes = (codeKey in map) ? ' status-label--' ~ map[codeKey] : '' %}
         <span class="status-label{{ classes }}">{{ label }}</span>
     {% endapply %}
 {% endmacro %}

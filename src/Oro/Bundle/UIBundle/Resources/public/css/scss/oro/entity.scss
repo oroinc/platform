@@ -23,10 +23,10 @@
         display: inline-block;
         vertical-align: top;
         margin-left: $content-padding-small * .5;
-        border-radius: 0 4px 4px 0;
 
         > .btn {
             font-size: 14px;
+            border-radius: $border-radius;
         }
     }
 }

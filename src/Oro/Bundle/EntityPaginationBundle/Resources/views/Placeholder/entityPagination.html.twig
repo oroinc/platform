@@ -19,7 +19,7 @@
 
         {% set componentName = 'oroui/js/app/components/hidden-redirect-component' %}
         {% set componentOptions = {type: 'warning'} %}
-        
+
         <div id="entity-pagination" class="entity-pagination" {% if isMobileVersion() %}
             {{ UI.renderPageComponentAttributes({
                 view: 'oroui/js/app/views/sticky-element/sticky-element-view',
@@ -31,10 +31,10 @@
                 }
             }) }}
         {% endif %}>
-            <ul class="pagination pagination--mini">
+            <ul class="pagination">
                 <li class="page-item{% if pager.current == 1 %} disabled{% endif %}">
                     <a href="{{ path(first_route, allParams) }}"
-                       class="page-link" 
+                       class="page-link"
                        data-page-component-module="{{ componentName }}"
                        data-page-component-options="{{ componentOptions|json_encode }}">
                         {{ 'oro.entity_pagination.first'|trans }}

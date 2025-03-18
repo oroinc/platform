@@ -31,21 +31,21 @@ $alert-close-hover-color: inherit !default;
 
 $alert-danger-background: $danger-lighten !default;
 $alert-danger-border-color: $danger-lighten !default;
-$alert-danger-color: $danger-ultra-dark !default;
-$alert-danger-close-color: $danger-darken !default;
-$alert-danger-icon-color: $danger-darken !default;
+$alert-danger-color: $danger-dark !default;
+$alert-danger-close-color: $danger-dark !default;
+$alert-danger-icon-color: $danger-dark !default;
 $alert-danger-icon-content: $fa-var-exclamation-circle !default;
 
 $alert-warning-background: $warning-light !default;
 $alert-warning-border-color: $warning-light !default;
-$alert-warning-color: $warning-darken !default;
+$alert-warning-color: $warning-dark !default;
 $alert-warning-close-color: $warning-dark !default;
 $alert-warning-icon-color: $warning-dark !default;
 $alert-warning-icon-content: $fa-var-exclamation-triangle !default;
 
 $alert-info-background: $info-lighten !default;
 $alert-info-border-color: $info-lighten !default;
-$alert-info-color: $info-ultra-dark !default;
+$alert-info-color: $info-dark !default;
 $alert-info-close-color: $info-dark !default;
 $alert-info-icon-color: $info-dark !default;
 $alert-info-icon-content: $fa-var-exclamation !default;
@@ -54,8 +54,8 @@ $alert-info-icon-inner-offset-left: 22px !default;
 $alert-success-background: $success-ultra-light !default;
 $alert-success-border-color: $success-ultra-light !default;
 $alert-success-color: $success-darken !default;
-$alert-success-close-color: $success-light !default;
-$alert-success-icon-color: $success-light !default;
+$alert-success-close-color: $success-darken !default;
+$alert-success-icon-color: $success-darken !default;
 $alert-success-icon-content: $fa-var-check !default;
 
 $alert-compact-inner-offset: 4px 8px !default;

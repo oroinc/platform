@@ -19,6 +19,8 @@
     height: 100%;
     user-select: none;
     padding-bottom: 90px;
+    border-radius: 10px 10px 0 0;
+    border: 1px solid $neutral-white;
 
     &.maximized {
         width: $sidebar-maximized-width;
@@ -144,6 +146,10 @@
 // sidebar-widget
 .sidebar-widget {
     border-bottom: 1px solid $primary-inverse;
+
+    &:first-child :where(.sidebar-widget__popup, .sidebar-widget__header) {
+        border-radius: 10px 10px 0 0;
+    }
 
     &__popup {
         display: none;
@@ -296,6 +302,9 @@
         background-color: transparent;
         padding-right: 8px;
         padding-left: 2px;
+
+        display: flex;
+        align-items: center;
     }
 
     &__header-toggle {

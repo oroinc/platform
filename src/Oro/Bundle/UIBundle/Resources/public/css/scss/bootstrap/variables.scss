@@ -4,11 +4,12 @@
 
 // Your variable overrides
 $border-radius: 4px;
-$btn-border-radius: 16px;
-$btn-border-width: 0;
+$border-radius-md: 10px;
+$btn-border-radius: 4px;
+$btn-border-width: 1px;
 $btn-square-border-radius: 2px;
 $btn-square-border-width: 2px;
-$font-family-sans-serif: arial, helvetica, sans-serif;
+$font-family-sans-serif: 'Plus Jakarta Sans', arial, helvetica, sans-serif;
 $font-size-base: 14px;
 $line-height-base: 1.57;
 $link-hover-decoration: none;
@@ -26,7 +27,7 @@ $btn-font-size-sm: $base-font-size--s;
 $btn-icon-font-size-sm: $base-font-size;
 $btn-line-height-sm: 24px;
 $btn-icon-line-height-sm: $btn-line-height-sm - 1px;
-$btn-border-radius-sm: 16px;
+$btn-border-radius-sm: 4px;
 
 $btn-mobile-font-size: $base-font-size--m;
 $btn-mobile-border-radius: 20px;
@@ -45,7 +46,7 @@ $label-margin-bottom: 0;
 $border-width: 2px;
 
 $input-color: $primary-200;
-$input-border-width: 2px;
+$input-border-width: 1px;
 $input-border-color: $primary-750;
 
 $input-btn-padding-y: 0;
@@ -53,8 +54,8 @@ $input-btn-padding-x: 16px;
 $input-btn-padding-y-sm: $content-padding-small;
 $input-btn-padding-y-lg: $content-padding;
 $input-box-shadow: none;
-$input-focus-box-shadow: none;
-$input-focus-border-color: $secondary;
+$input-focus-box-shadow: inset 0 0 0 1px $secondary-focus;
+$input-focus-border-color: $secondary-focus;
 
 $input-btn-mobile-padding-y: 0;
 $input-btn-mobile-padding-x: 16px;
@@ -66,7 +67,7 @@ $custom-control-indicator-size: 16px;
 // default .5rem it is equal to half of default font size 16px;
 $custom-control-gutter: 8px;
 
-$btn-line-height: 32px;
+$btn-line-height: 30px;
 $btn-square-line-height: 28px;
 
 $btn-mobile-line-height: 40px;
@@ -98,10 +99,10 @@ $pagination-current-padding-y: 5.5px;
 $breadcrumb-bg: transparent;
 $breadcrumb-font-size: 13px;
 $breadcrumb-padding-y: $content-padding-small;
-$breadcrumb-padding-x: $content-padding;
-$breadcrumb-color: $primary-300;
-$breadcrumb-divider-color: $primary-300;
-$breadcrumb-active-color: $primary-300;
+$breadcrumb-padding-x: 0;
+$breadcrumb-color: $text-primary;
+$breadcrumb-divider-color: $text-primary;
+$breadcrumb-active-color: $text-primary;
 $breadcrumb-margin-bottom: 0;
 $breadcrumb-item-padding: .2em !default;
 
@@ -110,10 +111,12 @@ $pagination-hover-bg: transparent;
 $pagination-active-bg: transparent;
 $pagination-disabled-bg: transparent;
 
-$pagination-fa-color: $primary-400;
+$pagination-fa-color: $text-primary;
 $pagination-fa-hover-color: color.adjust($primary-400, $lightness: 2%);
 $pagination-fa-active-color: color.adjust($primary-400, $lightness: 2%);
 $pagination-fa-disabled-color: $primary-500;
+
+$pagination-disabled-color: $text-disabled;
 
 $pagination-focus-outline: none;
 $pagination-focus-box-shadow: none;
@@ -134,16 +137,16 @@ $dropdown-item-icon-fa-offset: 4px;
 $dropdown-link-color: $primary-200;
 $dropdown-link-hover-color: $primary-300;
 $dropdown-link-hover-bg: $primary-900;
-$dropdown-link-active-color: $primary-300;
+$dropdown-link-active-color: $primary-500;
 $dropdown-link-active-bg: $primary-900;
 
 $dropdown-divider-bg: $primary-860 !default;
 
 $modal-backdrop-bg: $primary-inverse;
 $modal-backdrop-opacity: .9;
-$modal-content-border-radius: 4px;
-$modal-header-bg: $primary-200;
-$modal-header-padding: 16px 18px 14px 20px;
+$modal-content-border-radius: 10px;
+$modal-header-bg: $primary-main;
+$modal-header-padding: 14px $content-padding;
 $modal-header-color: $primary-inverse;
 $modal-header-close-padding: 0;
 $modal-header-close-margin: 0;
@@ -154,13 +157,13 @@ $modal-header-close-hover-opacity: 1;
 $modal-header-close-size: 18px;
 $modal-header-close-font-size: $base-font-size--l;
 $modal-title-font-size: 18px;
-$modal-title-font-weight: font-weight('bold');
+$modal-title-font-weight: font-weight('semi-bold');
 $modal-title-line-height: 1;
-$modal-inner-padding: 28px;
-$modal-content-border-width: 0;
+$modal-inner-padding: $content-padding;
+$modal-content-border-width: 1px;
 $modal-dialog-box-shadow: 1px 1px 9px 3px rgba(0 0 0 / 8%);
-$modal-footer-bg: $primary-900;
-$modal-footer-padding: 8px;
+$modal-footer-bg: $primary-inverse;
+$modal-footer-padding: $content-padding-medium $content-padding;
 
 $modal-md: 560px;
 
@@ -229,7 +232,8 @@ $width-close-panel: 25px;
 $width-left-panel: 230px;
 $width-left-panel2: 210;
 $width-input: 280px;
-$body-color: $primary-200;
+$body-bg: $neutral-grey-1;
+$body-color: $text-primary;
 $body-background: #3e434a;
 $well-background: $primary-900;
 $base-gradient-color-start: #39464f;
@@ -239,12 +243,12 @@ $logo-background-color: #2d333b;
 $header-icon-button-text-color: #2a313a;
 $header-text-color: #cad2da;
 $inline-action-color: #94b4c9;
-$inline-action-background: $secondary-300;
+$inline-action-background: $primary-main-light;
 $cell-selected-background: $inline-action-background;
 $row-selected-background: $extra-300;
 $row-highlight-background: color.adjust($row-selected-background, $lightness: -2%);
-$cell-success-background: #f1f8dc;
-$cell-success-color: #96b76d;
+$cell-success-background: $success-light;
+$cell-success-color: $success;
 $cell-error-background: #fcd4d3;
 $cell-loading-background: #f5f5f5;
 
@@ -288,8 +292,8 @@ $error-message-balloon-background: color.adjust($error-text, $lightness: 20%);
 $hover-transition: all 230ms ease-out !default;
 
 // Links
-$link-color: $secondary;
-$link-color-hover: color.adjust($link-color, $lightness: -10%);
+$link-color: $info-dark;
+$link-color-hover: $secondary-secondary-5;
 $menu-item-color: $primary-200;
 
 // Screen sizes

@@ -13,9 +13,9 @@
     left: 100%;
     z-index: -1;
 
-    width: calc(100vw - #{$menu-side-width-minimized});
-    height: 100vh;
-    max-width: calc(100vw - #{$menu-side-width-minimized});
+    width: calc(100vw - #{$menu-side-width-minimized + $content-padding * 2});
+    height: calc(100vh - #{$content-padding});
+    max-width: calc(100vw - #{$menu-side-width-minimized + $content-padding * 2});
     min-width: $width-body-page;
 
     font-size: $menu-font-size;
@@ -150,10 +150,7 @@
 
         background-color: $menu-dropdown-background-color;
         box-shadow: $side-menu-overlay-ui-fill-blur-box-shadow;
-    }
-
-    &__fill-blur-inner::after {
-        background-color: $side-menu-overlay-ui-fill-background-color;
+        border-start-end-radius: 10px;
     }
 
     .menu {
@@ -210,7 +207,7 @@
 
         &:hover,
         &:focus {
-            background-color: $menu-background-color-active;
+            background-color: $menu-background-color-hover;
         }
 
         $menu-overlay-title-offset: 0;

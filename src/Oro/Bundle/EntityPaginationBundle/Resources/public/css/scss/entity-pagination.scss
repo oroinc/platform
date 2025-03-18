@@ -7,6 +7,8 @@
 
     .pagination .page-link {
         padding: $entity-pagination-page-link-padding;
+        text-decoration: $entity-pagination-page-link-decoration;
+        color: $entity-pagination-page-link-color;
         line-height: 1;
 
         [class*='fa-'] {
@@ -15,6 +17,10 @@
             &::before {
                 font-size: $entity-pagination-arrow-icon-font-size;
             }
+        }
+
+        &:hover {
+            text-decoration: $entity-pagination-page-link-hover-decoration;
         }
     }
 

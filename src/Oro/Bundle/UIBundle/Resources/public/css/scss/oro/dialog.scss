@@ -13,7 +13,7 @@
     flex-direction: $dialog-flex-direction;
 
     &-titlebar {
-        background: $primary-200;
+        background: $secondary-secondary-5;
         border-radius: $dialog-border-radius $dialog-border-radius 0 0;
 
         padding: $dialog-titlebar-inner-offset;
@@ -168,10 +168,10 @@
         @include clearfix();
 
         margin: $dialog-widget-actions-outer-offset;
-        background: $primary-900;
+        background: $primary-inverse;
         padding: $dialog-widget-actions-inner-offset;
         border-radius: 0 0 $dialog-border-radius $dialog-border-radius;
-        border: $dialog-widget-actions-border;
+        border-top: $dialog-widget-actions-border;
     }
 
     .ui-dialog-body {

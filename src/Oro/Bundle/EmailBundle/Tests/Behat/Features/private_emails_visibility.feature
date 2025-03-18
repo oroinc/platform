@@ -24,7 +24,6 @@ Feature: Private emails visibility
     Then I should see following grid:
       | Subject                 |
       | Private email Some body |
-    When I click "Search"
     And type "Private email" in "search"
     Then I should see 1 search suggestions
     When I click "Search Submit"
@@ -37,7 +36,6 @@ Feature: Private emails visibility
 
   Scenario: View private email by second admin with default admin permissions
     Given I login as administrator
-    When I click "Search"
     And type "Private email" in "search"
     Then I should see 1 search suggestions
     When I click "Search Submit"
@@ -61,7 +59,6 @@ Feature: Private emails visibility
     Then I should see following grid:
       | Subject                 |
       | Private email Some body |
-    When I click "Search"
     And type "Private email" in "search"
     Then I should see 1 search suggestions
     When I click "Search Submit"
@@ -72,7 +69,6 @@ Feature: Private emails visibility
 
   Scenario: View private email by second admin with User access level
     Given I login as administrator
-    When I click "Search"
     And type "Private email" in "search"
     Then I should see 0 search suggestions
 
@@ -87,6 +83,5 @@ Feature: Private emails visibility
     Given I login as "charlie" user
     When I click My Emails in user menu
     Then I should not see "Private email"
-    When I click "Search"
     And type "Private email" in "search"
     Then I should see 0 search suggestions

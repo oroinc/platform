@@ -26,6 +26,7 @@
 
         &.select2-container-active {
             border-color: $select2-container-active-border-color;
+            box-shadow: $select2-container-active-box-shadow;
             z-index: $select2-container-active-z-index;
 
             .error &,
@@ -258,6 +259,7 @@
                     background-color: $select2-search-field-background-color;
                     margin-bottom: $select2-search-field-offset-bottom;
                     border: $select2-search-field-border;
+                    box-shadow: $select2-search-field-box-shadow;
                     padding: $select2-search-input-inner-offset;
 
                     &.select2-default {
@@ -630,6 +632,7 @@
     &.select2-container-multi {
         background: transparent;
         border: none;
+        box-shadow: none;
 
         &.hide-all-tree-related-ui {
             .select2-search-choice {

@@ -100,10 +100,12 @@ define([
          */
         toggleLoadingIndicator: function() {
             const visible = (this.collection.length === 0 || this.showLoadingForce) && this.collection.isSyncing();
-            if (this.subview('loading')) {
-                this.subview('loading').toggle(visible);
+            const loading = this.subview('loading');
+            if (loading) {
+                loading.toggle(visible);
+                loading.$el.toggleClass('loading--show', visible);
             } else {
-                this.$loading.toggle(visible);
+                this.$loading.toggle(visible).toggleClass('loading--show', visible);
             }
 
             return this.$loading;

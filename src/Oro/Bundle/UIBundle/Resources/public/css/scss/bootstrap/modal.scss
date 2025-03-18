@@ -185,26 +185,26 @@
 // Danger mode
 .oro-modal-danger {
     .modal-header {
-        background-color: $danger-darken;
+        background-color: $secondary-secondary-3;
         color: $primary-inverse;
     }
 
     .modal-body {
-        background-color: $danger-lighten;
-        color: $danger-ultra-dark;
+        background-color: $danger-light;
+        color: $text-primary;
     }
 }
 
 // Info mode
 .modal-primary {
     .modal-header {
-        background-color: $info-dark;
+        background-color: $secondary-secondary-4;
         color: $primary-inverse;
     }
 
     .modal-body {
-        color: $info-ultra-dark;
-        background-color: $info-lighten;
+        color: $text-primary;
+        background-color: $info-light;
     }
 }
 

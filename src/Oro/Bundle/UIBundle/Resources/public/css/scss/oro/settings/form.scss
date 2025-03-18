@@ -6,7 +6,7 @@ $field-size: 32px !default;
 $field-width: 294px !default;
 $select-caret-offset-end: 10px !default;
 
-$input-field-border-radius: 2px !default;
+$input-field-border-radius: $border-radius !default;
 $input-background-color: $primary-inverse !default;
 $input-inner-offset: ($content-padding-small * .5) $content-padding-small !default;
 $input-box-shadow: none !default;
@@ -19,16 +19,18 @@ $input-box-sizing: border-box !default;
 $input-outline: none !default;
 $input-append-width: $field-width - 30px !default;
 
-$input-focus-box-shadow: none !default;
-$input-focus-border-color: $secondary !default;
+$input-focus-box-shadow: inset 0 0 0 1px $secondary-focus !default;
+$input-focus-border-color: $secondary-focus !default;
+$input-focus-border-width: 1px !default;
 
-$input-invalid-focus-box-shadow: none !default;
-$input-invalid-focus-border-color: $secondary !default;
+$input-invalid-focus-box-shadow: inset 0 0 0 1px $secondary-focus !default;
+$input-invalid-focus-border-color: $secondary-focus !default;
+$input-invalid-focus-border-width: 1px !default;
 
 $input-disabled-cursor: not-allowed !default;
-$input-disabled-border-color: $primary-800 !default;
-$input-disabled-background-color: $primary-900 !default;
-$input-disabled-color: $primary-700 !default;
+$input-disabled-border-color: $text-disabled !default;
+$input-disabled-background-color: $neutral-grey-3 !default;
+$input-disabled-color: $text-disabled !default;
 $input-disabled-resize: none !default;
 
 $input-error-border-color: $danger-dark !default;
@@ -81,7 +83,7 @@ $selector-width: $field-width !default;
 $selector-max-width: $field-width !default;
 $selector-border: $input-border-width solid $primary-750 !default;
 $selector-background-color: $primary-inverse !default;
-$selector-border-radius: 2px !default;
+$selector-border-radius: $border-radius !default;
 $selector-inner-offset: 0 !default;
 
 $selector-option-inner-offset-left: 6px !default;
@@ -105,7 +107,7 @@ $selector-uniform-position: relative !default;
 $selector-uniform-font-size: 100% !default;
 $selector-uniform-width: 100% !default;
 
-$selector-uniform-arrow-outer-offset: 2px 0 0 0 !default;
+$selector-uniform-arrow-outer-offset: 4px 0 0 0 !default;
 $selector-uniform-arrow-display: inline-block !default;
 $selector-uniform-arrow-font-family: $fa-font-family !default;
 $selector-uniform-arrow-position: absolute !default;
@@ -117,23 +119,24 @@ $selector-uniform-line-height: 1 !default;
 // Add-on field button
 $add-on-vertical-align: baseline !default;
 $add-on-float: none !default;
-$add-on-border: 2px solid $primary-750 !default;
+$add-on-border: 1px solid $primary-750 !default;
 $add-on-background-color: $primary-inverse !default;
 $add-on-height: $field-size !default;
 $add-on-line-height: $field-size - 4px !default;
 $add-on-inner-offset: 0 6px !default;
 
 $add-on-input-outer-offset-top: -1px !default;
-$add-on-last-child-border-radius: 0 2px 2px 0 !default;
-$add-on-first-child-border-radius: 2px 0 0 2px !default;
+$add-on-last-child-border-radius: 0 $border-radius $border-radius 0 !default;
+$add-on-first-child-border-radius: $border-radius 0 0 $border-radius !default;
+$add-on-only-child-border-radius: $border-radius !default;
 
 $add-on-disabled-border-color: $primary-800 !default;
 $add-on-disabled-background-color: $primary-900 !default;
 $add-on-disabled-color: $primary-700 !default;
 
-$add-on-append-border-radius: 0 2px 2px 0 !default;
-$add-on-append-offset-left: -2px !default;
-$add-on-append-outer-offset-left: 4px !default;
+$add-on-append-border-radius: $border-radius !default;
+$add-on-append-offset-left: -1px !default;
+$add-on-append-outer-offset-left: $content-padding-xs !default;
 
 $add-on-prepend-border-radius: 2px 0 0 2px !default;
 $add-on-prepend-offset-right: -2px !default;

@@ -68,13 +68,13 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
                 ],
                 'default_settings' => [
                     'chartColors'         => [
-                        '#ACD39C',
-                        '#BE9DE2',
-                        '#6598DA',
-                        '#ECC87E',
-                        '#A4A2F6',
-                        '#6487BF',
-                        '#65BC87'
+                        '#B5D8DA',
+                        '#E6CFE3',
+                        '#CEDFF6',
+                        '#EFD7A7',
+                        '#CAB0B0',
+                        '#A2B4D2',
+                        '#BDD4B3'
                     ],
                     'chartFontSize'       => 9,
                     'chartFontColor'      => '#454545',

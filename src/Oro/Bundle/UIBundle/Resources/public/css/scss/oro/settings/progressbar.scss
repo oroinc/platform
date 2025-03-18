@@ -4,7 +4,7 @@ $progress-container-size: 130px !default;
 
 $progressbar-infinite-height: 6px !default;
 $progressbar-infinite-offset: 6px !default;
-$progressbar-infinite-background-color: #f8b800 !default;
+$progressbar-infinite-background-color: $primary-accent !default;
 
 $progressbar-infinite-line-point-size: 48px !default;
-$progressbar-infinite-line-background-color: $primary-860 !default;
+$progressbar-infinite-line-background-color: $primary-accent-extra-light !default;

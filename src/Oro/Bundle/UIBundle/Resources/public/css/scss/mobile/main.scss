@@ -2,6 +2,7 @@
 
 .mobile-version {
     @import 'variables';
+    @import 'loading/loading-bar';
     @import 'app-header';
     @import 'attribute-item';
     @import 'clearfix';

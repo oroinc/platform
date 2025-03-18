@@ -8,7 +8,7 @@ define(function(require, exports, module) {
 
     const config = require('module-config').default(module.id);
     const launcherOptions = _.extend({
-        className: 'toggle-filters-action btn',
+        className: 'toggle-filters-action btn btn-primary-light',
         icon: 'filter',
         label: __('oro.filter.datagrid-toolbar.filters'),
         ariaLabel: __('oro.filter.datagrid-toolbar.aria_label')

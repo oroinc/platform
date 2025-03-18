@@ -1,5 +1,13 @@
 /* @theme: admin.oro; */
 
+.actions-panel {
+    margin-left: $content-padding-xs;
+
+    .action {
+        margin-right: $content-padding-xs;
+    }
+}
+
 @media only screen and (max-width: $small-devices-media-breakpoint) {
     .actions-panel {
         > div .action {

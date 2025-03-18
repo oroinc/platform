@@ -1,9 +1,9 @@
 /* @theme: admin.oro; */
 
-$sidebar-minimized-width: 32px !default;
+$sidebar-minimized-width: 52px !default;
 $sidebar-maximized-width: 252px !default;
-$sidebar-bg-color: $primary-830 !default;
-$sidebar-color: $primary-400 !default;
+$sidebar-bg-color: rgba(255, 255, 255, .3) !default;
+$sidebar-color: $text-primary !default;
 $sidebar-active-color: $secondary-200 !default;
 $sidebar-resize-border-color-hover: $secondary !default;
 
@@ -15,7 +15,7 @@ $sidebar-widget-header-bg-color: $sidebar-bg-color !default;
 $sidebar-widget-header-active-bg-color: $sidebar-active-color !default;
 $sidebar-widget-title-color: $primary-200 !default;
 $sidebar-widget-actions-width: 30px !default;
-$sidebar-widget-actions-color: $primary-700 !default;
+$sidebar-widget-actions-color: $text-primary !default;
 $sidebar-widget-content-bg-color: $primary-900 !default;
 $sidebar-widget-setup-modal-margin-top: 20% !default;
 

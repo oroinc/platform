@@ -92,7 +92,7 @@ define([
       }
 
       // Build the list of colors
-      // <span class="color selected" title="Green" style="background-color: #7bd148;" role="button"></span>
+      // <span class="color selected" title="Green" style="background-color: #96C27C;" role="button"></span>
       var buildItemFunc = function($option, isSelect) {
         if (!isSelect && ((Array.isArray($option) && !$option.length) || !$option || (typeof $option === 'object' && !Object.keys($option).length))) {
             // Vertical break, like hr
@@ -175,7 +175,7 @@ define([
     /**
      * Changes the selected color.
      *
-     * @param color the hexadecimal color to select, ex: '#fbd75b'
+     * @param color the hexadecimal color to select, ex: '#C3B172'
      */
     selectColor: function(color) {
       var self = this;
@@ -199,7 +199,7 @@ define([
     /**
      * Sets empty color.
      *
-     * @param color the hexadecimal color to select, ex: '#fbd75b'
+     * @param color the hexadecimal color to select, ex: '#C3B172'
      */
     setEmptyColor: function(color) {
       var self = this;
@@ -221,8 +221,8 @@ define([
      * Replace the color.
      * This method can be used if `options.table` is true
      *
-     * @param {string} oldColor the hexadecimal color to be replaced, ex: '#fbd75b'
-     * @param {string} newColor the hexadecimal color to replace, ex: '#fbd75b'
+     * @param {string} oldColor the hexadecimal color to be replaced, ex: '#C3B172'
+     * @param {string} newColor the hexadecimal color to replace, ex: '#C3B172'
      * @param {jQuery.el} $colorSpan element to replace color on
      */
     replaceColor: function(oldColor, newColor, $colorSpan) {

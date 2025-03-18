@@ -101,17 +101,6 @@ define(function(require) {
                 itemView: ItemView,
                 filterer: function(item) {
                     return !pinBar.isVisibleItem(item);
-                },
-                position: function() {
-                    if (pinBar.el) {
-                        const left = Math.ceil(pinBar.$el.position().left);
-
-                        return {
-                            left: _.isRTL() ? left : left + Math.ceil(pinBar.$el.width())
-                        };
-                    } else {
-                        return null;
-                    }
                 }
             });
 

@@ -1,6 +1,8 @@
 /* @theme: admin.oro; */
 
 .loading-bar {
+    --final-width: calc(100% - 20px);
+
     display: $loading-bar-display;
     position: $loading-bar-position;
     bottom: $loading-bar-bottom;

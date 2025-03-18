@@ -47,13 +47,20 @@ $btn-square-icon-dropdown-toggle-fa-left: $content-padding-small !default;
 
 /* Style for button without theme modificator */
 $btn-theme: (
-    'background': $primary-830,
-    'border': $primary-830,
-    'color': $primary-100,
-    'hover-color': $primary-100,
-    'active-color': $primary-100,
-    'active-box-shadow': inset 0 2px 3px 2px rgba(0 0 0 / 21%),
-    'focus-box-shadow': (inset 0 0 0 2px $secondary-100, 0 0 6px 0 rgba($secondary-100, .8))
+    'background': transparent,
+    'hover-background': $primary-main-light,
+    'border': $primary-main,
+    'color': $primary-main,
+    'hover-color': $primary-main,
+    'active-color': $neutral-white,
+    'active-background': $secondary-secondary-4,
+    'active-border': $secondary-secondary-4,
+    'disabled-background': $neutral-grey-3,
+    'disabled-border': $text-disabled,
+    'disabled-color': $text-disabled,
+    'disabled-opacity': 1,
+    'focus-box-shadow': (inset 0 0 0 1px $secondary-focus),
+    'focus-border': $secondary-focus
 ) !default;
 
 $btn-theme-light: (
@@ -73,16 +80,13 @@ $btn-theme-light: (
 $btn-theme-light-custom: (
     'background': transparent,
     'border': transparent,
-    'color': $primary-400,
-    'hover-background': $primary-900,
+    'color': $primary-main,
+    'hover-background': $secondary-secondary-6,
     'hover-border': transparent,
-    'hover-color': $primary-500,
-    'active-background': $primary-860,
+    'hover-color': $primary-main,
+    'active-background': $secondary-secondary-4,
     'active-border': transparent,
-    'active-color': $primary-500,
-    'active-box-shadow': none,
-    'focus-background': $primary-900,
-    'focus-box-shadow': none,
+    'active-color': $neutral-white,
     'disabled-opacity': .25
 ) !default;
 
@@ -102,7 +106,22 @@ $btn-theme-lighter: (
 
 $btn-theme-primary: (
     'background': $secondary,
-    'border': $secondary
+    'hover-background': $secondary-secondary-5,
+    'active-background': $secondary-secondary-4,
+    'disabled-background': $text-disabled,
+    'border': $secondary,
+    'disabled-opacity': 1
+) !default;
+
+$btn-theme-primary-light: (
+    'background': $primary-main-light,
+    'hover-background': $secondary-secondary-6,
+    'active-background': $secondary-secondary-4,
+    'active-color': $neutral-white,
+    'disabled-background': $text-disabled,
+    'disabled-color': $neutral-white,
+    'border': $primary-main-light,
+    'color': $primary-main
 ) !default;
 
 $btn-theme-info: (
@@ -124,12 +143,18 @@ $btn-theme-warning: (
 ) !default;
 
 $btn-theme-danger: (
-    'background': $danger,
-    'border': $danger,
+    'background': $secondary-secondary-3,
+    'border': $secondary-secondary-3,
     'hover-background': $danger-dark,
     'hover-border': $danger-dark,
     'active-background': $danger-dark,
     'active-border': $danger-dark,
+) !default;
+
+$btn-theme-white: (
+    'background': transparent,
+    'color': $primary-inverse,
+    'border': transparent
 ) !default;
 
 $btn-theme-dark: (
@@ -138,8 +163,15 @@ $btn-theme-dark: (
 ) !default;
 
 $btn-theme-inverse: (
-    'background': $additional,
-    'border': $additional
+    'background': $primary-inverse,
+    'hover-background': $primary-main-light,
+    'active-background': $secondary-secondary-4,
+    'active-border': $secondary-secondary-4,
+    'border': $primary-main,
+    'color': $secondary,
+    'disabled-background': $neutral-grey-3,
+    'disabled-border': $text-disabled,
+    'disabled-color': $text-disabled,
 ) !default;
 
 $btn-theme-keys: () !default;
@@ -149,12 +181,14 @@ $btn-theme-keys: map.merge(
         'light-custom': $btn-theme-light-custom,
         'lighter': $btn-theme-lighter,
         'primary': $btn-theme-primary,
+        'primary-light': $btn-theme-primary-light,
         'info': $btn-theme-info,
         'success': $btn-theme-success,
         'warning': $btn-theme-warning,
         'danger': $btn-theme-danger,
         'dark': $btn-theme-dark,
-        'inverse': $btn-theme-inverse
+        'inverse': $btn-theme-inverse,
+        'white': $btn-theme-white
     ),
     $btn-theme-keys
 );

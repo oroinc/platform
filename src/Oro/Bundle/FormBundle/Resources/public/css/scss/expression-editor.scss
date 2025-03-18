@@ -29,12 +29,14 @@
     min-height: 300px;
     min-width: 500px;
     flex-direction: row;
+    border-radius: $border-radius-md;
 
     .cm-scroller {
-        margin: 8px;
+        margin: 6px;
         height: auto;
         width: 100%;
         border: $input-border-width solid $input-border-color;
+        border-radius: $border-radius;
 
         &.cm-has-linter-panel {
             padding-bottom: 30px;
@@ -93,6 +95,7 @@
 
         .cm-scroller {
             border-color: $input-focus-border-color;
+            box-shadow: inset 0 0 0 1px $input-focus-border-color;
         }
 
         .cm-nonmatchingBracket {
@@ -124,10 +127,11 @@
         position: static;
         width: 170px;
         min-width: 170px;
-        padding: 8px;
+        padding: 6px;
         border-top-width: 0;
         border-bottom-width: 0;
         border-right: 1px solid $input-border-color;
+        border-radius: $border-radius-md 0 0 $border-radius-md;
     }
 
     .cm-panel-title {
@@ -146,10 +150,10 @@
     }
 
     .cm-btn {
-        min-width: 48px;
+        min-width: 49px;
         height: 32px;
         padding: 0;
-        border-radius: 3px;
+        border-radius: $border-radius;
         border: 1px solid $primary-800;
         background-color: $primary-860;
         color: $primary-200;
@@ -165,7 +169,7 @@
         }
 
         &-half {
-            min-width: 74px;
+            min-width: 76px;
         }
 
         &-full {
@@ -203,6 +207,12 @@
         .cm-scroller {
             border-color: $input-error-border-color;
         }
+
+        &.cm-focused {
+            .cm-scroller {
+                box-shadow: inset 0 0 0 1px $input-error-border-color;
+            }
+        }
     }
 
     .expression-editor-data-source.active + & {
@@ -211,9 +221,9 @@
 
     .cm-linter-bottom-panel {
         position: absolute;
-        left: 180px;
-        right: 10px;
-        bottom: 10px;
+        left: 179px;
+        right: 9px;
+        bottom: 9px;
         padding: 2px 10px;
         background-color: $danger-ultra-light;
         color: $danger;

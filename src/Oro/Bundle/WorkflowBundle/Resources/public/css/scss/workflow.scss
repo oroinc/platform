@@ -69,7 +69,7 @@ table.grid {
 
 .workflow-entity {
     display: flex;
-    padding: $content-padding-medium * .5 0;
+    padding: $content-padding-medium * .5 0 $content-padding-medium;
 
     .workflow-label {
         padding: 0 6px;
@@ -103,10 +103,6 @@ table.grid {
     max-width: $workflow-widget-label-max-width;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-.workflow-widget-content {
-    padding-right: $content-padding;
 }
 
 .workflow-content {

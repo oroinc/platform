@@ -73,17 +73,17 @@ class OroSimpleColorPickerTypeTest extends FormIntegrationTestCase
             'color_schema'  => 'short',
             'show_input_control' => true,
             'colors'        => [
-                '#5484ED' => 'oro.form.color.bold_blue',
-                '#A4BDFC' => 'oro.form.color.blue',
-                '#46D6DB' => 'oro.form.color.turquoise',
-                '#7AE7BF' => 'oro.form.color.green',
-                '#51B749' => 'oro.form.color.bold_green',
-                '#FBD75B' => 'oro.form.color.yellow',
-                '#FFB878' => 'oro.form.color.orange',
-                '#FF887C' => 'oro.form.color.red',
-                '#DC2127' => 'oro.form.color.bold_red',
-                '#DBADFF' => 'oro.form.color.purple',
-                '#E1E1E1' => 'oro.form.color.gray'
+                '#6D8DD4' => 'oro.form.color.bold_blue',
+                '#76AAC5' => 'oro.form.color.blue',
+                '#5C9496' => 'oro.form.color.turquoise',
+                '#99B3AA' => 'oro.form.color.green',
+                '#547C51' => 'oro.form.color.bold_green',
+                '#C3B172' => 'oro.form.color.yellow',
+                '#C98950' => 'oro.form.color.orange',
+                '#D28E87' => 'oro.form.color.red',
+                '#A24A4D' => 'oro.form.color.bold_red',
+                '#A285B8' => 'oro.form.color.purple',
+                '#949CA1' => 'oro.form.color.gray'
             ],
         ];
 
@@ -92,17 +92,17 @@ class OroSimpleColorPickerTypeTest extends FormIntegrationTestCase
         $this->assertEquals(
             [
                 'colors'                => [
-                    '#5484ED' => 'oro.form.color.bold_blue',
-                    '#A4BDFC' => 'oro.form.color.blue',
-                    '#46D6DB' => 'oro.form.color.turquoise',
-                    '#7AE7BF' => 'oro.form.color.green',
-                    '#51B749' => 'oro.form.color.bold_green',
-                    '#FBD75B' => 'oro.form.color.yellow',
-                    '#FFB878' => 'oro.form.color.orange',
-                    '#FF887C' => 'oro.form.color.red',
-                    '#DC2127' => 'oro.form.color.bold_red',
-                    '#DBADFF' => 'oro.form.color.purple',
-                    '#E1E1E1' => 'oro.form.color.gray'
+                    '#6D8DD4' => 'oro.form.color.bold_blue',
+                    '#76AAC5' => 'oro.form.color.blue',
+                    '#5C9496' => 'oro.form.color.turquoise',
+                    '#99B3AA' => 'oro.form.color.green',
+                    '#547C51' => 'oro.form.color.bold_green',
+                    '#C3B172' => 'oro.form.color.yellow',
+                    '#C98950' => 'oro.form.color.orange',
+                    '#D28E87' => 'oro.form.color.red',
+                    '#A24A4D' => 'oro.form.color.bold_red',
+                    '#A285B8' => 'oro.form.color.purple',
+                    '#949CA1' => 'oro.form.color.gray'
                 ],
                 'translatable'          => true,
                 'allow_empty_color'     => false,

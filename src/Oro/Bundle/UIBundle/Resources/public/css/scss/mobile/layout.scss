@@ -4,6 +4,10 @@
 
 body {
     min-width: $width-body-page-mobile;
+
+    &:not(.login-page) {
+        background: $neutral-white;
+    }
 }
 
 & {

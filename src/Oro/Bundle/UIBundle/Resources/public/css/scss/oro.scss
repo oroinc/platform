@@ -153,7 +153,6 @@ footer {
 
     .top-action-box {
         padding: 0 12px;
-        background-color: $primary-inverse;
         float: right;
 
         > * {
@@ -529,7 +528,7 @@ label.radio.error {
     .oro-subtitle {
         line-height: 1.2;
         font-size: $base-font-size--xl;
-        font-weight: font-weight('light');
+        font-weight: font-weight('semi-bold');
         padding: 0;
         margin: 0;
     }
@@ -645,8 +644,6 @@ label.radio.error {
 }
 
 .box-type1 {
-    background-color: $primary-inverse;
-
     .title {
         padding-bottom: $content-padding-medium;
     }
@@ -777,7 +774,7 @@ span.validation-failed {
 .nav-tabs > li > a.widget-component-processing {
     /* stylelint-disable declaration-no-important */
     background: rgba($primary-inverse, .5) !important;
-    border-bottom: 1px solid transparent !important;
+    color: $text-disabled !important;
     /* stylelint-enable declaration-no-important */
     position: relative;
     z-index: 1;

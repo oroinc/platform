@@ -7,7 +7,7 @@ $checkbox-size-var: var(--checkbox-size, #{$checkbox-size}) !default;
 $checkbox-appearance: none !default;
 $checkbox-vertical-align: middle !default;
 $checkbox-margin: 0 !default;
-$checkbox-border: 2px solid $primary-750 !default;
+$checkbox-border: 1px solid $primary-750 !default;
 $checkbox-color: $primary-inverse !default;
 $checkbox-display: inline-grid !default;
 $checkbox-border-radius: 3px !default;
@@ -45,7 +45,7 @@ $checkbox-box-shadow-focus: 0 0 5px var(--checkbox-skin-color, #{$secondary}) !d
 $checkbox-opacity-disabled: .5 !default;
 
 // Variables for radio
-$checkbox-radio-border: 2px solid $primary-750 !default;
+$checkbox-radio-border: 1px solid $primary-750 !default;
 $checkbox-radio-border-radius: 50% !default;
 
 $checkbox-radio-icon-content: '' !default;

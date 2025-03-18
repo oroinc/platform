@@ -55,6 +55,13 @@
     .jstree-wholerow-clicked,
     .jstree-wholerow-hovered {
         height: $jstree-wholerow-hovered-height;
+    }
+
+    .jstree-wholerow-clicked {
+        background: $jstree-wholerow-clicked-background;
+    }
+
+    .jstree-wholerow-hovered {
         background: $jstree-wholerow-hovered-background;
     }
 

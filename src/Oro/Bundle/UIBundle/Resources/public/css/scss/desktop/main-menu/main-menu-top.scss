@@ -3,15 +3,14 @@
 /* stylelint-disable no-descending-specificity, selector-max-compound-selectors, max-nesting-depth */
 
 .main-menu-top {
-    background-color: $menu-background-color;
-
     @include clearfix();
 
     .main-menu {
+        background: none;
         display: flex;
         align-items: center;
         float: left;
-        padding-left: 5px;
+        padding-left: 10px;
 
         @include clearfix();
     }
@@ -92,7 +91,7 @@
             &:hover {
                 .title {
                     &:hover {
-                        background: $menu-background-color-active;
+                        background: $menu-background-color-hover;
                     }
 
                     &-level-1 {

@@ -57,11 +57,12 @@
     <div id="page" style="display:none;" class="app-page">
         {% block content_side %}
             <div class="app-page__content-side">
-                {% include '@OroUI/Default/navbar/sided.html.twig' %}
+                {%- include '@OroUI/Default/navbar/sided.html.twig' -%}
             </div>
         {% endblock content_side %}
-        <div class="app-page__content">
+        <div id="app-content" class="app-page__content">
             {% block header %}
+                {% placeholder pin_tabs_list %}
                 <header class="app-header{% if oro_config_value('oro_ui.navbar_position') != 'top' %} thick{% endif %}" id="oroplatform-header"
                     {% if isMobileVersion() %}
                         {{ UI.renderPageComponentAttributes({
@@ -76,28 +77,22 @@
                     {% placeholder before_navigation %}
                     <div class="app-header__inner">
                         <div class="app-header__container">
-                            {% placeholder header_logo %}
-                            <ul class="user-menu">
-                                {{ block('user_menu') }}
-                            </ul>
-                            <div class="app-header__search-and-shortcuts">
-                                {{ block('navbar') }}
+                            <div class="app-header__container-panel">
+                                {% placeholder header_logo %}
+                                <ul class="user-menu">
+                                    {{ block('user_menu') }}
+                                </ul>
+                                <div class="app-header__search-and-shortcuts">
+                                    {{ block('navbar') }}
+                                </div>
                             </div>
-                            {% placeholder pin_tabs_list %}
                         </div>
+                        {% include '@OroUI/Default/navbar/top.html.twig' %}
                     </div>
-                    {% include '@OroUI/Default/navbar/top.html.twig' %}
                     {% placeholder after_navigation %}
                 </header>
             {% endblock header %}
             <main class="app-page__main">
-                {% if isDesktopVersion() %}
-                    {% block left_panel %}
-                        <div id="left-panel" class="app-page__left-panel">
-                            {% placeholder left_panel with {placement: 'left'} %}
-                        </div>
-                    {% endblock left_panel %}
-                {% endif %}
                 {% block main %}
                     <div id="central-panel" class="app-page__central-panel">
                         {% block before_content %}
@@ -157,14 +152,29 @@
                         </div>
                     </div>
                 {% endblock main %}
-                {% if isDesktopVersion() %}
-                    {% block right_panel %}
-                        <div id="right-panel" class="app-page__right-panel">
-                            {% placeholder right_panel with {placement: 'right'} %}
-                        </div>
-                    {% endblock right_panel %}
-                {% endif %}
             </main>
+            {% if isDesktopVersion() %}
+                {% block left_panel %}
+                    {% set left_panel_content %}
+                        {%- placeholder left_panel with {placement: 'left'} -%}
+                    {% endset %}
+                    {%- if left_panel_content|trim|length > 0 -%}
+                    <div id="left-panel" class="app-page__left-panel">
+                        {{- left_panel_content|trim|raw -}}
+                    </div>
+                    {% endif %}
+                {% endblock left_panel %}
+                {% block right_panel %}
+                    {% set right_panel_content %}
+                        {%- placeholder right_panel with {placement: 'right'} -%}
+                    {% endset %}
+                    {%- if right_panel_content|trim|length > 0 -%}
+                    <div id="right-panel" class="app-page__right-panel">
+                        {{- right_panel_content|trim|raw -}}
+                    </div>
+                    {% endif %}
+                {% endblock right_panel %}
+            {% endif %}
         {% block footer %}
             <div id="dialog-extend-fixed-container" class="ui-dialog-minimize-container"></div>
             <footer id="footer" class="footer">

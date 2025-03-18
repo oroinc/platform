@@ -2,6 +2,10 @@
 
 /* stylelint-disable no-descending-specificity */
 
+body {
+    background: $primary-accent-gradient;
+}
+
 @mixin responsive-inline-position() {
     float: left;
     width: 50%;
@@ -285,7 +289,7 @@ body.backdrop {
         padding: 10px;
 
         @include safe-area-property-right(padding-right, 10px);
-        
+
         background-color: $primary-inverse;
     }
 

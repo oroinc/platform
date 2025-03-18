@@ -149,6 +149,8 @@
     }
 
     &--content {
+        padding-left: $content-padding;
+
         .responsive-section {
             .form-horizontal {
                 padding: $content-sidebar-form-horizontal-offset-inner;

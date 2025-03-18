@@ -76,17 +76,63 @@ body:not(.login-page) {
     box-sizing: border-box;
     display: flex;
     min-height: 0;
+    padding-top: $content-padding;
+    padding-inline: $content-padding;
+    gap: 0 #{$content-padding};
 
     &__content-side {
         flex-shrink: 0;
+
+        &:empty {
+            display: none;
+        }
     }
 
     &__content {
         flex-grow: 1;
         overflow: inherit;
         height: 100%;
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        gap: 0 16px;
+
+        grid-template-areas:
+            'pinbar'
+            'header'
+            'main'
+            'dialog'
+            'footer';
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+
+        &:has(.app-page__right-panel) {
+            grid-template-areas:
+            'pinbar pinbar'
+            'header rightpanel'
+            'main rightpanel'
+            'dialog dialog'
+            'footer footer';
+            grid-template-columns: minmax(0, 1fr) auto;
+        }
+
+        &:has(.app-page__left-panel) {
+            grid-template-areas:
+            'pinbar pinbar'
+            'leftpanel header'
+            'leftpanel main'
+            'dialog dialog'
+            'footer footer';
+            grid-template-columns: auto minmax(0, 1fr);
+        }
+
+        &:has(.app-page__left-panel):has(.app-page__right-panel) {
+            grid-template-areas:
+            'pinbar pinbar pinbar'
+            'leftpanel header rightpanel'
+            'leftpanel main rightpanel'
+            'dialog dialog dialog'
+            'footer footer footer';
+            grid-template-columns: auto minmax(0, 1fr) auto;
+        }
     }
 
     &__main {
@@ -98,12 +144,27 @@ body:not(.login-page) {
         flex-grow: 1;
         flex-shrink: 1;
         min-height: 0;
+        gap: 0 16px;
+        grid-area: main;
     }
 
     &__left-panel,
     &__right-panel {
         position: relative;
         overflow: visible;
+        box-shadow: $primary-box-shadow;
+
+        &:empty {
+            display: none;
+        }
+    }
+
+    &__left-panel {
+        grid-area: leftpanel;
+    }
+
+    &__right-panel {
+        grid-area: rightpanel;
     }
 
     &__central-panel {
@@ -113,19 +174,22 @@ body:not(.login-page) {
         overflow: hidden;
         flex-grow: 1;
     }
+
+    #dialog-extend-fixed-container {
+        grid-area: dialog;
+    }
+
+    .footer {
+        grid-area: footer;
+    }
 }
 
 .layout-content {
     > .scrollable-container {
-        padding-left: $content-padding;
-        padding-right: $content-padding;
-    }
-
-    // Update offset on pages with sidebar
-    > .sidebar-container .category-data {
-        padding-left: $content-padding;
-        padding-right: $content-padding;
-        margin-right: -$content-padding;
+        &:not(:has(.dashboard-container, .launchpad-container)) {
+            margin-right: -$content-padding;
+            padding-right: $content-padding;
+        }
     }
 
     //  Update offset on view pages
@@ -152,6 +216,20 @@ body:not(.login-page) {
     flex-shrink: 1;
     height: 100%;
     min-height: 0;
+}
+
+#container:not(:has(.dashboard-container-wrapper)) {
+    background-color: $neutral-white;
+    border-radius: $border-radius-md;
+    padding-top: $content-padding;
+
+    > .layout-content {
+        padding-inline: $content-padding;
+
+        .container-fluid.page-title {
+            padding-inline: 0;
+        }
+    }
 }
 
 .scrollable-container {

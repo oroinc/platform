@@ -23,7 +23,7 @@
         padding: 0;
         text-shadow: none;
         color: $primary-600;
-        font-weight: font-weight('light');
+        font-weight: font-weight('medium');
         font-size: $base-font-size--s;
         border-radius: $border-radius;
 
@@ -36,7 +36,8 @@
         }
 
         &.label-info {
-            background: $info;
+            background: $primary-accent;
+            border-color: $primary-accent;
             color: $primary-inverse;
             padding: $address-box-item-label-info-padding-vertical $address-box-item-label-info-padding-horizontal;
             margin: 0 $address-box-item-label-info-offset-horizontal 0 0;
@@ -109,7 +110,7 @@
         justify-content: center;
         min-height: $address-map-no-data-min-height;
 
-        background: $primary-900;
+        background: $neutral-grey-1;
         border-radius: $border-radius;
 
         .alert {
@@ -144,7 +145,7 @@
     }
 
     .map-item {
-        background: $primary-900;
+        background: $neutral-grey-1;
         padding: $address-content-padding-small $content-padding-medium;
         border: 1px solid $primary-900;
         border-radius: $border-radius;
@@ -156,8 +157,8 @@
         }
 
         &.active {
-            background-color: $primary-860;
-            border-color: $primary-800;
+            background-color: $neutral-grey-1;
+            border-color: $neutral-grey-3;
 
             cursor: default;
         }

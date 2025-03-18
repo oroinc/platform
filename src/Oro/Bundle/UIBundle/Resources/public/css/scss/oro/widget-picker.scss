@@ -75,6 +75,7 @@
 
     &__actions-column {
         width: $widget-picker-actions-column-width;
+        padding-left: $widget-picker-actions-column-padding-start;
         padding-right: $widget-picker-actions-column-padding-end;
         flex-grow: 0;
         flex-shrink: 0;
@@ -124,6 +125,7 @@
     &__summary-row {
         list-style: none;
         flex-wrap: wrap;
+        width: 100%;
 
         &::-webkit-details-marker {
             display: none;
