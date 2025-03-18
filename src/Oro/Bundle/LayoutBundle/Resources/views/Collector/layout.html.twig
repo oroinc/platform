@@ -595,7 +595,7 @@
         <h3>Customize the following blocks in twig templates:</h3>
         <div>
             <table>
-                {% for blockPrefix in data.block_prefixes|reverse %}
+                {% for blockPrefix in data.block_prefixes|default()|reverse %}
                     <tr>
                         <td>
                             {{ loop.index }}

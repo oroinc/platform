@@ -4,8 +4,8 @@ namespace Oro\Bundle\ThemeBundle\Form\EventListener;
 
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfiguration as LayoutThemeConfiguration;
-use Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfigurationProvider;
 use Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration;
+use Oro\Component\Layout\Extension\Theme\Model\ThemeDefinitionBagInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -16,7 +16,7 @@ use Symfony\Component\Form\FormEvents;
 class ThemeConfigurationSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private ThemeConfigurationProvider $provider
+        private ThemeDefinitionBagInterface $provider
     ) {
     }
 

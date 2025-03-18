@@ -1,0 +1,42 @@
+/* @theme: default; */
+
+.chart-container {
+    position: $chart-container-position;
+    padding-top: $chart-container-padding-top;
+
+    .chart-content {
+        --chart-height: #{$chart-height};
+        --chart-color: #{$chart-color};
+        --chart-colors: #{$chart-colors};
+        --chart-font-size: #{$chart-font-size};
+        --chart-font-color: #{$chart-font-color};
+
+        --chart-bar-width: #{$chart-bar-width};
+        --chart-bar-opacity: #{$chart-bar-opacity};
+
+        --chart-tooltip-line-color: #{$chart-tooltip-line-color};
+        --chart-tooltip-fill-color: #{$chart-tooltip-fill-color};
+        --chart-tooltip-margin: #{$chart-tooltip-margin};
+        --chart-tooltip-radius: #{$chart-tooltip-radius};
+        --chart-tooltip-opacity: #{$chart-tooltip-opacity};
+
+        --chart-yaxis-color: #{$chart-yaxis-color};
+
+        --chart-xaxis-color: #{$chart-xaxis-color};
+
+        --chart-grid-tick-color: #{$chart-grid-tick-color};
+        --chart-grid-text-color: #{$chart-grid-text-color};
+        --chart-grid-label-margin: #{$chart-grid-label-margin};
+        --chart-grid-label-y-margin: #{$chart-grid-label-y-margin};
+    }
+}
+
+@include breakpoint('mobile-landscape') {
+    .chart-container {
+        padding-bottom: $chart-container-padding-bottom-mobile-landscape;
+
+        .flotr-grid-label-x {
+            transform: $chart-container-flotr-grid-label-x-transform-mobile-landscape;
+        }
+    }
+}

@@ -1,0 +1,50 @@
+/* @theme: default; */
+
+.flotr-mouse-value {
+    // stylelint-disable-next-line declaration-no-important
+    opacity: unset !important;
+}
+
+.flotr-hint {
+    padding: $flotr-hint-offset;
+    color: $flotr-hint-color;
+
+    &::before {
+        content: '';
+
+        position: absolute;
+        inset: 0;
+
+        z-index: z('base');
+
+        background-color: $flotr-hint-background-color;
+        border-radius: $base-ui-element-border-radius;
+    }
+
+    &::after {
+        content: '';
+
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        z-index: z('base');
+
+        margin-left: -#{$flotr-hint-arrow-size};
+        border-width: $flotr-hint-arrow-size;
+        border-style: solid;
+        border-color: $flotr-hint-background-color transparent transparent transparent;
+    }
+
+    &__content {
+        position: relative;
+        z-index: z('base');
+    }
+
+    &__data {
+        font-size: $base-font-size--s;
+    }
+
+    &__volume {
+        font-weight: font-weight('semi-bold');
+    }
+}

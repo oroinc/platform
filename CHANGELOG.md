@@ -19,12 +19,15 @@ The current file describes significant changes in the code that may affect the u
 
 #### FormBundle
 * Added the ability to use nested constraints (e.g. `When`) in `\Oro\Bundle\FormBundle\Validator\ConstraintFactory` that creates constraints from an array definition (e.g. fetched from `system_configuration.yml`).
+* Added the ability to use the `time` HTML tag with a `datetime` attribute in `html_purifier_modes`.
 
 #### ThemeBundle
 * Added theme configuration feature that provides theme developers a way to make a storefront theme configurable by a store owner.
 * Added new `\Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration` entity that contains theme configuration options.
 * Added new `oro:theme:configuration:validate` command that validates theme configuration.
 * Added `\Oro\Bundle\ThemeBundle\Fallback\Provider\ThemeConfigurationFallbackProvider` fallback provider which fetches data from theme configuration.
+* Added `\Oro\Bundle\ThemeBundle\Acl\Voter\ThemeConfigurationDependencyDeleteVoter` voter that forbids removal operation for dependent entities if they are used in theme configuration.
+* Added a new `getThemeConfigurationOptionsNamesByType` method for `\Oro\Bundle\ThemeBundle\Provider\ThemeConfigurationProvider` provider that returns all theme options names by type of option.
 
 #### UIBundle
 * Added new twig function `oro_is_string` that finds whether the given variable type is a string.
@@ -48,6 +51,14 @@ The current file describes significant changes in the code that may affect the u
 * Added an "Add filter" button to each resource for API sandbox.
 * Added a new meta `validate` flag to create and update operations, making API requests with transaction rollback instead of commit.
 * Added a new `rollback_validated_request` event for `customize_form_data` action.
+
+#### ChartBundle
+* Chart scripts are declared as `dynamic-imports` scripts for the storefront.
+* Added a new `purchase-volume-chart` chart.
+
+#### DataGridBundle
+* Added a new `transTemplate` datagrid option for the `itemsCounter` section that allows to set translation template for the datagrid items counter. 
+* Added a new `orodatagrid/js/datagrid/builder/items-count-external` datagrid builder that allows the showing of datagrid item count in an element with the specific data attribute.
 
 ### Changed
 

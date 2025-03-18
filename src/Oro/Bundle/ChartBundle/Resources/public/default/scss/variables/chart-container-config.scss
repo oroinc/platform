@@ -1,0 +1,43 @@
+/* @theme: default; */
+
+$chart-container-position: relative !default;
+$chart-container-padding-top: spacing('xs') !default;
+
+$chart-height: 280px !default;
+$chart-color: get-color('primary', 'main') !default;
+// Colorscheme, there are > 5 series, additional colors are generated.
+$chart-colors: (
+    get-color('primary', 'main'),
+    get-color('secondary', 'c1'),
+    get-color('secondary', 'c2'),
+    get-color('secondary', 'c3'),
+    get-color('secondary', 'c4')
+) !default;
+
+$chart-font-size: $base-font-size !default;
+$chart-font-color: get-color('text', 'primary') !default;
+
+// small: 0.1, standard: 0.5, full width: 1
+$chart-bar-width: .76 !default;
+$chart-bar-opacity: 1 !default;
+
+$chart-tooltip-line-color: get-color('primary', 'hover') !default;
+$chart-tooltip-fill-color: get-color('primary', 'hover') !default;
+
+// margin in pixels of the value box
+$chart-tooltip-margin: -84px !default;
+$chart-tooltip-radius: $base-ui-element-border-radius !default;
+$chart-tooltip-opacity: 1 !default;
+
+$chart-yaxis-color: get-color('text', 'primary') !default;
+
+$chart-xaxis-color: get-color('text', 'primary') !default;
+
+$chart-grid-tick-color: get-color('neutral', 'grey1') !default;
+$chart-grid-text-color: get-color('neutral', 'grey3') !default;
+$chart-grid-label-margin: 10px !default;
+$chart-grid-label-y-margin: 22px !default;
+
+// Mobile Landscape
+$chart-container-padding-bottom-mobile-landscape: spacing('sm') !default;
+$chart-container-flotr-grid-label-x-transform-mobile-landscape: rotate(-90deg) !default;

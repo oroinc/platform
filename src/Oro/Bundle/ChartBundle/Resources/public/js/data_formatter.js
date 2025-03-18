@@ -35,6 +35,14 @@ define(function(require) {
                     date = new Date();
                     date.setTime(data);
                     return dateTimeFormatter.getMomentForBackendDate(date).format('MMM YYYY');
+                case 'month_short':
+                    date = new Date();
+                    date.setTime(data);
+                    return dateTimeFormatter.getMomentForBackendDate(date).format('MMM');
+                case 'month_long':
+                    date = new Date();
+                    date.setTime(data);
+                    return dateTimeFormatter.getMomentForBackendDate(date).format('MMMM YYYY');
                 case 'date':
                     date = new Date();
                     date.setTime(data);
@@ -94,6 +102,8 @@ define(function(require) {
                 case 'date':
                 case 'year':
                 case 'month':
+                case 'month_short':
+                case 'month_long':
                 case 'day':
                     if (_.isObject(data)) {
                         data = data.date;
@@ -127,6 +137,8 @@ define(function(require) {
                 case 'percent':
                 case 'date':
                 case 'month':
+                case 'month_short':
+                case 'month_long':
                 case 'datetime':
                     return true;
                 default:

@@ -12,6 +12,10 @@
         border-width: $datagrid-header-cell-border-width;
     }
 
+    .table-xs & {
+        line-height: $datagrid-header-cell-xs-line-height;
+    }
+
     &.sortable {
         &:hover {
             background-color: $datagrid-header-cell-sortable-background-color-hover;
