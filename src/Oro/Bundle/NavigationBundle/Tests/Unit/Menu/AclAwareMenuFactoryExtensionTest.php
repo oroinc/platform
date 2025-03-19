@@ -473,17 +473,30 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($item->getExtra('isAllowed'));
     }
 
-    /**
-     * @dataProvider optionsInvocableDataProvider
-     */
-    public function testBuildOptionsWithInvokableController(array $options, bool $isAllowed)
+    public function testBuildOptionsWithInvokableController(): void
     {
+        $this->tokenAccessor
+            ->expects(self::once())
+            ->method('getToken')
+            ->willReturn($this->createMock(TokenInterface::class));
+        $this->tokenAccessor
+            ->expects(self::once())
+            ->method('hasUser')
+            ->willReturn(true);
+
         $controllerClassProvider = $this->createMock(ControllerClassProvider::class);
-        $controllerClassProvider->expects($this->any())
+        $controllerClassProvider
+            ->expects(self::once())
             ->method('getControllers')
             ->willReturn([
-                'route_name' => ['controller'],
+                'sample_route' => ['Acme\Controller\SampleController'],
             ]);
+
+        $this->classAuthorizationChecker
+            ->expects(self::once())
+            ->method('isClassMethodGranted')
+            ->with('Acme\Controller\SampleController', '__invoke')
+            ->willReturn(true);
 
         $factoryExtension = new AclAwareMenuFactoryExtension(
             $this->urlMatcher,
@@ -497,30 +510,8 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit\Framework\TestCase
         $this->factory = new MenuFactory();
         $this->factory->addExtension($factoryExtension);
 
-        $item = $this->factory->createItem('test', $options);
-        $this->assertInstanceOf(MenuItem::class, $item);
-        $this->assertEquals($isAllowed, $item->getExtra('isAllowed'));
-    }
-
-    public function optionsInvocableDataProvider(): array
-    {
-        return [
-            'no access check' => [
-                [
-                    'check_access' => false,
-                ],
-                true,
-            ],
-            'show non authorized' => [
-                [
-                    'extras' => ['show_non_authorized' => true],
-                ],
-                true,
-            ],
-            'default' => [
-                [],
-                false,
-            ],
-        ];
+        $item = $this->factory->createItem('test', ['route' => 'sample_route']);
+        self::assertInstanceOf(MenuItem::class, $item);
+        self::assertTrue($item->getExtra('isAllowed'));
     }
 }

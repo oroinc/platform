@@ -22,6 +22,15 @@ oro_behat_extension:
           Title English: 'oro_localization[titles][values][localizations][1][value]'
           Title Use: 'oro_localization[titles][values][localizations][1][use_fallback]'
 
+    Configuration Localization Form:
+      selector: 'form[name="localization"]'
+      class: Oro\Bundle\TestFrameworkBundle\Behat\Element\Form
+      options:
+        mapping:
+          Default Localization: 'localization[oro_locale___default_localization][value]'
+          Primary Location Use Default: 'localization[oro_locale___country][use_parent_scope_value]'
+          Primary Location: 'localization[oro_locale___country][value]'
+
     Fallback Status:
       selector: '.fallback-status [class^="fa-language"]'
 

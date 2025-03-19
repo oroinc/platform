@@ -8,7 +8,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 use Twig\Environment;
 
 /**
- * BeforeViewRenderEvent event is triggered by oro_ui_scroll_data_before Twig function
+ * BeforeListRenderEvent event is triggered by oro_ui_scroll_data_before Twig function
  * to collect data for a scroll block. See the scrollData macro for the data format.
  * @see platform/src/Oro/Bundle/UIBundle/Resources/views/macros.html.twig
  */
