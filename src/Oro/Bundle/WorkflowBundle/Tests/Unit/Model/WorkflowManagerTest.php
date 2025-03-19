@@ -34,6 +34,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -1478,7 +1479,8 @@ class WorkflowManagerTest extends TestCase
     {
         $transition = new Transition(
             $this->createMock(TransitionOptionsResolver::class),
-            $this->createMock(EventDispatcher::class)
+            $this->createMock(EventDispatcher::class),
+            $this->createMock(TranslatorInterface::class)
         );
         $transition->setName($name);
 

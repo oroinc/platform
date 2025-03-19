@@ -85,6 +85,13 @@ services:
         tags:
             - { name: form.type, alias: oro_turnstile_token }
 
+    oro_form.captcha.captcha_form_type:
+        class: Oro\Bundle\FormBundle\Form\Type\CaptchaType
+        arguments:
+            - '@oro_form.captcha.settings_provider'
+        tags:
+            - { name: form.type, alias: oro_captcha }
+
     oro_form.captcha.captcha_protected_form_select_type:
         class: Oro\Bundle\FormBundle\Form\Type\CaptchaProtectedFormSelectType
         arguments:

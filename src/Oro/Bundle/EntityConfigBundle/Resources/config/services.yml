@@ -123,6 +123,10 @@ services:
             - '@oro_entity_config.config_cache_impl'
             - '@oro_entity_config.model_cache_impl'
             - [] # scopes. Set by Oro\Bundle\EntityConfigBundle\DependencyInjection\Compiler\EntityConfigPass
+        calls:
+            - ['setLogger', ['@logger']]
+        tags:
+            - { name: monolog.logger, channel: entity_config }
 
     oro_entity_config.config_cache_impl:
         public: false

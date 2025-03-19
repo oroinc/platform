@@ -7,17 +7,21 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 
 /**
  * The cache for entity configs.
- * IMPORTANT: A performance of this class is very crucial. Double check a performance during a refactoring.
+ * IMPORTANT: A performance of this class is very crucial. Double-check a performance during a refactoring.
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class ConfigCache
+class ConfigCache implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     private const ENTITY_CLASSES_KEY = '_entities';
     private const FIELD_NAMES_KEY    = '_fields_';
 
@@ -719,6 +723,16 @@ class ConfigCache
     {
         $packed = [];
         foreach ($entry as $fieldName => $fieldEntry) {
+            if (!isset($fieldEntry[0])) {
+                $this->logger?->error(
+                    'Broken field config',
+                    [
+                        'fieldName' => $fieldName,
+                        'config' => $fieldEntry
+                    ]
+                );
+                continue;
+            }
             $config = $fieldEntry[0];
             if ($config instanceof ConfigInterface) {
                 $config = $config->getValues();

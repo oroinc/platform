@@ -111,6 +111,10 @@ class AclAwareMenuFactoryExtension implements Factory\ExtensionInterface
             return $defaultValue;
         }
 
+        if (count($controller) === 1) {
+            $controller[] = '__invoke';
+        }
+
         [$class, $method] = $controller;
 
         // invokable controller given (for example, with the single __invoke method)

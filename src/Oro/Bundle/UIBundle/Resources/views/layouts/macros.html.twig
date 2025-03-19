@@ -13,6 +13,7 @@ Parameters - array:
         'successMessage' - message to display after the operation is finished
         'label' - button label
         'visible' - defines whether the button is visible (true by default)
+        'disabled' - defines whether the button is disabled
         'dataAttributes' - additional HTML data attributes
     ]
 #}
@@ -36,6 +37,9 @@ Parameters - array:
                 {% elseif (parameters.dataUrl is defined) %}
                     data-url="{{ parameters.dataUrl }}"
                 {%- endif -%}
+                {%- if parameters.disabled is defined %}
+                    disabled="{{ parameters.disabled }}"
+                {%- endif %}
         >
         {%- apply spaceless -%}
             {%- if parameters.icon is defined -%}

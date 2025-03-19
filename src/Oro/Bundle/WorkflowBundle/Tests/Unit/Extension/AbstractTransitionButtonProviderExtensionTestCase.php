@@ -14,6 +14,7 @@ use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUnit\Framework\TestCase
 {
@@ -35,6 +36,9 @@ abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUni
     /** @var EventDispatcher|MockObject */
     protected $eventDispatcher;
 
+    /** @var TranslatorInterface|MockObject  */
+    protected $translator;
+
     /** @var AbstractButtonProviderExtension */
     protected $extension;
 
@@ -47,6 +51,7 @@ abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUni
         $this->applicationProvider = $this->createMock(CurrentApplicationProviderInterface::class);
         $this->optionsResolver = $this->createMock(TransitionOptionsResolver::class);
         $this->eventDispatcher = $this->createMock(EventDispatcher::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->extension = $this->createExtension();
         $this->extension->setApplicationProvider($this->applicationProvider);
@@ -84,7 +89,7 @@ abstract class AbstractTransitionButtonProviderExtensionTestCase extends \PHPUni
 
     protected function getTransition(string $name): Transition
     {
-        $transition = new Transition($this->optionsResolver, $this->eventDispatcher);
+        $transition = new Transition($this->optionsResolver, $this->eventDispatcher, $this->translator);
 
         return $transition->setName($name);
     }

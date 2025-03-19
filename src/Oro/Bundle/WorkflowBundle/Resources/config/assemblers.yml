@@ -31,6 +31,7 @@ services:
             - '@oro_workflow.form_options_configuration_assembler'
             - '@oro_workflow.resolver.transition_options_resolver'
             - '@oro_workflow.event_dispatcher'
+            - '@translator'
             - !tagged_locator { tag: 'oro_workflow.transition_service' }
 
     Oro\Bundle\WorkflowBundle\Model\TransitionAssembler:

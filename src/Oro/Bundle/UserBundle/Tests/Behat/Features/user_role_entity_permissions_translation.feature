@@ -11,7 +11,7 @@ Feature: User role entity permissions translation
     When go to System / User Management / Roles
     And I click view Administrator in grid
     Then the role has following active permissions:
-      | Account    | View:Global |
+      | Comment    | View:Global |
       | Attachment | View:Global |
 
     # Prepare new label for Attachment entity in german language
@@ -33,5 +33,5 @@ Feature: User role entity permissions translation
     When go to System / User Management / Roles
     And I click view Administrator in grid
     Then the role has following active permissions:
-      | Account       | View:Global |
+      | Comment       | View:Global |
       | Attachment_DE | View:Global |

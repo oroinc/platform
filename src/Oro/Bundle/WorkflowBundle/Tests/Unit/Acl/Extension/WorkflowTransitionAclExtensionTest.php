@@ -22,6 +22,7 @@ use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -51,6 +52,9 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
     /** @var EventDispatcher|MockObject */
     private $eventDispatcher;
 
+    /** @var TranslatorInterface|MockObject */
+    private $translator;
+
     /** @var WorkflowTransitionAclExtension */
     private $extension;
 
@@ -64,6 +68,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
         $this->workflowManager = $this->createMock(WorkflowManager::class);
         $this->optionsResolver = $this->createMock(TransitionOptionsResolver::class);
         $this->eventDispatcher = $this->createMock(EventDispatcher::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->extension = new WorkflowTransitionAclExtension(
             $this->objectIdAccessor,
@@ -76,7 +81,7 @@ class WorkflowTransitionAclExtensionTest extends \PHPUnit\Framework\TestCase
 
     private function createStartTransition(): Transition
     {
-        $transition = new Transition($this->optionsResolver, $this->eventDispatcher);
+        $transition = new Transition($this->optionsResolver, $this->eventDispatcher, $this->translator);
         $transition->setStart(true);
 
         return $transition;

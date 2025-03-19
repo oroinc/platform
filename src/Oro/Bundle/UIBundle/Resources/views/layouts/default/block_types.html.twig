@@ -68,13 +68,13 @@
                                 {% set url = breadcrumb.url %}
                             {% endif %}
 
-                            {% if url and not loop.last %}
-                                <a href="{{ url  }}" class="breadcrumbs__link">{{ breadcrumb.label|trans }}</a>
+                            {% if not loop.last %}
+                                <a href="{{ url|default('#') }}" class="breadcrumbs__link">{{ breadcrumb.label|trans }}</a>
                                 <span aria-hidden="true" class="breadcrumbs-separator">{{ renderIcon.icon({name: 'chevron-right', extraClass: 'theme-icon--small'}) }}</span>
                             {% else %}
-                                <a href="{{ url  }}" class="breadcrumbs__link" aria-current="location">{{ breadcrumb.label|trans }}</a>
+                                <a href="{{ url }}" class="breadcrumbs__link" aria-current="location">{{ breadcrumb.label|trans }}</a>
                             {% endif %}
-                        {%  else %}
+                        {% else %}
                             {% if not loop.first %}
                                 <span aria-hidden="true" class="breadcrumbs-separator">{{ renderIcon.icon({name: 'chevron-right', extraClass: 'theme-icon--small'}) }}</span>
                             {% endif %}

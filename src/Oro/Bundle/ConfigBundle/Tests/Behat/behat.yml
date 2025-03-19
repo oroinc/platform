@@ -79,6 +79,11 @@ oro_behat_extension:
     Organization Notice Close:
       selector: '.oropro-organization-notice-holder .popover-close'
 
+    EuroAsDefaultValue:
+      selector:
+        type: xpath
+        locator: '//td[text()[contains(.,"EUR")]]/parent::tr/*[1]//input'
+
   suites:
     OroConfigBundle:
       contexts:

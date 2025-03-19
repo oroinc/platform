@@ -1,0 +1,3 @@
+styles:
+    inputs:
+        - 'bundles/oroworkflow/default/scss/components/workflow-transition-container.scss'
