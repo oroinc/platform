@@ -408,7 +408,9 @@ define(function(require) {
          * Opens "Add step" dialog
          */
         addNewStep: function() {
-            const step = new StepModel();
+            const step = new StepModel({
+                order: this.model.get('steps').getOrderForNew()
+            });
             this.openManageStepForm(step);
         },
 
