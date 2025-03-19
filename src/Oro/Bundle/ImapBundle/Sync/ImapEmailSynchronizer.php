@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Sync;
 
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizationProcessor;
@@ -183,5 +184,32 @@ class ImapEmailSynchronizer extends AbstractEmailSynchronizer
 
         // remove success processed origin
         $this->credentialsIssueManager->removeOriginFromTheFailed($origin);
+    }
+
+    #[\Override]
+    protected function findOriginToSyncQueryBuilder(int $maxConcurrentTasks, int $minExecIntervalInMin): QueryBuilder
+    {
+        $queryBuilder = parent::findOriginToSyncQueryBuilder($maxConcurrentTasks, $minExecIntervalInMin);
+
+        return $this->addCredentialFilter($queryBuilder);
+    }
+
+    #[\Override]
+    protected function findOriginQueryBuilder(int $originId): QueryBuilder
+    {
+        $queryBuilder = parent::findOriginQueryBuilder($originId);
+
+        return $this->addCredentialFilter($queryBuilder);
+    }
+
+    private function addCredentialFilter(QueryBuilder $queryBuilder): QueryBuilder
+    {
+        $queryBuilder
+            ->andWhere('o.imapHost IS NOT NULL')
+            ->andWhere('o.imapPort > 0')
+            ->andWhere('o.user IS NOT NULL')
+            ->andWhere('o.password IS NOT NULL');
+
+        return $queryBuilder;
     }
 }
