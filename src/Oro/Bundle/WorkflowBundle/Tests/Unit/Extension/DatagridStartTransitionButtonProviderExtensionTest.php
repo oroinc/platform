@@ -19,6 +19,7 @@ use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit\Framework\TestCase
 {
@@ -236,7 +237,8 @@ class DatagridStartTransitionButtonProviderExtensionTest extends \PHPUnit\Framew
     {
         $transition = new Transition(
             $this->createMock(TransitionOptionsResolver::class),
-            $this->createMock(EventDispatcher::class)
+            $this->createMock(EventDispatcher::class),
+            $this->createMock(TranslatorInterface::class)
         );
 
         return $transition->setStart(true);

@@ -179,7 +179,17 @@ class LoggerSubscriberTest extends \PHPUnit\Framework\TestCase
                 ]
             );
 
+        $jobExecution = $this->createMock(JobExecution::class);
+        $jobExecution->expects(self::any())
+            ->method('getLabel')
+            ->willReturn('job_label');
         $stepExecution = $this->createMock(StepExecution::class);
+        $stepExecution->expects($this->any())
+            ->method('getJobExecution')
+            ->willReturn($jobExecution);
+        $stepExecution->expects($this->any())
+            ->method('getStepName')
+            ->willReturn('step_name');
         $stepExecution->expects(self::any())
             ->method('getFailureExceptions')
             ->willReturn(
@@ -203,7 +213,32 @@ class LoggerSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->subscriber->stepExecutionErrored($event);
 
         self::assertEquals(
-            [['error', 'Encountered an error executing the step: Item1 is wrong, Item2 is wrong', []]],
+            [
+                [
+                    'error',
+                    'Encountered an error executing the step "job_label:step_name": Item1 is wrong',
+                    [
+                        'exception' => [
+                            'message' => 'foo is wrong',
+                            'messageParameters' => [
+                                'foo' => 'Item1'
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    'error',
+                    'Encountered an error executing the step "job_label:step_name": Item2 is wrong',
+                    [
+                        'exception' => [
+                            'message' => 'bar is wrong',
+                            'messageParameters' => [
+                                'bar' => 'Item2'
+                            ]
+                        ]
+                    ]
+                ],
+            ],
             $this->logger->cleanLogs()
         );
     }

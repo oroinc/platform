@@ -190,6 +190,8 @@ oro:
 
         transition:
             start: "Start %workflow%"
+            not_allowed:
+                message: Could not perform transition "%transition_name%".
             form:
                 submit.label: Submit
                 cancel.label: Cancel

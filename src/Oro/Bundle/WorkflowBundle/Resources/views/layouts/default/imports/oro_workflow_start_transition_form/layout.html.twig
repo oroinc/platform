@@ -1,6 +1,15 @@
+{% block _transition_container_wrapper_widget %}
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' grid workflow-transition-container'
+    }) %}
+    <div{{ block('block_attributes') }}>
+        {{ block_widget(block) }}
+    </div>
+{% endblock %}
+
 {% block _transition_form_wrapper_widget %}
-    {% set attr = attr|merge({
-    class: attr.class|default('') ~ " start-transition-form-widget"
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' grid-col-12'
     }) %}
     <div{{ block('block_attributes') }}>
         {{ block_widget(block) }}
@@ -8,8 +17,8 @@
 {% endblock %}
 
 {% block _form_warning_message_widget %}
-    {% set attr = attr|merge({
-    class: attr.class|default('') ~ " transition-message alert"
+    {% set attr = layout_attr_defaults(attr, {
+        '~class': ' grid-col-12 notification--warning'
     }) %}
     <div{{ block('block_attributes') }}>
         {{ block_widget(block) }}

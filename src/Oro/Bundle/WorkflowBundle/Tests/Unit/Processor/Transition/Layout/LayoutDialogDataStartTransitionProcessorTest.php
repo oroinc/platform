@@ -33,10 +33,12 @@ class LayoutDialogDataStartTransitionProcessorTest extends \PHPUnit\Framework\Te
         $transition = $this->createMock(Transition::class);
 
         $request = $this->createMock(Request::class);
-        $request->expects($this->once())
+        $request->expects($this->exactly(2))
             ->method('get')
-            ->with('entityId', 0)
-            ->willReturn(42);
+            ->willReturnMap([
+                ['entityId', 0, 42],
+                ['entityClass', null, \stdClass::class]
+            ]);
 
         $formView = $this->createMock(FormView::class);
 
@@ -65,6 +67,7 @@ class LayoutDialogDataStartTransitionProcessorTest extends \PHPUnit\Framework\Te
                     'transitionName' => 'transitionName',
                     'transitionFormView' => $formView,
                     'entityId' => 42,
+                    'entityClass' => \stdClass::class,
                     'formRouteName' => 'route_name',
                     'originalUrl' => null
                 ]

@@ -22,6 +22,7 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\ConfigExpression\ExpressionInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * A model that stores all the necessary functionality for transferring between workflow states.
@@ -134,10 +135,17 @@ class Transition
     /** @var TransitionServiceInterface|null */
     protected $transitionService;
 
-    public function __construct(TransitionOptionsResolver $optionsResolver, EventDispatcher $eventDispatcher)
-    {
+    /** @var TranslatorInterface */
+    protected $translator;
+
+    public function __construct(
+        TransitionOptionsResolver $optionsResolver,
+        EventDispatcher $eventDispatcher,
+        TranslatorInterface $translator
+    ) {
         $this->optionsResolver = $optionsResolver;
         $this->eventDispatcher = $eventDispatcher;
+        $this->translator = $translator;
     }
 
     /**
@@ -353,9 +361,7 @@ class Transition
             return $this->getStepTo();
         }
 
-        throw new ForbiddenTransitionException(
-            sprintf('Transition "%s" is not allowed.', $this->getName())
-        );
+        $this->throwForbiddenTransitionException();
     }
 
     public function addConditionalStepTo(Step $stepTo, ExpressionInterface $condition)
@@ -395,6 +401,23 @@ class Transition
         $this->aclMessage = $aclMessage;
 
         return $this;
+    }
+
+    private function throwForbiddenTransitionException(): void
+    {
+        $name = $this->getName();
+        if ($this->getLabel()) {
+            $name = $this->translator->trans($this->getLabel(), [], 'workflows');
+        }
+
+        throw new ForbiddenTransitionException(
+            $this->translator->trans(
+                'oro.workflow.transition.not_allowed.message',
+                [
+                    '%transition_name%' => $name
+                ]
+            )
+        );
     }
 
     /**
@@ -512,9 +535,7 @@ class Transition
         if ($this->isAllowed($workflowItem, $errors)) {
             $this->transitUnconditionally($workflowItem);
         } else {
-            throw new ForbiddenTransitionException(
-                sprintf('Transition "%s" is not allowed.', $this->getName())
-            );
+            $this->throwForbiddenTransitionException();
         }
     }
 

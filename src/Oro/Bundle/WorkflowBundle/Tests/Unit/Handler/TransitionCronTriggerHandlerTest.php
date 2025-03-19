@@ -19,6 +19,7 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowStartArguments;
 use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 use Oro\Component\Testing\Unit\EntityTrait;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TransitionCronTriggerHandlerTest extends \PHPUnit\Framework\TestCase
 {
@@ -231,7 +232,8 @@ class TransitionCronTriggerHandlerTest extends \PHPUnit\Framework\TestCase
     {
         $transition = new Transition(
             $this->createMock(TransitionOptionsResolver::class),
-            $this->createMock(EventDispatcher::class)
+            $this->createMock(EventDispatcher::class),
+            $this->createMock(TranslatorInterface::class)
         );
 
         return $transition->setName(self::TRANSITION_NAME)->setStart($isStart);

@@ -34,4 +34,9 @@ class EventDispatcher
             );
         }
     }
+
+    public function dispatchRaw(object $event, ?string $eventName = null): object
+    {
+        return $this->eventDispatcher->dispatch($event, $eventName);
+    }
 }

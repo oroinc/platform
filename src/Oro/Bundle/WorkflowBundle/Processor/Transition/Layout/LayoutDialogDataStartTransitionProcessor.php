@@ -7,6 +7,9 @@ use Oro\Bundle\WorkflowBundle\Processor\Context\TransitionContext;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
+/**
+ * Prepares context data for start transition.
+ */
 class LayoutDialogDataStartTransitionProcessor implements ProcessorInterface
 {
     /**
@@ -30,6 +33,7 @@ class LayoutDialogDataStartTransitionProcessor implements ProcessorInterface
                     'transitionName' => $context->getTransitionName(),
                     'transitionFormView' => $context->getForm()->createView(),
                     'entityId' => $context->getRequest()->get('entityId', 0),
+                    'entityClass' => $context->getRequest()->get('entityClass'),
                     'formRouteName' => $resultType->getFormRouteName(),
                     'originalUrl' => null
                 ]

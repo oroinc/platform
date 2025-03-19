@@ -4,6 +4,8 @@ layout:
             themes: '@OroWorkflow/layouts/default/imports/oro_workflow_start_transition_form/layout.html.twig'
         - '@addTree':
             items:
+                transition_container_wrapper:
+                    blockType: container
                 transition_form_wrapper:
                     blockType: container
                 form_warning_message:
@@ -20,6 +22,7 @@ layout:
                             workflowName: '=data["workflowName"]'
                             transitionName: '=data["transitionName"]'
                             entityId: '=data["entityId"]'
+                            entityClass: '=data.offsetExists("entityClass") ? data["entityClass"]'
                             originalUrl: '=data["originalUrl"]'
                 form_fields:
                     blockType: form_fields
@@ -38,10 +41,11 @@ layout:
                         text: oro.workflow.transition.form.submit.label
             tree:
                 transition_form_holder:
-                    transition_form_wrapper:
+                    transition_container_wrapper:
                         form_warning_message: ~
-                        form_start: ~
-                        form_fields: ~
-                        form_actions:
-                            form_actions_submit: ~
-                        form_end: ~
+                        transition_form_wrapper:
+                            form_start: ~
+                            form_fields: ~
+                            form_actions:
+                                form_actions_submit: ~
+                            form_end: ~
