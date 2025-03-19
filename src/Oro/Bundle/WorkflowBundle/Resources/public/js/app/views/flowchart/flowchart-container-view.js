@@ -26,6 +26,7 @@ define(function(require) {
          * @inheritdoc
          */
         constructor: function FlowchartContainerView(options) {
+            this.autoZoom = _.debounce(this.autoZoom.bind(this));
             FlowchartContainerView.__super__.constructor.call(this, options);
         },
 
@@ -70,6 +71,10 @@ define(function(require) {
                 chartView.jsPlumbManager.organizeBlocks();
             }
 
+            this.autoZoom();
+        },
+
+        autoZoom() {
             const zoomView = this.subview('zoom');
             if (zoomView) {
                 zoomView.model.autoZoom();
