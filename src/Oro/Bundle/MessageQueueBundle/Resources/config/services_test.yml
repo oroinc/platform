@@ -21,6 +21,11 @@ services:
         tags:
             - { name: 'oro_message_queue.client.message_processor' }
 
+    oro_message_queue.async.requeue_processor:
+        class: Oro\Component\MessageQueue\Test\Async\RequeueProcessor
+        tags:
+            - { name: 'oro_message_queue.client.message_processor' }
+
     oro_message_queue.async.unique_message_processor:
         class: Oro\Component\MessageQueue\Test\Async\UniqueMessageProcessor
         arguments:

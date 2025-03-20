@@ -32,25 +32,31 @@ Feature: Theme Configuration Grid
   Scenario: Sort by Name
     Given I should see following grid:
       | Name            |
+      | Golden Carbon   |
       | Refreshing Teal |
     When I sort grid by "Name"
     Then I should see following grid:
       | Name            |
       | Custom          |
       | Default         |
+      | Golden Carbon   |
       | Refreshing Teal |
     When I sort grid by "Name" again
     Then I should see following grid:
       | Name            |
       | Refreshing Teal |
+      | Golden Carbon   |
       | Default         |
+      | Custom          |
     And I reset "Theme Configurations Grid" grid
 
   Scenario: Sort by Description
     Given I should see following grid:
       | Description         |
       |                     |
+      |                     |
       | Default Description |
+      | Custom              |
     When I sort grid by "Description"
     Then I should see following grid:
       | Description         |
@@ -60,24 +66,30 @@ Feature: Theme Configuration Grid
     Then I should see following grid:
       | Description         |
       |                     |
+      |                     |
       | Default Description |
+      | Custom              |
     And I reset "Theme Configurations Grid" grid
 
   Scenario: Sort by Theme
     Given I should see following grid:
-      | Theme   |
-      | default |
-      | default |
-      | custom  |
+      | Theme         |
+      | golden_carbon |
+      | default       |
+      | default       |
+      | custom        |
     When I sort grid by "Theme"
     Then I should see following grid:
-      | Theme   |
-      | custom  |
-      | default |
+      | Theme         |
+      | custom        |
+      | default       |
+      | default       |
+      | golden_carbon |
     When I sort grid by "Theme" again
     Then I should see following grid:
-      | Theme   |
-      | default |
-      | default |
-      | custom  |
+      | Theme         |
+      | golden_carbon |
+      | default       |
+      | default       |
+      | custom        |
     And I reset "Theme Configurations Grid" grid

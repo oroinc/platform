@@ -4,6 +4,7 @@ services:
             - { name: oro_message_queue.topic }
 
     Oro\Component\MessageQueue\Test\Async\Topic\BasicMessageTestTopic: ~
+    Oro\Component\MessageQueue\Test\Async\Topic\RequeueTestTopic: ~
     Oro\Component\MessageQueue\Test\Async\Topic\DependentMessageTestTopic: ~
     Oro\Component\MessageQueue\Test\Async\Topic\DependentMessageDependentJobTestTopic: ~
     Oro\Component\MessageQueue\Test\Async\Topic\UniqueJobTestTopic: ~
