@@ -108,7 +108,7 @@ class SecurityAwareConsumptionExtensionTest extends \PHPUnit\Framework\TestCase
             ->with('Exception message');
 
         $this->extension->onPreReceived($context);
-        $this->assertEquals(MessageProcessorInterface::REJECT, $context->getStatus());
+        $this->assertEquals(MessageProcessorInterface::ACK, $context->getStatus());
     }
 
     public function testOnPreReceivedShouldThrowExceptionIfSecurityTokenCannotBeDeserialized(): void

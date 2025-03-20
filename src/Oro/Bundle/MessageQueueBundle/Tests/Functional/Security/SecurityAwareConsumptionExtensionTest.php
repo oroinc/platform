@@ -2,13 +2,17 @@
 
 namespace Oro\Bundle\MessageQueueBundle\Tests\Functional\Security;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\MessageQueueBundle\Security\SecurityAwareDriver;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\SecurityBundle\Exception\InvalidTokenSerializationException;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Test\Async\Topic\BasicMessageTestTopic;
+use Oro\Component\MessageQueue\Test\Async\Topic\RequeueTestTopic;
 
 class SecurityAwareConsumptionExtensionTest extends WebTestCase
 {
@@ -18,6 +22,7 @@ class SecurityAwareConsumptionExtensionTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient();
+        $this->loadFixtures([LoadUserData::class]);
 
         self::purgeMessageQueue();
     }
@@ -56,13 +61,37 @@ class SecurityAwareConsumptionExtensionTest extends WebTestCase
         self::consume(1);
     }
 
+    public function testWithInvalidTokenAndRedelivered(): void
+    {
+        $user = $this->getReference(LoadUserData::SIMPLE_USER);
+
+        $serializedToken = 'organizationId=1;userId=%s;userClass=Oro\\Bundle\\UserBundle\\Entity\\User;roles=';
+        $serializedToken = sprintf($serializedToken, $user->getId());
+
+        // Simulate the situation when a message is re-queued.
+        self::sendMessage(RequeueTestTopic::getName(), $this->createMessage($serializedToken));
+
+        self::consume();
+        $requeueMessages = self::getProcessedMessagesByStatus(MessageProcessorInterface::REQUEUE);
+        self::assertCount(1, $requeueMessages);
+
+        // Remove the user and start the consumer. Expect the security token to be invalid and the 're-queue' message
+        // to be rejected without error.
+        $this->removeUser($user->getId());
+        self::assertEmpty(self::getProcessedMessagesByStatus(MessageProcessorInterface::REJECT));
+
+        self::consume();
+        $rejectMessages = self::getProcessedMessagesByStatus(MessageProcessorInterface::REJECT);
+        self::assertCount(1, $rejectMessages);
+    }
+
     public function testWithInvalidUserAndOrganization(): void
     {
         $serializedToken = 'organizationId=100;userId=50;userClass=Oro\\Bundle\\UserBundle\\Entity\\User;roles=';
         $sentMessage = self::sendMessage(BasicMessageTestTopic::getName(), $this->createMessage($serializedToken));
         self::consume();
 
-        self::assertProcessedMessageStatus(MessageProcessorInterface::REJECT, $sentMessage);
+        self::assertProcessedMessageStatus(MessageProcessorInterface::ACK, $sentMessage);
     }
 
     private function createMessage(string $serializedToken = ''): Message
@@ -72,5 +101,18 @@ class SecurityAwareConsumptionExtensionTest extends WebTestCase
         $message->setBody([]);
 
         return $message;
+    }
+
+    private function removeUser(int $userId): void
+    {
+        /** @var ManagerRegistry $managerRegistry */
+        $managerRegistry = $this->getContainer()->get('doctrine');
+        $entityManager = $managerRegistry->getManager();
+        $originalUser = $managerRegistry->getRepository(User::class)->find($userId);
+        if ($originalUser) {
+            $entityManager->remove($originalUser);
+            $entityManager->flush($originalUser);
+            $entityManager->clear();
+        }
     }
 }
