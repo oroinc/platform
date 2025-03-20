@@ -1,13 +1,28 @@
 {% macro css(src, extra_attributes) %}
-    {% if webpack_hmr_enabled() %}
+   {% if webpack_hmr_enabled() %}
         <script src="{{ asset(src|webpack_asset) }}"></script>
     {% else %}
-        <link rel="stylesheet" {{ extra_attributes|raw }} href="{{ asset(src) }}">
+         {% if 'styles-print' in src %}
+            <script>
+                document.addEventListener('DOMContentLoaded', function(){
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href='{{ asset(src) }}';
+                link.media = 'print';
+                document.head.appendChild(link);
+                });
+            </script>
+            <noscript>
+                <link rel="stylesheet" {{ extra_attributes|raw }} href="{{ asset(src) }}">
+            </noscript>
+        {% else %}
+            <link rel="stylesheet" {{ extra_attributes|raw }} href="{{ asset(src) }}">
+        {% endif %}
     {% endif %}
 {% endmacro %}
 
 {% macro js(src) %}
-    <script src="{{ asset(src) }}"></script>
+    <script defer src="{{ asset(src) }}"></script>
 {% endmacro %}
 
 {% macro js_modules_config(config) %}
