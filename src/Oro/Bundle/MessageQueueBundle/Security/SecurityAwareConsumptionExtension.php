@@ -55,7 +55,10 @@ class SecurityAwareConsumptionExtension extends AbstractExtension
                 // The data for the token is invalid, but this does not prevent the consumer from executing.
                 // For example, a user was deleted before we started performing actions on them with the consumer, etc.
                 $context->getLogger()->error($exception->getMessage());
-                $context->setStatus(MessageProcessorInterface::REJECT);
+                // There is no point in changing the status, since the status of the message is already known.
+                if (!$context->getStatus()) {
+                    $context->setStatus(MessageProcessorInterface::ACK);
+                }
 
                 return;
             } catch (InvalidTokenSerializationException $exception) {
