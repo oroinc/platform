@@ -32,6 +32,7 @@ services:
             - '@oro_workflow.resolver.transition_options_resolver'
         calls:
             - ['setEventDispatcher', ['@oro_workflow.event_dispatcher']]
+            - ['setTranslator', ['@translator']]
             - ['setTransitionServiceLocator', [!tagged_locator { tag: 'oro_workflow.transition_service' }]]
 
     Oro\Bundle\WorkflowBundle\Model\TransitionAssembler:

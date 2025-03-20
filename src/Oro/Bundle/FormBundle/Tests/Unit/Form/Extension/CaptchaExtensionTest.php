@@ -4,7 +4,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension;
 
 use Oro\Bundle\FormBundle\Captcha\CaptchaSettingsProviderInterface;
 use Oro\Bundle\FormBundle\Form\Extension\CaptchaExtension;
-use Oro\Bundle\FormBundle\Validator\Constraints\IsCaptchaVerified;
+use Oro\Bundle\FormBundle\Form\Type\CaptchaType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -140,10 +140,6 @@ class CaptchaExtensionTest extends TestCase
 
     private function assertCaptchaFieldAdded(FormBuilderInterface|MockObject $builder): void
     {
-        $this->captchaSettingsProvider->expects($this->once())
-            ->method('getFormType')
-            ->willReturn('form_type');
-
         $builder->expects($this->once())
             ->method('addEventListener')
             ->willReturnCallback(function ($eventName, $callback) use ($builder) {
@@ -152,15 +148,12 @@ class CaptchaExtensionTest extends TestCase
                     ->method('add')
                     ->with(
                         'captcha',
-                        'form_type',
+                        CaptchaType::class,
                         [
                             'label' => null,
                             'required' => false,
                             'mapped' => false,
-                            'data' => false,
-                            'constraints' => [
-                                new IsCaptchaVerified()
-                            ]
+                            'data' => false
                         ]
                     );
 

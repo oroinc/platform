@@ -45,7 +45,7 @@ define([
                         e.stopImmediatePropagation();
                         doRedirect(response.workflowItem.result.redirectUrl);
                     } else if (pageRefresh) {
-                        /** By default reload page */
+                        /** By default, reload page */
                         doReload();
                     }
                 });
@@ -62,6 +62,10 @@ define([
                 }
 
                 element.one('transitions_failure', function() {
+                    if (jqxhr.status === 403 && !_.isUndefined(jqxhr.responseJSON.message)) {
+                        return;
+                    }
+
                     let message = __('Could not perform transition');
                     if (jqxhr.message !== undefined) {
                         message += ': ' + jqxhr.message;

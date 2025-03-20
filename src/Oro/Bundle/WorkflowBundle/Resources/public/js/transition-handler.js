@@ -23,9 +23,11 @@ define(function(require) {
             element.data('_in-progress', false);
         };
 
+        const dialogTitle = element.data('dialog-title') || element.data('transition-label') || element.html();
+
         const showDialog = function() {
             let dialogOptions = {
-                title: element.data('transition-label') || element.html(),
+                title: dialogTitle,
                 url: element.data('dialog-url'),
                 stateEnabled: false,
                 incrementalPosition: false,

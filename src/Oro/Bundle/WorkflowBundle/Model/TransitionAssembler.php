@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Event\EventDispatcher;
+use Oro\Bundle\WorkflowBundle\Event\Transition\TransitionAssembleEvent;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
 use Oro\Component\Action\Action\ActionFactoryInterface;
@@ -17,6 +18,7 @@ use Oro\Component\Action\Model\AbstractAssembler as BaseAbstractAssembler;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 use Symfony\Contracts\Service\ResetInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Assemble transition based on a given configuration.
@@ -30,6 +32,7 @@ class TransitionAssembler extends BaseAbstractAssembler
     protected TransitionOptionsResolver $optionsResolver;
     protected ServiceProviderInterface $transitionServiceLocator;
     protected EventDispatcher $eventDispatcher;
+    protected TranslatorInterface $translator;
 
     public function __construct(
         FormOptionsAssembler $formOptionsAssembler,
@@ -48,6 +51,11 @@ class TransitionAssembler extends BaseAbstractAssembler
     public function setEventDispatcher(EventDispatcher $eventDispatcher): void
     {
         $this->eventDispatcher = $eventDispatcher;
+    }
+
+    public function setTranslator(TranslatorInterface $translator): void
+    {
+        $this->translator = $translator;
     }
 
     public function setTransitionServiceLocator(ServiceProviderInterface $transitionServiceLocator): void
@@ -81,7 +89,9 @@ class TransitionAssembler extends BaseAbstractAssembler
         foreach ($transitionsConfiguration as $name => $options) {
             $definition = $this->getTransitionDefinition($options, $definitions);
 
-            $transition = $this->assembleTransition($name, $options, $definition, $steps, $attributes);
+            $event = new TransitionAssembleEvent($name, $options, $definition, $steps, $attributes);
+            $this->eventDispatcher->dispatchRaw($event, $event::NAME);
+            $transition = $this->assembleTransition($name, $event->getOptions(), $definition, $steps, $attributes);
             $transitions->set($name, $transition);
         }
 
@@ -138,6 +148,7 @@ class TransitionAssembler extends BaseAbstractAssembler
 
         $transition = new Transition($this->optionsResolver);
         $transition->setEventDispatcher($this->eventDispatcher);
+        $transition->setTranslator($this->translator);
         $transition->setName($name)
             ->setStepTo($steps[$stepToName])
             ->setAclResource($this->getOption($options, 'acl_resource'))

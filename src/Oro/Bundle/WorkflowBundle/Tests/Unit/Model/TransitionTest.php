@@ -17,6 +17,7 @@ use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -27,6 +28,7 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
 
     private TransitionOptionsResolver|MockObject $optionsResolver;
     private EventDispatcher|MockObject $eventDispatcher;
+    private TranslatorInterface|MockObject $translator;
 
     private Transition $transition;
 
@@ -34,9 +36,14 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
     {
         $this->optionsResolver = $this->createMock(TransitionOptionsResolver::class);
         $this->eventDispatcher = $this->createMock(EventDispatcher::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
+        $this->translator->expects($this->any())
+            ->method('trans')
+            ->willReturnCallback(fn (string $string) => $string . ' TR');
 
         $this->transition = new Transition($this->optionsResolver);
         $this->transition->setEventDispatcher($this->eventDispatcher);
+        $this->transition->setTranslator($this->translator);
     }
 
     public function testAccessors(): void
@@ -277,8 +284,11 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
      */
     public function testTransitNotAllowed(bool $preConditionAllowed, bool $conditionAllowed): void
     {
+        $this->transition->setName('transition_name');
+        $this->transition->setLabel('transition_label');
+
         $this->expectException(ForbiddenTransitionException::class);
-        $this->expectExceptionMessage('Transition "test" is not allowed.');
+        $this->expectExceptionMessage('oro.workflow.transition.not_allowed.message TR');
 
         $workflowItem = $this->createMock(WorkflowItem::class);
         $errors = new ArrayCollection();
@@ -596,6 +606,9 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
 
     public function testStepToWithNotMatchedConditionalSteps()
     {
+        $this->transition->setName('transition_name');
+        $this->transition->setLabel('transition_label');
+
         $step1 = new Step();
         $step1->setName('step1');
         $step2 = new Step();
@@ -619,7 +632,7 @@ class TransitionTest extends \PHPUnit\Framework\TestCase
         $this->transition->addConditionalStepTo($step1, $dummyExpression);
 
         $this->expectException(ForbiddenTransitionException::class);
-        $this->expectExceptionMessage('Transition "transition1" is not allowed.');
+        $this->expectExceptionMessage('oro.workflow.transition.not_allowed.message TR');
 
         $this->transition->getResolvedStepTo($workflowItem);
     }

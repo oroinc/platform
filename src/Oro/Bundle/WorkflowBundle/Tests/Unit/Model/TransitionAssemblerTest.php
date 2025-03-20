@@ -23,6 +23,7 @@ use Oro\Component\ConfigExpression\ExpressionFactory;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Service\ServiceProviderInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -44,6 +45,9 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
 
     /** @var ServiceProviderInterface|MockObject */
     private $serviceLocator;
+
+    /** @var TranslatorInterface|MockObject */
+    private $translator;
 
     /** @var TransitionAssembler */
     private $assembler;
@@ -86,6 +90,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
         $this->actionFactory = $this->createMock(ActionFactoryInterface::class);
         $this->eventDispatcher = $this->createMock(EventDispatcher::class);
         $this->serviceLocator = $this->createMock(ServiceProviderInterface::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
 
         $this->assembler = new TransitionAssembler(
             $this->formOptionsAssembler,
@@ -96,6 +101,7 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
         );
         $this->assembler->setEventDispatcher($this->eventDispatcher);
         $this->assembler->setTransitionServiceLocator($this->serviceLocator);
+        $this->assembler->setTranslator($this->translator);
     }
 
     /**
@@ -262,6 +268,9 @@ class TransitionAssemblerTest extends \PHPUnit\Framework\TestCase
             ->method('assemble')
             ->with($configuration['form_options'] ?? [], $attributes)
             ->willReturnArgument(0);
+
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatchRaw');
 
         $transitions = $this->assembler->assemble(
             $fullConfiguration,

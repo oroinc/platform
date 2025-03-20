@@ -4,6 +4,7 @@ namespace Oro\Bundle\FormBundle\Twig;
 
 use Oro\Bundle\FormBundle\Captcha\CaptchaSettingsProviderInterface;
 use Oro\Bundle\FormBundle\Form\Twig\DataBlockRenderer;
+use Oro\Bundle\FormBundle\Form\Type\CaptchaType;
 use Psr\Container\ContainerInterface;
 use Symfony\Bridge\Twig\Node\RenderBlockNode;
 use Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode;
@@ -187,14 +188,10 @@ class FormExtension extends AbstractExtension implements ServiceSubscriberInterf
 
     public function getCaptchaFormElement(string $name = 'captcha'): FormView
     {
-        /** @var CaptchaSettingsProviderInterface $settingsProvider */
-        $settingsProvider = $this->container->get('oro_form.captcha.settings_provider');
         /** @var FormFactoryInterface $formFactory */
         $formFactory = $this->container->get('form.factory');
 
-        $captchaField = $formFactory->createNamed($name, $settingsProvider->getFormType());
-
-        return $captchaField->createView();
+        return $formFactory->createNamed($name, CaptchaType::class)->createView();
     }
 
     private function getFormRenderer(): FormRendererInterface

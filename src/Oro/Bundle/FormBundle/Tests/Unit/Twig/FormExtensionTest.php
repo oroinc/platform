@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\FormBundle\Captcha\CaptchaSettingsProviderInterface;
+use Oro\Bundle\FormBundle\Form\Type\CaptchaType;
 use Oro\Bundle\FormBundle\Twig\FormExtension;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -56,15 +57,10 @@ class FormExtensionTest extends TestCase
     public function testGetCaptchaFormElement(): void
     {
         $captchaForm = $this->createMock(FormInterface::class);
-        $captchaType = 'captcha_type';
-
-        $this->captchaSettingsProvider->expects($this->once())
-            ->method('getFormType')
-            ->willReturn($captchaType);
 
         $this->formFactory->expects($this->once())
             ->method('createNamed')
-            ->with('captcha', $captchaType)
+            ->with('captcha', CaptchaType::class)
             ->willReturn($captchaForm);
 
         $formView = $this->createMock(FormView::class);

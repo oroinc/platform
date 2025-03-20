@@ -4,7 +4,7 @@ namespace Oro\Bundle\FormBundle\Form\Extension;
 
 use Oro\Bundle\FormBundle\Captcha\CaptchaSettingsProviderInterface;
 use Oro\Bundle\FormBundle\Form\Extension\Traits\FormExtendedTypeTrait;
-use Oro\Bundle\FormBundle\Validator\Constraints\IsCaptchaVerified;
+use Oro\Bundle\FormBundle\Form\Type\CaptchaType;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -38,15 +38,12 @@ class CaptchaExtension extends AbstractTypeExtension
                 $form = $event->getForm();
                 $form->add(
                     self::FIELD_NAME,
-                    $this->captchaSettingsProvider->getFormType(),
+                    CaptchaType::class,
                     [
                         'label' => null,
                         'required' => false,
                         'mapped' => false,
-                        'data' => false,
-                        'constraints' => [
-                            new IsCaptchaVerified()
-                        ]
+                        'data' => false
                     ]
                 );
             }

@@ -6,6 +6,7 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Event\EventDispatcher;
 use Oro\Bundle\WorkflowBundle\Event\WorkflowItemAwareEvent;
 use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class EventDispatcherTest extends TestCase
@@ -46,5 +47,16 @@ class EventDispatcherTest extends TestCase
             );
 
         $this->dispatcher->dispatch($event, $contextName);
+    }
+
+    public function testDispatchRaw(): void
+    {
+        $event = new Event();
+
+        $this->innerDispatcher->expects(self::once())
+            ->method('dispatch')
+            ->with($event, 'oro_workflow.some_event');
+
+        $this->dispatcher->dispatchRaw($event, 'oro_workflow.some_event');
     }
 }

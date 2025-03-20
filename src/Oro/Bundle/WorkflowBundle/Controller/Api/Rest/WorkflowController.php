@@ -52,19 +52,7 @@ class WorkflowController extends AbstractFOSRestController
             $workflowManager = $this->container->get('oro_workflow.manager');
 
             $entityId = $request->get('entityId', 0);
-            $data = $request->get('data');
-            $dataArray = [];
-            if ($data) {
-                $serializer = $this->container->get('oro_workflow.serializer.data.serializer');
-                $serializer->setWorkflowName($workflowName);
-                /** @var WorkflowData $data */
-                $data = $serializer->deserialize(
-                    $data,
-                    WorkflowData::class,
-                    'json'
-                );
-                $dataArray = $data->getValues();
-            }
+            $dataArray = $this->getDataArray($request, $workflowName);
 
             $workflow = $workflowManager->getWorkflow($workflowName);
             $entityClass = $workflow->getDefinition()->getRelatedEntity();
@@ -308,5 +296,28 @@ class WorkflowController extends AbstractFOSRestController
         }
 
         return $this->container->get('oro_workflow.workflow_item_serializer')->serialize($workflowItem);
+    }
+
+    protected function getDataArray(Request $request, string $workflowName): array
+    {
+        $requestData = $request->get('data');
+        if (is_array($requestData)) {
+            return $requestData;
+        }
+
+        if ($requestData) {
+            $serializer = $this->container->get('oro_workflow.serializer.data.serializer');
+            $serializer->setWorkflowName($workflowName);
+            /** @var WorkflowData $requestData */
+            $data = $serializer->deserialize(
+                $requestData,
+                WorkflowData::class,
+                'json'
+            );
+
+            return $data->getValues();
+        }
+
+        return [];
     }
 }

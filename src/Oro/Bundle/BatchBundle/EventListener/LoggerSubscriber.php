@@ -161,25 +161,24 @@ class LoggerSubscriber implements EventSubscriberInterface
     {
         $stepExecution = $event->getStepExecution();
 
-        $this->logger->error(
-            sprintf(
-                'Encountered an error executing the step: %s',
-                implode(
-                    ', ',
-                    array_map(
-                        function ($exception) {
-                            return $this->translator->trans(
-                                $exception['message'],
-                                $exception['messageParameters'],
-                                $this->translationDomain,
-                                $this->translationLocale
-                            );
-                        },
-                        $stepExecution->getFailureExceptions()
+        foreach ($stepExecution->getFailureExceptions() as $exception) {
+            $this->logger->error(
+                sprintf(
+                    'Encountered an error executing the step "%s:%s": %s',
+                    $stepExecution->getJobExecution()->getLabel(),
+                    $stepExecution->getStepName(),
+                    $this->translator->trans(
+                        $exception['message'],
+                        $exception['messageParameters'],
+                        $this->translationDomain,
+                        $this->translationLocale
                     )
-                )
-            )
-        );
+                ),
+                [
+                    'exception' => $exception
+                ]
+            );
+        }
     }
 
     /**
