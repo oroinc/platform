@@ -34,6 +34,8 @@ abstract class AbstractLoadThemeConfiguration extends AbstractFixture implements
 
     abstract protected function isApplicable(): bool;
 
+    abstract protected function getFrontendTheme(ConfigManager $configManager, ?object $scope = null);
+
     /**
      * Options from System configuration that should replace values from theme.yml
      */
@@ -54,16 +56,23 @@ abstract class AbstractLoadThemeConfiguration extends AbstractFixture implements
                 continue;
             }
 
+            $themeConfiguration = $this->getThemeConfiguration($this->configManager, $manager, $scope);
+            if ($themeConfiguration && $themeConfiguration->getTheme() === $frontendTheme) {
+                continue;
+            }
+
             $themeConfiguration = $this->createThemeConfiguration($frontendTheme, $scope);
 
             $this->manager->persist($themeConfiguration);
             $manager->flush();
 
-            $this->configManager->set(
-                Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION),
-                $themeConfiguration->getId(),
-                $scope
-            );
+            if ($this->isStoreInSystemConfig()) {
+                $this->configManager->set(
+                    Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION),
+                    $themeConfiguration->getId(),
+                    $scope
+                );
+            }
         }
 
         $this->configManager->flush();
@@ -74,6 +83,11 @@ abstract class AbstractLoadThemeConfiguration extends AbstractFixture implements
         $this->manager = $manager;
         $this->themeDefinitionBag = $this->container->get('oro_layout.theme_extension.configuration.provider');
         $this->configManager = $this->getConfigManager();
+    }
+
+    protected function isStoreInSystemConfig(): bool
+    {
+        return true;
     }
 
     protected function createThemeConfiguration(string $frontendTheme, object|null $scope): ThemeConfiguration
@@ -89,9 +103,23 @@ abstract class AbstractLoadThemeConfiguration extends AbstractFixture implements
             ->setConfiguration($this->buildConfigurationFromDefinition($definition, $scope));
     }
 
-    protected function getFrontendTheme(ConfigManager $configManager, ?object $scope): ?string
-    {
-        return $configManager->get('oro_frontend.frontend_theme', false, false, $scope);
+    protected function getThemeConfiguration(
+        ConfigManager $configManager,
+        ObjectManager $manager,
+        ?object $scope = null
+    ): ?ThemeConfiguration {
+        $themeConfigurationId = $configManager->get(
+            Configuration::getConfigKeyByName(Configuration::THEME_CONFIGURATION),
+            false,
+            false,
+            $scope
+        );
+
+        if (!$themeConfigurationId) {
+            return null;
+        }
+
+        return $manager->getRepository(ThemeConfiguration::class)->find($themeConfigurationId);
     }
 
     protected function getThemeConfigurationName(array $definition, object|null $scope): string
