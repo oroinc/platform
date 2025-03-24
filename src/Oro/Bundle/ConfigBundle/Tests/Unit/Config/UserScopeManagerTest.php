@@ -6,13 +6,13 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Config\UserScopeManager;
 use Oro\Bundle\ConfigBundle\Entity\Config;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class UserScopeManagerTest extends AbstractScopeManagerTestCase
 {
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $securityContext;
+    private TokenStorageInterface&MockObject $securityContext;
 
     #[\Override]
     protected function setUp(): void

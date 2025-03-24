@@ -23,13 +23,13 @@ class TextareaTypeTest extends AbstractConfigTypeTestCase
     /**
      * @dataProvider submitProvider
      */
-    public function testSubmit(string $newVal, ?string $oldVal, string $state, bool $isSetStateExpected)
+    public function testSubmit(string $newVal, ?string $oldVal, string $state, bool $isSetStateExpected): void
     {
         $this->doTestSubmit(
             'testAttr',
             TextareaType::class,
             [
-                'config_id' => new EntityConfigId('test', 'Test\Entity'),
+                'config_id' => new EntityConfigId('test', 'Test\Entity')
             ],
             [],
             $newVal,
@@ -51,19 +51,13 @@ class TextareaTypeTest extends AbstractConfigTypeTestCase
         ];
     }
 
-    public function testGetBlockPrefix()
+    public function testGetBlockPrefix(): void
     {
-        $this->assertEquals(
-            'oro_entity_extend_textarea',
-            $this->getFormType()->getBlockPrefix()
-        );
+        self::assertEquals('oro_entity_extend_textarea', $this->getFormType()->getBlockPrefix());
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
-        $this->assertEquals(
-            SymfonyTextareaType::class,
-            $this->getFormType()->getParent()
-        );
+        self::assertEquals(SymfonyTextareaType::class, $this->getFormType()->getParent());
     }
 }

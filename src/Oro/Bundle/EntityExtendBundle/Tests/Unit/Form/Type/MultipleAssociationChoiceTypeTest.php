@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\MultipleAssociationChoiceType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Form;
@@ -17,8 +17,7 @@ use Symfony\Component\Form\FormView;
 
 class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
 {
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfigProvider;
+    private ConfigProvider&MockObject $entityConfigProvider;
 
     #[\Override]
     protected function getFormType(): AbstractType
@@ -33,7 +32,7 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
         $config5 = new Config(new EntityConfigId('grouping', 'Test\Entity5'));
         $config5->set('groups', ['test']);
         $this->groupingConfigProvider = $this->createMock(ConfigProvider::class);
-        $this->groupingConfigProvider->expects($this->any())
+        $this->groupingConfigProvider->expects(self::any())
             ->method('getConfigs')
             ->willReturn([$config1, $config2, $config3, $config4, $config5]);
 
@@ -44,7 +43,7 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
         $entityConfig5 = new Config(new EntityConfigId('entity', 'Test\Entity5'));
         $entityConfig5->set('plural_label', 'Entity5');
         $this->entityConfigProvider = $this->createMock(ConfigProvider::class);
-        $this->entityConfigProvider->expects($this->any())
+        $this->entityConfigProvider->expects(self::any())
             ->method('getConfig')
             ->willReturnMap([
                 ['Test\Entity3', null, $entityConfig3],
@@ -52,13 +51,8 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
                 ['Test\Entity5', null, $entityConfig5],
             ]);
 
-        $entityClassResolver = $this->createMock(EntityClassResolver::class);
-        $entityClassResolver->expects($this->any())
-            ->method('getEntityClass')
-            ->willReturnArgument(0);
-
         return new MultipleAssociationChoiceType(
-            new AssociationTypeHelper($this->configManager, $entityClassResolver),
+            new AssociationTypeHelper($this->configManager),
             $this->configManager
         );
     }
@@ -73,16 +67,16 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
         bool $isSetStateExpected,
         ?array $immutable,
         array $expectedData
-    ) {
+    ): void {
         $testConfig = new Config(new EntityConfigId('test', 'Test\Entity'));
         if ($immutable !== null) {
             $testConfig->set('immutable', $immutable);
         }
-        $this->testConfigProvider->expects($this->any())
+        $this->testConfigProvider->expects(self::any())
             ->method('hasConfig')
             ->with('Test\Entity', null)
             ->willReturn(true);
-        $this->testConfigProvider->expects($this->any())
+        $this->testConfigProvider->expects(self::any())
             ->method('getConfig')
             ->with('Test\Entity', null)
             ->willReturn($testConfig);
@@ -104,7 +98,7 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
             $isSetStateExpected
         );
 
-        $this->assertEquals($expectedData, $data);
+        self::assertEquals($expectedData, $data);
     }
 
     /**
@@ -220,15 +214,18 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
         ];
     }
 
-    public function testFinishViewNoConfig()
+    public function testFinishViewNoConfig(): void
     {
-        $this->prepareFinishViewTest();
+        $this->configManager->expects(self::any())
+            ->method('getProvider')
+            ->with('test')
+            ->willReturn($this->testConfigProvider);
 
-        $this->testConfigProvider->expects($this->once())
+        $this->testConfigProvider->expects(self::once())
             ->method('hasConfig')
             ->with('Test\Entity')
             ->willReturn(false);
-        $this->testConfigProvider->expects($this->never())
+        $this->testConfigProvider->expects(self::never())
             ->method('getConfig');
 
         $view = new FormView();
@@ -247,14 +244,14 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
         $type = $this->getFormType();
         $type->finishView($view, $form, $options);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'attr'  => [],
                 'value' => 'Test\Entity1'
             ],
             $view->children[0]->vars
         );
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'attr'  => [],
                 'value' => 'Test\Entity2'
@@ -263,16 +260,19 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
         );
     }
 
-    public function testFinishViewNoImmutable()
+    public function testFinishViewNoImmutable(): void
     {
-        $this->prepareFinishViewTest();
+        $this->configManager->expects(self::any())
+            ->method('getProvider')
+            ->with('test')
+            ->willReturn($this->testConfigProvider);
 
         $testConfig = new Config(new EntityConfigId('test', 'Test\Entity'));
-        $this->testConfigProvider->expects($this->once())
+        $this->testConfigProvider->expects(self::once())
             ->method('hasConfig')
             ->with('Test\Entity')
             ->willReturn(true);
-        $this->testConfigProvider->expects($this->once())
+        $this->testConfigProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Entity')
             ->willReturn($testConfig);
@@ -293,14 +293,14 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
         $type = $this->getFormType();
         $type->finishView($view, $form, $options);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'attr'  => [],
                 'value' => 'Test\Entity1'
             ],
             $view->children[0]->vars
         );
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'attr'  => [],
                 'value' => 'Test\Entity2'
@@ -309,17 +309,20 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
         );
     }
 
-    public function testFinishViewWithImmutable()
+    public function testFinishViewWithImmutable(): void
     {
-        $this->prepareFinishViewTest();
+        $this->configManager->expects(self::any())
+            ->method('getProvider')
+            ->with('test')
+            ->willReturn($this->testConfigProvider);
 
         $testConfig = new Config(new EntityConfigId('test', 'Test\Entity'));
         $testConfig->set('immutable', ['Test\Entity1']);
-        $this->testConfigProvider->expects($this->once())
+        $this->testConfigProvider->expects(self::once())
             ->method('hasConfig')
             ->with('Test\Entity')
             ->willReturn(true);
-        $this->testConfigProvider->expects($this->once())
+        $this->testConfigProvider->expects(self::once())
             ->method('getConfig')
             ->with('Test\Entity')
             ->willReturn($testConfig);
@@ -340,7 +343,7 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
         $type = $this->getFormType();
         $type->finishView($view, $form, $options);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'attr'     => [],
                 'disabled' => true,
@@ -348,7 +351,7 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
             ],
             $view->children[0]->vars
         );
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'attr'  => [],
                 'value' => 'Test\Entity2'
@@ -357,15 +360,18 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
         );
     }
 
-    public function testFinishViewForDisabled()
+    public function testFinishViewForDisabled(): void
     {
-        $this->prepareFinishViewTest();
+        $this->configManager->expects(self::any())
+            ->method('getProvider')
+            ->with('test')
+            ->willReturn($this->testConfigProvider);
 
-        $this->testConfigProvider->expects($this->once())
+        $this->testConfigProvider->expects(self::once())
             ->method('hasConfig')
             ->with('Test\Entity')
             ->willReturn(false);
-        $this->testConfigProvider->expects($this->never())
+        $this->testConfigProvider->expects(self::never())
             ->method('getConfig');
 
         $view = new FormView();
@@ -386,7 +392,7 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
         $type = $this->getFormType();
         $type->finishView($view, $form, $options);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'attr'     => [],
                 'disabled' => true,
@@ -394,7 +400,7 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
             ],
             $view->children[0]->vars
         );
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'attr'     => [],
                 'disabled' => true,
@@ -404,22 +410,13 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
         );
     }
 
-    public function testGetBlockPrefix()
+    public function testGetBlockPrefix(): void
     {
-        $this->assertEquals('oro_entity_extend_multiple_association_choice', $this->getFormType()->getBlockPrefix());
+        self::assertEquals('oro_entity_extend_multiple_association_choice', $this->getFormType()->getBlockPrefix());
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
-        $this->assertEquals(ChoiceType::class, $this->getFormType()->getParent());
-    }
-
-    private function prepareFinishViewTest()
-    {
-        $this->configManager->expects($this->any())
-            ->method('getProvider')
-            ->willReturnMap([
-                ['test', $this->testConfigProvider],
-            ]);
+        self::assertEquals(ChoiceType::class, $this->getFormType()->getParent());
     }
 }

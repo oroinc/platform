@@ -2,45 +2,61 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
+use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionCronTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 class TransitionCronTriggerTest extends AbstractTransitionTriggerTestCase
 {
     #[\Override]
-    public function testAccessors()
+    protected function getEntity(): BaseTransitionTrigger
+    {
+        return new TransitionCronTrigger();
+    }
+
+    private function createTriggerCron(array $attributes): TransitionCronTrigger
+    {
+        $trigger = new TransitionCronTrigger();
+        foreach ($attributes as $name => $value) {
+            $method = 'set' . ucfirst($name);
+            $trigger->$method($value);
+        }
+
+        return $trigger;
+    }
+
+    #[\Override]
+    public function testAccessors(): void
     {
         parent::testAccessors();
 
-        $this->assertPropertyAccessors($this->entity, [
+        self::assertPropertyAccessors($this->entity, [
             ['cron', 'test_cron'],
             ['filter', 'test_filter'],
         ]);
     }
 
-    public function testImport()
+    public function testImport(): void
     {
+        /** @var TransitionCronTrigger $trigger */
         $trigger = $this->getEntity();
         /** @var TransitionCronTrigger $entity */
         $entity = $this->entity;
         $this->setDataToTrigger($trigger);
-        $trigger->setCron('test_cron')
-            ->setFilter('test_filter');
+        $trigger->setCron('test_cron');
+        $trigger->setFilter('test_filter');
         $entity->import($trigger);
         $this->assertImportData();
-        $this->assertEquals($trigger->getCron(), $entity->getCron());
-        $this->assertEquals($trigger->getFilter(), $entity->getFilter());
+        self::assertEquals($trigger->getCron(), $entity->getCron());
+        self::assertEquals($trigger->getFilter(), $entity->getFilter());
     }
 
     /**
      * @dataProvider toStringDataProvider
-     *
-     * @param array $data
-     * @param string $expected
      */
-    public function testToString(array $data, $expected)
+    public function testToString(array $data, string $expected): void
     {
-        $this->assertEquals($expected, (string) $this->createTriggerCron($data));
+        self::assertEquals($expected, (string)$this->createTriggerCron($data));
     }
 
     public function toStringDataProvider(): array
@@ -73,14 +89,10 @@ class TransitionCronTriggerTest extends AbstractTransitionTriggerTestCase
 
     /**
      * @dataProvider equalityDataProvider
-     *
-     * @param bool $expected
-     * @param array $match
-     * @param array $against
      */
-    public function testIsEqual($expected, array $match, array $against)
+    public function testIsEqual(bool $expected, array $match, array $against): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             $expected,
             $this->createTriggerCron($match)->isEqualTo(
                 $this->createTriggerCron($against)
@@ -143,30 +155,6 @@ class TransitionCronTriggerTest extends AbstractTransitionTriggerTestCase
             ];
         }
 
-        $cases = array_merge($cases, $oneDiffers);
-
-        return $cases;
-    }
-
-    /**
-     * @param array $attributes
-     * @return TransitionCronTrigger
-     */
-    private function createTriggerCron(array $attributes)
-    {
-        $trigger = new TransitionCronTrigger();
-
-        foreach ($attributes as $name => $value) {
-            $method = 'set' . ucfirst($name);
-            $trigger->$method($value);
-        }
-
-        return $trigger;
-    }
-
-    #[\Override]
-    protected function getEntity()
-    {
-        return new TransitionCronTrigger();
+        return array_merge($cases, $oneDiffers);
     }
 }

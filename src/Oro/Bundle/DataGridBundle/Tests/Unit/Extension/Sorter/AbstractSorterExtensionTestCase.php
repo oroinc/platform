@@ -10,17 +10,14 @@ use Oro\Bundle\DataGridBundle\Extension\Sorter\AbstractSorterExtension;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\Configuration;
 use Oro\Bundle\DataGridBundle\Provider\State\SortersStateProvider;
 use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-abstract class AbstractSorterExtensionTestCase extends \PHPUnit\Framework\TestCase
+abstract class AbstractSorterExtensionTestCase extends TestCase
 {
-    /** @var SortersStateProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $sortersStateProvider;
-
-    /** @var SystemAwareResolver|\PHPUnit\Framework\MockObject\MockObject **/
-    protected $resolver;
-
-    /** @var AbstractSorterExtension */
-    protected $extension;
+    protected SortersStateProvider&MockObject $sortersStateProvider;
+    protected SystemAwareResolver&MockObject $resolver;
+    protected AbstractSorterExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -34,7 +31,7 @@ abstract class AbstractSorterExtensionTestCase extends \PHPUnit\Framework\TestCa
      */
     public function testVisitMetadata(array $sorters, array $columns, array $expectedData): void
     {
-        $this->sortersStateProvider->expects($this->once())
+        $this->sortersStateProvider->expects(self::once())
             ->method('getState')
             ->willReturn([]);
         $this->sortersStateProvider->expects(self::once())
@@ -336,9 +333,9 @@ abstract class AbstractSorterExtensionTestCase extends \PHPUnit\Framework\TestCa
         ];
     }
 
-    protected function configureResolver()
+    protected function configureResolver(): void
     {
-        $this->resolver->expects($this->any())
+        $this->resolver->expects(self::any())
             ->method('resolve')
             ->willReturnArgument(1);
     }

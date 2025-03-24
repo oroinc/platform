@@ -10,15 +10,13 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 
 class DateRangeTypeTest extends AbstractTypeTestCase
 {
-    /** @var DateRangeType */
-    private $type;
-
-    /** @var string */
-    protected $defaultTimezone = 'Pacific/Honolulu';
+    private DateRangeType $type;
 
     #[\Override]
     protected function setUp(): void
     {
+        $this->defaultTimezone = 'Pacific/Honolulu';
+
         $localeSettings = $this->getMockBuilder(LocaleSettings::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getTimezone'])
@@ -30,6 +28,7 @@ class DateRangeTypeTest extends AbstractTypeTestCase
 
         $this->type = new DateRangeType($localeSettings);
         $this->formExtensions[] = new PreloadedExtension([$this->type], []);
+
         parent::setUp();
     }
 
@@ -48,11 +47,11 @@ class DateRangeTypeTest extends AbstractTypeTestCase
                     'field_type' => DateType::class,
                     'field_options' => [],
                     'start_field_options' => [
-                        'html5' => false,
+                        'html5' => false
                     ],
                     'end_field_options' => [
-                        'html5' => false,
-                    ],
+                        'html5' => false
+                    ]
                 ]
             ]
         ];
@@ -66,10 +65,10 @@ class DateRangeTypeTest extends AbstractTypeTestCase
                 'bindData' => ['start' => 'Jan 12, 1970', 'end' => 'Jan 12, 2013'],
                 'formData' => [
                     'start' => $this->createDateTime('1970-01-12', 'UTC'),
-                    'end' => $this->createDateTime('2013-01-12', 'UTC'),
+                    'end' => $this->createDateTime('2013-01-12', 'UTC')
                 ],
                 'viewData' => [
-                    'value' => ['start' => 'Jan 12, 1970', 'end' => 'Jan 12, 2013'],
+                    'value' => ['start' => 'Jan 12, 1970', 'end' => 'Jan 12, 2013']
                 ],
                 'customOptions' => [
                     'field_options' => [

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityExtendBundle\Form\Type\IntegerAssociationPropertyType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
 use Symfony\Component\Form\AbstractType;
@@ -13,30 +12,19 @@ class IntegerAssociationPropertyTypeTest extends AssociationTypeTestCase
     #[\Override]
     protected function getFormType(): AbstractType
     {
-        $entityClassResolver = $this->createMock(EntityClassResolver::class);
-        $entityClassResolver->expects($this->any())
-            ->method('getEntityClass')
-            ->willReturnArgument(0);
-
         return new IntegerAssociationPropertyType(
-            new AssociationTypeHelper($this->configManager, $entityClassResolver),
+            new AssociationTypeHelper($this->configManager),
             $this->configManager
         );
     }
 
-    public function testGetBlockPrefix()
+    public function testGetBlockPrefix(): void
     {
-        $this->assertEquals(
-            'oro_entity_extend_association_property_integer',
-            $this->getFormType()->getBlockPrefix()
-        );
+        self::assertEquals('oro_entity_extend_association_property_integer', $this->getFormType()->getBlockPrefix());
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
-        $this->assertEquals(
-            IntegerType::class,
-            $this->getFormType()->getParent()
-        );
+        self::assertEquals(IntegerType::class, $this->getFormType()->getParent());
     }
 }

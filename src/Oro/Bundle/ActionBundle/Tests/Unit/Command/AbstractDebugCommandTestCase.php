@@ -5,26 +5,19 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Command;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1;
 use Oro\Component\ConfigExpression\FactoryWithTypesInterface;
 use Oro\Component\Testing\Unit\Command\Stub\OutputStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-abstract class AbstractDebugCommandTestCase extends \PHPUnit\Framework\TestCase
+abstract class AbstractDebugCommandTestCase extends TestCase
 {
-    /** @var FactoryWithTypesInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $factory;
-
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $container;
-
-    /** @var InputInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $input;
-
-    /** @var OutputStub */
-    protected $output;
-
-    /** @var Command */
-    protected $command;
+    protected FactoryWithTypesInterface&MockObject $factory;
+    protected ContainerInterface&MockObject $container;
+    protected InputInterface&MockObject $input;
+    protected OutputStub $output;
+    protected Command $command;
 
     #[\Override]
     protected function setUp(): void
@@ -46,27 +39,27 @@ abstract class AbstractDebugCommandTestCase extends \PHPUnit\Framework\TestCase
         ?string $argument = null,
         ?\Throwable $exception = null
     ): void {
-        $this->input->expects($this->once())
+        $this->input->expects(self::once())
             ->method('getArgument')
             ->willReturn($argument);
 
-        $this->factory->expects($this->any())
+        $this->factory->expects(self::any())
             ->method('isTypeExists')
             ->with($argument)
             ->willReturn(isset($types[$argument]));
 
-        $this->factory->expects($this->any())
+        $this->factory->expects(self::any())
             ->method('getTypes')
             ->willReturn($types);
 
-        $this->container->expects($this->any())
+        $this->container->expects(self::any())
             ->method('get')
             ->willReturnCallback(function ($serviceId) use ($exception, $types) {
                 if ($exception) {
                     throw $exception;
                 }
 
-                $this->assertContains($serviceId, $types);
+                self::assertContains($serviceId, $types);
 
                 return new TestEntity1();
             });

@@ -23,13 +23,13 @@ class IntegerTypeTest extends AbstractConfigTypeTestCase
     /**
      * @dataProvider submitProvider
      */
-    public function testSubmit(string|int $newVal, ?int $oldVal, string $state, bool $isSetStateExpected)
+    public function testSubmit(string|int $newVal, ?int $oldVal, string $state, bool $isSetStateExpected): void
     {
         $this->doTestSubmit(
             'testAttr',
             IntegerType::class,
             [
-                'config_id' => new EntityConfigId('test', 'Test\Entity'),
+                'config_id' => new EntityConfigId('test', 'Test\Entity')
             ],
             [],
             $newVal,
@@ -51,19 +51,13 @@ class IntegerTypeTest extends AbstractConfigTypeTestCase
         ];
     }
 
-    public function testGetBlockPrefix()
+    public function testGetBlockPrefix(): void
     {
-        $this->assertEquals(
-            'oro_entity_extend_integer',
-            $this->getFormType()->getBlockPrefix()
-        );
+        self::assertEquals('oro_entity_extend_integer', $this->getFormType()->getBlockPrefix());
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
-        $this->assertEquals(
-            SymfonyIntegerType::class,
-            $this->getFormType()->getParent()
-        );
+        self::assertEquals(SymfonyIntegerType::class, $this->getFormType()->getParent());
     }
 }

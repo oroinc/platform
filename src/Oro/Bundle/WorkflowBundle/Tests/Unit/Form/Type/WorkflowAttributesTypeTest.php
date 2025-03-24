@@ -13,6 +13,7 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -24,32 +25,15 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 {
-    /** @var WorkflowRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $workflowRegistry;
-
-    /** @var AttributeGuesser|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeGuesser;
-
-    /** @var DefaultValuesListener|\PHPUnit\Framework\MockObject\MockObject */
-    private $defaultValuesListener;
-
-    /** @var FormInitListener|\PHPUnit\Framework\MockObject\MockObject */
-    private $formInitListener;
-
-    /** @var RequiredAttributesListener|\PHPUnit\Framework\MockObject\MockObject */
-    private $requiredAttributesListener;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $dispatcher;
-
-    /** @var PropertyPathSecurityHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $propertyPathSecurityHelper;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var WorkflowAttributesType */
-    private $type;
+    private WorkflowRegistry&MockObject $workflowRegistry;
+    private AttributeGuesser&MockObject $attributeGuesser;
+    private DefaultValuesListener&MockObject $defaultValuesListener;
+    private FormInitListener&MockObject $formInitListener;
+    private RequiredAttributesListener&MockObject $requiredAttributesListener;
+    private EventDispatcherInterface&MockObject $dispatcher;
+    private PropertyPathSecurityHelper&MockObject $propertyPathSecurityHelper;
+    private TranslatorInterface&MockObject $translator;
+    private WorkflowAttributesType $type;
 
     #[\Override]
     protected function setUp(): void
@@ -97,7 +81,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
     /**
      * @dataProvider buildFormProvider
      */
-    public function testBuildForm(array $attributeField, array $expectedOptions)
+    public function testBuildForm(array $attributeField, array $expectedOptions): void
     {
         $workflow = $this->createWorkflow(
             'test_workflow_with_attributes',
@@ -115,14 +99,14 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ],
         ];
 
-        $this->translator->expects($this->any())
+        $this->translator->expects(self::any())
             ->method('trans')
             ->willReturnCallback(function ($id, $parameters, $domain) {
                 return $domain === 'custom' ? $id : sprintf('%s-%s', $id, $domain);
             });
 
         $builder = $this->createMock(FormBuilderInterface::class);
-        $builder->expects($this->once())
+        $builder->expects(self::once())
             ->method('add')
             ->with('attr', TextType::class, $expectedOptions)
             ->willReturnSelf();
@@ -228,33 +212,33 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         array $childrenOptions,
         array $guessedData = [],
         ?WorkflowData $sourceWorkflowData = null
-    ) {
+    ): void {
         // Check default values listener is subscribed or not subscribed
         if (!empty($formOptions['attribute_default_values'])) {
-            $this->defaultValuesListener->expects($this->once())
+            $this->defaultValuesListener->expects(self::once())
                 ->method('initialize')
                 ->with(
                     $formOptions['workflow_item'],
                     $formOptions['attribute_default_values'] ?? []
                 );
         } else {
-            $this->defaultValuesListener->expects($this->never())
+            $this->defaultValuesListener->expects(self::never())
                 ->method($this->anything());
         }
 
         // Check required attributes listener is subscribed or not subscribed
         if (!empty($formOptions['attribute_fields'])) {
-            $this->requiredAttributesListener->expects($this->once())
+            $this->requiredAttributesListener->expects(self::once())
                 ->method('initialize')
                 ->with(array_keys($formOptions['attribute_fields']));
-            $this->requiredAttributesListener->expects($this->once())
+            $this->requiredAttributesListener->expects(self::once())
                 ->method('onPreSetData')
                 ->with($this->isInstanceOf(FormEvent::class));
-            $this->requiredAttributesListener->expects($this->once())
+            $this->requiredAttributesListener->expects(self::once())
                 ->method('onSubmit')
                 ->with($this->isInstanceOf(FormEvent::class));
         } else {
-            $this->requiredAttributesListener->expects($this->never())
+            $this->requiredAttributesListener->expects(self::never())
                 ->method($this->anything());
         }
 
@@ -269,28 +253,28 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
                 TypeGuess::VERY_HIGH_CONFIDENCE
             );
         }
-        $this->attributeGuesser->expects($this->exactly(count($guessClassAttributeFormExpectations)))
+        $this->attributeGuesser->expects(self::exactly(count($guessClassAttributeFormExpectations)))
             ->method('guessClassAttributeForm')
             ->withConsecutive(...$guessClassAttributeFormExpectations)
             ->willReturnOnConsecutiveCalls(...$guessClassAttributeFormExpectationResults);
 
         $form = $this->factory->create(WorkflowAttributesType::class, $sourceWorkflowData, $formOptions);
 
-        $this->assertSameSize($childrenOptions, $form->all());
+        self::assertSameSize($childrenOptions, $form->all());
 
         foreach ($childrenOptions as $childName => $childOptions) {
-            $this->assertTrue($form->has($childName));
+            self::assertTrue($form->has($childName));
             $childForm = $form->get($childName);
             foreach ($childOptions as $optionName => $optionValue) {
-                $this->assertTrue($childForm->getConfig()->hasOption($optionName));
-                $this->assertEquals($optionValue, $childForm->getConfig()->getOption($optionName));
+                self::assertTrue($childForm->getConfig()->hasOption($optionName));
+                self::assertEquals($optionValue, $childForm->getConfig()->getOption($optionName));
             }
         }
 
         $form->submit($submitData);
 
-        $this->assertTrue($form->isSynchronized());
-        $this->assertEquals($formData, $form->getData(), 'Actual form data does not equal expected form data');
+        self::assertTrue($form->isSynchronized());
+        self::assertEquals($formData, $form->getData(), 'Actual form data does not equal expected form data');
     }
 
     /**
@@ -451,7 +435,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         string $expectedException,
         string $expectedMessage,
         array $options
-    ) {
+    ): void {
         $this->expectException($expectedException);
         $this->expectExceptionMessage($expectedMessage);
 
@@ -516,7 +500,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         ];
     }
 
-    public function testNotEditableAttributes()
+    public function testNotEditableAttributes(): void
     {
         $entity = (object)['first' => null, 'second' => null];
         $formData = $this->createWorkflowData(['entity' => $entity]);
@@ -537,7 +521,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ]
         ];
 
-        $this->propertyPathSecurityHelper->expects($this->exactly(2))
+        $this->propertyPathSecurityHelper->expects(self::exactly(2))
             ->method('isGrantedByPropertyPath')
             ->willReturnMap([
                 [$entity, 'first', 'EDIT', true],
@@ -546,11 +530,11 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
 
         $form = $this->factory->create(WorkflowAttributesType::class, $formData, $formOptions);
 
-        $this->assertTrue($form->has('first'));
-        $this->assertFalse($form->has('second'));
+        self::assertTrue($form->has('first'));
+        self::assertFalse($form->has('second'));
     }
 
-    public function testEditableVirtualAttributes()
+    public function testEditableVirtualAttributes(): void
     {
         $entity = new \stdClass();
         $formData = $this->createWorkflowData(['entity' => $entity]);
@@ -571,16 +555,16 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ],
         ];
 
-        $this->propertyPathSecurityHelper->expects($this->never())
+        $this->propertyPathSecurityHelper->expects(self::never())
             ->method('isGrantedByPropertyPath');
 
         $form = $this->factory->create(WorkflowAttributesType::class, $formData, $formOptions);
 
-        $this->assertTrue($form->has('first'));
-        $this->assertTrue($form->has('second'));
+        self::assertTrue($form->has('first'));
+        self::assertTrue($form->has('second'));
     }
 
-    public function testNormalizers()
+    public function testNormalizers(): void
     {
         $expectedWorkflow = $this->createWorkflow('test_workflow');
         $options = [
@@ -588,7 +572,7 @@ class WorkflowAttributesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             'attribute_fields' => [],
         ];
 
-        $this->workflowRegistry->expects($this->once())
+        $this->workflowRegistry->expects(self::once())
             ->method('getWorkflow')
             ->with($expectedWorkflow->getName())
             ->willReturn($expectedWorkflow);

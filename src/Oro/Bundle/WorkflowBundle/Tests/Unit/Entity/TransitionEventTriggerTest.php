@@ -2,17 +2,35 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
+use Oro\Bundle\WorkflowBundle\Entity\BaseTransitionTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\TransitionEventTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 class TransitionEventTriggerTest extends AbstractTransitionTriggerTestCase
 {
     #[\Override]
-    public function testAccessors()
+    protected function getEntity(): BaseTransitionTrigger
+    {
+        return new TransitionEventTrigger();
+    }
+
+    private function createEventTrigger(array $attributes): TransitionEventTrigger
+    {
+        $trigger = new TransitionEventTrigger();
+        foreach ($attributes as $name => $value) {
+            $method = 'set' . ucfirst($name);
+            $trigger->$method($value);
+        }
+
+        return $trigger;
+    }
+
+    #[\Override]
+    public function testAccessors(): void
     {
         parent::testAccessors();
 
-        $this->assertPropertyAccessors($this->entity, [
+        self::assertPropertyAccessors($this->entity, [
             ['entityClass', 'test_entity'],
             ['event', 'test_event'],
             ['field', 'test_field'],
@@ -21,35 +39,33 @@ class TransitionEventTriggerTest extends AbstractTransitionTriggerTestCase
         ]);
     }
 
-    public function testImport()
+    public function testImport(): void
     {
+        /** @var TransitionEventTrigger $trigger */
         $trigger = $this->getEntity();
         /** @var TransitionEventTrigger $entity */
         $entity = $this->entity;
         $this->setDataToTrigger($trigger);
-        $trigger->setEvent('test_event')
-            ->setEntityClass('test_entity')
-            ->setRelation('test_relation')
-            ->setRequire('test_require')
-            ->setField('test_field');
+        $trigger->setEvent('test_event');
+        $trigger->setEntityClass('test_entity');
+        $trigger->setRelation('test_relation');
+        $trigger->setRequire('test_require');
+        $trigger->setField('test_field');
         $entity->import($trigger);
         $this->assertImportData();
-        $this->assertEquals($trigger->getEvent(), $entity->getEvent());
-        $this->assertEquals($trigger->getEntityClass(), $entity->getEntityClass());
-        $this->assertEquals($trigger->getRelation(), $entity->getRelation());
-        $this->assertEquals($trigger->getRequire(), $entity->getRequire());
-        $this->assertEquals($trigger->getField(), $entity->getField());
+        self::assertEquals($trigger->getEvent(), $entity->getEvent());
+        self::assertEquals($trigger->getEntityClass(), $entity->getEntityClass());
+        self::assertEquals($trigger->getRelation(), $entity->getRelation());
+        self::assertEquals($trigger->getRequire(), $entity->getRequire());
+        self::assertEquals($trigger->getField(), $entity->getField());
     }
 
     /**
      * @dataProvider toStringDataProvider
-     *
-     * @param array $data
-     * @param string $expected
      */
-    public function testToString(array $data, $expected)
+    public function testToString(array $data, string $expected): void
     {
-        $this->assertEquals($expected, (string) $this->createEventTrigger($data));
+        self::assertEquals($expected, (string)$this->createEventTrigger($data));
     }
 
     public function toStringDataProvider(): array
@@ -86,13 +102,10 @@ class TransitionEventTriggerTest extends AbstractTransitionTriggerTestCase
 
     /**
      * @dataProvider equalityDataProvider
-     * @param bool $expected
-     * @param array $match
-     * @param array $against
      */
-    public function testIsEqual($expected, array $match, array $against)
+    public function testIsEqual(bool $expected, array $match, array $against): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             $expected,
             $this->createEventTrigger($match)->isEqualTo(
                 $this->createEventTrigger($against)
@@ -194,46 +207,22 @@ class TransitionEventTriggerTest extends AbstractTransitionTriggerTestCase
             ];
         }
 
-        $cases = array_merge($cases, $oneDiffers);
-
-        return $cases;
+        return array_merge($cases, $oneDiffers);
     }
 
-    public function testGetEntityClass()
+    public function testGetEntityClass(): void
     {
         $trigger = new TransitionEventTrigger();
 
-        $this->assertNull($trigger->getEntityClass());
+        self::assertNull($trigger->getEntityClass());
 
         $definition = new WorkflowDefinition();
         $definition->setRelatedEntity('test class name');
 
         $trigger->setWorkflowDefinition($definition);
-        $this->assertEquals($definition->getRelatedEntity(), $trigger->getEntityClass());
+        self::assertEquals($definition->getRelatedEntity(), $trigger->getEntityClass());
 
         $trigger->setEntityClass('stdClass');
-        $this->assertEquals('stdClass', $trigger->getEntityClass());
-    }
-
-    /**
-     * @param array $attributes
-     * @return TransitionEventTrigger
-     */
-    private function createEventTrigger(array $attributes)
-    {
-        $trigger = new TransitionEventTrigger();
-
-        foreach ($attributes as $name => $value) {
-            $method = 'set' . ucfirst($name);
-            $trigger->$method($value);
-        }
-
-        return $trigger;
-    }
-
-    #[\Override]
-    protected function getEntity()
-    {
-        return new TransitionEventTrigger();
+        self::assertEquals('stdClass', $trigger->getEntityClass());
     }
 }

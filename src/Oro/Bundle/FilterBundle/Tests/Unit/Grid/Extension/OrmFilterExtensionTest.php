@@ -8,14 +8,11 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
 use Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class OrmFilterExtensionTest extends AbstractFilterExtensionTestCase
 {
-    /** @var OrmFilterExtension */
-    protected $extension;
-
-    /** @var OrmDatasource|\PHPUnit\Framework\MockObject\MockObject */
-    private $datasource;
+    private OrmDatasource&MockObject $datasource;
 
     #[\Override]
     protected function setUp(): void
@@ -31,6 +28,25 @@ class OrmFilterExtensionTest extends AbstractFilterExtensionTestCase
         );
 
         $this->datasource = $this->createMock(OrmDatasource::class);
+    }
+
+    private function mockFiltersState(array $filtersState): void
+    {
+        $this->filtersStateProvider->expects(self::once())
+            ->method('getStateFromParameters')
+            ->with(self::isInstanceOf(DatagridConfiguration::class), $this->datagridParameters)
+            ->willReturn($filtersState);
+    }
+
+    private function mockDatasource(QueryBuilder $queryBuilder, ?QueryBuilder $countQueryBuilder): void
+    {
+        $this->datasource->expects(self::once())
+            ->method('getQueryBuilder')
+            ->willReturn($queryBuilder);
+
+        $this->datasource->expects(self::once())
+            ->method('getCountQb')
+            ->willReturn($countQueryBuilder);
     }
 
     /**
@@ -87,29 +103,10 @@ class OrmFilterExtensionTest extends AbstractFilterExtensionTestCase
         $this->extension->visitDatasource($datagridConfig, $this->datasource);
     }
 
-    private function mockFiltersState(array $filtersState): void
-    {
-        $this->filtersStateProvider->expects(self::once())
-            ->method('getStateFromParameters')
-            ->with(self::isInstanceOf(DatagridConfiguration::class), $this->datagridParameters)
-            ->willReturn($filtersState);
-    }
-
-    private function mockDatasource(QueryBuilder $queryBuilder, ?QueryBuilder $countQueryBuilder): void
-    {
-        $this->datasource->expects(self::once())
-            ->method('getQueryBuilder')
-            ->willReturn($queryBuilder);
-
-        $this->datasource->expects(self::once())
-            ->method('getCountQb')
-            ->willReturn($countQueryBuilder);
-    }
-
     public function testVisitDataSourceWhenNoState(): void
     {
         $datagridConfig = $this->createCommonDatagridConfig();
-        $filter = $this->assertFilterInitialized();
+        $filter = $this->createFilter();
 
         $this->mockFiltersState([]);
         $this->mockDatasource($this->createMock(QueryBuilder::class), null);
@@ -125,12 +122,12 @@ class OrmFilterExtensionTest extends AbstractFilterExtensionTestCase
     public function testVisitDataSourceWhenFilterStateNotValid(): void
     {
         $datagridConfig = $this->createCommonDatagridConfig();
-        $filter = $this->assertFilterInitialized();
+        $filter = $this->createFilter();
 
         $this->mockFiltersState([self::FILTER_NAME => ['value' => 'sampleFilterValue1']]);
         $this->mockDatasource($this->createMock(QueryBuilder::class), null);
 
-        $filterForm = $this->mockFilterForm($filter);
+        $filterForm = $this->createFilterForm($filter);
         $filterForm->expects(self::once())
             ->method('isValid')
             ->willReturn(false);
@@ -149,12 +146,12 @@ class OrmFilterExtensionTest extends AbstractFilterExtensionTestCase
         $formData = ['value' => 'sampleFilterValue1'];
 
         $datagridConfig = $this->createCommonDatagridConfig();
-        $filter = $this->assertFilterInitialized();
+        $filter = $this->createFilter();
 
         $this->mockFiltersState($filtersState);
         $this->mockDatasource($this->createMock(QueryBuilder::class), null);
 
-        $filterForm = $this->mockFilterForm($filter);
+        $filterForm = $this->createFilterForm($filter);
         $filterForm->expects(self::once())
             ->method('isValid')
             ->willReturn(true);
@@ -178,12 +175,12 @@ class OrmFilterExtensionTest extends AbstractFilterExtensionTestCase
         $formData = ['value' => 'sampleFilterValue1'];
 
         $datagridConfig = $this->createCommonDatagridConfig();
-        $filter = $this->assertFilterInitialized();
+        $filter = $this->createFilter();
 
         $this->mockFiltersState($filtersState);
         $this->mockDatasource($this->createMock(QueryBuilder::class), $this->createMock(QueryBuilder::class));
 
-        $filterForm = $this->mockFilterForm($filter);
+        $filterForm = $this->createFilterForm($filter);
         $filterForm->expects(self::once())
             ->method('isValid')
             ->willReturn(true);

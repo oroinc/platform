@@ -14,6 +14,7 @@ use Oro\Bundle\LocaleBundle\Formatter\Factory\IntlNumberFormatterFactory;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
@@ -21,15 +22,9 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 
 class NumberFilterTypeTest extends AbstractTypeTestCase
 {
-    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
-    private $localeSettings;
-
-    /** @var NumberFormatter|\PHPUnit\Framework\MockObject\MockObject */
-    private $numberFormatter;
-
-    /** @var NumberFilterType */
-    private $type;
-
+    private LocaleSettings&MockObject $localeSettings;
+    private NumberFormatter $numberFormatter;
+    private NumberFilterType $type;
     private string $defaultLocale;
 
     #[\Override]
@@ -38,7 +33,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
         $constraintFactory = new ConstraintFactory();
         $constraintExtension = new ConstraintAsOptionExtension($constraintFactory);
 
-        $translator = $this->createMockTranslator();
+        $translator = $this->createTranslator();
         $this->localeSettings = $this->createMock(LocaleSettings::class);
         $this->numberFormatter = new NumberFormatter(
             $this->localeSettings,
@@ -116,7 +111,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
         array $formData,
         array $viewData,
         array $customOptions = []
-    ) {
+    ): void {
         // NOTE: must be executed after EntityBundle, because it will be fail result
 
         $locale = 'en';
@@ -309,7 +304,7 @@ class NumberFilterTypeTest extends AbstractTypeTestCase
         array $formData,
         array $viewData,
         array $customOptions
-    ) {
+    ): void {
         // NOTE: must be executed after EntityBundle, because it will be fail result
 
         $locale = 'de_DE';

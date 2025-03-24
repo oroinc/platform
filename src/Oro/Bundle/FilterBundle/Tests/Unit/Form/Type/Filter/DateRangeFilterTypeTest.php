@@ -10,34 +10,32 @@ use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 use Oro\Bundle\FilterBundle\Tests\Unit\Fixtures\CustomFormExtension;
 use Oro\Bundle\FilterBundle\Tests\Unit\Form\Type\AbstractTypeTestCase;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\TestFrameworkBundle\Test\Form\MutableFormEventSubscriber;
 use Oro\Component\Testing\Unit\PreloadedExtension;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DateRangeFilterTypeTest extends AbstractTypeTestCase
 {
-    /** @var DateRangeFilterType */
-    private $type;
+    private DateRangeFilterType $type;
 
     #[\Override]
     protected function setUp(): void
     {
-        $translator = $this->createMockTranslator();
+        $translator = $this->createTranslator();
 
-        $subscriber = $this->getSubscriber(DateFilterSubscriber::class);
+        $subscriber = new MutableFormEventSubscriber($this->createMock(DateFilterSubscriber::class));
 
         $localeSettings = $this->createMock(LocaleSettings::class);
-        $localeSettings->expects($this->any())
+        $localeSettings->expects(self::any())
             ->method('getTimezone')
             ->willReturn('UTC');
 
-        $types = [
+        $this->type = new DateRangeFilterType($translator, new DateModifierProvider(), $subscriber);
+        $this->formExtensions[] = new CustomFormExtension([
             new DateRangeType($localeSettings),
             new FilterType($translator)
-        ];
-
-        $this->type = new DateRangeFilterType($translator, new DateModifierProvider(), $subscriber);
-        $this->formExtensions[] = new CustomFormExtension($types);
+        ]);
         $this->formExtensions[] = new PreloadedExtension([$this->type], []);
 
         parent::setUp();
@@ -53,7 +51,7 @@ class DateRangeFilterTypeTest extends AbstractTypeTestCase
      * @dataProvider configureOptionsDataProvider
      */
     #[\Override]
-    public function testConfigureOptions(array $defaultOptions, array $requiredOptions = [])
+    public function testConfigureOptions(array $defaultOptions, array $requiredOptions = []): void
     {
         $resolver = new OptionsResolver();
         $this->getTestFormType()->configureOptions($resolver);
@@ -117,12 +115,12 @@ class DateRangeFilterTypeTest extends AbstractTypeTestCase
         ];
     }
 
-    public function testBuildView()
+    public function testBuildView(): void
     {
         $form = $this->factory->create(get_class($this->type));
         $view = $form->createView();
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'showDatevariables' => true,
                 'showTime' => false,
@@ -130,7 +128,7 @@ class DateRangeFilterTypeTest extends AbstractTypeTestCase
             ],
             $view->vars['widget_options']
         );
-        $this->assertEquals(
+        self::assertEquals(
             [
                 DateModifierProvider::PART_VALUE => 'oro.filter.form.label_date_part.value',
                 DateModifierProvider::PART_DOW => 'oro.filter.form.label_date_part.dayofweek',
@@ -143,7 +141,7 @@ class DateRangeFilterTypeTest extends AbstractTypeTestCase
             ],
             $view->vars['date_parts']
         );
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'value' => [
                     DateModifierProvider::VAR_NOW => 'oro.filter.form.label_date_var.now',
@@ -181,7 +179,7 @@ class DateRangeFilterTypeTest extends AbstractTypeTestCase
             ],
             $view->vars['date_vars']
         );
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'between' => DateRangeFilterType::TYPE_BETWEEN,
                 'notBetween' => DateRangeFilterType::TYPE_NOT_BETWEEN,

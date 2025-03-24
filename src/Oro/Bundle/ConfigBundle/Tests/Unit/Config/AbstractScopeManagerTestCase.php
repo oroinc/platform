@@ -11,6 +11,8 @@ use Oro\Bundle\ConfigBundle\Entity\ConfigValue;
 use Oro\Bundle\ConfigBundle\Entity\Repository\ConfigRepository;
 use Oro\Bundle\ConfigBundle\Event\ConfigManagerScopeIdUpdateEvent;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -19,28 +21,15 @@ use Symfony\Contracts\Cache\ItemInterface;
  * Abstract test case for scope manager unit tests.
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
+abstract class AbstractScopeManagerTestCase extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrine;
-
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $em;
-
-    /** @var ConfigRepository|\PHPUnit\Framework\MockObject\MockObject */
-    protected $repo;
-
-    /** @var CacheInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $cache;
-
-    /** @var EventDispatcher|\PHPUnit\Framework\MockObject\MockObject */
-    protected $dispatcher;
-
-    /** @var ConfigBag|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configBag;
-
-    /** @var AbstractScopeManager */
-    protected $manager;
+    protected ManagerRegistry&MockObject $doctrine;
+    protected CacheInterface&MockObject $cache;
+    protected EventDispatcher&MockObject $dispatcher;
+    protected ConfigBag&MockObject $configBag;
+    protected EntityManagerInterface&MockObject $em;
+    protected ConfigRepository&MockObject $repo;
+    protected AbstractScopeManager $manager;
 
     #[\Override]
     protected function setUp(): void
@@ -51,7 +40,6 @@ abstract class AbstractScopeManagerTestCase extends \PHPUnit\Framework\TestCase
         $this->configBag = $this->createMock(ConfigBag::class);
 
         $this->repo = $this->createMock(ConfigRepository::class);
-
         $this->em = $this->createMock(EntityManagerInterface::class);
         $this->em->expects(self::any())
             ->method('getRepository')

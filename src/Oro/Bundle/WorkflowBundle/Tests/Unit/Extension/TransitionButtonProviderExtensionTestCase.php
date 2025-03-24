@@ -7,27 +7,66 @@ use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException;
+use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
+use Oro\Bundle\ActionBundle\Provider\OriginalUrlProvider;
+use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 use Oro\Bundle\WorkflowBundle\Button\TransitionButton;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
+use Oro\Bundle\WorkflowBundle\Extension\AbstractButtonProviderExtension;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\StepManager;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-abstract class TransitionButtonProviderExtensionTestCase extends AbstractTransitionButtonProviderExtensionTestCase
+abstract class TransitionButtonProviderExtensionTestCase extends TestCase
 {
     private const DATAGRID_NAME = 'datagrid1';
     private const ENTITY = 'entity1';
 
+    protected WorkflowRegistry&MockObject $workflowRegistry;
+    protected RouteProviderInterface&MockObject $routeProvider;
+    protected OriginalUrlProvider&MockObject $originalUrlProvider;
+    protected CurrentApplicationProviderInterface&MockObject $applicationProvider;
+    protected AbstractButtonProviderExtension $extension;
+
+    #[\Override]
+    protected function setUp(): void
+    {
+        $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
+        $this->routeProvider = $this->createMock(RouteProviderInterface::class);
+        $this->originalUrlProvider = $this->createMock(OriginalUrlProvider::class);
+        $this->applicationProvider = $this->createMock(CurrentApplicationProviderInterface::class);
+
+        $this->extension = $this->createExtension();
+        $this->extension->setApplicationProvider($this->applicationProvider);
+    }
+
+    abstract protected function createExtension(): AbstractButtonProviderExtension;
+
+    abstract protected function getApplication(): string;
+
+    private function getTransitionManager(array $transitions, string $method): TransitionManager
+    {
+        $manager = $this->createMock(TransitionManager::class);
+        $manager->expects(self::any())
+            ->method($method)
+            ->willReturn(new ArrayCollection($transitions));
+
+        return $manager;
+    }
+
     /**
      * @dataProvider buttonDataProvider
      */
-    public function testIsSupport(ButtonInterface $button, bool $expected)
+    public function testIsSupport(ButtonInterface $button, bool $expected): void
     {
-        $this->assertSame($expected, $this->extension->supports($button));
+        self::assertSame($expected, $this->extension->supports($button));
     }
 
     public function buttonDataProvider(): array
@@ -36,12 +75,12 @@ abstract class TransitionButtonProviderExtensionTestCase extends AbstractTransit
 
         $createButtonInstance = function ($className, $isStart) use ($transition) {
             $cloneTransition = clone $transition;
-            $cloneTransition->expects($this->once())
+            $cloneTransition->expects(self::once())
                 ->method('isStart')
                 ->willReturn($isStart);
 
             $button = $this->createMock($className);
-            $button->expects($this->once())
+            $button->expects(self::once())
                 ->method('getTransition')
                 ->willReturn($cloneTransition);
 
@@ -67,9 +106,9 @@ abstract class TransitionButtonProviderExtensionTestCase extends AbstractTransit
     /**
      * @dataProvider findDataProvider
      */
-    public function testFind(bool $expected, ?string $entityClass = null, ?string $datagrid = null)
+    public function testFind(bool $expected, ?string $entityClass = null, ?string $datagrid = null): void
     {
-        $this->applicationProvider->expects($this->atLeastOnce())
+        $this->applicationProvider->expects(self::atLeastOnce())
             ->method('getCurrentApplication')
             ->willReturn($expected ? $this->getApplication() : null);
 
@@ -82,7 +121,7 @@ abstract class TransitionButtonProviderExtensionTestCase extends AbstractTransit
 
             $workflow = $this->getWorkflow($transitionManager);
 
-            $this->workflowRegistry->expects($this->once())
+            $this->workflowRegistry->expects(self::once())
                 ->method('getActiveWorkflows')
                 ->willReturn(new ArrayCollection([$workflow]));
 
@@ -92,7 +131,7 @@ abstract class TransitionButtonProviderExtensionTestCase extends AbstractTransit
             $buttons = [new TransitionButton($transition, $workflow, $buttonContext)];
         }
 
-        $this->assertEquals(
+        self::assertEquals(
             $buttons,
             $this->extension->find(
                 (new ButtonSearchContext())->setEntity($entityClass)->setDatagrid($datagrid)
@@ -120,7 +159,7 @@ abstract class TransitionButtonProviderExtensionTestCase extends AbstractTransit
         ];
     }
 
-    public function testIsAvailableWhenButtonNotSupported()
+    public function testIsAvailableWhenButtonNotSupported(): void
     {
         $this->expectException(UnsupportedButtonException::class);
         $this->extension->isAvailable(
@@ -132,9 +171,9 @@ abstract class TransitionButtonProviderExtensionTestCase extends AbstractTransit
     /**
      * @dataProvider isAvailableDataProvider
      */
-    public function testIsAvailable(bool $expected, ButtonInterface $button)
+    public function testIsAvailable(bool $expected, ButtonInterface $button): void
     {
-        $this->assertEquals($expected, $this->extension->isAvailable($button, new ButtonSearchContext()));
+        self::assertEquals($expected, $this->extension->isAvailable($button, new ButtonSearchContext()));
     }
 
     public function isAvailableDataProvider(): array
@@ -175,16 +214,16 @@ abstract class TransitionButtonProviderExtensionTestCase extends AbstractTransit
             ->getMock();
 
         $definition = $this->createMock(WorkflowDefinition::class);
-        $definition->expects($this->any())
+        $definition->expects(self::any())
             ->method('getDatagrids')
             ->willReturn([self::DATAGRID_NAME]);
-        $definition->expects($this->any())
+        $definition->expects(self::any())
             ->method('getRelatedEntity')
             ->willReturn(self::ENTITY);
 
         $workflow->setDefinition($definition);
 
-        $workflow->expects($this->any())
+        $workflow->expects(self::any())
             ->method('getTransitionManager')
             ->willReturn($transitionManager);
 
@@ -198,46 +237,46 @@ abstract class TransitionButtonProviderExtensionTestCase extends AbstractTransit
         bool $isAllowedTransition = true
     ): TransitionButton {
         $transition = $this->createMock(Transition::class);
-        $transition->expects($this->any())
+        $transition->expects(self::any())
             ->method('isStart')
             ->willReturn(false);
-        $transition->expects($this->any())
+        $transition->expects(self::any())
             ->method('isHidden')
             ->willReturn($isHidden);
 
         $step = $this->createMock(Step::class);
-        $step->expects($this->any())
+        $step->expects(self::any())
             ->method('isAllowedTransition')
             ->willReturn($isAllowedTransition);
         $stepManager = $this->createMock(StepManager::class);
-        $stepManager->expects($this->any())
+        $stepManager->expects(self::any())
             ->method('getStep')
             ->willReturn($step);
 
         $workflow = $this->createMock(Workflow::class);
-        $workflow->expects($this->any())
+        $workflow->expects(self::any())
             ->method('isTransitionAvailable')
             ->willReturn($isAvailable);
-        $workflow->expects($this->any())
+        $workflow->expects(self::any())
             ->method('getStepManager')
             ->willReturn($stepManager);
 
         if (true === $isExistWorkflowItem) {
             $workflowItem = $this->createMock(WorkflowItem::class);
-            $workflowItem->expects($this->any())
+            $workflowItem->expects(self::any())
                 ->method('getCurrentStep')
                 ->willReturn((new WorkflowStep())->setName('test_step'));
 
-            $workflow->expects($this->once())
+            $workflow->expects(self::once())
                 ->method('getWorkflowItemByEntityId')
                 ->willReturn($workflowItem);
         }
 
         $button = $this->createMock(TransitionButton::class);
-        $button->expects($this->any())
+        $button->expects(self::any())
             ->method('getWorkflow')
             ->willReturn($workflow);
-        $button->expects($this->any())
+        $button->expects(self::any())
             ->method('getTransition')
             ->willReturn($transition);
 

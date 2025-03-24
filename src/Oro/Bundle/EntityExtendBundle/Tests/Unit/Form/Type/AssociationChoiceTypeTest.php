@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Form\Type\AssociationChoiceType;
@@ -15,13 +14,8 @@ class AssociationChoiceTypeTest extends AssociationTypeTestCase
     #[\Override]
     protected function getFormType(): AbstractType
     {
-        $entityClassResolver = $this->createMock(EntityClassResolver::class);
-        $entityClassResolver->expects($this->any())
-            ->method('getEntityClass')
-            ->willReturnArgument(0);
-
         return new AssociationChoiceType(
-            new AssociationTypeHelper($this->configManager, $entityClassResolver),
+            new AssociationTypeHelper($this->configManager),
             $this->configManager
         );
     }
@@ -29,13 +23,13 @@ class AssociationChoiceTypeTest extends AssociationTypeTestCase
     /**
      * @dataProvider submitProvider
      */
-    public function testSubmit(bool $newVal, bool $oldVal, string $state, bool $isSetStateExpected)
+    public function testSubmit(bool $newVal, bool $oldVal, string $state, bool $isSetStateExpected): void
     {
         $this->doTestSubmit(
             'enabled',
             AssociationChoiceType::class,
             [
-                'config_id'         => new EntityConfigId('test', 'Test\Entity'),
+                'config_id' => new EntityConfigId('test', 'Test\Entity'),
                 'association_class' => 'Test\AssocEntity'
             ],
             [],
@@ -57,24 +51,13 @@ class AssociationChoiceTypeTest extends AssociationTypeTestCase
         ];
     }
 
-    public function testGetBlockPrefix()
+    public function testGetBlockPrefix(): void
     {
-        $this->assertEquals('oro_entity_extend_association_choice', $this->getFormType()->getBlockPrefix());
+        self::assertEquals('oro_entity_extend_association_choice', $this->getFormType()->getBlockPrefix());
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
-        $this->assertEquals(ChoiceType::class, $this->getFormType()->getParent());
-    }
-
-    protected function getDisabledFormView(?string $cssClass = null): array
-    {
-        return [
-            'disabled' => true,
-            'attr'     => [
-                'class' => empty($cssClass) ? 'disabled-choice' : $cssClass . ' disabled-choice'
-            ],
-            'value'    => null
-        ];
+        self::assertEquals(ChoiceType::class, $this->getFormType()->getParent());
     }
 }

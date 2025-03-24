@@ -13,27 +13,21 @@ use Symfony\Component\Form\AbstractType;
 
 class EntityFilterTypeTest extends AbstractTypeTestCase
 {
-    /** @var EntityFilterType */
-    private $type;
+    private EntityFilterType $type;
 
     #[\Override]
     protected function setUp(): void
     {
-        $translator = $this->createMockTranslator();
+        $translator = $this->createTranslator();
+        $this->type = new EntityFilterType($translator);
 
-        $registry = $this->createMock(ManagerRegistry::class);
-
-        $types = [
+        $this->formExtensions[] = new CustomFormExtension([
             new FilterType($translator),
             new ChoiceFilterType($translator),
-            new EntityType($registry)
-        ];
-
-        $this->formExtensions[] = new CustomFormExtension($types);
+            new EntityType($this->createMock(ManagerRegistry::class))
+        ]);
 
         parent::setUp();
-
-        $this->type = new EntityFilterType($translator);
     }
 
     #[\Override]
@@ -42,9 +36,9 @@ class EntityFilterTypeTest extends AbstractTypeTestCase
         return $this->type;
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
-        $this->assertEquals(ChoiceFilterType::class, $this->type->getParent());
+        self::assertEquals(ChoiceFilterType::class, $this->type->getParent());
     }
 
     #[\Override]
@@ -70,7 +64,7 @@ class EntityFilterTypeTest extends AbstractTypeTestCase
         array $formData,
         array $viewData,
         array $customOptions = []
-    ) {
+    ): void {
         // bind method should be tested in functional test
     }
 

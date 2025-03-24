@@ -4,10 +4,11 @@ namespace Oro\Bundle\LocaleBundle\Tests\Unit\Converter;
 
 use Oro\Bundle\LocaleBundle\Converter\DateTimeFormatConverterInterface;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
-use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-abstract class AbstractFormatConverterTestCase extends \PHPUnit\Framework\TestCase
+abstract class AbstractFormatConverterTestCase extends TestCase
 {
     protected const LOCALE_EN = 'en';
     protected const LOCALE_RU = 'ru';
@@ -16,45 +17,40 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit\Framework\TestCa
     protected const LOCALE_PT_BR = 'pt_BR';
     protected const LOCALE_ZH_CN = 'zh_CN';
 
-    /** @var DateTimeFormatConverterInterface */
-    protected $converter;
-
-    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
-    protected $formatter;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $translator;
+    protected DateTimeFormatterInterface&MockObject $formatter;
+    protected TranslatorInterface&MockObject $translator;
+    protected DateTimeFormatConverterInterface $converter;
 
     protected array $localFormatMap = [
-        [null, null, self::LOCALE_EN, null, "MMM d, y h:mm a"],
-        [\IntlDateFormatter::LONG, \IntlDateFormatter::MEDIUM, self::LOCALE_EN, null, "MMMM d, y h:mm:ss a"],
-        [\IntlDateFormatter::LONG, \IntlDateFormatter::NONE, self::LOCALE_EN, null, "MMMM d, y"],
-        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, self::LOCALE_EN, null, "MMM d, y h:mm a"],
-        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, self::LOCALE_EN, null, "MMM d, y"],
-        [null, \IntlDateFormatter::NONE, self::LOCALE_EN, null, "MMM d, y"],
-        [\IntlDateFormatter::NONE, \IntlDateFormatter::MEDIUM, self::LOCALE_EN, null, "h:mm:ss a"],
-        [\IntlDateFormatter::NONE, \IntlDateFormatter::SHORT, self::LOCALE_EN, null, "h:mm a"],
-        [\IntlDateFormatter::NONE, null, self::LOCALE_EN, null, "h:mm a"],
+        [null, null, self::LOCALE_EN, null, 'MMM d, y h:mm a'],
+        [\IntlDateFormatter::LONG, \IntlDateFormatter::MEDIUM, self::LOCALE_EN, null, 'MMMM d, y h:mm:ss a'],
+        [\IntlDateFormatter::LONG, \IntlDateFormatter::NONE, self::LOCALE_EN, null, 'MMMM d, y'],
+        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, self::LOCALE_EN, null, 'MMM d, y h:mm a'],
+        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, self::LOCALE_EN, null, 'MMM d, y'],
+        [null, \IntlDateFormatter::NONE, self::LOCALE_EN, null, 'MMM d, y'],
+        [\IntlDateFormatter::NONE, \IntlDateFormatter::MEDIUM, self::LOCALE_EN, null, 'h:mm:ss a'],
+        [\IntlDateFormatter::NONE, \IntlDateFormatter::SHORT, self::LOCALE_EN, null, 'h:mm a'],
+        [\IntlDateFormatter::NONE, null, self::LOCALE_EN, null, 'h:mm a'],
 
-        [null, null, self::LOCALE_RU, null, "dd.MM.yyyy H:mm"],
+        [null, null, self::LOCALE_RU, null, 'dd.MM.yyyy H:mm'],
         [\IntlDateFormatter::LONG, \IntlDateFormatter::MEDIUM, self::LOCALE_RU, null, "d MMMM y 'г.' H:mm:ss"],
         [\IntlDateFormatter::LONG, \IntlDateFormatter::NONE, self::LOCALE_RU, null, "d MMMM y 'г.'"],
-        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, self::LOCALE_RU, null, "dd.MM.yyyy H:mm"],
-        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, self::LOCALE_RU, null, "dd.MM.yyyy"],
-        [null, \IntlDateFormatter::NONE, self::LOCALE_RU, null, "dd.MM.yyyy"],
-        [\IntlDateFormatter::NONE, \IntlDateFormatter::MEDIUM, self::LOCALE_RU, null, "H:mm:ss"],
-        [\IntlDateFormatter::NONE, \IntlDateFormatter::SHORT, self::LOCALE_RU, null, "H:mm"],
-        [\IntlDateFormatter::NONE, null, self::LOCALE_RU, null, "H:mm"],
+        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, self::LOCALE_RU, null, 'dd.MM.yyyy H:mm'],
+        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, self::LOCALE_RU, null, 'dd.MM.yyyy'],
+        [null, \IntlDateFormatter::NONE, self::LOCALE_RU, null, 'dd.MM.yyyy'],
+        [\IntlDateFormatter::NONE, \IntlDateFormatter::MEDIUM, self::LOCALE_RU, null, 'H:mm:ss'],
+        [\IntlDateFormatter::NONE, \IntlDateFormatter::SHORT, self::LOCALE_RU, null, 'H:mm'],
+        [\IntlDateFormatter::NONE, null, self::LOCALE_RU, null, 'H:mm'],
 
-        [null, null, self::LOCALE_AR, null, "d MMMM y h:mm:ss"],
-        [\IntlDateFormatter::LONG, \IntlDateFormatter::MEDIUM, self::LOCALE_AR, null, "d MMMM y h:mm:ss"],
-        [\IntlDateFormatter::LONG, \IntlDateFormatter::NONE, self::LOCALE_AR, null, "d MMMM y"],
-        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, self::LOCALE_AR, null, "dd‏/MM‏/y h:mm"],
-        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, self::LOCALE_AR, null, "dd‏/MM‏/y"],
-        [null, \IntlDateFormatter::NONE, self::LOCALE_AR, null, "d MMMM y"],
-        [\IntlDateFormatter::NONE, \IntlDateFormatter::MEDIUM, self::LOCALE_AR, null, "h:mm:ss"],
-        [\IntlDateFormatter::NONE, \IntlDateFormatter::SHORT, self::LOCALE_AR, null, "h:mm"],
-        [\IntlDateFormatter::NONE, null, self::LOCALE_AR, null, "h:mm:ss"],
+        [null, null, self::LOCALE_AR, null, 'd MMMM y h:mm:ss'],
+        [\IntlDateFormatter::LONG, \IntlDateFormatter::MEDIUM, self::LOCALE_AR, null, 'd MMMM y h:mm:ss'],
+        [\IntlDateFormatter::LONG, \IntlDateFormatter::NONE, self::LOCALE_AR, null, 'd MMMM y'],
+        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, self::LOCALE_AR, null, 'dd‏/MM‏/y h:mm'],
+        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, self::LOCALE_AR, null, 'dd‏/MM‏/y'],
+        [null, \IntlDateFormatter::NONE, self::LOCALE_AR, null, 'd MMMM y'],
+        [\IntlDateFormatter::NONE, \IntlDateFormatter::MEDIUM, self::LOCALE_AR, null, 'h:mm:ss'],
+        [\IntlDateFormatter::NONE, \IntlDateFormatter::SHORT, self::LOCALE_AR, null, 'h:mm'],
+        [\IntlDateFormatter::NONE, null, self::LOCALE_AR, null, 'h:mm:ss'],
 
         [null, null, self::LOCALE_PT_BR, null, "d 'de' MMMM 'de' y HH:mm:ss"],
         [\IntlDateFormatter::LONG, \IntlDateFormatter::MEDIUM, self::LOCALE_PT_BR, null, "d 'de' MMMM 'de' y HH:mm:ss"],
@@ -66,20 +62,20 @@ abstract class AbstractFormatConverterTestCase extends \PHPUnit\Framework\TestCa
         [\IntlDateFormatter::NONE, \IntlDateFormatter::SHORT, self::LOCALE_PT_BR, null, 'HH:mm'],
         [\IntlDateFormatter::NONE, null, self::LOCALE_PT_BR, null, 'HH:mm:ss'],
         [null, null, self::LOCALE_ZH_CN, null, 'y年M月d日 HH:mm'],
-        [\IntlDateFormatter::LONG, \IntlDateFormatter::MEDIUM, self::LOCALE_ZH_CN, null, "y年M月d日 HH:mm:ss"],
-        [\IntlDateFormatter::LONG, \IntlDateFormatter::NONE, self::LOCALE_ZH_CN, null, "y年M月d日"],
-        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, self::LOCALE_ZH_CN, null, "y年M月d日 HH:mm"],
-        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, self::LOCALE_ZH_CN, null, "y年M月d日"],
+        [\IntlDateFormatter::LONG, \IntlDateFormatter::MEDIUM, self::LOCALE_ZH_CN, null, 'y年M月d日 HH:mm:ss'],
+        [\IntlDateFormatter::LONG, \IntlDateFormatter::NONE, self::LOCALE_ZH_CN, null, 'y年M月d日'],
+        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, self::LOCALE_ZH_CN, null, 'y年M月d日 HH:mm'],
+        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, self::LOCALE_ZH_CN, null, 'y年M月d日'],
 
-        [null, null, self::LOCALE_BS_BA, null, "d. MMM y."],
+        [null, null, self::LOCALE_BS_BA, null, 'd. MMM y.'],
         [\IntlDateFormatter::LONG, \IntlDateFormatter::MEDIUM, self::LOCALE_BS_BA, null, "d. MMMM y. 'u' HH:mm:ss"],
-        [\IntlDateFormatter::LONG, \IntlDateFormatter::NONE, self::LOCALE_BS_BA, null, "d. MMMM y."],
+        [\IntlDateFormatter::LONG, \IntlDateFormatter::NONE, self::LOCALE_BS_BA, null, 'd. MMMM y.'],
         [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, self::LOCALE_BS_BA, null, "d. MMM y. 'u' HH:mm"],
-        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, self::LOCALE_BS_BA, null, "d. MMM y."],
-        [null, \IntlDateFormatter::NONE, self::LOCALE_BS_BA, null, "d. MMM y."],
-        [\IntlDateFormatter::NONE, \IntlDateFormatter::MEDIUM, self::LOCALE_BS_BA, null, "HH:mm:ss"],
-        [\IntlDateFormatter::NONE, \IntlDateFormatter::SHORT, self::LOCALE_BS_BA, null, "HH:mm"],
-        [\IntlDateFormatter::NONE, null, self::LOCALE_BS_BA, null, "HH:mm"],
+        [\IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, self::LOCALE_BS_BA, null, 'd. MMM y.'],
+        [null, \IntlDateFormatter::NONE, self::LOCALE_BS_BA, null, 'd. MMM y.'],
+        [\IntlDateFormatter::NONE, \IntlDateFormatter::MEDIUM, self::LOCALE_BS_BA, null, 'HH:mm:ss'],
+        [\IntlDateFormatter::NONE, \IntlDateFormatter::SHORT, self::LOCALE_BS_BA, null, 'HH:mm'],
+        [\IntlDateFormatter::NONE, null, self::LOCALE_BS_BA, null, 'HH:mm'],
     ];
 
     #[\Override]

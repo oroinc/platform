@@ -13,15 +13,13 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
 class DateTimeRangeTypeTest extends AbstractTypeTestCase
 {
-    /** @var DateRangeType */
-    private $type;
-
-    /** @var string */
-    protected $defaultTimezone = 'Pacific/Honolulu';
+    private DateTimeRangeType $type;
 
     #[\Override]
     protected function setUp(): void
     {
+        $this->defaultTimezone = 'Pacific/Honolulu';
+
         $localeSettings = $this->getMockBuilder(LocaleSettings::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getTimezone'])

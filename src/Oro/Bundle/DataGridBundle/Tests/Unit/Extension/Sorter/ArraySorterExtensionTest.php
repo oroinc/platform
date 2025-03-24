@@ -9,17 +9,12 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\ArraySorterExtension;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\Configuration;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class ArraySorterExtensionTest extends AbstractSorterExtensionTestCase
 {
-    /** @var ArraySorterExtension */
-    protected $extension;
-
-    /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject * */
-    private $config;
-
-    /** @var ArrayDatasource */
-    private $arrayDatasource;
+    private DatagridConfiguration&MockObject $config;
+    private ArrayDatasource $arrayDatasource;
 
     private array $arraySource = [
         [
@@ -52,65 +47,65 @@ class ArraySorterExtensionTest extends AbstractSorterExtensionTestCase
         $this->extension->setParameters(new ParameterBag());
     }
 
-    public function testIsApplicableWithArrayDatasource()
+    public function testIsApplicableWithArrayDatasource(): void
     {
-        $this->config->expects($this->once())
+        $this->config->expects(self::once())
             ->method('getDatasourceType')
             ->willReturn(ArrayDatasource::TYPE);
 
-        $this->config->expects($this->once())
+        $this->config->expects(self::once())
             ->method('offsetGetByPath')
             ->with(Configuration::COLUMNS_PATH)->willReturn([]);
 
-        $this->assertTrue($this->extension->isApplicable($this->config));
+        self::assertTrue($this->extension->isApplicable($this->config));
     }
 
-    public function testIsApplicableWithWrongDatasource()
+    public function testIsApplicableWithWrongDatasource(): void
     {
-        $this->config->expects($this->once())
+        $this->config->expects(self::once())
             ->method('getDatasourceType')
             ->willReturn(OrmDatasource::TYPE);
 
-        $this->config->expects($this->never())
+        $this->config->expects(self::never())
             ->method('offsetGetByPath')
             ->with(Configuration::COLUMNS_PATH)
             ->willReturn([]);
 
-        $this->assertFalse($this->extension->isApplicable($this->config));
+        self::assertFalse($this->extension->isApplicable($this->config));
     }
 
     /**
      * @dataProvider sortingDataProvider
      */
-    public function testVisitDatasource(array $sorter, array $state, array $expectedData)
+    public function testVisitDatasource(array $sorter, array $state, array $expectedData): void
     {
         $this->configureResolver();
-        $this->config->expects($this->once())
+        $this->config->expects(self::once())
             ->method('offsetGetByPath')
             ->with(Configuration::COLUMNS_PATH)
             ->willReturn($sorter);
 
-        $this->sortersStateProvider->expects($this->once())
+        $this->sortersStateProvider->expects(self::once())
             ->method('getStateFromParameters')
             ->willReturn($state);
 
         $this->extension->setParameters(new ParameterBag());
         $this->extension->visitDatasource($this->config, $this->arrayDatasource);
 
-        $this->assertEquals($expectedData, $this->arrayDatasource->getArraySource());
+        self::assertEquals($expectedData, $this->arrayDatasource->getArraySource());
     }
 
-    public function testVisitDatasourceWithWrongDatasourceType()
+    public function testVisitDatasourceWithWrongDatasourceType(): void
     {
         $this->expectException(UnexpectedTypeException::class);
 
         $this->configureResolver();
-        $this->config->expects($this->once())
+        $this->config->expects(self::once())
             ->method('offsetGetByPath')
             ->with(Configuration::COLUMNS_PATH)
             ->willReturn(['priceListName' => ['data_name' => 'priceListName']]);
 
-        $this->sortersStateProvider->expects($this->once())
+        $this->sortersStateProvider->expects(self::once())
             ->method('getStateFromParameters')
             ->willReturn(['priceListName' => 'DESC']);
 

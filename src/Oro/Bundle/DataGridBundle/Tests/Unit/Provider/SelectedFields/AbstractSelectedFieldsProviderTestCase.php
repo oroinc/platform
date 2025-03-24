@@ -6,37 +6,37 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Provider\SelectedFields\AbstractSelectedFieldsProvider;
 use Oro\Bundle\DataGridBundle\Provider\State\DatagridStateProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-abstract class AbstractSelectedFieldsProviderTestCase extends \PHPUnit\Framework\TestCase
+abstract class AbstractSelectedFieldsProviderTestCase extends TestCase
 {
-    /** @var DatagridStateProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $datagridStateProvider;
-
-    /** @var AbstractSelectedFieldsProvider */
-    protected $provider;
-
-    /** @var DatagridConfiguration|\PHPUnit\Framework\MockObject\MockObject */
-    protected $datagridConfiguration;
-
-    /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject */
-    protected $parameterBag;
+    protected DatagridStateProviderInterface&MockObject $datagridStateProvider;
+    protected DatagridConfiguration&MockObject $datagridConfiguration;
+    protected ParameterBag&MockObject $parameterBag;
+    protected AbstractSelectedFieldsProvider $provider;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->datagridStateProvider = $this->createMock(DatagridStateProviderInterface::class);
-
         $this->datagridConfiguration = $this->createMock(DatagridConfiguration::class);
         $this->parameterBag = $this->createMock(ParameterBag::class);
     }
+
+    abstract protected function expectGetConfiguration(array $configuration): void;
 
     /**
      * @dataProvider getSelectedFieldsDataProvider
      */
     public function testGetSelectedFields(array $state, array $configuration, array $expectedSelectedFields): void
     {
-        $this->mockGetState($state);
-        $this->mockGetConfiguration($configuration);
+        $this->datagridStateProvider->expects(self::once())
+            ->method('getStateFromParameters')
+            ->with($this->datagridConfiguration, $this->parameterBag)
+            ->willReturn($state);
+
+        $this->expectGetConfiguration($configuration);
 
         $selectedFields = $this->provider->getSelectedFields($this->datagridConfiguration, $this->parameterBag);
         self::assertEquals($expectedSelectedFields, $selectedFields);
@@ -72,14 +72,4 @@ abstract class AbstractSelectedFieldsProviderTestCase extends \PHPUnit\Framework
             ],
         ];
     }
-
-    protected function mockGetState(array $state): void
-    {
-        $this->datagridStateProvider->expects(self::once())
-            ->method('getStateFromParameters')
-            ->with($this->datagridConfiguration, $this->parameterBag)
-            ->willReturn($state);
-    }
-
-    abstract protected function mockGetConfiguration(array $configuration): void;
 }

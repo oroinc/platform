@@ -19,9 +19,9 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\Repository\AttributeFamilyRepository;
 use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Grid\AbstractFieldsExtension;
 use Oro\Bundle\EntityExtendBundle\Grid\DynamicFieldsExtension;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -30,14 +30,9 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
 {
     use EntityTrait;
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var Config */
-    private $attributeEntityConfig;
-
-    /** @var SelectedFieldsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $selectedFieldsProvider;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private Config $attributeEntityConfig;
+    private SelectedFieldsProviderInterface&MockObject $selectedFieldsProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -55,7 +50,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
     }
 
     #[\Override]
-    protected function getExtension(): AbstractFieldsExtension
+    protected function getExtension(): DynamicFieldsExtension
     {
         $extension = new DynamicFieldsExtension(
             $this->configManager,
@@ -71,9 +66,9 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         return $extension;
     }
 
-    public function testIsApplicable()
+    public function testIsApplicable(): void
     {
-        $this->assertFalse(
+        self::assertFalse(
             $this->getExtension()->isApplicable(
                 DatagridConfiguration::create(
                     [
@@ -84,7 +79,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
                 )
             )
         );
-        $this->assertFalse(
+        self::assertFalse(
             $this->getExtension()->isApplicable(
                 DatagridConfiguration::create(
                     [
@@ -95,7 +90,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         );
     }
 
-    public function testIsApplicableWhenHasNoConfig()
+    public function testIsApplicableWhenHasNoConfig(): void
     {
         $datagridConfig = DatagridConfiguration::create([
             'extended_entity_name' => self::ENTITY_NAME,
@@ -104,12 +99,12 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
             ],
         ]);
 
-        $this->extendConfigProvider->expects($this->once())
+        $this->extendConfigProvider->expects(self::once())
             ->method('hasConfig')
             ->with(self::ENTITY_CLASS)
             ->willReturn(false);
 
-        $this->assertFalse($this->getExtension()->isApplicable($datagridConfig));
+        self::assertFalse($this->getExtension()->isApplicable($datagridConfig));
     }
 
     public function isExtendDataProvider(): array
@@ -127,7 +122,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
     /**
      * @dataProvider isExtendDataProvider
      */
-    public function testIsApplicableIfEntityIsExtendable(bool $isExtend)
+    public function testIsApplicableIfEntityIsExtendable(bool $isExtend): void
     {
         $datagridConfig = DatagridConfiguration::create([
             'extended_entity_name' => self::ENTITY_NAME,
@@ -137,33 +132,33 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         ]);
 
         $config = $this->createMock(ConfigInterface::class);
-        $config->expects($this->once())
+        $config->expects(self::once())
             ->method('is')
             ->with('is_extend')
             ->willReturn($isExtend);
 
-        $this->extendConfigProvider->expects($this->once())
+        $this->extendConfigProvider->expects(self::once())
             ->method('getConfig')
             ->with(self::ENTITY_CLASS)
             ->willReturn($config);
 
-        $this->extendConfigProvider->expects($this->once())
+        $this->extendConfigProvider->expects(self::once())
             ->method('hasConfig')
             ->with(self::ENTITY_CLASS)
             ->willReturn(true);
 
-        $this->assertEquals($isExtend, $this->getExtension()->isApplicable($datagridConfig));
+        self::assertEquals($isExtend, $this->getExtension()->isApplicable($datagridConfig));
     }
 
-    public function testGetPriority()
+    public function testGetPriority(): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             300,
             $this->getExtension()->getPriority()
         );
     }
 
-    public function testProcessConfigsWithVisibleFilter()
+    public function testProcessConfigsWithVisibleFilter(): void
     {
         $fieldType = 'string';
 
@@ -173,7 +168,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         $initialConfig = $config->toArray();
 
         $this->getExtension()->processConfigs($config);
-        $this->assertEquals(
+        self::assertEquals(
             array_merge(
                 $initialConfig,
                 [
@@ -227,7 +222,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         string $fieldName,
         string $fieldType,
         array $extendFieldConfig = []
-    ) {
+    ): void {
         // Assume that entity cannot have attributes.
         $this->attributeEntityConfig->set('has_attributes', false);
 
@@ -254,37 +249,37 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
             new FieldConfigId('view', $className, $fieldName, $fieldType)
         );
 
-        $this->fieldsHelper->expects($this->any())
+        $this->fieldsHelper->expects(self::any())
             ->method('getFields')
             ->willReturn([$fieldId]);
 
-        $this->entityConfigProvider->expects($this->any())
+        $this->entityConfigProvider->expects(self::any())
             ->method('getConfig')
             ->with($className, $fieldName)
             ->willReturn($entityFieldConfig);
 
-        $this->extendConfigProvider->expects($this->any())
+        $this->extendConfigProvider->expects(self::any())
             ->method('getConfig')
             ->with($className, $fieldName)
             ->willReturn($extendConfig);
 
-        $this->datagridConfigProvider->expects($this->any())
+        $this->datagridConfigProvider->expects(self::any())
             ->method('getConfig')
             ->with($className, $fieldName)
             ->willReturn($datagridFieldConfig);
 
-        $this->viewConfigProvider->expects($this->any())
+        $this->viewConfigProvider->expects(self::any())
             ->method('getConfig')
             ->with($className, $fieldName)
             ->willReturn($viewFieldConfig);
 
-        $this->configManager->expects($this->any())
+        $this->configManager->expects(self::any())
             ->method('getEntityConfig')
             ->with('attribute', $className)
             ->willReturn($this->attributeEntityConfig);
     }
 
-    public function testProcessConfigsWhenNoAttributes()
+    public function testProcessConfigsWhenNoAttributes(): void
     {
         $fieldType = 'string';
 
@@ -298,10 +293,10 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         $config = $this->getDatagridConfiguration();
 
         $this->getExtension()->processConfigs($config);
-        $this->assertEquals($this->getExpectedConfig($config), $config->toArray());
+        self::assertEquals($this->getExpectedConfig($config), $config->toArray());
     }
 
-    public function testProcessConfigsWhenAttributesInFamilies()
+    public function testProcessConfigsWhenAttributesInFamilies(): void
     {
         $fieldType = 'string';
 
@@ -316,10 +311,10 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         $config = $this->getDatagridConfiguration();
 
         $this->getExtension()->processConfigs($config);
-        $this->assertEquals($this->getExpectedConfig($config), $config->toArray());
+        self::assertEquals($this->getExpectedConfig($config), $config->toArray());
     }
 
-    public function testProcessConfigsWhenAttributesNotInFamilies()
+    public function testProcessConfigsWhenAttributesNotInFamilies(): void
     {
         $fieldType = 'string';
 
@@ -335,7 +330,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         $initialConfig = $config->toArray();
 
         $this->getExtension()->processConfigs($config);
-        $this->assertEquals($initialConfig, $config->toArray());
+        self::assertEquals($initialConfig, $config->toArray());
     }
 
     private function getExpectedConfig(DatagridConfiguration $config): array
@@ -387,17 +382,17 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
             ['id' => 1, 'fieldName' => $fieldConfigId->getFieldName(), 'type' => $fieldConfigId->getFieldType()]
         );
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('getConfigFieldModel')
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->willReturn($fieldConfigModel);
 
-        $this->doctrineHelper->expects($this->once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getEntityRepositoryForClass')
             ->with(AttributeFamily::class)
             ->willReturn($attributeFamilyRepository = $this->createMock(AttributeFamilyRepository::class));
 
-        $attributeFamilyRepository->expects($this->once())
+        $attributeFamilyRepository->expects(self::once())
             ->method('getFamilyIdsForAttributes')
             ->with([$fieldConfigModel])
             ->willReturn($familiesIdsByAttributesIds);
@@ -410,7 +405,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         );
         $attributeFieldConfig->set('is_attribute', $isAttribute);
 
-        $this->attributeConfigProvider->expects($this->any())
+        $this->attributeConfigProvider->expects(self::any())
             ->method('getConfig')
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->willReturn($attributeFieldConfig);
@@ -418,7 +413,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         return $attributeFieldConfig;
     }
 
-    public function testBuildExpressionWhenNoRelevantFields()
+    public function testBuildExpressionWhenNoRelevantFields(): void
     {
         $selectedFieldsProvider = $this->createMock(SelectedFieldsProviderInterface::class);
         $extension = new DynamicFieldsExtension(
@@ -441,7 +436,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
 
         $fieldConfigId = new FieldConfigId('attribute', self::ENTITY_CLASS, self::FIELD_NAME, 'string');
         $extension->buildExpression([$fieldConfigId], $config, 'o');
-        $this->assertEquals($expectedConfigArray, $config->toArray());
+        self::assertEquals($expectedConfigArray, $config->toArray());
     }
 
     /**
@@ -450,7 +445,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
      * @param FieldConfigId[] $fieldsConfigIds
      * @param array $configArray
      */
-    public function testBuildExpressionWhenFieldNotRelevant(array $fieldsConfigIds, array $configArray)
+    public function testBuildExpressionWhenFieldNotRelevant(array $fieldsConfigIds, array $configArray): void
     {
         $extension = $this->getExtension();
 
@@ -465,7 +460,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         );
 
         $extension->buildExpression($fieldsConfigIds, $config, 'o');
-        $this->assertEquals($expectedConfigArray, $config->toArray());
+        self::assertEquals($expectedConfigArray, $config->toArray());
     }
 
     /**
@@ -596,7 +591,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         ];
     }
 
-    public function testProcessConfigsToOneEntityFallbackValue()
+    public function testProcessConfigsToOneEntityFallbackValue(): void
     {
         $fieldType = 'manyToOne';
 
@@ -613,7 +608,7 @@ class DynamicFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         $config = $this->getDatagridConfiguration(['source' => ['query' => ['groupBy' => 'o.someField']]]);
         $initialConfig = $config->toArray();
         $this->getExtension()->processConfigs($config);
-        $this->assertEquals(
+        self::assertEquals(
             array_merge(
                 $initialConfig,
                 [
