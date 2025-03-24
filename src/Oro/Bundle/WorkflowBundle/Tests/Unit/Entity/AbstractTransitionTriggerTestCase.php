@@ -10,8 +10,7 @@ abstract class AbstractTransitionTriggerTestCase extends \PHPUnit\Framework\Test
 {
     use EntityTestCaseTrait;
 
-    /** @var BaseTransitionTrigger */
-    protected $entity;
+    protected BaseTransitionTrigger $entity;
 
     #[\Override]
     protected function setUp(): void
@@ -19,49 +18,42 @@ abstract class AbstractTransitionTriggerTestCase extends \PHPUnit\Framework\Test
         $this->entity = $this->getEntity();
     }
 
-    public function testAccessors()
+    abstract protected function getEntity(): BaseTransitionTrigger;
+
+    public function testAccessors(): void
     {
-        $this->assertPropertyAccessors($this->entity, [
+        self::assertPropertyAccessors($this->entity, [
             ['id', 1],
             ['queued', false, true],
             ['workflowDefinition', new WorkflowDefinition()],
         ]);
     }
 
-    public function testGetWorkflowName()
+    public function testGetWorkflowName(): void
     {
-        $this->assertNull($this->entity->getWorkflowName());
+        self::assertNull($this->entity->getWorkflowName());
 
         $definition = new WorkflowDefinition();
         $definition->setName('test name');
 
         $this->entity->setWorkflowDefinition($definition);
 
-        $this->assertEquals($definition->getName(), $this->entity->getWorkflowName());
+        self::assertEquals($definition->getName(), $this->entity->getWorkflowName());
     }
 
-    /**
-     * @param BaseTransitionTrigger $trigger
-     * @return BaseTransitionTrigger
-     */
-    protected function setDataToTrigger(BaseTransitionTrigger $trigger)
+    protected function setDataToTrigger(BaseTransitionTrigger $trigger): BaseTransitionTrigger
     {
         return $trigger->setTransitionName('test_transition')
             ->setQueued(false)
             ->setWorkflowDefinition(new WorkflowDefinition());
     }
 
-    protected function assertImportData()
+    protected function assertImportData(): void
     {
         $trigger = $this->getEntity();
         $this->setDataToTrigger($trigger);
-        $this->assertEquals($trigger->getTransitionName(), $this->entity->getTransitionName());
-        $this->assertEquals($trigger->getWorkflowDefinition(), $this->entity->getWorkflowDefinition());
-        $this->assertEquals($trigger->isQueued(), $this->entity->isQueued());
+        self::assertEquals($trigger->getTransitionName(), $this->entity->getTransitionName());
+        self::assertEquals($trigger->getWorkflowDefinition(), $this->entity->getWorkflowDefinition());
+        self::assertEquals($trigger->isQueued(), $this->entity->isQueued());
     }
-
-    /**
-     * @return BaseTransitionTrigger
-     */
-    abstract protected function getEntity();
 }

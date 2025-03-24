@@ -72,8 +72,8 @@ class PhpDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
     {
         return [
             'en default' => ['M j', self::LOCALE_EN],
-            'ru default' => ["d.m", self::LOCALE_RU],
-            'ar default' => ["d‏/m", self::LOCALE_AR],
+            'ru default' => ['d.m', self::LOCALE_RU],
+            'ar default' => ['d‏/m', self::LOCALE_AR],
         ];
     }
 }

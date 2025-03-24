@@ -11,13 +11,12 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class FilterTypeTest extends AbstractTypeTestCase
 {
-    /** @var FilterType */
-    private $type;
+    private FilterType $type;
 
     #[\Override]
     protected function setUp(): void
     {
-        $translator = $this->createMockTranslator();
+        $translator = $this->createTranslator();
         $this->type = new FilterType($translator);
         $this->formExtensions[] = new PreloadedExtension([$this->type], []);
         parent::setUp();

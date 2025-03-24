@@ -12,37 +12,24 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Grid\AbstractFieldsExtension;
 use Oro\Bundle\EntityExtendBundle\Grid\FieldsHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
-abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCase
+abstract class AbstractFieldsExtensionTestCase extends TestCase
 {
     protected const ENTITY_CLASS = 'Test\Entity';
     protected const ENTITY_NAME = 'Test:Entity';
     protected const FIELD_NAME = 'testField';
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
-
-    /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityClassResolver;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityConfigProvider;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $extendConfigProvider;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $viewConfigProvider;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $datagridConfigProvider;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $attributeConfigProvider;
-
-    /** @var FieldsHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $fieldsHelper;
+    protected ConfigManager&MockObject $configManager;
+    protected EntityClassResolver&MockObject $entityClassResolver;
+    protected ConfigProvider&MockObject $entityConfigProvider;
+    protected ConfigProvider&MockObject $extendConfigProvider;
+    protected ConfigProvider&MockObject $viewConfigProvider;
+    protected ConfigProvider&MockObject $datagridConfigProvider;
+    protected ConfigProvider&MockObject $attributeConfigProvider;
+    protected FieldsHelper&MockObject $fieldsHelper;
 
     abstract protected function getExtension(): AbstractFieldsExtension;
 
@@ -52,7 +39,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
         $this->configManager = $this->createMock(ConfigManager::class);
         $this->entityClassResolver = $this->createMock(EntityClassResolver::class);
 
-        $this->entityClassResolver->expects($this->any())
+        $this->entityClassResolver->expects(self::any())
             ->method('getEntityClass')
             ->willReturnMap([
                 [self::ENTITY_CLASS, self::ENTITY_CLASS],
@@ -66,7 +53,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
         $this->viewConfigProvider = $this->createMock(ConfigProvider::class);
         $this->attributeConfigProvider = $this->createMock(ConfigProvider::class);
 
-        $this->configManager->expects($this->any())
+        $this->configManager->expects(self::any())
             ->method('getProvider')
             ->willReturnMap([
                 ['entity', $this->entityConfigProvider],
@@ -79,9 +66,9 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
         $this->fieldsHelper = $this->createMock(FieldsHelper::class);
     }
 
-    public function testProcessConfigsNoFields()
+    public function testProcessConfigsNoFields(): void
     {
-        $this->fieldsHelper->expects($this->any())
+        $this->fieldsHelper->expects(self::any())
             ->method('getFields')
             ->willReturn([]);
 
@@ -91,7 +78,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
 
     abstract protected function getDatagridConfiguration(array $options = []): DatagridConfiguration;
 
-    public function testProcessConfigsWithDatagridOrder()
+    public function testProcessConfigsWithDatagridOrder(): void
     {
         $fieldType = 'string';
 
@@ -105,7 +92,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
             ]
         );
 
-        $this->datagridConfigProvider->expects($this->any())
+        $this->datagridConfigProvider->expects(self::any())
             ->method('getConfig')
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->willReturn($datagridFieldConfig);
@@ -116,7 +103,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
         $initialConfig = $config->toArray();
 
         $this->getExtension()->processConfigs($config);
-        $this->assertEquals(
+        self::assertEquals(
             array_merge(
                 $initialConfig,
                 [
@@ -159,7 +146,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
         );
     }
 
-    public function testProcessConfigs()
+    public function testProcessConfigs(): void
     {
         $fieldType = 'string';
 
@@ -168,7 +155,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
         $config = $this->getDatagridConfiguration();
         $initialConfig = $config->toArray();
         $this->getExtension()->processConfigs($config);
-        $this->assertEquals(
+        self::assertEquals(
             array_merge(
                 $initialConfig,
                 [
@@ -210,7 +197,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
         );
     }
 
-    public function testProcessConfigsWithFrom()
+    public function testProcessConfigsWithFrom(): void
     {
         $fieldType = 'string';
 
@@ -223,7 +210,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
         $config = $this->getDatagridConfiguration(['source' => ['query' => ['from' => $from]]]);
         $initialConfig = $config->toArray();
         $this->getExtension()->processConfigs($config);
-        $this->assertEquals(
+        self::assertEquals(
             array_merge(
                 $initialConfig,
                 [
@@ -270,9 +257,9 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
         string $fieldName,
         string $fieldType,
         array $extendFieldConfig = []
-    );
+    ): void;
 
-    public function testProcessConfigsForEnum()
+    public function testProcessConfigsForEnum(): void
     {
         $fieldType = 'enum';
         $alias = 'c';
@@ -294,7 +281,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
 
         $initialConfig = $config->toArray();
         $this->getExtension()->processConfigs($config);
-        $this->assertEquals(
+        self::assertEquals(
             array_merge(
                 $initialConfig,
                 [
@@ -355,7 +342,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
         );
     }
 
-    public function testProcessConfigsForMultiEnum()
+    public function testProcessConfigsForMultiEnum(): void
     {
         $fieldType = 'multiEnum';
         $alias = 'c';
@@ -377,7 +364,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
 
         $initialConfig = $config->toArray();
         $this->getExtension()->processConfigs($config);
-        $this->assertEquals(
+        self::assertEquals(
             array_merge(
                 $initialConfig,
                 [
@@ -425,7 +412,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
         );
     }
 
-    public function testProcessConfigsToOne()
+    public function testProcessConfigsToOne(): void
     {
         $fieldType = 'manyToOne';
 
@@ -439,7 +426,7 @@ abstract class AbstractFieldsExtensionTestCase extends \PHPUnit\Framework\TestCa
         $config = $this->getDatagridConfiguration(['source' => ['query' => ['groupBy' => 'o.someField']]]);
         $initialConfig = $config->toArray();
         $this->getExtension()->processConfigs($config);
-        $this->assertEquals(
+        self::assertEquals(
             array_merge(
                 $initialConfig,
                 [

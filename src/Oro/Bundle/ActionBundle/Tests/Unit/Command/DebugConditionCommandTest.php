@@ -11,9 +11,9 @@ class DebugConditionCommandTest extends AbstractDebugCommandTestCase
 {
     public function testConfigure(): void
     {
-        $this->assertNotEmpty($this->command->getDescription());
-        $this->assertNotEmpty($this->command->getHelp());
-        $this->assertEquals(DebugConditionCommand::getDefaultName(), $this->command->getName());
+        self::assertNotEmpty($this->command->getDescription());
+        self::assertNotEmpty($this->command->getHelp());
+        self::assertEquals(DebugConditionCommand::getDefaultName(), $this->command->getName());
     }
 
     #[\Override]

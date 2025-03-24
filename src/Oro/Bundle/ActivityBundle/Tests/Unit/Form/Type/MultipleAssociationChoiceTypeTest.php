@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActivityBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\ActivityBundle\Form\Type\MultipleAssociationChoiceType;
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\Form\Type\MultipleAssociationChoiceType as BaseMultipleAssociationChoiceType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\AssociationTypeHelper;
@@ -19,28 +18,28 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
     protected function getFormType(): AbstractType
     {
         return new MultipleAssociationChoiceType(
-            new AssociationTypeHelper($this->configManager, $this->createMock(EntityClassResolver::class)),
+            new AssociationTypeHelper($this->configManager),
             $this->configManager
         );
     }
 
-    public function testFinishViewForDisabled()
+    public function testFinishViewForDisabled(): void
     {
-        $this->configManager->expects($this->any())
+        $this->configManager->expects(self::any())
             ->method('getProvider')
             ->willReturnMap([
                 ['test', $this->testConfigProvider],
             ]);
 
-        $this->testConfigProvider->expects($this->once())
+        $this->testConfigProvider->expects(self::once())
             ->method('hasConfig')
             ->with('Test\Entity2')
             ->willReturn(false);
-        $this->testConfigProvider->expects($this->never())
+        $this->testConfigProvider->expects(self::never())
             ->method('getConfig');
 
-        $view    = new FormView();
-        $form    = new Form($this->createMock(FormConfigInterface::class));
+        $view = new FormView();
+        $form = new Form($this->createMock(FormConfigInterface::class));
         $options = [
             'config_id'         => new EntityConfigId('test', 'Test\Entity2'),
             'association_class' => 'test'
@@ -57,14 +56,14 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
         $type = $this->getFormType();
         $type->finishView($view, $form, $options);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'attr'     => [],
                 'value'    => 'Test\Entity1'
             ],
             $view->children[0]->vars
         );
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'attr'     => [],
                 'disabled' => true,
@@ -74,13 +73,13 @@ class MultipleAssociationChoiceTypeTest extends AssociationTypeTestCase
         );
     }
 
-    public function testGetBlockPrefix()
+    public function testGetBlockPrefix(): void
     {
-        $this->assertEquals('oro_activity_multiple_association_choice', $this->getFormType()->getBlockPrefix());
+        self::assertEquals('oro_activity_multiple_association_choice', $this->getFormType()->getBlockPrefix());
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
-        $this->assertEquals(BaseMultipleAssociationChoiceType::class, $this->getFormType()->getParent());
+        self::assertEquals(BaseMultipleAssociationChoiceType::class, $this->getFormType()->getParent());
     }
 }

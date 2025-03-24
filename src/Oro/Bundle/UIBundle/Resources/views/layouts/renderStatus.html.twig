@@ -13,7 +13,7 @@ Parameters - array:
         {% set code = parameters.code|default('') %}
         {% set map = parameters.map|default([]) %}
         {% set codeKey = code is iterable ? '' : code %}
-        {% set classes = (codeKey in map) ? ' status-label--' ~ map[codeKey] : '' %}
+        {% set classes = map[codeKey] is defined ? ' status-label--' ~ map[codeKey] : '' %}
         <span class="status-label{{ classes }}">{{ label }}</span>
     {% endapply %}
 {% endmacro %}

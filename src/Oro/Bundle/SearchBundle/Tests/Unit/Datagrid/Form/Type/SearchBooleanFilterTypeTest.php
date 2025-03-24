@@ -13,22 +13,21 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class SearchBooleanFilterTypeTest extends AbstractTypeTestCase
 {
-    /** @var SearchBooleanFilterType */
-    private $type;
+    private SearchBooleanFilterType $type;
 
     #[\Override]
     protected function setUp(): void
     {
-        $translator = $this->createMockTranslator();
+        $translator = $this->createTranslator();
         $this->type = new SearchBooleanFilterType();
-        $this->formExtensions[] = new CustomFormExtension(
-            [
-                new BooleanFilterType(),
-                new ChoiceFilterType($translator),
-                new FilterType($translator),
-                $this->type
-            ]
-        );
+
+        $this->formExtensions[] = new CustomFormExtension([
+            new BooleanFilterType(),
+            new ChoiceFilterType($translator),
+            new FilterType($translator),
+            $this->type
+        ]);
+
         parent::setUp();
     }
 
@@ -38,7 +37,7 @@ class SearchBooleanFilterTypeTest extends AbstractTypeTestCase
         return $this->type;
     }
 
-    public function testFormConfigureOptions()
+    public function testFormConfigureOptions(): void
     {
         $resolver = new OptionsResolver();
         $resolver->setDefined('field_options');
@@ -83,13 +82,13 @@ class SearchBooleanFilterTypeTest extends AbstractTypeTestCase
         ];
     }
 
-    public function testGetBlockPrefix()
+    public function testGetBlockPrefix(): void
     {
-        $this->assertEquals('oro_search_type_boolean_filter', $this->type->getBlockPrefix());
+        self::assertEquals('oro_search_type_boolean_filter', $this->type->getBlockPrefix());
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
-        $this->assertEquals(BooleanFilterType::class, $this->type->getParent());
+        self::assertEquals(BooleanFilterType::class, $this->type->getParent());
     }
 }

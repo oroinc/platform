@@ -4,20 +4,16 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Datagrid\Extension\Filter;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\FilterBundle\Filter\FilterExecutionContext;
-use Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension;
 use Oro\Bundle\FilterBundle\Tests\Unit\Grid\Extension\AbstractFilterExtensionTestCase;
 use Oro\Bundle\SearchBundle\Datagrid\Datasource\SearchDatasource;
 use Oro\Bundle\SearchBundle\Datagrid\Extension\Filter\SearchFilterExtension;
 use Oro\Bundle\SearchBundle\Datagrid\Filter\Adapter\SearchFilterDatasourceAdapter;
 use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class SearchFilterExtensionTest extends AbstractFilterExtensionTestCase
 {
-    /** @var OrmFilterExtension */
-    protected $extension;
-
-    /** @var SearchDatasource|\PHPUnit\Framework\MockObject\MockObject */
-    private $datasource;
+    private SearchDatasource&MockObject $datasource;
 
     #[\Override]
     protected function setUp(): void
@@ -33,6 +29,21 @@ class SearchFilterExtensionTest extends AbstractFilterExtensionTestCase
         );
 
         $this->datasource = $this->createMock(SearchDatasource::class);
+    }
+
+    private function mockFiltersState(array $filtersState): void
+    {
+        $this->filtersStateProvider->expects(self::once())
+            ->method('getStateFromParameters')
+            ->with(self::isInstanceOf(DatagridConfiguration::class), $this->datagridParameters)
+            ->willReturn($filtersState);
+    }
+
+    private function mockDatasource(): void
+    {
+        $this->datasource->expects(self::once())
+            ->method('getSearchQuery')
+            ->willReturn($this->createMock(SearchQueryInterface::class));
     }
 
     /**
@@ -89,25 +100,10 @@ class SearchFilterExtensionTest extends AbstractFilterExtensionTestCase
         $this->extension->visitDatasource($datagridConfig, $this->datasource);
     }
 
-    private function mockFiltersState(array $filtersState): void
-    {
-        $this->filtersStateProvider->expects(self::once())
-            ->method('getStateFromParameters')
-            ->with(self::isInstanceOf(DatagridConfiguration::class), $this->datagridParameters)
-            ->willReturn($filtersState);
-    }
-
-    private function mockDatasource(): void
-    {
-        $this->datasource->expects(self::once())
-            ->method('getSearchQuery')
-            ->willReturn($this->createMock(SearchQueryInterface::class));
-    }
-
     public function testVisitDataSourceWhenNoState(): void
     {
         $datagridConfig = $this->createCommonDatagridConfig();
-        $filter = $this->assertFilterInitialized();
+        $filter = $this->createFilter();
 
         $this->mockFiltersState([]);
         $this->mockDatasource();
@@ -123,12 +119,12 @@ class SearchFilterExtensionTest extends AbstractFilterExtensionTestCase
     public function testVisitDataSourceWhenFilterStateNotValid(): void
     {
         $datagridConfig = $this->createCommonDatagridConfig();
-        $filter = $this->assertFilterInitialized();
+        $filter = $this->createFilter();
 
         $this->mockFiltersState([self::FILTER_NAME => ['value' => 'sampleFilterValue1']]);
         $this->mockDatasource();
 
-        $filterForm = $this->mockFilterForm($filter);
+        $filterForm = $this->createFilterForm($filter);
         $filterForm->expects(self::once())
             ->method('isValid')
             ->willReturn(false);
@@ -147,12 +143,12 @@ class SearchFilterExtensionTest extends AbstractFilterExtensionTestCase
         $formData = ['value' => 'sampleFilterValue1'];
 
         $datagridConfig = $this->createCommonDatagridConfig();
-        $filter = $this->assertFilterInitialized();
+        $filter = $this->createFilter();
 
         $this->mockFiltersState($filtersState);
         $this->mockDatasource();
 
-        $filterForm = $this->mockFilterForm($filter);
+        $filterForm = $this->createFilterForm($filter);
         $filterForm->expects(self::once())
             ->method('isValid')
             ->willReturn(true);

@@ -10,13 +10,12 @@ use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Grid\AbstractFieldsExtension;
 use Oro\Bundle\EntityExtendBundle\Grid\AdditionalFieldsExtension;
 
 class AdditionalFieldsExtensionTest extends AbstractFieldsExtensionTestCase
 {
     #[\Override]
-    protected function getExtension(): AbstractFieldsExtension
+    protected function getExtension(): AdditionalFieldsExtension
     {
         $extension = new AdditionalFieldsExtension(
             $this->configManager,
@@ -29,9 +28,9 @@ class AdditionalFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         return $extension;
     }
 
-    public function testIsApplicable()
+    public function testIsApplicable(): void
     {
-        $this->assertFalse(
+        self::assertFalse(
             $this->getExtension()->isApplicable(
                 DatagridConfiguration::create(
                     [
@@ -42,7 +41,7 @@ class AdditionalFieldsExtensionTest extends AbstractFieldsExtensionTestCase
                 )
             )
         );
-        $this->assertTrue(
+        self::assertTrue(
             $this->getExtension()->isApplicable(
                 DatagridConfiguration::create(
                     [
@@ -57,7 +56,7 @@ class AdditionalFieldsExtensionTest extends AbstractFieldsExtensionTestCase
                 )
             )
         );
-        $this->assertFalse(
+        self::assertFalse(
             $this->getExtension()->isApplicable(
                 DatagridConfiguration::create(
                     [
@@ -72,7 +71,7 @@ class AdditionalFieldsExtensionTest extends AbstractFieldsExtensionTestCase
                 )
             )
         );
-        $this->assertFalse(
+        self::assertFalse(
             $this->getExtension()->isApplicable(
                 DatagridConfiguration::create(
                     [
@@ -86,7 +85,7 @@ class AdditionalFieldsExtensionTest extends AbstractFieldsExtensionTestCase
                 )
             )
         );
-        $this->assertFalse(
+        self::assertFalse(
             $this->getExtension()->isApplicable(
                 DatagridConfiguration::create(
                     [
@@ -100,9 +99,9 @@ class AdditionalFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         );
     }
 
-    public function testGetPriority()
+    public function testGetPriority(): void
     {
-        $this->assertEquals(
+        self::assertEquals(
             250,
             $this->getExtension()->getPriority()
         );
@@ -130,7 +129,7 @@ class AdditionalFieldsExtensionTest extends AbstractFieldsExtensionTestCase
         string $fieldName,
         string $fieldType,
         array $extendFieldConfig = []
-    ) {
+    ): void {
         $extendConfig = new Config(new FieldConfigId('extend', $className, $fieldName, $fieldType));
         $extendConfig->set('state', ExtendScope::STATE_ACTIVE);
         $extendConfig->set('is_deleted', false);
@@ -150,28 +149,28 @@ class AdditionalFieldsExtensionTest extends AbstractFieldsExtensionTestCase
             new FieldConfigId('view', self::ENTITY_CLASS, self::FIELD_NAME, $fieldType)
         );
 
-        $this->configManager->expects($this->once())
+        $this->configManager->expects(self::once())
             ->method('hasConfig')
             ->with($className)
             ->willReturn(true);
 
-        $this->extendConfigProvider->expects($this->once())
+        $this->extendConfigProvider->expects(self::once())
             ->method('hasConfig')
             ->with($className, $fieldName)
             ->willReturn(true);
-        $this->extendConfigProvider->expects($this->any())
+        $this->extendConfigProvider->expects(self::any())
             ->method('getConfig')
             ->with($className, $fieldName)
             ->willReturn($extendConfig);
-        $this->entityConfigProvider->expects($this->any())
+        $this->entityConfigProvider->expects(self::any())
             ->method('getConfig')
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->willReturn($entityFieldConfig);
-        $this->datagridConfigProvider->expects($this->any())
+        $this->datagridConfigProvider->expects(self::any())
             ->method('getConfig')
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->willReturn($datagridFieldConfig);
-        $this->viewConfigProvider->expects($this->any())
+        $this->viewConfigProvider->expects(self::any())
             ->method('getConfig')
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->willReturn($viewFieldConfig);

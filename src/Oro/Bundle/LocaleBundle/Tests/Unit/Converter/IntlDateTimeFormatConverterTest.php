@@ -17,9 +17,9 @@ class IntlDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
     public function getDateFormatDataProvider(): array
     {
         return [
-            'en default' => ["MMM d, y", null, self::LOCALE_EN],
-            'en custom' => ["MMMM d, y", \IntlDateFormatter::LONG, self::LOCALE_EN],
-            'ru default' => ["dd.MM.yyyy", null, self::LOCALE_RU],
+            'en default' => ['MMM d, y', null, self::LOCALE_EN],
+            'en custom' => ['MMMM d, y', \IntlDateFormatter::LONG, self::LOCALE_EN],
+            'ru default' => ['dd.MM.yyyy', null, self::LOCALE_RU],
             'ru custom' => ["d MMMM y 'г.'", \IntlDateFormatter::LONG, self::LOCALE_RU],
             'ar default' => ['d MMMM y', null, self::LOCALE_AR],
             'ar custom' => ['dd‏/MM‏/y', \IntlDateFormatter::MEDIUM, self::LOCALE_AR],
@@ -30,10 +30,10 @@ class IntlDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
     public function getTimeFormatDataProvider(): array
     {
         return [
-            'en default' => ["h:mm a", null, self::LOCALE_EN],
-            'en custom' => ["h:mm:ss a", \IntlDateFormatter::MEDIUM, self::LOCALE_EN],
-            'ru default' => ["H:mm", null, self::LOCALE_RU],
-            'ru custom' => ["H:mm:ss", \IntlDateFormatter::MEDIUM, self::LOCALE_RU],
+            'en default' => ['h:mm a', null, self::LOCALE_EN],
+            'en custom' => ['h:mm:ss a', \IntlDateFormatter::MEDIUM, self::LOCALE_EN],
+            'ru default' => ['H:mm', null, self::LOCALE_RU],
+            'ru custom' => ['H:mm:ss', \IntlDateFormatter::MEDIUM, self::LOCALE_RU],
             'ar default' => ['h:mm:ss', null, self::LOCALE_AR],
             'ar custom' => ['h:mm', \IntlDateFormatter::SHORT, self::LOCALE_AR],
         ];
@@ -43,14 +43,14 @@ class IntlDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
     public function getDateTimeFormatDataProvider(): array
     {
         return [
-            'en default' => ["MMM d, y h:mm a", null, null, self::LOCALE_EN],
+            'en default' => ['MMM d, y h:mm a', null, null, self::LOCALE_EN],
             'en custom' => [
-                "MMMM d, y h:mm:ss a",
+                'MMMM d, y h:mm:ss a',
                 \IntlDateFormatter::LONG,
                 \IntlDateFormatter::MEDIUM,
                 self::LOCALE_EN,
             ],
-            'ru default' => ["dd.MM.yyyy H:mm", null, null, self::LOCALE_RU],
+            'ru default' => ['dd.MM.yyyy H:mm', null, null, self::LOCALE_RU],
             'ru custom'  => [
                 "d MMMM y 'г.' H:mm:ss",
                 \IntlDateFormatter::LONG,
@@ -71,9 +71,9 @@ class IntlDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
     public function getDateFormatDayProvider(): array
     {
         return [
-            'en default' => ["MMM d", self::LOCALE_EN],
-            'ru default' => ["dd.MM", self::LOCALE_RU],
-            'ar default' => ["dd‏/MM", self::LOCALE_AR],
+            'en default' => ['MMM d', self::LOCALE_EN],
+            'ru default' => ['dd.MM', self::LOCALE_RU],
+            'ar default' => ['dd‏/MM', self::LOCALE_AR],
         ];
     }
 }

@@ -7,18 +7,74 @@ use Oro\Bundle\ActionBundle\Button\ButtonContext;
 use Oro\Bundle\ActionBundle\Button\ButtonInterface;
 use Oro\Bundle\ActionBundle\Button\ButtonSearchContext;
 use Oro\Bundle\ActionBundle\Exception\UnsupportedButtonException;
+use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
+use Oro\Bundle\ActionBundle\Provider\OriginalUrlProvider;
+use Oro\Bundle\ActionBundle\Provider\RouteProviderInterface;
 use Oro\Bundle\ActionBundle\Tests\Unit\Stub\StubButton;
 use Oro\Bundle\WorkflowBundle\Button\StartTransitionButton;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Event\EventDispatcher;
+use Oro\Bundle\WorkflowBundle\Extension\AbstractButtonProviderExtension;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionManager;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+use Oro\Bundle\WorkflowBundle\Resolver\TransitionOptionsResolver;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTransitionButtonProviderExtensionTestCase
+abstract class StartTransitionButtonProviderExtensionTestCase extends TestCase
 {
     private const ENTITY_CLASS = 'entity1';
     private const ROUTE_NAME = 'route1';
     private const DATAGRID = 'datagrid1';
+
+    protected WorkflowRegistry&MockObject $workflowRegistry;
+    protected RouteProviderInterface&MockObject $routeProvider;
+    protected OriginalUrlProvider&MockObject $originalUrlProvider;
+    protected CurrentApplicationProviderInterface&MockObject $applicationProvider;
+    protected TransitionOptionsResolver&MockObject $optionsResolver;
+    protected EventDispatcher&MockObject $eventDispatcher;
+    protected TranslatorInterface&MockObject $translator;
+    protected AbstractButtonProviderExtension $extension;
+
+    #[\Override]
+    protected function setUp(): void
+    {
+        $this->workflowRegistry = $this->createMock(WorkflowRegistry::class);
+        $this->routeProvider = $this->createMock(RouteProviderInterface::class);
+        $this->originalUrlProvider = $this->createMock(OriginalUrlProvider::class);
+        $this->applicationProvider = $this->createMock(CurrentApplicationProviderInterface::class);
+        $this->optionsResolver = $this->createMock(TransitionOptionsResolver::class);
+        $this->eventDispatcher = $this->createMock(EventDispatcher::class);
+        $this->translator = $this->createMock(TranslatorInterface::class);
+
+        $this->extension = $this->createExtension();
+        $this->extension->setApplicationProvider($this->applicationProvider);
+    }
+
+    abstract protected function createExtension(): AbstractButtonProviderExtension;
+
+    abstract protected function getApplication(): string;
+
+    private function getTransitionManager(array $transitions, string $method): TransitionManager
+    {
+        $manager = $this->createMock(TransitionManager::class);
+        $manager->expects(self::any())
+            ->method($method)
+            ->willReturn(new ArrayCollection($transitions));
+
+        return $manager;
+    }
+
+    private function getTransition(string $name): Transition
+    {
+        $transition = new Transition($this->optionsResolver, $this->eventDispatcher, $this->translator);
+        $transition->setName($name);
+
+        return $transition;
+    }
 
     /**
      * @dataProvider findDataProvider
@@ -28,8 +84,8 @@ abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTr
         ?string $entityClass = null,
         string $routeName = '',
         ?string $datagrid = null
-    ) {
-        $this->applicationProvider->expects($this->atLeastOnce())
+    ): void {
+        $this->applicationProvider->expects(self::atLeastOnce())
             ->method('getCurrentApplication')
             ->willReturn($expected ? $this->getApplication() : null);
 
@@ -58,7 +114,7 @@ abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTr
                 ]
             );
 
-            $this->workflowRegistry->expects($this->once())
+            $this->workflowRegistry->expects(self::once())
                 ->method('getActiveWorkflows')
                 ->willReturn(new ArrayCollection([$workflow]));
 
@@ -68,17 +124,17 @@ abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTr
                 ->setOriginalUrl('example.com')
                 ->setDatagridName($datagrid);
 
-            $this->originalUrlProvider->expects($this->once())
+            $this->originalUrlProvider->expects(self::once())
                 ->method('getOriginalUrl')
                 ->willReturn('example.com');
 
             $buttons = [new StartTransitionButton($transition, $workflow, $buttonContext)];
         } else {
-            $this->originalUrlProvider->expects($this->never())
+            $this->originalUrlProvider->expects(self::never())
                 ->method('getOriginalUrl');
         }
 
-        $this->assertEquals(
+        self::assertEquals(
             $buttons,
             $this->extension->find(
                 (new ButtonSearchContext())->setEntity($entityClass)->setRouteName($routeName)->setDatagrid($datagrid)
@@ -111,7 +167,7 @@ abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTr
         ];
     }
 
-    public function testFindWithExclusiveRecordGroups()
+    public function testFindWithExclusiveRecordGroups(): void
     {
         $configuration = [
             'init_entities' => [
@@ -146,18 +202,18 @@ abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTr
             ['group3', 'group4']
         );
 
-        $this->workflowRegistry->expects($this->once())
+        $this->workflowRegistry->expects(self::once())
             ->method('getActiveWorkflows')
             ->willReturn(new ArrayCollection([$workflow1, $workflow2, $workflow3]));
 
         $buttonContext = new ButtonContext();
         $buttonContext->setEntity('entity1');
 
-        $this->applicationProvider->expects($this->atLeastOnce())
+        $this->applicationProvider->expects(self::atLeastOnce())
             ->method('getCurrentApplication')
             ->willReturn($this->getApplication());
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 new StartTransitionButton($this->getTransition('transition1'), $workflow1, $buttonContext),
                 new StartTransitionButton($this->getTransition('transition2'), $workflow1, $buttonContext),
@@ -167,11 +223,11 @@ abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTr
         );
     }
 
-    public function testFindWithGroupAtContext()
+    public function testFindWithGroupAtContext(): void
     {
-        $this->workflowRegistry->expects($this->never())
+        $this->workflowRegistry->expects(self::never())
             ->method('getActiveWorkflows');
-        $this->assertEquals(
+        self::assertEquals(
             [],
             $this->extension->find((new ButtonSearchContext())->setGroup('test_group'))
         );
@@ -180,9 +236,9 @@ abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTr
     /**
      * @dataProvider isAvailableDataProvider
      */
-    public function testIsAvailable(ButtonInterface $button, bool $expected)
+    public function testIsAvailable(ButtonInterface $button, bool $expected): void
     {
-        $this->assertEquals($expected, $this->extension->isAvailable($button, new ButtonSearchContext()));
+        self::assertEquals($expected, $this->extension->isAvailable($button, new ButtonSearchContext()));
     }
 
     public function isAvailableDataProvider(): array
@@ -199,7 +255,7 @@ abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTr
         ];
     }
 
-    public function testIsAvailableException()
+    public function testIsAvailableException(): void
     {
         $stubButton = new StubButton();
 
@@ -213,16 +269,16 @@ abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTr
         $this->extension->isAvailable($stubButton, new ButtonSearchContext());
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         // for start transition
-        $this->assertTrue($this->extension->supports($this->createTransitionButton()));
+        self::assertTrue($this->extension->supports($this->createTransitionButton()));
         // for not start transition
-        $this->assertFalse($this->extension->supports($this->createTransitionButton(false, false)));
+        self::assertFalse($this->extension->supports($this->createTransitionButton(false, false)));
 
         $notTransitionButton = $this->createMock(ButtonInterface::class);
         // for not supported button
-        $this->assertFalse($this->extension->supports($notTransitionButton));
+        self::assertFalse($this->extension->supports($notTransitionButton));
     }
 
     private function getWorkflow(
@@ -236,21 +292,21 @@ abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTr
             ->getMock();
 
         $definition = $this->createMock(WorkflowDefinition::class);
-        $definition->expects($this->any())
+        $definition->expects(self::any())
             ->method('getRelatedEntity')
             ->willReturn(self::ENTITY_CLASS);
-        $definition->expects($this->any())
+        $definition->expects(self::any())
             ->method('getConfiguration')
             ->willReturn($configuration);
-        $definition->expects($this->any())
+        $definition->expects(self::any())
             ->method('getExclusiveRecordGroups')
             ->willReturn($exclusiveRecordGroups);
 
         $workflow->setDefinition($definition);
-        $workflow->expects($this->any())
+        $workflow->expects(self::any())
             ->method('getTransitionManager')
             ->willReturn($transitionManager);
-        $workflow->expects($this->any())
+        $workflow->expects(self::any())
             ->method('getVariables')
             ->willReturn(new ArrayCollection());
 
@@ -260,10 +316,10 @@ abstract class StartTransitionButtonProviderExtensionTestCase extends AbstractTr
     private function createTransitionButton(bool $isAvailable = false, bool $isStart = true): StartTransitionButton
     {
         $transition = $this->createMock(Transition::class);
-        $transition->expects($this->any())
+        $transition->expects(self::any())
             ->method('isAvailable')
             ->willReturn($isAvailable);
-        $transition->expects($this->any())
+        $transition->expects(self::any())
             ->method('isStart')
             ->willReturn($isStart);
         $transitionManager = $this->createMock(TransitionManager::class);

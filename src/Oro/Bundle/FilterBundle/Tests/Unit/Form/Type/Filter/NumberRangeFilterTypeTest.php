@@ -19,16 +19,12 @@ use Symfony\Component\Form\Extension\Core\Type\NumberType;
 
 class NumberRangeFilterTypeTest extends AbstractTypeTestCase
 {
-    /** @var NumberRangeFilterType */
-    protected $type;
+    private NumberRangeFilterType $type;
 
     #[\Override]
     protected function setUp(): void
     {
-        $constraintFactory = new ConstraintFactory();
-        $constraintExtension = new ConstraintAsOptionExtension($constraintFactory);
-
-        $translator = $this->createMockTranslator();
+        $translator = $this->createTranslator();
         $this->type = new NumberRangeFilterType($translator);
 
         $localeSettings = $this->createMock(LocaleSettings::class);
@@ -42,13 +38,12 @@ class NumberRangeFilterTypeTest extends AbstractTypeTestCase
 
         $this->formExtensions[] = new CustomFormExtension([
             new FilterType($translator),
-            new NumberFilterType($translator, $numberFormatter),
+            new NumberFilterType($translator, $numberFormatter)
         ]);
-        $this->formExtensions[] = new PreloadedExtension([
-            $this->type,
-        ], [
-            NumberType::class => [$constraintExtension],
-        ]);
+        $this->formExtensions[] = new PreloadedExtension(
+            [$this->type],
+            [NumberType::class => [new ConstraintAsOptionExtension(new ConstraintFactory())]]
+        );
 
         parent::setUp();
     }

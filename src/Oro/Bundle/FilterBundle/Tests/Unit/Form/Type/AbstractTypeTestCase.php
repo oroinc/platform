@@ -3,7 +3,7 @@
 namespace Oro\Bundle\FilterBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Extension\DateTimeExtension;
-use Oro\Bundle\TestFrameworkBundle\Test\Form\MutableFormEventSubscriber;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\FormFactoryInterface;
@@ -15,15 +15,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 abstract class AbstractTypeTestCase extends FormIntegrationTestCase
 {
     protected FormFactoryInterface $factory;
-
-    /** @var string */
-    protected $defaultTimezone;
-
-    /** @var string */
-    private $oldTimezone;
-
+    protected string $defaultTimezone = '';
+    private string $oldTimezone;
     /** @var FormExtensionInterface[] */
-    protected $formExtensions = [];
+    protected array $formExtensions = [];
 
     #[\Override]
     protected function setUp(): void
@@ -44,10 +39,19 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
         }
     }
 
-    protected function createMockTranslator(): TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject
+    #[\Override]
+    protected function getExtensions(): array
+    {
+        return array_merge(
+            $this->formExtensions,
+            [new PreloadedExtension([], ['datetime' => [new DateTimeExtension()]])]
+        );
+    }
+
+    protected function createTranslator(): TranslatorInterface
     {
         $translator = $this->createMock(TranslatorInterface::class);
-        $translator->expects($this->any())
+        $translator->expects(self::any())
             ->method('trans')
             ->with($this->anything(), [])
             ->willReturnArgument(0);
@@ -55,7 +59,7 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
         return $translator;
     }
 
-    protected function createMockOptionsResolver(): OptionsResolver|\PHPUnit\Framework\MockObject\MockObject
+    protected function createOptionsResolver(): OptionsResolver&MockObject
     {
         return $this->createMock(OptionsResolver::class);
     }
@@ -63,19 +67,19 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
     /**
      * @dataProvider configureOptionsDataProvider
      */
-    public function testConfigureOptions(array $defaultOptions, array $requiredOptions = [])
+    public function testConfigureOptions(array $defaultOptions, array $requiredOptions = []): void
     {
-        $resolver = $this->createMockOptionsResolver();
+        $resolver = $this->createOptionsResolver();
 
         if ($defaultOptions) {
-            $resolver->expects($this->once())
+            $resolver->expects(self::once())
                 ->method('setDefaults')
                 ->with($defaultOptions)
                 ->willReturnSelf();
         }
 
         if ($requiredOptions) {
-            $resolver->expects($this->once())
+            $resolver->expects(self::once())
                 ->method('setRequired')
                 ->with($requiredOptions)
                 ->willReturnSelf();
@@ -84,9 +88,6 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
         $this->getTestFormType()->configureOptions($resolver);
     }
 
-    /**
-     * Data provider for testBindData
-     */
     abstract public function configureOptionsDataProvider(): array;
 
     /**
@@ -97,43 +98,23 @@ abstract class AbstractTypeTestCase extends FormIntegrationTestCase
         array $formData,
         array $viewData,
         array $customOptions = []
-    ) {
+    ): void {
         $form = $this->factory->create(get_class($this->getTestFormType()), null, $customOptions);
 
         $form->submit($bindData);
 
-        $this->assertTrue($form->isSynchronized());
-        $this->assertEquals($formData, $form->getData());
+        self::assertTrue($form->isSynchronized());
+        self::assertEquals($formData, $form->getData());
 
         $view = $form->createView();
 
         foreach ($viewData as $key => $value) {
-            $this->assertArrayHasKey($key, $view->vars);
-            $this->assertEquals($value, $view->vars[$key]);
+            self::assertArrayHasKey($key, $view->vars);
+            self::assertEquals($value, $view->vars[$key]);
         }
     }
 
-    /**
-     * Data provider for testBindData
-     */
     abstract public function bindDataProvider(): array;
 
     abstract protected function getTestFormType(): AbstractType;
-
-    #[\Override]
-    protected function getExtensions(): array
-    {
-        return array_merge(
-            $this->formExtensions,
-            [new PreloadedExtension([], ['datetime' => [new DateTimeExtension()]])]
-        );
-    }
-
-    protected function getSubscriber(string $class, array $events = []): MutableFormEventSubscriber
-    {
-        $subscriber = new MutableFormEventSubscriber($this->createMock($class));
-        $subscriber->setSubscribedEvents($events);
-
-        return $subscriber;
-    }
 }

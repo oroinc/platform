@@ -3,25 +3,18 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Extension;
 
 use Oro\Bundle\ActionBundle\Provider\CurrentApplicationProviderInterface;
-use Oro\Bundle\WorkflowBundle\Extension\AbstractButtonProviderExtension;
 use Oro\Bundle\WorkflowBundle\Extension\TransitionButtonProviderExtension;
 
 class TransitionButtonProviderExtensionTest extends TransitionButtonProviderExtensionTestCase
 {
-    /**
-     * @return string
-     */
     #[\Override]
-    protected function getApplication()
+    protected function getApplication(): string
     {
         return CurrentApplicationProviderInterface::DEFAULT_APPLICATION;
     }
 
-    /**
-     * @return AbstractButtonProviderExtension
-     */
     #[\Override]
-    protected function createExtension()
+    protected function createExtension(): TransitionButtonProviderExtension
     {
         return new TransitionButtonProviderExtension(
             $this->workflowRegistry,

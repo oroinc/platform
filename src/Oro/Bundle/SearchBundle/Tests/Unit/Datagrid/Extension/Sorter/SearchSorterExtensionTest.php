@@ -13,9 +13,6 @@ use Oro\Bundle\SearchBundle\Query\SearchQueryInterface;
 
 class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
 {
-    /** @var SearchSorterExtension */
-    protected $extension;
-
     #[\Override]
     protected function setUp(): void
     {
@@ -27,7 +24,7 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
     /**
      * @dataProvider visitDatasourceWithValidTypeProvider
      */
-    public function testVisitDatasourceWithValidType(string $configDataType)
+    public function testVisitDatasourceWithValidType(string $configDataType): void
     {
         $this->configureResolver();
         $config = DatagridConfiguration::create([
@@ -35,23 +32,20 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
                 Configuration::DEFAULT_SORTERS_KEY => [
                     'testColumn' => 'ASC'
                 ],
-                Configuration::COLUMNS_KEY         => [
-                    'testColumn' => [
-                        'data_name' => 'testColumn',
-                        'type'      => $configDataType,
-                    ]
+                Configuration::COLUMNS_KEY => [
+                    'testColumn' => ['data_name' => 'testColumn', 'type' => $configDataType]
                 ]
             ]
         ]);
 
-        $this->sortersStateProvider->expects($this->once())
+        $this->sortersStateProvider->expects(self::once())
             ->method('getStateFromParameters')
             ->willReturn(['testColumn' => 'ASC']);
 
         $query = $this->createMock(SearchQueryInterface::class);
 
         $datasource = $this->createMock(SearchDatasource::class);
-        $datasource->expects($this->once())
+        $datasource->expects(self::once())
             ->method('getSearchQuery')
             ->willReturn($query);
 
@@ -64,16 +58,16 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
     public function visitDatasourceWithValidTypeProvider(): array
     {
         return [
-            'string'  => [
-                'configDataType' => 'string',
+            'string' => [
+                'configDataType' => 'string'
             ],
             'integer' => [
-                'configDataType' => 'integer',
+                'configDataType' => 'integer'
             ],
         ];
     }
 
-    public function testVisitDatasourceWithInvalidType()
+    public function testVisitDatasourceWithInvalidType(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->configureResolver();
@@ -82,16 +76,13 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
                 Configuration::DEFAULT_SORTERS_KEY => [
                     'testColumn' => 'ASC'
                 ],
-                Configuration::COLUMNS_KEY         => [
-                    'testColumn' => [
-                        'data_name' => 'testColumn',
-                        'type'      => 'this_will_not_be_a_valid_type',
-                    ]
+                Configuration::COLUMNS_KEY => [
+                    'testColumn' => ['data_name' => 'testColumn', 'type' => 'this_will_not_be_a_valid_type']
                 ]
             ]
         ]);
 
-        $this->sortersStateProvider->expects($this->once())
+        $this->sortersStateProvider->expects(self::once())
             ->method('getStateFromParameters')
             ->willReturn(['testColumn' => 'ASC']);
 
@@ -102,31 +93,28 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
         $this->extension->visitDatasource($config, $datasource);
     }
 
-    public function testVisitDatasourceWithDefaultSorterAndDefaultSortingIsNotDisabled()
+    public function testVisitDatasourceWithDefaultSorterAndDefaultSortingIsNotDisabled(): void
     {
         $this->configureResolver();
         $config = DatagridConfiguration::create([
             Configuration::SORTERS_KEY => [
-                Configuration::COLUMNS_KEY         => [
-                    'testColumn' => [
-                        'data_name' => 'testColumn',
-                        'type'      => 'string',
-                    ]
+                Configuration::COLUMNS_KEY => [
+                    'testColumn' => ['data_name' => 'testColumn', 'type' => 'string']
                 ],
                 Configuration::DEFAULT_SORTERS_KEY => [
-                    'testColumn' => 'ASC',
+                    'testColumn' => 'ASC'
                 ]
             ],
         ]);
 
-        $this->sortersStateProvider->expects($this->once())
+        $this->sortersStateProvider->expects(self::once())
             ->method('getStateFromParameters')
             ->willReturn(['testColumn' => 'ASC']);
 
         $query = $this->createMock(SearchQueryInterface::class);
 
         $datasource = $this->createMock(SearchDatasource::class);
-        $datasource->expects($this->once())
+        $datasource->expects(self::once())
             ->method('getSearchQuery')
             ->willReturn($query);
 
@@ -136,27 +124,24 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
         $this->extension->visitDatasource($config, $datasource);
     }
 
-    public function testVisitDatasourceWithNoDefaultSorterAndDisableDefaultSorting()
+    public function testVisitDatasourceWithNoDefaultSorterAndDisableDefaultSorting(): void
     {
         $this->configureResolver();
-        $this->sortersStateProvider->expects($this->any())
+        $this->sortersStateProvider->expects(self::any())
             ->method('getStateFromParameters')
             ->willReturn([]);
 
         $config = DatagridConfiguration::create([
             Configuration::SORTERS_KEY => [
-                Configuration::COLUMNS_KEY                 => [
-                    'testColumn' => [
-                        'data_name' => 'testColumn',
-                        'type'      => 'string',
-                    ]
+                Configuration::COLUMNS_KEY => [
+                    'testColumn' => ['data_name' => 'testColumn', 'type' => 'string']
                 ],
                 Configuration::DISABLE_DEFAULT_SORTING_KEY => true,
             ],
         ]);
 
         $datasource = $this->createMock(SearchDatasource::class);
-        $datasource->expects($this->never())
+        $datasource->expects(self::never())
             ->method('getSearchQuery')
             ->willReturn($this->createMock(SearchQueryInterface::class));
 
@@ -166,30 +151,27 @@ class SearchSorterExtensionTest extends AbstractSorterExtensionTestCase
         $this->extension->visitDatasource($config, $datasource);
     }
 
-    public function testVisitDatasourceWithDefaultSorterAndDisableDefaultSorting()
+    public function testVisitDatasourceWithDefaultSorterAndDisableDefaultSorting(): void
     {
         $this->configureResolver();
-        $this->sortersStateProvider->expects($this->any())
+        $this->sortersStateProvider->expects(self::any())
             ->method('getStateFromParameters')
             ->willReturn([]);
 
         $config = DatagridConfiguration::create([
             Configuration::SORTERS_KEY => [
-                Configuration::COLUMNS_KEY                 => [
-                    'testColumn' => [
-                        'data_name' => 'testColumn',
-                        'type'      => 'string',
-                    ]
+                Configuration::COLUMNS_KEY => [
+                    'testColumn' => ['data_name' => 'testColumn', 'type' => 'string']
                 ],
                 Configuration::DISABLE_DEFAULT_SORTING_KEY => true,
-                Configuration::DEFAULT_SORTERS_KEY         => [
-                    'testColumn' => 'ASC',
+                Configuration::DEFAULT_SORTERS_KEY => [
+                    'testColumn' => 'ASC'
                 ]
             ],
         ]);
 
         $datasource = $this->createMock(SearchDatasource::class);
-        $datasource->expects($this->never())
+        $datasource->expects(self::never())
             ->method('getSearchQuery')
             ->willReturn($this->createMock(SearchQueryInterface::class));
 

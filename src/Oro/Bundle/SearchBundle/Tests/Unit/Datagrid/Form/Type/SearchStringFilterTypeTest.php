@@ -12,21 +12,18 @@ use Symfony\Component\Form\AbstractType;
 
 class SearchStringFilterTypeTest extends AbstractTypeTestCase
 {
-    /** @var SearchStringFilterType */
-    private $type;
+    private SearchStringFilterType $type;
 
     #[\Override]
     protected function setUp(): void
     {
-        $translator             = $this->createMockTranslator();
+        $translator = $this->createTranslator();
         $this->type = new SearchStringFilterType($translator);
 
-        $this->formExtensions[] = new CustomFormExtension(
-            [
-                new FilterType($translator),
-                new TextFilterType($translator)
-            ]
-        );
+        $this->formExtensions[] = new CustomFormExtension([
+            new FilterType($translator),
+            new TextFilterType($translator)
+        ]);
         $this->formExtensions[] = new PreloadedExtension([$this->type], []);
 
         parent::setUp();
@@ -38,14 +35,14 @@ class SearchStringFilterTypeTest extends AbstractTypeTestCase
         return $this->type;
     }
 
-    public function testGetBlockPrefix()
+    public function testGetBlockPrefix(): void
     {
-        $this->assertEquals(SearchStringFilterType::NAME, $this->type->getBlockPrefix());
+        self::assertEquals(SearchStringFilterType::NAME, $this->type->getBlockPrefix());
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
-        $this->assertEquals(TextFilterType::class, $this->type->getParent());
+        self::assertEquals(TextFilterType::class, $this->type->getParent());
     }
 
     #[\Override]

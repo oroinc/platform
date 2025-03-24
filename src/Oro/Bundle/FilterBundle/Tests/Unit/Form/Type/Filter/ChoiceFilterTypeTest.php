@@ -12,13 +12,12 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class ChoiceFilterTypeTest extends AbstractTypeTestCase
 {
-    /** @var ChoiceFilterType */
-    private $type;
+    private ChoiceFilterType $type;
 
     #[\Override]
     protected function setUp(): void
     {
-        $translator = $this->createMockTranslator();
+        $translator = $this->createTranslator();
         $this->type = new ChoiceFilterType($translator);
         $this->formExtensions[] = new CustomFormExtension([new FilterType($translator)]);
         $this->formExtensions[] = new PreloadedExtension([$this->type], []);

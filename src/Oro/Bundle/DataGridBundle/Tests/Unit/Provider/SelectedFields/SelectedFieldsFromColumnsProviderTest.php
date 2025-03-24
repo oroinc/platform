@@ -17,9 +17,19 @@ class SelectedFieldsFromColumnsProviderTest extends AbstractSelectedFieldsProvid
     }
 
     #[\Override]
+    protected function expectGetConfiguration(array $configuration): void
+    {
+        $this->datagridConfiguration->expects(self::once())
+            ->method('offsetGet')
+            ->with(Configuration::COLUMNS_KEY)
+            ->willReturn($configuration);
+    }
+
+    #[\Override]
     public function getSelectedFieldsDataProvider(): array
     {
-        return [
+        return
+            [
                 'state not empty, data_name is not defined' => [
                     'state' => ['sampleColumn1' => [ColumnsStateProvider::RENDER_FIELD_NAME => true]],
                     'configuration' => ['sampleColumn1' => []],
@@ -44,15 +54,7 @@ class SelectedFieldsFromColumnsProviderTest extends AbstractSelectedFieldsProvid
                     ],
                     'expectedSelectedFields' => [],
                 ],
-            ] + parent::getSelectedFieldsDataProvider();
-    }
-
-    #[\Override]
-    protected function mockGetConfiguration(array $configuration): void
-    {
-        $this->datagridConfiguration->expects(self::once())
-            ->method('offsetGet')
-            ->with(Configuration::COLUMNS_KEY)
-            ->willReturn($configuration);
+            ]
+            + parent::getSelectedFieldsDataProvider();
     }
 }

@@ -11,6 +11,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\TranslationBundle\Translation\IdentityTranslator;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
@@ -23,11 +24,8 @@ use Symfony\Component\Validator\Validator\RecursiveValidator;
 
 abstract class AbstractConfigTypeTestCase extends TypeTestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    protected $configManager;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    protected $testConfigProvider;
+    protected ConfigManager&MockObject $configManager;
+    protected ConfigProvider&MockObject $testConfigProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -78,11 +76,11 @@ abstract class AbstractConfigTypeTestCase extends TypeTestCase
         $config->set($formName, $oldVal);
 
         $propertyConfig = $this->createMock(PropertyConfigContainer::class);
-        $propertyConfig->expects($this->once())
+        $propertyConfig->expects(self::once())
             ->method('isSchemaUpdateRequired')
             ->with($formName, $config->getId())
             ->willReturn(true);
-        $this->testConfigProvider->expects($this->once())
+        $this->testConfigProvider->expects(self::once())
             ->method('getPropertyConfig')
             ->willReturn($propertyConfig);
 
@@ -90,11 +88,11 @@ abstract class AbstractConfigTypeTestCase extends TypeTestCase
         $extendConfig   = new Config($extendConfigId);
         $extendConfig->set('state', $state);
         $extendConfigProvider = $this->createMock(ConfigProvider::class);
-        $extendConfigProvider->expects($this->any())
+        $extendConfigProvider->expects(self::any())
             ->method('getConfigById')
             ->with($config->getId())
             ->willReturn($extendConfig);
-        $this->configManager->expects($this->any())
+        $this->configManager->expects(self::any())
             ->method('getConfig')
             ->with($config->getId())
             ->willReturn($config);
@@ -106,7 +104,7 @@ abstract class AbstractConfigTypeTestCase extends TypeTestCase
         foreach ($configProviders as $configProviderScope => $configProvider) {
             $configProvidersMap[] = [$configProviderScope, $configProvider];
         }
-        $this->configManager->expects($this->any())
+        $this->configManager->expects(self::any())
             ->method('getProvider')
             ->willReturnMap($configProvidersMap);
 
@@ -129,29 +127,29 @@ abstract class AbstractConfigTypeTestCase extends TypeTestCase
                                 $newVal
                             )
                             : $newVal
-                    ],
-                ],
+                    ]
+                ]
             ]);
         }
         if ($isSetStateExpected) {
             $expectedExtendConfig->set('state', ExtendScope::STATE_UPDATE);
-            $this->configManager->expects($this->once())
+            $this->configManager->expects(self::once())
                 ->method('persist')
                 ->with($expectedExtendConfig);
         } else {
             $expectedExtendConfig->set('state', $state);
-            $this->configManager->expects($this->exactly($schemaUpdateRequired ? 1 : 0))
+            $this->configManager->expects(self::exactly($schemaUpdateRequired ? 1 : 0))
                 ->method('persist');
         }
 
         // flush should be never called
-        $this->configManager->expects($this->never())
+        $this->configManager->expects(self::never())
             ->method('flush');
 
         $form->submit($newVal);
 
-        $this->assertTrue($form->isSynchronized(), 'Expected that a form is synchronized');
-        $this->assertEquals($expectedExtendConfig, $extendConfig);
+        self::assertTrue($form->isSynchronized(), 'Expected that a form is synchronized');
+        self::assertEquals($expectedExtendConfig, $extendConfig);
 
         return $form->getData();
     }

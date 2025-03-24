@@ -36,12 +36,12 @@ class WorkflowTransitionTypeTest extends AbstractWorkflowAttributesTypeTestCase
         ];
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
-        $this->assertEquals(WorkflowAttributesType::class, $this->type->getParent());
+        self::assertEquals(WorkflowAttributesType::class, $this->type->getParent());
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $builder = $this->createMock(FormBuilderInterface::class);
 
@@ -49,7 +49,7 @@ class WorkflowTransitionTypeTest extends AbstractWorkflowAttributesTypeTestCase
 
         $transitionName = 'test';
         $transition = $this->createMock(Transition::class);
-        $transition->expects($this->once())
+        $transition->expects(self::once())
             ->method('getName')
             ->willReturn($transitionName);
 
@@ -68,7 +68,7 @@ class WorkflowTransitionTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $this->type->buildForm($builder, $options);
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = new OptionsResolver();
         $resolver->setDefaults(['constraints' => null]);
@@ -83,7 +83,7 @@ class WorkflowTransitionTypeTest extends AbstractWorkflowAttributesTypeTestCase
                 'transition_name' => $transitionName
             ]
         );
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'workflow_item' => $workflowItem,
                 'transition_name' => $transitionName,
