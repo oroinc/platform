@@ -119,7 +119,7 @@
         <div class="row-fluid form-horizontal">
             <div class="responsive-block">
                 {% for stat in stats %}
-                    {{ UI.renderProperty(
+                    {{ UI.renderHtmlProperty(
                         stat.title|trans,
                         stat.value|default('N/A'),
                         null,
