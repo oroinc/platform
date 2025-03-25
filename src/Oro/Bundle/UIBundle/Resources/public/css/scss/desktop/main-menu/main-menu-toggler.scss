@@ -20,7 +20,12 @@
 
     &:hover,
     &:focus {
-        background-color: $primary-main-light;
+        background-color: $secondary-secondary-6;
+    }
+
+    &:active {
+        background-color: $secondary-secondary-4;
+        color: $neutral-white;
     }
 }
 
