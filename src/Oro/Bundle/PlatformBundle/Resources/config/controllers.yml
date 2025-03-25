@@ -12,3 +12,4 @@ services:
        arguments:
            - '@oro_platform.provider.package.with_license_info'
            - '@oro_platform.provider.deployment_variables'
+           - '@oro_platform.provider.usage_stats.usage_stats_provider'

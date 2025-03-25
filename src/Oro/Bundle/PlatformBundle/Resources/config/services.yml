@@ -185,7 +185,7 @@ services:
 
     Oro\Component\DependencyInjection\PgsqlAdvisorySchemaInUrlEnvVarProcessor:
         tags: [container.env_var_processor]
-    
+
     oro_platform.cache.provider.page_request_provider.abstract:
         class: 'Oro\Bundle\PlatformBundle\Provider\AbstractPageRequestProvider'
         arguments:
@@ -198,3 +198,13 @@ services:
         class: Oro\Bundle\PlatformBundle\Validator\Constraints\WhenValidator
         arguments:
             - '@validator.expression_language'
+
+    oro_platform.provider.usage_stats.usage_stats_provider_registry:
+        class: Oro\Bundle\PlatformBundle\Provider\UsageStats\UsageStatsProviderRegistry
+        arguments:
+            - [] # providers. They are set by Oro\Bundle\PlatformBundle\DependencyInjection\Compiler\UsageStatsCompilerPass
+
+    oro_platform.provider.usage_stats.usage_stats_provider:
+        class: Oro\Bundle\PlatformBundle\Provider\UsageStats\UsageStatsProvider
+        arguments:
+            - '@oro_platform.provider.usage_stats.usage_stats_provider_registry'
