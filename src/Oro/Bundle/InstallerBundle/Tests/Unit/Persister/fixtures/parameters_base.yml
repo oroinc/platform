@@ -12,6 +12,7 @@ parameters:
     locale: en
     secret: ThisTokenIsNotSoSecretChangeIt
     enterprise_licence: null
+    enterprise_licence_start: null
     message_queue_transport_dsn: 'dbal:'
     enable_price_sharding: false
 
