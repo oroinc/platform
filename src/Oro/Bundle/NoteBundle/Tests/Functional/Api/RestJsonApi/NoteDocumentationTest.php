@@ -80,7 +80,7 @@ class NoteDocumentationTest extends RestJsonApiTestCase
         $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
         self::assertEquals('Get activity notes', $resourceData['description']);
         self::assertEquals(
-            '<p>Retrieve the records of the notes associated with a specific test activity target record.</p>',
+            '<p>Retrieve records of the notes associated with a specific test activity target record.</p>',
             $resourceData['documentation']
         );
     }

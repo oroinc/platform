@@ -138,11 +138,11 @@ Example:
 
 #### get_subresource
 
-Retrieve the record of the organization a specific attribute family record belongs to.
+Retrieve a record of the organization a specific attribute family record belongs to.
 
 #### get_relationship
 
-Retrieve the ID of the organization record which a specific attribute family record will belong to.
+Retrieve the ID of the organization record which a specific attribute family record belongs to.
 
 #### update_relationship
 
@@ -165,7 +165,7 @@ Example:
 
 #### get_subresource
 
-Retrieve the record of the user who is an owner of a specific attribute family record.
+Retrieve a record of the user who is an owner of a specific attribute family record.
 
 #### get_relationship
 
@@ -196,7 +196,7 @@ Retrieve a record of image assigned to a specific attribute family record.
 
 #### get_relationship
 
-Retrieve ID of image records assigned to a specific attribute family record.
+Retrieve the ID of image records assigned to a specific attribute family record.
 
 #### update_relationship
 

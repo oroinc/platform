@@ -18,7 +18,7 @@ The comments associated with the %entity_name% record.
 
 #### get_subresource
 
-Retrieve the records of the comments associated with a specific %entity_name% record.
+Retrieve records of the comments associated with a specific %entity_name% record.
 
 #### get_relationship
 

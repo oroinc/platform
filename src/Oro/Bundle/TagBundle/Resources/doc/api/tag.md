@@ -196,7 +196,7 @@ Example:
 
 #### get_subresource
 
-Retrieve the records of the entities that are marked by the tag.
+Retrieve records of the entities that are marked by the tag.
 
 #### get_relationship
 

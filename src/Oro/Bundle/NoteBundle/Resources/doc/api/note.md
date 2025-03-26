@@ -135,7 +135,7 @@ Delete a collection of note records.
 
 #### get_subresource
 
-Retrieve the record of the attachment uploaded with a specific note.
+Retrieve a record of the attachment uploaded with a specific note.
 
 #### get_relationship
 
@@ -162,11 +162,11 @@ Example:
 
 #### get_subresource
 
-Retrieve the record of the organization a specific note record belongs to.
+Retrieve a record of the organization a specific note record belongs to.
 
 #### get_relationship
 
-Retrieve the ID of the organization record which a specific note record will belong to.
+Retrieve the ID of the organization record which a specific note record belongs to.
 
 #### update_relationship
 
@@ -189,7 +189,7 @@ Example:
 
 #### get_subresource
 
-Retrieve the record of the user who is the owner of a specific note record.
+Retrieve a record of the user who is the owner of a specific note record.
 
 #### get_relationship
 
@@ -216,7 +216,7 @@ Example:
 
 #### get_subresource
 
-Retrieve the record of the user who updated a specific note record.
+Retrieve a record of the user who updated a specific note record.
 
 #### get_relationship
 

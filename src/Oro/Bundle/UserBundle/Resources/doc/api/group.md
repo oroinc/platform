@@ -123,7 +123,7 @@ Delete a collection of user group records.
 
 #### get_subresource
 
-Retrieve the record of the organization a specific user group record belongs to.
+Retrieve a record of the organization a specific user group record belongs to.
 
 #### get_relationship
 
@@ -150,7 +150,7 @@ Example:
 
 #### get_subresource
 
-Retrieve the record of the business unit which is the owner of a specific user group record.
+Retrieve a record of the business unit which is the owner of a specific user group record.
 
 #### get_relationship
 
@@ -177,7 +177,7 @@ Example:
 
 #### get_subresource
 
-Retrieve the records of the roles that are assigned to the user group. **Currently is not supported and will be removed.** 
+Retrieve records of the roles that are assigned to the user group. **Currently is not supported and will be removed.** 
 
 #### get_relationship
 

@@ -140,7 +140,7 @@ Delete a collection of business unit records.
 
 #### get_subresource
 
-Retrieve the records of the organization which a specific business unit record belongs to.
+Retrieve a record of the organization which a specific business unit record belongs to.
 
 #### get_relationship
 
@@ -167,7 +167,7 @@ Example:
 
 #### get_subresource
 
-Retrieve the records of the business unit which is the owner of a specific business unit record.
+Retrieve a record of the business unit which is the owner of a specific business unit record.
 
 #### get_relationship
 
@@ -194,7 +194,7 @@ Example:
 
 #### get_subresource
 
-Retrieve the records of users who have access to a specific business unit record.
+Retrieve records of users who have access to a specific business unit record.
 
 #### get_relationship
 
