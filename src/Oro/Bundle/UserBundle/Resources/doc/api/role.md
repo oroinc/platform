@@ -120,7 +120,7 @@ Delete a collection of user roles.
 
 #### get_subresource
 
-Retrieve the record of the organization that a specific user role belongs to.
+Retrieve a record of the organization that a specific user role belongs to.
 
 #### get_relationship
 
@@ -147,7 +147,7 @@ Example:
 
 #### get_subresource
 
-Retrieve the records of users who are assigned to a specific user role record.
+Retrieve records of users who are assigned to a specific user role record.
 
 #### get_relationship
 

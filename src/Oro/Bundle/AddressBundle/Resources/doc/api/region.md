@@ -20,7 +20,7 @@ Retrieve a collection of region records.
 
 #### get_subresource
 
-Retrieve the record of the country that the region is a part of.
+Retrieve a record of the country that the region is a part of.
 
 #### get_relationship
 

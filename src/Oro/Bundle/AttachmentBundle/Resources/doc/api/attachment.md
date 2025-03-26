@@ -190,7 +190,7 @@ Example:
 
 #### get_subresource
 
-Retrieve the record of the organization that a specific attachment record belongs to.
+Retrieve a record of the organization that a specific attachment record belongs to.
 
 #### get_relationship
 
@@ -217,7 +217,7 @@ Example:
 
 #### get_subresource
 
-Retrieve the record of a user who is the owner of a specific attachment record.
+Retrieve a record of a user who is the owner of a specific attachment record.
 
 #### get_relationship
 

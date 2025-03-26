@@ -91,7 +91,7 @@ Retrieve a record of localization assigned to a specific localized fallback valu
 
 #### get_relationship
 
-Retrieve ID of localization record assigned to a specific localized fallback value record.
+Retrieve the ID of localization record assigned to a specific localized fallback value record.
 
 #### update_relationship
 

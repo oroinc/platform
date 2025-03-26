@@ -120,7 +120,7 @@ class CommentDocumentationTest extends RestJsonApiTestCase
         $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
         self::assertEquals('Get comments', $resourceData['description']);
         self::assertEquals(
-            '<p>Retrieve the records of the comments associated with a specific note record.</p>',
+            '<p>Retrieve records of the comments associated with a specific note record.</p>',
             $resourceData['documentation']
         );
     }

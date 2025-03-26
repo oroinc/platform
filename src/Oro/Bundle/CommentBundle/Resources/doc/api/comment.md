@@ -163,7 +163,7 @@ A record that the comment was made on.
 
 #### get_subresource
 
-Retrieve the record of the attachment uploaded with a specific comment.
+Retrieve a record of the attachment uploaded with a specific comment.
 
 #### get_relationship
 
@@ -190,7 +190,7 @@ Example:
 
 #### get_subresource
 
-Retrieve the record of the organization that a specific comment belongs to.
+Retrieve a record of the organization that a specific comment belongs to.
 
 #### get_relationship
 
@@ -217,7 +217,7 @@ Example:
 
 #### get_subresource
 
-Retrieve the record of the user who is the owner of a specific comment record.
+Retrieve a record of the user who is the owner of a specific comment record.
 
 #### get_relationship
 
@@ -271,7 +271,7 @@ Example:
 
 #### get_subresource
 
-Retrieve the record of the user who last updated a specific comment.
+Retrieve a record of the user who last updated a specific comment.
 
 #### get_relationship
 

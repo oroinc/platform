@@ -124,7 +124,7 @@ class AttachmentDocumentationTest extends RestJsonApiTestCase
         $resourceData = $this->getResourceData($this->getSimpleFormatter()->format($docs));
         self::assertEquals('Get attachments', $resourceData['description']);
         self::assertEquals(
-            '<p>Retrieve the records of the attachments associated with a specific test department record.</p>',
+            '<p>Retrieve records of the attachments associated with a specific test department record.</p>',
             $resourceData['documentation']
         );
     }

@@ -165,7 +165,7 @@ The entity to which this file belongs.
 
 #### get_subresource
 
-Retrieve the record of the user who is the owner of a specific file record.
+Retrieve a record of the user who is the owner of a specific file record.
 
 #### get_relationship
 

@@ -423,7 +423,7 @@ Example:
 
 #### get_subresource
 
-Retrieve the record of the organization that a specific user belongs to.
+Retrieve a record of the organization that a specific user belongs to.
 
 #### get_relationship
 
@@ -450,7 +450,7 @@ Example:
 
 #### get_subresource
 
-Retrieve the records of the organizations that a specific user has access to.
+Retrieve records of the organizations that a specific user has access to.
 
 #### get_relationship
 
@@ -533,7 +533,7 @@ Example:
 
 #### get_subresource
 
-Retrieve the record of the business unit that is the owner of a specific user record.
+Retrieve a record of the business unit that is the owner of a specific user record.
 
 #### get_relationship
 
@@ -560,7 +560,7 @@ Example:
 
 #### get_subresource
 
-Retrieve the records of the roles that are assigned to a specific user.
+Retrieve records of the roles that are assigned to a specific user.
 
 #### get_relationship
 

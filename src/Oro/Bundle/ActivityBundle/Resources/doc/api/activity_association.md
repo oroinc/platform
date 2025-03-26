@@ -12,7 +12,7 @@ The %activity_entity_plural_name% associated with the %entity_name% record.
 
 #### get_subresource
 
-Retrieve the records of the %activity_entity_plural_name% associated with a specific %entity_name% record.
+Retrieve records of the %activity_entity_plural_name% associated with a specific %entity_name% record.
 
 #### get_relationship
 
