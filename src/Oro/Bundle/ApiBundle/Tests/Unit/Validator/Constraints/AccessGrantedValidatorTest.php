@@ -48,9 +48,9 @@ class AccessGrantedValidatorTest extends ConstraintValidatorTestCase
             ->willReturn(true);
 
         $this->doctrineHelper->expects(self::once())
-            ->method('getSingleEntityIdentifier')
+            ->method('isNewEntity')
             ->with(self::identicalTo($entity))
-            ->willReturn(2);
+            ->willReturn(false);
 
         $this->validator->validate($entity, $constraint);
 
@@ -67,9 +67,9 @@ class AccessGrantedValidatorTest extends ConstraintValidatorTestCase
             ->with('EDIT', self::identicalTo($entity))
             ->willReturn(true);
         $this->doctrineHelper->expects(self::once())
-            ->method('getSingleEntityIdentifier')
+            ->method('isNewEntity')
             ->with(self::identicalTo($entity))
-            ->willReturn(2);
+            ->willReturn(false);
 
         $this->validator->validate($entity, $constraint);
 
@@ -86,9 +86,9 @@ class AccessGrantedValidatorTest extends ConstraintValidatorTestCase
             ->with('VIEW', self::identicalTo($entity))
             ->willReturn(false);
         $this->doctrineHelper->expects(self::once())
-            ->method('getSingleEntityIdentifier')
+            ->method('isNewEntity')
             ->with(self::identicalTo($entity))
-            ->willReturn(2);
+            ->willReturn(false);
 
         $this->validator->validate($entity, $constraint);
 
@@ -107,9 +107,9 @@ class AccessGrantedValidatorTest extends ConstraintValidatorTestCase
             ->with('EDIT', self::identicalTo($entity))
             ->willReturn(false);
         $this->doctrineHelper->expects(self::once())
-            ->method('getSingleEntityIdentifier')
+            ->method('isNewEntity')
             ->with(self::identicalTo($entity))
-            ->willReturn(2);
+            ->willReturn(false);
 
         $this->validator->validate($entity, $constraint);
 
@@ -129,12 +129,12 @@ class AccessGrantedValidatorTest extends ConstraintValidatorTestCase
             ->willReturn(true);
 
         $this->doctrineHelper->expects(self::once())
-            ->method('getSingleEntityIdentifier')
+            ->method('isNewEntity')
             ->with(self::identicalTo($entity))
-            ->willReturn(null);
+            ->willReturn(true);
 
         $this->doctrineHelper->expects(self::once())
-            ->method('getEntityClass')
+            ->method('getClass')
             ->with(self::identicalTo($entity))
             ->willReturn(\stdClass::class);
 

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Validator\Constraints;
 
+use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
@@ -36,21 +37,19 @@ class AccessGrantedValidator extends ConstraintValidator
             throw new UnexpectedTypeException($value, 'object');
         }
 
+        $subject = $value;
         try {
-            if (!$this->doctrineHelper->getSingleEntityIdentifier($value)) {
-                $value = ObjectIdentityHelper::encodeIdentityString(
+            if ($this->doctrineHelper->isNewEntity($value)) {
+                $subject = ObjectIdentityHelper::encodeIdentityString(
                     EntityAclExtension::NAME,
-                    $this->doctrineHelper->getEntityClass($value)
+                    $this->doctrineHelper->getClass($value)
                 );
             }
-        } catch (\Exception $e) {
-            $value = ObjectIdentityHelper::encodeIdentityString(
-                EntityAclExtension::NAME,
-                $this->doctrineHelper->getEntityClass($value)
-            );
+        } catch (NotManageableEntityException) {
+            // not manageable entities should be checked as usual
         }
 
-        if (!$this->authorizationChecker->isGranted($constraint->permission, $value)) {
+        if (!$this->authorizationChecker->isGranted($constraint->permission, $subject)) {
             $this->context->addViolation(
                 $constraint->message,
                 ['{{ permission }}' => $constraint->permission]
