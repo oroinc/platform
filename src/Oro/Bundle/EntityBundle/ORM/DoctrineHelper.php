@@ -126,6 +126,7 @@ class DoctrineHelper implements ResetInterface
     /**
      * Extracts the single identifier value of the given entity.
      *
+     * @throws Exception\NotManageableEntityException if an entity is not manageable and it doesn't have getId() method
      * @throws Exception\InvalidEntityException if the entity has several identifier fields and $throwException is TRUE
      */
     public function getSingleEntityIdentifier(object $entity, bool $throwException = true): mixed
@@ -133,9 +134,9 @@ class DoctrineHelper implements ResetInterface
         $entityIdentifier = $this->getEntityIdentifier($entity);
 
         $result = null;
-        if (count($entityIdentifier) > 1) {
+        if (\count($entityIdentifier) > 1) {
             if ($throwException) {
-                throw new Exception\InvalidEntityException(sprintf(
+                throw new Exception\InvalidEntityException(\sprintf(
                     'Can\'t get single identifier for "%s" entity.',
                     $this->getEntityClass($entity)
                 ));
