@@ -74,6 +74,14 @@ define(function(require) {
             return this.frontendFormats.datetime;
         },
 
+        getFormat(format) {
+            if (format in this.frontendFormats) {
+                return this.frontendFormats[format];
+            } else {
+                throw new Error(`Passed format "${format}" is unregistered`);
+            }
+        },
+
         /**
          * @returns {string}
          */
@@ -297,6 +305,17 @@ define(function(require) {
                 throw new Error('Invalid backend time ' + value);
             }
             return momentTime;
+        },
+
+        /**
+         * Get date/time string by need format
+         * @param {string} value
+         * @param {string} [format='datetime'|'date'|'time'|'day']
+         * @returns {string}
+         */
+        getDateTimeByFormat(value, format = 'datetime') {
+            return this.getMomentForBackendDateTime(value).tz(this.timezone)
+                .format(this.getFormat(format));
         },
 
         /**
