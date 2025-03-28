@@ -8,82 +8,37 @@ $charset: 'UTF-8' !default;
 // List with theme fonts
 $theme-fonts: (
     'main': (
-        'family': 'Poppins',
+        'family': 'Plus Jakarta Sans',
         'variants': (
             (
-                'path': '#{$global-url}/orofrontend/default/fonts/poppins/Poppins-Light-subset',
-                'weight': 300,
-                'style': normal
-            ),
-            (
-                'path': '#{$global-url}/orofrontend/default/fonts/poppins/Poppins-LightItalic-subset',
-                'weight': 300,
-                'style': italic
-            ),
-            (
-                'path': '#{$global-url}/orofrontend/default/fonts/poppins/Poppins-Regular-subset',
-                'weight': 400,
-                'style': normal
-            ),
-            (
-                'path': '#{$global-url}/orofrontend/default/fonts/poppins/Poppins-Italic-subset',
-                'weight': 400,
-                'style': italic
-            ),
-            (
-                'path': '#{$global-url}/orofrontend/default/fonts/poppins/Poppins-Medium-subset',
-                'weight': 500,
-                'style': normal
-            ),
-            (
-                'path': '#{$global-url}/orofrontend/default/fonts/poppins/Poppins-MediumItalic-subset',
-                'weight': 500,
-                'style': italic
-            ),
-            (
-                'path': '#{$global-url}/orofrontend/default/fonts/poppins/Poppins-SemiBold-subset',
-                'weight': 600,
-                'style': normal
-            ),
-            (
-                'path': '#{$global-url}/orofrontend/default/fonts/poppins/Poppins-SemiBoldItalic-subset',
-                'weight': 600,
-                'style': italic
-            ),
-            (
-                'path': '#{$global-url}/orofrontend/default/fonts/poppins/Poppins-Bold-subset',
-                'weight': 700,
-                'style': normal
-            ),
-            (
-                'path': '#{$global-url}/orofrontend/default/fonts/poppins/Poppins-BoldItalic-subset',
-                'weight': 700,
-                'style': italic
+                'path': '#{$global-url}/orofrontend/default/fonts/Plus_Jakarta_Sans/PlusJakartaSans-variable',
+                'weight': 300 700,
+                'style': normal italic
             )
         ),
-        'formats': ('woff2', 'woff')
+        'formats': ('woff2')
     ),
     'secondary': (
         'family': 'Bitter',
         'variants': (
             (
-                    'path': '#{$global-url}/orofrontend/default/fonts/bitter/Bitter-SemiBold',
-                    'weight': 600,
-                    'style': normal
+                'path': '#{$global-url}/orofrontend/default/fonts/bitter/Bitter-SemiBold',
+                'weight': 600,
+                'style': normal
             ),
         ),
-        'formats': ('woff2', 'woff')
+        'formats': ('woff2')
     ),
     'code': (
           'family': 'DM Mono',
           'variants': (
               (
-                      'path': '#{$global-url}/orofrontend/default/fonts/dm-mono/DMMono-Regular',
-                      'weight': 400,
-                      'style': normal
+                  'path': '#{$global-url}/orofrontend/default/fonts/dm-mono/DMMono-Regular',
+                  'weight': 400,
+                  'style': normal
               ),
           ),
-          'formats': ('woff2', 'woff')
+          'formats': ('woff2')
     ),
     'only-bullets': (
         'family': 'only-bullets',
@@ -94,7 +49,7 @@ $theme-fonts: (
                 'style': normal
             )
         ),
-        'formats': ('woff2', 'woff')
+        'formats': ('woff2')
     )
 ) !default;
 
@@ -121,7 +76,7 @@ $font-weights: (
 ) !default;
 
 // Fonts families
-$base-font: get-font-name('main'), 'helvetica', arial, sans-serif !default;
+$base-font: get-font-name('main'), sans-serif !default;
 $secondary-font: get-font-name('secondary'), 'times new roman', serif !default;
 $code-font: get-font-name('code'), 'courier', monospace !default;
 $base-font-masked: get-font-name('only-bullets'), 'helvetica', arial, sans-serif !default;
