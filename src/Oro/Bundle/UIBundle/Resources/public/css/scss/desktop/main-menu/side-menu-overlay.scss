@@ -14,7 +14,7 @@
     z-index: -1;
 
     width: calc(100vw - #{$menu-side-width-minimized + $content-padding * 2});
-    height: calc(100vh - #{$content-padding});
+    height: 100vh;
     max-width: calc(100vw - #{$menu-side-width-minimized + $content-padding * 2});
     min-width: $width-body-page;
 
@@ -150,7 +150,6 @@
 
         background-color: $menu-dropdown-background-color;
         box-shadow: $side-menu-overlay-ui-fill-blur-box-shadow;
-        border-start-end-radius: 10px;
     }
 
     .menu {

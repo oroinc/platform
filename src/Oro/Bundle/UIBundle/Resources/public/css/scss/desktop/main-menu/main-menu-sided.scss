@@ -7,7 +7,6 @@
     width: $menu-side-width;
     height: 100%;
     padding-block: 10px 80px;
-    border-radius: 10px 10px 0 0;
 
     background-color: $menu-background-color;
     box-shadow: $menu-box-shadow;
@@ -128,6 +127,8 @@
         padding: 16px 24px;
 
         background-color: $menu-dropdown-background-color-active;
+        border-top: 1px solid $menu-dropdown-border-color-active;
+        border-bottom: 1px solid $menu-dropdown-border-color-active;
         color: $menu-item-first-level-text-color;
 
         .menu-icon {
@@ -141,6 +142,8 @@
         }
 
         &.collapsed {
+            border-top-color: transparent;
+            border-bottom-color: transparent;
             background-color: $menu-background-color;
         }
 
@@ -195,6 +198,9 @@
 
             width: $menu-side-width-minimized;
 
+            border-top: 1px solid transparent;
+            border-bottom: 1px solid transparent;
+
             .dropdown-menu {
                 display: none;
             }
@@ -209,6 +215,7 @@
 
             &.active {
                 background-color: $menu-dropdown-background-color;
+                border-color: $menu-dropdown-border-color;
 
                 .title-level-1 {
                     color: $menu-minimized-item-first-level-text-color-active;

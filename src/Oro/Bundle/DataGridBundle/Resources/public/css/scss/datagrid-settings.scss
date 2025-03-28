@@ -4,11 +4,11 @@
 
 .datagrid-settings {
     &:not(:first-child) {
-        margin-left: $content-padding-medium;
+        margin-left: $oro-datagrid-actions-panel-action-offset;
     }
 
     &:not(:last-child) {
-        margin-right: $content-padding-medium;
+        margin-right: $oro-datagrid-actions-panel-action-offset;
     }
 
     a.action.btn.dropdown-toggle {

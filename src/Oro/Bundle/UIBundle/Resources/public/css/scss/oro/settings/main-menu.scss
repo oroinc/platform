@@ -28,8 +28,10 @@ $menu-side-width-minimized: 80px !default;
 // Main menu dropdown
 $menu-header-background-color: transparent !default;
 $menu-dropdown-background-color: $neutral-grey-2 !default;
+$menu-dropdown-border-color: $neutral-grey-3 !default;
 $menu-dropdown-box-shadow: 1px 1px 9px 3px rgba(0 0 0 / 8%) !default;
 $menu-dropdown-background-color-active: $neutral-grey-1 !default;
+$menu-dropdown-border-color-active: $neutral-grey-3 !default;
 $menu-dropdown-background-color-light-active: $primary-700 !default;
 
 // Mobile main menu
