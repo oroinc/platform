@@ -4,11 +4,13 @@
     display: flex;
     align-items: baseline;
     line-height: $entity-pagination-line-height;
+    padding-inline: $content-padding;
 
     .pagination .page-link {
         padding: $entity-pagination-page-link-padding;
         text-decoration: $entity-pagination-page-link-decoration;
         color: $entity-pagination-page-link-color;
+        font-size: $entity-pagination-page-link-font-size;
         line-height: 1;
 
         [class*='fa-'] {

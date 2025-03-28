@@ -76,9 +76,8 @@ body:not(.login-page) {
     box-sizing: border-box;
     display: flex;
     min-height: 0;
-    padding-top: $content-padding;
-    padding-inline: $content-padding;
-    gap: 0 #{$content-padding};
+    padding-inline-end: $content-padding-medium;
+    gap: 0 #{$content-padding-medium};
 
     &__content-side {
         flex-shrink: 0;
@@ -86,6 +85,10 @@ body:not(.login-page) {
         &:empty {
             display: none;
         }
+    }
+
+    &:has(.app-header .main-menu-top) {
+        padding-inline-start: $content-padding-medium;
     }
 
     &__content {
@@ -96,17 +99,15 @@ body:not(.login-page) {
         gap: 0 16px;
 
         grid-template-areas:
-            'pinbar'
             'header'
             'main'
             'dialog'
             'footer';
         grid-template-columns: minmax(0, 1fr);
-        grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+        grid-template-rows: auto minmax(0, 1fr) auto auto;
 
         &:has(.app-page__right-panel) {
             grid-template-areas:
-            'pinbar pinbar'
             'header rightpanel'
             'main rightpanel'
             'dialog dialog'
@@ -116,7 +117,6 @@ body:not(.login-page) {
 
         &:has(.app-page__left-panel) {
             grid-template-areas:
-            'pinbar pinbar'
             'leftpanel header'
             'leftpanel main'
             'dialog dialog'
@@ -126,7 +126,6 @@ body:not(.login-page) {
 
         &:has(.app-page__left-panel):has(.app-page__right-panel) {
             grid-template-areas:
-            'pinbar pinbar pinbar'
             'leftpanel header rightpanel'
             'leftpanel main rightpanel'
             'dialog dialog dialog'
@@ -221,7 +220,7 @@ body:not(.login-page) {
 #container:not(:has(.dashboard-container-wrapper)) {
     background-color: $neutral-white;
     border-radius: $border-radius-md;
-    padding-top: $content-padding;
+    padding-top: $content-padding-medium;
 
     > .layout-content {
         padding-inline: $content-padding;

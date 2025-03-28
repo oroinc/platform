@@ -4,15 +4,47 @@
 
 .list-bar-wrapper {
     display: flex;
-    flex-grow: 1;
-    flex-basis: 0;
+    align-items: center;
     min-width: $pin-item-show-more-menu-width;
-    grid-area: pinbar;
-    margin-bottom: 24px;
     position: relative;
 
     .pin-holder {
         position: relative;
+
+        &:before {
+            content: '';
+            position: absolute;
+            inset: 0 -4px;
+            display: block;
+            background-color: $pin-item-highlight-bg-color;
+            border-radius: $border-radius;
+            opacity: 0;
+
+            transition: all 230ms ease-in-out;
+            z-index: -1;
+        }
+
+        &.highlight {
+            &.animated-item-view {
+                opacity: 0;
+                transform: scale(0);
+                transition: $pin-item-transition;
+
+                &:before {
+                    transform: scaleY(0);
+                }
+            }
+
+            &.animated-item-view-end {
+                opacity: 1;
+                transform: scale(1);
+
+                &:before {
+                    opacity: 1;
+                    transform: scaleY(1);
+                }
+            }
+        }
 
         &.outdated a {
             color: $pin-item-outdated-color;
@@ -27,7 +59,7 @@
         .btn-close {
             position: absolute;
             top: 50%;
-            right: 14px;
+            right: 0;
             width: 14px;
             height: 14px;
             display: block;
@@ -52,12 +84,18 @@
                 color: $pin-item-close-hover-color;
             }
         }
+
+        &:last-child {
+            .btn-close {
+                right: 0;
+            }
+        }
     }
 
     .pin-bar-empty {
         a {
             display: inline-block;
-            margin: 2px 10px;
+            margin: 2px 0;
             font-size: 12px;
             line-height: 20px;
             white-space: nowrap;
@@ -114,10 +152,6 @@
 .show-more {
     // don't show dropbox by default
     display: none;
-    position: absolute;
-    top: 0;
-    right: $content-padding-medium;
-    margin-left: -$pin-item-show-more-menu-width;
     height: 100%;
 
     &::before {
@@ -174,6 +208,28 @@
             padding: 7px 34px 7px 13px;
         }
     }
+
+    .pin-holder {
+        &:before {
+            display: none;
+        }
+
+        @media (hover: hover) {
+            .btn-close {
+                transition: opacity 230ms ease-in-out;
+                opacity: 0;
+            }
+
+            &:hover .btn-close {
+                opacity: 1;
+            }
+        }
+
+        .btn-close,
+        &:last-child .btn-close {
+            right: 10px;
+        }
+    }
 }
 
 .list-bar {
@@ -181,11 +237,13 @@
     flex-basis: 100%;
 
     ul {
-        margin: 0 36px 0 0;
-        padding: 0;
+        margin: 0;
+        padding: 0 0 0 4px;
+        gap: 0 $content-padding-medium;
         overflow: hidden;
         list-style: none;
-        display: block;
+        display: flex;
+        align-items: center;
         white-space: nowrap;
 
         &:empty {
@@ -198,7 +256,8 @@
         text-align: left;
         line-height: inherit;
         position: relative;
-        padding: 0 30px 0 0;
+        padding-right: 16px;
+        font-size: $base-font-size--s;
 
         &.active {
             background-color: $pin-item-active-bg-color;

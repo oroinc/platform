@@ -19,8 +19,8 @@
     height: 100%;
     user-select: none;
     padding-bottom: 90px;
-    border-radius: 10px 10px 0 0;
-    border: 1px solid $neutral-white;
+    border-left: 1px solid $neutral-white;
+    border-right: 1px solid $neutral-white;
 
     &.maximized {
         width: $sidebar-maximized-width;

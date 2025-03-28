@@ -5,7 +5,9 @@ define(function(require) {
     const _ = require('underscore');
 
     const BarCollectionView = BaseCollectionView.extend({
-        animationDuration: 0,
+        animationDuration: 230,
+
+        useCssAnimation: true,
 
         /**
          * @inheritdoc
@@ -39,6 +41,14 @@ define(function(require) {
             return _.isRTL()
                 ? this.el.offsetLeft <= itemView.el.offsetLeft
                 : this.el.offsetWidth >= itemView.el.offsetLeft + itemView.el.offsetWidth;
+        },
+
+        itemAdded(item, collection, options) {
+            const view = BarCollectionView.__super__.itemAdded.call(this, item, collection, options);
+
+            view.highlight();
+
+            return view;
         }
     });
 
