@@ -62,7 +62,6 @@
         {% endblock content_side %}
         <div id="app-content" class="app-page__content">
             {% block header %}
-                {% placeholder pin_tabs_list %}
                 <header class="app-header{% if oro_config_value('oro_ui.navbar_position') != 'top' %} thick{% endif %}" id="oroplatform-header"
                     {% if isMobileVersion() %}
                         {{ UI.renderPageComponentAttributes({
@@ -128,6 +127,9 @@
                                     {% placeholder breadcrumb %}
                                 {% endblock breadcrumb %}
                             </div>
+
+                            {% placeholder pin_tabs_list %}
+
                             <div id="before-content-addition" class="page-toolbar_before-content-addition" data-layout="separate"
                                  {{ UI.renderPageComponentAttributes({view: 'oroui/js/app/views/page/before-content-addition-view'}) }}>
                                 {% block before_content_addition %}{% endblock before_content_addition %}

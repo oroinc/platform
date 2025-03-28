@@ -83,6 +83,26 @@ define(function(require) {
             const isUrlSame = this.checkCurrentUrl();
             this.$el.toggleClass('active', isUrlSame);
             this.$el.find('a').data('options', {forceStartup: !isUrlSame});
+        },
+
+        highlight(hideDelay = 3000) {
+            this.$el.addClass('highlight');
+
+            if (this.highlightTimeoutId) {
+                clearTimeout(this.highlightTimeoutId);
+            }
+
+            this.highlightTimeoutId = setTimeout(() => this.$el.removeClass('highlight'), hideDelay);
+        },
+
+        dispose() {
+            if (this.disposed) {
+                return;
+            }
+
+            clearTimeout(this.highlightTimeoutId);
+
+            PinItemView.__super__.dispose.call(this);
         }
     });
 

@@ -8,13 +8,57 @@
 
     &_bookmark-buttons {
         flex-shrink: 0;
+
+        &:has(.top-action-box .btn:not(.hide)) {
+            padding-left: $content-padding-medium;
+            position: relative;
+
+            &:before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                margin: auto;
+                height: 24px;
+                border-left: 1px solid $neutral-grey-4;
+            }
+        }
     }
 
     &_breadcrumb {
         margin-right: auto;
+        flex-shrink: 0;
     }
 
     &_before-content-addition {
         flex-shrink: 0;
+
+        &:not(:empty) {
+            position: relative;
+
+            &:before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                margin: auto;
+                height: 24px;
+                border-left: 1px solid $neutral-grey-4;
+            }
+        }
+    }
+
+    .list-bar-wrapper {
+        padding-inline: 130px $content-padding;
+    }
+}
+
+.app-page {
+    &:has(.dashboard-container-wrapper) {
+        .page-toolbar .list-bar-wrapper {
+            padding-inline-end: 0;
+        }
     }
 }
