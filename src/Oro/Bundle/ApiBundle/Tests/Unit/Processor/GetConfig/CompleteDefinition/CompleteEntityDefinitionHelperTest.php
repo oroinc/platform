@@ -28,6 +28,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -38,29 +39,14 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
  */
 class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var EntityOverrideProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityOverrideProvider;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var CompleteCustomDataTypeHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $customDataTypeHelper;
-
-    /** @var ExclusionProviderRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $exclusionProviderRegistry;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var ChainDictionaryValueListProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $dictionaryProvider;
-
-    /** @var CompleteEntityDefinitionHelper */
-    private $completeEntityDefinitionHelper;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EntityOverrideProviderInterface&MockObject $entityOverrideProvider;
+    private ConfigProvider&MockObject $configProvider;
+    private CompleteCustomDataTypeHelper&MockObject $customDataTypeHelper;
+    private ExclusionProviderRegistry&MockObject $exclusionProviderRegistry;
+    private ConfigManager&MockObject $configManager;
+    private ChainDictionaryValueListProvider&MockObject $dictionaryProvider;
+    private CompleteEntityDefinitionHelper $completeEntityDefinitionHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -1381,9 +1367,26 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
             ->method('getEntityMetadataForClass')
             ->with(self::TEST_CLASS_NAME)
             ->willReturn($rootEntityMetadata);
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with('Test\Association1Target')
+            ->willReturn(false);
 
-        $this->configProvider->expects(self::never())
-            ->method('getConfig');
+        $this->configProvider->expects(self::once())
+            ->method('getConfig')
+            ->with('Test\Association1Target', $context->getVersion(), $context->getRequestType())
+            ->willReturn(
+                $this->createRelationConfigObject(
+                    [
+                        'identifier_field_names' => ['id'],
+                        'fields' => [
+                            'id' => [
+                                'data_type' => 'integer'
+                            ]
+                        ]
+                    ]
+                )
+            );
 
         $this->dictionaryProvider->expects(self::once())
             ->method('isSupportedEntityClass')
@@ -1395,12 +1398,20 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->assertConfig(
             [
                 'identifier_field_names' => ['id'],
-                'fields'                 => [
-                    'id'           => null,
+                'fields' => [
+                    'id' => null,
                     'association1' => [
-                        'data_type'    => 'some_custom_association',
+                        'data_type' => 'some_custom_association',
                         'target_class' => 'Test\Association1Target',
-                        'target_type'  => 'to-one'
+                        'target_type' => 'to-one',
+                        'collapse' => true,
+                        'exclusion_policy' => 'all',
+                        'identifier_field_names' => ['id'],
+                        'fields' => [
+                            'id' => [
+                                'data_type' => 'integer'
+                            ]
+                        ]
                     ]
                 ]
             ],
