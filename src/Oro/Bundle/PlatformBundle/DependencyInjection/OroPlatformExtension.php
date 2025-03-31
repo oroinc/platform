@@ -19,10 +19,6 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
     #[\Override]
     public function prepend(ContainerBuilder $container): void
     {
-        if (!$container->hasParameter('web_backend_prefix')) {
-            $container->setParameter('web_backend_prefix', '/admin');
-        }
-
         $this->loadAppConfigsFromBundles($container);
         $this->preparePostgreSql($container);
         $this->configureJmsSerializer($container);
@@ -227,7 +223,7 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
             return $subConf2['priority'] <=> $subConf1['priority'];
         });
         foreach ($finalAccessControlConf as &$tmpConf) {
-            unset($tmpConf['priority']);
+            unset($tmpConf['priority'], $tmpConf['options']);
         }
         unset($tmpConf);
 

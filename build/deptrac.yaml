@@ -1,0 +1,100 @@
+deptrac:
+  paths:
+    - ../../../../vendor/oro
+  exclude_files:
+    - '#.*Test.*#'
+  layers:
+    oro/commerceenterprise:
+      name: oro/commerceenterprise
+      collectors: [{ type: class, value: 'Oro\\Bundle\\ApplicationProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\CatalogProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\CMSProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\CommerceOrganizationBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\CommerceOrganizationMenuBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\CustomerRecommendationBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\CustomerProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\FrontendImportExportProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ImpersonateUserBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\MultiWebsiteBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\MultiWebsiteOrderBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\MultiWebsitePaymentBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\MultiWebsiteShippingBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\PaymentProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\PricingProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ProductProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\RedirectProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\RFPProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\SalesOrderCurrencyBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\SellerDashboardBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ShippingProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\TaxProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\WarehouseBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\WebsiteElasticSearchBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\WebsiteMenuBundle\\.*' }]
+    oro/crm:
+      name: oro/crm
+      collectors: [{ type: class, value: 'Oro\\Bridge\\CalendarCRM\\.*' }, { type: class, value: 'Oro\\Bridge\\CallCRM\\.*' }, { type: class, value: 'Oro\\Bridge\\CustomerPortalCRM\\.*' }, { type: class, value: 'Oro\\Bridge\\TaskCRM\\.*' }, { type: class, value: 'Oro\\Bundle\\AccountBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ActivityContactBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\AnalyticsBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\CaseBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ChannelBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ContactBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ContactUsBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\CRMBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\DemoDataBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ReportCRMBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\SalesBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\TestFrameworkCRMBundle\\.*' }]
+    oro/crmenterprise:
+      name: oro/crmenterprise
+      collectors: [{ type: class, value: 'Oro\\Bridge\\MarketingCRMPro\\.*' }, { type: class, value: 'Oro\\Bundle\\ChannelCRMProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\CRMProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\EmailAddonBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\OrganizationConfigCRMProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\SalesCRMProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\SalesTerritoryBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\SecurityCRMProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\TerritoryBundle\\.*' }]
+    oro/customerportal:
+      name: oro/customerportal
+      collectors: [{ type: class, value: 'Oro\\Bridge\\CRMCustomerPortal\\.*' }, { type: class, value: 'Oro\\Bundle\\CommerceMenuBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\CustomerBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\FrontendAttachmentBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\FrontendBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\FrontendImportExportBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\StyleBookBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\WebsiteBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\AddressValidationBundle\\.*' }]
+    oro/marketing:
+      name: oro/marketing
+      collectors: [{ type: class, value: 'Oro\\Bundle\\CampaignBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\MarketingActivityBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\MarketingListBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\TrackingBundle\\.*' }]
+    oro/marketplace:
+      name: oro/marketplace
+      collectors: [{ type: class, value: 'Oro\\Bundle\\MarketplaceSellerOrganizationBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\MarketplaceSellerRegistrationBundle\\.*' }]
+    oro/platform:
+      name: oro/platform
+      collectors: [{ type: class, value: 'Oro\\Bundle\\ActionBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ActivityBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ActivityListBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\AddressBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ApiBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\AssetBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\AttachmentBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\BatchBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\BusinessEntitiesBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\CacheBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ChartBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\CommentBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ConfigBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\CronBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\CurrencyBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\DashboardBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\DataAuditBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\DataGridBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\DigitalAssetBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\DistributionBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\DraftBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\EmailBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\EmbeddedFormBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\EntityBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\EntityConfigBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\EntityExtendBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\EntityMergeBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\EntityPaginationBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ExpressionLanguageBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\FeatureToggleBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\FilterBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\FormBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\GaufretteBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\GoogleIntegrationBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\HelpBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ImapBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ImportExportBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\InstallerBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\IntegrationBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\LayoutBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\LocaleBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\LoggerBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\MaintenanceBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\MessageQueueBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\MicrosoftIntegrationBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\MigrationBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\NavigationBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\NoteBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\NotificationBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\OrganizationBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\PlatformBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\QueryDesignerBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\RedisConfigBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ReminderBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ReportBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ScopeBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\SearchBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\SecurityBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\SegmentBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\SidebarBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\SanitizeBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\SoapBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\SSOBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\SyncBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\TagBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\TestFrameworkBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ThemeBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\TranslationBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\UIBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\UserBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ViewSwitcherBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\WindowsBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\WorkflowBundle\\.*' }, { type: class, value: 'Oro\\Component\\Action\\.*' }, { type: class, value: 'Oro\\Component\\ChainProcessor\\.*' }, { type: class, value: 'Oro\\Component\\Config\\.*' }, { type: class, value: 'Oro\\Component\\ConfigExpression\\.*' }, { type: class, value: 'Oro\\Component\\DependencyInjection\\.*' }, { type: class, value: 'Oro\\Component\\DoctrineUtils\\.*' }, { type: class, value: 'Oro\\Component\\Duplicator\\.*' }, { type: class, value: 'Oro\\Component\\EntitySerializer\\.*' }, { type: class, value: 'Oro\\Component\\Exception\\.*' }, { type: class, value: 'Oro\\Component\\ExpressionLanguage\\.*' }, { type: class, value: 'Oro\\Component\\Layout\\.*' }, { type: class, value: 'Oro\\Component\\Log\\.*' }, { type: class, value: 'Oro\\Component\\Math\\.*' }, { type: class, value: 'Oro\\Component\\MessageQueue\\.*' }, { type: class, value: 'Oro\\Component\\PropertyAccess\\.*' }, { type: class, value: 'Oro\\Component\\PhpUtils\\.*' }, { type: class, value: 'Oro\\Component\\Routing\\.*' }, { type: class, value: 'Oro\\Component\\TestUtils\\.*' }]
+    oro/platformenterprise:
+      name: oro/platformenterprise
+      collectors: [{ type: class, value: 'Oro\\Bundle\\AmqpMessageQueueBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\CalendarProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\CommentProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\CronProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\DataGridProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ElasticSearchBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\EmailProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\EntityConfigProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\EntityExtendProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\FusionChartsBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ImportExportProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ImapProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\LocaleProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\MultiCurrencyBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\OrganizationConfigBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\OrganizationMenuBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\OrganizationProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\PlatformProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\SecurityProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\TestFrameworkProBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\UserProBundle\\.*' }, { type: class, value: 'Oro\\Component\\AmqpMessageQueue\\.*' }]
+    oro/commerce:
+      name: oro/commerce
+      collectors: [{ type: class, value: 'Oro\\Bridge\\CalendarCommerce\\.*' }, { type: class, value: 'Oro\\Bridge\\MarketingCommerce\\.*' }, { type: class, value: 'Oro\\Bundle\\AlternativeCheckoutBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ApplicationBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\CatalogBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\CheckoutBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\CMSBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\CommerceBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\CommerceEntityBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ConsentBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\FallbackBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\FedexShippingBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\FlatRateShippingBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\FixedProductShippingBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\FrontendLocalizationBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\FrontendTestFrameworkBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\InventoryBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\MoneyOrderBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\OrderBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\PaymentBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\PaymentTermBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\PayPalBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\PricingBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ProductBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\PromotionBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\RedirectBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\RFPBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\RuleBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\SaleBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\SEOBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ShippingBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ShoppingListBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\TaxBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\UPSBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\ValidationBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\VisibilityBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\WebsiteSearchTermBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\WebCatalogBundle\\.*' }, { type: class, value: 'Oro\\Bundle\\WebsiteSearchBundle\\.*' }, { type: class, value: 'Oro\\Component\\Checkout\\.*' }, { type: class, value: 'Oro\\Component\\Expression\\.*' }, { type: class, value: 'Oro\\Component\\SEO\\.*' }, { type: class, value: 'Oro\\Component\\Tree\\.*' }, { type: class, value: 'Oro\\Component\\WebCatalog\\.*' }, { type: class, value: 'Oro\\Component\\Website\\.*' }]
+  ruleset:
+    oro/commerceenterprise:
+      - oro/customerportal
+      - oro/marketing
+      - oro/platform
+      - oro/platformenterprise
+      - oro/commerce
+    oro/crm:
+      - oro/marketing
+      - oro/platform
+    oro/crmenterprise:
+      - oro/marketing
+      - oro/platform
+      - oro/platformenterprise
+      - oro/crm
+    oro/customerportal:
+      - oro/marketing
+      - oro/platform
+      - oro/commerce
+    oro/marketing:
+      - oro/platform
+    oro/marketplace:
+      - oro/commerceenterprise
+      - oro/commerce
+      - oro/customerportal
+      - oro/marketing
+      - oro/platform
+      - oro/platformenterprise
+    oro/platform: {  }
+    oro/platformenterprise:
+      - oro/platform
+    oro/commerce:
+      - oro/marketing
+      - oro/platform
+      - oro/customerportal
+  skip_violations:
+    Oro\Bundle\ThemeBundle\Acl\Voter\ThemeConfigurationDependencyDeleteVoter:
+      - Oro\Bundle\CMSBundle\Entity\ContentBlock
+    Oro\Bundle\MarketplaceSellerRegistrationBundle\Api\Provider\SellerRegistrationRequestEmailAddonDetailsProvider:
+      - Oro\Bundle\EmailAddonBundle\Api\Provider\EntityDetailsUtil
+    Oro\Bridge\CRMCustomerPortal\Migrations\Data\ORM\LoadAccountAndContactToAccountManagerRole:
+      - Oro\Bundle\AccountBundle\Entity\Account
+      - Oro\Bundle\ContactBundle\Entity\Contact
+    Oro\Bridge\CustomerPortalCRM\Migrations\Data\ORM\LoadAccountAndContactToAccountManagerRole:
+      - Oro\Bundle\FrontendBundle\Migrations\Data\ORM\LoadUserRolesData
+    Oro\Bundle\ContactUsBundle\Entity\ContactRequest:
+      - Oro\Bundle\CustomerBundle\Entity\CustomerUser
+    Oro\Bundle\CampaignBundle\Entity\Repository\CampaignRepository:
+      - Oro\Bundle\SalesBundle\Entity\Lead
+    Oro\Bundle\TrackingBundle\Migrations\Schema\v1_13\UpdateFormTypeConfigsToFQCN:
+      - Oro\Bundle\ChannelBundle\Form\Type\ChannelSelectType
+    Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizationProcessor:
+      - Oro\Bundle\ContactBundle\Entity\ContactEmail
+    Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizationProcessor:
+      - Oro\Bundle\ContactBundle\Entity\ContactEmail
+    Oro\Bundle\SecurityProBundle\Twig\OroProSecurityExtension:
+      - Oro\Bundle\CustomerBundle\Entity\CustomerVisitor
+    Oro\Bundle\AddressBundle\Validator\Constraints\ValidOrganizationValidator:
+      - Oro\Bundle\CustomerBundle\Entity\AbstractDefaultTypedAddress
+    Oro\Bundle\SecurityBundle\Twig\OroSecurityExtension:
+      - Oro\Bundle\CustomerBundle\Entity\CustomerVisitor
+    Oro\Bundle\ThemeBundle\Form\Type\ThemeConfigurationType:
+      - Oro\Bundle\FrontendBundle\Form\Type\ThemeSelectType
+    Oro\Bundle\ThemeBundle\Migrations\Data\AbstractLoadThemeConfiguration:
+      - Oro\Bundle\WebsiteBundle\Entity\Website
+    Oro\Bundle\WorkflowBundle\Migrations\Data\ORM\UpdateAccessLevelsOfTransitionsPermissions:
+      - Oro\Bundle\FrontendBundle\Migrations\Data\ORM\LoadUserRolesData

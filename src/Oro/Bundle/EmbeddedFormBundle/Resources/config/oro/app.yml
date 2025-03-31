@@ -6,4 +6,4 @@ security:
 
 oro_security:
     access_control:
-        - { path: ^%web_backend_prefix%/embedded-form/(submit|success), roles: PUBLIC_ACCESS }
+        - { path: ^/embedded-form/(submit|success), roles: PUBLIC_ACCESS }

@@ -109,7 +109,7 @@ class CompleteEntityDefinitionHelper
                 $skipNotConfiguredCustomFields,
                 $requestType
             );
-            $this->completeDependentAssociations(
+            $this->completeDependentAndObjectAssociations(
                 $entityOverrideProvider,
                 $definition,
                 $metadata,
@@ -448,7 +448,7 @@ class CompleteEntityDefinitionHelper
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    private function completeDependentAssociations(
+    private function completeDependentAndObjectAssociations(
         EntityOverrideProviderInterface $entityOverrideProvider,
         EntityDefinitionConfig $definition,
         ClassMetadata $metadata,
@@ -509,6 +509,17 @@ class CompleteEntityDefinitionHelper
                     $version,
                     $requestType
                 );
+            }
+            if (null === $field->getTargetEntity()) {
+                $targetClass = $field->getTargetClass();
+                if ($targetClass && !$this->doctrineHelper->isManageableEntityClass($targetClass)) {
+                    $this->associationHelper->completeAssociation(
+                        $field,
+                        $targetClass,
+                        $version,
+                        $requestType
+                    );
+                }
             }
         }
     }
