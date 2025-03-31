@@ -6,7 +6,6 @@ parameters:
     websocket_backend_dsn: 'tcp://127.0.0.1:8080'
     search_engine_dsn: 'orm:'
     website_search_engine_dsn: 'orm:'
-    web_backend_prefix: /admin
     session_handler: null
     locale: en
     secret: ThisTokenIsNotSoSecretChangeIt

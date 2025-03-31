@@ -1,6 +1,6 @@
 <?php
 
-namespace Functional\EntityExtend;
+namespace Oro\Bundle\LocaleBundle\Tests\Functional\EntityExtend;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EntityExtendBundle\Tests\Functional\EntityExtend\Extension\EntityExtendTransportTrait;

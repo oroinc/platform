@@ -1,6 +1,6 @@
 <?php
 
-namespace Functional\Validator;
+namespace Oro\Bundle\EntityExtendBundle\Tests\Functional\Validator;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityExtendBundle\Validator\CustomEntityConfigValidatorService;

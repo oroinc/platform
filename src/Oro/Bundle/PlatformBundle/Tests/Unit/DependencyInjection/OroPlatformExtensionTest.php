@@ -100,18 +100,6 @@ class OroPlatformExtensionTest extends \PHPUnit\Framework\TestCase
             ->method('getExtensionConfig')
             ->willReturn([]);
 
-        $containerBuilder
-            ->expects($this->once())
-            ->method('hasParameter')
-            ->with($this->equalTo('web_backend_prefix'))
-            ->willReturn(false);
-
-        $containerBuilder
-            ->expects($this->once())
-            ->method('setParameter')
-            ->with($this->equalTo('web_backend_prefix'), $this->equalTo('/admin'))
-            ->willReturn(false);
-
         $extension->prepend($containerBuilder);
     }
 
@@ -125,18 +113,6 @@ class OroPlatformExtensionTest extends \PHPUnit\Framework\TestCase
             ->expects($this->any())
             ->method('getExtensionConfig')
             ->willReturn([]);
-
-        $containerBuilder
-            ->expects($this->once())
-            ->method('hasParameter')
-            ->with($this->equalTo('web_backend_prefix'))
-            ->willReturn(true);
-
-        $containerBuilder
-            ->expects($this->never())
-            ->method('setParameter')
-            ->with($this->equalTo('web_backend_prefix'), $this->equalTo('/admin'))
-            ->willReturn(false);
 
         $extension->prepend($containerBuilder);
     }

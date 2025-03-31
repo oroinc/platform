@@ -94,8 +94,8 @@ oro_security:
 #            web-share: deny
 #            xr-spatial-tracking: deny
     access_control:
-        - { path: ^/media/[\w-]+/.+$, roles: PUBLIC_ACCESS }
-        - { path: ^%web_backend_prefix%, roles: IS_AUTHENTICATED, priority: -100 }
+        - { path: ^/media/[\w-]+/.+$, roles: PUBLIC_ACCESS, options: { frontend: true } }
+        - { path: ^, roles: IS_AUTHENTICATED, priority: -100 }
 
 nelmio_security:
     # prevents framing of the entire site

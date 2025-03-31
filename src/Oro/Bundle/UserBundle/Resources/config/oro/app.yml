@@ -50,8 +50,8 @@ security:
 
 oro_security:
     access_control:
-        - { path: ^%web_backend_prefix%/user/(login|reset-request|send-email|check-email)$, roles: PUBLIC_ACCESS }
-        - { path: ^%web_backend_prefix%/user/reset/*, roles: PUBLIC_ACCESS }
+        - { path: ^/user/(login|reset-request|send-email|check-email)$, roles: PUBLIC_ACCESS }
+        - { path: ^/user/reset/*, roles: PUBLIC_ACCESS }
 
 oro_user:
     privileges:
