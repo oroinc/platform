@@ -37,6 +37,7 @@ define(function(require) {
             branding: false,
             browser_spellcheck: true,
             highlight_on_focus: true,
+            convert_unsafe_embeds: true,
             file_picker_types: 'image',
             file_picker_callback: function(callback, value, meta) {
                 const input = document.createElement('input');
