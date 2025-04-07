@@ -1,5 +1,8 @@
 /* @theme: admin.oro; */
 
+@use 'sass:list';
+@use 'sass:map';
+
 /** Use: @include breakpoint('desktop') {
         content
     }
@@ -7,9 +10,9 @@
 @mixin breakpoint($type) {
     // $breakpoints - global variable;
 
-    @if (length($breakpoints) > 0) {
-        @if (map-has-key($breakpoints, $type) and map-get($breakpoints, $type)) {
-            @media #{map-get($breakpoints, $type)} {
+    @if (list.length($breakpoints) > 0) {
+        @if (map.has-key($breakpoints, $type) and map.get($breakpoints, $type)) {
+            @media #{map.get($breakpoints, $type)} {
                 @content;
             }
         } @else {
@@ -25,9 +28,9 @@
 @mixin container-query($type, $name: null) {
     // $breakpoints - global variable;
 
-    @if (length($breakpoints) > 0) {
-        @if (map-has-key($breakpoints, $type) and map-get($breakpoints, $type)) {
-            @container #{$name} #{map-get($breakpoints, $type)} {
+    @if (list.length($breakpoints) > 0) {
+        @if (map.has-key($breakpoints, $type) and map.get($breakpoints, $type)) {
+            @container #{$name} #{map.get($breakpoints, $type)} {
                 @content;
             }
         } @else {

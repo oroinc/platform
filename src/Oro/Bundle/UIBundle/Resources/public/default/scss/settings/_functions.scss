@@ -12,7 +12,7 @@
 @function get-color($palette, $keys...) {
     $color-key: map.get($color-palette, $palette, $keys...);
 
-    @if not $color-key or type-of($color-key) == 'map' or type-of($color-key) == 'list' {
+    @if not $color-key or meta.type-of($color-key) == 'map' or meta.type-of($color-key) == 'list' {
         @warn 'Color not found';
 
         @return null;
@@ -39,7 +39,7 @@
     Use: get-var-key('btn', 'primary', 'hover') => --btn-primary-hover;
 */
 @function get-var-key($list...) {
-    @if not $list or type-of($list) != 'arglist' or list.length($list) == 0 {
+    @if not $list or meta.type-of($list) != 'arglist' or list.length($list) == 0 {
         @return null;
     }
 
@@ -146,7 +146,7 @@
 @function map-merge-wo-null($map1, $map2) {
     $result: map.merge($map1, $map2);
 
-    @each $key in map-keys($result) {
+    @each $key in map.keys($result) {
         @if not map.get($result, $key) {
             $result: map.remove($result, $key);
         }

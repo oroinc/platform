@@ -88,7 +88,7 @@
 @function map-merge-wo-null($map1, $map2) {
     $result: map.merge($map1, $map2);
 
-    @each $key in map-keys($result) {
+    @each $key in map.keys($result) {
         @if not map.get($result, $key) {
             $result: map.remove($result, $key);
         }

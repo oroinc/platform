@@ -269,7 +269,7 @@ class ScriptHandler
         bool $verbose = false
     ): void {
         $logLevel = $verbose ? 'info' : 'error';
-        $npmInstallCmd = ['npm', 'install', '--no-audit', '--save-exact', '--no-optional', '--loglevel', $logLevel];
+        $npmInstallCmd = ['npm', 'install', '--no-audit', '--save-exact', '--loglevel', $logLevel];
 
         if (self::runProcess($inputOutput, $npmInstallCmd, $timeout) !== 0) {
             throw new \RuntimeException('Failed to generate package-lock.json');
