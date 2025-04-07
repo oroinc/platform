@@ -20,7 +20,7 @@ class TestTemplate extends Template
      */
     protected function doDisplay(array $context, array $blocks = array())
     {
-        echo 'test';
+        yield 'test';
     }
 
     /**
