@@ -1,14 +1,16 @@
 /* @theme: admin.oro; */
 
+@use 'sass:color';
+
 @mixin button-custom-variant(
     $background,
     $border,
     $color: color-yiq($background),
-    $hover-background: darken($background, 8%),
-    $hover-border: darken($border, 8%),
+    $hover-background: color.adjust($background, $lightness: -8%),
+    $hover-border: color.adjust($border, $lightness: -8%),
     $hover-color: color-yiq($hover-background),
-    $active-background: darken($background, 8%),
-    $active-border: darken($border, 8%),
+    $active-background: color.adjust($background, $lightness: -8%),
+    $active-border: color.adjust($border, $lightness: -8%),
     $active-color: color-yiq($active-background),
     $active-box-shadow: null,
     $focus-background: null,

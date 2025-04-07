@@ -97,11 +97,12 @@
             .info {
                 min-height: 12px;
 
-                // stylelint-disable-next-line selector-max-compound-selectors
+                /* stylelint-disable selector-max-compound-selectors */
                 .title,
                 .empty-subject {
                     cursor: pointer;
                 }
+                /* stylelint-enable selector-max-compound-selectors */
             }
 
             .description {
@@ -117,13 +118,14 @@
                 margin-top: 12px;
                 line-height: 1.15;
 
-                // stylelint-disable-next-line selector-max-compound-selectors
+                /* stylelint-disable selector-max-compound-selectors */
                 .reply-action,
                 .reply-all-action,
                 .forward-action {
                     display: none;
                     margin-left: 12px;
                 }
+                /* stylelint-enable selector-max-compound-selectors */
             }
 
             &.highlight {
@@ -172,12 +174,13 @@
     }
 }
 
-// stylelint-disable-next-line selector-max-compound-selectors
+/* stylelint-disable selector-max-compound-selectors */
 .default-reply-action .items li .footer .reply-action,
 .default-reply-all-action .items li .footer .reply-all-action,
 .default-forward-action .items li .footer .forward-action {
     display: inline;
 }
+/* stylelint-enable selector-max-compound-selectors */
 
 .widget-setup .recent-emails-setup {
     padding: 15px 15px 15px 20px;

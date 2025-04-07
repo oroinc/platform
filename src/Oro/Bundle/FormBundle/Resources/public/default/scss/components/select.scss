@@ -65,6 +65,7 @@
     }
 }
 
+// stylelint-disable-next-line  at-rule-no-vendor-prefix
 @-moz-document url-prefix('') {
     .select {
         height: $select-firefox-height;

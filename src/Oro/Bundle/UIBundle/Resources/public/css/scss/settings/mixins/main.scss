@@ -209,7 +209,7 @@
 // Ex. @include safe-area-offset(padding, 10px 15px);
 // Ex. @include safe-area-offset(margin, 10px 15px 20px);
 @mixin safe-area-offset($property, $values, $default: true) {
-    @if ($property and $values and length($values) <= 4) {
+    @if ($property and $values and list.length($values) <= 4) {
         $safe-area-offset-left: 0;
         $safe-area-offset-right: 0;
 
@@ -218,13 +218,13 @@
         }
 
         @if ($enable-safe-area) {
-            @if (length($values) == 1) {
+            @if (list.length($values) == 1) {
                 $safe-area-offset-left: list.nth($values, 1);
                 $safe-area-offset-right: list.nth($values, 1);
-            } @else if (length($values) == 2 or length($values) == 3) {
+            } @else if (list.length($values) == 2 or list.length($values) == 3) {
                 $safe-area-offset-left: list.nth($values, 2);
                 $safe-area-offset-right: list.nth($values, 2);
-            } @else if (length($values) == 4) {
+            } @else if (list.length($values) == 4) {
                 $safe-area-offset-left: list.nth($values, 4);
                 $safe-area-offset-right: list.nth($values, 2);
             }
@@ -232,7 +232,7 @@
             @include safe-area-property-left(#{$property}-left, $safe-area-offset-left, false);
             @include safe-area-property-right(#{$property}-right, $safe-area-offset-right, false);
         }
-    } @else if (length($values) > 4) {
+    } @else if (list.length($values) > 4) {
         @warn 'Incorrect arguments of mixin';
     }
 }
