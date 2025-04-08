@@ -79,18 +79,11 @@ trait PrimaryEmailTestTrait
             false
         );
 
-        $this->assertResponseValidationErrors(
+        $this->assertResponseValidationError(
             [
-                [
-                    'title'  => 'contains primary constraint',
-                    'detail' => 'One of the emails must be set as primary.',
-                    'source' => ['pointer' => '/data/attributes/emails']
-                ],
-                [
-                    'title'  => 'primary item constraint',
-                    'detail' => 'Unknown primary email address.',
-                    'source' => ['pointer' => '/data/attributes/primaryEmail']
-                ]
+                'title'  => 'primary item constraint',
+                'detail' => 'Unknown primary email address.',
+                'source' => ['pointer' => '/data/attributes/primaryEmail']
             ],
             $response
         );
@@ -370,18 +363,11 @@ trait PrimaryEmailTestTrait
             false
         );
 
-        $this->assertResponseValidationErrors(
+        $this->assertResponseValidationError(
             [
-                [
-                    'title'  => 'contains primary constraint',
-                    'detail' => 'One of the emails must be set as primary.',
-                    'source' => ['pointer' => '/data/attributes/emails']
-                ],
-                [
-                    'title'  => 'primary item constraint',
-                    'detail' => 'Unknown primary email address.',
-                    'source' => ['pointer' => '/data/attributes/primaryEmail']
-                ]
+                'title'  => 'primary item constraint',
+                'detail' => 'Unknown primary email address.',
+                'source' => ['pointer' => '/data/attributes/primaryEmail']
             ],
             $response
         );

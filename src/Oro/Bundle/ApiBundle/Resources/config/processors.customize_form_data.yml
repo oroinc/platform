@@ -10,4 +10,4 @@ services:
         arguments:
             - '@oro_api.form.unidirectional_association_handler'
         tags:
-            - { name: oro.api.processor, action: customize_form_data, event: post_submit }
+            - { name: oro.api.processor, action: customize_form_data, event: post_submit, priority: -10 }
