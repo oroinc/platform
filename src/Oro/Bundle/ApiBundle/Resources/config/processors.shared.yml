@@ -1178,6 +1178,7 @@ services:
             - '@oro_api.constraint_text_extractor'
             - '@oro_api.error_completer_registry'
             - '@oro_api.form_property_accessor'
+            - '@translator'
         tags:
             - { name: oro.api.processor, action: create, group: transform_data, priority: -100 }
             - { name: oro.api.processor, action: update, group: transform_data, priority: -100 }
@@ -1188,6 +1189,7 @@ services:
             - '@oro_api.constraint_text_extractor'
             - '@oro_api.error_completer_registry'
             - '@oro_api.form_property_accessor'
+            - '@translator'
         tags:
             - { name: oro.api.processor, action: delete_subresource, group: transform_data, priority: -100 }
             - { name: oro.api.processor, action: add_subresource, group: transform_data, priority: -100 }

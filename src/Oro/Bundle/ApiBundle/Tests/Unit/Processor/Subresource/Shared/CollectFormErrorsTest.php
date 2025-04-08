@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\Constraints;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class CollectFormErrorsTest extends ChangeRelationshipProcessorTestCase
 {
@@ -25,7 +26,8 @@ class CollectFormErrorsTest extends ChangeRelationshipProcessorTestCase
         $this->processor = new CollectFormErrors(
             new ConstraintTextExtractor(),
             $this->createMock(ErrorCompleterRegistry::class),
-            PropertyAccess::createPropertyAccessor()
+            PropertyAccess::createPropertyAccessor(),
+            $this->createMock(TranslatorInterface::class)
         );
     }
 
@@ -39,7 +41,7 @@ class CollectFormErrorsTest extends ChangeRelationshipProcessorTestCase
         return $error;
     }
 
-    public function testErrorPropertyPathShouldBeEmptyStringForToOneAssociationRelatedError()
+    public function testErrorPropertyPathShouldBeEmptyStringForToOneAssociationRelatedError(): void
     {
         $associationName = 'testAssociation';
 
@@ -61,7 +63,7 @@ class CollectFormErrorsTest extends ChangeRelationshipProcessorTestCase
         );
     }
 
-    public function testAssociationNameShouldBeRemovedFromErrorPropertyPathForToManyAssociationRelatedError()
+    public function testAssociationNameShouldBeRemovedFromErrorPropertyPathForToManyAssociationRelatedError(): void
     {
         $associationName = 'testAssociation';
 

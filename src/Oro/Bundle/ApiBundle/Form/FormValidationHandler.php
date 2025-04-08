@@ -69,6 +69,11 @@ class FormValidationHandler
         if ($this->isFullValidationEnabled($form)) {
             ReflectionUtil::markFormChildrenAsSubmitted($form, $this->propertyAccessor);
         }
+        if ($form->getErrors(true)->count() > 0) {
+            // Skip validation because "customize_form_data" processors already find some errors.
+            // This is done to prevent returning unneeded errors in the response.
+            return;
+        }
         $this->getValidationListener()->validateForm(new FormEvent($form, $form->getViewData()));
     }
 

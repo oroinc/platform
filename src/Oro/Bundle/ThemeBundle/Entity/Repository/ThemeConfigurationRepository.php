@@ -4,7 +4,6 @@ namespace Oro\Bundle\ThemeBundle\Entity\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\AbstractQuery;
 use Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 
@@ -22,8 +21,8 @@ class ThemeConfigurationRepository extends ServiceEntityRepository
             ->where('e.id = :id')
             ->setParameter('id', $themeConfigId, Types::INTEGER)
             ->getQuery()
-            ->getSingleResult(AbstractQuery::HYDRATE_ARRAY);
+            ->getArrayResult();
 
-        return $row[$fieldName] ?? null;
+        return $row[0][$fieldName] ?? null;
     }
 }

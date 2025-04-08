@@ -46,7 +46,7 @@ class ButtonsCollection implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @param callable $filter callable(ButtonInterface $button, ButtonProviderExtensionInterface $extension):bool
+     * @param callable $filter callable(ButtonInterface $button, ButtonProviderExtensionInterface $extension): bool
      * @return static
      */
     public function filter(callable $filter)
