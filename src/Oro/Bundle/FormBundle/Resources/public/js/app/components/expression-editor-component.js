@@ -83,11 +83,13 @@ const ExpressionEditorComponent = BaseComponent.extend({
                 type: 'selectField',
                 viewOptions: {
                     supportedNames: options.supportedNames,
+                    dataProviderConfig: options.dataProviderConfig,
                     dataSourceNames: _.keys(options.dataSource),
+                    itemLevelLimit: options.itemLevelLimit,
                     entityStructureDataProvider
                 }
             }]
-        }, _.pick(options, 'dataSource'));
+        }, _.pick(options, 'dataSource', 'dataProviderConfig'));
         this.view = new ExpressionEditorView(viewOptions);
     },
 

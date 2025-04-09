@@ -82,11 +82,15 @@ define(function(require) {
             this.trigger('change', selectedItem);
         },
 
-        render: function() {
-            this._deferredRender();
-            const providerOptions = {
+        getProviderConfig() {
+            return {
                 rootEntity: this.entity
             };
+        },
+
+        render: function() {
+            this._deferredRender();
+            const providerOptions = this.getProviderConfig();
             _.each(['filterPreset', 'exclude', 'include'], function(key) {
                 if (this[key]) {
                     providerOptions[key] = this[key];
@@ -232,6 +236,16 @@ define(function(require) {
         getFieldSignature: function(fieldId) {
             return this.dataProvider.getFieldSignatureSafely(fieldId);
         },
+
+        /**
+         *
+         * @param chain
+         * @returns {*}
+         */
+        getEntityFieldsFromChain(chain) {
+            return _.result(_.last(chain).entity, 'fields');
+        },
+
         /**
          *
          * @param {string} path
@@ -247,7 +261,7 @@ define(function(require) {
 
             try {
                 chain = this.dataProvider.pathToEntityChainExcludeTrailingField(path);
-                entityFields = _.result(_.last(chain).entity, 'fields');
+                entityFields = this.getEntityFieldsFromChain(chain);
             } catch (e) {
                 return results;
             }
