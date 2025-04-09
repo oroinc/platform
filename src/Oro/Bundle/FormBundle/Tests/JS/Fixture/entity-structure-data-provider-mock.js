@@ -17,6 +17,18 @@ const nodeProperties = {
         value: function() {
             return true;
         }
+    },
+    __children: {
+        get() {
+            return Object.fromEntries(Object.entries(this).filter(([name]) => {
+                return !name.startsWith('__');
+            }));
+        }
+    },
+    __hasChildren: {
+        get() {
+            return !!Object.keys(this).length;
+        }
     }
 };
 

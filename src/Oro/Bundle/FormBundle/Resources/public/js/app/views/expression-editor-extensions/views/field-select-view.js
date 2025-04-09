@@ -4,7 +4,10 @@ import FieldChoiceEntityChainView from './field-choice-entity-chain-view';
 import {updateState} from '../side-panel/default-operations';
 
 const FieldSelectView = BaseView.extend({
-    optionNames: ['rootEntityClassName', 'entityStructureDataProvider', 'supportedNames', 'dataSourceNames'],
+    optionNames: [
+        'rootEntityClassName', 'entityStructureDataProvider', 'supportedNames',
+        'dataSourceNames', 'dataProviderConfig', 'itemLevelLimit'
+    ],
 
     className: 'cm-field-select',
 
@@ -31,6 +34,8 @@ const FieldSelectView = BaseView.extend({
             entity: this.entityStructureDataProvider.rootEntityClassName,
             supportedNames: this.supportedNames,
             dataSourceNames: this.dataSourceNames,
+            dataProviderConfig: this.dataProviderConfig,
+            itemLevelLimit: this.itemLevelLimit,
             handler: this.handler.bind(this),
             select2: {
                 placeholder: __('oro.form.expression_editor.fields.select_placeholder'),

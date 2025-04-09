@@ -263,7 +263,15 @@ const ExpressionEditorUtil = BaseClass.extend({
      * @private
      */
     _getSupportedNames() {
-        const names = _.clone(this.options.supportedNames);
+        const entityTree = this.entityDataProvider.entityTree;
+        const names = this.options.supportedNames.filter(name => {
+            const entity = entityTree[name];
+            if (entity) {
+                return entity.__isEntity && entity.__hasChildren;
+            }
+            return false;
+        });
+
         const rootEntityName = this.entityDataProvider.rootEntity && this.entityDataProvider.rootEntity.get('alias');
         if (rootEntityName && names.indexOf(rootEntityName) === -1) {
             names.push(rootEntityName);
