@@ -13,6 +13,7 @@ const SidePanelButtonModel = BaseModel.extend({
         title: '',
         className: 'cm-btn',
         extraClassName: '',
+        operation: 'default',
         viewOptions: null,
         type: 'button'
     },
@@ -22,6 +23,18 @@ const SidePanelButtonModel = BaseModel.extend({
      */
     constructor: function SidePanelButtonModel(attrs, options) {
         SidePanelButtonModel.__super__.constructor.call(this, attrs, options);
+    },
+
+    isAllowed(allowedOperations) {
+        if (this.get('operation') === 'default') {
+            return true;
+        }
+
+        if (Array.isArray(this.get('operation'))) {
+            return this.get('operation').some(item => allowedOperations.includes(item));
+        }
+
+        return allowedOperations.includes(this.get('operation'));
     }
 });
 

@@ -60,7 +60,7 @@ define(function(require) {
         },
         __hasChildren: {
             get() {
-                return !!Object.values(this.__children).length;
+                return !!Object.keys(this).length;
             }
         }
     });

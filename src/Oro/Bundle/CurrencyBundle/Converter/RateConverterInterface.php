@@ -4,6 +4,9 @@ namespace Oro\Bundle\CurrencyBundle\Converter;
 
 use Oro\Bundle\CurrencyBundle\Entity\MultiCurrency;
 
+/**
+ * The representation of Currency converter
+ */
 interface RateConverterInterface
 {
     /**

@@ -6,6 +6,12 @@ import BaseCollectionView from 'oroui/js/app/views/base/collection-view';
 import template from 'tpl-loader!oroform/templates/expression-editor-extensions/buttons-list.html';
 
 const SidePanelButtonsCollectionView = BaseCollectionView.extend({
+    optionNames: BaseCollectionView.prototype.optionNames.concat(['applicableOperations', 'allowedOperations']),
+
+    applicableOperations: null,
+
+    allowedOperations: [],
+
     /**
      * @inheritdoc
      */
@@ -38,9 +44,12 @@ const SidePanelButtonsCollectionView = BaseCollectionView.extend({
      * @inheritdoc
      */
     filterer: function(item) {
-        return item.get('enabled');
+        return item.get('enabled') && item.isAllowed(this.allowedOperations);
     },
 
+    filterCallback(view, included) {
+        view.$el.toggleClass('hide', !included);
+    },
 
     initItemView(model) {
         const View = SidePanelButtonsCollectionView.getViewConstructorByType(model.get('type'));
