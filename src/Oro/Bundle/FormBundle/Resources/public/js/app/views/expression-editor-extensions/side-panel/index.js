@@ -1,7 +1,7 @@
 import ButtonsCollectionView from './buttons-collection-view';
 import defaultOperations from './default-operations';
 
-export default function(operationButtons = [], codeMirror) {
+export default function(operationButtons = [], util, codeMirror) {
     const operations = [
         ...defaultOperations,
         ...operationButtons
@@ -29,7 +29,10 @@ export default function(operationButtons = [], codeMirror) {
         return operations;
     }, []);
 
-    const buttonsCollectionView = new ButtonsCollectionView({operationButtons: operations});
+    const buttonsCollectionView = new ButtonsCollectionView({
+        operationButtons: operations,
+        allowedOperations: util.options.allowedOperations
+    });
 
     return {
         top: true,

@@ -52,7 +52,7 @@ export const editorExtensions = ({
                 return a - b;
             }
         }),
-        showPanel.of(sidePanel.bind(showPanel, operationButtons)),
+        showPanel.of(sidePanel.bind(showPanel, operationButtons, util)),
         EditorView.lineWrapping,
         EditorView.editorAttributes.of({
             'class': 'expression-editor'

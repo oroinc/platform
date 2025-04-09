@@ -24,6 +24,7 @@ export default [{
     title: __('oro.form.expression_editor.operators.detail.equal'),
     order: 10,
     enabled: true,
+    operation: 'equality',
     handler(cm) {
         cm.focus();
         updateState(cm, '==');
@@ -33,6 +34,7 @@ export default [{
     label: '>',
     order: 20,
     enabled: true,
+    operation: 'compare',
     title: __('oro.form.expression_editor.operators.detail.greater_than'),
     handler(cm) {
         cm.focus();
@@ -44,6 +46,7 @@ export default [{
     title: __('oro.form.expression_editor.operators.detail.greater_than_or_equal'),
     order: 30,
     enabled: true,
+    operation: 'compare',
     handler(cm) {
         cm.focus();
         updateState(cm, '>=');
@@ -54,6 +57,7 @@ export default [{
     order: 40,
     title: __('oro.form.expression_editor.operators.detail.not_equal'),
     enabled: true,
+    operation: 'equality',
     handler(cm) {
         cm.focus();
         updateState(cm, '!=');
@@ -64,6 +68,7 @@ export default [{
     title: __('oro.form.expression_editor.operators.detail.less_than'),
     order: 50,
     enabled: true,
+    operation: 'compare',
     handler(cm) {
         cm.focus();
         updateState(cm, '<');
@@ -74,6 +79,7 @@ export default [{
     title: __('oro.form.expression_editor.operators.detail.less_than_or_equal'),
     order: 60,
     enabled: true,
+    operation: 'compare',
     handler(cm) {
         cm.focus();
         updateState(cm, '<=');
@@ -84,6 +90,7 @@ export default [{
     title: __('oro.form.expression_editor.operators.detail.addition'),
     order: 70,
     enabled: true,
+    operation: 'math',
     handler(cm) {
         cm.focus();
         updateState(cm, '+');
@@ -94,6 +101,7 @@ export default [{
     title: __('oro.form.expression_editor.operators.detail.multiplication'),
     order: 80,
     enabled: true,
+    operation: 'math',
     handler(cm) {
         cm.focus();
         updateState(cm, '*');
@@ -104,6 +112,7 @@ export default [{
     title: __('oro.form.expression_editor.operators.detail.remainder'),
     order: 90,
     enabled: true,
+    operation: 'math',
     handler(cm) {
         cm.focus();
         updateState(cm, '%');
@@ -114,6 +123,7 @@ export default [{
     title: __('oro.form.expression_editor.operators.detail.subtraction'),
     order: 100,
     enabled: true,
+    operation: 'math',
     handler(cm) {
         cm.focus();
         updateState(cm, '-');
@@ -124,6 +134,7 @@ export default [{
     title: __('oro.form.expression_editor.operators.detail.division'),
     order: 110,
     enabled: true,
+    operation: 'math',
     handler(cm) {
         cm.focus();
         updateState(cm, '/');
@@ -134,6 +145,7 @@ export default [{
     title: __('oro.form.expression_editor.operators.detail.parentheses'),
     order: 120,
     enabled: true,
+    operation: ['inclusion', 'math', 'bool', 'compare'],
     handler(cm) {
         const {state} = cm;
         const selection = state.selection.ranges.at(0);
@@ -148,6 +160,7 @@ export default [{
     title: __('oro.form.expression_editor.operators.detail.in'),
     order: 130,
     enabled: true,
+    operation: 'inclusion',
     handler(cm) {
         cm.focus();
         updateState(cm, 'in');
@@ -158,6 +171,7 @@ export default [{
     title: __('oro.form.expression_editor.operators.detail.not_in'),
     order: 140,
     enabled: true,
+    operation: 'inclusion',
     handler(cm) {
         cm.focus();
         updateState(cm, 'not in');
@@ -168,6 +182,7 @@ export default [{
     title: __('oro.form.expression_editor.operators.detail.and'),
     order: 150,
     enabled: true,
+    operation: 'bool',
     handler(cm) {
         cm.focus();
         updateState(cm, 'and');
@@ -178,6 +193,7 @@ export default [{
     title: __('oro.form.expression_editor.operators.detail.or'),
     order: 160,
     enabled: true,
+    operation: 'bool',
     handler(cm) {
         cm.focus();
         updateState(cm, 'or');
@@ -188,6 +204,7 @@ export default [{
     title: __('oro.form.expression_editor.operators.detail.yes'),
     order: 170,
     enabled: true,
+    operation: 'bool',
     handler(cm) {
         cm.focus();
         updateState(cm, 'yes');
@@ -198,6 +215,7 @@ export default [{
     title: __('oro.form.expression_editor.operators.detail.no'),
     order: 180,
     enabled: true,
+    operation: 'bool',
     handler(cm) {
         cm.focus();
         updateState(cm, 'no');
@@ -209,6 +227,7 @@ export default [{
     extraClassName: 'cm-btn-half',
     order: 190,
     enabled: true,
+    operation: 'like',
     handler(cm) {
         cm.focus();
         updateState(cm, 'matches');
@@ -220,6 +239,7 @@ export default [{
     extraClassName: 'cm-btn-half',
     order: 200,
     enabled: true,
+    operation: 'like',
     handler(cm) {
         cm.focus();
         updateState(cm, 'does not match');
@@ -231,6 +251,7 @@ export default [{
     extraClassName: 'cm-btn-half',
     order: 210,
     enabled: true,
+    operation: 'like',
     handler(cm) {
         cm.focus();
         updateState(cm, 'is empty');
@@ -242,6 +263,7 @@ export default [{
     extraClassName: 'cm-btn-half',
     order: 220,
     enabled: true,
+    operation: 'like',
     handler(cm) {
         cm.focus();
         updateState(cm, 'is not empty');
@@ -253,6 +275,7 @@ export default [{
     extraClassName: 'cm-btn-full',
     order: 230,
     enabled: false,
+    operation: 'like',
     handler(cm) {
         cm.focus();
         updateState(cm, 'between');
@@ -264,6 +287,7 @@ export default [{
     extraClassName: 'cm-btn-full',
     order: 240,
     enabled: false,
+    operation: 'like',
     handler(cm) {
         cm.focus();
         updateState(cm, 'not between');

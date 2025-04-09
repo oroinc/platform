@@ -2,12 +2,33 @@ import __ from 'orotranslation/js/translator';
 import FieldChoiceView from 'oroentity/js/app/views/field-choice-view';
 
 const FieldChoiceEntityChainView = FieldChoiceView.extend({
-    optionNames: ['supportedNames', 'entityDataProvider', 'handler', 'dataSourceNames'],
+    optionNames: [
+        'supportedNames', 'entityDataProvider', 'handler',
+        'dataSourceNames', 'dataProviderConfig'
+    ],
 
     rootSelected: false,
 
+    /**
+     * Deep limit for entity chain
+     * @property {number}
+     */
+    itemLevelLimit: 3,
+
     constructor: function FieldChoiceEntityChainView(...args) {
         FieldChoiceEntityChainView.__super__.constructor.apply(this, args);
+    },
+
+    initialize(options) {
+        if (options.itemLevelLimit) {
+            this.itemLevelLimit = options.itemLevelLimit;
+        }
+
+        FieldChoiceEntityChainView.__super__.initialize.call(this, options);
+    },
+
+    getProviderConfig() {
+        return this.dataProviderConfig;
     },
 
     onChange(event) {
@@ -49,6 +70,23 @@ const FieldChoiceEntityChainView = FieldChoiceView.extend({
         return !!this.supportedNames?.length;
     },
 
+    /**
+     * Omit unnecessary field according autocomplete conditions
+     * @param {Object[]} chain
+     * @returns {Object[]}
+     */
+    getEntityFieldsFromChain(chain) {
+        const entityTree = this.entityDataProvider.entityTree;
+        const entityData = chain[chain.length - 1].entity;
+        const omitRelationFields = this.itemLevelLimit <= chain.length + 1;
+        const fields = FieldChoiceEntityChainView.__super__.getEntityFieldsFromChain.call(this, chain);
+        return fields.filter(field => {
+            const node = entityTree[entityData.alias][field.name];
+            return !node.__isEntity ||
+                (!omitRelationFields && node.__hasScalarFieldsInSubtree(this.itemLevelLimit - chain.length - 1));
+        });
+    },
+
     _select2Data(path) {
         if (this.isMultiplyEntity()) {
             if (!this.entity && path) {
@@ -67,9 +105,10 @@ const FieldChoiceEntityChainView = FieldChoiceView.extend({
 
                         return {
                             pagePath: fields.__entity.className.replace(/[\\]+/g, '\\'),
-                            text: fields.__entity.label
+                            text: fields.__entity.label,
+                            hasChildren: fields.__isEntity && fields.__hasChildren
                         };
-                    })
+                    }).filter(({hasChildren}) => hasChildren)
                 }];
             }
         }

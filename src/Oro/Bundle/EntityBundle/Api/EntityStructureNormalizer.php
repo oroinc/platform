@@ -7,7 +7,6 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\EntityBundle\Model\EntityFieldStructure;
 use Oro\Bundle\EntityBundle\Model\EntityStructure;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
@@ -15,13 +14,9 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
  */
 class EntityStructureNormalizer
 {
-    private ValueNormalizer $valueNormalizer;
-    private ConfigManager $configManager;
-
-    public function __construct(ValueNormalizer $valueNormalizer, ConfigManager $configManager)
-    {
-        $this->valueNormalizer = $valueNormalizer;
-        $this->configManager = $configManager;
+    public function __construct(
+        private ValueNormalizer $valueNormalizer
+    ) {
     }
 
     public function normalize(EntityStructure $entity, RequestType $requestType): array
