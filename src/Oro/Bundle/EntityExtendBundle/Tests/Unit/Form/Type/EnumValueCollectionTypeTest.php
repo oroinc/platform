@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueCollectionType;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
@@ -47,8 +46,6 @@ class EnumValueCollectionTypeTest extends TypeTestCase
         array $options,
         array $expectedOptions
     ) {
-        $enumOptionClassName = $enumCode ? EnumOption::class : null;
-
         $this->typeHelper->expects($this->any())
             ->method('getEnumCode')
             ->with(
@@ -59,8 +56,8 @@ class EnumValueCollectionTypeTest extends TypeTestCase
         $this->typeHelper->expects($this->any())
             ->method('isImmutable')
             ->willReturnMap([
-                ['enum', $enumOptionClassName, 'testField', 'add', $isImmutableAdd],
-                ['enum', $enumOptionClassName, 'testField', 'delete', $isImmutableDelete],
+                ['enum', $configId->getClassName(), 'testField', 'add', $isImmutableAdd],
+                ['enum', $configId->getClassName(), 'testField', 'delete', $isImmutableDelete],
             ]);
 
         $resolver = $this->getOptionsResolver();
