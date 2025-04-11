@@ -66,3 +66,19 @@ services:
       - '@fob_symfony.kernel'
     tags:
       - { name: 'oro_behat.isolator', priority: 200 }
+
+  oro_behat_extension.isolation.unix_file_cache_isolator:
+    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\UnixFileCacheIsolator'
+    arguments:
+      - '@fob_symfony.kernel'
+      -   - 'oro_data'
+    tags:
+      - { name: 'oro_behat.isolator', priority: 100 }
+
+  oro_behat_extension.isolation.windows_file_cache_isolator:
+    class: 'Oro\Bundle\TestFrameworkBundle\Behat\Isolation\WindowsFileCacheIsolator'
+    arguments:
+      - '@fob_symfony.kernel'
+      -   - 'oro_data'
+    tags:
+      - { name: 'oro_behat.isolator', priority: 100 }
