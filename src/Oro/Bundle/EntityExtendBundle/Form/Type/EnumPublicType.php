@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
-use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -89,7 +88,7 @@ class EnumPublicType extends AbstractType
                 // a new field reuses public enum
                 return true;
             }
-            if ($this->typeHelper->isImmutable('enum', EnumOption::class, null, 'public')) {
+            if ($this->typeHelper->isImmutable('enum', $className, $fieldName, 'public')) {
                 // is immutable
                 return true;
             }
