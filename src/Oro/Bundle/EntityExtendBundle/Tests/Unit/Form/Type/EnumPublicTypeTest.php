@@ -4,7 +4,6 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumPublicType;
 use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -46,7 +45,6 @@ class EnumPublicTypeTest extends TypeTestCase
         array $expectedOptions
     ) {
         $fieldName = $configId instanceof FieldConfigId ? $configId->getFieldName() : null;
-        $enumOptionClassName = $enumCode ? EnumOption::class : null;
 
         $this->typeHelper->expects($this->any())
             ->method('getEnumCode')
@@ -58,7 +56,7 @@ class EnumPublicTypeTest extends TypeTestCase
             ->willReturn($isSystem);
         $this->typeHelper->expects($this->any())
             ->method('isImmutable')
-            ->with('enum', $enumOptionClassName, null, 'public')
+            ->with('enum', $configId->getClassName(), $fieldName, 'public')
             ->willReturn($isImmutablePublic);
         $this->typeHelper->expects($this->any())
             ->method('hasOtherReferences')

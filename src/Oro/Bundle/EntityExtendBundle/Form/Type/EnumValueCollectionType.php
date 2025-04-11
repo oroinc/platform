@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
-use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FormBundle\Form\Type\CollectionType;
@@ -123,7 +122,7 @@ class EnumValueCollectionType extends AbstractType
                 return true;
             }
             if ($constraintName) {
-                if ($this->typeHelper->isImmutable('enum', EnumOption::class, $fieldName, $constraintName)) {
+                if ($this->typeHelper->isImmutable('enum', $className, $fieldName, $constraintName)) {
                     // is immutable
                     return true;
                 }
