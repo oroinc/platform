@@ -186,6 +186,15 @@ services:
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: date_grouping }
 
+    oro_filter.entity_date_grouping_filter:
+        class: Oro\Bundle\FilterBundle\Filter\EntityDateGroupingFilter
+        public: true
+        arguments:
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: entity_date_grouping }
+
     oro_filter.skip_empty_periods_filter:
         class: Oro\Bundle\FilterBundle\Filter\SkipEmptyPeriodsFilter
         public: false
