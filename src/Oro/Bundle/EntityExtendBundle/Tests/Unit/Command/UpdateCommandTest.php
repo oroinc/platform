@@ -82,7 +82,7 @@ class UpdateCommandTest extends \PHPUnit\Framework\TestCase
         $commandTester = $this->doExecuteCommand($this->command, ['--dry-run' => true]);
 
         $this->assertSuccessReturnCode($commandTester);
-        $this->assertOutputContains($commandTester, 'There are no any changes.');
+        $this->assertOutputContains($commandTester, 'There are no changes that require the database schema update.');
     }
 
     public function testExecuteWithDryRunAndHaveChanges()

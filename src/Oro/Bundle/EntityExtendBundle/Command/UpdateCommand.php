@@ -78,7 +78,7 @@ HELP
     {
         $changes = $this->getChanges();
         if (!$changes) {
-            $io->success('There are no any changes.');
+            $io->success('There are no changes that require the database schema update.');
 
             return;
         }
