@@ -87,6 +87,11 @@ trusted_data:
                 fieldName: true
             getExpressionForPostgreSql:
                 fieldName: true
+        Oro\Bundle\FilterBundle\Filter\EntityDateGroupingFilter:
+            applyFilter:
+                selectAndGroupByColumns: true
+            buildSelect:
+                selectExpr: true
     safe_static_methods:
         Oro\Bundle\FilterBundle\Filter\FilterOrmQueryUtil:
             getSelectFieldFromGroupBy: true
