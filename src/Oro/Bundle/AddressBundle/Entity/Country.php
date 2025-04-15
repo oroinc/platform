@@ -52,6 +52,9 @@ class Country implements Translatable, ExtendEntityInterface
     #[ORM\OneToMany(mappedBy: 'country', targetEntity: Region::class, cascade: ['ALL'], fetch: 'EXTRA_LAZY')]
     protected ?Collection $regions = null;
 
+    #[ORM\Column(name: 'deleted', type: Types::BOOLEAN, options: ['default' => false])]
+    protected bool $deleted = false;
+
     #[Gedmo\Locale]
     protected ?string $locale = null;
 
@@ -176,6 +179,29 @@ class Country implements Translatable, ExtendEntityInterface
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Set country deleted status
+     *
+     * @param  bool $deleted
+     * @return Country
+     */
+    public function setDeleted(bool $deleted): self
+    {
+        $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    /**
+     * Get country deleted status
+     *
+     * @return bool
+     */
+    public function isDeleted(): bool
+    {
+        return $this->deleted;
     }
 
     /**

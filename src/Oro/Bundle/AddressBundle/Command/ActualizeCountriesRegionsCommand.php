@@ -176,9 +176,14 @@ HELP
             throw new RuntimeException($exception->getMessage());
         }
 
-        $externalCountries = array_column($externalCountries, 'name', 'alpha_2');
+        $countries = [];
+        foreach ($externalCountries as $externalCountry) {
+            $name = $externalCountry['common_name'] ?? $externalCountry['name'] ?? $externalCountry['official_name'];
+            $countries[$externalCountry['alpha_2']] = $name;
+        }
+
         $countriesRegionsTranslation['country'] = $this->updateTranslationsBySelectedOption(
-            $externalCountries,
+            $countries,
             $countriesRegionsTranslation['country'],
             $selectedOption
         );

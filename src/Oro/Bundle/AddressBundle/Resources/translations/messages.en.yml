@@ -91,6 +91,9 @@ oro:
             country_name.label:      Country name
             country_iso2_code.label: Country ISO2 code
             country_iso3_code.label: Country ISO3 code
+            deleted:
+                label:               Deleted
+                description:         Status of region
 
             label:           State
             description:     The region specified in the address record.
@@ -116,6 +119,9 @@ oro:
                 description:      A two letter ISO country code.
             label:                Country
             description:          The country specified in the address record.
+            deleted:
+                label:            Deleted
+                description:      Status of country
 
         addresstype:
             entity_label:         Address Type
