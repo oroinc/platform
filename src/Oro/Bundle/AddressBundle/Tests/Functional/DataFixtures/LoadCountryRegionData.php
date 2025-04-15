@@ -11,11 +11,13 @@ use Oro\Bundle\AddressBundle\Entity\Region;
 class LoadCountryRegionData extends AbstractFixture implements DependentFixtureInterface
 {
     const REGION_US_FL = 'region.usfl';
+    const REGION_US_XX = 'region.usxx';
 
     /** @var array */
     protected $data = [
         LoadRegionData::REGION_US_NY => LoadCountryData::COUNTRY_USA,
         self::REGION_US_FL => LoadCountryData::COUNTRY_USA,
+        self::REGION_US_XX => LoadCountryData::COUNTRY_USA,
     ];
 
     /** @var array */
@@ -24,6 +26,13 @@ class LoadCountryRegionData extends AbstractFixture implements DependentFixtureI
             'combinedCode' => 'US-FL',
             'code' => 'US',
             'name' => 'Florida',
+        ],
+        self::REGION_US_XX => [
+            'combinedCode' => 'US-XXXXXXXXXXXXX',
+            'code' => 'US',
+            'country' => 'US',
+            'name' => 'XXX',
+            'deleted' => true
         ],
     ];
 
@@ -71,6 +80,7 @@ class LoadCountryRegionData extends AbstractFixture implements DependentFixtureI
                 $region = new Region($data['combinedCode']);
                 $region->setCode($data['code']);
                 $region->setName($data['name']);
+                $region->setDeleted($data['deleted']);
             }
 
             $this->setReference($regionReference, $region);

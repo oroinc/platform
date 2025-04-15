@@ -1,0 +1,26 @@
+YY:
+  iso2Code: YY
+  iso3Code: YYY
+  regions: {
+    YY-YY: {
+      combinedCode: YY-YY,
+      code: 'YY'
+    },
+    YY-01: {
+      combinedCode: YY-01,
+      code: '01'
+    },
+  }
+QQ:
+  iso2Code: QQ
+  iso3Code: QQQ
+AA:
+  iso2Code: AA
+  iso3Code: AAA
+  regions: {
+    AA-AA:
+      {
+        combinedCode: AA-AA,
+        code: AA
+      }
+  }

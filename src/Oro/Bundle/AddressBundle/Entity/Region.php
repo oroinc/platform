@@ -38,6 +38,9 @@ class Region implements Translatable
     #[Gedmo\Translatable]
     protected ?string $name = null;
 
+    #[ORM\Column(name: 'deleted', type: Types::BOOLEAN, options: ['default' => false])]
+    protected bool $deleted = false;
+
     #[Gedmo\Locale]
     protected ?string $locale = null;
 
@@ -147,6 +150,18 @@ class Region implements Translatable
     public function getName()
     {
         return $this->name;
+    }
+
+    public function setDeleted(bool $deleted): self
+    {
+        $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function isDeleted(): bool
+    {
+        return $this->deleted;
     }
 
     /**
