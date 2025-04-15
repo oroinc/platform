@@ -110,7 +110,7 @@ class LoadCountryData extends AbstractTranslatableEntityFixture implements
      */
     protected function getCountry($locale, array $countryData)
     {
-        if (empty($countryData['iso2Code']) || empty($countryData['iso3Code'])) {
+        if ($countryData['iso2Code'] === '' || $countryData['iso3Code'] === '') {
             return null;
         }
 
@@ -137,7 +137,7 @@ class LoadCountryData extends AbstractTranslatableEntityFixture implements
      */
     protected function getRegion($locale, Country $country, array $regionData)
     {
-        if (empty($regionData['combinedCode']) || empty($regionData['code'])) {
+        if ($regionData['combinedCode'] === '' || $regionData['code'] === '') {
             return null;
         }
 

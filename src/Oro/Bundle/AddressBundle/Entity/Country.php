@@ -83,6 +83,14 @@ class Country implements Translatable, ExtendEntityInterface
     protected $locale;
 
     /**
+     * @var bool
+     *
+     * @ORM\Column(name="deleted", type="boolean", options={"default"=false})
+     */
+    protected $deleted = false;
+
+
+    /**
      * @param string $iso2Code ISO2 country code
      */
     public function __construct($iso2Code)
@@ -234,5 +242,17 @@ class Country implements Translatable, ExtendEntityInterface
     public function __toString()
     {
         return (string) $this->getName();
+    }
+
+    public function setDeleted(bool $deleted): self
+    {
+        $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function isDeleted(): bool
+    {
+        return $this->deleted;
     }
 }

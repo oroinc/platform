@@ -75,6 +75,13 @@ class Region implements Translatable
     protected $locale;
 
     /**
+     * @var bool
+     *
+     * @ORM\Column(name="deleted", type="boolean", options={"default"=false})
+     */
+    protected $deleted = false;
+
+    /**
      * @param string $combinedCode
      */
     public function __construct($combinedCode)
@@ -180,6 +187,18 @@ class Region implements Translatable
     public function getName()
     {
         return $this->name;
+    }
+
+    public function setDeleted(bool $deleted): self
+    {
+        $this->deleted = $deleted;
+
+        return $this;
+    }
+
+    public function isDeleted(): bool
+    {
+        return $this->deleted;
     }
 
     /**

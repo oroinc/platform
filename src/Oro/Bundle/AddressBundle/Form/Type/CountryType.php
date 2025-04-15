@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AddressBundle\Form\Type;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\TranslationBundle\Form\Type\Select2TranslatableEntityType;
 use Symfony\Component\Form\AbstractType;
@@ -23,8 +24,12 @@ class CountryType extends AbstractType
                 'class' => 'OroAddressBundle:Country',
                 'random_id' => true,
                 'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('c')
-                        ->orderBy('c.name', 'ASC');
+                    $qb = $er->createQueryBuilder('c');
+
+                    return $qb
+                        ->where($qb->expr()->eq('c.deleted', ':deleted'))
+                        ->orderBy('c.name', 'ASC')
+                        ->setParameter('deleted', false, Types::BOOLEAN);
                 },
                 'choice_label' => 'name',
                 'configs' => array(
