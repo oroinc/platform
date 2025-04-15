@@ -4,3 +4,12 @@ trusted_data:
         Oro\Bundle\AddressBundle\Entity\Repository\AddressTypeRepository:
             getBatchIterator:
                 fieldName: true
+        Oro\Bundle\AddressBundle\Command\UpdateCountriesRegionsCommand:
+            addTranslationKeys:
+                valuesWithId: true
+            updateExistedCountryTranslation:
+                translationKeySubQuerySql: true
+                languageSubQuerySql: true
+            updateExistedRegionTranslation:
+                translationKeySubQuerySql: true
+                languageSubQuerySql: true

@@ -11,7 +11,7 @@ class OroAddressBundleInstaller implements Installation
     #[\Override]
     public function getMigrationVersion(): string
     {
-        return 'v1_6';
+        return 'v1_6_1';
     }
 
     #[\Override]
@@ -96,6 +96,7 @@ class OroAddressBundleInstaller implements Installation
         $table->addColumn('iso2_code', 'string', ['length' => 2]);
         $table->addColumn('iso3_code', 'string', ['length' => 3]);
         $table->addColumn('name', 'string', ['length' => 255]);
+        $table->addColumn('deleted', 'boolean', ['default' => false]);
         $table->setPrimaryKey(['iso2_code']);
         $table->addIndex(['name'], 'country_name_idx');
     }
@@ -126,6 +127,7 @@ class OroAddressBundleInstaller implements Installation
         $table->addColumn('country_code', 'string', ['notnull' => false, 'length' => 2]);
         $table->addColumn('code', 'string', ['length' => 32]);
         $table->addColumn('name', 'string', ['length' => 255]);
+        $table->addColumn('deleted', 'boolean', ['default' => false]);
         $table->setPrimaryKey(['combined_code']);
         $table->addIndex(['country_code'], 'IDX_8C71325AF026BB7C');
         $table->addIndex(['name'], 'region_name_idx');
