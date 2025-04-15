@@ -55,7 +55,7 @@ class LoadCountryData extends AbstractTranslatableEntityFixture implements Versi
 
     private function getCountry(EntityRepository $countryRepository, string $locale, array $countryData): ?Country
     {
-        if (empty($countryData['iso2Code']) || empty($countryData['iso3Code'])) {
+        if ($countryData['iso2Code'] === '' || $countryData['iso3Code'] === '') {
             return null;
         }
 
@@ -78,7 +78,7 @@ class LoadCountryData extends AbstractTranslatableEntityFixture implements Versi
         Country $country,
         array $regionData
     ): ?Region {
-        if (empty($regionData['combinedCode']) || empty($regionData['code'])) {
+        if ($regionData['combinedCode'] === '' || $regionData['code'] === '') {
             return null;
         }
 

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AddressBundle\Entity\Repository;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
@@ -19,10 +20,14 @@ class RegionRepository extends EntityRepository
 
     public function getCountryRegionsQueryBuilder(Country $country): QueryBuilder
     {
-        return $this->createQueryBuilder('r')
-            ->where('r.country = :country')
+        $qb = $this->createQueryBuilder('r');
+
+        return $qb
+            ->where($qb->expr()->eq('r.country', ':country'))
+            ->andWhere($qb->expr()->eq('r.deleted', ':deleted'))
             ->orderBy('r.name', 'ASC')
-            ->setParameter('country', $country);
+            ->setParameter('country', $country)
+            ->setParameter('deleted', false, Types::BOOLEAN);
     }
 
     /**
