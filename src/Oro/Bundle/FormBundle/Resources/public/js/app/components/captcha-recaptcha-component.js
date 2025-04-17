@@ -15,24 +15,29 @@ const CaptchaReCaptchaComponent = BaseComponent.extend({
             .done(this.initializeView.bind(this, options));
     },
 
-    initializeView(options) {
-        window.grecaptcha.ready(function() {
-            options._sourceElement.data('captcha-received', false);
-            const $form = $(options._sourceElement).closest('form');
-            $form.on('submit', function(e) {
-                if (options._sourceElement.data('captcha-received')) {
-                    return;
-                }
+    initializeView: function(options) {
+        window.grecaptcha.ready(this.onRecaptchaReady.bind(this, options));
+    },
 
-                e.preventDefault();
-                window.grecaptcha
-                    .execute(options.site_key, {action: options.action})
-                    .then(function(token) {
-                        options._sourceElement.data('captcha-received', true);
-                        options._sourceElement.val(token);
-                        $form.trigger('submit');
-                    });
-            });
+    onRecaptchaReady: function(options) {
+        options._sourceElement.data('captcha-received', false);
+        const $form = $(options._sourceElement).closest('form');
+        $form.bindFirst('submit', function(e) {
+            if (options._sourceElement.data('captcha-received')) {
+                options._sourceElement.data('captcha-received', false);
+
+                return;
+            }
+
+            e.preventDefault();
+            e.stopPropagation();
+            window.grecaptcha
+                .execute(options.site_key, {action: options.action})
+                .then(function(token) {
+                    options._sourceElement.data('captcha-received', true);
+                    options._sourceElement.val(token);
+                    $form.trigger('submit');
+                });
         });
     }
 });
