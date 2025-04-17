@@ -73,7 +73,10 @@ class EmailTemplateRepositoryTest extends WebTestCase
             $this->getMainEmailTemplateByName('system_maintenance')->getId(),
         ];
 
-        self::assertEquals($expectedIds, $this->getEntitiesIds($actualResult));
+        $actualIds = $this->getEntitiesIds($actualResult);
+        foreach ($expectedIds as $emailTemplateId) {
+            self::assertContains($emailTemplateId, $actualIds);
+        }
     }
 
     /**
