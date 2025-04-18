@@ -96,7 +96,7 @@ class ParameterBinder
             $config = $this->parseArrayParameterConfig($index, $value);
 
             $value = $this->getParameterValue($datagridParameters, $config);
-            $type = isset($config['type']) ? $config['type'] : null;
+            $type = $config['type'] ?? null;
 
             $this->addOrReplaceParameter($queryParameters, new Parameter($config['name'], $value, $type));
         }

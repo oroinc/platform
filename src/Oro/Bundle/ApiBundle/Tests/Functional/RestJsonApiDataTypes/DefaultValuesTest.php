@@ -91,16 +91,12 @@ class DefaultValuesTest extends DefaultAndNullTestCase
 
         $result = self::jsonToArray($response->getContent());
         self::assertNull($result['data']['attributes']['withDefaultValueString']);
-        self::assertFalse($result['data']['attributes']['withDefaultValueBoolean']);
+        self::assertNull($result['data']['attributes']['withDefaultValueBoolean']);
         self::assertNull($result['data']['attributes']['withDefaultValueInteger']);
 
         $entity = $this->loadTestEntity((int)$result['data']['id']);
         self::assertNull($entity->withDefaultValueString);
-        // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
-        // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
-        if (!$this->isPostgreSql()) {
-            self::assertNull($entity->withDefaultValueBoolean);
-        }
+        self::assertNull($entity->withDefaultValueBoolean);
         self::assertNull($entity->withDefaultValueInteger);
     }
 

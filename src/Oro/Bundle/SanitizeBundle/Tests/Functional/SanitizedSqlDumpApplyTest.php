@@ -90,7 +90,13 @@ class SanitizedSqlDumpApplyTest extends WebTestCase
         $this->runCommand('oro:sanitize:dump-sql', [$this->outputFile], true);
         $sanitizeSql = file_get_contents($this->outputFile);
 
-        $this->connection->executeQuery($sanitizeSql);
+        foreach (explode(PHP_EOL, $sanitizeSql) as $singleSql) {
+            $singleSql = trim($singleSql);
+            if (!$singleSql || str_starts_with($singleSql, '--')) {
+                continue;
+            }
+            $this->connection->executeQuery($singleSql);
+        }
         $sql = 'SELECT * FROM test_sanitizable_entity LIMIT 1';
         $data = $this->connection->fetchAssoc($sql);
         $serializedData = json_decode($data['serialized_data'], true);

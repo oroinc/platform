@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\EventListener;
 
+use Doctrine\DBAL\Connection;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\BindParametersInterface;
@@ -97,6 +98,7 @@ class RowSelectionListener
 
         $config->offsetSetByPath(self::REQUIRED_MODULES_KEY, $jsModules);
         $defaultParameter = $this->getDefaultParameter($config);
+        $type = $defaultParameter === [0] ? Connection::PARAM_INT_ARRAY : Connection::PARAM_STR_ARRAY;
 
         // bind parameters for selection
         $datasource->bindParameters(
@@ -104,12 +106,14 @@ class RowSelectionListener
                 'data_in' => [
                     'name' => self::GRID_PARAM_DATA_IN,
                     'path' => ParameterBag::ADDITIONAL_PARAMETERS . '.' . self::GRID_PARAM_DATA_IN,
-                    'default' => $defaultParameter
+                    'default' => $defaultParameter,
+                    'type' => $type
                 ],
                 'data_not_in' => [
                     'name' => self::GRID_PARAM_DATA_NOT_IN,
                     'path' => ParameterBag::ADDITIONAL_PARAMETERS . '.' . self::GRID_PARAM_DATA_NOT_IN,
-                    'default' => $defaultParameter
+                    'default' => $defaultParameter,
+                    'type' => $type
                 ],
             ]
         );

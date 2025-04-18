@@ -52,6 +52,19 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
             ->method('find')
             ->with($entityClass, $entityId)
             ->willReturn($entity);
+        $classMetadata = $this->createMock(ClassMetadata::class);
+        $classMetadata->expects(self::once())
+            ->method('getSingleIdentifierFieldName')
+            ->willReturn('id');
+        $fieldMapping = ['type' => 'integer'];
+        $classMetadata->expects(self::once())
+            ->method('getFieldMapping')
+            ->with('id')
+            ->willReturn($fieldMapping);
+        $em->expects(self::once())
+            ->method('getClassMetadata')
+            ->with($entityClass)
+            ->willReturn($classMetadata);
 
         $this->queryHintResolver->expects(self::never())
             ->method('resolveHints');
@@ -78,6 +91,20 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
             ->with($entityClass, $entityId)
             ->willReturn(null);
 
+        $classMetadata = $this->createMock(ClassMetadata::class);
+        $classMetadata->expects(self::once())
+            ->method('getSingleIdentifierFieldName')
+            ->willReturn('id');
+        $fieldMapping = ['type' => 'integer'];
+        $classMetadata->expects(self::once())
+            ->method('getFieldMapping')
+            ->with('id')
+            ->willReturn($fieldMapping);
+        $em->expects(self::once())
+            ->method('getClassMetadata')
+            ->with($entityClass)
+            ->willReturn($classMetadata);
+
         $this->queryHintResolver->expects(self::never())
             ->method('resolveHints');
 
@@ -100,6 +127,14 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
         $classMetadata->expects(self::once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
+        $classMetadata->expects(self::once())
+            ->method('getSingleIdentifierFieldName')
+            ->willReturn('id');
+        $fieldMapping = ['type' => 'integer'];
+        $classMetadata->expects(self::once())
+            ->method('getFieldMapping')
+            ->with('id')
+            ->willReturn($fieldMapping);
 
         $em = $this->createMock(EntityManagerInterface::class);
 
@@ -139,6 +174,14 @@ class EntityLoaderTest extends \PHPUnit\Framework\TestCase
         $classMetadata->expects(self::once())
             ->method('getIdentifierFieldNames')
             ->willReturn(['id']);
+        $classMetadata->expects(self::once())
+            ->method('getSingleIdentifierFieldName')
+            ->willReturn('id');
+        $fieldMapping = ['type' => 'integer'];
+        $classMetadata->expects(self::once())
+            ->method('getFieldMapping')
+            ->with('id')
+            ->willReturn($fieldMapping);
 
         $em = $this->createMock(EntityManagerInterface::class);
 
