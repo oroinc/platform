@@ -97,7 +97,7 @@ class AttributeFamily implements
      * @var bool|null
      */
     #[ORM\Column(name: 'is_enabled', type: Types::BOOLEAN, length: 255)]
-    private $isEnabled;
+    private $isEnabled = true;
 
     #[ORM\ManyToOne(targetEntity: Organization::class)]
     #[ORM\JoinColumn(name: 'organization_id', referencedColumnName: 'id', onDelete: 'SET NULL')]

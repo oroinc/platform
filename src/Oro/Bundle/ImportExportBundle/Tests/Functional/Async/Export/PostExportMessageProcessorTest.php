@@ -32,7 +32,7 @@ class PostExportMessageProcessorTest extends WebTestCase
         $message = new Message();
         $message->setMessageId('abc');
         $message->setBody([
-            'jobId' => PHP_INT_MAX,
+            'jobId' => self::BIGINT,
         ]);
 
         $processor = self::getContainer()->get('oro_importexport.async.post_export');

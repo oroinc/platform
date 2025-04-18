@@ -41,8 +41,8 @@ class TransitionTriggerProcessorTest extends WebTestCase
     public function testProcessWhenNoTrigger(): void
     {
         $sentMessage = self::sendMessage(WorkflowTransitionEventTriggerTopic::getName(), [
-            TransitionTriggerMessage::TRANSITION_TRIGGER => PHP_INT_MAX,
-            TransitionTriggerMessage::MAIN_ENTITY => PHP_INT_MAX,
+            TransitionTriggerMessage::TRANSITION_TRIGGER => self::BIGINT,
+            TransitionTriggerMessage::MAIN_ENTITY => self::BIGINT,
         ]);
 
         self::consume();
@@ -52,7 +52,7 @@ class TransitionTriggerProcessorTest extends WebTestCase
 
         self::assertTrue(
             self::getLoggerTestHandler()->hasErrorThatContains(
-                'Transition trigger #' . PHP_INT_MAX . ' is not found'
+                'Transition trigger #' . self::BIGINT . ' is not found'
             )
         );
     }

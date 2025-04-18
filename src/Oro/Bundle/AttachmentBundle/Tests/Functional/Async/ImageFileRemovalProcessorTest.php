@@ -29,7 +29,7 @@ class ImageFileRemovalProcessorTest extends WebTestCase
             [
                 'images' => [
                     [
-                        'id' => PHP_INT_MAX,
+                        'id' => self::BIGINT,
                         'fileName' => 'test1',
                         'originalFileName' => 'test1',
                         'parentEntityClass' => \stdClass::class,

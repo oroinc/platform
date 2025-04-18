@@ -41,13 +41,22 @@ class EntityLoader
         /** @var EntityManagerInterface $em */
         $em = $this->doctrineHelper->getEntityManagerForClass($entityClass);
 
+        $classMetadata = $em->getClassMetadata($entityClass);
         if (null === $metadata) {
+            if (!$this->isValidIdentifier($entityId, $classMetadata)) {
+                return null;
+            }
+
             return $em->find($entityClass, $entityId);
         }
 
         $hints = $metadata->getHints();
         $criteria = $this->buildFindCriteria($entityId, $metadata);
-        if (!$hints && $this->isEntityIdentifierEqualToPrimaryKey($criteria, $em->getClassMetadata($entityClass))) {
+        if (!$hints && $this->isEntityIdentifierEqualToPrimaryKey($criteria, $classMetadata)) {
+            // Do not search in DB when identifier is passed with incompatible type (f.e. temporary relation identifier)
+            if (!$this->isValidIdentifier($entityId, $classMetadata)) {
+                return null;
+            }
             if (\is_array($entityId)) {
                 $entityId = $criteria;
             }
@@ -67,6 +76,18 @@ class EntityLoader
         }
 
         return $query->getOneOrNullResult();
+    }
+
+    private function isValidIdentifier(mixed $entityId, ClassMetadata $classMetadata): bool
+    {
+        if (!is_scalar($entityId)) {
+            return true;
+        }
+
+        $primaryKeyFieldName = $classMetadata->getSingleIdentifierFieldName();
+        $primaryKeyType = $classMetadata->getFieldMapping($primaryKeyFieldName)['type'];
+
+        return $primaryKeyType !== 'integer' || (int)$entityId == $entityId;
     }
 
     private function buildFindCriteria(mixed $entityId, EntityIdMetadataInterface $metadata): array

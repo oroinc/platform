@@ -34,24 +34,26 @@ class UpdateEmailOriginTableQuery extends ParametrizedMigrationQuery
     {
         $platform = $this->connection->getDatabasePlatform();
         if ($platform instanceof PostgreSqlPlatform) {
-            $query = <<<SQL
-UPDATE oro_email_origin AS eo SET owner_id = ueo.user_id
-  FROM oro_user_email_origin AS ueo WHERE ueo.origin_id = eo.id;
-UPDATE oro_email_origin AS eo SET organization_id = u.organization_id
-  FROM oro_user AS u WHERE u.id = eo.owner_id;
-SQL;
+            $queries = [
+                'UPDATE oro_email_origin AS eo SET owner_id = ueo.user_id
+                FROM oro_user_email_origin AS ueo WHERE ueo.origin_id = eo.id',
+                'UPDATE oro_email_origin AS eo SET organization_id = u.organization_id
+                FROM oro_user AS u WHERE u.id = eo.owner_id'
+            ];
         } else {
-            $query = <<<SQL
-UPDATE oro_email_origin eo SET eo.owner_id =
-  (SELECT ueo.user_id FROM oro_user_email_origin ueo WHERE ueo.origin_id = eo.id);
-UPDATE oro_email_origin eo SET eo.organization_id =
-  (SELECT u.organization_id FROM oro_user u WHERE u.id = eo.owner_id);
-SQL;
+            $queries = [
+                'UPDATE oro_email_origin eo SET eo.owner_id =
+                (SELECT ueo.user_id FROM oro_user_email_origin ueo WHERE ueo.origin_id = eo.id)',
+                'UPDATE oro_email_origin eo SET eo.organization_id =
+                (SELECT u.organization_id FROM oro_user u WHERE u.id = eo.owner_id)'
+            ];
         }
 
-        $this->logQuery($logger, $query);
-        if (!$dryRun) {
-            $this->connection->executeStatement($query);
+        foreach ($queries as $query) {
+            $this->logQuery($logger, $query);
+            if (!$dryRun) {
+                $this->connection->executeStatement($query);
+            }
         }
     }
 }

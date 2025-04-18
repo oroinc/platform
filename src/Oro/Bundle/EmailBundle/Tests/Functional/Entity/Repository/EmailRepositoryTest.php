@@ -24,7 +24,7 @@ class EmailRepositoryTest extends WebTestCase
 
     public function testFindMessageIdReturnsNullWhenNoEmailFound(): void
     {
-        self::assertNull($this->getRepository()->findMessageIdByEmailId(PHP_INT_MAX));
+        self::assertNull($this->getRepository()->findMessageIdByEmailId(self::BIGINT));
     }
 
     public function testFindMessageId(): void

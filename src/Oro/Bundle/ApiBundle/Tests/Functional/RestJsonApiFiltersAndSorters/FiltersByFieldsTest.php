@@ -204,12 +204,6 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
         $key = key($filter);
         $filter = [sprintf('filter[%s][neq]', $key) => $filter[$key]];
 
-        // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
-        // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
-        if ('fieldBoolean' === $key && $this->isPostgreSql()) {
-            $expectedRows = array_merge($expectedRows, [['id' => '<toString(@NullItem->id)>']]);
-        }
-
         $entityType = $this->getEntityType(TestAllDataTypes::class);
         $this->prepareExpectedRows($expectedRows, $entityType);
 
@@ -225,12 +219,6 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     {
         $key = key($filter);
         $filter[$key] = ['neq' => $filter[$key]];
-
-        // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
-        // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
-        if ('fieldBoolean' === $key && $this->isPostgreSql()) {
-            $expectedRows = array_merge($expectedRows, [['id' => '<toString(@NullItem->id)>']]);
-        }
 
         $entityType = $this->getEntityType(TestAllDataTypes::class);
         $this->prepareExpectedRows($expectedRows, $entityType);
@@ -853,12 +841,6 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     {
         $filter = ['filters' => sprintf('filter[%s][exists]=true', $filterFieldName)];
 
-        // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
-        // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
-        if ('fieldBoolean' === $filterFieldName && $this->isPostgreSql()) {
-            $expectedRows = array_merge($expectedRows, [['id' => '<toString(@NullItem->id)>']]);
-        }
-
         $entityType = $this->getEntityType(TestAllDataTypes::class);
         $this->prepareExpectedRows($expectedRows, $entityType);
 
@@ -873,12 +855,6 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     public function testExistsFilterAlternativeSyntax(string $filterFieldName, array $expectedRows)
     {
         $filter = [$filterFieldName => ['exists' => 'true']];
-
-        // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
-        // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
-        if ('fieldBoolean' === $filterFieldName && $this->isPostgreSql()) {
-            $expectedRows = array_merge($expectedRows, [['id' => '<toString(@NullItem->id)>']]);
-        }
 
         $entityType = $this->getEntityType(TestAllDataTypes::class);
         $this->prepareExpectedRows($expectedRows, $entityType);
@@ -1069,12 +1045,6 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     {
         $filter = ['filters' => sprintf('filter[%s][exists]=false', $filterFieldName)];
 
-        // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
-        // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
-        if ('fieldBoolean' === $filterFieldName && $this->isPostgreSql()) {
-            $expectedRows = [];
-        }
-
         $entityType = $this->getEntityType(TestAllDataTypes::class);
         $this->prepareExpectedRows($expectedRows, $entityType);
 
@@ -1089,12 +1059,6 @@ class FiltersByFieldsTest extends RestJsonApiTestCase
     public function testNotExistsFilterAlternativeSyntax(string $filterFieldName, array $expectedRows)
     {
         $filter = [$filterFieldName => ['exists' => 'false']];
-
-        // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
-        // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
-        if ('fieldBoolean' === $filterFieldName && $this->isPostgreSql()) {
-            $expectedRows = [];
-        }
 
         $entityType = $this->getEntityType(TestAllDataTypes::class);
         $this->prepareExpectedRows($expectedRows, $entityType);

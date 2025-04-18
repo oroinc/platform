@@ -132,7 +132,7 @@ class Email implements ActivityInterface, ExtendEntityInterface
     protected ?string $acceptLanguageHeader = null;
 
     #[ORM\Column(name: 'body_synced', type: Types::BOOLEAN, nullable: true, options: ['default' => false])]
-    protected ?bool $bodySynced = null;
+    protected ?bool $bodySynced = false;
 
     public function __construct()
     {
@@ -738,13 +738,13 @@ class Email implements ActivityInterface, ExtendEntityInterface
     }
 
     /**
-     * @param $bodySynced
+     * @param bool $bodySynced
      *
      * @return Email
      */
     public function setBodySynced($bodySynced)
     {
-        $this->bodySynced = $bodySynced;
+        $this->bodySynced = (bool)$bodySynced;
 
         return $this;
     }

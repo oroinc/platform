@@ -394,7 +394,7 @@ datagrids:
             query:
                 select:
                     - >
-                      (CASE WHEN (:role_id IS NOT NULL) THEN
+                      (CASE WHEN (CAST(:role_id as INTEGER) IS NOT NULL) THEN
                         CASE WHEN (:role_id MEMBER OF u.userRoles OR u.id IN (:data_in)) AND u.id NOT IN (:data_not_in)
                         THEN true ELSE false END
                       ELSE
@@ -509,7 +509,7 @@ datagrids:
             query:
                 select:
                     - >
-                      (CASE WHEN (:group_id IS NOT NULL) THEN
+                      (CASE WHEN (CAST(:group_id as INTEGER) IS NOT NULL) THEN
                         CASE WHEN (:group_id MEMBER OF u.groups OR u.id IN (:data_in)) AND u.id NOT IN (:data_not_in)
                         THEN true ELSE false END
                       ELSE

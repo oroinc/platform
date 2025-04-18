@@ -77,6 +77,9 @@ abstract class WebTestCase extends BaseWebTestCase
     protected const AUTH_PW = 'admin';
     protected const AUTH_ORGANIZATION = 1;
 
+    /** BIG Integer number that does not exceed PostgreSQL INT */
+    protected const BIGINT = 2147483647;
+
     /** @var string Default application kernel class */
     protected static $class = 'AppKernel';
 

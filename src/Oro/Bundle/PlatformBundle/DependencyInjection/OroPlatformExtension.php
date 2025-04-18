@@ -109,7 +109,7 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
             }
         }
 
-        // original security config has highest priority
+        // original security config has the highest priority
         if ($securityConfig && $securityModified) {
             $this->mergeConfigIntoOne($container, 'security', reset($securityConfig));
         }
@@ -118,7 +118,7 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
     }
 
     /**
-     * Enable ATTR_EMULATE_PREPARES for PostgreSQL connections to avoid https://bugs.php.net/bug.php?id=36652
+     * Configure options for PostgreSQL connections
      */
     private function preparePostgreSql(ContainerBuilder $container): void
     {
@@ -127,9 +127,10 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
         foreach ($doctrineConfig as $config) {
             if (isset($config['dbal']['connections'])) {
                 foreach (array_keys($config['dbal']['connections']) as $connectionName) {
-                    // Enable ATTR_EMULATE_PREPARES for PostgreSQL
+                    // Set ATTR_ERRMODE for PostgreSQL to ERRMODE_EXCEPTION
+                    // to get notified about Invalid parameter number
                     $doctrineConnectionOptions['dbal']['connections'][$connectionName]['options'] = [
-                        \PDO::ATTR_EMULATE_PREPARES => true
+                        \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
                     ];
                     // Add support of "oid" and "name" Db types for EnterpriseDB
                     $doctrineConnectionOptions['dbal']['connections'][$connectionName]['mapping_types'] = [

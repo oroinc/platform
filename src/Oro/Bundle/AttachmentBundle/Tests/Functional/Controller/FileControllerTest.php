@@ -34,7 +34,7 @@ class FileControllerTest extends WebTestCase
             $this->getUrl(
                 'oro_attachment_get_file',
                 [
-                    'id' => PHP_INT_MAX,
+                    'id' => self::BIGINT,
                     'action' => FileUrlProviderInterface::FILE_ACTION_DOWNLOAD,
                     'filename' => 'sample-filename',
                 ]
@@ -51,7 +51,7 @@ class FileControllerTest extends WebTestCase
             $this->getUrl(
                 'oro_attachment_get_file',
                 [
-                    'id' => PHP_INT_MAX,
+                    'id' => self::BIGINT,
                     'action' => FileUrlProviderInterface::FILE_ACTION_DOWNLOAD,
                     'filename' => 'invalid-filename',
                 ]
@@ -116,7 +116,7 @@ class FileControllerTest extends WebTestCase
             $this->getUrl(
                 'oro_resize_attachment',
                 [
-                    'id' => PHP_INT_MAX,
+                    'id' => self::BIGINT,
                     'width' => 42,
                     'height' => 142,
                     'filename' => 'sample-filename',
@@ -183,7 +183,7 @@ class FileControllerTest extends WebTestCase
             $this->getUrl(
                 'oro_filtered_attachment',
                 [
-                    'id' => PHP_INT_MAX,
+                    'id' => self::BIGINT,
                     'filter' => __FUNCTION__,
                     'filterMd5' => md5(__FUNCTION__),
                     'filename' => 'sample-filename',

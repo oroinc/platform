@@ -4,6 +4,7 @@ namespace Oro\Bundle\DataAuditBundle\Migrations\Schema\v1_8;
 
 use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareTrait;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
@@ -89,24 +90,26 @@ EOD
             }
 
             foreach ($rows as $row) {
-                $sql = 'UPDATE oro_audit SET version = 0 '.
-                    'WHERE object_id = :object_id AND '.
-                    'object_class = :object_class;'.
-                    'SET @version = 0;'.
-                    'UPDATE oro_audit SET version = @version:=@version+1 '.
-                    'WHERE object_id = :object_id AND '.
-                    'object_class = :object_class;';
+                $parameters = [
+                    'object_id' => $row['object_id'],
+                    'object_class' => $row['object_class'],
+                ];
+                $types = [
+                    'object_id' => Types::INTEGER,
+                    'object_class' => Types::STRING,
+                ];
 
                 $this->connection->executeStatement(
-                    $sql,
-                    [
-                        'object_id' => $row['object_id'],
-                        'object_class' => $row['object_class'],
-                    ],
-                    [
-                        'object_id' => 'integer',
-                        'object_class' => 'string',
-                    ]
+                    'UPDATE oro_audit SET version = 0 WHERE object_id = :object_id AND object_class = :object_class',
+                    $parameters,
+                    $types
+                );
+                $this->connection->executeStatement('SET @version = 0');
+                $this->connection->executeStatement(
+                    'UPDATE oro_audit SET version = @version:=@version+1 
+                    WHERE object_id = :object_id AND object_class = :object_class',
+                    $parameters,
+                    $types
                 );
             }
         }
