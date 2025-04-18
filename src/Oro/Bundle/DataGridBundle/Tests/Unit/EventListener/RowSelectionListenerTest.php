@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\EventListener;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
@@ -122,12 +123,14 @@ class RowSelectionListenerTest extends \PHPUnit\Framework\TestCase
                         'name' => RowSelectionListener::GRID_PARAM_DATA_IN,
                         'path' => ParameterBag::ADDITIONAL_PARAMETERS . '.' . RowSelectionListener::GRID_PARAM_DATA_IN,
                         'default' => [0],
+                        'type' => Connection::PARAM_INT_ARRAY
                     ],
                     'data_not_in' => [
                         'name' => RowSelectionListener::GRID_PARAM_DATA_NOT_IN,
                         'path' => ParameterBag::ADDITIONAL_PARAMETERS . '.'
                             . RowSelectionListener::GRID_PARAM_DATA_NOT_IN,
                         'default' => [0],
+                        'type' => Connection::PARAM_INT_ARRAY
                     ],
                 ],
             ],
@@ -164,12 +167,14 @@ class RowSelectionListenerTest extends \PHPUnit\Framework\TestCase
                         'name' => RowSelectionListener::GRID_PARAM_DATA_IN,
                         'path' => ParameterBag::ADDITIONAL_PARAMETERS . '.' . RowSelectionListener::GRID_PARAM_DATA_IN,
                         'default' => [''],
+                        'type' => Connection::PARAM_STR_ARRAY
                     ],
                     'data_not_in' => [
                         'name' => RowSelectionListener::GRID_PARAM_DATA_NOT_IN,
                         'path' => ParameterBag::ADDITIONAL_PARAMETERS . '.'
                             . RowSelectionListener::GRID_PARAM_DATA_NOT_IN,
                         'default' => [''],
+                        'type' => Connection::PARAM_STR_ARRAY
                     ],
                 ],
             ],
@@ -204,12 +209,14 @@ class RowSelectionListenerTest extends \PHPUnit\Framework\TestCase
                         'name' => RowSelectionListener::GRID_PARAM_DATA_IN,
                         'path' => ParameterBag::ADDITIONAL_PARAMETERS . '.' . RowSelectionListener::GRID_PARAM_DATA_IN,
                         'default' => [0],
+                        'type' => Connection::PARAM_INT_ARRAY
                     ],
                     'data_not_in' => [
                         'name' => RowSelectionListener::GRID_PARAM_DATA_NOT_IN,
                         'path' => ParameterBag::ADDITIONAL_PARAMETERS . '.'
                             . RowSelectionListener::GRID_PARAM_DATA_NOT_IN,
                         'default' => [0],
+                        'type' => Connection::PARAM_INT_ARRAY
                     ],
                 ],
             ],
@@ -243,12 +250,14 @@ class RowSelectionListenerTest extends \PHPUnit\Framework\TestCase
                         'name' => RowSelectionListener::GRID_PARAM_DATA_IN,
                         'path' => ParameterBag::ADDITIONAL_PARAMETERS . '.' . RowSelectionListener::GRID_PARAM_DATA_IN,
                         'default' => [0],
+                        'type' => Connection::PARAM_INT_ARRAY
                     ],
                     'data_not_in' => [
                         'name' => RowSelectionListener::GRID_PARAM_DATA_NOT_IN,
                         'path' => ParameterBag::ADDITIONAL_PARAMETERS . '.'
                             . RowSelectionListener::GRID_PARAM_DATA_NOT_IN,
                         'default' => [0],
+                        'type' => Connection::PARAM_INT_ARRAY
                     ],
                 ],
             ],

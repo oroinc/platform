@@ -103,7 +103,7 @@ abstract class AbstractRestApiTest extends WebTestCase
             'PUT',
             $this->getUrl(
                 'oro_api_put_navigationitems_id',
-                ['type' => $this->getItemType(), 'itemId' => PHP_INT_MAX]
+                ['type' => $this->getItemType(), 'itemId' => self::BIGINT]
             ),
             ['url' => 'sample/url'],
             self::generateApiAuthHeader(LoadUserData::USER_NAME_2)
@@ -118,7 +118,7 @@ abstract class AbstractRestApiTest extends WebTestCase
             'DELETE',
             $this->getUrl(
                 'oro_api_delete_navigationitems_id',
-                ['type' => $this->getItemType(), 'itemId' => PHP_INT_MAX]
+                ['type' => $this->getItemType(), 'itemId' => self::BIGINT]
             ),
             [],
             self::generateApiAuthHeader(LoadUserData::USER_NAME_2)

@@ -52,8 +52,8 @@ END;
 $$ LANGUAGE plpgsql
 FUNCTOIN;
 
+        $dropTriggerSql = 'DROP TRIGGER IF EXISTS oro_scope_fill_row_hash_trigger ON oro_scope';
         $triggerSql = <<<TRIGGER
-DROP TRIGGER IF EXISTS oro_scope_fill_row_hash_trigger ON oro_scope;
 CREATE TRIGGER oro_scope_fill_row_hash_trigger
 BEFORE INSERT ON oro_scope
 FOR EACH ROW
@@ -61,9 +61,11 @@ EXECUTE PROCEDURE oro_scope_fill_row_hash();
 TRIGGER;
 
         $this->logQuery($logger, $updateProcedure);
+        $this->logQuery($logger, $dropTriggerSql);
         $this->logQuery($logger, $triggerSql);
         if (!$dryRun) {
             $this->connection->executeQuery($updateProcedure);
+            $this->connection->executeQuery($dropTriggerSql);
             $this->connection->executeQuery($triggerSql);
         }
     }
@@ -75,8 +77,8 @@ TRIGGER;
     {
         $columnHashExpression = $this->getColumnsHashExpressionForMySql('NEW.');
 
+        $dropTriggerSql = 'DROP TRIGGER IF EXISTS oro_scope_fill_row_hash_trigger';
         $triggerSql = <<<TRIGGER
-DROP TRIGGER IF EXISTS oro_scope_fill_row_hash_trigger;
 CREATE TRIGGER oro_scope_fill_row_hash_trigger BEFORE INSERT ON oro_scope 
 FOR EACH ROW
  BEGIN
@@ -84,8 +86,10 @@ FOR EACH ROW
  END;
 TRIGGER;
 
+        $this->logQuery($logger, $dropTriggerSql);
         $this->logQuery($logger, $triggerSql);
         if (!$dryRun) {
+            $this->connection->executeQuery($dropTriggerSql);
             $this->connection->executeQuery($triggerSql);
         }
     }

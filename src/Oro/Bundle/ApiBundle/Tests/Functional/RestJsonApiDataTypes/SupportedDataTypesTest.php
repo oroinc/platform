@@ -199,13 +199,6 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
 
         $this->assertResponseContains($data, $response);
 
-        $fieldBooleanNullValue = null;
-        // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
-        // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
-        if ($this->isPostgreSql()) {
-            $fieldBooleanNullValue = false;
-        }
-
         self::assertArrayContains(
             [
                 'fieldString'         => null,
@@ -213,7 +206,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
                 'fieldInt'            => null,
                 'fieldSmallInt'       => null,
                 'fieldBigInt'         => null,
-                'fieldBoolean'        => $fieldBooleanNullValue,
+                'fieldBoolean'        => null,
                 'fieldDecimal'        => null,
                 'fieldDecimalDefault' => null,
                 'fieldFloat'          => null,
@@ -303,12 +296,6 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
         mixed $responseValue,
         mixed $entityValue
     ) {
-        // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
-        // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
-        if ('fieldBoolean' === $fieldName && null === $entityValue && $this->isPostgreSql()) {
-            $entityValue = false;
-        }
-
         $entityType = $this->getEntityType(TestAllDataTypes::class);
 
         $data = [
@@ -338,17 +325,6 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
         mixed $responseValue,
         mixed $entityValue
     ) {
-        // this is a workaround for a known PDO driver issue not saving null to nullable boolean field
-        // for PostgreSQL, see https://github.com/doctrine/dbal/issues/2580 for details
-        if ('fieldBoolean' === $fieldName && $this->isPostgreSql()) {
-            if (null === $responseValue) {
-                $responseValue = false;
-            }
-            if (null === $entityValue) {
-                $entityValue = false;
-            }
-        }
-
         $entityType = $this->getEntityType(TestAllDataTypes::class);
 
         $data = [
@@ -386,7 +362,7 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
             'BigInt NULL'                  => ['fieldBigInt', null, null, null],
             'BigInt Zero'                  => ['fieldBigInt', '0', '0', '0'],
             'BigInt Zero (int)'            => ['fieldBigInt', 0, '0', '0'],
-            'Boolean NULL'                 => ['fieldBoolean', null, false, null],
+            'Boolean NULL'                 => ['fieldBoolean', null, null, null],
             'Boolean FALSE'                => ['fieldBoolean', false, false, false],
             'Decimal NULL'                 => ['fieldDecimal', null, null, null],
             'Decimal Zero'                 => ['fieldDecimal', '0', '0', '0.00000000'],

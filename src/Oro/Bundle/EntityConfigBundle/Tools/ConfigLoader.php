@@ -323,7 +323,7 @@ class ConfigLoader
                 $fieldConfigId = $fieldConfigInfo['id'];
                 $this->queries[] = [
                     'UPDATE oro_entity_config_field '
-                        . 'SET updated=?, data=?'
+                        . 'SET updated=?, data=? '
                         . 'WHERE id=?',
                     [
                         new \DateTime(),
@@ -346,7 +346,7 @@ class ConfigLoader
 
     private function getPropertyConfig($scope)
     {
-        return $this->providerBag->getProvider($scope)->getPropertyConfig();
+        return $this->providerBag->getProvider($scope)?->getPropertyConfig();
     }
 
     /**
@@ -485,27 +485,8 @@ class ConfigLoader
 
     private function executeQueries(): void
     {
-        $sql = '';
-        $params = $types = [];
-        $batchCount = $queryNum = 1;
-        $queriesCount = count($this->queries);
-
-        foreach ($this->queries as $query) {
-            $sql .= $query[0] . ';';
-            $params = array_merge($params, $query[1]);
-            $types = array_merge($types, $query[2]);
-
-            if ($batchCount === 300 || $queryNum === $queriesCount) {
-                $this->connection->executeStatement($sql, $params, $types);
-                $sql = '';
-                $params = $types = [];
-                $batchCount = 0;
-            }
-
-            $batchCount++;
-            $queryNum++;
+        while ($query = array_shift($this->queries)) {
+            $this->connection->executeStatement($query[0], $query[1], $query[2]);
         }
-
-        $this->queries = [];
     }
 }

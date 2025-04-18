@@ -143,19 +143,28 @@ class OrmIndexer extends AbstractIndexer
      */
     protected function clearSearchIndexForEntity($class)
     {
-        $query = <<<EOF
-DELETE FROM oro_search_index_integer  WHERE item_id IN (SELECT DISTINCT id FROM oro_search_item WHERE entity = ?);
-DELETE FROM oro_search_index_datetime WHERE item_id IN (SELECT DISTINCT id FROM oro_search_item WHERE entity = ?);
-DELETE FROM oro_search_index_decimal  WHERE item_id IN (SELECT DISTINCT id FROM oro_search_item WHERE entity = ?);
-DELETE FROM oro_search_index_text     WHERE item_id IN (SELECT DISTINCT id FROM oro_search_item WHERE entity = ?);
-DELETE FROM oro_search_item           WHERE entity = ?;
-EOF;
+        $tables = [
+            'oro_search_index_integer',
+            'oro_search_index_datetime',
+            'oro_search_index_decimal',
+            'oro_search_index_text'
+        ];
+        $queries = [];
+        foreach ($tables as $table) {
+            $queries[] = sprintf(
+                'DELETE FROM %s WHERE item_id IN (SELECT DISTINCT id FROM oro_search_item WHERE entity = ?)',
+                $table
+            );
+        }
+        $queries[] = 'DELETE FROM oro_search_item WHERE entity = ?';
 
-        $this->getIndexManager()->getConnection()->executeQuery(
-            $query,
-            [$class, $class, $class, $class, $class],
-            [\PDO::PARAM_STR, \PDO::PARAM_STR, \PDO::PARAM_STR, \PDO::PARAM_STR, \PDO::PARAM_STR]
-        );
+        foreach ($queries as $query) {
+            $this->getIndexManager()->getConnection()->executeQuery(
+                $query,
+                [$class],
+                [\PDO::PARAM_STR]
+            );
+        }
     }
 
     /**
