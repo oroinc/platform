@@ -11,7 +11,7 @@
     <span class="empty">-- {{ 'oro.entity_merge.form.empty'|trans }} --</span>
 {% endset %}
 
-{% set escapeStrategy = metadata.has('autoescape') ? metadata.get('autoescape') : true %}
+{% set escapeStrategy = metadata.has('autoescape') and metadata.get('autoescape') ? 'html' : false %}
 
 {% if convertedValue|length %}
     {% if isListValue %}
@@ -37,7 +37,7 @@
     {{ empty_cell }}
 {% endif %}
 
-{% macro escape(value, escapeStrategy = true) %}
+{% macro escape(value, escapeStrategy = 'html') %}
     {% if escapeStrategy %}
         {{ value|e(escapeStrategy)|raw }}
     {% else %}

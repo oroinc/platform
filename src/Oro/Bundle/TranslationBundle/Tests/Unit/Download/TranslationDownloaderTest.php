@@ -46,7 +46,6 @@ YAML
 
     private const PARSED_YAML_TRANSLATIONS = [
         'test' => 'test',
-        'test1' => null,
         'test %num%' => 'tessto presto %num%',
         'multi' => "Test l'aide <a href=\"http://community.oroinc.com\"> forums</a>.\nSecond line.",
         'another one' => 'another one string',
@@ -354,7 +353,7 @@ YAML
 
         $this->databasePersister->expects(self::once())
             ->method('persist')
-            ->with($langCode, $expectedTranslations, Translation::SCOPE_INSTALLED);
+            ->with($langCode, $expectedTranslations);
         $this->jsTranslationDumper->expects(self::once())
             ->method('dumpTranslations')
             ->with([$langCode]);
