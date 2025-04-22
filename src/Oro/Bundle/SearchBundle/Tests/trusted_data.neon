@@ -1,6 +1,9 @@
 # Configuration for https://github.com/oroinc/phpstan-rules/
 trusted_data:
     variables:
+        Oro\Bundle\SearchBundle\Engine\OrmIndexer:
+            clearSearchIndexForEntity:
+                query: true
         Oro\Bundle\SearchBundle\Engine\AbstractIndexer:
             reindexSingleEntity:
                 orderingsExpr: true

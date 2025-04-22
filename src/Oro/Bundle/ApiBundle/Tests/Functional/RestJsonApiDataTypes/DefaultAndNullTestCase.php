@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiDataTypes;
 
-use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestDefaultAndNull;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -57,10 +56,5 @@ class DefaultAndNullTestCase extends RestJsonApiTestCase
         $em->persist($entity);
         $em->flush();
         $em->clear();
-    }
-
-    protected function isPostgreSql(): bool
-    {
-        return $this->getEntityManager()->getConnection()->getDatabasePlatform() instanceof PostgreSqlPlatform;
     }
 }
