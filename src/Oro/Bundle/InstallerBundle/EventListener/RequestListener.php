@@ -3,7 +3,7 @@
 namespace Oro\Bundle\InstallerBundle\EventListener;
 
 use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 /**
@@ -12,13 +12,11 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
  */
 class RequestListener
 {
-    private bool $debug;
-    private ApplicationState $applicationState;
-
-    public function __construct(ApplicationState $applicationState, bool $debug = false)
-    {
-        $this->applicationState = $applicationState;
-        $this->debug = $debug;
+    public function __construct(
+        private ApplicationState $applicationState,
+        private string $templatePath,
+        private bool $debug = false
+    ) {
     }
 
     public function onRequest(RequestEvent $event): void
@@ -44,7 +42,11 @@ class RequestListener
         }
 
         if (!in_array($event->getRequest()->get('_route'), $allowedRoutes, true)) {
-            $event->setResponse(new RedirectResponse($event->getRequest()->getBasePath() . '/notinstalled.html'));
+            $response = new Response(
+                file_get_contents($this->templatePath),
+                Response::HTTP_SERVICE_UNAVAILABLE
+            );
+            $event->setResponse($response);
         }
 
         $event->stopPropagation();
