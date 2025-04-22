@@ -37,5 +37,7 @@ services:
         arguments:
             - '@oro_distribution.handler.application_status'
             - '%kernel.debug%'
+        calls:
+            - [ setTemplatePath, ['%kernel.project_dir%/public/notinstalled.html']]
         tags:
-            - { name: kernel.event_listener, event: kernel.request, method: onRequest, priority: 10 }
+            - { name: kernel.event_listener, event: kernel.request, method: onRequest, priority: 100 }
