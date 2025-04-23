@@ -42,6 +42,7 @@ class ThemeFactory implements ThemeFactoryInterface
             'label',
             'screenshot',
             'icon',
+            'favicons_path',
             'logo',
             'logo_small',
             'image_placeholders',

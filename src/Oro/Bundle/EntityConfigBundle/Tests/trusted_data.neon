@@ -1,6 +1,9 @@
 # Configuration for https://github.com/oroinc/phpstan-rules/
 trusted_data:
     variables:
+        Oro\Bundle\EntityConfigBundle\Tools\ConfigLoader:
+            executeQueries:
+                query: true
         Oro\Bundle\EntityConfigBundle\EventListener\AbstractConfigGridListener:
             prepareQuery:
                 item: true

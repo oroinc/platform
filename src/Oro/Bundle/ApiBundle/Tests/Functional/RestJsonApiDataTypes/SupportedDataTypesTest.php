@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiDataTypes;
 
-use Doctrine\DBAL\Platforms\PostgreSqlPlatform;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes;
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 
@@ -21,11 +20,6 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
         $this->loadFixtures([
             '@OroApiBundle/Tests/Functional/DataFixtures/supported_data_types.yml'
         ]);
-    }
-
-    private function isPostgreSql(): bool
-    {
-        return $this->getEntityManager()->getConnection()->getDatabasePlatform() instanceof PostgreSqlPlatform;
     }
 
     private function getEntityData(int $entityId): array

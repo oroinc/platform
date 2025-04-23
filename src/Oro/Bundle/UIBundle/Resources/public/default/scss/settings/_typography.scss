@@ -30,15 +30,15 @@ $theme-fonts: (
         'formats': ('woff2')
     ),
     'code': (
-          'family': 'DM Mono',
-          'variants': (
-              (
-                  'path': '#{$global-url}/orofrontend/default/fonts/dm-mono/DMMono-Regular',
-                  'weight': 400,
-                  'style': normal
-              ),
-          ),
-          'formats': ('woff2')
+        'family': 'DM Mono',
+        'variants': (
+            (
+                'path': '#{$global-url}/orofrontend/default/fonts/dm-mono/DMMono-Regular',
+                'weight': 400,
+                'style': normal
+            ),
+        ),
+        'formats': ('woff2')
     ),
     'only-bullets': (
         'family': 'only-bullets',
