@@ -23,15 +23,15 @@
     }
 
     &.inverse {
-        background-color: $extra;
+        background-color: $warning-background-dark;
     }
 
     &.info {
-        background-color: $info;
+        background-color: $in-progress-background;
     }
 
     &.warning {
-        background-color: $warning;
+        background-color: $inverse-background;
     }
 }
 
