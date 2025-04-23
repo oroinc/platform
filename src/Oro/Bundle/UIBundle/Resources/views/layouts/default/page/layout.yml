@@ -21,12 +21,6 @@ layout:
                     options:
                         name: viewport
                         content: 'width=device-width, initial-scale=1'
-                theme_icon:
-                    blockType: external_resource
-                    options:
-                        visible: '=data["theme"].getIcon(context["theme"])!=null'
-                        href: '=data["asset"].getUrl(data["theme"].getIcon(context["theme"]))'
-                        rel: shortcut icon
                 critical_css:
                     blockType: style
                     options:
@@ -76,7 +70,6 @@ layout:
                         title: ~
                         meta_charset: ~
                         meta_viewport: ~
-                        theme_icon: ~
                         critical_css: ~
                         service_worker: ~
                         styles: ~

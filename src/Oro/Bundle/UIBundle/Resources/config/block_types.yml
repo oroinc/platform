@@ -59,3 +59,13 @@ services:
               }]]
         tags:
             - { name: layout.block_type, alias: logo }
+
+    oro_ui.layout.block_type.favicons:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            - [setName, ['favicons']]
+            - [setOptionsConfig, [{
+                  favicons_path: {default: null}
+              }]]
+        tags:
+            - { name: layout.block_type, alias: favicons }

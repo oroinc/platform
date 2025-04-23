@@ -23,6 +23,9 @@ class Theme
     /** @var string */
     protected $icon;
 
+    /** @var string */
+    protected $faviconsPath;
+
     /** @var array */
     protected $imagePlaceholders = [];
 
@@ -124,6 +127,22 @@ class Theme
     public function setIcon($icon)
     {
         $this->icon = $icon;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFaviconsPath()
+    {
+        return $this->faviconsPath;
+    }
+
+    /**
+     * @param string $faviconsPath
+     */
+    public function setFaviconsPath($faviconsPath)
+    {
+        $this->faviconsPath = $faviconsPath;
     }
 
     public function getImagePlaceholders(): array
