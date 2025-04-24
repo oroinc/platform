@@ -15,6 +15,8 @@ class MetaOperationParser
     private const ID_FIELD = 'id';
 
     /**
+     * @return array|null [update flag, upsert flag, validate flag]
+     *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
@@ -28,7 +30,7 @@ class MetaOperationParser
     ): ?array {
         $updateFlag = null;
         if (\array_key_exists($updateFlagName, $meta)) {
-            $updateFlag = self::getUpdateFlag($meta, $updateFlagName);
+            $updateFlag = self::getBooleanFlag($meta, $updateFlagName);
             if (null === $updateFlag) {
                 if (null !== $context) {
                     self::addValidationError(
@@ -62,7 +64,7 @@ class MetaOperationParser
 
         $validateFlag = null;
         if (\array_key_exists($validateFlagName, $meta)) {
-            $validateFlag = self::getValidateFlag($meta, $validateFlagName);
+            $validateFlag = self::getBooleanFlag($meta, $validateFlagName);
             if (null === $validateFlag) {
                 if (null !== $context) {
                     self::addValidationError(
@@ -79,7 +81,7 @@ class MetaOperationParser
 
         $flags = [$updateFlag, $upsertFlag, $validateFlag];
         $flags = array_filter($flags, static fn ($flag) => (bool)$flag === true);
-        if (count($flags) > 1) {
+        if (\count($flags) > 1) {
             if (null !== $context) {
                 self::addValidationError(
                     $context,
@@ -99,9 +101,31 @@ class MetaOperationParser
         return [$updateFlag, $upsertFlag, $validateFlag];
     }
 
-    private static function getUpdateFlag(array $meta, string $updateFlagName): ?bool
+    public static function assertOperationFlagNotExists(
+        array $meta,
+        string $flagName,
+        ?string $metaPointer = null,
+        ?FormContext $context = null
+    ): bool {
+        $result = true;
+        if (\array_key_exists($flagName, $meta)) {
+            $result = false;
+            if (null !== $context) {
+                self::addValidationError(
+                    $context,
+                    Constraint::VALUE,
+                    'The option is not supported.',
+                    self::buildPointer($metaPointer, $flagName)
+                );
+            }
+        }
+
+        return $result;
+    }
+
+    private static function getBooleanFlag(array $meta, string $flagName): ?bool
     {
-        $value = $meta[$updateFlagName];
+        $value = $meta[$flagName];
         if (false === $value || true === $value) {
             return $value;
         }
@@ -116,16 +140,6 @@ class MetaOperationParser
             return $value;
         }
         if (\is_array($value) && self::isValidListOfFieldNames($value)) {
-            return $value;
-        }
-
-        return null;
-    }
-
-    private static function getValidateFlag(array $meta, string $validateFlagName): ?bool
-    {
-        $value = $meta[$validateFlagName];
-        if (false === $value || true === $value) {
             return $value;
         }
 

@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
  */
 class MetaOperationParserTest extends TestCase
 {
-    public function testEmptyMeta(): void
+    public function testGetOperationFlagsForEmptyMeta(): void
     {
         $meta = [];
 
@@ -30,7 +30,7 @@ class MetaOperationParserTest extends TestCase
         self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate'));
     }
 
-    public function testUpdateMetaOptionEqualsToTrue(): void
+    public function testGetOperationFlagsWhenUpdateMetaOptionEqualsToTrue(): void
     {
         $meta = [
             'update' => true
@@ -47,7 +47,7 @@ class MetaOperationParserTest extends TestCase
         self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate'));
     }
 
-    public function testUpdateMetaOptionEqualsToFalse(): void
+    public function testGetOperationFlagsWhenUpdateMetaOptionEqualsToFalse(): void
     {
         $meta = [
             'update' => false
@@ -67,7 +67,7 @@ class MetaOperationParserTest extends TestCase
     /**
      * @dataProvider invalidUpdateOptionDataProvider
      */
-    public function testInvalidUpdateMetaOption(mixed $updateOptionValue): void
+    public function testGetOperationFlagsWhenInvalidUpdateMetaOption(mixed $updateOptionValue): void
     {
         $meta = [
             'update' => $updateOptionValue
@@ -97,7 +97,7 @@ class MetaOperationParserTest extends TestCase
         ];
     }
 
-    public function testUpsertMetaOptionEqualsToTrue(): void
+    public function testGetOperationFlagsWhenUpsertMetaOptionEqualsToTrue(): void
     {
         $meta = [
             'upsert' => true
@@ -114,7 +114,7 @@ class MetaOperationParserTest extends TestCase
         self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate'));
     }
 
-    public function testUpsertMetaOptionEqualsToFalse(): void
+    public function testGetOperationFlagsWhenUpsertMetaOptionEqualsToFalse(): void
     {
         $meta = [
             'upsert' => false
@@ -131,7 +131,7 @@ class MetaOperationParserTest extends TestCase
         self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate'));
     }
 
-    public function testUpsertMetaOptionEqualsToIdArray(): void
+    public function testGetOperationFlagsWhenUpsertMetaOptionEqualsToIdArray(): void
     {
         $meta = [
             'upsert' => ['id']
@@ -148,7 +148,7 @@ class MetaOperationParserTest extends TestCase
         self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate'));
     }
 
-    public function testUpsertMetaOptionEqualsToArrayOfFields(): void
+    public function testGetOperationFlagsWhenUpsertMetaOptionEqualsToArrayOfFields(): void
     {
         $meta = [
             'upsert' => ['field1', 'field2']
@@ -168,7 +168,7 @@ class MetaOperationParserTest extends TestCase
     /**
      * @dataProvider invalidUpsertOptionDataProvider
      */
-    public function testInvalidUpsertMetaOption(mixed $upsertOptionValue): void
+    public function testGetOperationFlagsWhenInvalidUpsertMetaOption(mixed $upsertOptionValue): void
     {
         $meta = [
             'upsert' => $upsertOptionValue
@@ -203,7 +203,7 @@ class MetaOperationParserTest extends TestCase
         ];
     }
 
-    public function testValidateMetaOptionEqualsToTrue(): void
+    public function testGetOperationFlagsWhenValidateMetaOptionEqualsToTrue(): void
     {
         $meta = [
             'validate' => true
@@ -220,7 +220,7 @@ class MetaOperationParserTest extends TestCase
         self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate'));
     }
 
-    public function testValidateMetaOptionEqualsToFalse(): void
+    public function testGetOperationFlagsWhenValidateMetaOptionEqualsToFalse(): void
     {
         $meta = [
             'validate' => false
@@ -240,7 +240,7 @@ class MetaOperationParserTest extends TestCase
     /**
      * @dataProvider invalidUpdateOptionDataProvider
      */
-    public function testInvalidValidateMetaOption(mixed $validateOptionValue): void
+    public function testGetOperationFlagsWhenInvalidValidateMetaOption(mixed $validateOptionValue): void
     {
         $meta = [
             'validate' => $validateOptionValue
@@ -262,7 +262,7 @@ class MetaOperationParserTest extends TestCase
         self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate'));
     }
 
-    public function testBothUpdateAndUpsertMetaOptionsEqualsToTrue(): void
+    public function testGetOperationFlagsWhenBothUpdateAndUpsertMetaOptionsEqualsToTrue(): void
     {
         $meta = [
             'update' => true,
@@ -285,7 +285,7 @@ class MetaOperationParserTest extends TestCase
         self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate'));
     }
 
-    public function testBothUpdateAndUpsertMetaOptionsEqualsToFalse(): void
+    public function testGetOperationFlagsWhenBothUpdateAndUpsertMetaOptionsEqualsToFalse(): void
     {
         $meta = [
             'update' => false,
@@ -303,7 +303,7 @@ class MetaOperationParserTest extends TestCase
         self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate'));
     }
 
-    public function testAllMetaOptionsEqualsToTrue(): void
+    public function testGetOperationFlagsWhenAllMetaOptionsEqualsToTrue(): void
     {
         $meta = [
             'update' => true,
@@ -327,7 +327,7 @@ class MetaOperationParserTest extends TestCase
         self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate'));
     }
 
-    public function testValidateMetaOptionsEqualsToTrueWithFalseOptions(): void
+    public function testGetOperationFlagsWhenValidateMetaOptionsEqualsToTrueWithFalseOptions(): void
     {
         $meta = [
             'update' => false,
@@ -344,5 +344,59 @@ class MetaOperationParserTest extends TestCase
         self::assertSame([false, false, true], $flags);
 
         self::assertSame($flags, MetaOperationParser::getOperationFlags($meta, 'update', 'upsert', 'validate'));
+    }
+
+    public function testAssertOperationFlagNotExistsForEmptyMeta(): void
+    {
+        $meta = [];
+
+        $context = $this->createMock(FormContext::class);
+        $context->expects(self::never())
+            ->method('addError');
+
+        self::assertTrue(MetaOperationParser::assertOperationFlagNotExists($meta, 'update', '/meta', $context));
+        self::assertTrue(MetaOperationParser::assertOperationFlagNotExists($meta, 'update'));
+    }
+
+    public function testAssertOperationFlagNotExistsWhenFlagDoesNotExist(): void
+    {
+        $meta = [
+            'upsert' => true
+        ];
+
+        $context = $this->createMock(FormContext::class);
+        $context->expects(self::never())
+            ->method('addError');
+
+        self::assertTrue(MetaOperationParser::assertOperationFlagNotExists($meta, 'update', '/meta', $context));
+        self::assertTrue(MetaOperationParser::assertOperationFlagNotExists($meta, 'update'));
+    }
+
+    /**
+     * @dataProvider assertOperationFlagNotExistsWhenFlagExistsDataProvider
+     */
+    public function testAssertOperationFlagNotExistsWhenFlagExists(array $meta): void
+    {
+        $error = Error::createValidationError(
+            Constraint::VALUE,
+            'The option is not supported.'
+        )->setSource(ErrorSource::createByPointer('/meta/update'));
+
+        $context = $this->createMock(FormContext::class);
+        $context->expects(self::once())
+            ->method('addError')
+            ->with($error);
+
+        self::assertFalse(MetaOperationParser::assertOperationFlagNotExists($meta, 'update', '/meta', $context));
+        self::assertFalse(MetaOperationParser::assertOperationFlagNotExists($meta, 'update'));
+    }
+
+    public static function assertOperationFlagNotExistsWhenFlagExistsDataProvider(): array
+    {
+        return [
+            [['update' => null]],
+            [['update' => false]],
+            [['update' => true]]
+        ];
     }
 }
