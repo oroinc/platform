@@ -2,7 +2,30 @@ The upgrade instructions are available at [Oro documentation website](https://do
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
-## UNRELEASED
+## Changes in the Platform package versions
+
+- [6.1.0](#610-2025-03-31)
+- [6.0.0](#600-2024-03-30)
+- [5.1.0](#510-2023-03-31)
+- [5.0.0](#500-2022-01-26)
+- [4.2.10](#4210)
+- [4.2.4](#424)
+- [4.2.2](#422)
+- [4.2.0](#420-2020-01-29)
+- [4.1.0](#410-2020-01-31)
+- [4.0.0](#400-2019-07-31)
+- [3.1.4](#314)
+- [3.1.3](#313-2019-02-19)
+- [3.1.2](#312-2019-02-05)
+- [3.1.0](#310-2019-01-30)
+- [3.0.0](#300-2018-07-27)
+- [2.6.0](#260-2018-01-31)
+- [2.5.0](#250-2017-11-30)
+- [2.2.0](#220-2017-05-31)
+- [2.1.0](#210-2017-03-30)
+
+## 6.1.0 (2025-03-31)
+[Show detailed list of changes](incompatibilities-6-1.md)
 
 ### Security Changes
 * Security firewall `wsse_secured` renamed to `old_api_secured`.
@@ -15,7 +38,7 @@ The current file describes significant changes in the code that may affect the u
 * Added new event `oro_distribution.route_collection.all` dispatched when routes are loaded from all route loaders. Implemented via `\Oro\Bundle\DistributionBundle\Routing\DelegatingLoader` decorating the `routing.loader` service.
 * Added `\Oro\Bundle\DistributionBundle\EventListener\RoutePrioritizingListener` as a general solution to alter route priorities.
 * Added `oro_distribution.event_listener.route_prioritizing.web_debug_toolbar` to increase the priorities of web debug toolbar routes (_wdt, _profiler*, _preview_error).
-* Added the ability to override controller template attribute with `_template_override` request attribute. Useful for overriding the template of a forwarded request. Implemented in `\Oro\Bundle\DistributionBundle\EventListener\ControllerTemplateListener`. 
+* Added the ability to override controller template attribute with `_template_override` request attribute. Useful for overriding the template of a forwarded request. Implemented in `\Oro\Bundle\DistributionBundle\EventListener\ControllerTemplateListener`.
 
 #### FormBundle
 * Added the ability to use nested constraints (e.g. `When`) in `\Oro\Bundle\FormBundle\Validator\ConstraintFactory` that creates constraints from an array definition (e.g. fetched from `system_configuration.yml`).
@@ -57,7 +80,7 @@ The current file describes significant changes in the code that may affect the u
 * Added a new `purchase-volume-chart` chart.
 
 #### DataGridBundle
-* Added a new `transTemplate` datagrid option for the `itemsCounter` section that allows to set translation template for the datagrid items counter. 
+* Added a new `transTemplate` datagrid option for the `itemsCounter` section that allows to set translation template for the datagrid items counter.
 * Added a new `orodatagrid/js/datagrid/builder/items-count-external` datagrid builder that allows the showing of datagrid item count in an element with the specific data attribute.
 
 ### Changed
@@ -94,8 +117,8 @@ For all event types 2 events are triggered: `oro_operation.<event_name>` and `or
 * Moved `acl_resource` check to the guard event listener instead of constantly adding it to pre-conditions (this check was lost for service-based action_groups)
 * Action group execution events added for better extensibility and control of execution flow
 
-    * `guard` event is triggered during checking conditions
-      *`pre_execute` and `execute` events are triggered before and after operation logic execution
+  * `guard` event is triggered during checking conditions
+    *`pre_execute` and `execute` events are triggered before and after operation logic execution
 
 For all event types 2 events are triggered. `oro_action_group.<event_name>` and `oro_action_group.<operation_name>.<event_name>`
 
@@ -160,7 +183,7 @@ For all events except start 3 events are triggered. `oro_workflow.<event_name>`,
 * Changed a field value of the `type` field on a string instead of the removed `\Oro\Bundle\ThemeBundle\Entity\Enum\ThemeConfigurationType` enum for `\Oro\Bundle\ThemeBundle\Entity\ThemeConfiguration` entity.
 
 #### ApiBundle
-* The `masterRequest` attribute in API context was replaced with `mainRequest`. If you have API processors that use the `masterRequest` attribute in the `oro.api.processor` service tag it should be replaces with the `mainRequest` attribute. 
+* The `masterRequest` attribute in API context was replaced with `mainRequest`. If you have API processors that use the `masterRequest` attribute in the `oro.api.processor` service tag it should be replaces with the `mainRequest` attribute.
 * Changed `\Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface` to be able to use filters by same field but with different operators, e.g. `?filter[id][gt]=1&filter[id][lt]=10`:
   - added `getOne` method
   - changed return value for `get` method from `?FilterValue` to `FilterValue[]`
@@ -805,27 +828,6 @@ Scenario: Create Multi-Select fields with one auditable
 
 #### WsseAuthenticationBundle
 * WsseAuthenticationBundle was removed. WSSE auth headers cannot be used for API. Use Oauth 2.0 instead.
-
-## Changes in the Platform package versions
-
-- [6.0.0](#600-2024-03-30)
-- [5.1.0](#510-2023-03-31)
-- [5.0.0](#500-2022-01-26)
-- [4.2.10](#4210)
-- [4.2.4](#424)
-- [4.2.2](#422)
-- [4.2.0](#420-2020-01-29)
-- [4.1.0](#410-2020-01-31)
-- [4.0.0](#400-2019-07-31)
-- [3.1.4](#314)
-- [3.1.3](#313-2019-02-19)
-- [3.1.2](#312-2019-02-05)
-- [3.1.0](#310-2019-01-30)
-- [3.0.0](#300-2018-07-27)
-- [2.6.0](#260-2018-01-31)
-- [2.5.0](#250-2017-11-30)
-- [2.2.0](#220-2017-05-31)
-- [2.1.0](#210-2017-03-30)
 
 ## 6.0.0 (2024-03-30)
 [Show detailed list of changes](incompatibilities-6-0.md)
