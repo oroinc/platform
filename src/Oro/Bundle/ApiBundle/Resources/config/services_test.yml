@@ -383,6 +383,17 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, extra: '!identifier_fields_only', class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestCustomMagazine, priority: -35 }
 
+    oro_api.tests.update_list.process_by_message_queue_state:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\DisableProcessByMessageQueueState
+        public: true
+
+    oro_api.tests.update_list.disable_process_by_message_queue:
+        class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\DisableProcessByMessageQueue
+        arguments:
+            - '@oro_api.tests.update_list.process_by_message_queue_state'
+        tags:
+            - { name: oro.api.processor, action: update_list, group: initialize, priority: 255 }
+
     oro_api.tests.wait_for_synchronous_operation_processed:
         class: Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\WaitForSynchronousModeMessagesProcessed
         tags:

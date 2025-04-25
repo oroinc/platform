@@ -22,10 +22,12 @@ class TranslatorTest extends WebTestCase
     protected function setUp(): void
     {
         $this->initClient();
-        $this->loadFixtures([LoadStrategyLanguages::class]);
 
         $this->translator = self::getContainer()->get('translator.default');
         $this->translator->setStrategyProvider(new TranslationStrategyProvider([$this->createStrategy()]));
+
+        // Load the locales after installing the strategy, as this is necessary to create the correct fallback locales.
+        $this->loadFixtures([LoadStrategyLanguages::class]);
     }
 
     private function getTranslationManager(): TranslationManager
@@ -64,7 +66,6 @@ class TranslatorTest extends WebTestCase
             Translation::SCOPE_INSTALLED
         );
         $manager->flush();
-
         // Check that translator returns correct translation for locale without translation cache.
         $this->assertEquals(
             $enValue,

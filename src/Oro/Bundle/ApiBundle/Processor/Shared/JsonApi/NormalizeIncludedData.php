@@ -322,10 +322,10 @@ class NormalizeIncludedData implements ProcessorInterface
     private function getDataProperty(mixed $data, string $pointer): array
     {
         if (!\is_array($data)) {
-            throw new RuntimeException(sprintf('The "%s" element should be an array.', $pointer));
+            throw new RuntimeException(\sprintf('The "%s" element should be an array.', $pointer));
         }
         if (!\array_key_exists(JsonApiDoc::DATA, $data)) {
-            throw new RuntimeException(sprintf(
+            throw new RuntimeException(\sprintf(
                 'The "%s" element should have "%s" property.',
                 $pointer,
                 JsonApiDoc::DATA
@@ -333,7 +333,7 @@ class NormalizeIncludedData implements ProcessorInterface
         }
         $data = $data[JsonApiDoc::DATA];
         if (!\is_array($data)) {
-            throw new RuntimeException(sprintf(
+            throw new RuntimeException(\sprintf(
                 'The "%s" property of "%s" element should be an array.',
                 JsonApiDoc::DATA,
                 $pointer
@@ -349,14 +349,27 @@ class NormalizeIncludedData implements ProcessorInterface
             ? $data[JsonApiDoc::META]
             : [];
 
-        return MetaOperationParser::getOperationFlags(
+        $pointer = $this->buildPointer($pointer, JsonApiDoc::META);
+        $flags = MetaOperationParser::getOperationFlags(
             $meta,
             JsonApiDoc::META_UPDATE,
             JsonApiDoc::META_UPSERT,
             JsonApiDoc::META_VALIDATE,
-            $this->buildPointer($pointer, JsonApiDoc::META),
+            $pointer,
             $this->context
         );
+        if (null !== $flags
+            && !MetaOperationParser::assertOperationFlagNotExists(
+                $meta,
+                JsonApiDoc::META_VALIDATE,
+                $pointer,
+                $this->context
+            )
+        ) {
+            $flags = null;
+        }
+
+        return $flags;
     }
 
     private function getEntityClass(string $entityType, string $pointer): ?string
@@ -373,7 +386,7 @@ class NormalizeIncludedData implements ProcessorInterface
         $this->addValidationError(
             Constraint::ENTITY_TYPE,
             $this->buildPointer($pointer, JsonApiDoc::TYPE),
-            sprintf('Unknown entity type: %s.', $entityType)
+            \sprintf('Unknown entity type: %s.', $entityType)
         );
 
         return null;
@@ -483,7 +496,7 @@ class NormalizeIncludedData implements ProcessorInterface
             $configExtras
         )->getDefinition();
         if (null === $config) {
-            throw new \RuntimeException(sprintf(
+            throw new \RuntimeException(\sprintf(
                 'The entity config for the "%s" entity was not found.',
                 $entityClass
             ));

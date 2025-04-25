@@ -14,7 +14,7 @@ services:
     oro_api.update_list.check_processing_mode:
         class: Oro\Bundle\ApiBundle\Processor\UpdateList\CheckProcessingMode
         tags:
-            - { name: oro.api.processor, action: update_list, group:  initialize, priority: 200 }
+            - { name: oro.api.processor, action: update_list, group: initialize, priority: 200 }
 
     oro_api.update_list.initialize_config_extras:
         class: Oro\Bundle\ApiBundle\Processor\UpdateList\InitializeConfigExtras
@@ -70,7 +70,26 @@ services:
             - '@oro_api.batch.chunk_size_provider'
             - '@oro_api.batch.sync_processing_limit_provider'
         tags:
-            - { name: oro.api.processor, action: update_list, group: save_data, priority: -10 }
+            - { name: oro.api.processor, action: update_list, group: save_data, processByMessageQueue: true, priority: -10 }
+
+    oro_api.update_list.process_without_message_queue:
+        class: Oro\Bundle\ApiBundle\Processor\UpdateList\ProcessWithoutMessageQueue
+        arguments:
+            - '@oro_api.batch.update_handler'
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.batch.file_splitter_registry'
+            - '@oro_api.batch.chunk_file_classifier_registry'
+            - '@oro_api.batch.include_accessor_registry'
+            - '@oro_api.batch.include_map_manager'
+            - '@oro_api.batch.file_manager.source_data'
+            - '@oro_api.batch.file_manager'
+            - '@oro_api.batch.async.operation_manager'
+            - '@oro_api.batch.async.update_list_processing_helper'
+            - '@oro_api.batch.file_name_provider'
+            - '@oro_api.batch.retry_helper'
+            - '@oro_api.batch.data_encoder_registry'
+        tags:
+            - { name: oro.api.processor, action: update_list, group: save_data, processByMessageQueue: false, priority: -20 }
 
     #
     # finalize
@@ -88,7 +107,7 @@ services:
             - '@oro_api.action_processor_bag'
             - '@oro_api.filter_names_registry'
         tags:
-            - { name: oro.api.processor, action: update_list, group: finalize, priority: 10 }
+            - { name: oro.api.processor, action: update_list, group: finalize, synchronousMode: true, priority: 10 }
 
     oro_api.update_list.set_content_location_header:
         class: Oro\Bundle\ApiBundle\Processor\UpdateList\SetContentLocationHeader

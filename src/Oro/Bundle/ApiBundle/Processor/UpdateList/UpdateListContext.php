@@ -3,22 +3,35 @@
 namespace Oro\Bundle\ApiBundle\Processor\UpdateList;
 
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 
 /**
  * The execution context for processors for "update_list" action.
  */
 class UpdateListContext extends Context
 {
-    /** @var resource|null */
+    /** indicates whether a batch operation should be processed in the synchronous mode */
+    private const SYNCHRONOUS_MODE = 'synchronousMode';
+
+    /** indicates whether a batch operation should be processed by the message queue */
+    private const PROCESS_BY_MESSAGE_QUEUE = 'processByMessageQueue';
+
+    /** @var resource|array|null */
     private $requestData = null;
     private ?string $targetFileName = null;
     private ?int $operationId = null;
-    private ?bool $synchronousMode = null;
+
+    public function __construct(ConfigProvider $configProvider, MetadataProvider $metadataProvider)
+    {
+        parent::__construct($configProvider, $metadataProvider);
+        $this->set(self::PROCESS_BY_MESSAGE_QUEUE, true);
+    }
 
     /**
      * Gets a resource contains request data.
      *
-     * @return resource|null
+     * @return resource|array|null
      */
     public function getRequestData()
     {
@@ -28,7 +41,7 @@ class UpdateListContext extends Context
     /**
      * Sets a resource contains request data.
      *
-     * @param resource|null $requestData
+     * @param resource|array|null $requestData
      */
     public function setRequestData($requestData): void
     {
@@ -72,7 +85,7 @@ class UpdateListContext extends Context
      */
     public function hasSynchronousMode(): bool
     {
-        return null !== $this->synchronousMode;
+        return $this->has(self::SYNCHRONOUS_MODE);
     }
 
     /**
@@ -80,7 +93,7 @@ class UpdateListContext extends Context
      */
     public function isSynchronousMode(): bool
     {
-        return (bool)$this->synchronousMode;
+        return (bool)$this->get(self::SYNCHRONOUS_MODE);
     }
 
     /**
@@ -88,6 +101,26 @@ class UpdateListContext extends Context
      */
     public function setSynchronousMode(?bool $synchronousMode): void
     {
-        $this->synchronousMode = $synchronousMode;
+        if (null === $synchronousMode) {
+            $this->remove(self::SYNCHRONOUS_MODE);
+        } else {
+            $this->set(self::SYNCHRONOUS_MODE, $synchronousMode);
+        }
+    }
+
+    /**
+     * Indicates whether a batch operation should be processed by the message queue.
+     */
+    public function isProcessByMessageQueue(): bool
+    {
+        return $this->get(self::PROCESS_BY_MESSAGE_QUEUE);
+    }
+
+    /**
+     * Sets a flag indicates whether a batch operation should be processed by the message queue.
+     */
+    public function setProcessByMessageQueue(?bool $processByMessageQueue): void
+    {
+        $this->set(self::PROCESS_BY_MESSAGE_QUEUE, $processByMessageQueue ?? true);
     }
 }

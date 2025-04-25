@@ -5,8 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\UpdateList;
 use Oro\Bundle\ApiBundle\Processor\UpdateList\UpdateListContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use PHPUnit\Framework\TestCase;
 
-class UpdateListContextTest extends \PHPUnit\Framework\TestCase
+class UpdateListContextTest extends TestCase
 {
     private UpdateListContext $context;
 
@@ -30,6 +31,10 @@ class UpdateListContextTest extends \PHPUnit\Framework\TestCase
         } finally {
             fclose($resource);
         }
+
+        $data = [['name' => 'value']];
+        $this->context->setRequestData($data);
+        self::assertSame($data, $this->context->getRequestData());
 
         $this->context->setRequestData(null);
         self::assertNull($this->context->getRequestData());
@@ -63,17 +68,39 @@ class UpdateListContextTest extends \PHPUnit\Framework\TestCase
     {
         self::assertFalse($this->context->hasSynchronousMode());
         self::assertFalse($this->context->isSynchronousMode());
+        self::assertFalse($this->context->has('synchronousMode'));
 
         $this->context->setSynchronousMode(true);
         self::assertTrue($this->context->hasSynchronousMode());
         self::assertTrue($this->context->isSynchronousMode());
+        self::assertTrue($this->context->get('synchronousMode'));
 
         $this->context->setSynchronousMode(false);
         self::assertTrue($this->context->hasSynchronousMode());
         self::assertFalse($this->context->isSynchronousMode());
+        self::assertFalse($this->context->get('synchronousMode'));
 
         $this->context->setSynchronousMode(null);
         self::assertFalse($this->context->hasSynchronousMode());
         self::assertFalse($this->context->isSynchronousMode());
+        self::assertFalse($this->context->has('synchronousMode'));
+    }
+
+    public function testProcessByMessageQueue(): void
+    {
+        self::assertTrue($this->context->isProcessByMessageQueue());
+        self::assertTrue($this->context->get('processByMessageQueue'));
+
+        $this->context->setProcessByMessageQueue(false);
+        self::assertFalse($this->context->isProcessByMessageQueue());
+        self::assertFalse($this->context->get('processByMessageQueue'));
+
+        $this->context->setProcessByMessageQueue(true);
+        self::assertTrue($this->context->isProcessByMessageQueue());
+        self::assertTrue($this->context->get('processByMessageQueue'));
+
+        $this->context->setProcessByMessageQueue(null);
+        self::assertTrue($this->context->isProcessByMessageQueue());
+        self::assertTrue($this->context->get('processByMessageQueue'));
     }
 }

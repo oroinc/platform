@@ -7,34 +7,32 @@ use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListCreateChunkJobsTopic;
 use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListProcessChunkTopic;
 use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListStartChunkJobsTopic;
 use Oro\Bundle\ApiBundle\Batch\Async\UpdateListProcessingHelper;
+use Oro\Bundle\ApiBundle\Batch\Encoder\DataEncoderInterface;
 use Oro\Bundle\ApiBundle\Batch\FileNameProvider;
 use Oro\Bundle\ApiBundle\Batch\Model\ChunkFile;
+use Oro\Bundle\ApiBundle\Exception\FileSplitterException;
+use Oro\Bundle\ApiBundle\Exception\ParsingErrorFileSplitterException;
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
+class UpdateListProcessingHelperTest extends TestCase
 {
-    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileManager;
-
-    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $producer;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var UpdateListProcessingHelper */
-    private $helper;
+    private FileManager&MockObject $fileManager;
+    private MessageProducerInterface&MockObject $producer;
+    private LoggerInterface&MockObject $logger;
+    private UpdateListProcessingHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -648,5 +646,92 @@ class UpdateListProcessingHelperTest extends \PHPUnit\Framework\TestCase
             );
 
         $this->helper->sendProcessChunkMessage($parentBody, $job, $chunkFile, true);
+    }
+
+    public function testSafeDeleteFilesAfterFileSplitterFailure(): void
+    {
+        $this->fileManager->expects(self::once())
+            ->method('findFiles')
+            ->with('api_123_chunk_')
+            ->willReturn(['chunkFile1', 'chunkFile2']);
+        $this->fileManager->expects(self::exactly(4))
+            ->method('deleteFile')
+            ->withConsecutive(
+                ['targetFile1'],
+                ['targetFile2'],
+                ['chunkFile1'],
+                ['chunkFile2']
+            );
+
+        $this->helper->safeDeleteFilesAfterFileSplitterFailure(
+            new FileSplitterException('sourceFile', ['targetFile1', 'targetFile2']),
+            123
+        );
+    }
+
+    /**
+     * @dataProvider getFileSplitterFailureErrorMessageDataProvider
+     */
+    public function testGetFileSplitterFailureErrorMessage(
+        FileSplitterException $exception,
+        string $errorMessage
+    ): void {
+        self::assertEquals(
+            $errorMessage,
+            $this->helper->getFileSplitterFailureErrorMessage($exception)
+        );
+    }
+
+    public static function getFileSplitterFailureErrorMessageDataProvider(): array
+    {
+        return [
+            [
+                new FileSplitterException('sourceFile', ['targetFile']),
+                'Failed to parse the data file.'
+            ],
+            [
+                new FileSplitterException('sourceFile', ['targetFile'], new \Exception('Some error.')),
+                'Failed to parse the data file. Some error.'
+            ],
+            [
+                new ParsingErrorFileSplitterException('sourceFile', ['targetFile']),
+                'Failed to parse the data file.'
+            ]
+        ];
+    }
+
+    public function testGetChunkFilesToRetry(): void
+    {
+        $parentChunkFile = new ChunkFile('parent_chunk', 1, 500, 'testSection');
+        $chunksToRetry = [[1000, ['item1_1', 'item1_2']], [2000, ['item2_1', 'item2_2']]];
+        $firstFileIndex = 100;
+        $dataEncoder = $this->createMock(DataEncoderInterface::class);
+
+        $dataEncoder->expects(self::exactly(2))
+            ->method('encodeItems')
+            ->willReturnCallback(function ($items) {
+                return json_encode($items, JSON_THROW_ON_ERROR);
+            });
+
+        $this->fileManager->expects(self::exactly(2))
+            ->method('writeToStorage')
+            ->withConsecutive(
+                ['["item1_1","item1_2"]', 'parent_chunk_0'],
+                ['["item2_1","item2_2"]', 'parent_chunk_1']
+            );
+
+        $chunkFiles = $this->helper->getChunkFilesToRetry(
+            $parentChunkFile,
+            $chunksToRetry,
+            $firstFileIndex,
+            $dataEncoder
+        );
+        self::assertEquals(
+            [
+                new ChunkFile('parent_chunk_0', 100, 1500, 'testSection'),
+                new ChunkFile('parent_chunk_1', 101, 2500, 'testSection')
+            ],
+            $chunkFiles
+        );
     }
 }

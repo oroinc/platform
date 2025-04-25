@@ -41,7 +41,7 @@ class Translator extends BaseTranslator
     private ?string $appliedStrategyName = null;
     private ?string $appliedLocale = null;
     private bool $enableDumpCatalogue = false;
-    private bool $disableResetCatalogues = false;
+    private bool $disableResetCatalogues = true;
 
     public function __construct(
         ContainerInterface $container,
@@ -381,6 +381,11 @@ class Translator extends BaseTranslator
             $locale = $this->getLocale();
         }
         $strategyName = $this->strategyProvider->getStrategy()->getName();
+
+        if ($this->appliedStrategyName !== $strategyName) {
+            $this->catalogues = [];
+        }
+
         if ($this->appliedLocale !== $locale || $this->appliedStrategyName !== $strategyName) {
             $this->appliedLocale = $locale;
             $this->appliedStrategyName = $strategyName;

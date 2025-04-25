@@ -14,7 +14,6 @@ use Oro\Bundle\ApiBundle\Batch\Splitter\FileSplitterInterface;
 use Oro\Bundle\ApiBundle\Batch\Splitter\FileSplitterRegistry;
 use Oro\Bundle\ApiBundle\Batch\Splitter\PartialFileSplitterInterface;
 use Oro\Bundle\ApiBundle\Exception\FileSplitterException;
-use Oro\Bundle\ApiBundle\Exception\ParsingErrorFileSplitterException;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -179,7 +178,7 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
             }
             $errors = $this->includeMapManager->updateIncludedChunkIndex(
                 $this->fileManager,
-                $messageBody['operationId'],
+                $operationId,
                 $includeAccessor,
                 $includedChunkFiles
             );
@@ -437,6 +436,10 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
             $splitter->setChunkSizePerSection($initialChunkSizePerSection);
             $splitter->setChunkCountLimit($initialChunkCountLimit);
             $splitter->setChunkCountLimitPerSection($initialChunkCountLimitPerSection);
+            if ($splitter instanceof PartialFileSplitterInterface) {
+                $splitter->setTimeout(-1);
+                $splitter->setState([]);
+            }
         }
     }
 
@@ -450,23 +453,8 @@ class UpdateListMessageProcessor implements MessageProcessorInterface, TopicSubs
         $errorMessage = $exception->getMessage();
         $errorException = $exception;
         if ($exception instanceof FileSplitterException) {
-            // remove all target files that were already created before the failure
-            foreach ($exception->getTargetFileNames() as $fileName) {
-                $this->processingHelper->safeDeleteFile($fileName);
-            }
-            $this->processingHelper->safeDeleteChunkFiles(
-                $operationId,
-                $this->fileNameProvider->getChunkFileNameTemplate($operationId)
-            );
-
-            $errorMessage = 'Failed to parse the data file.';
-            if (null !== $exception->getPrevious()) {
-                $errorMessage .= ' ' . $exception->getPrevious()->getMessage();
-            }
-            if ($exception instanceof ParsingErrorFileSplitterException) {
-                // remove invalid UTF-8 characters from the error message
-                $errorMessage = mb_convert_encoding($errorMessage, 'UTF-8', 'UTF-8');
-            }
+            $this->processingHelper->safeDeleteFilesAfterFileSplitterFailure($exception, $operationId);
+            $errorMessage = $this->processingHelper->getFileSplitterFailureErrorMessage($exception);
             $errorException = null;
         }
 

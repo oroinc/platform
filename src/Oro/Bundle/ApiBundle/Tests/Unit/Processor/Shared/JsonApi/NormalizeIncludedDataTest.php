@@ -317,7 +317,7 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         );
     }
 
-    public function testProcessForValidateFlagThatNotAffectNormalization(): void
+    public function testProcessForNotSupportedValidateFlag(): void
     {
         $type = 'testType';
         $id = 'testId';
@@ -327,24 +327,9 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
             ]
         ];
         $normalizedType = 'Test\Class';
-        $includedEntity = new \stdClass();
 
-        $config = new EntityDefinitionConfig();
-
-        $this->doctrineHelper->expects(self::once())
-            ->method('resolveManageableEntityClass')
-            ->with($normalizedType)
-            ->willReturn($normalizedType);
-
-        $this->configProvider->expects(self::once())
-            ->method('getConfig')
-            ->with(
-                $normalizedType,
-                $this->context->getVersion(),
-                $this->context->getRequestType(),
-                [new EntityDefinitionConfigExtra(ApiAction::CREATE), new FilterIdentifierFieldsConfigExtra()]
-            )
-            ->willReturn($this->getConfig($config));
+        $this->doctrineHelper->expects(self::never())
+            ->method('resolveManageableEntityClass');
 
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
@@ -356,13 +341,13 @@ class NormalizeIncludedDataTest extends FormProcessorTestCase
         $this->context->setRequestData($requestData);
         $this->processor->process($this->context);
 
-        self::assertFalse($this->context->hasErrors());
-        self::assertNotNull($this->context->getIncludedEntities());
-        $addedIncludedEntity = $this->context->getIncludedEntities()->get($normalizedType, $id);
-        self::assertEquals($includedEntity, $addedIncludedEntity);
+        self::assertNull($this->context->getIncludedEntities());
         self::assertEquals(
-            new IncludedEntityData('/included/0', 0, false, ApiAction::CREATE),
-            $this->context->getIncludedEntities()->getData($addedIncludedEntity)
+            [
+                Error::createValidationError(Constraint::VALUE, 'The option is not supported.')
+                    ->setSource(ErrorSource::createByPointer('/included/0/meta/validate'))
+            ],
+            $this->context->getErrors()
         );
     }
 
