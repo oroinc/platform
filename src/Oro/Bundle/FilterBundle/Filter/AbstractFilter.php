@@ -72,7 +72,11 @@ abstract class AbstractFilter implements FilterInterface
         $this->params = $params;
 
         $options = $this->getOr(FilterUtility::FORM_OPTIONS_KEY, []);
-        $this->unresolvedOptions = array_filter($options, 'is_callable');
+        $this->unresolvedOptions = array_filter(
+            $options,
+            // exclude string values from callable checks since call without arguments may lead to unexpected behavior
+            static fn ($option) => !is_string($option) && is_callable($option)
+        );
         if (!$this->isLazy()) {
             $this->resolveOptions();
         } else {
