@@ -22,10 +22,7 @@ class MetaPropertyTest extends RestJsonApiTestCase
             [
                 'fields' => [
                     'title' => [
-                        'meta_property' => true,
-                        'form_options'  => [
-                            'constraints' => [['NotBlank' => null]]
-                        ]
+                        'meta_property' => true
                     ]
                 ]
             ]

@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\BatchUpdateExceptionController;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Processor\DisableProcessByMessageQueueState;
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
@@ -223,12 +224,78 @@ class RestJsonApiUpdateListTestCase extends RestJsonApiTestCase
         self::assertSame($hasErrors, $operation->isHasErrors(), 'Operation hasErrors');
     }
 
+    protected function getLastOperationId(): int
+    {
+        return $this->getEntityManager(AsyncOperation::class)
+            ->getRepository(AsyncOperation::class)
+            ->createQueryBuilder('e')
+            ->select('e.id')
+            ->orderBy('e.id', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    protected function disableProcessByMessageQueue(): void
+    {
+        /** @var DisableProcessByMessageQueueState $processByMessageQueueState */
+        $processByMessageQueueState = self::getContainer()
+            ->get('oro_api.tests.update_list.process_by_message_queue_state');
+        $processByMessageQueueState->disableProcessByMessageQueue();
+    }
+
     protected function sendUpdateListRequest(string $entityClass, array|string $data): int
     {
         $response = $this->cpatch(['entity' => $this->getEntityType($entityClass)], $data);
         self::assertResponseStatusCodeEquals($response, Response::HTTP_ACCEPTED);
 
         return $this->extractOperationIdFromContentLocationHeader($response);
+    }
+
+    protected function sendUpdateListRequestWithoutMessageQueue(
+        string $entityClass,
+        array|string $data,
+        ?string $failedGroupName = null
+    ): int {
+        $this->disableProcessByMessageQueue();
+
+        if ($failedGroupName) {
+            $this->getBatchUpdateExceptionController()->setFailedGroups([$failedGroupName]);
+        }
+
+        $response = $this->cpatch(['entity' => $this->getEntityType($entityClass)], $data);
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_ACCEPTED);
+
+        self::assertTrue($response->headers->has('Content-Location'));
+        $locationHeader = $response->headers->get('Content-Location');
+        $delimiterPosition = strrpos($locationHeader, '/');
+
+        return substr($locationHeader, $delimiterPosition + 1);
+    }
+
+    protected function sendUpdateListRequestWithoutMessageQueueAndWithSynchronousMode(
+        string $entityClass,
+        array|string $data,
+        bool $assertValid = true,
+        ?string $failedGroupName = null
+    ): Response {
+        $this->disableProcessByMessageQueue();
+
+        if ($failedGroupName) {
+            $this->getBatchUpdateExceptionController()->setFailedGroups([$failedGroupName]);
+        }
+
+        $response = $this->cpatch(
+            ['entity' => $this->getEntityType($entityClass)],
+            $data,
+            ['HTTP_X-Mode' => 'sync'],
+            $assertValid
+        );
+        if ($assertValid) {
+            self::assertResponseStatusCodeEquals($response, Response::HTTP_OK);
+        }
+
+        return $response;
     }
 
     protected function processUpdateListMessage(Context $messageContext): void

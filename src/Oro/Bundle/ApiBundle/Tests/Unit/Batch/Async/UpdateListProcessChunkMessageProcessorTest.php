@@ -528,7 +528,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
 
         $this->logger->expects(self::once())
             ->method('error')
-            ->with('Cannot get data encoder. Request Type: testRequest.');
+            ->with('A data encoder was not found for the request type "testRequest".');
 
         $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
@@ -745,6 +745,8 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
         $operationId = 123;
         $requestType = ['testRequest'];
         $fileName = 'chunkFile';
+        $fileIndex = 10;
+        $sectionName = 'test';
         $body = [
             'operationId'       => $operationId,
             'entityClass'       => 'Test\Entity',
@@ -753,9 +755,9 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             'synchronousMode'   => false,
             'jobId'             => $jobId,
             'fileName'          => $fileName,
-            'fileIndex'         => 10,
+            'fileIndex'         => $fileIndex,
             'firstRecordOffset' => 0,
-            'sectionName'       => 'test',
+            'sectionName'       => $sectionName,
             'extra_chunk'       => false,
         ];
         $message = $this->getMessage($body);
@@ -814,16 +816,17 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
         $this->fileLockManager->expects(self::once())
             ->method('releaseLock')
             ->with(sprintf('api_%s_info.lock', $operationId));
-        $dataEncoder->expects(self::once())
-            ->method('encodeItems')
-            ->with([$rawItems[0]])
-            ->willReturn('[{"key":"val1"}]');
-        $this->fileManager->expects(self::exactly(2))
-            ->method('writeToStorage')
-            ->withConsecutive(
-                [sprintf('{"chunkCount":%d}', $chunkCount + 1), sprintf('api_%s_info', $operationId)],
-                ['[{"key":"val1"}]', $fileName . '_0']
-            );
+        $this->processingHelper->expects(self::once())
+            ->method('getChunkFilesToRetry')
+            ->with(
+                new ChunkFile($fileName, $fileIndex, 0, $sectionName),
+                [
+                    [0, [['key' => 'val1']]]
+                ],
+                $chunkCount,
+                self::identicalTo($dataEncoder)
+            )
+            ->willReturn([new ChunkFile($fileName . '_0', $chunkCount, 0, $sectionName)]);
         $this->jobRunner->expects(self::once())
             ->method('createDelayed')
             ->with('oro:batch_api:123:chunk:1:1')
@@ -838,7 +841,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
             ->with(
                 $body,
                 self::isInstanceOf(Job::class),
-                new ChunkFile($fileName . '_0', $chunkCount, 0, 'test'),
+                new ChunkFile($fileName . '_0', $chunkCount, 0, $sectionName),
                 true
             );
 

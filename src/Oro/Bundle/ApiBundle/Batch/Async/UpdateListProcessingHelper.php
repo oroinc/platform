@@ -5,9 +5,12 @@ namespace Oro\Bundle\ApiBundle\Batch\Async;
 use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListCreateChunkJobsTopic;
 use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListProcessChunkTopic;
 use Oro\Bundle\ApiBundle\Batch\Async\Topic\UpdateListStartChunkJobsTopic;
+use Oro\Bundle\ApiBundle\Batch\Encoder\DataEncoderInterface;
 use Oro\Bundle\ApiBundle\Batch\FileNameProvider;
 use Oro\Bundle\ApiBundle\Batch\JsonUtil;
 use Oro\Bundle\ApiBundle\Batch\Model\ChunkFile;
+use Oro\Bundle\ApiBundle\Exception\FileSplitterException;
+use Oro\Bundle\ApiBundle\Exception\ParsingErrorFileSplitterException;
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
@@ -22,21 +25,12 @@ use Psr\Log\LoggerInterface;
  */
 class UpdateListProcessingHelper
 {
-    private FileManager $fileManager;
-    private FileNameProvider $fileNameProvider;
-    private MessageProducerInterface $producer;
-    private LoggerInterface $logger;
-
     public function __construct(
-        FileManager $fileManager,
-        FileNameProvider $fileNameProvider,
-        MessageProducerInterface $producer,
-        LoggerInterface $logger
+        private readonly FileManager $fileManager,
+        private readonly FileNameProvider $fileNameProvider,
+        private readonly MessageProducerInterface $producer,
+        private readonly LoggerInterface $logger
     ) {
-        $this->fileManager = $fileManager;
-        $this->fileNameProvider = $fileNameProvider;
-        $this->producer = $producer;
-        $this->logger = $logger;
     }
 
     public function getCommonBody(array $parentBody): array
@@ -255,6 +249,68 @@ class UpdateListProcessingHelper
             $body['extra_chunk'] = true;
         }
         $this->producer->send(UpdateListProcessChunkTopic::getName(), $this->createMessage($body));
+    }
+
+    public function safeDeleteFilesAfterFileSplitterFailure(
+        FileSplitterException $exception,
+        int $operationId
+    ): void {
+        // remove all target files that were already created before the failure
+        foreach ($exception->getTargetFileNames() as $fileName) {
+            $this->safeDeleteFile($fileName);
+        }
+        $this->safeDeleteChunkFiles(
+            $operationId,
+            $this->fileNameProvider->getChunkFileNameTemplate($operationId)
+        );
+    }
+
+    public function getFileSplitterFailureErrorMessage(FileSplitterException $exception): string
+    {
+        $errorMessage = 'Failed to parse the data file.';
+        if (null !== $exception->getPrevious()) {
+            $errorMessage .= ' ' . $exception->getPrevious()->getMessage();
+        }
+        if ($exception instanceof ParsingErrorFileSplitterException) {
+            // remove invalid UTF-8 characters from the error message
+            $errorMessage = mb_convert_encoding($errorMessage, 'UTF-8', 'UTF-8');
+        }
+
+        return $errorMessage;
+    }
+
+    /**
+     * @param ChunkFile            $parentChunkFile
+     * @param array                $chunksToRetry [[first item index, [item, ...]], ...]
+     * @param int                  $firstFileIndex
+     * @param DataEncoderInterface $dataEncoder
+     *
+     * @return ChunkFile[]
+     */
+    public function getChunkFilesToRetry(
+        ChunkFile $parentChunkFile,
+        array $chunksToRetry,
+        int $firstFileIndex,
+        DataEncoderInterface $dataEncoder
+    ): array {
+        $chunkFiles = [];
+        $firstRecordOffset = $parentChunkFile->getFirstRecordOffset();
+        $chunkFileNameTemplate = $parentChunkFile->getFileName() . '_%d';
+        $sectionName = $parentChunkFile->getSectionName();
+        $chunkFileIndex = 0;
+        foreach ($chunksToRetry as [$recordOffset, $items]) {
+            $chunkFileName = \sprintf($chunkFileNameTemplate, $chunkFileIndex);
+            $this->fileManager->writeToStorage($dataEncoder->encodeItems($items), $chunkFileName);
+            $chunkFiles[] = new ChunkFile(
+                $chunkFileName,
+                $firstFileIndex + $chunkFileIndex,
+                $firstRecordOffset + $recordOffset,
+                $sectionName
+            );
+            $chunkFileIndex++;
+        }
+
+        return $chunkFiles;
     }
 
     private function createMessage(array $body): Message

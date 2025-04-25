@@ -10,6 +10,7 @@ use Oro\Component\MessageQueue\Job\Job;
 
 /**
  * @dbIsolationPerTest
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestCase
@@ -43,79 +44,40 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
         return $employee->getId();
     }
 
-    /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     */
-    public function testCreateEntitiesWithNotIntersectedRelationships()
+    public function testCreateEntitiesWithNotIntersectedRelationships(): void
     {
-        $departmentEntityType = $this->getEntityType(TestDepartment::class);
-        $employeeEntityType = $this->getEntityType(TestEmployee::class);
         $operationId = $this->processUpdateList(
             TestDepartment::class,
-            [
-                'data'     => [
-                    [
-                        'type'          => $departmentEntityType,
-                        'attributes'    => ['title' => 'New Department 1'],
-                        'relationships' => [
-                            'staff' => [
-                                'data' => [
-                                    ['type' => $employeeEntityType, 'id' => 'new_employee1']
-                                ]
-                            ]
-                        ]
-                    ],
-                    [
-                        'type'          => $departmentEntityType,
-                        'attributes'    => ['title' => 'New Department 2'],
-                        'relationships' => [
-                            'staff' => [
-                                'data' => [
-                                    ['type' => $employeeEntityType, 'id' => 'new_employee2'],
-                                    ['type' => $employeeEntityType, 'id' => 'new_employee3']
-                                ]
-                            ]
-                        ]
-                    ]
-                ],
-                'included' => [
-                    [
-                        'type'       => $employeeEntityType,
-                        'id'         => 'new_employee1',
-                        'attributes' => ['name' => 'New Employee 1']
-                    ],
-                    [
-                        'type'       => $employeeEntityType,
-                        'id'         => 'new_employee2',
-                        'attributes' => ['name' => 'New Employee 2']
-                    ],
-                    [
-                        'type'       => $employeeEntityType,
-                        'id'         => 'new_employee3',
-                        'attributes' => ['name' => 'New Employee 3']
-                    ]
-                ]
-            ]
+            $this->getCreateEntitiesWithNotIntersectedRelationshipsRequestData()
+        );
+        $this->assertCreateEntitiesWithNotIntersectedRelationshipsResult($operationId);
+    }
+
+    public function testCreateEntitiesWithNotIntersectedRelationshipsWithoutMessageQueue(): void
+    {
+        $operationId = $this->sendUpdateListRequestWithoutMessageQueue(
+            TestDepartment::class,
+            $this->getCreateEntitiesWithNotIntersectedRelationshipsRequestData()
+        );
+        $this->assertCreateEntitiesWithNotIntersectedRelationshipsResult($operationId);
+    }
+
+    public function testCreateEntitiesWithNotIntersectedRelationshipsWithoutMessageQueueAndWithSyncMode(): void
+    {
+        $response = $this->sendUpdateListRequestWithoutMessageQueueAndWithSynchronousMode(
+            TestDepartment::class,
+            $this->getCreateEntitiesWithNotIntersectedRelationshipsRequestData()
         );
 
-        $response = $this->cget(['entity' => $departmentEntityType], ['page[size]' => 10]);
+        $departmentEntityType = $this->getEntityType(TestDepartment::class);
+        $employeeEntityType = $this->getEntityType(TestEmployee::class);
         $responseContent = $this->updateResponseContent(
             [
                 'data' => [
                     [
-                        'type'       => $departmentEntityType,
-                        'id'         => '<toString(@department1->id)>',
-                        'attributes' => ['title' => 'Existing Department 1']
-                    ],
-                    [
-                        'type'       => $departmentEntityType,
-                        'id'         => '<toString(@department2->id)>',
-                        'attributes' => ['title' => 'Existing Department 2']
-                    ],
-                    [
-                        'type'          => $departmentEntityType,
-                        'id'            => 'new',
-                        'attributes'    => ['title' => 'New Department 1'],
+                        'type' => $departmentEntityType,
+                        'id' => 'new',
+                        'attributes' => ['title' => 'New Department 1'],
                         'relationships' => [
                             'staff' => [
                                 'data' => [
@@ -125,9 +87,136 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
                         ]
                     ],
                     [
-                        'type'          => $departmentEntityType,
-                        'id'            => 'new',
-                        'attributes'    => ['title' => 'New Department 2'],
+                        'type' => $departmentEntityType,
+                        'id' => 'new',
+                        'attributes' => ['title' => 'New Department 2'],
+                        'relationships' => [
+                            'staff' => [
+                                'data' => [
+                                    ['type' => $employeeEntityType, 'id' => 'new'],
+                                    ['type' => $employeeEntityType, 'id' => 'new']
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'included' => [
+                    [
+                        'type' => $employeeEntityType,
+                        'id' => 'new',
+                        'meta' => ['includeId' => 'new_employee1'],
+                        'attributes' => ['name' => 'New Employee 1']
+                    ],
+                    [
+                        'type' => $employeeEntityType,
+                        'id' => 'new',
+                        'meta' => ['includeId' => 'new_employee2'],
+                        'attributes' => ['name' => 'New Employee 2']
+                    ],
+                    [
+                        'type' => $employeeEntityType,
+                        'id' => 'new',
+                        'meta' => ['includeId' => 'new_employee3'],
+                        'attributes' => ['name' => 'New Employee 3']
+                    ]
+                ]
+            ],
+            $response
+        );
+        $this->assertResponseContains($responseContent, $response);
+
+        $this->assertCreateEntitiesWithNotIntersectedRelationshipsResult($this->getLastOperationId());
+    }
+
+    private function getCreateEntitiesWithNotIntersectedRelationshipsRequestData(): array
+    {
+        $departmentEntityType = $this->getEntityType(TestDepartment::class);
+        $employeeEntityType = $this->getEntityType(TestEmployee::class);
+
+        return [
+            'data' => [
+                [
+                    'type' => $departmentEntityType,
+                    'attributes' => ['title' => 'New Department 1'],
+                    'relationships' => [
+                        'staff' => [
+                            'data' => [
+                                ['type' => $employeeEntityType, 'id' => 'new_employee1']
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    'type' => $departmentEntityType,
+                    'attributes' => ['title' => 'New Department 2'],
+                    'relationships' => [
+                        'staff' => [
+                            'data' => [
+                                ['type' => $employeeEntityType, 'id' => 'new_employee2'],
+                                ['type' => $employeeEntityType, 'id' => 'new_employee3']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'included' => [
+                [
+                    'type' => $employeeEntityType,
+                    'id' => 'new_employee1',
+                    'attributes' => ['name' => 'New Employee 1']
+                ],
+                [
+                    'type' => $employeeEntityType,
+                    'id' => 'new_employee2',
+                    'attributes' => ['name' => 'New Employee 2']
+                ],
+                [
+                    'type' => $employeeEntityType,
+                    'id' => 'new_employee3',
+                    'attributes' => ['name' => 'New Employee 3']
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    private function assertCreateEntitiesWithNotIntersectedRelationshipsResult(int $operationId): void
+    {
+        $departmentEntityType = $this->getEntityType(TestDepartment::class);
+        $employeeEntityType = $this->getEntityType(TestEmployee::class);
+
+        $response = $this->cget(['entity' => $departmentEntityType], ['page[size]' => 10]);
+        $responseContent = $this->updateResponseContent(
+            [
+                'data' => [
+                    [
+                        'type' => $departmentEntityType,
+                        'id' => '<toString(@department1->id)>',
+                        'attributes' => ['title' => 'Existing Department 1']
+                    ],
+                    [
+                        'type' => $departmentEntityType,
+                        'id' => '<toString(@department2->id)>',
+                        'attributes' => ['title' => 'Existing Department 2']
+                    ],
+                    [
+                        'type' => $departmentEntityType,
+                        'id' => 'new',
+                        'attributes' => ['title' => 'New Department 1'],
+                        'relationships' => [
+                            'staff' => [
+                                'data' => [
+                                    ['type' => $employeeEntityType, 'id' => 'new']
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $departmentEntityType,
+                        'id' => 'new',
+                        'attributes' => ['title' => 'New Department 2'],
                         'relationships' => [
                             'staff' => [
                                 'data' => [
@@ -153,9 +242,9 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
             [
                 'data' => [
                     [
-                        'type'          => $employeeEntityType,
-                        'id'            => '<toString(@employee1->id)>',
-                        'attributes'    => ['name' => 'Existing Employee 1'],
+                        'type' => $employeeEntityType,
+                        'id' => '<toString(@employee1->id)>',
+                        'attributes' => ['name' => 'Existing Employee 1'],
                         'relationships' => [
                             'department' => [
                                 'data' => ['type' => $departmentEntityType, 'id' => '<toString(@department1->id)>']
@@ -163,9 +252,9 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
                         ]
                     ],
                     [
-                        'type'          => $employeeEntityType,
-                        'id'            => (string)$newEmployee1Id,
-                        'attributes'    => ['name' => 'New Employee 1'],
+                        'type' => $employeeEntityType,
+                        'id' => (string)$newEmployee1Id,
+                        'attributes' => ['name' => 'New Employee 1'],
                         'relationships' => [
                             'department' => [
                                 'data' => ['type' => $departmentEntityType, 'id' => (string)$newDepartment1Id]
@@ -173,9 +262,9 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
                         ]
                     ],
                     [
-                        'type'          => $employeeEntityType,
-                        'id'            => (string)$newEmployee2Id,
-                        'attributes'    => ['name' => 'New Employee 2'],
+                        'type' => $employeeEntityType,
+                        'id' => (string)$newEmployee2Id,
+                        'attributes' => ['name' => 'New Employee 2'],
                         'relationships' => [
                             'department' => [
                                 'data' => ['type' => $departmentEntityType, 'id' => (string)$newDepartment2Id]
@@ -183,9 +272,9 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
                         ]
                     ],
                     [
-                        'type'          => $employeeEntityType,
-                        'id'            => (string)$newEmployee3Id,
-                        'attributes'    => ['name' => 'New Employee 3'],
+                        'type' => $employeeEntityType,
+                        'id' => (string)$newEmployee3Id,
+                        'attributes' => ['name' => 'New Employee 3'],
                         'relationships' => [
                             'department' => [
                                 'data' => ['type' => $departmentEntityType, 'id' => (string)$newDepartment2Id]
@@ -202,9 +291,9 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
         unset($summary['aggregateTime']);
         self::assertSame(
             [
-                'readCount'   => 2,
-                'writeCount'  => 2,
-                'errorCount'  => 0,
+                'readCount' => 2,
+                'writeCount' => 2,
+                'errorCount' => 0,
                 'createCount' => 2,
                 'updateCount' => 0
             ],
@@ -212,7 +301,7 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
         );
         self::assertSame(
             [
-                'primary'  => [
+                'primary' => [
                     [$this->getDepartmentId('New Department 1'), null, false],
                     [$this->getDepartmentId('New Department 2'), null, false]
                 ],
@@ -226,80 +315,40 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
         );
     }
 
-    /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     */
-    public function testCreateEntitiesWithIntersectedRelationships()
+    public function testCreateEntitiesWithIntersectedRelationships(): void
     {
-        $departmentEntityType = $this->getEntityType(TestDepartment::class);
-        $employeeEntityType = $this->getEntityType(TestEmployee::class);
-        $this->processUpdateList(
+        $operationId = $this->processUpdateList(
             TestDepartment::class,
-            [
-                'data'     => [
-                    [
-                        'type'          => $departmentEntityType,
-                        'attributes'    => ['title' => 'New Department 1'],
-                        'relationships' => [
-                            'staff' => [
-                                'data' => [
-                                    ['type' => $employeeEntityType, 'id' => 'new_employee3'],
-                                    ['type' => $employeeEntityType, 'id' => 'new_employee1']
-                                ]
-                            ]
-                        ]
-                    ],
-                    [
-                        'type'          => $departmentEntityType,
-                        'attributes'    => ['title' => 'New Department 2'],
-                        'relationships' => [
-                            'staff' => [
-                                'data' => [
-                                    ['type' => $employeeEntityType, 'id' => 'new_employee2'],
-                                    ['type' => $employeeEntityType, 'id' => 'new_employee1']
-                                ]
-                            ]
-                        ]
-                    ]
-                ],
-                'included' => [
-                    [
-                        'type'       => $employeeEntityType,
-                        'id'         => 'new_employee1',
-                        'attributes' => ['name' => 'New Employee 1']
-                    ],
-                    [
-                        'type'       => $employeeEntityType,
-                        'id'         => 'new_employee2',
-                        'attributes' => ['name' => 'New Employee 2']
-                    ],
-                    [
-                        'type'       => $employeeEntityType,
-                        'id'         => 'new_employee3',
-                        'attributes' => ['name' => 'New Employee 3']
-                    ]
-                ]
-            ]
+            $this->getCreateEntitiesWithIntersectedRelationshipsRequestData()
+        );
+        $this->assertCreateEntitiesWithIntersectedRelationshipsResult($operationId);
+    }
+
+    public function testCreateEntitiesWithIntersectedRelationshipsWithoutMessageQueue(): void
+    {
+        $operationId = $this->sendUpdateListRequestWithoutMessageQueue(
+            TestDepartment::class,
+            $this->getCreateEntitiesWithIntersectedRelationshipsRequestData()
+        );
+        $this->assertCreateEntitiesWithIntersectedRelationshipsResult($operationId);
+    }
+
+    public function testCreateEntitiesWithIntersectedRelationshipsWithoutMessageQueueAndWithSyncMode(): void
+    {
+        $response = $this->sendUpdateListRequestWithoutMessageQueueAndWithSynchronousMode(
+            TestDepartment::class,
+            $this->getCreateEntitiesWithIntersectedRelationshipsRequestData()
         );
 
-        $response = $this->cget(['entity' => $departmentEntityType], ['page[size]' => 10]);
+        $departmentEntityType = $this->getEntityType(TestDepartment::class);
+        $employeeEntityType = $this->getEntityType(TestEmployee::class);
         $responseContent = $this->updateResponseContent(
             [
                 'data' => [
                     [
-                        'type'       => $departmentEntityType,
-                        'id'         => '<toString(@department1->id)>',
-                        'attributes' => ['title' => 'Existing Department 1']
-                    ],
-                    [
-                        'type'       => $departmentEntityType,
-                        'id'         => '<toString(@department2->id)>',
-                        'attributes' => ['title' => 'Existing Department 2']
-                    ],
-                    [
-                        'type'          => $departmentEntityType,
-                        'id'            => 'new',
-                        'attributes'    => ['title' => 'New Department 1'],
+                        'type' => $departmentEntityType,
+                        'id' => 'new',
+                        'attributes' => ['title' => 'New Department 1'],
                         'relationships' => [
                             'staff' => [
                                 'data' => [
@@ -309,9 +358,137 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
                         ]
                     ],
                     [
-                        'type'          => $departmentEntityType,
-                        'id'            => 'new',
-                        'attributes'    => ['title' => 'New Department 2'],
+                        'type' => $departmentEntityType,
+                        'id' => 'new',
+                        'attributes' => ['title' => 'New Department 2'],
+                        'relationships' => [
+                            'staff' => [
+                                'data' => [
+                                    ['type' => $employeeEntityType, 'id' => 'new'],
+                                    ['type' => $employeeEntityType, 'id' => 'new']
+                                ]
+                            ]
+                        ]
+                    ]
+                ],
+                'included' => [
+                    [
+                        'type' => $employeeEntityType,
+                        'id' => 'new',
+                        'meta' => ['includeId' => 'new_employee1'],
+                        'attributes' => ['name' => 'New Employee 1']
+                    ],
+                    [
+                        'type' => $employeeEntityType,
+                        'id' => 'new',
+                        'meta' => ['includeId' => 'new_employee3'],
+                        'attributes' => ['name' => 'New Employee 3']
+                    ],
+                    [
+                        'type' => $employeeEntityType,
+                        'id' => 'new',
+                        'meta' => ['includeId' => 'new_employee2'],
+                        'attributes' => ['name' => 'New Employee 2']
+                    ]
+                ]
+            ],
+            $response
+        );
+        $this->assertResponseContains($responseContent, $response);
+
+        $this->assertCreateEntitiesWithIntersectedRelationshipsResult($this->getLastOperationId());
+    }
+
+    private function getCreateEntitiesWithIntersectedRelationshipsRequestData(): array
+    {
+        $departmentEntityType = $this->getEntityType(TestDepartment::class);
+        $employeeEntityType = $this->getEntityType(TestEmployee::class);
+
+        return [
+            'data' => [
+                [
+                    'type' => $departmentEntityType,
+                    'attributes' => ['title' => 'New Department 1'],
+                    'relationships' => [
+                        'staff' => [
+                            'data' => [
+                                ['type' => $employeeEntityType, 'id' => 'new_employee3'],
+                                ['type' => $employeeEntityType, 'id' => 'new_employee1']
+                            ]
+                        ]
+                    ]
+                ],
+                [
+                    'type' => $departmentEntityType,
+                    'attributes' => ['title' => 'New Department 2'],
+                    'relationships' => [
+                        'staff' => [
+                            'data' => [
+                                ['type' => $employeeEntityType, 'id' => 'new_employee2'],
+                                ['type' => $employeeEntityType, 'id' => 'new_employee1']
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'included' => [
+                [
+                    'type' => $employeeEntityType,
+                    'id' => 'new_employee1',
+                    'attributes' => ['name' => 'New Employee 1']
+                ],
+                [
+                    'type' => $employeeEntityType,
+                    'id' => 'new_employee2',
+                    'attributes' => ['name' => 'New Employee 2']
+                ],
+                [
+                    'type' => $employeeEntityType,
+                    'id' => 'new_employee3',
+                    'attributes' => ['name' => 'New Employee 3']
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    private function assertCreateEntitiesWithIntersectedRelationshipsResult(int $operationId): void
+    {
+        $departmentEntityType = $this->getEntityType(TestDepartment::class);
+        $employeeEntityType = $this->getEntityType(TestEmployee::class);
+
+        $response = $this->cget(['entity' => $departmentEntityType], ['page[size]' => 10]);
+        $responseContent = $this->updateResponseContent(
+            [
+                'data' => [
+                    [
+                        'type' => $departmentEntityType,
+                        'id' => '<toString(@department1->id)>',
+                        'attributes' => ['title' => 'Existing Department 1']
+                    ],
+                    [
+                        'type' => $departmentEntityType,
+                        'id' => '<toString(@department2->id)>',
+                        'attributes' => ['title' => 'Existing Department 2']
+                    ],
+                    [
+                        'type' => $departmentEntityType,
+                        'id' => 'new',
+                        'attributes' => ['title' => 'New Department 1'],
+                        'relationships' => [
+                            'staff' => [
+                                'data' => [
+                                    ['type' => $employeeEntityType, 'id' => 'new']
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $departmentEntityType,
+                        'id' => 'new',
+                        'attributes' => ['title' => 'New Department 2'],
                         'relationships' => [
                             'staff' => [
                                 'data' => [
@@ -337,9 +514,9 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
             [
                 'data' => [
                     [
-                        'type'          => $employeeEntityType,
-                        'id'            => '<toString(@employee1->id)>',
-                        'attributes'    => ['name' => 'Existing Employee 1'],
+                        'type' => $employeeEntityType,
+                        'id' => '<toString(@employee1->id)>',
+                        'attributes' => ['name' => 'Existing Employee 1'],
                         'relationships' => [
                             'department' => [
                                 'data' => ['type' => $departmentEntityType, 'id' => '<toString(@department1->id)>']
@@ -347,9 +524,9 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
                         ]
                     ],
                     [
-                        'type'          => $employeeEntityType,
-                        'id'            => (string)$newEmployee1Id,
-                        'attributes'    => ['name' => 'New Employee 1'],
+                        'type' => $employeeEntityType,
+                        'id' => (string)$newEmployee1Id,
+                        'attributes' => ['name' => 'New Employee 1'],
                         'relationships' => [
                             'department' => [
                                 'data' => ['type' => $departmentEntityType, 'id' => (string)$newDepartment2Id]
@@ -357,9 +534,9 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
                         ]
                     ],
                     [
-                        'type'          => $employeeEntityType,
-                        'id'            => (string)$newEmployee2Id,
-                        'attributes'    => ['name' => 'New Employee 2'],
+                        'type' => $employeeEntityType,
+                        'id' => (string)$newEmployee2Id,
+                        'attributes' => ['name' => 'New Employee 2'],
                         'relationships' => [
                             'department' => [
                                 'data' => ['type' => $departmentEntityType, 'id' => (string)$newDepartment2Id]
@@ -367,9 +544,9 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
                         ]
                     ],
                     [
-                        'type'          => $employeeEntityType,
-                        'id'            => (string)$newEmployee3Id,
-                        'attributes'    => ['name' => 'New Employee 3'],
+                        'type' => $employeeEntityType,
+                        'id' => (string)$newEmployee3Id,
+                        'attributes' => ['name' => 'New Employee 3'],
                         'relationships' => [
                             'department' => [
                                 'data' => ['type' => $departmentEntityType, 'id' => (string)$newDepartment1Id]
@@ -380,22 +557,50 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
             ],
             $response
         );
+
+        $operation = $this->getEntityManager()->find(AsyncOperation::class, $operationId);
+        $summary = $operation->getSummary();
+        unset($summary['aggregateTime']);
+        self::assertSame(
+            [
+                'readCount' => 2,
+                'writeCount' => 2,
+                'errorCount' => 0,
+                'createCount' => 2,
+                'updateCount' => 0
+            ],
+            $summary
+        );
+        self::assertSame(
+            [
+                'primary' => [
+                    [$this->getDepartmentId('New Department 1'), null, false],
+                    [$this->getDepartmentId('New Department 2'), null, false]
+                ],
+                'included' => [
+                    [TestEmployee::class, $this->getEmployeeId('New Employee 1'), 'new_employee1', false],
+                    [TestEmployee::class, $this->getEmployeeId('New Employee 3'), 'new_employee3', false],
+                    [TestEmployee::class, $this->getEmployeeId('New Employee 2'), 'new_employee2', false]
+                ]
+            ],
+            $operation->getAffectedEntities()
+        );
     }
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testCreateEntitiesWithProcessedIncludedItemsButWithoutIncludedItemsOnSecondIteration()
+    public function testCreateEntitiesWithProcessedIncludedItemsButWithoutIncludedItemsOnSecondIteration(): void
     {
         $departmentEntityType = $this->getEntityType(TestDepartment::class);
         $employeeEntityType = $this->getEntityType(TestEmployee::class);
         $this->processUpdateList(
             TestDepartment::class,
             [
-                'data'     => [
+                'data' => [
                     [
-                        'type'          => $departmentEntityType,
-                        'attributes'    => ['title' => 'New Department 1'],
+                        'type' => $departmentEntityType,
+                        'attributes' => ['title' => 'New Department 1'],
                         'relationships' => [
                             'staff' => [
                                 'data' => [
@@ -405,8 +610,8 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
                         ]
                     ],
                     [
-                        'type'          => $departmentEntityType,
-                        'attributes'    => ['title' => 'New Department 2'],
+                        'type' => $departmentEntityType,
+                        'attributes' => ['title' => 'New Department 2'],
                         'relationships' => [
                             'staff' => [
                                 'data' => [
@@ -418,8 +623,8 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
                 ],
                 'included' => [
                     [
-                        'type'       => $employeeEntityType,
-                        'id'         => 'new_employee1',
+                        'type' => $employeeEntityType,
+                        'id' => 'new_employee1',
                         'attributes' => ['name' => 'New Employee 1']
                     ]
                 ]
@@ -431,24 +636,24 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
             [
                 'data' => [
                     [
-                        'type'       => $departmentEntityType,
-                        'id'         => '<toString(@department1->id)>',
+                        'type' => $departmentEntityType,
+                        'id' => '<toString(@department1->id)>',
                         'attributes' => ['title' => 'Existing Department 1']
                     ],
                     [
-                        'type'       => $departmentEntityType,
-                        'id'         => '<toString(@department2->id)>',
+                        'type' => $departmentEntityType,
+                        'id' => '<toString(@department2->id)>',
                         'attributes' => ['title' => 'Existing Department 2']
                     ],
                     [
-                        'type'       => $departmentEntityType,
-                        'id'         => 'new',
+                        'type' => $departmentEntityType,
+                        'id' => 'new',
                         'attributes' => ['title' => 'New Department 1']
                     ],
                     [
-                        'type'          => $departmentEntityType,
-                        'id'            => 'new',
-                        'attributes'    => ['title' => 'New Department 2'],
+                        'type' => $departmentEntityType,
+                        'id' => 'new',
+                        'attributes' => ['title' => 'New Department 2'],
                         'relationships' => [
                             'staff' => [
                                 'data' => [
@@ -470,9 +675,9 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
             [
                 'data' => [
                     [
-                        'type'          => $employeeEntityType,
-                        'id'            => '<toString(@employee1->id)>',
-                        'attributes'    => ['name' => 'Existing Employee 1'],
+                        'type' => $employeeEntityType,
+                        'id' => '<toString(@employee1->id)>',
+                        'attributes' => ['name' => 'Existing Employee 1'],
                         'relationships' => [
                             'department' => [
                                 'data' => ['type' => $departmentEntityType, 'id' => '<toString(@department1->id)>']
@@ -480,9 +685,9 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
                         ]
                     ],
                     [
-                        'type'          => $employeeEntityType,
-                        'id'            => (string)$newEmployee1Id,
-                        'attributes'    => ['name' => 'New Employee 1'],
+                        'type' => $employeeEntityType,
+                        'id' => (string)$newEmployee1Id,
+                        'attributes' => ['name' => 'New Employee 1'],
                         'relationships' => [
                             'department' => [
                                 'data' => ['type' => $departmentEntityType, 'id' => (string)$newDepartment2Id]
@@ -495,7 +700,7 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
         );
     }
 
-    public function testCreateEntitiesWithSeveralIncludedDataChunks()
+    public function testCreateEntitiesWithSeveralIncludedDataChunks(): void
     {
         $departmentEntityType = $this->getEntityType(TestDepartment::class);
         $employeeEntityType = $this->getEntityType(TestEmployee::class);
@@ -505,13 +710,13 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
         $expectedDepartments = [
             'data' => [
                 [
-                    'type'       => $departmentEntityType,
-                    'id'         => '<toString(@department1->id)>',
+                    'type' => $departmentEntityType,
+                    'id' => '<toString(@department1->id)>',
                     'attributes' => ['title' => 'Existing Department 1']
                 ],
                 [
-                    'type'       => $departmentEntityType,
-                    'id'         => '<toString(@department2->id)>',
+                    'type' => $departmentEntityType,
+                    'id' => '<toString(@department2->id)>',
                     'attributes' => ['title' => 'Existing Department 2']
                 ]
             ]
@@ -519,12 +724,12 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
         for ($i = 0; $i <= $chunkSize; $i++) {
             $departmentName = sprintf('New Department %d', $i + 1);
             $data['data'][] = [
-                'type'       => $departmentEntityType,
+                'type' => $departmentEntityType,
                 'attributes' => ['title' => $departmentName]
             ];
             $expectedDepartments['data'][] = [
                 'type' => $departmentEntityType,
-                'id'   => 'new'
+                'id' => 'new'
             ];
         }
         for ($j = 0; $j <= $includedDataChunkSize * 2; $j++) {
@@ -533,16 +738,16 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
             $departmentIndex = $j % $chunkSize;
             $data['data'][$departmentIndex]['relationships']['staff']['data'][] = [
                 'type' => $employeeEntityType,
-                'id'   => $employeeId
+                'id' => $employeeId
             ];
             $data['included'][] = [
-                'type'       => $employeeEntityType,
-                'id'         => $employeeId,
+                'type' => $employeeEntityType,
+                'id' => $employeeId,
                 'attributes' => ['name' => $employeeName]
             ];
             $expectedDepartments['data'][$departmentIndex + 2]['relationships']['staff']['data'][] = [
                 'type' => $employeeEntityType,
-                'id'   => 'new'
+                'id' => 'new'
             ];
         }
         $this->processUpdateList(TestDepartment::class, $data);
@@ -555,16 +760,16 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testCreateEntitiesWithValidationErrorsInIncludedData()
+    public function testCreateEntitiesWithValidationErrorsInIncludedData(): void
     {
         $departmentEntityType = $this->getEntityType(TestDepartment::class);
         $employeeEntityType = $this->getEntityType(TestEmployee::class);
 
         $operationId = $this->sendUpdateListRequest(TestDepartment::class, [
-            'data'     => [
+            'data' => [
                 [
-                    'type'          => $departmentEntityType,
-                    'attributes'    => ['title' => 'New Department 1'],
+                    'type' => $departmentEntityType,
+                    'attributes' => ['title' => 'New Department 1'],
                     'relationships' => [
                         'staff' => [
                             'data' => [
@@ -574,8 +779,8 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
                     ]
                 ],
                 [
-                    'type'          => $departmentEntityType,
-                    'attributes'    => ['title' => 'New Department 2'],
+                    'type' => $departmentEntityType,
+                    'attributes' => ['title' => 'New Department 2'],
                     'relationships' => [
                         'staff' => [
                             'data' => [
@@ -588,18 +793,18 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
             ],
             'included' => [
                 [
-                    'type'       => $employeeEntityType,
-                    'id'         => 'new_employee1',
+                    'type' => $employeeEntityType,
+                    'id' => 'new_employee1',
                     'attributes' => ['name' => 'New Employee 1']
                 ],
                 [
-                    'type'       => $employeeEntityType,
-                    'id'         => 'new_employee2',
+                    'type' => $employeeEntityType,
+                    'id' => 'new_employee2',
                     'attributes' => ['name' => 'New Employee 2']
                 ],
                 [
-                    'type'       => $employeeEntityType,
-                    'id'         => 'new_employee3',
+                    'type' => $employeeEntityType,
+                    'id' => 'new_employee3',
                     'attributes' => ['name' => null]
                 ]
             ]
@@ -610,28 +815,15 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
 
         $this->consumeMessages();
 
-        $this->appendEntityConfig(
-            TestEmployee::class,
-            [
-                'fields' => [
-                    'name' => [
-                        'form_options' => [
-                            'constraints' => [['NotBlank' => null]]
-                        ]
-                    ]
-                ]
-            ]
-        );
-
         //refresh token after resetting in consumer
         $tokenStorage->setToken($token);
         $this->consumeAllMessages();
 
         $this->assertAsyncOperationError(
             [
-                'id'     => $operationId . '-1-1',
+                'id' => $operationId . '-1-1',
                 'status' => 400,
-                'title'  => 'not blank constraint',
+                'title' => 'not blank constraint',
                 'detail' => 'This value should not be blank.',
                 'source' => ['pointer' => '/included/2/attributes/name']
             ],
@@ -643,19 +835,19 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
             [
                 'data' => [
                     [
-                        'type'       => $departmentEntityType,
-                        'id'         => '<toString(@department1->id)>',
+                        'type' => $departmentEntityType,
+                        'id' => '<toString(@department1->id)>',
                         'attributes' => ['title' => 'Existing Department 1']
                     ],
                     [
-                        'type'       => $departmentEntityType,
-                        'id'         => '<toString(@department2->id)>',
+                        'type' => $departmentEntityType,
+                        'id' => '<toString(@department2->id)>',
                         'attributes' => ['title' => 'Existing Department 2']
                     ],
                     [
-                        'type'          => $departmentEntityType,
-                        'id'            => 'new',
-                        'attributes'    => ['title' => 'New Department 1'],
+                        'type' => $departmentEntityType,
+                        'id' => 'new',
+                        'attributes' => ['title' => 'New Department 1'],
                         'relationships' => [
                             'staff' => [
                                 'data' => [
@@ -677,9 +869,9 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
             [
                 'data' => [
                     [
-                        'type'          => $employeeEntityType,
-                        'id'            => '<toString(@employee1->id)>',
-                        'attributes'    => ['name' => 'Existing Employee 1'],
+                        'type' => $employeeEntityType,
+                        'id' => '<toString(@employee1->id)>',
+                        'attributes' => ['name' => 'Existing Employee 1'],
                         'relationships' => [
                             'department' => [
                                 'data' => ['type' => $departmentEntityType, 'id' => '<toString(@department1->id)>']
@@ -687,9 +879,9 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
                         ]
                     ],
                     [
-                        'type'          => $employeeEntityType,
-                        'id'            => (string)$newEmployee1Id,
-                        'attributes'    => ['name' => 'New Employee 1'],
+                        'type' => $employeeEntityType,
+                        'id' => (string)$newEmployee1Id,
+                        'attributes' => ['name' => 'New Employee 1'],
                         'relationships' => [
                             'department' => [
                                 'data' => ['type' => $departmentEntityType, 'id' => (string)$newDepartment1Id]
@@ -705,17 +897,17 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testCreateEntitiesWithRequestDataErrorInIncludedData()
+    public function testCreateEntitiesWithRequestDataErrorInIncludedData(): void
     {
         $departmentEntityType = $this->getEntityType(TestDepartment::class);
         $employeeEntityType = $this->getEntityType(TestEmployee::class);
         $operationId = $this->processUpdateList(
             TestDepartment::class,
             [
-                'data'     => [
+                'data' => [
                     [
-                        'type'          => $departmentEntityType,
-                        'attributes'    => ['title' => 'New Department 1'],
+                        'type' => $departmentEntityType,
+                        'attributes' => ['title' => 'New Department 1'],
                         'relationships' => [
                             'staff' => [
                                 'data' => [
@@ -725,8 +917,8 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
                         ]
                     ],
                     [
-                        'type'          => $departmentEntityType,
-                        'attributes'    => ['title' => 'New Department 2'],
+                        'type' => $departmentEntityType,
+                        'attributes' => ['title' => 'New Department 2'],
                         'relationships' => [
                             'staff' => [
                                 'data' => [
@@ -739,18 +931,18 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
                 ],
                 'included' => [
                     [
-                        'type'       => $employeeEntityType,
-                        'id'         => 'new_employee1',
+                        'type' => $employeeEntityType,
+                        'id' => 'new_employee1',
                         'attributes' => ['name' => 'New Employee 1']
                     ],
                     [
-                        'type'       => $employeeEntityType,
-                        'id'         => 'new_employee2',
+                        'type' => $employeeEntityType,
+                        'id' => 'new_employee2',
                         'attributes' => ['name' => 'New Employee 2']
                     ],
                     [
-                        'type'       => $employeeEntityType,
-                        'id'         => 'new_employee3',
+                        'type' => $employeeEntityType,
+                        'id' => 'new_employee3',
                         'attributes' => []
                     ]
                 ]
@@ -760,9 +952,9 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
 
         $this->assertAsyncOperationError(
             [
-                'id'     => $operationId . '-1-1',
+                'id' => $operationId . '-1-1',
                 'status' => 400,
-                'title'  => 'request data constraint',
+                'title' => 'request data constraint',
                 'detail' => 'The \'attributes\' property should not be empty',
                 'source' => ['pointer' => '/included/2/attributes']
             ],
@@ -774,19 +966,19 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
             [
                 'data' => [
                     [
-                        'type'       => $departmentEntityType,
-                        'id'         => '<toString(@department1->id)>',
+                        'type' => $departmentEntityType,
+                        'id' => '<toString(@department1->id)>',
                         'attributes' => ['title' => 'Existing Department 1']
                     ],
                     [
-                        'type'       => $departmentEntityType,
-                        'id'         => '<toString(@department2->id)>',
+                        'type' => $departmentEntityType,
+                        'id' => '<toString(@department2->id)>',
                         'attributes' => ['title' => 'Existing Department 2']
                     ],
                     [
-                        'type'          => $departmentEntityType,
-                        'id'            => 'new',
-                        'attributes'    => ['title' => 'New Department 1'],
+                        'type' => $departmentEntityType,
+                        'id' => 'new',
+                        'attributes' => ['title' => 'New Department 1'],
                         'relationships' => [
                             'staff' => [
                                 'data' => [
@@ -808,9 +1000,9 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
             [
                 'data' => [
                     [
-                        'type'          => $employeeEntityType,
-                        'id'            => '<toString(@employee1->id)>',
-                        'attributes'    => ['name' => 'Existing Employee 1'],
+                        'type' => $employeeEntityType,
+                        'id' => '<toString(@employee1->id)>',
+                        'attributes' => ['name' => 'Existing Employee 1'],
                         'relationships' => [
                             'department' => [
                                 'data' => ['type' => $departmentEntityType, 'id' => '<toString(@department1->id)>']
@@ -818,9 +1010,9 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
                         ]
                     ],
                     [
-                        'type'          => $employeeEntityType,
-                        'id'            => (string)$newEmployee1Id,
-                        'attributes'    => ['name' => 'New Employee 1'],
+                        'type' => $employeeEntityType,
+                        'id' => (string)$newEmployee1Id,
+                        'attributes' => ['name' => 'New Employee 1'],
                         'relationships' => [
                             'department' => [
                                 'data' => ['type' => $departmentEntityType, 'id' => (string)$newDepartment1Id]
@@ -836,17 +1028,17 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testCreateEntitiesWithInvalidAndUnlinkedIncludedItems()
+    public function testCreateEntitiesWithInvalidAndUnlinkedIncludedItems(): void
     {
         $departmentEntityType = $this->getEntityType(TestDepartment::class);
         $employeeEntityType = $this->getEntityType(TestEmployee::class);
         $operationId = $this->processUpdateList(
             TestDepartment::class,
             [
-                'data'     => [
+                'data' => [
                     [
-                        'type'          => $departmentEntityType,
-                        'attributes'    => ['title' => 'New Department 1'],
+                        'type' => $departmentEntityType,
+                        'attributes' => ['title' => 'New Department 1'],
                         'relationships' => [
                             'staff' => [
                                 'data' => [
@@ -856,8 +1048,8 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
                         ]
                     ],
                     [
-                        'type'          => $departmentEntityType,
-                        'attributes'    => ['title' => 'New Department 2'],
+                        'type' => $departmentEntityType,
+                        'attributes' => ['title' => 'New Department 2'],
                         'relationships' => [
                             'staff' => [
                                 'data' => [
@@ -870,40 +1062,40 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
                 ],
                 'included' => [
                     [
-                        'type'       => $employeeEntityType,
-                        'id'         => 'new_employee1',
+                        'type' => $employeeEntityType,
+                        'id' => 'new_employee1',
                         'attributes' => ['name' => 'New Employee 1']
                     ],
                     [
-                        'type'       => $employeeEntityType,
+                        'type' => $employeeEntityType,
                         'attributes' => ['name' => 'New Employee 2']
                     ],
                     [
-                        'type'       => $employeeEntityType,
-                        'id'         => 'new_employee3',
+                        'type' => $employeeEntityType,
+                        'id' => 'new_employee3',
                         'attributes' => ['name' => 'New Employee 3']
                     ],
                     [
-                        'type'       => $employeeEntityType,
-                        'id'         => 'new_employee4',
+                        'type' => $employeeEntityType,
+                        'id' => 'new_employee4',
                         'attributes' => ['name' => 'New Employee 4']
                     ],
                     [
-                        'type'       => $employeeEntityType,
-                        'id'         => 'new_employee5',
+                        'type' => $employeeEntityType,
+                        'id' => 'new_employee5',
                         'attributes' => ['name' => 'New Employee 5']
                     ],
                     [
-                        'type'       => $employeeEntityType,
-                        'id'         => 'new_employee6',
+                        'type' => $employeeEntityType,
+                        'id' => 'new_employee6',
                         'attributes' => ['name' => 'New Employee 6']
                     ],
                     null,
                     0,
                     'invalid value',
                     [
-                        'type'       => $employeeEntityType,
-                        'id'         => 'new_employee5',
+                        'type' => $employeeEntityType,
+                        'id' => 'new_employee5',
                         'attributes' => ['name' => 'New Employee 5 (duplicate)']
                     ]
                 ]
@@ -913,52 +1105,52 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
 
         $expectedErrors = [
             [
-                'id'     => $operationId . '-0-1',
+                'id' => $operationId . '-0-1',
                 'status' => 400,
-                'title'  => 'request data constraint',
+                'title' => 'request data constraint',
                 'detail' => "The 'id' property is required",
                 'source' => ['pointer' => '/included/1']
             ],
             [
-                'id'     => $operationId . '-0-2',
+                'id' => $operationId . '-0-2',
                 'status' => 400,
-                'title'  => 'request data constraint',
+                'title' => 'request data constraint',
                 'detail' => 'The item should be an object',
                 'source' => ['pointer' => '/included/6']
             ],
             [
-                'id'     => $operationId . '-0-3',
+                'id' => $operationId . '-0-3',
                 'status' => 400,
-                'title'  => 'request data constraint',
+                'title' => 'request data constraint',
                 'detail' => 'The item should be an object',
                 'source' => ['pointer' => '/included/7']
             ],
             [
-                'id'     => $operationId . '-0-4',
+                'id' => $operationId . '-0-4',
                 'status' => 400,
-                'title'  => 'request data constraint',
+                'title' => 'request data constraint',
                 'detail' => 'The item should be an object',
                 'source' => ['pointer' => '/included/8']
             ],
             [
-                'id'     => $operationId . '-0-5',
+                'id' => $operationId . '-0-5',
                 'status' => 400,
-                'title'  => 'request data constraint',
+                'title' => 'request data constraint',
                 'detail' => 'The item duplicates the item with the index 4',
                 'source' => ['pointer' => '/included/9']
             ],
             [
-                'id'     => $operationId . '-0-6',
+                'id' => $operationId . '-0-6',
                 'status' => 400,
-                'title'  => 'request data constraint',
+                'title' => 'request data constraint',
                 'detail' => 'The entity should have a relationship with at least one primary entity'
                     . ' and this should be explicitly specified in the request',
                 'source' => ['pointer' => '/included/0']
             ],
             [
-                'id'     => $operationId . '-0-7',
+                'id' => $operationId . '-0-7',
                 'status' => 400,
-                'title'  => 'request data constraint',
+                'title' => 'request data constraint',
                 'detail' => 'The entity should have a relationship with at least one primary entity'
                     . ' and this should be explicitly specified in the request',
                 'source' => ['pointer' => '/included/5']
@@ -972,9 +1164,9 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
             1.0,
             true,
             [
-                'readCount'   => 2,
-                'writeCount'  => 2,
-                'errorCount'  => count($expectedErrors),
+                'readCount' => 2,
+                'writeCount' => 2,
+                'errorCount' => count($expectedErrors),
                 'createCount' => 2,
                 'updateCount' => 0
             ]
@@ -985,19 +1177,19 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
             [
                 'data' => [
                     [
-                        'type'       => $departmentEntityType,
-                        'id'         => '<toString(@department1->id)>',
+                        'type' => $departmentEntityType,
+                        'id' => '<toString(@department1->id)>',
                         'attributes' => ['title' => 'Existing Department 1']
                     ],
                     [
-                        'type'       => $departmentEntityType,
-                        'id'         => '<toString(@department2->id)>',
+                        'type' => $departmentEntityType,
+                        'id' => '<toString(@department2->id)>',
                         'attributes' => ['title' => 'Existing Department 2']
                     ],
                     [
-                        'type'          => $departmentEntityType,
-                        'id'            => 'new',
-                        'attributes'    => ['title' => 'New Department 1'],
+                        'type' => $departmentEntityType,
+                        'id' => 'new',
+                        'attributes' => ['title' => 'New Department 1'],
                         'relationships' => [
                             'staff' => [
                                 'data' => [
@@ -1007,9 +1199,9 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
                         ]
                     ],
                     [
-                        'type'          => $departmentEntityType,
-                        'id'            => 'new',
-                        'attributes'    => ['title' => 'New Department 2'],
+                        'type' => $departmentEntityType,
+                        'id' => 'new',
+                        'attributes' => ['title' => 'New Department 2'],
                         'relationships' => [
                             'staff' => [
                                 'data' => [
@@ -1035,9 +1227,9 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
             [
                 'data' => [
                     [
-                        'type'          => $employeeEntityType,
-                        'id'            => '<toString(@employee1->id)>',
-                        'attributes'    => ['name' => 'Existing Employee 1'],
+                        'type' => $employeeEntityType,
+                        'id' => '<toString(@employee1->id)>',
+                        'attributes' => ['name' => 'Existing Employee 1'],
                         'relationships' => [
                             'department' => [
                                 'data' => ['type' => $departmentEntityType, 'id' => '<toString(@department1->id)>']
@@ -1045,9 +1237,9 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
                         ]
                     ],
                     [
-                        'type'          => $employeeEntityType,
-                        'id'            => (string)$newEmployee3Id,
-                        'attributes'    => ['name' => 'New Employee 3'],
+                        'type' => $employeeEntityType,
+                        'id' => (string)$newEmployee3Id,
+                        'attributes' => ['name' => 'New Employee 3'],
                         'relationships' => [
                             'department' => [
                                 'data' => ['type' => $departmentEntityType, 'id' => (string)$newDepartment1Id]
@@ -1055,9 +1247,9 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
                         ]
                     ],
                     [
-                        'type'          => $employeeEntityType,
-                        'id'            => (string)$newEmployee4Id,
-                        'attributes'    => ['name' => 'New Employee 4'],
+                        'type' => $employeeEntityType,
+                        'id' => (string)$newEmployee4Id,
+                        'attributes' => ['name' => 'New Employee 4'],
                         'relationships' => [
                             'department' => [
                                 'data' => ['type' => $departmentEntityType, 'id' => (string)$newDepartment2Id]
@@ -1065,9 +1257,9 @@ class UpdateListForEntityWithIncludedDataTest extends RestJsonApiUpdateListTestC
                         ]
                     ],
                     [
-                        'type'          => $employeeEntityType,
-                        'id'            => (string)$newEmployee5Id,
-                        'attributes'    => ['name' => 'New Employee 5'],
+                        'type' => $employeeEntityType,
+                        'id' => (string)$newEmployee5Id,
+                        'attributes' => ['name' => 'New Employee 5'],
                         'relationships' => [
                             'department' => [
                                 'data' => ['type' => $departmentEntityType, 'id' => (string)$newDepartment2Id]

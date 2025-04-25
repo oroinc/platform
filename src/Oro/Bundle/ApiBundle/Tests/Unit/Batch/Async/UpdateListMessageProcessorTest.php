@@ -31,6 +31,8 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -39,51 +41,26 @@ use Psr\Log\LoggerInterface;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class UpdateListMessageProcessorTest extends TestCase
 {
     use MessageQueueExtension;
 
     private const SPLIT_FILE_TIMEOUT = 30000;
     private const JOB_NAME = 'oro:batch_api:';
 
-    /** @var JobRunner|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobRunner;
-
-    /** @var JobManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobManager;
-
-    /** @var DependentJobService|\PHPUnit\Framework\MockObject\MockObject */
-    private $dependentJob;
-
-    /** @var FileSplitterRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $splitterRegistry;
-
-    /** @var ChunkFileClassifierRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $chunkFileClassifierRegistry;
-
-    /** @var IncludeAccessorRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $includeAccessorRegistry;
-
-    /** @var IncludeMapManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $includeMapManager;
-
-    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $sourceDataFileManager;
-
-    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileManager;
-
-    /** @var AsyncOperationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $operationManager;
-
-    /** @var UpdateListProcessingHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $processingHelper;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var UpdateListMessageProcessor */
-    private $processor;
+    private JobRunner&MockObject $jobRunner;
+    private JobManagerInterface&MockObject $jobManager;
+    private DependentJobService&MockObject $dependentJob;
+    private FileSplitterRegistry&MockObject $splitterRegistry;
+    private ChunkFileClassifierRegistry&MockObject $chunkFileClassifierRegistry;
+    private IncludeAccessorRegistry&MockObject $includeAccessorRegistry;
+    private IncludeMapManager&MockObject $includeMapManager;
+    private FileManager&MockObject $sourceDataFileManager;
+    private FileManager&MockObject $fileManager;
+    private AsyncOperationManager&MockObject $operationManager;
+    private UpdateListProcessingHelper&MockObject $processingHelper;
+    private LoggerInterface&MockObject $logger;
+    private UpdateListMessageProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -154,7 +131,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     private function expectSplitFile(
-        FileSplitterInterface|\PHPUnit\Framework\MockObject\MockObject $splitter,
+        FileSplitterInterface&MockObject $splitter,
         int $operationId,
         string $fileName,
         int $chunkSize,
@@ -185,7 +162,7 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
     }
 
     private function expectSplitFileThrowException(
-        FileSplitterInterface|\PHPUnit\Framework\MockObject\MockObject $splitter,
+        FileSplitterInterface&MockObject $splitter,
         int $operationId,
         string $fileName,
         int $chunkSize,
@@ -240,9 +217,8 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             });
     }
 
-    private function createDependentJobContext(
-        Job $rootJob
-    ): DependentJobContext|\PHPUnit\Framework\MockObject\MockObject {
+    private function createDependentJobContext(Job $rootJob): DependentJobContext&MockObject
+    {
         $dependentJobContext = $this->createMock(DependentJobContext::class);
         $this->dependentJob->expects(self::once())
             ->method('createDependentJobContext')
@@ -365,6 +341,13 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->expectGetSplitter(new RequestType($requestType), $splitter);
         $this->expectGetClassifier(new RequestType($requestType), $classifier);
         $this->expectSplitFileThrowException($splitter, $operationId, $fileName, $chunkSize, $splitterException);
+        $this->processingHelper->expects(self::once())
+            ->method('safeDeleteFilesAfterFileSplitterFailure')
+            ->with($splitterException, $operationId);
+        $this->processingHelper->expects(self::once())
+            ->method('getFileSplitterFailureErrorMessage')
+            ->with($splitterException)
+            ->willReturn('Failed to parse the data file. Some parsing error.');
         $this->operationManager->expects(self::once())
             ->method('markAsFailed')
             ->with($operationId, $fileName, 'Failed to parse the data file. Some parsing error.');
@@ -375,10 +358,6 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
                 'The splitting of the file "testFile" failed.'
                 . ' Reason: Failed to parse the data file. Some parsing error.'
             );
-
-        $this->processingHelper->expects(self::once())
-            ->method('safeDeleteChunkFiles')
-            ->with($operationId, sprintf('api_%d_chunk_', $operationId) . '%s');
 
         $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
@@ -412,6 +391,13 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->expectGetSplitter(new RequestType($requestType), $splitter);
         $this->expectGetClassifier(new RequestType($requestType), $classifier);
         $this->expectSplitFileThrowException($splitter, $operationId, $fileName, $chunkSize, $splitterException);
+        $this->processingHelper->expects(self::once())
+            ->method('safeDeleteFilesAfterFileSplitterFailure')
+            ->with($splitterException, $operationId);
+        $this->processingHelper->expects(self::once())
+            ->method('getFileSplitterFailureErrorMessage')
+            ->with($splitterException)
+            ->willReturn('Failed to parse the data file.');
         $this->operationManager->expects(self::once())
             ->method('markAsFailed')
             ->with($operationId, $fileName, 'Failed to parse the data file.');
@@ -419,10 +405,6 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->logger->expects(self::once())
             ->method('error')
             ->with('The splitting of the file "testFile" failed. Reason: Failed to parse the data file.');
-
-        $this->processingHelper->expects(self::once())
-            ->method('safeDeleteChunkFiles')
-            ->with($operationId, sprintf('api_%d_chunk_', $operationId) . '%s');
 
         $result = $this->processor->process($message, $this->createMock(SessionInterface::class));
 
@@ -620,12 +602,12 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->method('markAsRunning');
         $this->expectGetSplitter(new RequestType($requestType), $splitter);
         $this->expectGetClassifier(new RequestType($requestType), $classifier);
-        $splitter->expects(self::once())
+        $splitter->expects(self::exactly(2))
             ->method('setTimeout')
-            ->with(self::SPLIT_FILE_TIMEOUT);
-        $splitter->expects(self::once())
+            ->withConsecutive([self::SPLIT_FILE_TIMEOUT], [-1]);
+        $splitter->expects(self::exactly(2))
             ->method('setState')
-            ->with($splitterState);
+            ->withConsecutive([$splitterState], [[]]);
         $splitter->expects(self::once())
             ->method('isCompleted')
             ->willReturn(true);
@@ -746,12 +728,12 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with($operationId);
         $this->expectGetSplitter(new RequestType($requestType), $splitter);
         $this->expectGetClassifier(new RequestType($requestType), $classifier);
-        $splitter->expects(self::once())
+        $splitter->expects(self::exactly(2))
             ->method('setTimeout')
-            ->with(self::SPLIT_FILE_TIMEOUT);
-        $splitter->expects(self::once())
+            ->withConsecutive([self::SPLIT_FILE_TIMEOUT], [-1]);
+        $splitter->expects(self::exactly(2))
             ->method('setState')
-            ->with(self::identicalTo([]));
+            ->withConsecutive([[]], [[]]);
         $splitter->expects(self::once())
             ->method('isCompleted')
             ->willReturn(false);
@@ -834,12 +816,12 @@ class UpdateListMessageProcessorTest extends \PHPUnit\Framework\TestCase
             ->with($operationId);
         $this->expectGetSplitter(new RequestType($requestType), $splitter);
         $this->expectGetClassifier(new RequestType($requestType), $classifier);
-        $splitter->expects(self::once())
+        $splitter->expects(self::exactly(2))
             ->method('setTimeout')
-            ->with(self::SPLIT_FILE_TIMEOUT);
-        $splitter->expects(self::once())
+            ->withConsecutive([self::SPLIT_FILE_TIMEOUT], [-1]);
+        $splitter->expects(self::exactly(2))
             ->method('setState')
-            ->with(self::identicalTo([]));
+            ->withConsecutive([[]], [[]]);
         $splitter->expects(self::once())
             ->method('isCompleted')
             ->willReturn(true);

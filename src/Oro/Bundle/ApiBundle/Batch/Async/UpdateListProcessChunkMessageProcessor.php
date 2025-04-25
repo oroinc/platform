@@ -142,9 +142,9 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
             'createCount'   => $response->getSummary()->getCreateCount(),
             'updateCount'   => $response->getSummary()->getUpdateCount()
         ];
-        $affectedEntitiesData = $this->getAffectedEntitiesData($response->getAffectedEntities());
-        if ($affectedEntitiesData) {
-            $jobData['affectedEntities'] = $affectedEntitiesData;
+        $affectedEntities = $this->getAffectedEntitiesData($response->getAffectedEntities());
+        if ($affectedEntities) {
+            $jobData['affectedEntities'] = $affectedEntities;
         }
         $job->setData($jobData);
 
@@ -217,7 +217,7 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
         ChunkFile $chunkFile,
         string $retryReason
     ): bool {
-        $this->logger->info(sprintf('The retry requested. Reason: %s', $retryReason));
+        $this->logger->info(\sprintf('The retry requested. Reason: %s', $retryReason));
 
         $chunkCount = $this->updateChunkCount($body['operationId'], 1);
         if (null === $chunkCount) {
@@ -252,7 +252,7 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
         if (false !== $pos) {
             $retryNumber = substr($jobName, $pos + 2);
             if (is_numeric($retryNumber)) {
-                return sprintf('%s:r%d', substr($jobName, 0, $pos), (int)$retryNumber + 1);
+                return \sprintf('%s:r%d', substr($jobName, 0, $pos), (int)$retryNumber + 1);
             }
         }
 
@@ -269,7 +269,10 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
         $requestType = new RequestType($body['requestType']);
         $dataEncoder = $this->dataEncoderRegistry->getEncoder($requestType);
         if (null === $dataEncoder) {
-            $this->logger->error(sprintf('Cannot get data encoder. Request Type: %s.', (string)$requestType));
+            $this->logger->error(\sprintf(
+                'A data encoder was not found for the request type "%s".',
+                (string)$requestType
+            ));
 
             return false;
         }
@@ -280,30 +283,18 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
             return false;
         }
 
-        $chunkFileNames = [];
-        $chunkFileNameTemplate = $parentChunkFile->getFileName() . '_%d';
-        $chunkFileIndex = 0;
-        foreach ($chunksToRetry as [$recordOffset, $items]) {
-            $chunkFileName = sprintf($chunkFileNameTemplate, $chunkFileIndex);
-            $this->fileManager->writeToStorage($dataEncoder->encodeItems($items), $chunkFileName);
-            $chunkFileNames[] = [$recordOffset, $chunkFileIndex, $chunkFileName];
-            $chunkFileIndex++;
-        }
-
-        $firstFileIndex = $chunkCount - $numberOfChunksToRetry;
-        $firstRecordOffset = $parentChunkFile->getFirstRecordOffset();
-        $sectionName = $parentChunkFile->getSectionName();
-        foreach ($chunkFileNames as [$recordOffset, $chunkFileIndex, $chunkFileName]) {
+        $chunkFiles = $this->processingHelper->getChunkFilesToRetry(
+            $parentChunkFile,
+            $chunksToRetry,
+            $chunkCount - $numberOfChunksToRetry,
+            $dataEncoder
+        );
+        foreach ($chunkFiles as $chunkFileIndex => $chunkFile) {
             $this->createChunkJob(
                 $jobRunner,
-                sprintf('%s:%d', $job->getName(), $chunkFileIndex + 1),
+                \sprintf('%s:%d', $job->getName(), $chunkFileIndex + 1),
                 $body,
-                new ChunkFile(
-                    $chunkFileName,
-                    $firstFileIndex + $chunkFileIndex,
-                    $firstRecordOffset + $recordOffset,
-                    $sectionName
-                )
+                $chunkFile
             );
         }
 
@@ -331,7 +322,7 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
         $infoFileName = $this->fileNameProvider->getInfoFileName($operationId);
         $lockFileName = $this->fileNameProvider->getLockFileName($infoFileName);
         if (!$this->fileLockManager->acquireLock($lockFileName)) {
-            $this->logger->error(sprintf(
+            $this->logger->error(\sprintf(
                 'Cannot update the chunk count. Reason:'
                 . ' Failed to update the info file "%s" because the lock cannot be acquired.',
                 $infoFileName
@@ -345,7 +336,7 @@ class UpdateListProcessChunkMessageProcessor implements MessageProcessorInterfac
         } catch (\Throwable $e) {
             $chunkCount = null;
             $this->logger->error(
-                sprintf('Cannot update the chunk count. Reason: Failed to update the info file "%s".', $infoFileName),
+                \sprintf('Cannot update the chunk count. Reason: Failed to update the info file "%s".', $infoFileName),
                 ['exception' => $e]
             );
         } finally {
