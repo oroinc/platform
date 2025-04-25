@@ -69,12 +69,9 @@ class ConnectionChecker implements LoggerAwareInterface, ResettableInterface
 
     public function isConfigured(): bool
     {
-        if ($this->websocketClientParametersProvider === null) {
-            // Assumes that websocket server is always configured - as a BC layer.
-            return true;
-        }
+        $host = $this->websocketClientParametersProvider->getHost();
 
-        return $this->websocketClientParametersProvider->getHost() !== '';
+        return $host !== '' && $host !== 'null';
     }
 
     public function reset(): void

@@ -40,6 +40,11 @@ class ConnectionCheckerTest extends TestCase
 
     public function testCheckConnectionWhenNoWebsocketClientParametersProvider(): void
     {
+        $this->websocketClientParametersProvider
+            ->expects(self::exactly(2))
+            ->method('getHost')
+            ->willReturn('test.org');
+        $this->checker->setWebsocketClientParametersProvider($this->websocketClientParametersProvider);
         $this->client->expects(self::once())
             ->method('connect');
         $this->client->expects(self::once())
@@ -217,6 +222,12 @@ class ConnectionCheckerTest extends TestCase
 
     public function testIsConfiguredWhenNoWebsocketClientParametersProvider(): void
     {
+        $this->websocketClientParametersProvider
+            ->expects(self::once())
+            ->method('getHost')
+            ->willReturn('test.org');
+        $this->checker->setWebsocketClientParametersProvider($this->websocketClientParametersProvider);
+
         self::assertTrue($this->checker->isConfigured());
     }
 
