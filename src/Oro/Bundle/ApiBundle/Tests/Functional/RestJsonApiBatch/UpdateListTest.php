@@ -27,6 +27,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class UpdateListTest extends RestJsonApiUpdateListTestCase
 {
@@ -203,11 +204,10 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
     public function testTryToProcessWhenLoadOfChunkDataFailed(): void
     {
         $entityClass = TestDepartment::class;
-        $entityType = $this->getEntityType($entityClass);
         $data = [
             'data' => [
                 [
-                    'type'       => $entityType,
+                    'type' => $this->getEntityType($entityClass),
                     'attributes' => ['title' => 'New Department 1']
                 ]
             ]
@@ -255,14 +255,85 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         );
     }
 
+    public function testTryToProcessWithoutMessageQueueWhenLoadOfChunkDataFailed(): void
+    {
+        $entityClass = TestDepartment::class;
+        $operationId = $this->sendUpdateListRequestWithoutMessageQueue(
+            $entityClass,
+            [
+                'data' => [
+                    [
+                        'type' => $this->getEntityType($entityClass),
+                        'attributes' => ['title' => 'New Department 1']
+                    ]
+                ]
+            ],
+            'initialize'
+        );
+
+        $this->getEntityManager()->clear();
+        self::assertCount(0, $this->getEntityManager()->getRepository(TestDepartment::class)->findAll());
+
+        $this->assertAsyncOperationError(
+            [
+                'id' => $operationId . '-1-1',
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'title' => 'runtime exception',
+                'detail' => 'A test exception from the "initialize" group.',
+                'source' => null
+            ],
+            $operationId
+        );
+    }
+
+    public function testTryToProcessWithoutMessageQueueAndWithSyncModeWhenLoadOfChunkDataFailed(): void
+    {
+        $entityClass = TestDepartment::class;
+        $response = $this->sendUpdateListRequestWithoutMessageQueueAndWithSynchronousMode(
+            $entityClass,
+            [
+                'data' => [
+                    [
+                        'type' => $this->getEntityType($entityClass),
+                        'attributes' => ['title' => 'New Department 1']
+                    ]
+                ]
+            ],
+            false,
+            'initialize'
+        );
+        $this->assertResponseValidationError(
+            [
+                'title' => 'runtime exception',
+                'detail' => 'A test exception from the "initialize" group.'
+            ],
+            $response,
+            Response::HTTP_INTERNAL_SERVER_ERROR
+        );
+
+        $this->getEntityManager()->clear();
+        self::assertCount(0, $this->getEntityManager()->getRepository(TestDepartment::class)->findAll());
+
+        $operationId = $this->getLastOperationId();
+        $this->assertAsyncOperationError(
+            [
+                'id' => $operationId . '-1-1',
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'title' => 'runtime exception',
+                'detail' => 'A test exception from the "initialize" group.',
+                'source' => null
+            ],
+            $operationId
+        );
+    }
+
     public function testTryToProcessWhenFinalizationOfChunkFailed(): void
     {
         $entityClass = TestDepartment::class;
-        $entityType = $this->getEntityType($entityClass);
         $data = [
             'data' => [
                 [
-                    'type'       => $entityType,
+                    'type' => $this->getEntityType($entityClass),
                     'attributes' => ['title' => 'New Department 1']
                 ]
             ]
@@ -311,14 +382,87 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         );
     }
 
+    public function testTryToProcessWithoutMessageQueueWhenFinalizationOfChunkFailed(): void
+    {
+        $entityClass = TestDepartment::class;
+        $operationId = $this->sendUpdateListRequestWithoutMessageQueue(
+            $entityClass,
+            [
+                'data' => [
+                    [
+                        'type' => $this->getEntityType($entityClass),
+                        'attributes' => ['title' => 'New Department 1']
+                    ]
+                ]
+            ],
+            'finalize'
+        );
+
+        $this->getEntityManager()->clear();
+        $entities = $this->getEntityManager()->getRepository(TestDepartment::class)->findAll();
+        self::assertEquals(['New Department 1'], $this->getDepartmentNames($entities));
+
+        $this->assertAsyncOperationError(
+            [
+                'id' => $operationId . '-1-1',
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'title' => 'runtime exception',
+                'detail' => 'A test exception from the "finalize" group.',
+                'source' => null
+            ],
+            $operationId
+        );
+    }
+
+    public function testTryToProcessWithoutMessageQueueAndWithSyncModeWhenFinalizationOfChunkFailed(): void
+    {
+        $entityClass = TestDepartment::class;
+        $response = $this->sendUpdateListRequestWithoutMessageQueueAndWithSynchronousMode(
+            $entityClass,
+            [
+                'data' => [
+                    [
+                        'type' => $this->getEntityType($entityClass),
+                        'attributes' => ['title' => 'New Department 1']
+                    ]
+                ]
+            ],
+            false,
+            'finalize'
+        );
+        $this->assertResponseValidationError(
+            [
+                'title' => 'runtime exception',
+                'detail' => 'A test exception from the "finalize" group.'
+            ],
+            $response,
+            Response::HTTP_INTERNAL_SERVER_ERROR
+        );
+
+        $this->getEntityManager()->clear();
+        $entities = $this->getEntityManager()->getRepository(TestDepartment::class)->findAll();
+        self::assertEquals(['New Department 1'], $this->getDepartmentNames($entities));
+
+        $operationId = $this->getLastOperationId();
+        $this->assertAsyncOperationError(
+            [
+                'id' => $operationId . '-1-1',
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'title' => 'runtime exception',
+                'detail' => 'A test exception from the "finalize" group.',
+                'source' => null
+            ],
+            $operationId
+        );
+    }
+
     public function testTryToProcessWhenExceptionOccurredBeforeFlushChunkData(): void
     {
         $entityClass = TestDepartment::class;
-        $entityType = $this->getEntityType($entityClass);
         $data = [
             'data' => [
                 [
-                    'type'       => $entityType,
+                    'type' => $this->getEntityType($entityClass),
                     'attributes' => ['title' => 'New Department 1']
                 ]
             ]
@@ -371,14 +515,85 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         );
     }
 
+    public function testTryToProcessWithoutMessageQueueWhenExceptionOccurredBeforeFlushChunkData(): void
+    {
+        $entityClass = TestDepartment::class;
+        $operationId = $this->sendUpdateListRequestWithoutMessageQueue(
+            $entityClass,
+            [
+                'data' => [
+                    [
+                        'type' => $this->getEntityType($entityClass),
+                        'attributes' => ['title' => 'New Department 1']
+                    ]
+                ]
+            ],
+            'save_data:before_flush'
+        );
+
+        $this->getEntityManager()->clear();
+        self::assertCount(0, $this->getEntityManager()->getRepository(TestDepartment::class)->findAll());
+
+        $this->assertAsyncOperationError(
+            [
+                'id' => $operationId . '-1-1',
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'title' => 'runtime exception',
+                'detail' => 'A test exception from the "before_flush" stage of the "save_data" group.',
+                'source' => null
+            ],
+            $operationId
+        );
+    }
+
+    public function testTryToProcessWithoutMessageQueueAndWithSyncModeWhenExceptionOccurredBeforeFlushChunkData(): void
+    {
+        $entityClass = TestDepartment::class;
+        $response = $this->sendUpdateListRequestWithoutMessageQueueAndWithSynchronousMode(
+            $entityClass,
+            [
+                'data' => [
+                    [
+                        'type' => $this->getEntityType($entityClass),
+                        'attributes' => ['title' => 'New Department 1']
+                    ]
+                ]
+            ],
+            false,
+            'save_data:before_flush'
+        );
+        $this->assertResponseValidationError(
+            [
+                'title' => 'runtime exception',
+                'detail' => 'A test exception from the "before_flush" stage of the "save_data" group.'
+            ],
+            $response,
+            Response::HTTP_INTERNAL_SERVER_ERROR
+        );
+
+        $this->getEntityManager()->clear();
+        self::assertCount(0, $this->getEntityManager()->getRepository(TestDepartment::class)->findAll());
+
+        $operationId = $this->getLastOperationId();
+        $this->assertAsyncOperationError(
+            [
+                'id' => $operationId . '-1-1',
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'title' => 'runtime exception',
+                'detail' => 'A test exception from the "before_flush" stage of the "save_data" group.',
+                'source' => null
+            ],
+            $operationId
+        );
+    }
+
     public function testTryToProcessWhenExceptionOccurredAfterFlushChunkData(): void
     {
         $entityClass = TestDepartment::class;
-        $entityType = $this->getEntityType($entityClass);
         $data = [
             'data' => [
                 [
-                    'type'       => $entityType,
+                    'type' => $this->getEntityType($entityClass),
                     'attributes' => ['title' => 'New Department 1']
                 ]
             ]
@@ -427,14 +642,87 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         );
     }
 
+    public function testTryToProcessWithoutMessageQueueWhenExceptionOccurredAfterFlushChunkData(): void
+    {
+        $entityClass = TestDepartment::class;
+        $operationId = $this->sendUpdateListRequestWithoutMessageQueue(
+            $entityClass,
+            [
+                'data' => [
+                    [
+                        'type' => $this->getEntityType($entityClass),
+                        'attributes' => ['title' => 'New Department 1']
+                    ]
+                ]
+            ],
+            'save_data'
+        );
+
+        $this->getEntityManager()->clear();
+        $entities = $this->getEntityManager()->getRepository(TestDepartment::class)->findAll();
+        self::assertEquals(['New Department 1'], $this->getDepartmentNames($entities));
+
+        $this->assertAsyncOperationError(
+            [
+                'id' => $operationId . '-1-1',
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'title' => 'runtime exception',
+                'detail' => 'A test exception from the "save_data" group.',
+                'source' => null
+            ],
+            $operationId
+        );
+    }
+
+    public function testTryToProcessWithoutMessageQueueAndWithSyncModeWhenExceptionOccurredAfterFlushChunkData(): void
+    {
+        $entityClass = TestDepartment::class;
+        $response = $this->sendUpdateListRequestWithoutMessageQueueAndWithSynchronousMode(
+            $entityClass,
+            [
+                'data' => [
+                    [
+                        'type' => $this->getEntityType($entityClass),
+                        'attributes' => ['title' => 'New Department 1']
+                    ]
+                ]
+            ],
+            false,
+            'save_data'
+        );
+        $this->assertResponseValidationError(
+            [
+                'title' => 'runtime exception',
+                'detail' => 'A test exception from the "save_data" group.'
+            ],
+            $response,
+            Response::HTTP_INTERNAL_SERVER_ERROR
+        );
+
+        $this->getEntityManager()->clear();
+        $entities = $this->getEntityManager()->getRepository(TestDepartment::class)->findAll();
+        self::assertEquals(['New Department 1'], $this->getDepartmentNames($entities));
+
+        $operationId = $this->getLastOperationId();
+        $this->assertAsyncOperationError(
+            [
+                'id' => $operationId . '-1-1',
+                'status' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'title' => 'runtime exception',
+                'detail' => 'A test exception from the "save_data" group.',
+                'source' => null
+            ],
+            $operationId
+        );
+    }
+
     public function testTryToProcessWhenExceptionOccurredBeforeSaveChunkErrors(): void
     {
         $entityClass = TestDepartment::class;
-        $entityType = $this->getEntityType($entityClass);
         $data = [
             'data' => [
                 [
-                    'type'       => $entityType,
+                    'type' => $this->getEntityType($entityClass),
                     'attributes' => ['title' => 'New Department 1']
                 ]
             ]
@@ -474,14 +762,61 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         $this->assertAsyncOperationErrors([], $operationId);
     }
 
-    public function testTryToProcessWhenExceptionOccurredInNormalizeResultGroup(): void
+    public function testTryToProcessWithoutMessageQueueWhenExceptionOccurredBeforeSaveChunkErrors(): void
     {
         $entityClass = TestDepartment::class;
-        $entityType = $this->getEntityType($entityClass);
+        $operationId = $this->sendUpdateListRequestWithoutMessageQueue(
+            $entityClass,
+            [
+                'data' => [
+                    [
+                        'type' => $this->getEntityType($entityClass),
+                        'attributes' => ['title' => 'New Department 1']
+                    ]
+                ]
+            ],
+            'save_errors'
+        );
+
+        $this->getEntityManager()->clear();
+        $entities = $this->getEntityManager()->getRepository(TestDepartment::class)->findAll();
+        self::assertEquals(['New Department 1'], $this->getDepartmentNames($entities));
+
+        $this->assertAsyncOperationErrors([], $operationId);
+    }
+
+    public function testTryToProcessWithoutMessageQueueAndWithSyncModeWhenExceptionOccurredBeforeSaveChunkErrors(): void
+    {
+        $entityClass = TestDepartment::class;
+        $response = $this->sendUpdateListRequestWithoutMessageQueueAndWithSynchronousMode(
+            $entityClass,
+            [
+                'data' => [
+                    [
+                        'type' => $this->getEntityType($entityClass),
+                        'attributes' => ['title' => 'New Department 1']
+                    ]
+                ]
+            ],
+            false,
+            'save_errors'
+        );
+        self::assertResponseStatusCodeEquals($response, Response::HTTP_ACCEPTED);
+
+        $this->getEntityManager()->clear();
+        $entities = $this->getEntityManager()->getRepository(TestDepartment::class)->findAll();
+        self::assertEquals(['New Department 1'], $this->getDepartmentNames($entities));
+
+        $this->assertAsyncOperationErrors([], $this->getLastOperationId());
+    }
+
+    public function testTryToProcessWhenExceptionOccurredInNormalizeResult(): void
+    {
+        $entityClass = TestDepartment::class;
         $data = [
             'data' => [
                 [
-                    'type'       => $entityType,
+                    'type' => $this->getEntityType($entityClass),
                     'attributes' => ['title' => 'New Department 1']
                 ]
             ]
@@ -500,6 +835,70 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
         self::assertCount(0, $this->getEntityManager()->getRepository(TestDepartment::class)->findAll());
 
         $this->assertAsyncOperationErrors([], $operationId);
+    }
+
+    public function testTryToProcessWithoutMessageQueueWhenExceptionOccurredInNormalizeResult(): void
+    {
+        $entityClass = TestDepartment::class;
+        $this->disableProcessByMessageQueue();
+        $this->getBatchUpdateExceptionController()->setFailedGroups(['normalize_result']);
+        $response = $this->cpatch(
+            ['entity' => $this->getEntityType($entityClass)],
+            [
+                'data' => [
+                    [
+                        'type' => $this->getEntityType($entityClass),
+                        'attributes' => ['title' => 'New Department 1']
+                    ]
+                ]
+            ],
+            [],
+            false
+        );
+        $this->assertResponseValidationError(
+            [
+                'title' => 'runtime exception',
+                'detail' => 'A test exception from the "normalize_result" group.'
+            ],
+            $response,
+            Response::HTTP_INTERNAL_SERVER_ERROR
+        );
+
+        $this->getEntityManager()->clear();
+        self::assertCount(0, $this->getEntityManager()->getRepository(TestDepartment::class)->findAll());
+
+        $this->assertAsyncOperationErrors([], $this->getLastOperationId());
+    }
+
+    public function testTryToProcessWithoutMessageQueueAndWithSyncModeWhenExceptionOccurredInNormalizeResult(): void
+    {
+        $entityClass = TestDepartment::class;
+        $response = $this->sendUpdateListRequestWithoutMessageQueueAndWithSynchronousMode(
+            $entityClass,
+            [
+                'data' => [
+                    [
+                        'type' => $this->getEntityType($entityClass),
+                        'attributes' => ['title' => 'New Department 1']
+                    ]
+                ]
+            ],
+            false,
+            'normalize_result'
+        );
+        $this->assertResponseValidationError(
+            [
+                'title' => 'runtime exception',
+                'detail' => 'A test exception from the "normalize_result" group.'
+            ],
+            $response,
+            Response::HTTP_INTERNAL_SERVER_ERROR
+        );
+
+        $this->getEntityManager()->clear();
+        self::assertCount(0, $this->getEntityManager()->getRepository(TestDepartment::class)->findAll());
+
+        $this->assertAsyncOperationErrors([], $this->getLastOperationId());
     }
 
     public function testUpdateListRequest(): void
@@ -748,7 +1147,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
 
         $operationID = $this->sendUpdateListRequest($entityClass, $data);
 
-        self::consumeMessages();
+        $this->consumeMessages();
 
         self::assertMessagesCount(UpdateListProcessChunkTopic::getName(), 1);
 
@@ -794,7 +1193,8 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
             ];
         }
         $operationID = $this->sendUpdateListRequest($entityClass, $data);
-        self::consumeMessages();
+
+        $this->consumeMessages();
 
         self::assertMessagesCount(UpdateListProcessChunkTopic::getName(), 2);
 
@@ -1162,16 +1562,7 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
             $entityClass,
             $data,
             $expectedJobs,
-            null,
-            [
-                'fields' => [
-                    'title' => [
-                        'form_options' => [
-                            'constraints' => [['NotBlank' => null]]
-                        ]
-                    ]
-                ]
-            ]
+            null
         );
 
         $this->assertAsyncOperationRootJobStatus(
@@ -1187,6 +1578,138 @@ class UpdateListTest extends RestJsonApiUpdateListTestCase
                 'updateCount' => 1
             ]
         );
+
+        $this->getEntityManager()->clear();
+        $entities = $this->getEntityManager()->getRepository(TestDepartment::class)->findAll();
+        self::assertEquals(['Department 2', 'Updated Department 3'], $this->getDepartmentNames($entities));
+
+        $errors = $this->getErrorManager()->readErrors($this->getFileManager(), $operationId, 0, 10);
+        $expectedErrors = [
+            $this->createBatchError(
+                $operationId . '-1-1',
+                400,
+                'not blank constraint',
+                'This value should not be blank.',
+                0,
+                '/data/0/attributes/title'
+            ),
+            $this->createBatchError(
+                $operationId . '-1-2',
+                400,
+                'not blank constraint',
+                'This value should not be blank.',
+                1,
+                '/data/1/attributes/title'
+            )
+        ];
+        self::assertEquals($expectedErrors, $errors);
+    }
+
+    public function testTryToProcessChunkWithoutMessageQueueAndWithValidationErrors(): void
+    {
+        $entityClass = TestDepartment::class;
+        $entityType = $this->getEntityType($entityClass);
+        $departments = $this->createDepartments(['Department 2', 'Department 3']);
+        $data = [
+            'data' => [
+                [
+                    'type'       => $entityType,
+                    'attributes' => ['title' => '']
+                ],
+                [
+                    'meta'       => ['update' => true],
+                    'type'       => $entityType,
+                    'id'         => (string)$departments[0]->getId(),
+                    'attributes' => ['title' => '']
+                ],
+                [
+                    'meta'       => ['update' => true],
+                    'type'       => $entityType,
+                    'id'         => (string)$departments[1]->getId(),
+                    'attributes' => ['title' => 'Updated ' . $departments[1]->getName()]
+                ]
+            ]
+        ];
+
+        $operationId = $this->sendUpdateListRequestWithoutMessageQueue(
+            $entityClass,
+            $data
+        );
+
+        $this->getEntityManager()->clear();
+        $entities = $this->getEntityManager()->getRepository(TestDepartment::class)->findAll();
+        self::assertEquals(['Department 2', 'Updated Department 3'], $this->getDepartmentNames($entities));
+
+        $errors = $this->getErrorManager()->readErrors($this->getFileManager(), $operationId, 0, 10);
+        $expectedErrors = [
+            $this->createBatchError(
+                $operationId . '-1-1',
+                400,
+                'not blank constraint',
+                'This value should not be blank.',
+                0,
+                '/data/0/attributes/title'
+            ),
+            $this->createBatchError(
+                $operationId . '-1-2',
+                400,
+                'not blank constraint',
+                'This value should not be blank.',
+                1,
+                '/data/1/attributes/title'
+            )
+        ];
+        self::assertEquals($expectedErrors, $errors);
+    }
+
+    public function testTryToProcessChunkWithoutMessageQueueAndWithSyncModeAndWithValidationErrors(): void
+    {
+        $entityClass = TestDepartment::class;
+        $entityType = $this->getEntityType($entityClass);
+        $departments = $this->createDepartments(['Department 2', 'Department 3']);
+        $data = [
+            'data' => [
+                [
+                    'type'       => $entityType,
+                    'attributes' => ['title' => '']
+                ],
+                [
+                    'meta'       => ['update' => true],
+                    'type'       => $entityType,
+                    'id'         => (string)$departments[0]->getId(),
+                    'attributes' => ['title' => '']
+                ],
+                [
+                    'meta'       => ['update' => true],
+                    'type'       => $entityType,
+                    'id'         => (string)$departments[1]->getId(),
+                    'attributes' => ['title' => 'Updated ' . $departments[1]->getName()]
+                ]
+            ]
+        ];
+
+        $response = $this->sendUpdateListRequestWithoutMessageQueueAndWithSynchronousMode(
+            $entityClass,
+            $data,
+            false
+        );
+        $this->assertResponseValidationErrors(
+            [
+                [
+                    'title'  => 'not blank constraint',
+                    'detail' => 'This value should not be blank.',
+                    'source' => ['pointer' => '/data/0/attributes/title']
+                ],
+                [
+                    'title'  => 'not blank constraint',
+                    'detail' => 'This value should not be blank.',
+                    'source' => ['pointer' => '/data/1/attributes/title']
+                ]
+            ],
+            $response
+        );
+
+        $operationId = $this->getLastOperationId();
 
         $this->getEntityManager()->clear();
         $entities = $this->getEntityManager()->getRepository(TestDepartment::class)->findAll();

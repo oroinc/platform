@@ -27,7 +27,7 @@ class WaitForSynchronousModeMessagesProcessed implements ProcessorInterface
     {
         /** @var UpdateListContext $context */
 
-        if (!$context->isSynchronousMode()) {
+        if (!$context->isSynchronousMode() || !$context->isProcessByMessageQueue()) {
             return;
         }
 

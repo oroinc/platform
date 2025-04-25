@@ -27,23 +27,18 @@ class StoreRequestData implements ProcessorInterface
     {
         /** @var UpdateListContext $context */
 
+        $fileName = $context->getTargetFileName();
+        if (!$fileName) {
+            throw new \RuntimeException('The target file name was not set to the context.');
+        }
+
         $requestData = $context->getRequestData();
         if (null === $requestData) {
             // request data already stored
             return;
         }
 
-        if (!\is_resource($requestData)) {
-            // request data should be a resource
-            return;
-        }
-
-        $fileName = $context->getTargetFileName();
-        if (!$fileName) {
-            throw new \RuntimeException('The target file name was not set to the context.');
-        }
-
-        if (!$this->fileManager->writeStreamToStorage(new ReadonlyResourceStream($requestData), $fileName, true)) {
+        if (!$this->writeRequestDataToStorage($requestData, $fileName)) {
             $context->setTargetFileName(null);
             $context->addError(
                 Error::createValidationError(Constraint::REQUEST_DATA, 'The request data should not be empty.')
@@ -51,5 +46,27 @@ class StoreRequestData implements ProcessorInterface
         }
 
         $context->setRequestData(null);
+    }
+
+    private function writeRequestDataToStorage(mixed $requestData, string $fileName): bool
+    {
+        if (\is_resource($requestData)) {
+            return $this->fileManager->writeStreamToStorage(new ReadonlyResourceStream($requestData), $fileName, true);
+        }
+
+        if (!\is_array($requestData)) {
+            throw new \RuntimeException(\sprintf(
+                'The request data should be resource or array, got "%s".',
+                get_debug_type($requestData)
+            ));
+        }
+
+        if (!$requestData) {
+            return false;
+        }
+
+        $this->fileManager->writeToStorage(json_encode($requestData, JSON_THROW_ON_ERROR), $fileName);
+
+        return true;
     }
 }

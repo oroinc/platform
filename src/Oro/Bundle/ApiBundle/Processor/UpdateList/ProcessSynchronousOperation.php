@@ -71,10 +71,6 @@ class ProcessSynchronousOperation implements ProcessorInterface
     {
         /** @var UpdateListContext $context */
 
-        if (!$context->isSynchronousMode()) {
-            return;
-        }
-
         $operationId = $context->getOperationId();
         if (null === $operationId) {
             return;
@@ -94,9 +90,11 @@ class ProcessSynchronousOperation implements ProcessorInterface
                 $this->addErrorsToContext($context, $operationId);
             }
         } finally {
-            $this->producer->send(DeleteAsyncOperationTopic::getName(), ['operationId' => $operationId]);
-            if ($this->producer instanceof BufferedMessageProducer && $this->producer->isBufferingEnabled()) {
-                $this->producer->flushBuffer();
+            if ($context->isProcessByMessageQueue()) {
+                $this->producer->send(DeleteAsyncOperationTopic::getName(), ['operationId' => $operationId]);
+                if ($this->producer instanceof BufferedMessageProducer && $this->producer->isBufferingEnabled()) {
+                    $this->producer->flushBuffer();
+                }
             }
         }
     }
@@ -113,13 +111,13 @@ class ProcessSynchronousOperation implements ProcessorInterface
         while ((int)round(microtime(true) - $startTime) <= $this->waitTimeout) {
             $status = $this->getAsyncOperationStatus($query);
             if (null === $status) {
-                throw new RuntimeException(sprintf(
+                throw new RuntimeException(\sprintf(
                     'An operation for synchronous processing was not found. The operation ID: %d.',
                     $operationId
                 ));
             }
             if (AsyncOperation::STATUS_CANCELLED === $status) {
-                throw new RuntimeException(sprintf(
+                throw new RuntimeException(\sprintf(
                     'An operation for synchronous processing was cancelled. The operation ID: %d.',
                     $operationId
                 ));
@@ -171,7 +169,7 @@ class ProcessSynchronousOperation implements ProcessorInterface
 
         $result = [
             self::PRIMARY_ENTITIES => $primaryEntities,
-            self::PRIMARY_DATA     => $context->getResult()
+            self::PRIMARY_DATA => $context->getResult()
         ];
 
         $includedEntities = $affectedEntities['included'] ?? [];
@@ -337,15 +335,15 @@ class ProcessSynchronousOperation implements ProcessorInterface
     {
         $detail = $batchError->getDetail();
         if ($detail && str_starts_with($detail, self::CHUNK_LIMIT_EXCEEDED_ERROR_MESSAGE)) {
-            $prefix = substr($detail, strlen(self::CHUNK_LIMIT_EXCEEDED_ERROR_MESSAGE));
+            $prefix = substr($detail, \strlen(self::CHUNK_LIMIT_EXCEEDED_ERROR_MESSAGE));
             $detail = 'The data limit for the synchronous operation exceeded' . $prefix;
             if ('.' === $prefix) {
-                $detail .= sprintf(
+                $detail .= \sprintf(
                     ' The maximum number of records that can be processed by the synchronous operation is %d.',
                     $this->syncProcessingLimitProvider->getLimit($entityClass)
                 );
             } elseif (' for the section "included".' === $prefix) {
-                $detail .= sprintf(
+                $detail .= \sprintf(
                     ' The maximum number of included records that can be processed by the synchronous operation is %d.',
                     $this->syncProcessingLimitProvider->getIncludedDataLimit($entityClass)
                 );
