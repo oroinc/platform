@@ -27,7 +27,8 @@
         "ext-zip": "*",
         "composer-plugin-api": "^2.1",
         "composer/semver": "~3.4.0",
-        "psr/container": "^1.0",
+        "psr/container": "^1.0|^2.0",
+        "psr/log": "1.1.*|^2|^3",
         "psr/simple-cache": "3.0.*",
         "symfony/asset": "~6.4.0",
         "symfony/cache": "~6.4.0",
@@ -128,7 +129,6 @@
         "symfony/requirements-checker": "^2.0.0",
         "gedmo/doctrine-extensions": "~3.10.0",
         "predis/predis": "~1.1.6",
-        "psr/log": "1.1.*",
         "oro/platform-serialised-fields": "6.1.*",
         "google/recaptcha": "^1.3"
     },
