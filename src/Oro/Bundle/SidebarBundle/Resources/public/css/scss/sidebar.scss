@@ -421,3 +421,15 @@
         }
     }
 }
+
+@media (max-width: 1400px) {
+    .sidebar {
+        border-radius: 10px 10px 0 0;
+    }
+
+    .sidebar-widget:first-child {
+        .sidebar-widget__icon {
+            border-radius: 10px 10px 0 0;
+        }
+    }
+}
