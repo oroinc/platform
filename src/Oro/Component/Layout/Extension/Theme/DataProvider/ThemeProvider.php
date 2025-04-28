@@ -43,6 +43,16 @@ class ThemeProvider implements LoggerAwareInterface
      *
      * @return string
      */
+    public function getFaviconsPath($themeName)
+    {
+        return $this->getTheme($themeName)->getFaviconsPath();
+    }
+
+    /**
+     * @param string $themeName
+     *
+     * @return string
+     */
     public function getLogo($themeName)
     {
         return $this->getTheme($themeName)->getLogo();

@@ -53,6 +53,9 @@ class ThemeConfiguration implements ConfigurationInterface
         return array_merge(...$fileNames);
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
@@ -85,6 +88,9 @@ class ThemeConfiguration implements ConfigurationInterface
                     ->end()
                     ->scalarNode('icon')
                         ->info('The icon is displayed in the UI')
+                    ->end()
+                    ->scalarNode('favicons_path')
+                        ->info('The path to favicons')
                     ->end()
                     ->arrayNode('image_placeholders')
                         ->info('The images which will be displayed while no image')
