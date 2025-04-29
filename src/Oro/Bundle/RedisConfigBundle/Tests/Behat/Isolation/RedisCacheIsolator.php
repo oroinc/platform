@@ -37,7 +37,8 @@ class RedisCacheIsolator implements IsolatorInterface
     #[\Override]
     public function isApplicable(ContainerInterface $container)
     {
-        return \getenv(self::REDIS_ENABLED_ENV_VAR) === 'REDIS' && (bool)$this->knownClients;
+        $cacheValue = \getenv(self::REDIS_ENABLED_ENV_VAR);
+        return ($cacheValue === 'REDIS' || $cacheValue === 'DRAGONFLY') && (bool)$this->knownClients;
     }
 
     #[\Override]
