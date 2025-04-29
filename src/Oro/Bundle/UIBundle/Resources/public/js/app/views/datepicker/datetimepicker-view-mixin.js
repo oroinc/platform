@@ -161,6 +161,7 @@ define(function(require) {
             });
             this.$frontTimeField.on('blur', function() {
                 $(this).parent().toggleClass('timepicker-error', $(this).hasClass('error'));
+                $(this).timepicker('hide');
             });
             if (this.$el.attr('disabled') || this.$el.attr('readonly')) {
                 this.$frontTimeField.prop('disabled', true);
