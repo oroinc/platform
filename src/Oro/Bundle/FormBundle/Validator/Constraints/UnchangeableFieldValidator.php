@@ -41,12 +41,19 @@ class UnchangeableFieldValidator extends ConstraintValidator
                     $fieldName,
                     $em,
                     $metadata,
+                    $constraint->allowReset,
                     $constraint->allowChangeOwner
                 )
             ) {
                 $this->context->addViolation($constraint->message);
             }
-        } elseif ($this->isFieldValueChanged($value, $this->context->getObject(), $fieldName, $em)) {
+        } elseif ($this->isFieldValueChanged(
+            $value,
+            $this->context->getObject(),
+            $fieldName,
+            $em,
+            $constraint->allowReset
+        )) {
             $this->context->addViolation($constraint->message);
         }
     }
@@ -55,17 +62,24 @@ class UnchangeableFieldValidator extends ConstraintValidator
         mixed $value,
         object $entity,
         string $fieldName,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        bool $allowReset
     ): bool {
         $existingValue = $this->getExistingValue($entity, $fieldName, $em);
+        if (null === $existingValue) {
+            return false;
+        }
 
-        return
-            null !== $existingValue
-            && $existingValue !== $value;
+        if ($allowReset && null === $value) {
+            return false;
+        }
+
+        return $existingValue !== $value;
     }
 
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     private function isAssociationValueChanged(
         ?object $value,
@@ -73,6 +87,7 @@ class UnchangeableFieldValidator extends ConstraintValidator
         string $fieldName,
         EntityManagerInterface $em,
         ClassMetadata $metadata,
+        bool $allowReset,
         bool $allowChangeOwner
     ): bool {
         $associationMapping = $metadata->getAssociationMapping($fieldName);
@@ -112,6 +127,10 @@ class UnchangeableFieldValidator extends ConstraintValidator
             )
         ) {
             return true;
+        }
+
+        if ($allowReset && null === $value) {
+            return false;
         }
 
         return $this->isValueChanged($value, $existingValue, $targetMetadata);
