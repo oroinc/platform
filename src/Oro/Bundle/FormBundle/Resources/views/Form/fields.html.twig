@@ -245,20 +245,11 @@
 
         <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
             {%- if warning is defined and warning -%}
-                {% import '@OroUI/macros.html.twig' as ui %}
-                {{ ui.tooltip(
-                    warning,
-                    {},
-                    null,
-                    false,
-                    null,
-                    null,
-                    true,
-                    'warning'
-                ) }}
-            {% endif %}
-            {%- if tooltip is defined and tooltip -%}
-                {% import '@OroUI/macros.html.twig' as ui %}
+                {% import '@OroUI/macros.html.twig' as ui -%}
+                {{ ui.tooltip(warning, {}, null, false, null, null, true, 'warning') }}
+            {%- endif -%}
+            {%- if tooltip is defined and tooltip and (showTooltip is not defined or showTooltip) -%}
+                {% import '@OroUI/macros.html.twig' as ui -%}
                 {{ ui.tooltip(
                     tooltip,
                     tooltip_parameters|default({}),

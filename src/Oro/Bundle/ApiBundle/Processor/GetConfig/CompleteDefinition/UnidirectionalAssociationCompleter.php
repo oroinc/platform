@@ -74,6 +74,7 @@ class UnidirectionalAssociationCompleter implements CustomDataTypeCompleterInter
 
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     private function completeUnidirectionalAssociation(
         ClassMetadata $metadata,
@@ -120,17 +121,6 @@ class UnidirectionalAssociationCompleter implements CustomDataTypeCompleterInter
             ));
         }
 
-        if (!$field->hasTargetType()) {
-            $field->setTargetType(ConfigUtil::TO_MANY);
-        } elseif (ConfigUtil::TO_MANY !== $field->getTargetType()) {
-            throw new \RuntimeException(\sprintf(
-                'The target type for the unidirectional association "%s::%s" must not be specified or must be "%s".',
-                $metadata->getName(),
-                $fieldName,
-                ConfigUtil::TO_MANY
-            ));
-        }
-
         $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($targetClass);
         $targetAssociationName = substr($dataType, \strlen(self::UNIDIRECTIONAL_ASSOCIATION_PREFIX));
         if (!$targetMetadata->hasAssociation($targetAssociationName)) {
@@ -144,6 +134,21 @@ class UnidirectionalAssociationCompleter implements CustomDataTypeCompleterInter
         }
 
         $this->assetTargetAssociationMapping($metadata, $fieldName, $targetMetadata, $targetAssociationName);
+
+        $targetAssociationType = $targetMetadata->getAssociationMapping($targetAssociationName)['type'];
+        $targetType = $targetAssociationType & ClassMetadata::ONE_TO_ONE
+            ? ConfigUtil::TO_ONE
+            : ConfigUtil::TO_MANY;
+        if (!$field->hasTargetType()) {
+            $field->setTargetType($targetType);
+        } elseif ($targetType !== $field->getTargetType()) {
+            throw new \RuntimeException(\sprintf(
+                'The target type for the unidirectional association "%s::%s" must not be specified or must be "%s".',
+                $metadata->getName(),
+                $fieldName,
+                $targetType
+            ));
+        }
 
         $field->setDataType(null);
         $field->setFormOption('mapped', false);
@@ -193,10 +198,10 @@ class UnidirectionalAssociationCompleter implements CustomDataTypeCompleterInter
                 $metadata->getName()
             ));
         }
-        if (!($targetAssociationMapping['type'] & (ClassMetadata::MANY_TO_ONE | ClassMetadata::MANY_TO_MANY))) {
+        if (!($targetAssociationMapping['type'] & (ClassMetadata::TO_ONE | ClassMetadata::MANY_TO_MANY))) {
             throw new \RuntimeException(\sprintf(
                 'The association "%s::%s" that is referred by the unidirectional association "%s::%s"'
-                . ' must be many-to-one or many-to-many ORM association.',
+                . ' must be one-to-one, many-to-one or many-to-many ORM association.',
                 $targetMetadata->getName(),
                 $targetAssociationName,
                 $metadata->getName(),
@@ -210,19 +215,33 @@ class UnidirectionalAssociationCompleter implements CustomDataTypeCompleterInter
         ClassMetadata $targetMetadata,
         string $targetAssociationName
     ): QueryBuilder {
-        $qb = $this->doctrineHelper->createQueryBuilder($metadata->getName(), 'e');
-        if ($targetMetadata->isCollectionValuedAssociation($targetAssociationName)) {
-            $qb->innerJoin($targetMetadata->getName(), 'r', Join::WITH, \sprintf(
-                'e MEMBER OF r.%s',
-                $targetAssociationName
-            ));
-        } else {
-            $qb->innerJoin($targetMetadata->getName(), 'r', Join::WITH, \sprintf(
-                'r.%s = e',
-                $targetAssociationName
-            ));
+        $targetAssociationType = $targetMetadata->getAssociationMapping($targetAssociationName)['type'];
+        if ($targetAssociationType & ClassMetadata::MANY_TO_MANY) {
+            return $this->doctrineHelper->createQueryBuilder($metadata->getName(), 'e')
+                ->innerJoin(
+                    $targetMetadata->getName(),
+                    'r',
+                    Join::WITH,
+                    \sprintf('e MEMBER OF r.%s', $targetAssociationName)
+                );
         }
 
-        return $qb;
+        if ($targetAssociationType & ClassMetadata::MANY_TO_ONE) {
+            return $this->doctrineHelper->createQueryBuilder($metadata->getName(), 'e')
+                ->innerJoin(
+                    $targetMetadata->getName(),
+                    'r',
+                    Join::WITH,
+                    \sprintf('r.%s = e', $targetAssociationName)
+                );
+        }
+
+        return $this->doctrineHelper->createQueryBuilder($targetMetadata->getName(), 'r')
+            ->innerJoin(
+                $metadata->getName(),
+                'e',
+                Join::WITH,
+                \sprintf('r.%s = e', $targetAssociationName)
+            );
     }
 }

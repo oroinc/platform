@@ -21,6 +21,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Collects errors occurred when submitting forms for primary and included entities
@@ -34,6 +35,7 @@ class CollectFormErrors implements ProcessorInterface
     protected ConstraintTextExtractorInterface $constraintTextExtractor;
     protected ErrorCompleterRegistry $errorCompleterRegistry;
     protected PropertyAccessorInterface $propertyAccessor;
+    protected TranslatorInterface $translator;
 
     public function __construct(
         ConstraintTextExtractorInterface $constraintTextExtractor,
@@ -43,6 +45,11 @@ class CollectFormErrors implements ProcessorInterface
         $this->constraintTextExtractor = $constraintTextExtractor;
         $this->errorCompleterRegistry = $errorCompleterRegistry;
         $this->propertyAccessor = $propertyAccessor;
+    }
+
+    public function setTranslator(TranslatorInterface $translator): void
+    {
+        $this->translator = $translator;
     }
 
     #[\Override]
@@ -292,7 +299,6 @@ class CollectFormErrors implements ProcessorInterface
     protected function getFormErrorPropertyPath(FormError $error): ?string
     {
         $result = null;
-
         $cause = $error->getCause();
         if ($cause instanceof ConstraintViolation) {
             $result = $this->getConstraintViolationPropertyPath($cause);
@@ -448,7 +454,10 @@ class CollectFormErrors implements ProcessorInterface
 
     protected function createErrorObject(FormError $formError, ?string $propertyPath = null): Error
     {
-        $error = Error::createValidationError($this->getFormErrorTitle($formError), $formError->getMessage());
+        $error = Error::createValidationError(
+            $this->getFormErrorTitle($formError),
+            $this->getFormErrorDetail($formError)
+        );
         $statusCode = $this->getFormErrorStatusCode($formError);
         if (null !== $statusCode) {
             $error->setStatusCode($statusCode);
@@ -477,6 +486,22 @@ class CollectFormErrors implements ProcessorInterface
 
         // undefined constraint type
         return Constraint::FORM;
+    }
+
+    protected function getFormErrorDetail(FormError $formError): string
+    {
+        $result = $formError->getMessage();
+        $cause = $formError->getCause();
+        if ($cause instanceof ConstraintViolation
+            && !$cause->getMessageTemplate()
+            && null !== $cause->getConstraint()
+            && property_exists($cause->getConstraint(), 'message')
+            && $cause->getConstraint()->message === $result
+        ) {
+            $result = $this->translator->trans($result, $cause->getParameters(), 'validators');
+        }
+
+        return $result;
     }
 
     protected function getFormErrorStatusCode(FormError $formError): ?int

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Form\Handler;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityIdMetadataAdapter;
@@ -69,27 +70,30 @@ class UnidirectionalAssociationHandler
             }
 
             $field = $config->getField($fieldName);
-            $previousTargetEntities = $this->getPreviousTargetEntities(
-                $entity,
-                $field->getAssociationQuery(),
-                $metadata
-            );
             $targetEntityClass = $field->getTargetClass();
             $targetEntityMetadata = $this->doctrineHelper->getEntityMetadataForClass(
                 $this->getEntityClass($targetEntityClass, $requestType)
             );
-            if ($targetEntityMetadata->isCollectionValuedAssociation($targetAssociationName)) {
-                $this->updateCollectionValuedAssociation(
+            $targetAssociationType = $targetEntityMetadata->getAssociationMapping($targetAssociationName)['type'];
+            if ($targetAssociationType & ClassMetadata::MANY_TO_MANY) {
+                $this->updateManyToManyAssociation(
                     $entity,
-                    $previousTargetEntities,
+                    $this->getPreviousTargetEntities($entity, $field->getAssociationQuery(), $metadata),
+                    $fieldForm,
+                    $targetEntityClass,
+                    $targetAssociationName
+                );
+            } elseif ($targetAssociationType & ClassMetadata::MANY_TO_ONE) {
+                $this->updateManyToOneAssociation(
+                    $entity,
+                    $this->getPreviousTargetEntities($entity, $field->getAssociationQuery(), $metadata),
                     $fieldForm,
                     $targetEntityClass,
                     $targetAssociationName
                 );
             } else {
-                $this->updateSingleValuedAssociation(
+                $this->updateOneToOneAssociation(
                     $entity,
-                    $previousTargetEntities,
                     $fieldForm,
                     $targetEntityClass,
                     $targetAssociationName
@@ -190,7 +194,7 @@ class UnidirectionalAssociationHandler
         }
     }
 
-    private function updateCollectionValuedAssociation(
+    private function updateManyToManyAssociation(
         object $entity,
         array $previousTargetEntities,
         FormInterface $fieldForm,
@@ -215,7 +219,7 @@ class UnidirectionalAssociationHandler
         }
     }
 
-    private function updateSingleValuedAssociation(
+    private function updateManyToOneAssociation(
         object $entity,
         array $previousTargetEntities,
         FormInterface $fieldForm,
@@ -235,6 +239,26 @@ class UnidirectionalAssociationHandler
                 if (!$this->hasEntity($targetEntity, $newTargetEntities)) {
                     $em->remove($targetEntity);
                 }
+            }
+        }
+    }
+
+    private function updateOneToOneAssociation(
+        object $entity,
+        FormInterface $fieldForm,
+        string $targetEntityClass,
+        string $targetAssociationName
+    ): void {
+        $newTargetEntity = $fieldForm->getData();
+        if (null === $newTargetEntity) {
+            return;
+        }
+
+        $currentEntity = $this->propertyAccessor->getValue($newTargetEntity, $targetAssociationName);
+        if ($entity !== $currentEntity) {
+            $this->propertyAccessor->setValue($newTargetEntity, $targetAssociationName, $entity);
+            if (null !== $currentEntity) {
+                $this->doctrineHelper->getEntityManagerForClass($targetEntityClass)->remove($currentEntity);
             }
         }
     }

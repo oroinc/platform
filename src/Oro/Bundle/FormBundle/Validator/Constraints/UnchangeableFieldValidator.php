@@ -9,6 +9,7 @@ use Doctrine\ORM\PersistentCollection;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 /**
  * The validator for UnchangeableField constraint.
@@ -26,53 +27,82 @@ class UnchangeableFieldValidator extends ConstraintValidator
     #[\Override]
     public function validate($value, Constraint $constraint)
     {
+        if (!$constraint instanceof UnchangeableField) {
+            throw new UnexpectedTypeException($constraint, UnchangeableField::class);
+        }
+
         $entityClass = $this->context->getClassName();
         $em = $this->doctrineHelper->getEntityManagerForClass($entityClass);
         $metadata = $em->getClassMetadata($entityClass);
 
-        if ($metadata->hasAssociation($this->context->getPropertyName())) {
-            if ((null === $value || is_object($value)) && $this->isAssociationValueChanged($value, $em, $metadata)) {
+        $fieldName = $this->context->getPropertyName();
+        if ($metadata->hasAssociation($fieldName)) {
+            if ((null === $value || is_object($value))
+                && $this->isAssociationValueChanged(
+                    $value,
+                    $this->context->getObject(),
+                    $fieldName,
+                    $em,
+                    $metadata,
+                    $constraint->allowReset,
+                    $constraint->allowChangeOwner
+                )
+            ) {
                 $this->context->addViolation($constraint->message);
             }
-        } elseif ($this->isFieldValueChanged($value, $em)) {
+        } elseif ($this->isFieldValueChanged(
+            $value,
+            $this->context->getObject(),
+            $fieldName,
+            $em,
+            $constraint->allowReset
+        )) {
             $this->context->addViolation($constraint->message);
         }
     }
 
-    /**
-     * @param mixed                  $value
-     * @param EntityManagerInterface $em
-     *
-     * @return bool
-     */
-    private function isFieldValueChanged($value, EntityManagerInterface $em): bool
-    {
-        $existingValue = $this->getExistingValue($em);
+    private function isFieldValueChanged(
+        mixed $value,
+        object $entity,
+        string $fieldName,
+        EntityManagerInterface $em,
+        bool $allowReset
+    ): bool {
+        $existingValue = $this->getExistingValue($entity, $fieldName, $em);
+        if (null === $existingValue) {
+            return false;
+        }
 
-        return
-            null !== $existingValue
-            && $existingValue !== $value;
+        if ($allowReset && null === $value) {
+            return false;
+        }
+
+        return $existingValue !== $value;
     }
 
     /**
-     * @param object|null            $value
-     * @param EntityManagerInterface $em
-     * @param ClassMetadata          $metadata
-     *
-     * @return bool
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    private function isAssociationValueChanged($value, EntityManagerInterface $em, ClassMetadata $metadata): bool
-    {
+    private function isAssociationValueChanged(
+        ?object $value,
+        object $entity,
+        string $fieldName,
+        EntityManagerInterface $em,
+        ClassMetadata $metadata,
+        bool $allowReset,
+        bool $allowChangeOwner
+    ): bool {
+        $associationMapping = $metadata->getAssociationMapping($fieldName);
+        $associationType = $associationMapping['type'];
         if ($value instanceof Collection
-            && null !== $this->getSingleIdentifierValue($this->context->getObject(), $metadata)
-            && $metadata->getAssociationMapping($this->context->getPropertyName())['type'] & ClassMetadata::TO_MANY
+            && $associationType & ClassMetadata::TO_MANY
+            && null !== $this->getSingleIdentifierValue($entity, $metadata)
         ) {
             return count($value->getDeleteDiff()) || count($value->getInsertDiff());
         }
 
-        $targetEntityClass = $metadata->getAssociationTargetClass($this->context->getPropertyName());
+        $targetEntityClass = $associationMapping['targetEntity'];
         if (is_object($value) && (!is_a($value, $targetEntityClass) && !($value instanceof PersistentCollection))) {
             return false;
         }
@@ -83,18 +113,69 @@ class UnchangeableFieldValidator extends ConstraintValidator
                 '%s is not allowed to be used for %s::%s'
                 . ' because the target entity %s has composite identifier.',
                 self::class,
-                $this->context->getClassName(),
-                $this->context->getPropertyName(),
-                $targetEntityClass
+                $metadata->name,
+                $fieldName,
+                $targetMetadata->name
             ));
         }
 
-        $existingValue = $this->getExistingValue($em);
-        if (null === $existingValue || !is_object($existingValue) || !is_a($existingValue, $targetEntityClass)) {
+        $existingValue = $this->getExistingValue($entity, $fieldName, $em);
+
+        if (!$allowChangeOwner
+            && $this->isOwnerChanged(
+                $value,
+                $existingValue,
+                $targetMetadata,
+                $associationType & ClassMetadata::ONE_TO_ONE
+            )
+        ) {
+            return true;
+        }
+
+        if ($allowReset && null === $value) {
             return false;
         }
 
-        $existingValueId = $this->getSingleIdentifierValue($existingValue, $targetMetadata);
+        return $this->isValueChanged($value, $existingValue, $targetMetadata);
+    }
+
+    private function isOwnerChanged(
+        ?object $value,
+        ?object $existingValue,
+        ClassMetadata $metadata,
+        bool $isSingleValuedInverseSideAssociation
+    ): bool {
+        if (null === $value) {
+            return false;
+        }
+
+        $valueId = $this->getSingleIdentifierValue($value, $metadata);
+        if (null === $valueId) {
+            return false;
+        }
+
+        if (null === $existingValue) {
+            return $isSingleValuedInverseSideAssociation;
+        }
+
+        if (!is_object($existingValue) || !is_a($existingValue, $metadata->name)) {
+            return false;
+        }
+
+        $existingValueId = $this->getSingleIdentifierValue($existingValue, $metadata);
+
+        return
+            null === $existingValueId
+            || (string)$valueId !== (string)$existingValueId;
+    }
+
+    private function isValueChanged(?object $value, ?object $existingValue, ClassMetadata $metadata): bool
+    {
+        if (null === $existingValue || !is_object($existingValue) || !is_a($existingValue, $metadata->name)) {
+            return false;
+        }
+
+        $existingValueId = $this->getSingleIdentifierValue($existingValue, $metadata);
         if (null === $value) {
             return null !== $existingValueId;
         }
@@ -102,35 +183,24 @@ class UnchangeableFieldValidator extends ConstraintValidator
             return false;
         }
 
-        $valueId = $this->getSingleIdentifierValue($value, $targetMetadata);
+        $valueId = $this->getSingleIdentifierValue($value, $metadata);
 
         return
             null === $valueId
             || (string)$valueId !== (string)$existingValueId;
     }
 
-    /**
-     * @param EntityManagerInterface $em
-     *
-     * @return mixed
-     */
-    private function getExistingValue(EntityManagerInterface $em)
+    private function getExistingValue(object $entity, string $fieldName, EntityManagerInterface $em): mixed
     {
-        $originalData = $em->getUnitOfWork()->getOriginalEntityData($this->context->getObject());
+        $originalData = $em->getUnitOfWork()->getOriginalEntityData($entity);
 
-        return $originalData[$this->context->getPropertyName()] ?? null;
+        return $originalData[$fieldName] ?? null;
     }
 
-    /**
-     * @param object        $object
-     * @param ClassMetadata $metadata
-     *
-     * @return mixed
-     */
-    private function getSingleIdentifierValue($object, ClassMetadata $metadata)
+    private function getSingleIdentifierValue(object $entity, ClassMetadata $metadata): mixed
     {
-        $objectId = $metadata->getIdentifierValues($object);
+        $entityId = $metadata->getIdentifierValues($entity);
 
-        return !empty($objectId) ? reset($objectId) : null;
+        return !empty($entityId) ? reset($entityId) : null;
     }
 }

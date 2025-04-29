@@ -79,18 +79,11 @@ trait PrimaryPhoneTestTrait
             false
         );
 
-        $this->assertResponseValidationErrors(
+        $this->assertResponseValidationError(
             [
-                [
-                    'title'  => 'contains primary constraint',
-                    'detail' => 'One of the phones must be set as primary.',
-                    'source' => ['pointer' => '/data/attributes/phones']
-                ],
-                [
-                    'title'  => 'primary item constraint',
-                    'detail' => 'Unknown primary phone number.',
-                    'source' => ['pointer' => '/data/attributes/primaryPhone']
-                ]
+                'title'  => 'primary item constraint',
+                'detail' => 'Unknown primary phone number.',
+                'source' => ['pointer' => '/data/attributes/primaryPhone']
             ],
             $response
         );
@@ -370,18 +363,11 @@ trait PrimaryPhoneTestTrait
             false
         );
 
-        $this->assertResponseValidationErrors(
+        $this->assertResponseValidationError(
             [
-                [
-                    'title'  => 'contains primary constraint',
-                    'detail' => 'One of the phones must be set as primary.',
-                    'source' => ['pointer' => '/data/attributes/phones']
-                ],
-                [
-                    'title'  => 'primary item constraint',
-                    'detail' => 'Unknown primary phone number.',
-                    'source' => ['pointer' => '/data/attributes/primaryPhone']
-                ]
+                'title'  => 'primary item constraint',
+                'detail' => 'Unknown primary phone number.',
+                'source' => ['pointer' => '/data/attributes/primaryPhone']
             ],
             $response
         );
