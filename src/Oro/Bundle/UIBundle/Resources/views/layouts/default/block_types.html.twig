@@ -42,7 +42,7 @@
 {% endblock %}
 
 {% block breadcrumbs_widget %}
-    {% if breadcrumbs is empty %}
+    {% if breadcrumbs is empty and not oro_config_value('oro_catalog.breadcrumbs_remove_single_breadcrumb') %}
         {% set breadcrumbs = blocks.title.vars.value|split(' - ')|reverse %}
     {% endif %}
 
