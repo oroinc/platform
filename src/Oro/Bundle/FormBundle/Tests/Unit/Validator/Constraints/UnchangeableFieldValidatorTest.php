@@ -154,6 +154,30 @@ class UnchangeableFieldValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
+    public function testValidateWhenAllowResetAndFieldValueHasChangedToNull(): void
+    {
+        $object = new TestEntity();
+        $fieldName = 'email';
+        $metadata = $this->getClassMetadata(TestEntity::class);
+
+        $this->em->expects(self::once())
+            ->method('getClassMetadata')
+            ->with(TestEntity::class)
+            ->willReturn($metadata);
+        $metadata->expects(self::once())
+            ->method('hasAssociation')
+            ->with($fieldName)
+            ->willReturn(false);
+
+        $this->expectOriginalEntityData($object, $fieldName, 'value');
+
+        $constraint = new UnchangeableField(['allowReset' => true]);
+        $this->setProperty($object, $fieldName);
+        $this->validator->validate(null, $constraint);
+
+        $this->assertNoViolation();
+    }
+
     public function testValidateWhenAssociationValueHasChanged(): void
     {
         $oldValue = new TestTargetEntity();
@@ -564,6 +588,39 @@ class UnchangeableFieldValidatorTest extends ConstraintValidatorTestCase
         $constraint = new UnchangeableField();
         $this->setProperty($object, $associationName);
         $this->validator->validate($newValue, $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testValidateWhenAllowResetAndAssociationValueHasChangedToNull(): void
+    {
+        $object = new TestEntity();
+        $associationName = 'owner';
+        $metadata = $this->getClassMetadata(TestEntity::class);
+        $targetMetadata = $this->getClassMetadata(TestTargetEntity::class);
+
+        $this->em->expects(self::exactly(2))
+            ->method('getClassMetadata')
+            ->willReturnMap([
+                [TestEntity::class, $metadata],
+                [TestTargetEntity::class, $targetMetadata]
+            ]);
+        $metadata->expects(self::once())
+            ->method('hasAssociation')
+            ->with($associationName)
+            ->willReturn(true);
+        $metadata->expects(self::once())
+            ->method('getAssociationMapping')
+            ->with($associationName)
+            ->willReturn(['targetEntity' => TestTargetEntity::class, 'type' => ClassMetadata::MANY_TO_ONE]);
+        $targetMetadata->expects(self::never())
+            ->method('getIdentifierValues');
+
+        $this->expectOriginalEntityData($object, $associationName, new TestTargetEntity());
+
+        $constraint = new UnchangeableField(['allowReset' => true]);
+        $this->setProperty($object, $associationName);
+        $this->validator->validate(null, $constraint);
 
         $this->assertNoViolation();
     }

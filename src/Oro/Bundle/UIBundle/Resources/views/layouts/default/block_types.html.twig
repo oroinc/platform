@@ -42,10 +42,6 @@
 {% endblock %}
 
 {% block breadcrumbs_widget %}
-    {% if breadcrumbs is empty %}
-        {% set breadcrumbs = blocks.title.vars.value|split(' - ')|reverse %}
-    {% endif %}
-
     {% set attr = layout_attr_defaults(attr, {
         '~class': ' breadcrumbs scrollable-container start-scroll-from-end invisible-scrollbar horizontal-scrolling'
     }) %}
