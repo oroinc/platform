@@ -43,7 +43,7 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
         if ($container->hasParameter('kernel.debug') && $container->getParameter('kernel.debug')) {
             $this->cacheDirectories['oro'] = 'oro';
         }
-        if (\getenv('CACHE') === 'REDIS') {
+        if (\getenv('CACHE') === 'REDIS' || \getenv('CACHE') === 'DRAGONFLY') {
             return false;
         }
 
