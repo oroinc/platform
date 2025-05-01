@@ -117,12 +117,15 @@ class DataAuditTest extends WebTestCase
 
     public function testArray()
     {
+        $oldValue = [1, 2, 'foo', ['a' => 'b', 'k' => 'l']];
+        $newValue = [1, 3, 'bar', ['a' => 'c', 'x' => 'y']];
+
         $owner = new TestAuditDataOwner();
-        $owner->setArrayProperty([1, 2]);
+        $owner->setArrayProperty($oldValue);
 
         $em = $this->saveOwnerAndClearMessages($owner);
 
-        $owner->setArrayProperty([1, 3]);
+        $owner->setArrayProperty($newValue);
         $em->flush();
 
         $this->processMessages();
@@ -130,8 +133,12 @@ class DataAuditTest extends WebTestCase
         $this->assertData(
             [
                 TestAuditDataOwner::class => [
-                    $owner->getId() => '<s>{&quot;0&quot;:1,&quot;1&quot;:2}</s>' .
-                        '&nbsp;{&quot;0&quot;:1,&quot;1&quot;:3}',
+                    /* @see /package/platform/src/Oro/Bundle/DataAuditBundle/Resources/views/macros.html.twig */
+                    $owner->getId() => \sprintf(
+                        "<s><pre>%s</pre></s>&nbsp;<pre>%s</pre>",
+                        $this->escapeString(\json_encode($oldValue, \JSON_FORCE_OBJECT | \JSON_PRETTY_PRINT)),
+                        $this->escapeString(\json_encode($newValue, \JSON_FORCE_OBJECT | \JSON_PRETTY_PRINT))
+                    ),
                 ],
             ]
         );
@@ -455,12 +462,15 @@ class DataAuditTest extends WebTestCase
 
     public function testJsonArray()
     {
+        $oldValue = [1, 2, 'foo', ['a' => 'b', 'k' => 'l']];
+        $newValue = [1, 3, 'bar', ['a' => 'c', 'x' => 'y']];
+
         $owner = new TestAuditDataOwner();
-        $owner->setArrayProperty([1, 2]);
+        $owner->setJsonArrayProperty($oldValue);
 
         $em = $this->saveOwnerAndClearMessages($owner);
 
-        $owner->setArrayProperty([1, 3]);
+        $owner->setJsonArrayProperty($newValue);
         $em->flush();
 
         $this->processMessages();
@@ -468,8 +478,41 @@ class DataAuditTest extends WebTestCase
         $this->assertData(
             [
                 TestAuditDataOwner::class => [
-                    $owner->getId() => '<s>{&quot;0&quot;:1,&quot;1&quot;:2}</s>' .
-                        '&nbsp;{&quot;0&quot;:1,&quot;1&quot;:3}',
+                    /* @see /package/platform/src/Oro/Bundle/DataAuditBundle/Resources/views/macros.html.twig */
+                    $owner->getId() => \sprintf(
+                        "<s><pre>%s</pre></s>&nbsp;<pre>%s</pre>",
+                        $this->escapeString(\json_encode($oldValue, \JSON_FORCE_OBJECT | \JSON_PRETTY_PRINT)),
+                        $this->escapeString(\json_encode($newValue, \JSON_FORCE_OBJECT | \JSON_PRETTY_PRINT))
+                    ),
+                ],
+            ]
+        );
+    }
+
+    public function testJson()
+    {
+        $oldValue = [1, 2, 'foo', ['a' => 'b', 'k' => 'l']];
+        $newValue = [1, 3, 'bar', ['a' => 'c', 'x' => 'y']];
+
+        $owner = new TestAuditDataOwner();
+        $owner->setJsonProperty($oldValue);
+
+        $em = $this->saveOwnerAndClearMessages($owner);
+
+        $owner->setJsonProperty($newValue);
+        $em->flush();
+
+        $this->processMessages();
+
+        $this->assertData(
+            [
+                TestAuditDataOwner::class => [
+                    /* @see /package/platform/src/Oro/Bundle/DataAuditBundle/Resources/views/macros.html.twig */
+                    $owner->getId() => \sprintf(
+                        "<s><pre>%s</pre></s>&nbsp;<pre>%s</pre>",
+                        $this->escapeString(\json_encode($oldValue, \JSON_FORCE_OBJECT | \JSON_PRETTY_PRINT)),
+                        $this->escapeString(\json_encode($newValue, \JSON_FORCE_OBJECT | \JSON_PRETTY_PRINT))
+                    ),
                 ],
             ]
         );
@@ -2038,11 +2081,13 @@ class DataAuditTest extends WebTestCase
     public function testSimpleArray()
     {
         $owner = new TestAuditDataOwner();
-        $owner->setSimpleArrayProperty([1 => 2, 2 => 3]);
+        $oldValue = [1 => 2, 2 => 3];
+        $owner->setSimpleArrayProperty($oldValue);
 
         $em = $this->saveOwnerAndClearMessages($owner);
 
-        $owner->setSimpleArrayProperty([1 => 3, 3 => 4]);
+        $newValue = [1 => 3, 3 => 4];
+        $owner->setSimpleArrayProperty($newValue);
         $em->flush();
 
         $this->processMessages();
@@ -2050,7 +2095,12 @@ class DataAuditTest extends WebTestCase
         $this->assertData(
             [
                 TestAuditDataOwner::class => [
-                    $owner->getId() => '<s>2, 3</s>&nbsp;3, 4',
+                    /* @see /package/platform/src/Oro/Bundle/DataAuditBundle/Resources/views/macros.html.twig */
+                    $owner->getId() => \sprintf(
+                        "<s><pre>%s</pre></s>&nbsp;<pre>%s</pre>",
+                        $this->escapeString(\json_encode($oldValue, \JSON_FORCE_OBJECT | \JSON_PRETTY_PRINT)),
+                        $this->escapeString(\json_encode($newValue, \JSON_FORCE_OBJECT | \JSON_PRETTY_PRINT))
+                    ),
                 ],
             ]
         );
@@ -2155,11 +2205,6 @@ class DataAuditTest extends WebTestCase
     }
 
     public function testDatetimetzImmutable()
-    {
-        $this->markTestSkipped('BAP-18750');
-    }
-
-    public function testJson()
     {
         $this->markTestSkipped('BAP-18750');
     }
@@ -2270,5 +2315,11 @@ class DataAuditTest extends WebTestCase
         $this->getMessageCollector()->clear();
 
         return $em;
+    }
+
+    /* @see \Twig\Runtime\EscaperRuntime::escape() */
+    private function escapeString(string $value): string
+    {
+        return \htmlspecialchars($value, \ENT_QUOTES | \ENT_SUBSTITUTE, 'UTF-8');
     }
 }

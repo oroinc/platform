@@ -41,6 +41,7 @@ class FieldsTransformer
                 'time' => true,
                 'array' => true,
                 'jsonarray' => true,
+                'json' => true,
             ];
             if (array_key_exists($field->getDataType(), $simpleTypes)) {
                 $newValue = [

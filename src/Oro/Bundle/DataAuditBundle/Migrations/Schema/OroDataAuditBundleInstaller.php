@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oro\Bundle\DataAuditBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
@@ -12,7 +14,7 @@ class OroDataAuditBundleInstaller implements Installation
     #[\Override]
     public function getMigrationVersion(): string
     {
-        return 'v2_8';
+        return 'v6_1_0_1';
     }
 
     #[\Override]
@@ -103,6 +105,8 @@ class OroDataAuditBundleInstaller implements Installation
             'notnull' => false,
             'comment' => '(DC2Type:json_array)',
         ]);
+        $table->addColumn('old_json', 'json', ['notnull' => false]);
+        $table->addColumn('new_json', 'json', ['notnull' => false]);
         $table->addColumn('collection_diffs', 'json_array', [
             'notnull' => false,
             'comment' => '(DC2Type:json_array)',

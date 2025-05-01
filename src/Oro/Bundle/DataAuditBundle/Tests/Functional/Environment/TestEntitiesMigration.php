@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataAuditBundle\Tests\Functional\Environment;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
@@ -127,7 +128,11 @@ class TestEntitiesMigration implements Migration, ExtendExtensionAwareInterface
             'datetimetz_immutable',
             ['notnull' => false, 'comment' => '(DC2Type:datetimetz_immutable)']
         );
-        $table->addColumn('json_property', 'json', ['notnull' => false, 'comment' => '(DC2Type:json)']);
+        $table->addColumn('json_property', Types::JSON, [
+            'notnull' => false,
+            'comment' => '(DC2Type:json)',
+            'platformOptions' => ['jsonb' => true]
+        ]);
         $table->addColumn(
             'time_immutable_property',
             'time_immutable',

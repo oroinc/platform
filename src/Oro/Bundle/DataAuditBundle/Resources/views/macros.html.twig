@@ -15,8 +15,10 @@
         {{- fieldValue|oro_format_datetime -}}
     {%- elseif fieldValue.timestamp is defined and type == 'time' -%}
         {{- fieldValue|oro_format_time -}}
-    {%- elseif type == 'array' or type == 'jsonarray' -%}
-        {{- fieldValue is not null ? fieldValue|json_encode(constant('JSON_FORCE_OBJECT')) -}}
+    {%- elseif type == 'array' or type == 'jsonarray' or type == 'json' -%}
+        {%- if fieldValue is not null -%}
+            <pre>{{- fieldValue|json_encode(constant('JSON_FORCE_OBJECT') b-or constant('JSON_PRETTY_PRINT')) -}}</pre>
+        {%- endif %}
     {%- elseif type == 'boolean' or fieldValue is same as(true) or fieldValue is same as(false) -%}
         {{- fieldValue ? 'Yes'|trans : 'No'|trans -}}
     {%- else -%}
@@ -35,11 +37,16 @@
                 </dd>
             {%- endif -%}
         {%- elseif fieldValue is iterable -%}
-            {%- set result = [] -%}
-            {%- for item in fieldValue -%}
-                {%- set result = result|merge([AuditMacro.renderFieldValue(item)]) -%}
-            {%- endfor -%}
-            {{- result|join(', ')|raw -}}
+            {%- set isAssocArray = fieldValue is not empty and fieldValue|keys != range(0, fieldValue|length - 1) -%}
+            {%- if isAssocArray -%}
+                <pre>{{- fieldValue|json_encode(constant('JSON_FORCE_OBJECT') b-or constant('JSON_PRETTY_PRINT')) -}}</pre>
+            {%- else -%}
+                {%- set result = [] -%}
+                {%- for item in fieldValue -%}
+                    {%- set result = result|merge([AuditMacro.renderFieldValue(item)]) -%}
+                {%- endfor -%}
+                {{- result|join(', ')|raw -}}
+            {%- endif -%}
         {%- else -%}
             {%- if field.translationDomain is defined -%}
                 {{- fieldValue|trans({}, field.translationDomain)|default('') -}}
