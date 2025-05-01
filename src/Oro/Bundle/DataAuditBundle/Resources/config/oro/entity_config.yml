@@ -34,7 +34,7 @@ entity_config:
                     options:
                         value_type:         boolean
                         priority:           60
-                        allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, oneToMany, oneToOne, manyToOne, manyToMany, array, simple_array, json_array, ref-many, ref-one]
+                        allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, oneToMany, oneToOne, manyToOne, manyToMany, array, simple_array, json_array, json, ref-many, ref-one]
                     grid:
                         type:               boolean
                         label:              oro.dataaudit.entity_config.field.items.auditable
