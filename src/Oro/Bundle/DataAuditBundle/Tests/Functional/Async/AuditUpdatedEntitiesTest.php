@@ -188,15 +188,20 @@ class AuditUpdatedEntitiesTest extends WebTestCase
         $this->assertSame($organization->getId(), $audit->getOrganization()->getId());
     }
 
-    public function testShouldCreateAuditEntityForUpdatedEntityWithStringPropertyChanged()
-    {
+    /** @dataProvider propertyChangeDataProvider */
+    public function testShouldCreateAuditEntityForUpdatedEntityWithPropertyChanged(
+        string $propertyName,
+        string $expectedDataType,
+        mixed $oldValue,
+        mixed $newValue
+    ): void {
         $message = $this->createDummyMessage([
             'entities_updated' => [
                 '000000007ec8f22c00000000536823d4' => [
                     'entity_class' => TestAuditDataOwner::class,
                     'entity_id' => 123,
                     'change_set' => [
-                        'stringProperty' => ['theOldValue', 'theNewValue'],
+                        $propertyName => [$oldValue, $newValue],
                     ],
                 ]
             ],
@@ -212,120 +217,51 @@ class AuditUpdatedEntitiesTest extends WebTestCase
 
         $this->assertCount(1, $audit->getFields());
 
-        $auditField = $audit->getField('stringProperty');
+        $auditField = $audit->getField($propertyName);
         $this->assertInstanceOf(AuditField::class, $auditField);
 
         $this->assertSame($audit, $auditField->getAudit());
-        $this->assertSame('text', $auditField->getDataType());
-        $this->assertSame('stringProperty', $auditField->getField());
-        $this->assertSame('theNewValue', $auditField->getNewValue());
-        $this->assertSame('theOldValue', $auditField->getOldValue());
+        $this->assertSame($expectedDataType, $auditField->getDataType());
+        $this->assertSame($propertyName, $auditField->getField());
+        $this->assertEquals($newValue, $auditField->getNewValue());
+        $this->assertEquals($oldValue, $auditField->getOldValue());
     }
-
-    public function testShouldCreateAuditEntityForUpdatedEntityWithIntegerPropertyChanged()
+    public function propertyChangeDataProvider(): array
     {
-        $message = $this->createDummyMessage([
-            'entities_updated' => [
-                '000000007ec8f22c00000000536823d4' => [
-                    'entity_class' => TestAuditDataOwner::class,
-                    'entity_id' => 123,
-                    'change_set' => [
-                        'integerProperty' => [333, 123],
-                    ],
-                ]
+        $oldArray = [1, 2, 'foo', ['a' => 'b', 'k' => 'l']];
+        $newArray = [1, 3, 'bar', ['a' => 'c', 'x' => 'y']];
+        return [
+            'string property' => [
+                'propertyName' => 'stringProperty',
+                'dataType' => 'text',
+                'oldValue' => 'theOldValue',
+                'newValue' => 'theNewValue',
             ],
-        ]);
-
-        $this->processor->process($message, $this->getConnection()->createSession());
-
-        $this->assertStoredAuditCount(1);
-        $audit = $this->findLastStoredAudit();
-
-        $this->assertNotNull($audit->getId());
-        $this->assertEquals(Audit::ACTION_UPDATE, $audit->getAction());
-
-        $this->assertCount(1, $audit->getFields());
-
-        $auditField = $audit->getField('integerProperty');
-        $this->assertInstanceOf(AuditField::class, $auditField);
-
-        $this->assertSame($audit, $auditField->getAudit());
-        $this->assertSame('integer', $auditField->getDataType());
-        $this->assertSame('integerProperty', $auditField->getField());
-        $this->assertSame(123, $auditField->getNewValue());
-        $this->assertSame(333, $auditField->getOldValue());
-    }
-
-    public function testShouldCreateAuditEntityForUpdatedEntityWithObjectPropertyChanged()
-    {
-        $expectedNewVal = serialize(['foo' => 'bar']);
-
-        $message = $this->createDummyMessage([
-            'entities_updated' => [
-                '000000007ec8f22c00000000536823d4' => [
-                    'entity_class' => TestAuditDataOwner::class,
-                    'entity_id' => 123,
-                    'change_set' => [
-                        'objectProperty' => ['theOldValue', $expectedNewVal],
-                    ],
-                ]
+            'integer property' => [
+                'propertyName' => 'integerProperty',
+                'dataType' => 'integer',
+                'oldValue' => 333,
+                'newValue' => 123,
             ],
-        ]);
-
-        $this->processor->process($message, $this->getConnection()->createSession());
-
-        $this->assertStoredAuditCount(1);
-        $audit = $this->findLastStoredAudit();
-
-        $this->assertNotNull($audit->getId());
-        $this->assertEquals(Audit::ACTION_UPDATE, $audit->getAction());
-
-        $this->assertCount(1, $audit->getFields());
-
-        $auditField = $audit->getField('objectProperty');
-        $this->assertInstanceOf(AuditField::class, $auditField);
-
-        $this->assertSame($audit, $auditField->getAudit());
-        $this->assertSame('object', $auditField->getDataType());
-        $this->assertSame('objectProperty', $auditField->getField());
-        $this->assertSame($expectedNewVal, $auditField->getNewValue());
-        $this->assertSame('theOldValue', $auditField->getOldValue());
-    }
-
-    public function testShouldCreateAuditEntityForUpdatedEntityWithJsonArrayPropertyChanged()
-    {
-        $expectedNewVal = json_encode(['foo' => 'bar'], JSON_THROW_ON_ERROR);
-
-        $message = $this->createDummyMessage([
-            'entities_updated' => [
-                '000000007ec8f22c00000000536823d4' => [
-                    'entity_class' => TestAuditDataOwner::class,
-                    'entity_id' => 123,
-                    'change_set' => [
-                        'jsonArrayProperty' => ['theOldValue', $expectedNewVal],
-                    ],
-                ]
+            'object property' => [
+                'propertyName' => 'objectProperty',
+                'dataType' => 'object',
+                'oldValue' => 'theOldValue',
+                'newValue' => serialize(['foo' => 'bar']),
             ],
-        ]);
-
-        $this->processor->process($message, $this->getConnection()->createSession());
-
-        $this->assertStoredAuditCount(1);
-        $audit = $this->findLastStoredAudit();
-
-        $this->assertNotNull($audit->getId());
-        $this->assertEquals(Audit::ACTION_UPDATE, $audit->getAction());
-
-        $this->assertCount(1, $audit->getFields());
-
-        $auditField = $audit->getField('jsonArrayProperty');
-        $this->assertInstanceOf(AuditField::class, $auditField);
-
-        $this->assertSame($audit, $auditField->getAudit());
-        $this->assertSame('jsonarray', $auditField->getDataType());
-        $this->assertSame('jsonArrayProperty', $auditField->getField());
-        $this->assertSame($expectedNewVal, $auditField->getNewValue());
-        $this->assertSame('theOldValue', $auditField->getOldValue());
+            'json property' => [
+                'propertyName' => 'jsonProperty',
+                'dataType' => 'json',
+                'oldValue' => $oldArray,
+                'newValue' => $newArray,
+            ],
+            'json array property' => [
+                'propertyName' => 'jsonArrayProperty',
+                'dataType' => 'jsonarray',
+                'oldValue' => $oldArray,
+                'newValue' => $newArray,
+            ],
+        ];
     }
 
     public function testShouldCreateAuditEntityForUpdatedEntityWithDateTimePropertyChanged()

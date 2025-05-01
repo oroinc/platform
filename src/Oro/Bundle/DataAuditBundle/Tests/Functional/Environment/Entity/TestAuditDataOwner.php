@@ -193,12 +193,9 @@ class TestAuditDataOwner implements
     #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
     private ?int $integerProperty = null;
 
-    /**
-     * @var array
-     */
-    #[ORM\Column(name: 'json_array_property', type: 'json_array', nullable: true)]
+    #[ORM\Column(name: 'json_array_property', type: Types::JSON_ARRAY, nullable: true)]
     #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
-    private $jsonArrayProperty;
+    private ?array $jsonArrayProperty = null;
 
     /**
      * @var float
@@ -279,12 +276,9 @@ class TestAuditDataOwner implements
     #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
     private $datetimetzImmutable;
 
-    /**
-     * @var array
-     */
     #[ORM\Column(name: 'json_property', type: Types::JSON, nullable: true)]
     #[ConfigField(defaultValues: ['dataaudit' => ['auditable' => true]])]
-    private $json;
+    private ?array $jsonProperty = null;
 
     /**
      * @var \DateTimeImmutable
@@ -751,20 +745,15 @@ class TestAuditDataOwner implements
         $this->htmlEscapedProperty = $htmlEscapedProperty;
     }
 
-    /**
-     * @return array
-     */
-    public function getJsonArrayProperty()
+    public function getJsonArrayProperty(): ?array
     {
         return $this->jsonArrayProperty;
     }
 
-    /**
-     * @param array $jsonArrayProperty
-     */
-    public function setJsonArrayProperty($jsonArrayProperty)
+    public function setJsonArrayProperty(?array $jsonArrayProperty): self
     {
         $this->jsonArrayProperty = $jsonArrayProperty;
+        return $this;
     }
 
     /**
@@ -974,17 +963,15 @@ class TestAuditDataOwner implements
         $this->datetimetzImmutable = $datetimetzImmutable;
     }
 
-    /**
-     * @return array
-     */
-    public function getJson()
+    public function getJsonProperty(): ?array
     {
-        return $this->json;
+        return $this->jsonProperty;
     }
 
-    public function setJson(array $json = [])
+    public function setJsonProperty(?array $jsonProperty): self
     {
-        $this->json = $json;
+        $this->jsonProperty = $jsonProperty;
+        return $this;
     }
 
     /**

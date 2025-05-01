@@ -28,6 +28,7 @@ class AuditFieldTypeRegistry
         'guid' => 'text',
         'integer' => 'integer',
         'json_array' => 'jsonarray',
+        'json' => 'json',
         'money' => 'float',
         'money_value' => 'float',
         'object' => 'object',
@@ -42,7 +43,6 @@ class AuditFieldTypeRegistry
         'dateinterval' => false,
         'datetime_immutable' => false,
         'datetimeyz_immutable' => false,
-        'json' => true,
         'time_immutable' => false,
 
         // collection types
@@ -74,6 +74,7 @@ class AuditFieldTypeRegistry
         'array' => true,
         'simplearray' => true,
         'jsonarray' => true,
+        'json' => true,
         'boolean' => true,
         'date' => true,
         'time' => true,

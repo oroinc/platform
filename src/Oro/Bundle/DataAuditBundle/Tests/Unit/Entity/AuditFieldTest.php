@@ -60,6 +60,7 @@ class AuditFieldTest extends \PHPUnit\Framework\TestCase
                 'datetime'
             ],
             ['field', 'testingtype', 'old', 'new', 'testingtype'],
+            ['field', 'json', [1, 2, 'foo', ['a' => 'b', 'k' => 'l']], [1, 3, 'bar', ['a' => 'c', 'x' => 'y']], 'json'],
         ];
     }
 
