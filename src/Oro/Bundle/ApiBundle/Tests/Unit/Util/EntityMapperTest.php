@@ -12,6 +12,9 @@ use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
 use Oro\Bundle\ApiBundle\Util\EntityMapper;
 use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class EntityMapperTest extends OrmRelatedTestCase
 {
     /** @var EntityOverrideProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
@@ -165,6 +168,30 @@ class EntityMapperTest extends OrmRelatedTestCase
 
         $this->entityMapper->registerEntity($model);
         $entity = $this->entityMapper->getEntity($model, SomeModel::class);
+
+        self::assertSame($model, $entity);
+    }
+
+    public function testGetModelWhenItIsEnum(): void
+    {
+        $entity = new EnumOption('testenum', 'Item', 'item');
+
+        $this->entityOverrideProvider->expects(self::never())
+            ->method('getSubstituteEntityClass');
+
+        $model = $this->entityMapper->getModel($entity, 'Extend\Entity\EV_TestEnum');
+
+        self::assertSame($entity, $model);
+    }
+
+    public function testGetEntityWhenItIsEnum(): void
+    {
+        $model = new EnumOption('testenum', 'Item', 'item');
+
+        $this->entityOverrideProvider->expects(self::never())
+            ->method('getSubstituteEntityClass');
+
+        $entity = $this->entityMapper->getEntity($model, EnumOption::class);
 
         self::assertSame($model, $entity);
     }

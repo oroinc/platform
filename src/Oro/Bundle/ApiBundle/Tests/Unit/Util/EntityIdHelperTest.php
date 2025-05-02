@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -139,6 +140,20 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         ));
 
         $this->entityIdHelper->setEntityIdentifier($entity, $entityId, $entityMetadata);
+    }
+
+    public function testSetIdentifierForEnumEntity()
+    {
+        /** @var EnumOption $entity */
+        $entity = (new \ReflectionClass(EnumOption::class))->newInstanceWithoutConstructor();
+        $entityMetadata = new EntityMetadata('Extend\Entity\EV_TestEnum');
+        $entityMetadata->setIdentifierFieldNames(['id']);
+        $entityMetadata->addField(new FieldMetadata('id'));
+
+        $this->entityIdHelper->setEntityIdentifier($entity, 'testenum.item', $entityMetadata);
+        self::assertEquals('testenum.item', $entity->getId());
+        self::assertEquals('testenum', $entity->getEnumCode());
+        self::assertEquals('item', $entity->getInternalId());
     }
 
     public function testApplyEntityIdentifierRestrictionForSingleIdEntity()

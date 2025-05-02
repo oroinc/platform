@@ -6,6 +6,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Component\PhpUtils\ArrayUtil;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
@@ -288,6 +290,8 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
      *                              Also it can be NULL or empty string, in this case the response content
      *                              will be written in to the console
      * @param Response    $response
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function dumpYmlTemplate(?string $fileName, Response $response): void
     {
@@ -301,20 +305,33 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
                 $entityClass = $doctrineHelper->getClass($entity);
                 $entityType = ValueNormalizerUtil::tryConvertToEntityType(
                     $this->getValueNormalizer(),
-                    $entityClass,
+                    $entity instanceof EnumOption
+                        ? ExtendHelper::getOutdatedEnumOptionClassName($entity->getEnumCode())
+                        : $entityClass,
                     $this->getRequestType()
                 );
                 if ($entityType) {
-                    $em = $doctrine->getManagerForClass($entityClass);
+                    $em = $doctrine->getManagerForClass(
+                        ExtendHelper::isOutdatedEnumOptionEntity($entityClass)
+                            ? EnumOption::class
+                            : $entityClass
+                    );
                     if ($em instanceof EntityManagerInterface) {
-                        $metadata = $em->getClassMetadata($entityClass);
-                        $entityId = $metadata->getIdentifierValues($entity);
-                        if (count($entityId) === 1) {
-                            $entityId = (string)reset($entityId);
-                            $idReferences[$entityType . '::' . $entityId] = [
+                        if ($entity instanceof EnumOption) {
+                            $idReferences[$entityType . '::' . $entity->getInternalId()] = [
                                 $referenceId,
-                                $metadata->getSingleIdentifierFieldName()
+                                'internalId'
                             ];
+                        } else {
+                            $metadata = $em->getClassMetadata($entityClass);
+                            $entityId = $metadata->getIdentifierValues($entity);
+                            if (count($entityId) === 1) {
+                                $entityId = (string)reset($entityId);
+                                $idReferences[$entityType . '::' . $entityId] = [
+                                    $referenceId,
+                                    $metadata->getSingleIdentifierFieldName()
+                                ];
+                            }
                         }
                     }
                 }

@@ -48,3 +48,10 @@ Oro\Bundle\EntityExtendBundle\Model\EnumOption:
             - NotBlank: ~
             - Length:
                 max: 255
+
+Oro\Bundle\EntityExtendBundle\Entity\EnumOption:
+    properties:
+        name:
+            - NotBlank: ~
+            - Length:
+                max: 255

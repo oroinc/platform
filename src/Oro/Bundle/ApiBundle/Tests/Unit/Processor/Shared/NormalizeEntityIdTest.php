@@ -44,6 +44,17 @@ class NormalizeEntityIdTest extends GetProcessorTestCase
         $this->processor->process($this->context);
     }
 
+    public function testProcessWhenEnumIdAlreadyNormalized()
+    {
+        $this->context->setClassName('Extend\Entity\EV_Test_Enum');
+        $this->context->setId('test_enum.option1');
+
+        $this->entityIdTransformer->expects(self::never())
+            ->method('reverseTransform');
+
+        $this->processor->process($this->context);
+    }
+
     public function testProcess()
     {
         $metadata = new EntityMetadata('Test\Entity');
@@ -60,6 +71,25 @@ class NormalizeEntityIdTest extends GetProcessorTestCase
         $this->processor->process($this->context);
 
         self::assertSame(123, $this->context->getId());
+        self::assertSame([], $this->context->getNotResolvedIdentifiers());
+    }
+
+    public function testProcessForEnum()
+    {
+        $metadata = new EntityMetadata('Extend\Entity\EV_Test_Enum');
+
+        $this->context->setClassName('Extend\Entity\EV_Test_Enum');
+        $this->context->setId('option1');
+        $this->context->setMetadata($metadata);
+
+        $this->entityIdTransformer->expects(self::once())
+            ->method('reverseTransform')
+            ->with($this->context->getId(), self::identicalTo($metadata))
+            ->willReturn('test_enum.option1');
+
+        $this->processor->process($this->context);
+
+        self::assertSame('test_enum.option1', $this->context->getId());
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 

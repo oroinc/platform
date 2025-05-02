@@ -143,6 +143,9 @@ class EntityMapper
             if (!$modelClass) {
                 $modelClass = $this->getModelClass($entityClass);
             }
+            if (ExtendHelper::isOutdatedEnumOptionEntity($modelClass)) {
+                $modelClass = EnumOption::class;
+            }
             if ($modelClass !== $entityClass) {
                 $this->assertEntityAndModelClasses($entityClass, $modelClass);
                 $model = $this->createObject($modelClass, $entity);

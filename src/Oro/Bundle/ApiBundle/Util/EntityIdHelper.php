@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\EntityIdMetadataInterface;
 use Oro\Bundle\EntityExtendBundle\EntityReflectionClass;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\PhpUtils\ReflectionUtil;
 
@@ -46,24 +47,22 @@ class EntityIdHelper
                     $fieldName
                 ));
             }
-            $setter = $this->getSetter($reflClass, $propertyName);
-            if (null !== $setter) {
-                $setter->invoke($entity, $value);
-            } else {
-                $property = ReflectionUtil::getProperty($reflClass, $propertyName);
-                if (null === $property) {
-                    throw new \InvalidArgumentException(sprintf(
-                        'The entity "%s" does not have the "%s" property.',
-                        $metadata->getClassName(),
-                        $propertyName
-                    ));
-                }
+            $this->setPropertyValue($reflClass, $entity, $propertyName, $value);
+        }
 
-                if (!$property->isPublic()) {
-                    $property->setAccessible(true);
-                }
-                $property->setValue($entity, $value);
-            }
+        if (ExtendHelper::isOutdatedEnumOptionEntity($metadata->getClassName())) {
+            $this->setPropertyValue(
+                $reflClass,
+                $entity,
+                'enumCode',
+                ExtendHelper::getEnumCode($metadata->getClassName())
+            );
+            $this->setPropertyValue(
+                $reflClass,
+                $entity,
+                'internalId',
+                ExtendHelper::getEnumInternalId(reset($entityId))
+            );
         }
     }
 
@@ -298,5 +297,31 @@ class EntityIdHelper
     private function camelize(string $value): string
     {
         return str_replace(' ', '', ucwords(str_replace('.', ' ', str_replace('_', ' ', $value))));
+    }
+
+    private function setPropertyValue(
+        \ReflectionClass $reflClass,
+        object $entity,
+        string $propertyName,
+        mixed $value
+    ): void {
+        $setter = $this->getSetter($reflClass, $propertyName);
+        if (null !== $setter) {
+            $setter->invoke($entity, $value);
+        } else {
+            $property = ReflectionUtil::getProperty($reflClass, $propertyName);
+            if (null === $property) {
+                throw new \InvalidArgumentException(sprintf(
+                    'The entity "%s" does not have the "%s" property.',
+                    $reflClass->getName(),
+                    $propertyName
+                ));
+            }
+
+            if (!$property->isPublic()) {
+                $property->setAccessible(true);
+            }
+            $property->setValue($entity, $value);
+        }
     }
 }

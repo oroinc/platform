@@ -359,6 +359,10 @@ api:
             actions:
                 get_list:
                     disable_paging: true
+                create: true
+                update: true
+                delete: true
+                delete_list: true
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestCurrentDepartment: ~
         Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestResourceWithoutIdentifier:
             fields:
