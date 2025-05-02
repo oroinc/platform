@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
@@ -33,6 +34,13 @@ class NormalizeEntityId implements ProcessorInterface
         $entityId = $context->getId();
         if (!\is_string($entityId)) {
             // an entity identifier does not exist or it is already normalized
+            return;
+        }
+
+        if (ExtendHelper::isOutdatedEnumOptionEntity($context->getClassName())
+            && !ExtendHelper::isInternalEnumId($entityId)
+        ) {
+            // an enum entity identifier is already normalized
             return;
         }
 

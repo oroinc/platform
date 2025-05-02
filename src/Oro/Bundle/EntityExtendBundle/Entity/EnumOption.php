@@ -31,17 +31,17 @@ class EnumOption implements Translatable, PriorityItem, EnumOptionInterface, Ext
     private string $id;
 
     #[ORM\Column(name: 'priority', type: Types::INTEGER)]
-    private int $priority;
+    private int $priority = 0;
 
     #[ORM\Column(name: 'is_default', type: Types::BOOLEAN)]
-    private bool $default;
+    private bool $default = false;
 
     #[ORM\Column(name: 'enum_code', type: Types::STRING, length: 64)]
     private string $enumCode;
 
     #[ORM\Column(name: 'name', type: Types::STRING, length: 255)]
     #[Gedmo\Translatable]
-    private string $name;
+    private ?string $name = null;
 
     #[ORM\Column(name: 'internal_id', type: Types::STRING, length: 32)]
     private string $internalId;
@@ -119,7 +119,7 @@ class EnumOption implements Translatable, PriorityItem, EnumOptionInterface, Ext
 
     public function getName(): string
     {
-        return $this->name;
+        return $this->name ?? '';
     }
 
     public function setLocale(string $locale): static
