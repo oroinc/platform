@@ -237,6 +237,7 @@ body:not(.login-page) {
     flex-shrink: 1;
     height: 100%;
     min-height: 0;
+    outline: none;
 }
 
 .container-fluid {
@@ -310,6 +311,44 @@ form > .layout-content {
                 z-index: inherit;
                 width: 100%;
             }
+        }
+    }
+}
+
+@media (max-width: 1400px) {
+    .app-page {
+        &__content {
+            &:has(.app-page__right-panel) {
+                grid-template-areas:
+                'header header'
+                'main rightpanel'
+                'dialog dialog'
+                'footer footer';
+                grid-template-columns: minmax(0, 1fr) auto;
+            }
+    
+            &:has(.app-page__left-panel) {
+                grid-template-areas:
+                'header header'
+                'leftpanel main'
+                'dialog dialog'
+                'footer footer';
+                grid-template-columns: auto minmax(0, 1fr);
+            }
+    
+            &:has(.app-page__left-panel):has(.app-page__right-panel) {
+                grid-template-areas:
+                'header header header'
+                'leftpanel main rightpanel'
+                'dialog dialog dialog'
+                'footer footer footer';
+                grid-template-columns: auto minmax(0, 1fr) auto;
+            }
+        }
+
+        &__left-panel,
+        &__right-panel {
+            margin-block-start: 12px;
         }
     }
 }
