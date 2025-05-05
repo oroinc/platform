@@ -1,7 +1,8 @@
 /* @theme: admin.oro; */
 
 $app-header-height: 32px !default;
-$app-header-max-width: 260px !default;
+$app-header-max-width: 120px !default;
+$app-header-switcher-max-width: 220px !default;
 $app-header-thick-height: 48px !default;
 $app-header-h-padding: $content-padding !default;
 $app-header-font-size: 14px !default;
@@ -17,7 +18,7 @@ $app-header-text-color: $text-primary !default;
 $app-header-text-hover-color: $primary-100 !default;
 $app-header-divider-color: $neutral-grey-3 !default;
 $app-header-divider-width: 1px !default;
-$app-header-search-input-min-width: 220px !default;
+$app-header-search-input-min-width: 65px !default;
 $app-header-search-select-max-width: 200px !default;
 $app-header-dropdown-title-text-transform: none !default;
 $app-header-app-logo-width: 16px !default;
@@ -30,11 +31,11 @@ $app-header-avatar-border-radius: 50% !default;
 $app-header-avatar-margin: 0 $content-padding-medium 0 0 !default;
 $app-header-search-and-shortcuts-container-padding: 0 5px !default;
 $app-header-search-and-shortcuts-margin: 0 5px !default;
-$app-header-search-and-shortcuts-dropdown-start: 6px !default;
+$app-header-search-and-shortcuts-dropdown-start: -6px !default;
 $app-header-search-and-shortcuts-arrow-start: 12px !default;
 $app-header-search-suggestion-item-font-size: 13px !default;
 $app-header-search-suggestion-item-description-font-size: 14px !default;
-$desktop-app-header-dropdown-menu-padding: $desktop-content-padding !default;
+$desktop-app-header-dropdown-menu-padding: 16px !default;
 $desktop-app-header-user-menu-margin-start: 15px !default;
 $desktop-app-header-user-menu-offset: -12px !default;
 $desktop-app-header-user-menu-item-margin: 0 8px !default;

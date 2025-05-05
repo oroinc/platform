@@ -5,19 +5,19 @@
         data-toggle="dropdown"
         aria-label="{{ 'oro.user.menu.user_menu.label'|trans }}" aria-haspopup="true" aria-expanded="false"
 >
-    {% if isMobileVersion() %}
+    {%- if isMobileVersion() -%}
         <span class="fa-user-circle" aria-hidden="true"></span>
-    {% else %}
-        {% set user_name = app.user|oro_format_name %}
-        {% if app.user.avatar is defined %}
-            {% include '@OroAttachment/Twig/picture.html.twig' with {
+    {%- else -%}
+        {%- set user_name = app.user|oro_format_name -%}
+        {%- if app.user.avatar is defined -%}
+            {%- include '@OroAttachment/Twig/picture.html.twig' with {
                 file: app.user.avatar,
                 filter: 'avatar_med',
                 img_attrs: { alt: user_name, class: 'avatar' },
-            } %}
-        {%  endif %}
-        {{ user_name }}
-    {% endif %}
+            } -%}
+        {%-  endif -%}
+        <span class="dropdown-toggle__label">{{- user_name -}}</span>
+    {%- endif -%}
 </button>
 {% set options = options|merge({togglerId: togglerId}) %}
 {% if isMobileVersion() %}
