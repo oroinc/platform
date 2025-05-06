@@ -23,6 +23,7 @@ class AddCommentAssociationDescriptions implements ProcessorInterface
     private const COMMENT_ASSOCIATION_DOC_RESOURCE = '@OroCommentBundle/Resources/doc/api/comment_association.md';
     private const COMMENT_TARGET_ENTITY = '%comment_target_entity%';
     private const COMMENTS_ASSOCIATION = '%comments_association%';
+    private const ENTITY_NAME = '%entity_name%';
 
     private CommentAssociationProvider $commentAssociationProvider;
     private ResourceDocParserProvider $resourceDocParserProvider;
@@ -106,7 +107,7 @@ class AddCommentAssociationDescriptions implements ProcessorInterface
             $targetAction
         );
         $commentsAssociationDefinition->setDescription(strtr($associationDocumentationTemplate, [
-            '%entity_name%' => $this->entityNameProvider->getEntityName($entityClass, true)
+            self::ENTITY_NAME => $this->entityNameProvider->getEntityName($entityClass, true)
         ]));
     }
 
@@ -123,7 +124,7 @@ class AddCommentAssociationDescriptions implements ProcessorInterface
             $targetAction
         );
         $definition->setDocumentation(strtr($subresourceDocumentationTemplate, [
-            '%entity_name%' => $this->entityNameProvider->getEntityName($entityClass, true)
+            self::ENTITY_NAME => $this->entityNameProvider->getEntityName($entityClass, true)
         ]));
     }
 

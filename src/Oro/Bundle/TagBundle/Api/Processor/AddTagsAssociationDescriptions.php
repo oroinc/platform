@@ -24,6 +24,8 @@ class AddTagsAssociationDescriptions implements ProcessorInterface
     private const TAGS_ASSOCIATION_DOC_RESOURCE = '@OroTagBundle/Resources/doc/api/tags_association.md';
     private const TAGGABLE_ENTITY = '%taggable_entity%';
     private const TAGS_ASSOCIATION = '%tags_association%';
+    private const TAG_ENTITY_TYPE = '%tag_entity_type%';
+    private const ENTITY_NAME = '%entity_name%';
     private const TAGS_ASSOCIATION_NAME = 'tags';
 
     private TaggableHelper $taggableHelper;
@@ -83,7 +85,7 @@ class AddTagsAssociationDescriptions implements ProcessorInterface
         $tagsAssociationDefinition = $definition->getField(self::TAGS_ASSOCIATION_NAME);
         if (null !== $tagsAssociationDefinition && !$tagsAssociationDefinition->hasDescription()) {
             $tagsAssociationDefinition->setDescription(strtr($associationDocumentationTemplate, [
-                '%entity_name%' => $entityName
+                self::ENTITY_NAME => $entityName
             ]));
         }
     }
@@ -102,8 +104,8 @@ class AddTagsAssociationDescriptions implements ProcessorInterface
         );
 
         $definition->setDocumentation(strtr($subresourceDocumentationTemplate, [
-            '%entity_name%'     => $this->entityNameProvider->getEntityName($entityClass, true),
-            '%tag_entity_type%' => $this->getEntityType(Tag::class, $requestType)
+            self::ENTITY_NAME => $this->entityNameProvider->getEntityName($entityClass, true),
+            self::TAG_ENTITY_TYPE => $this->getEntityType(Tag::class, $requestType)
         ]));
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Oro\Bundle\MigrationBundle\Tests\Functional\Migration;
 
 use Oro\Bundle\MessageQueueBundle\Test\Functional\MessageQueueExtension;
@@ -19,7 +21,7 @@ class LoadDataFixturesTest extends WebTestCase
         $this->initClient();
     }
 
-    public function testLoadDemoDataFixtures()
+    public function testLoadDemoDataFixtures(): void
     {
         // for manual execution needs reset autoincrements, like that ALTER TABLE `<table_name>` AUTO_INCREMENT=2
         self::runCommand(LoadDataFixturesCommand::getDefaultName(), ['--fixtures-type=demo', '-vvv'], true, true);
