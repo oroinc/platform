@@ -14,6 +14,7 @@ use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\MigrationBundle\Locator\FixturePathLocatorInterface;
 use Oro\Bundle\MigrationBundle\Migration\DataFixturesExecutorInterface;
 use Oro\Bundle\MigrationBundle\Migration\Loader\DataFixturesLoader;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Cursor;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,46 +27,33 @@ use Symfony\Component\HttpKernel\KernelInterface;
 /**
  * Loads data fixtures.
  */
+#[AsCommand(
+    name: 'oro:migration:data:load',
+    description: 'Loads data fixtures.'
+)]
 class LoadDataFixturesCommand extends Command
 {
     use LocalizationOptionsCommandTrait;
 
-    public const MAIN_FIXTURES_TYPE = DataFixturesExecutorInterface::MAIN_FIXTURES;
-    public const DEMO_FIXTURES_TYPE = DataFixturesExecutorInterface::DEMO_FIXTURES;
-
-    /** @var string */
-    protected static $defaultName = 'oro:migration:data:load';
-
-    protected KernelInterface $kernel;
-    protected DataFixturesLoader $dataFixturesLoader;
-    protected DataFixturesExecutorInterface $dataFixturesExecutor;
-    protected FixturePathLocatorInterface $fixturePathLocator;
-    protected ConfigManager $configManager;
-    protected ManagerRegistry $doctrine;
+    public const string MAIN_FIXTURES_TYPE = DataFixturesExecutorInterface::MAIN_FIXTURES;
+    public const string DEMO_FIXTURES_TYPE = DataFixturesExecutorInterface::DEMO_FIXTURES;
 
     private InputOptionProvider $inputOptionProvider;
 
     public function __construct(
-        KernelInterface $kernel,
-        DataFixturesLoader $dataFixturesLoader,
-        DataFixturesExecutorInterface $dataFixturesExecutor,
-        FixturePathLocatorInterface $fixturePathLocator,
-        ConfigManager $configManager,
-        ManagerRegistry $doctrine
+        protected readonly KernelInterface $kernel,
+        protected readonly DataFixturesLoader $dataFixturesLoader,
+        protected readonly DataFixturesExecutorInterface $dataFixturesExecutor,
+        protected readonly FixturePathLocatorInterface $fixturePathLocator,
+        protected readonly ConfigManager $configManager,
+        protected readonly ManagerRegistry $doctrine
     ) {
         parent::__construct();
-
-        $this->kernel = $kernel;
-        $this->dataFixturesLoader = $dataFixturesLoader;
-        $this->dataFixturesExecutor = $dataFixturesExecutor;
-        $this->fixturePathLocator = $fixturePathLocator;
-        $this->configManager = $configManager;
-        $this->doctrine = $doctrine;
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
     #[\Override]
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addOption(
@@ -88,40 +76,54 @@ class LoadDataFixturesCommand extends Command
                 'Bundles to load the data from'
             )
             ->addOption(
+                'no-bundles',
+                null,
+                InputOption::VALUE_NONE,
+                'Load fixtures only from the application\'s "migrations" folder.'
+            )
+            ->addOption(
                 'exclude',
                 null,
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
                 'Bundles with the fixtures that should be skipped'
             )
             ->addLocalizationOptions()
-            ->setDescription('Loads data fixtures.')
             ->setHelp(
+                // phpcs:disable Generic.Files.LineLength.TooLong
                 <<<'HELP'
 The <info>%command.name%</info> command loads data fixtures.
-The fixtures type ("main", or "demo") can be specified with the <info>--fixtures-type</info> option:
 
-  <info>php %command.full_name% --fixtures-type=<type></info>
+The fixture type ("main" or "demo") can be specified using the <info>--fixtures-type</info> option:
 
-The <info>--dry-run</info> option can be used to print the list of fixtures without applying them:
+  <info>%command.full_name% --fixtures-type=<type></info>
 
-  <info>php %command.full_name% --dry-run</info>
+Use the <info>--dry-run</info> option to display the list of fixtures without loading them:
 
-The <info>--bundles</info> option can be used to load the fixtures only from the specified bundles:
+  <info>%command.full_name% --dry-run</info>
 
-  <info>php %command.full_name% --bundles=<BundleOne> --bundles=<BundleTwo> --bundles=<BundleThree></info>
+Use the <info>--bundles</info> option to load fixtures only from the specified bundles:
 
-The <info>--exclude</info> option will skip loading fixtures from the specified bundles:
+  <info>%command.full_name% --bundles=<BundleOne> --bundles=<BundleTwo> --bundles=<BundleThree></info>
 
-  <info>php %command.full_name% --exclude=<BundleOne> --exclude=<BundleTwo> --exclude=<BundleThree></info>
+Use the <info>--exclude</info> option to skip loading fixtures from the specified bundles:
+
+  <info>%command.full_name% --exclude=<BundleOne> --exclude=<BundleTwo> --exclude=<BundleThree></info>
+
+Use the <info>--no-bundles</info> option to skip all bundle fixtures and load only those from the application's "migrations" directory:
+
+  <info>%command.full_name% --no-bundles</info>
 
 HELP
+                // phpcs:enable Generic.Files.LineLength.TooLong
                 . $this->getLocalizationOptionsHelp()
             )
             ->addUsage('--fixtures-type=main')
             ->addUsage('--fixtures-type=demo')
             ->addUsage('--dry-run')
             ->addUsage('--bundles=<BundleOne> --bundles=<BundleTwo>')
+            ->addUsage('--no-bundles')
             ->addUsage('--fixtures-type=demo --bundles=<BundleOne> --bundles=<BundleTwo>')
+            ->addUsage('--fixtures-type=demo --no-bundles')
             ->addUsage('--dry-run --fixtures-type=demo --bundles=<BundleOne> --bundles=<BundleTwo>')
             ->addUsage('--exclude=<BundleOne> --exclude=<BundleTwo>')
             ->addUsage('--fixtures-type=demo --exclude=<BundleOne> --exclude=<BundleTwo>')
@@ -163,25 +165,29 @@ HELP
      */
     protected function getFixtures(InputInterface $input, OutputInterface $output): array
     {
-        $includeBundles = $input->getOption('bundles');
-        $excludeBundles = $input->getOption('exclude');
         $fixtureRelativePath = $this->getFixtureRelativePath($input);
 
-        /** @var BundleInterface[] $bundles */
-        $bundles = $this->kernel->getBundles();
+        if (!$input->getOption('no-bundles')) {
+            $includeBundles = $input->getOption('bundles');
+            $excludeBundles = $input->getOption('exclude');
 
-        foreach ($bundles as $bundle) {
-            if (!empty($includeBundles) && !in_array($bundle->getName(), $includeBundles, true)) {
-                continue;
-            }
-            if (!empty($excludeBundles) && in_array($bundle->getName(), $excludeBundles, true)) {
-                continue;
-            }
-            $path = $bundle->getPath() . $fixtureRelativePath;
-            if (is_dir($path)) {
-                $this->dataFixturesLoader->loadFromDirectory($path);
+            /** @var BundleInterface[] $bundles */
+            $bundles = $this->kernel->getBundles();
+
+            foreach ($bundles as $bundle) {
+                if (!empty($includeBundles) && !in_array($bundle->getName(), $includeBundles, true)) {
+                    continue;
+                }
+                if (!empty($excludeBundles) && in_array($bundle->getName(), $excludeBundles, true)) {
+                    continue;
+                }
+                $path = $bundle->getPath() . $fixtureRelativePath;
+                if (is_dir($path)) {
+                    $this->dataFixturesLoader->loadFromDirectory($path);
+                }
             }
         }
+
         $this->loadAppFixtures($fixtureRelativePath);
 
         return $this->dataFixturesLoader->getFixtures();
@@ -241,7 +247,7 @@ HELP
             $this->dataFixturesExecutor->setLogger(
                 function ($message) use ($output, $cursor) {
                     $output->write(\sprintf('  <comment>></comment> <info>%s</info>', $message));
-                    // Saves the cursor position to make it possible to return to the end of previous line in the
+                    // Saves the cursor position to make it possible to return to the end of the previous line in the
                     // progress callback to append the progress info.
                     $cursor->savePosition();
                     $output->writeln('');
@@ -249,7 +255,7 @@ HELP
             );
 
             $progressCallback = static function (int $memoryBytes, float $durationMilli) use ($output, $cursor) {
-                // Returns cursor to the end of the previous line so the progress info will be appended after it.
+                // Returns the cursor to the end of the previous line, so the progress info will be appended after it.
                 $cursor->restorePosition();
                 $cursor->moveUp();
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Oro\Bundle\InstallerBundle\Command;
 
 use Oro\Bundle\MigrationBundle\Command\LoadDataFixturesCommand;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -14,19 +15,19 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 /**
  * Loads demo data fixtures from the specified package directories.
  */
+#[AsCommand(
+    name: 'oro:package:demo:load',
+    description: 'Loads demo data fixtures from the specified package directories.'
+)]
 class LoadPackageDemoDataCommand extends LoadDataFixturesCommand
 {
-    /** @var string */
-    protected static $defaultName = 'oro:package:demo:load';
-
     /** @noinspection PhpMissingParentCallCommonInspection */
     #[\Override]
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addArgument('package', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'Package directories')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Print the list of fixtures without applying them')
-            ->setDescription('Loads demo data fixtures from the specified package directories.')
             ->addUsage('<package1> <package2> <package3>')
             ->addUsage('--dry-run <package>')
         ;

@@ -30,15 +30,16 @@ trait LocalizationOptionsCommandTrait
 
     private function getLocalizationOptionsHelp(): string
     {
+        // phpcs:disable Generic.Files.LineLength.TooLong
         return <<<'HELP'
 
-The <info>--language</info> and <info>--formatting</info> code options can be used to specify
-the localization language and the localization formatting setting that are used
-during execution of this command:
+The <info>--language</info> and <info>--formatting-code</info> options can be used to specify the localization language and formatting settings used during execution of this command:
 
-  <info>php %command.full_name% --language=<language-code> --formatting-code=<formatting-code></info>
-  <info>php %command.full_name% --language=en --formatting-code=en_US</info>
+  <info>%command.full_name% --language=<language-code> --formatting-code=<formatting-code></info>
+  <info>%command.full_name% --language=en --formatting-code=en_US</info>
+
 HELP;
+        // phpcs:enable Generic.Files.LineLength.TooLong
     }
 
     private function addLocalizationOptionsUsage(): self
