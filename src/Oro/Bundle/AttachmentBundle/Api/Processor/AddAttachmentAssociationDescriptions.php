@@ -24,6 +24,7 @@ class AddAttachmentAssociationDescriptions implements ProcessorInterface
         '@OroAttachmentBundle/Resources/doc/api/attachment_association.md';
     private const ATTACHMENT_TARGET_ENTITY = '%attachment_target_entity%';
     private const ATTACHMENTS_ASSOCIATION = '%attachments_association%';
+    private const ENTITY_NAME = '%entity_name%';
 
     private AttachmentAssociationProvider $attachmentAssociationProvider;
     private ResourceDocParserProvider $resourceDocParserProvider;
@@ -51,12 +52,11 @@ class AddAttachmentAssociationDescriptions implements ProcessorInterface
 
         $associationName = $context->getAssociationName();
         $entityClass = $associationName ? $context->getParentClassName() : $context->getClassName();
-        $version = $context->getVersion();
         $requestType = $context->getRequestType();
 
         $attachmentAssociationName = $this->attachmentAssociationProvider->getAttachmentAssociationName(
             $entityClass,
-            $version,
+            $context->getVersion(),
             $requestType
         );
         if ($attachmentAssociationName) {
@@ -107,7 +107,7 @@ class AddAttachmentAssociationDescriptions implements ProcessorInterface
             $targetAction
         );
         $attachmentsAssociationDefinition->setDescription(strtr($associationDocumentationTemplate, [
-            '%entity_name%' => $this->entityNameProvider->getEntityName($entityClass, true)
+            self::ENTITY_NAME => $this->entityNameProvider->getEntityName($entityClass, true)
         ]));
     }
 
@@ -124,7 +124,7 @@ class AddAttachmentAssociationDescriptions implements ProcessorInterface
             $targetAction
         );
         $definition->setDocumentation(strtr($subresourceDocumentationTemplate, [
-            '%entity_name%' => $this->entityNameProvider->getEntityName($entityClass, true)
+            self::ENTITY_NAME => $this->entityNameProvider->getEntityName($entityClass, true)
         ]));
     }
 

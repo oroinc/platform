@@ -30,7 +30,12 @@ class AddActivityAssociationDescriptions implements ProcessorInterface
     private const ACTIVITY_ASSOCIATION_DOC_RESOURCE =
         '@OroActivityBundle/Resources/doc/api/activity_association.md';
     private const ACTIVITY_TARGET_ENTITY = '%activity_target_entity%';
+    private const ACTIVITY_TARGET_ENTITY_TYPE = '%activity_target_entity_type%';
+    private const ACTIVITY_ENTITY_NAME = '%activity_entity_name%';
+    private const ACTIVITY_ENTITY_PLURAL_NAME = '%activity_entity_plural_name%';
+    private const ACTIVITY_ENTITY_TYPE = '%activity_entity_type%';
     private const ACTIVITY_ASSOCIATION = '%activity_association%';
+    private const ENTITY_NAME = '%entity_name%';
 
     private ActivityAssociationProvider $activityAssociationProvider;
     private ValueNormalizer $valueNormalizer;
@@ -161,7 +166,7 @@ class AddActivityAssociationDescriptions implements ProcessorInterface
             self::ACTIVITY_TARGETS_ASSOCIATION
         );
         $activityTargetsAssociationDefinition->setDescription(strtr($associationDocumentationTemplate, [
-            '%activity_entity_name%' => $this->entityNameProvider->getEntityName($activityEntityClass, true)
+            self::ACTIVITY_ENTITY_NAME => $this->entityNameProvider->getEntityName($activityEntityClass, true)
         ]));
     }
 
@@ -187,8 +192,8 @@ class AddActivityAssociationDescriptions implements ProcessorInterface
             ? $this->getEntityType(reset($activityTargetEntityClasses), $requestType)
             : 'users';
         $definition->setDocumentation(strtr($subresourceDocumentationTemplate, [
-            '%activity_entity_name%'        => $this->entityNameProvider->getEntityName($activityEntityClass, true),
-            '%activity_target_entity_type%' => $activityTargetEntityType
+            self::ACTIVITY_ENTITY_NAME => $this->entityNameProvider->getEntityName($activityEntityClass, true),
+            self::ACTIVITY_TARGET_ENTITY_TYPE => $activityTargetEntityType
         ]));
     }
 
@@ -211,8 +216,8 @@ class AddActivityAssociationDescriptions implements ProcessorInterface
                 continue;
             }
             $activityAssociationDefinition->setDescription(strtr($associationDocumentationTemplate, [
-                '%entity_name%'                 => $entityName,
-                '%activity_entity_plural_name%' => $this->entityNameProvider->getEntityPluralName(
+                self::ENTITY_NAME => $entityName,
+                self::ACTIVITY_ENTITY_PLURAL_NAME => $this->entityNameProvider->getEntityPluralName(
                     $activityAssociation['className'],
                     true
                 )
@@ -235,12 +240,12 @@ class AddActivityAssociationDescriptions implements ProcessorInterface
         );
 
         $definition->setDocumentation(strtr($subresourceDocumentationTemplate, [
-            '%entity_name%'                 => $this->entityNameProvider->getEntityName($entityClass, true),
-            '%activity_entity_plural_name%' => $this->entityNameProvider->getEntityPluralName(
+            self::ENTITY_NAME => $this->entityNameProvider->getEntityName($entityClass, true),
+            self::ACTIVITY_ENTITY_PLURAL_NAME => $this->entityNameProvider->getEntityPluralName(
                 $activityEntityClass,
                 true
             ),
-            '%activity_entity_type%'        => $this->getEntityType($activityEntityClass, $requestType)
+            self::ACTIVITY_ENTITY_TYPE => $this->getEntityType($activityEntityClass, $requestType)
         ]));
     }
 
