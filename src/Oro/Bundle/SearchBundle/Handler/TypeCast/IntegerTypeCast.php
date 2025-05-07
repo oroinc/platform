@@ -2,33 +2,26 @@
 
 namespace Oro\Bundle\SearchBundle\Handler\TypeCast;
 
+use Oro\Bundle\SearchBundle\Exception\TypeCastingException;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 /**
  * Ensures that the data added to the search index is of the appropriate 'integer' type.
  * Allows to convert type 'boolean' to type 'integer'.
  */
-class IntegerTypeCast extends AbstractTypeCastingHandler
+class IntegerTypeCast implements TypeCastingHandlerInterface
 {
     #[\Override]
     public function castValue(mixed $value): mixed
     {
-        if ($this->isSupported($value)) {
+        if (\is_int($value) || \is_bool($value)) {
             return (int)$value;
         }
 
-        return parent::castValue($value);
-    }
+        if (\is_scalar($value) || $value instanceof \DateTime) {
+            throw new TypeCastingException(Query::TYPE_INTEGER);
+        }
 
-    #[\Override]
-    public function isSupported($value): bool
-    {
-        return is_int($value) || is_bool($value);
-    }
-
-    #[\Override]
-    public static function getType(): string
-    {
-        return Query::TYPE_INTEGER;
+        return $value;
     }
 }

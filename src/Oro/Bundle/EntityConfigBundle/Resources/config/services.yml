@@ -596,7 +596,7 @@ services:
     oro_entity_config.validator.field_config_constraints_factory:
         class: Oro\Bundle\EntityConfigBundle\Validator\FieldConfigConstraintsFactory
         arguments:
-            - !tagged_iterator { tag: 'oro_entity_config.field_config_constraints_provider', index_by: 'type' }
+            - !abstract '$providers defined in Oro\Bundle\EntityConfigBundle\OroEntityConfigBundle'
 
     oro_entity_config.validator.constraints.provider.string:
         class: Oro\Bundle\EntityConfigBundle\Validator\Constraints\Provider\StringFieldConfigConstraintsProvider

@@ -22,6 +22,11 @@ class OroEntityConfigBundle extends Bundle
             'oro_entity_config.attribute_type',
             'type'
         ));
+        $container->addCompilerPass(new PriorityTaggedLocatorCompilerPass(
+            'oro_entity_config.validator.field_config_constraints_factory',
+            'oro_entity_config.field_config_constraints_provider',
+            'type'
+        ));
 
         $container->addCompilerPass(
             DoctrineOrmMappingsPass::createAttributeMappingDriver(
@@ -29,7 +34,6 @@ class OroEntityConfigBundle extends Bundle
                 [$this->getPath() . DIRECTORY_SEPARATOR . 'Audit' . DIRECTORY_SEPARATOR . 'Entity']
             )
         );
-
         $container->addCompilerPass(
             DoctrineOrmMappingsPass::createAttributeMappingDriver(
                 ['Oro\Bundle\EntityConfigBundle\Attribute\Entity'],

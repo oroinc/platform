@@ -4,33 +4,35 @@ namespace Oro\Bundle\EntityConfigBundle\Validator;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Validator\Constraints\Provider\FieldConfigConstraintsProviderInterface;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\Validator\Constraint;
 
 /**
- * Creates constraints based on field configuration
+ * Creates constraints based on field configuration.
  */
 class FieldConfigConstraintsFactory
 {
-    /** @var array|FieldConfigConstraintsProviderInterface[] */
-    private array $providers;
-
-    public function __construct(iterable $providers)
-    {
-        $this->providers = iterator_to_array($providers);
+    public function __construct(
+        private readonly ContainerInterface $providers
+    ) {
     }
 
     /**
      * Creates a validation constraints.
+     *
+     * @return Constraint[]
      */
     public function create(ConfigInterface $config): array
     {
         $fieldType = $config->getId()->getFieldType();
-        $constraints = [];
-        if (isset($this->providers[$fieldType]) &&
-            $this->providers[$fieldType] instanceof FieldConfigConstraintsProviderInterface
-        ) {
-            $constraints = $this->providers[$fieldType]->create($config);
+        if (!$this->providers->has($fieldType)) {
+            return [];
+        }
+        $provider = $this->providers->get($fieldType);
+        if (!$provider instanceof FieldConfigConstraintsProviderInterface) {
+            return [];
         }
 
-        return $constraints;
+        return $provider->create($config);
     }
 }

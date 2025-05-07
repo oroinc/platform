@@ -4,12 +4,11 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Handler\TypeCast;
 
 use Oro\Bundle\SearchBundle\Exception\TypeCastingException;
 use Oro\Bundle\SearchBundle\Handler\TypeCast\IntegerTypeCast;
-use Oro\Bundle\SearchBundle\Query\Query;
+use PHPUnit\Framework\TestCase;
 
-class IntegerTypeCastTest extends \PHPUnit\Framework\TestCase
+class IntegerTypeCastTest extends TestCase
 {
-    /** @var IntegerTypeCast */
-    private $handler;
+    private IntegerTypeCast $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -22,8 +21,7 @@ class IntegerTypeCastTest extends \PHPUnit\Framework\TestCase
      */
     public function testCastValue($value, $expected): void
     {
-        $this->assertEquals($expected, $this->handler->castValue($value));
-        $this->assertIsInt($this->handler->castValue($value));
+        self::assertSame($expected, $this->handler->castValue($value));
     }
 
     public function validTypesDataProvider(): array
@@ -40,8 +38,14 @@ class IntegerTypeCastTest extends \PHPUnit\Framework\TestCase
             'boolean(false)' => [
                 'value' => false,
                 'expected' => 0
-            ],
+            ]
         ];
+    }
+
+    public function testCastValueForObject(): void
+    {
+        $value = new \stdClass();
+        self::assertSame($value, $this->handler->castValue($value));
     }
 
     /**
@@ -67,10 +71,5 @@ class IntegerTypeCastTest extends \PHPUnit\Framework\TestCase
                 'value' => 1.1
             ]
         ];
-    }
-
-    public function testGetType(): void
-    {
-        $this->assertEquals(Query::TYPE_INTEGER, IntegerTypeCast::getType());
     }
 }

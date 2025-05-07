@@ -6,6 +6,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Validator\Constraints\Provider\StringFieldConfigConstraintsProvider;
 use Oro\Bundle\EntityConfigBundle\Validator\FieldConfigConstraintsFactory;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Validator\Constraints\Length;
 
 class FieldConfigConstraintsFactoryTest extends \PHPUnit\Framework\TestCase
@@ -17,10 +18,15 @@ class FieldConfigConstraintsFactoryTest extends \PHPUnit\Framework\TestCase
     #[\Override]
     protected function setUp(): void
     {
-        $providers = new \ArrayIterator([
-            self::STRING_TYPE => new StringFieldConfigConstraintsProvider(),
-            'other_type' => new \stdClass(),
+        $providers = new ServiceLocator([
+            self::STRING_TYPE => function () {
+                return new StringFieldConfigConstraintsProvider();
+            },
+            'other_type' => function () {
+                return new \stdClass();
+            }
         ]);
+
         $this->constraintsFactory = new FieldConfigConstraintsFactory($providers);
     }
 
