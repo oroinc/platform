@@ -4,12 +4,11 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Handler\TypeCast;
 
 use Oro\Bundle\SearchBundle\Exception\TypeCastingException;
 use Oro\Bundle\SearchBundle\Handler\TypeCast\DateTimeTypeCast;
-use Oro\Bundle\SearchBundle\Query\Query;
+use PHPUnit\Framework\TestCase;
 
-class DateTimeTypeCastTest extends \PHPUnit\Framework\TestCase
+class DateTimeTypeCastTest extends TestCase
 {
-    /** @var DateTimeTypeCast */
-    private $handler;
+    private DateTimeTypeCast $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -20,8 +19,13 @@ class DateTimeTypeCastTest extends \PHPUnit\Framework\TestCase
     public function testCastValue(): void
     {
         $value = new \DateTime('now');
-        $this->assertEquals($value, $this->handler->castValue($value));
-        $this->assertInstanceOf(\DateTime::class, $value);
+        self::assertSame($value, $this->handler->castValue($value));
+    }
+
+    public function testCastValueForObject(): void
+    {
+        $value = new \stdClass();
+        self::assertSame($value, $this->handler->castValue($value));
     }
 
     /**
@@ -50,10 +54,5 @@ class DateTimeTypeCastTest extends \PHPUnit\Framework\TestCase
                 'value' => 1.1
             ]
         ];
-    }
-
-    public function testGetType(): void
-    {
-        $this->assertEquals(Query::TYPE_DATETIME, DateTimeTypeCast::getType());
     }
 }

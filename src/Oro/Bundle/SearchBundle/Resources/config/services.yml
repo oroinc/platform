@@ -383,26 +383,27 @@ services:
     oro_search.handler.type_cast.type_casting_handler_registry:
         class: Oro\Bundle\SearchBundle\Handler\TypeCast\TypeCastingHandlerRegistry
         arguments:
-            - !tagged_iterator { tag: 'oro_search.type_cast_handler', default_index_method: 'getType' }
+            - !abstract '$handlers defined in Oro\Bundle\SearchBundle\OroSearchBundle'
 
-    Oro\Bundle\SearchBundle\Handler\TypeCast\TypeCastingHandlerRegistry:
-        alias: oro_search.handler.type_cast.type_casting_handler_registry
-
-    Oro\Bundle\SearchBundle\Handler\TypeCast\TextTypeCast:
+    oro_search.type_cast_handler.text:
+        class: Oro\Bundle\SearchBundle\Handler\TypeCast\TextTypeCast
         tags:
-            - { name: 'oro_search.type_cast_handler'}
+            - { name: oro_search.type_cast_handler, type: text }
 
-    Oro\Bundle\SearchBundle\Handler\TypeCast\IntegerTypeCast:
+    oro_search.type_cast_handler.integer:
+        class: Oro\Bundle\SearchBundle\Handler\TypeCast\IntegerTypeCast
         tags:
-            - { name: 'oro_search.type_cast_handler'}
+            - { name: oro_search.type_cast_handler, type: integer }
 
-    Oro\Bundle\SearchBundle\Handler\TypeCast\DecimalTypeCast:
+    oro_search.type_cast_handler.decimal:
+        class: Oro\Bundle\SearchBundle\Handler\TypeCast\DecimalTypeCast
         tags:
-            - { name: 'oro_search.type_cast_handler' }
+            - { name: oro_search.type_cast_handler, type: decimal }
 
-    Oro\Bundle\SearchBundle\Handler\TypeCast\DateTimeTypeCast:
+    oro_search.type_cast_handler.datetime:
+        class: Oro\Bundle\SearchBundle\Handler\TypeCast\DateTimeTypeCast
         tags:
-            - { name: 'oro_search.type_cast_handler' }
+            - { name: oro_search.type_cast_handler, type: datetime }
 
     oro_search.factory.filter.search:
         class: Oro\Bundle\FilterBundle\Factory\FilterFactory

@@ -3,14 +3,13 @@
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Handler\TypeCast;
 
 use Oro\Bundle\SearchBundle\Exception\TypeCastingException;
-use Oro\Bundle\SearchBundle\Handler\TypeCast\IntegerTypeCast;
 use Oro\Bundle\SearchBundle\Handler\TypeCast\TextTypeCast;
-use Oro\Bundle\SearchBundle\Query\Query;
+use Oro\Bundle\SearchBundle\Tests\Unit\Stub\EntityStub;
+use PHPUnit\Framework\TestCase;
 
-class TextTypeCastTest extends \PHPUnit\Framework\TestCase
+class TextTypeCastTest extends TestCase
 {
-    /** @var IntegerTypeCast */
-    private $handler;
+    private TextTypeCast $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -20,8 +19,19 @@ class TextTypeCastTest extends \PHPUnit\Framework\TestCase
 
     public function testCastValue(): void
     {
-        $this->assertEquals('string', $this->handler->castValue('string'));
-        $this->assertIsString($this->handler->castValue('string'));
+        self::assertEquals('string', $this->handler->castValue('string'));
+    }
+
+    public function testCastValueForStringableObject(): void
+    {
+        $value = new EntityStub(1, 'test');
+        self::assertEquals('test', $this->handler->castValue($value));
+    }
+
+    public function testCastValueForObject(): void
+    {
+        $value = new \stdClass();
+        self::assertSame($value, $this->handler->castValue($value));
     }
 
     /**
@@ -50,10 +60,5 @@ class TextTypeCastTest extends \PHPUnit\Framework\TestCase
                 'value' => 1.1
             ]
         ];
-    }
-
-    public function testGetType(): void
-    {
-        $this->assertEquals(Query::TYPE_TEXT, TextTypeCast::getType());
     }
 }

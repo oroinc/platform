@@ -4,12 +4,11 @@ namespace Oro\Bundle\SearchBundle\Tests\Unit\Handler\TypeCast;
 
 use Oro\Bundle\SearchBundle\Exception\TypeCastingException;
 use Oro\Bundle\SearchBundle\Handler\TypeCast\DecimalTypeCast;
-use Oro\Bundle\SearchBundle\Query\Query;
+use PHPUnit\Framework\TestCase;
 
-class DecimalTypeCastTest extends \PHPUnit\Framework\TestCase
+class DecimalTypeCastTest extends TestCase
 {
-    /** @var DecimalTypeCast */
-    private $handler;
+    private DecimalTypeCast $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -18,14 +17,12 @@ class DecimalTypeCastTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @param int|float $value
-     *
      * @dataProvider validTypesDataProvider
      */
-    public function testCastValue($value): void
+    public function testCastValue(mixed $value): void
     {
-        $this->assertEquals($value, $this->handler->castValue($value));
-        $this->assertIsFloat($this->handler->castValue($value));
+        self::assertEquals($value, $this->handler->castValue($value));
+        self::assertIsFloat($this->handler->castValue($value));
     }
 
     public function validTypesDataProvider(): array
@@ -44,6 +41,12 @@ class DecimalTypeCastTest extends \PHPUnit\Framework\TestCase
                 'expected' => 123.123
             ]
         ];
+    }
+
+    public function testCastValueForObject(): void
+    {
+        $value = new \stdClass();
+        self::assertSame($value, $this->handler->castValue($value));
     }
 
     /**
@@ -72,10 +75,5 @@ class DecimalTypeCastTest extends \PHPUnit\Framework\TestCase
                 'value' => 'E123.123000000'
             ],
         ];
-    }
-
-    public function testGetType(): void
-    {
-        $this->assertEquals(Query::TYPE_DECIMAL, DecimalTypeCast::getType());
     }
 }

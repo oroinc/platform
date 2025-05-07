@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UserBundle;
 
-use Oro\Bundle\UserBundle\DependencyInjection\Compiler\AddLoginFormToCaptchaProtected;
+use Oro\Bundle\UserBundle\DependencyInjection\Compiler\AddLoginFormToCaptchaProtectedPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -13,6 +13,6 @@ class OroUserBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new AddLoginFormToCaptchaProtected());
+        $container->addCompilerPass(new AddLoginFormToCaptchaProtectedPass());
     }
 }
