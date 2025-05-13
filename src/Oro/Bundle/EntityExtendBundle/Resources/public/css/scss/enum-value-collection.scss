@@ -5,13 +5,18 @@
     width: $field-width;
 
     &__clear-default {
-        position: absolute;
-        bottom: $content-padding-small;
-        right: 0;
+        display: flex;
+        justify-self: end;
 
         &.disabled {
             display: none;
         }
+    }
+
+    &:has(.add-list-item) &__clear-default {
+        position: absolute;
+        bottom: $content-padding-small;
+        right: 0;
     }
 
     .controls & {
