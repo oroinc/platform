@@ -159,6 +159,53 @@ class UpdateListForUpsertTest extends RestJsonApiUpdateListTestCase
         self::assertSame('New Item', $createdEntity->name);
     }
 
+    public function testTryToUpsertWhenRequestDataHasValidationErrors(): void
+    {
+        $entityType = $this->getEntityType(TestCustomIdentifier::class);
+
+        $operationId = $this->processUpdateList(
+            TestCustomIdentifier::class,
+            [
+                'data' => [
+                    [
+                        'type' => $entityType,
+                        'id' => 'item 1',
+                        'meta' => ['upsert' => true],
+                        'attributes' => [
+                            'name' => null
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => 'new item',
+                        'meta' => ['upsert' => true]
+                    ]
+                ]
+            ],
+            false
+        );
+
+        $this->assertAsyncOperationErrors(
+            [
+                [
+                    'id'     => $operationId . '-1-1',
+                    'status' => 400,
+                    'title'  => 'not blank constraint',
+                    'detail' => 'This value should not be blank.',
+                    'source' => ['pointer' => '/data/0/attributes/name']
+                ],
+                [
+                    'id'     => $operationId . '-1-2',
+                    'status' => 400,
+                    'title'  => 'not blank constraint',
+                    'detail' => 'This value should not be blank.',
+                    'source' => ['pointer' => '/data/1/attributes/name']
+                ]
+            ],
+            $operationId
+        );
+    }
+
     public function testUpsertInIncludedDataWhenEntityExists(): void
     {
         $entityType = $this->getEntityType(TestCustomIdentifier::class);

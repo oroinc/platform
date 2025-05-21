@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'test_api_custom_id')]
@@ -20,6 +21,7 @@ class TestCustomIdentifier implements TestFrameworkEntityInterface
     #[ORM\Column(name: '`key`', type: Types::STRING, unique: true, nullable: false)]
     public ?string $key = null;
 
+    #[Assert\NotBlank]
     #[ORM\Column(name: 'name', type: Types::STRING, nullable: true)]
     public ?string $name = null;
 

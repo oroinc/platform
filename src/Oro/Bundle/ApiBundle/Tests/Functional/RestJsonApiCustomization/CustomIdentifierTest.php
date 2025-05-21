@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
  * @dbIsolationPerTest
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class CustomIdentifierTest extends RestJsonApiTestCase
 {
@@ -670,6 +671,42 @@ class CustomIdentifierTest extends RestJsonApiTestCase
         self::assertSame($this->getReference('test_custom_id1')->id, $createdEntity->getChildren()->first()->id);
     }
 
+    public function testTryToCreateWithoutName()
+    {
+        $entityType = $this->getEntityType(TestEntity::class);
+
+        $response = $this->post(
+            ['entity' => $entityType],
+            [
+                'data' => [
+                    'type' => $entityType,
+                    'id' => $this->getEntityId('new item'),
+                    'relationships' => [
+                        'parent' => [
+                            'data' => ['type' => $entityType, 'id' => $this->getEntityId('item 1')]
+                        ],
+                        'children' => [
+                            'data' => [
+                                ['type' => $entityType, 'id' => $this->getEntityId('item 1')]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title' => 'not blank constraint',
+                'detail' => 'This value should not be blank.',
+                'source' => ['pointer' => '/data/attributes/name']
+            ],
+            $response
+        );
+    }
+
     public function testUpdate()
     {
         $entityType = $this->getEntityType(TestEntity::class);
@@ -730,6 +767,36 @@ class CustomIdentifierTest extends RestJsonApiTestCase
         self::assertSame($this->getReference('test_custom_id2')->id, $updatedEntity->getParent()->id);
         self::assertCount(1, $updatedEntity->getChildren());
         self::assertSame($this->getReference('test_custom_id2')->id, $updatedEntity->getChildren()->first()->id);
+    }
+
+    public function testTryToUpdateNameToNull()
+    {
+        $entityType = $this->getEntityType(TestEntity::class);
+
+        $response = $this->patch(
+            ['entity' => $entityType, 'id' => $this->getEntityId('item 1')],
+            [
+                'data' => [
+                    'type' => $entityType,
+                    'id' => $this->getEntityId('item 1'),
+                    'attributes' => [
+                        'databaseId' => '@test_custom_id1->id',
+                        'name' => null
+                    ]
+                ]
+            ],
+            [],
+            false
+        );
+
+        $this->assertResponseValidationError(
+            [
+                'title' => 'not blank constraint',
+                'detail' => 'This value should not be blank.',
+                'source' => ['pointer' => '/data/attributes/name']
+            ],
+            $response
+        );
     }
 
     public function testDelete()

@@ -142,7 +142,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                     'validation_groups'      => ['Default', 'api', 'my_group'],
                     'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'enable_validation'      => false,
-                    'enable_full_validation' => false,
+                    'enable_full_validation' => true,
                     'api_context'            => $this->context
                 ]
             )
@@ -161,6 +161,85 @@ class BuildFormBuilderTest extends FormProcessorTestCase
     }
 
     public function testProcess()
+    {
+        $entityClass = 'Test\Entity';
+        $data = new \stdClass();
+        $formBuilder = $this->createMock(FormBuilderInterface::class);
+
+        $config = new EntityDefinitionConfig();
+        $config->addField('metaProperty1');
+        $config->addField('metaProperty2')->setPropertyPath('realMetaProperty2');
+        $config->addField('field1');
+        $config->addField('field2')->setPropertyPath('realField2');
+        $configField3 = $config->addField('field3');
+        $configField3->setPropertyPath('realField3');
+        $configField3->setFormType('text');
+        $configField3->setFormOptions(['trim' => false]);
+        $config->addField('association1');
+        $config->addField('association2')->setPropertyPath('realAssociation2');
+        $configAssociation3 = $config->addField('association3');
+        $configAssociation3->setPropertyPath('realAssociation3');
+        $configAssociation3->setFormType('text');
+        $configAssociation3->setFormOptions(['trim' => false]);
+
+        $metadata = new EntityMetadata('Test\Entity');
+        $metadata->addMetaProperty($this->createMetaPropertyMetadata('metaProperty1'));
+        $metadata->addMetaProperty($this->createMetaPropertyMetadata('metaProperty2'))
+            ->setPropertyPath('realMetaProperty2');
+        $metadata->addField($this->createFieldMetadata('field1'));
+        $metadata->addField($this->createFieldMetadata('field2'))
+            ->setPropertyPath('realField2');
+        $metadata->addField($this->createFieldMetadata('field3'))
+            ->setPropertyPath('realField3');
+        $metadata->addAssociation($this->createAssociationMetadata('association1'));
+        $metadata->addAssociation($this->createAssociationMetadata('association2'))
+            ->setPropertyPath('realAssociation2');
+        $metadata->addAssociation($this->createAssociationMetadata('association3'))
+            ->setPropertyPath('realAssociation3');
+
+        $this->formFactory->expects(self::once())
+            ->method('createNamedBuilder')
+            ->with(
+                null,
+                FormType::class,
+                $data,
+                [
+                    'data_class'             => $entityClass,
+                    'validation_groups'      => ['Default', 'api'],
+                    'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
+                    'enable_validation'      => false,
+                    'enable_full_validation' => true,
+                    'api_context'            => $this->context
+                ]
+            )
+            ->willReturn($formBuilder);
+
+        $formBuilder->expects(self::once())
+            ->method('setDataMapper')
+            ->with(self::isInstanceOf(DataMapper::class));
+        $formBuilder->expects(self::exactly(8))
+            ->method('add')
+            ->withConsecutive(
+                ['metaProperty1', null, []],
+                ['metaProperty2', null, ['property_path' => 'realMetaProperty2']],
+                ['field1', null, []],
+                ['field2', null, ['property_path' => 'realField2']],
+                ['field3', 'text', ['property_path' => 'realField3', 'trim' => false]],
+                ['association1', null, []],
+                ['association2', null, ['property_path' => 'realAssociation2']],
+                ['association3', 'text', ['property_path' => 'realAssociation3', 'trim' => false]]
+            )
+            ->willReturn($this->createMock(FormBuilderInterface::class));
+
+        $this->context->setClassName($entityClass);
+        $this->context->setConfig($config);
+        $this->context->setMetadata($metadata);
+        $this->context->setResult($data);
+        $this->processor->process($this->context);
+        self::assertSame($formBuilder, $this->context->getFormBuilder());
+    }
+
+    public function testProcessForExistingEntity()
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
@@ -235,6 +314,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $this->context->setConfig($config);
         $this->context->setMetadata($metadata);
         $this->context->setResult($data);
+        $this->context->setExisting(true);
         $this->processor->process($this->context);
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
@@ -326,7 +406,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                     'validation_groups'      => ['Default', 'api'],
                     'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'enable_validation'      => false,
-                    'enable_full_validation' => false,
+                    'enable_full_validation' => true,
                     'api_context'            => $this->context
                 ]
             )
@@ -373,7 +453,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                     'validation_groups'      => ['Default', 'api'],
                     'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'enable_validation'      => false,
-                    'enable_full_validation' => false,
+                    'enable_full_validation' => true,
                     'api_context'            => $this->context
                 ]
             )
@@ -420,7 +500,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                     'validation_groups'      => ['Default', 'api'],
                     'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'enable_validation'      => false,
-                    'enable_full_validation' => false,
+                    'enable_full_validation' => true,
                     'api_context'            => $this->context
                 ]
             )
@@ -466,7 +546,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                     'validation_groups'      => ['Default', 'api'],
                     'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'enable_validation'      => false,
-                    'enable_full_validation' => false,
+                    'enable_full_validation' => true,
                     'api_context'            => $this->context
                 ]
             )
@@ -513,7 +593,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                     'validation_groups'      => ['Default', 'api'],
                     'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'enable_validation'      => false,
-                    'enable_full_validation' => false,
+                    'enable_full_validation' => true,
                     'api_context'            => $this->context
                 ]
             )
@@ -559,7 +639,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                     'validation_groups'      => ['Default', 'api'],
                     'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'enable_validation'      => false,
-                    'enable_full_validation' => false,
+                    'enable_full_validation' => true,
                     'api_context'            => $this->context
                 ]
             )
@@ -604,7 +684,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                     'validation_groups'      => ['Default', 'api'],
                     'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'enable_validation'      => false,
-                    'enable_full_validation' => false,
+                    'enable_full_validation' => true,
                     'api_context'            => $this->context
                 ]
             )
@@ -650,7 +730,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                     'validation_groups'      => ['Default', 'api'],
                     'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'enable_validation'      => false,
-                    'enable_full_validation' => false,
+                    'enable_full_validation' => true,
                     'api_context'            => $this->context
                 ]
             )
@@ -694,7 +774,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                     'validation_groups'      => ['Default', 'api'],
                     'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'enable_validation'      => false,
-                    'enable_full_validation' => false,
+                    'enable_full_validation' => true,
                     'api_context'            => $this->context
                 ]
             )
@@ -739,7 +819,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                     'validation_groups'      => ['Default', 'api'],
                     'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'enable_validation'      => false,
-                    'enable_full_validation' => false,
+                    'enable_full_validation' => true,
                     'api_context'            => $this->context
                 ]
             )
@@ -817,7 +897,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                     'validation_groups'      => ['Default', 'api'],
                     'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'enable_validation'      => false,
-                    'enable_full_validation' => false,
+                    'enable_full_validation' => true,
                     'api_context'            => $this->context
                 ]
             )
@@ -859,7 +939,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                     'validation_groups'      => ['Default', 'api'],
                     'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'enable_validation'      => false,
-                    'enable_full_validation' => false,
+                    'enable_full_validation' => true,
                     'api_context'            => $this->context
                 ]
             )
@@ -907,7 +987,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                     'validation_groups'      => ['Default', 'api'],
                     'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'enable_validation'      => false,
-                    'enable_full_validation' => false,
+                    'enable_full_validation' => true,
                     'api_context'            => $this->context
                 ]
             )
@@ -955,7 +1035,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                     'validation_groups'      => ['Default', 'api'],
                     'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'enable_validation'      => false,
-                    'enable_full_validation' => false,
+                    'enable_full_validation' => true,
                     'api_context'            => $this->context
                 ]
             )
@@ -1002,7 +1082,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                     'validation_groups'      => ['Default', 'api'],
                     'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'enable_validation'      => false,
-                    'enable_full_validation' => false,
+                    'enable_full_validation' => true,
                     'api_context'            => $this->context
                 ]
             )
@@ -1049,7 +1129,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
                     'validation_groups'      => ['Default', 'api'],
                     'extra_fields_message'   => FormHelper::EXTRA_FIELDS_MESSAGE,
                     'enable_validation'      => false,
-                    'enable_full_validation' => false,
+                    'enable_full_validation' => true,
                     'api_context'            => $this->context
                 ]
             )

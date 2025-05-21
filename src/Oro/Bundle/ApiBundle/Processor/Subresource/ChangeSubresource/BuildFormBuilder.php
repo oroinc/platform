@@ -100,7 +100,8 @@ class BuildFormBuilder implements ProcessorInterface
         if (!empty($options) && isset($options['validation_groups'])) {
             $formOptions['validation_groups'] = $options['validation_groups'];
         }
-        $formOptions[ValidationExtension::ENABLE_FULL_VALIDATION] = $this->enableFullValidation;
+        $formOptions[ValidationExtension::ENABLE_FULL_VALIDATION] = $this->enableFullValidation
+            || !$context->isExisting();
 
         return $formOptions;
     }

@@ -99,7 +99,7 @@ class BuildFormBuilder implements ProcessorInterface
             $options['data_class'] = $this->getFormDataClass($context, $config);
         }
         $options[CustomizeFormDataHandler::API_CONTEXT] = $context;
-        $options[ValidationExtension::ENABLE_FULL_VALIDATION] = $this->enableFullValidation;
+        $options[ValidationExtension::ENABLE_FULL_VALIDATION] = $this->enableFullValidation || !$context->isExisting();
 
         return $options;
     }
