@@ -22,16 +22,13 @@ class BuildFormBuilder implements ProcessorInterface
 {
     private FormHelper $formHelper;
     private DoctrineHelper $doctrineHelper;
-    private bool $enableFullValidation;
 
     public function __construct(
         FormHelper $formHelper,
-        DoctrineHelper $doctrineHelper,
-        bool $enableFullValidation = false
+        DoctrineHelper $doctrineHelper
     ) {
         $this->formHelper = $formHelper;
         $this->doctrineHelper = $doctrineHelper;
-        $this->enableFullValidation = $enableFullValidation;
     }
 
     #[\Override]
@@ -97,7 +94,7 @@ class BuildFormBuilder implements ProcessorInterface
             $options['data_class'] = $this->getFormDataClass($context, $config);
         }
         $options[CustomizeFormDataHandler::API_CONTEXT] = $context;
-        $options[ValidationExtension::ENABLE_FULL_VALIDATION] = $this->enableFullValidation;
+        $options[ValidationExtension::ENABLE_FULL_VALIDATION] = !$context->isExisting();
 
         return array_merge($options, $context->getFormOptions() ?? []);
     }
