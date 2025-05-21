@@ -85,7 +85,7 @@ class FormType extends AbstractType
 
         $options = $options->toArray();
         foreach ($options['additional_block_prefixes'] as &$blockPrefix) {
-            $blockPrefix .=  $suffix;
+            $blockPrefix .= $suffix;
         }
         unset($blockPrefix);
 
