@@ -98,7 +98,7 @@ class BuildFormBuilder implements ProcessorInterface
         if (!empty($optionsFromConfig) && isset($optionsFromConfig['validation_groups'])) {
             $options['validation_groups'] = $optionsFromConfig['validation_groups'];
         }
-        $options[ValidationExtension::ENABLE_FULL_VALIDATION] = $this->enableFullValidation;
+        $options[ValidationExtension::ENABLE_FULL_VALIDATION] = $this->enableFullValidation || !$context->isExisting();
 
         return array_merge($options, $context->getFormOptions() ?? []);
     }
