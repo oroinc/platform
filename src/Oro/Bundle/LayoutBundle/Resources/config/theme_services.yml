@@ -15,12 +15,21 @@ services:
         arguments:
             - '@property_accessor'
 
+    oro_layout.theme_manager.cache:
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_layout_theme_manager' }
+
     oro_layout.theme_manager:
         class: Oro\Component\Layout\Extension\Theme\Model\ThemeManager
         arguments:
             - '@oro_layout.theme_factory'
             - '@oro_layout.theme_extension.configuration.provider'
+            - '@event_dispatcher'
+            - '@oro_layout.theme_manager.cache'
+            - '@property_accessor'
             - '%oro_layout.enabled_themes%'
+            - '%oro_layout.inherited_theme_options%'
 
     oro_layout.current_theme_provider:
         class: Oro\Component\Layout\Extension\Theme\Model\CurrentThemeProvider
@@ -75,7 +84,7 @@ services:
     oro_layout.layout_context_configurator.svg_icons_support:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\SvgIconsSupportContextConfigurator
         arguments:
-            - '@oro_layout.provider.svg_icons_support'
+            - '@oro_layout.theme_manager'
         tags:
             - { name: layout.context_configurator }
 

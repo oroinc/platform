@@ -53,7 +53,23 @@ class ThemeConfigurationTest extends TestCase
             'logo'                => 'test_logo.jpg',
             'screenshot'          => 'test_screenshot.jpg',
             'extra_js_builds'     => [],
-            'resolve_extra_paths' => ['/bundles/orothemedefault51']
+            'resolve_extra_paths' => ['/bundles/orothemedefault51'],
+            'fonts' => [
+                'main' => [
+                    'preload' => true,
+                    'family' => 'Plus Jakarta Sans',
+                    'variants' => [
+                        [
+                            'path' => '/bundles/orofrontend/default/fonts/Plus_Jakarta_Sans/PlusJakartaSans-variable',
+                            'weight' => '300 700'
+                        ], [
+                            'path' => '/bundles/orofrontend/default/fonts/bitter/Bitter-SemiBold',
+                            'weight' => '600'
+                        ]
+                    ],
+                    'formats' => ['woff2', 'woff']
+                ]
+            ]
         ];
         $result = $this->processConfiguration(['test_theme' => $themeConfig]);
         self::assertSame($themeConfig, $result['test_theme']);

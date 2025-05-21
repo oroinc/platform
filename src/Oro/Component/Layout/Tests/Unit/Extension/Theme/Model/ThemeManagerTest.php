@@ -3,43 +3,70 @@
 namespace Oro\Component\Layout\Tests\Unit\Extension\Theme\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Oro\Bundle\CacheBundle\Adapter\ChainAdapter;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
+use Oro\Component\Layout\Extension\Theme\Event\ThemeConfigOptionGetEvent;
+use Oro\Component\Layout\Extension\Theme\Event\ThemeOptionGetEvent;
 use Oro\Component\Layout\Extension\Theme\Model\PageTemplate;
 use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeDefinitionBagInterface;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactory;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactoryInterface;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
+use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\CacheItem;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class ThemeManagerTest extends \PHPUnit\Framework\TestCase
+final class ThemeManagerTest extends TestCase
 {
-    private ThemeFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $factory;
+    private ThemeFactoryInterface&MockObject $factory;
+    private ThemeDefinitionBagInterface&MockObject $themeDefinitionBag;
+    private EventDispatcherInterface&MockObject $dispatcher;
+    private ChainAdapter&MockObject $cache;
+    private PropertyAccessorInterface $propertyAccessor;
 
     #[\Override]
     protected function setUp(): void
     {
         $this->factory = $this->createMock(ThemeFactoryInterface::class);
+        $this->themeDefinitionBag = $this->createMock(ThemeDefinitionBagInterface::class);
+        $this->dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $this->cache = $this->createMock(ChainAdapter::class);
+        $this->propertyAccessor = new PropertyAccessor();
     }
 
     private function createManager(
         array $definitions = [],
         ?ThemeFactoryInterface $factory = null,
-        array $enabledThemes = []
+        array $enabledThemes = [],
+        array $inheritedThemeOptions = []
     ): ThemeManager {
-        $themeDefinitionBag = $this->createMock(ThemeDefinitionBagInterface::class);
-        $themeDefinitionBag->expects(self::any())
+        $this->themeDefinitionBag->expects(self::any())
             ->method('getThemeNames')
             ->willReturn(array_keys($definitions));
-        $themeDefinitionBag->expects(self::any())
+        $this->themeDefinitionBag->expects(self::any())
             ->method('getThemeDefinition')
             ->willReturnCallback(function ($themeName) use ($definitions) {
                 return $definitions[$themeName] ?? null;
             });
 
-        return new ThemeManager($factory ?? $this->factory, $themeDefinitionBag, $enabledThemes);
+        return new ThemeManager(
+            $factory ?? $this->factory,
+            $this->themeDefinitionBag,
+            $this->dispatcher,
+            $this->cache,
+            $this->propertyAccessor,
+            $enabledThemes,
+            $inheritedThemeOptions
+        );
     }
 
     public function testManagerWorkWithoutKnownThemes(): void
@@ -424,5 +451,229 @@ class ThemeManagerTest extends \PHPUnit\Framework\TestCase
                 'parentThemesToCheck' => ['base'],
             ],
         ];
+    }
+
+    public function testGetThemeConfigOptionWithCache(): void
+    {
+        $manager = $this->createManager();
+
+        $cacheItem = (new CacheItem())->set(['icon']);
+        ReflectionUtil::setPropertyValue($cacheItem, 'isHit', true);
+
+        $this->cache->expects(self::once())
+            ->method('getItem')
+            ->with('oro_theme.config_optiondefaulticons1')
+            ->willReturn($cacheItem);
+
+        self::assertSame(['icon'], $manager->getThemeConfigOption('default', 'icons'));
+    }
+
+    public function testGetThemeNoInheritedConfigOption(): void
+    {
+        $theme = (new Theme('default'))->setConfigByKey('icons', ['icon']);
+        $this->factory->expects(self::any())
+            ->method('create')
+            ->willReturn($theme);
+
+        $manager = $this->createManager(['default' => []], null, ['default']);
+
+        $cacheItem = new CacheItem();
+        $this->cache->expects(self::once())
+            ->method('getItem')
+            ->with('oro_theme.config_optiondefaulticons1')
+            ->willReturn($cacheItem);
+
+        $event = new ThemeConfigOptionGetEvent($manager, 'default', 'icons', true, ['icon']);
+        $this->dispatcher->expects(self::exactly(2))
+            ->method('dispatch')
+            ->withConsecutive(
+                [$event, ThemeConfigOptionGetEvent::NAME],
+                [$event, \sprintf('%s.%s', ThemeConfigOptionGetEvent::NAME, 'icons')]
+            );
+
+        $this->cache->expects(self::once())
+            ->method('save')
+            ->with($cacheItem->set(['icon']));
+
+        self::assertSame(['icon'], $manager->getThemeConfigOption('default', 'icons'));
+    }
+
+    public function testGetThemeInheritedConfigOption(): void
+    {
+        $definitions = ['default' => [], 'base' => []];
+        $parentTheme = (new Theme('base'))->setConfigByKey('icons', ['icon2']);
+        $theme = (new Theme('default', 'base'))->setConfigByKey('icons', ['icon']);
+
+        $this->themeDefinitionBag->expects(self::any())
+            ->method('getThemeDefinition')
+            ->willReturn([]);
+
+        $this->factory->expects(self::exactly(2))
+            ->method('create')
+            ->withConsecutive(['default', []], ['base', []])
+            ->willReturnOnConsecutiveCalls($theme, $parentTheme);
+
+        $manager = $this->createManager($definitions, null, ['default', 'base'], ['config.icons']);
+
+        $cacheItem = new CacheItem();
+        $this->cache->expects(self::once())
+            ->method('getItem')
+            ->with('oro_theme.config_optiondefaulticons1')
+            ->willReturn($cacheItem);
+
+        $event = new ThemeConfigOptionGetEvent($manager, 'default', 'icons', true, ['icon']);
+        $this->dispatcher->expects(self::exactly(2))
+            ->method('dispatch')
+            ->withConsecutive(
+                [$event, ThemeConfigOptionGetEvent::NAME],
+                [$event, \sprintf('%s.%s', ThemeConfigOptionGetEvent::NAME, 'icons')]
+            );
+
+        $this->cache->expects(self::once())
+            ->method('save')
+            ->with($cacheItem->set(['icon']));
+
+        self::assertSame(['icon'], $manager->getThemeConfigOption('default', 'icons'));
+    }
+
+    public function testGetThemeNoConfigOption(): void
+    {
+        $this->factory->expects(self::any())
+            ->method('create')
+            ->willReturn(new Theme('default'));
+
+        $manager = $this->createManager(['default' => []], null, ['default']);
+
+        $cacheItem = new CacheItem();
+        $this->cache->expects(self::once())
+            ->method('getItem')
+            ->with('oro_theme.config_optiondefaulticons1')
+            ->willReturn($cacheItem);
+
+        $event = new ThemeConfigOptionGetEvent($manager, 'default', 'icons', true, null);
+        $this->dispatcher->expects(self::exactly(2))
+            ->method('dispatch')
+            ->withConsecutive(
+                [$event, ThemeConfigOptionGetEvent::NAME],
+                [$event, \sprintf('%s.%s', ThemeConfigOptionGetEvent::NAME, 'icons')]
+            );
+
+        $this->cache->expects(self::once())
+            ->method('save')
+            ->with($cacheItem);
+
+        self::assertNull($manager->getThemeConfigOption('default', 'icons'));
+    }
+
+    public function testGetThemeOptionWithCache(): void
+    {
+        $manager = $this->createManager();
+
+        $cacheItem = (new CacheItem())->set(['font']);
+        ReflectionUtil::setPropertyValue($cacheItem, 'isHit', true);
+
+        $this->cache->expects(self::once())
+            ->method('getItem')
+            ->with('oro_theme.optiondefaultfonts1')
+            ->willReturn($cacheItem);
+
+        self::assertSame(['font'], $manager->getThemeOption('default', 'fonts'));
+    }
+
+    public function testGetThemeNoInheritedOption(): void
+    {
+        $theme = (new Theme('default'))->setFonts(['font']);
+        $this->factory->expects(self::any())
+            ->method('create')
+            ->willReturn($theme);
+
+        $manager = $this->createManager(['default' => []], null, ['default']);
+
+        $cacheItem = new CacheItem();
+        $this->cache->expects(self::once())
+            ->method('getItem')
+            ->with('oro_theme.optiondefaultfonts1')
+            ->willReturn($cacheItem);
+
+        $event = new ThemeOptionGetEvent($manager, 'default', 'fonts', true, ['font']);
+        $this->dispatcher->expects(self::exactly(2))
+            ->method('dispatch')
+            ->withConsecutive(
+                [$event, ThemeOptionGetEvent::NAME],
+                [$event, \sprintf('%s.%s', ThemeOptionGetEvent::NAME, 'fonts')]
+            );
+
+        $this->cache->expects(self::once())
+            ->method('save')
+            ->with($cacheItem->set(['font']));
+
+        self::assertSame(['font'], $manager->getThemeOption('default', 'fonts'));
+    }
+
+    public function testGetThemeInheritedOption(): void
+    {
+        $definitions = ['default' => [], 'base' => []];
+        $parentTheme = (new Theme('base'))->setFonts(['font2']);
+        $theme = (new Theme('default', 'base'))->setFonts(['font']);
+
+        $this->themeDefinitionBag->expects(self::any())
+            ->method('getThemeDefinition')
+            ->willReturn([]);
+
+        $this->factory->expects(self::exactly(2))
+            ->method('create')
+            ->withConsecutive(['default', []], ['base', []])
+            ->willReturnOnConsecutiveCalls($theme, $parentTheme);
+
+        $manager = $this->createManager($definitions, null, ['default', 'base'], ['fonts']);
+
+        $cacheItem = new CacheItem();
+        $this->cache->expects(self::once())
+            ->method('getItem')
+            ->with('oro_theme.optiondefaultfonts1')
+            ->willReturn($cacheItem);
+
+        $event = new ThemeOptionGetEvent($manager, 'default', 'fonts', true, ['font']);
+        $this->dispatcher->expects(self::exactly(2))
+            ->method('dispatch')
+            ->withConsecutive(
+                [$event, ThemeOptionGetEvent::NAME],
+                [$event, \sprintf('%s.%s', ThemeOptionGetEvent::NAME, 'fonts')]
+            );
+
+        $this->cache->expects(self::once())
+            ->method('save')
+            ->with($cacheItem->set(['font']));
+
+        self::assertSame(['font'], $manager->getThemeOption('default', 'fonts'));
+    }
+
+    public function testGetThemeNoOption(): void
+    {
+        $this->factory->expects(self::any())
+            ->method('create')
+            ->willReturn(new Theme('default'));
+
+        $manager = $this->createManager(['default' => []], null, ['default']);
+
+        $cacheItem = new CacheItem();
+        $this->cache->expects(self::once())
+            ->method('getItem')
+            ->with('oro_theme.optiondefaultfonts1')
+            ->willReturn($cacheItem);
+
+        $event = new ThemeOptionGetEvent($manager, 'default', 'fonts', true, []);
+        $this->dispatcher->expects(self::exactly(2))
+            ->method('dispatch')
+            ->withConsecutive(
+                [$event, ThemeOptionGetEvent::NAME],
+                [$event, \sprintf('%s.%s', ThemeOptionGetEvent::NAME, 'fonts')]
+            );
+
+        $this->cache->expects(self::once())
+            ->method('save')
+            ->with($cacheItem);
+
+        self::assertSame([], $manager->getThemeOption('default', 'fonts'));
     }
 }

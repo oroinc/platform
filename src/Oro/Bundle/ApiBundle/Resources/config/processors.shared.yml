@@ -1062,16 +1062,8 @@ services:
             - '@oro_api.form_helper'
             - '@oro_api.doctrine_helper'
         tags:
-            - { name: oro.api.processor, action: update, group: transform_data, priority: 100 }
-
-    oro_api.build_form_builder.full_validation:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\BuildFormBuilder
-        arguments:
-            - '@oro_api.form_helper'
-            - '@oro_api.doctrine_helper'
-            - true
-        tags:
             - { name: oro.api.processor, action: create, group: transform_data, priority: 100 }
+            - { name: oro.api.processor, action: update, group: transform_data, priority: 100 }
 
     oro_api.build_form:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildForm

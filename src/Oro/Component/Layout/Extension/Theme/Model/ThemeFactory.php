@@ -9,12 +9,9 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class ThemeFactory implements ThemeFactoryInterface
 {
-    /** @var PropertyAccessorInterface */
-    private $propertyAccessor;
-
-    public function __construct(PropertyAccessorInterface $propertyAccessor)
-    {
-        $this->propertyAccessor = $propertyAccessor;
+    public function __construct(
+        private PropertyAccessorInterface $propertyAccessor
+    ) {
     }
 
     #[\Override]
@@ -51,6 +48,7 @@ class ThemeFactory implements ThemeFactoryInterface
             'directory',
             'groups',
             'description',
+            'fonts'
         ];
 
         foreach ($properties as $property) {
