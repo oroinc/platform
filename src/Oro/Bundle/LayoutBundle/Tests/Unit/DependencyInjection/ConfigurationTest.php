@@ -3,14 +3,16 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\LayoutBundle\DependencyInjection\Configuration;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Processor;
 
-class ConfigurationTest extends \PHPUnit\Framework\TestCase
+final class ConfigurationTest extends TestCase
 {
     public function testProcessConfiguration(): void
     {
         $expected = [
             'view' => ['attributes' => true],
+            'enabled_themes' => [],
             'templating' => [
                 'default' => 'twig',
                 'twig' => [
@@ -18,11 +20,12 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                 ]
             ],
             'debug' => '%kernel.debug%',
-            'enabled_themes' => []
+            'inherited_theme_options' => [],
         ];
 
         $processedConfig = (new Processor())->processConfiguration(new Configuration(), []);
         unset($processedConfig['settings']);
-        self::assertEquals($expected, $processedConfig);
+
+        self::assertSame($expected, $processedConfig);
     }
 }

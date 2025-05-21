@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ThemeTest extends TestCase
+final class ThemeTest extends TestCase
 {
     private Theme $theme;
 
@@ -218,5 +218,19 @@ class ThemeTest extends TestCase
         $this->theme->addPageTemplateTitle('some_other_route', 'Some other route');
         $this->theme->addPageTemplateTitle('some_other_route', 'Some other route');
         self::assertEquals($expected, $this->theme->getPageTemplateTitles());
+    }
+
+    public function testGetFonts(): void
+    {
+        self::assertSame([], $this->theme->getFonts());
+    }
+
+    public function testSetFonts(): void
+    {
+        $this->theme->setFonts(['test' => 'fonts']);
+        self::assertSame(['test' => 'fonts'], $this->theme->getFonts());
+
+        $this->theme->setFonts([]);
+        self::assertSame([], $this->theme->getFonts());
     }
 }

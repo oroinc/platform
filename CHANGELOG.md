@@ -23,6 +23,9 @@ The current file describes significant changes in the code that may affect the u
 #### LayoutBundle
 * Added new twig function `oro_theme_configuration_value` that returns theme configuration option value.
 * Added theme configuration definition for configuration section into `\Oro\Bundle\LayoutBundle\Layout\Extension\ThemeConfiguration`.
+* Added a new `fonts` configuration to the theme definition for building fonts with Webpack and referencing preloaded fonts.
+* Added a new `preload_web_link` layout block type that uses Symfony WebLink component and pushes resources to clients before they even know that they need them.
+* Added a new `oro_layout.inherited_theme_options` configs to application settings.
 
 #### AttachmentBundle
 * Added new `\Oro\Bundle\AttachmentBundle\Form\Type\ContentFileType` form type that saves content from the uploaded file but does not save file in the system.
@@ -32,6 +35,10 @@ The current file describes significant changes in the code that may affect the u
 
 #### ApiBundle
 * Added new `crypted_text` doctrine type as a data type to `api_doc_data_types` and `open_api` sections of ORO API configuration.
+
+### Layout Component
+* Added `ThemeConfigOptionGetEvent` and `ThemeOptionGetEvent` events that are fired when a theme option or theme config value is retrieved.
+* Added new `getThemeConfigOption` and `getThemeOption` methods in `Oro\Component\Layout\Extension\Theme\Model\ThemeManager` for retrieving inherited values.
 
 ### Changed
 

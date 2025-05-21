@@ -68,7 +68,8 @@ class ThemeConfigurationProviderTest extends TestCase
                 'groups'             => [],
                 'image_placeholders' => [],
                 'extra_js_builds'  => [],
-                'resolve_extra_paths' => []
+                'resolve_extra_paths' => [],
+                'fonts' => []
             ],
             $this->configurationProvider->getThemeDefinition('base')
         );
@@ -154,6 +155,7 @@ class ThemeConfigurationProviderTest extends TestCase
             ],
             'extra_js_builds'  => [],
             'resolve_extra_paths' => [],
+            'fonts' => []
         ];
 
         $actual = $this->configurationProvider->getThemeDefinition('oro-black');

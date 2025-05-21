@@ -329,3 +329,18 @@ services:
             - [setName, ['form_errors']]
         tags:
              - { name: layout.block_type, alias: form_errors }
+
+    oro_layout.block_type.preload_web_link:
+        parent: oro_layout.block_type.abstract_configurable
+        calls:
+            -
+                - setOptionsConfig
+                -
+                    -
+                        path: {required: true}
+                        preload_attributes: {required: true, default: {}}
+                        as: {required: true}
+                        crossorigin: ~
+            - [setName, ['preload_web_link']]
+        tags:
+            - { name: layout.block_type, alias: preload_web_link }

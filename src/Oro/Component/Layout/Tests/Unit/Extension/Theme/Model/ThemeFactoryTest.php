@@ -8,7 +8,7 @@ use Oro\Component\Layout\Extension\Theme\Model\Theme;
 use Oro\Component\Layout\Extension\Theme\Model\ThemeFactory;
 use PHPUnit\Framework\TestCase;
 
-class ThemeFactoryTest extends TestCase
+final class ThemeFactoryTest extends TestCase
 {
     private ThemeFactory $factory;
 
@@ -19,12 +19,8 @@ class ThemeFactoryTest extends TestCase
 
     /**
      * @dataProvider themeDefinitionDataProvider
-     *
-     * @param string $name
-     * @param array  $definition
-     * @param mixed  $expectedResult
      */
-    public function testCreate($name, array $definition, $expectedResult): void
+    public function testCreate(string $name, array $definition, mixed $expectedResult): void
     {
         $result = $this->factory->create($name, $definition);
 
@@ -47,6 +43,7 @@ class ThemeFactoryTest extends TestCase
         $fullDefinition->setDirectory('OroBlack');
         $fullDefinition->setGroups(['main', 'frontend']);
         $fullDefinition->setDescription('description');
+        $fullDefinition->setFonts(['test' => 'font']);
 
         $config = [
             'key' => 'value',
@@ -69,7 +66,7 @@ class ThemeFactoryTest extends TestCase
                 'titles' => [
                     'some_route_name' => 'Title for some route name'
                 ]
-            ]
+            ],
         ];
 
         $fullDefinition->setConfig($config);
@@ -106,6 +103,7 @@ class ThemeFactoryTest extends TestCase
                     'svg_icons_support' => true,
                     'directory'  => 'OroBlack',
                     'description' => 'description',
+                    'fonts' => ['test' => 'font'],
                     'config' => $config
                 ],
                 '$expectedResult' => $fullDefinition,

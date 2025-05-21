@@ -59,6 +59,8 @@ class Theme
     /** @var array */
     protected $pageTemplateTitles = [];
 
+    protected array $fonts = [];
+
     /**
      * @param string $name
      * @param        $parentTheme
@@ -357,5 +359,17 @@ class Theme
     public function getPageTemplateTitles()
     {
         return $this->pageTemplateTitles;
+    }
+
+    public function getFonts(): array
+    {
+        return $this->fonts;
+    }
+
+    public function setFonts(array $fonts): self
+    {
+        $this->fonts = $fonts;
+
+        return $this;
     }
 }

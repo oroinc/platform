@@ -55,6 +55,7 @@ class ThemeConfiguration implements ConfigurationInterface
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function getConfigTreeBuilder(): TreeBuilder
     {
@@ -97,6 +98,33 @@ class ThemeConfiguration implements ConfigurationInterface
                     ->end()
                     ->scalarNode('logo_small')
                         ->info('The logo small image is displayed in the UI')
+                    ->end()
+                    ->arrayNode('fonts')
+                        ->info('The definition of fonts that are used on the storefront for the current theme.')
+                        ->normalizeKeys(false)
+                        ->useAttributeAsKey('name')
+                        ->prototype('array')
+                            ->children()
+                                ->booleanNode('preload')->defaultNull()->end() // <link rel="preload"
+                                ->scalarNode('family')->isRequired()->end()
+                                ->arrayNode('variants')
+                                    ->arrayPrototype()
+                                        ->children()
+                                            ->scalarNode('path')->isRequired()->end()
+                                            ->scalarNode('style')->end()
+                                            ->scalarNode('weight')->end()
+                                        ->end()
+                                    ->end()
+                                    ->isRequired()
+                                    ->requiresAtLeastOneElement()
+                                ->end()
+                                ->arrayNode('formats')
+                                    ->prototype('scalar')->end()
+                                    ->isRequired()
+                                    ->requiresAtLeastOneElement()
+                                ->end()
+                            ->end()
+                        ->end()
                     ->end()
                     ->scalarNode('screenshot')
                         ->info('The screenshot image is used in theme management UI for the theme preview')

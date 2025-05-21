@@ -1,6 +1,11 @@
 framework:
-  cache:
-    pools:
-      cache.oro_layout.render:
-        adapter: cache.adapter.filesystem
-        tags: true
+    cache:
+        pools:
+            cache.oro_layout.render:
+                adapter: cache.adapter.filesystem
+                tags: true
+
+oro_layout:
+    inherited_theme_options:
+        - svg_icons_support
+        - config.icons

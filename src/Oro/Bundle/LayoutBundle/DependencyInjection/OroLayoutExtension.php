@@ -41,6 +41,10 @@ class OroLayoutExtension extends Extension implements PrependExtensionInterface
             'oro_layout.enabled_themes',
             $config['enabled_themes']
         );
+        $container->setParameter(
+            'oro_layout.inherited_theme_options',
+            $config['inherited_theme_options']
+        );
         $loader->load('twig_renderer.yml');
         $container->setParameter(
             'oro_layout.twig.resources',

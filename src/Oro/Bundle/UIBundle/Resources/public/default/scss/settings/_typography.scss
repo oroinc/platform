@@ -1,10 +1,26 @@
 /* @theme: default; */
 
+@use 'sass:meta';
+@use 'sass:map';
+
 // NOTICE!
 // add !default to each variable;
 // $theme-fonts: map_merge($theme-fonts, $theme-default-fonts); => $theme-fonts;
 $charset: 'UTF-8' !default;
 
+/** List with theme fonts
+   'main': (
+        'family': 'Arial',
+        'variants': (
+            (
+                'path': '',
+                'weight': 600,
+                'style': normal
+            )
+        ),
+        'formats': ('woff2', 'woff')
+    )
+ */
 // List with theme fonts
 $theme-fonts: (
     'main': (
@@ -62,30 +78,34 @@ $theme-fonts: (
             )
         ),
         'formats': ('woff2', 'woff')
-    ),
-    'font-awesome': (
-        'family': 'FontAwesome',
-        'variants': (
-            (
-                'path': '~@oroinc/font-awesome/fonts/fontawesome-webfont',
-                'weight': normal,
-                'style': normal
-            )
         ),
-        'formats': ('woff2', 'woff')
-    ),
-    'only-bullets': (
-        'family': 'only-bullets',
-        'variants': (
-            (
-                'path': '#{$global-url}/orofrontend/default/fonts/only-bullets/only-bullets-regular',
-                'weight': normal,
-                'style': normal
-            )
+        'font-awesome': (
+            'family': 'FontAwesome',
+            'variants': (
+                (
+                    'path': '~@oroinc/font-awesome/fonts/fontawesome-webfont',
+                    'weight': normal,
+                    'style': normal
+                )
+            ),
+            'formats': ('woff2', 'woff')
         ),
-        'formats': ('woff2', 'woff')
-    )
+        'only-bullets': (
+            'family': 'only-bullets',
+            'variants': (
+                (
+                    'path': '#{$global-url}/orofrontend/default/fonts/only-bullets/only-bullets-regular',
+                    'weight': normal,
+                    'style': normal
+                )
+            ),
+            'formats': ('woff2', 'woff')
+        )
 ) !default;
+
+@if (meta.variable-exists('global-theme-fonts') and meta.type-of($global-theme-fonts) == 'map') {
+    $theme-fonts: map.deep-merge($global-theme-fonts, $theme-fonts);
+}
 
 // Fonts weights
 $font-weights: (

@@ -52,6 +52,7 @@ class ThemeFactory implements ThemeFactoryInterface
             'directory',
             'groups',
             'description',
+            'fonts'
         ];
 
         foreach ($properties as $property) {

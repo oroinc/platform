@@ -1,0 +1,8 @@
+layout:
+    actions:
+        - '@add':
+            id: theme_fonts
+            parentId: head
+            blockType: preload_fonts
+            siblingId: title
+            prepend: false
