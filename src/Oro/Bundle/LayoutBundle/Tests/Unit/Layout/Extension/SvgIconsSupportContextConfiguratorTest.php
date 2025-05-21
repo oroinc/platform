@@ -4,13 +4,15 @@ namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Extension;
 
 use Oro\Bundle\LayoutBundle\Layout\Extension\SvgIconsSupportContextConfigurator;
 use Oro\Bundle\LayoutBundle\Provider\SvgIconsSupportProvider;
+use Oro\Component\Layout\Extension\Theme\Model\ThemeManager;
 use Oro\Component\Layout\LayoutContext;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class SvgIconsSupportContextConfiguratorTest extends TestCase
+final class SvgIconsSupportContextConfiguratorTest extends TestCase
 {
-    private SvgIconsSupportProvider|MockObject $svgIconsSupportProvider;
+    private SvgIconsSupportProvider&MockObject $svgIconsSupportProvider;
+    private ThemeManager&MockObject $themeManager;
 
     private SvgIconsSupportContextConfigurator $contextConfigurator;
 
@@ -18,13 +20,15 @@ class SvgIconsSupportContextConfiguratorTest extends TestCase
     protected function setUp(): void
     {
         $this->svgIconsSupportProvider = $this->createMock(SvgIconsSupportProvider::class);
+        $this->themeManager = $this->createMock(ThemeManager::class);
 
         $this->contextConfigurator = new SvgIconsSupportContextConfigurator($this->svgIconsSupportProvider);
+        $this->contextConfigurator->setThemeManager($this->themeManager);
     }
 
     public function testConfigureContextWhenNoThemeName(): void
     {
-        $this->svgIconsSupportProvider->expects(self::never())
+        $this->themeManager->expects(self::never())
             ->method(self::anything());
 
         $context = new LayoutContext();
@@ -43,10 +47,10 @@ class SvgIconsSupportContextConfiguratorTest extends TestCase
     {
         $themeName = 'test';
 
-        $this->svgIconsSupportProvider
+        $this->themeManager
             ->expects(self::once())
-            ->method('isSvgIconsSupported')
-            ->with($themeName)
+            ->method('getThemeOption')
+            ->with($themeName, 'svg_icons_support')
             ->willReturn($themeSvgIconsSupport);
 
         $context = new LayoutContext();

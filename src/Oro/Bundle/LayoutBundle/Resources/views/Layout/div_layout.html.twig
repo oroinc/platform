@@ -448,3 +448,15 @@
 {% block list_item_widget -%}
     <li{{ block('block_attributes') }}>{{ block_widget(block) }}</li>
 {%- endblock %}
+
+{% block preload_web_link_widget -%}
+    {% apply spaceless %}
+        {% if crossorigin is defined %}
+            {% set attr = attr|merge({
+                crossorigin: crossorigin
+            }) %}
+        {% endif %}
+
+        <link {{ block('block_attributes') }} rel="preload" href="{{ preload(asset(path), preload_attributes) }}" as="{{ as }}">
+    {% endapply %}
+{%- endblock %}

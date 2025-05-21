@@ -155,10 +155,10 @@
                 $file-path: null;
 
                 // Default value
-                $font-weigh: normal;
+                $font-weigh: null;
 
                 // Default value
-                $font-style: normal;
+                $font-style: null;
 
                 @if (type-of($font-variants) == 'map') {
                     $file-path: map_get($font-variants, 'path');

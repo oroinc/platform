@@ -9,7 +9,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    private const DEFAULT_LAYOUT_TWIG_RESOURCE = '@OroLayout/Layout/div_layout.html.twig';
+    private const string DEFAULT_LAYOUT_TWIG_RESOURCE = '@OroLayout/Layout/div_layout.html.twig';
 
     #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
@@ -56,7 +56,7 @@ class Configuration implements ConfigurationInterface
     /**
      * Appends config nodes for "templating"
      */
-    protected function appendTemplatingNodes(ArrayNodeDefinition $parentNode)
+    protected function appendTemplatingNodes(ArrayNodeDefinition $parentNode): void
     {
         $treeBuilder = new TreeBuilder('templating');
         $node        = $treeBuilder->getRootNode();
@@ -96,7 +96,7 @@ class Configuration implements ConfigurationInterface
     /**
      * Appends config nodes for "themes"
      */
-    protected function appendThemingNodes(ArrayNodeDefinition $parentNode)
+    protected function appendThemingNodes(ArrayNodeDefinition $parentNode): void
     {
         $parentNode
             ->children()
@@ -106,6 +106,12 @@ class Configuration implements ConfigurationInterface
                 ->end()
                 ->scalarNode('active_theme')
                     ->info('The identifier of the theme that should be used by default')
+                ->end()
+                ->arrayNode('inherited_theme_options')
+                    ->info('List of inherited theme options or theme config options.')
+                    ->example(['svg_icons_support', 'config.icons'])
+                    ->prototype('scalar')->end()
+                    ->defaultValue([])
                 ->end()
             ->end();
     }

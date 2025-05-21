@@ -2,6 +2,19 @@ The upgrade instructions are available at [Oro documentation website](https://do
 
 The current file describes significant changes in the code that may affect the upgrade of your customizations.
 
+## UNRELEASED
+
+### Added
+
+### Layout Component
+* Added `ThemeConfigOptionGetEvent` and `ThemeOptionGetEvent` events that are fired when a theme option or theme config value is retrieved.
+* Added new `getThemeConfigOption` and `getThemeOption` methods in `Oro\Component\Layout\Extension\Theme\Model\ThemeManager` for retrieving inherited values.
+
+#### LayoutBundle
+* Added a new `fonts` configuration to the theme definition for building fonts with Webpack and referencing preloaded fonts.
+* Added a new `preload_web_link` layout block type that uses Symfony WebLink component and pushes resources to clients before they even know that they need them.
+* Added a new `oro_layout.inherited_theme_options` configs to application settings.
+
 ## Changes in the Platform package versions
 
 - [6.1.0](#610-2025-03-31)

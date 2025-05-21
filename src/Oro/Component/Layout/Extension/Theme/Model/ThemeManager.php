@@ -2,11 +2,23 @@
 
 namespace Oro\Component\Layout\Extension\Theme\Model;
 
+use Oro\Component\Layout\Extension\Theme\Event\ThemeConfigOptionGetEvent;
+use Oro\Component\Layout\Extension\Theme\Event\ThemeOptionGetEvent;
+use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Service\ResetInterface;
+
 /**
  * The main entry point for layout themes.
  */
-class ThemeManager
+class ThemeManager implements ResetInterface
 {
+    private const string CACHE_THEME_OPTION_KEY = 'oro_theme.option';
+    private const string CACHE_THEME_CONFIG_OPTION_KEY = 'oro_theme.config_option';
+    private const string INHERITED_THEME_CONFIG_NAMESPACE = 'config.';
+
     /** @var ThemeFactoryInterface */
     private $themeFactory;
 
@@ -18,6 +30,11 @@ class ThemeManager
 
     /** @var array local cache with all the themes  */
     private array $themes = [];
+
+    private EventDispatcherInterface $dispatcher;
+    private CacheInterface&CacheItemPoolInterface $cache;
+    private PropertyAccessorInterface $propertyAccessor;
+    private array $inheritedThemeOptions = [];
 
     /**
      * @var string[]
@@ -37,6 +54,27 @@ class ThemeManager
         $this->themeFactory = $themeFactory;
         $this->themeDefinitionBag = $themeDefinitionBag;
         $this->enabledThemes = $enabledThemes;
+    }
+
+    public function setEventDispatcher(EventDispatcherInterface $dispatcher): void
+    {
+        $this->dispatcher = $dispatcher;
+    }
+
+    public function setThemeManagerCache(CacheInterface&CacheItemPoolInterface $cache): void
+    {
+        $this->cache = $cache;
+    }
+
+    public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor): void
+    {
+        $this->propertyAccessor = $propertyAccessor;
+    }
+
+    public function setInheritedThemeOptions(array $inheritedThemeOptions): void
+    {
+        $this->inheritedThemeOptions = $inheritedThemeOptions;
+        $this->normalizeInheritedThemeOptions();
     }
 
     /**
@@ -195,5 +233,90 @@ class ThemeManager
             }
         }
         return false;
+    }
+
+    public function getThemeConfigOption(string $themeName, string $configOptionName, bool $inherited = true): mixed
+    {
+        $cacheKey = self::CACHE_THEME_CONFIG_OPTION_KEY . $themeName . $configOptionName . $inherited;
+        $cacheItem = $this->cache->getItem($cacheKey);
+        if ($cacheItem->isHit()) {
+            return $cacheItem->get();
+        }
+
+        if (\in_array($configOptionName, $this->inheritedThemeOptions['config'] ?? [], true) && $inherited) {
+            $value = $this->getHierarchyThemeOption($themeName, $configOptionName, true);
+        } else {
+            $value = $this->getTheme($themeName)->getConfigByKey($configOptionName);
+        }
+
+        $event = new ThemeConfigOptionGetEvent($this, $themeName, $configOptionName, $inherited, $value);
+        $this->dispatcher->dispatch($event, ThemeConfigOptionGetEvent::NAME);
+        $this->dispatcher->dispatch($event, \sprintf('%s.%s', ThemeConfigOptionGetEvent::NAME, $configOptionName));
+
+        $this->cache->save($cacheItem->set($event->getValue()));
+        return $cacheItem->get();
+    }
+
+    public function getThemeOption(string $themeName, string $optionName, bool $inherited = true): mixed
+    {
+        $cacheKey = self::CACHE_THEME_OPTION_KEY . $themeName . $optionName . $inherited;
+        $cacheItem = $this->cache->getItem($cacheKey);
+        if ($cacheItem->isHit()) {
+            return $cacheItem->get();
+        }
+
+        if (\in_array($optionName, $this->inheritedThemeOptions, true) && $inherited) {
+            $value = $this->getHierarchyThemeOption($themeName, $optionName);
+        } else {
+            $value = $this->propertyAccessor->getValue($this->getTheme($themeName), $optionName);
+        }
+
+        $event = new ThemeOptionGetEvent($this, $themeName, $optionName, $inherited, $value);
+        $this->dispatcher->dispatch($event, ThemeOptionGetEvent::NAME);
+        $this->dispatcher->dispatch($event, \sprintf('%s.%s', ThemeOptionGetEvent::NAME, $optionName));
+
+        $this->cache->save($cacheItem->set($event->getValue()));
+        return $cacheItem->get();
+    }
+
+    #[\Override]
+    public function reset(): void
+    {
+        $this->instances = [];
+        $this->themes = [];
+        $this->cache->clear();
+    }
+
+    private function getHierarchyThemeOption(string $themeName, string $optionName, bool $isConfig = false): mixed
+    {
+        $themes = $this->getThemesHierarchy($themeName);
+
+        $values = [];
+        foreach ($themes as $theme) {
+            $optionValue = $isConfig ?
+                $theme->getConfigByKey($optionName) :
+                $this->propertyAccessor->getValue($theme, $optionName);
+
+            if ($optionValue !== null && $optionValue !== []) {
+                $values[] = [$optionName => $optionValue];
+            }
+        }
+
+        $value = \array_merge(...$values);
+
+        return $value[$optionName] ?? null;
+    }
+
+    private function normalizeInheritedThemeOptions(): void
+    {
+        foreach ($this->inheritedThemeOptions as $key => $option) {
+            if (!\str_contains($option, self::INHERITED_THEME_CONFIG_NAMESPACE)) {
+                continue;
+            }
+
+            [$configKey, $configName] = \explode('.', $option);
+            $this->inheritedThemeOptions[$configKey][] = $configName;
+            unset($this->inheritedThemeOptions[$key]);
+        }
     }
 }
