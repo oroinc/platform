@@ -21,9 +21,6 @@ class EntityNameResolverTest extends WebTestCase
 {
     protected function setUp(): void
     {
-        self::markTestSkipped(
-            'Skipped during to memory usage in this test exceeds 1GB, waiting fixes in ticket/BAP-22701'
-        );
         $this->initClient();
         $this->loadFixtures([LoadOrganization::class, LoadBusinessUnit::class, LoadUser::class]);
     }
