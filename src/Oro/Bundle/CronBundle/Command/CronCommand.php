@@ -10,6 +10,7 @@ use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\CronBundle\Tools\CommandRunner;
 use Oro\Bundle\CronBundle\Tools\CronHelper;
 use Oro\Bundle\MaintenanceBundle\Maintenance\MaintenanceModeState;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LazyCommand;
@@ -21,34 +22,28 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class CronCommand extends Command
 {
+    public const CRON_LAST_EXECUTION_DATA = 'cron_last_execution_data';
+
+    private ?CacheItemPoolInterface $cache = null;
+
     /** @var string */
     protected static $defaultName = 'oro:cron';
 
-    private ManagerRegistry $doctrine;
-    private MaintenanceModeState $maintenanceMode;
-    private CronHelper $cronHelper;
-    private CommandRunnerInterface $commandRunner;
-    private CronCommandFeatureCheckerInterface $commandFeatureChecker;
-    private LoggerInterface $logger;
-    private string $environment;
-
     public function __construct(
-        ManagerRegistry $doctrine,
-        MaintenanceModeState $maintenanceMode,
-        CronHelper $cronHelper,
-        CommandRunnerInterface $commandRunner,
-        CronCommandFeatureCheckerInterface $commandFeatureChecker,
-        LoggerInterface $logger,
-        string $environment
+        private ManagerRegistry $doctrine,
+        private MaintenanceModeState $maintenanceMode,
+        private CronHelper $cronHelper,
+        private CommandRunnerInterface $commandRunner,
+        private CronCommandFeatureCheckerInterface $commandFeatureChecker,
+        private LoggerInterface $logger,
+        private string $environment
     ) {
         parent::__construct();
-        $this->doctrine = $doctrine;
-        $this->maintenanceMode = $maintenanceMode;
-        $this->cronHelper = $cronHelper;
-        $this->commandRunner = $commandRunner;
-        $this->commandFeatureChecker = $commandFeatureChecker;
-        $this->logger = $logger;
-        $this->environment = $environment;
+    }
+
+    public function setCache(CacheItemPoolInterface $cache): void
+    {
+        $this->cache = $cache;
     }
 
     /** @noinspection PhpMissingParentCallCommonInspection */
@@ -70,8 +65,7 @@ are an exception to this rule as they are launched immediately.
   <info>php %command.full_name%</info>
 
 HELP
-            )
-        ;
+            );
     }
 
     /**
@@ -81,6 +75,7 @@ HELP
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->saveLastCronExecution();
         // check for maintenance mode - do not run cron jobs if it is switched on
         if ($this->maintenanceMode->isOn()) {
             $message = 'System is in maintenance mode, aborting';
@@ -88,7 +83,7 @@ HELP
             $output->writeln(sprintf('<error>%s</error>', $message));
             $this->logger->error($message);
 
-            return 1;
+            return Command::FAILURE;
         }
 
         $schedules = $this->doctrine->getRepository(Schedule::class)->findAll();
@@ -105,7 +100,7 @@ HELP
             $cronExpression = $this->cronHelper->createCron($schedule->getDefinition());
             if (!$cronExpression->isDue()) {
                 $output->writeln(
-                    'Skipping not due command '.$schedule->getCommand(),
+                    'Skipping not due command ' . $schedule->getCommand(),
                     OutputInterface::VERBOSITY_DEBUG
                 );
                 continue;
@@ -150,7 +145,7 @@ HELP
 
         $output->writeln('All commands scheduled', OutputInterface::VERBOSITY_DEBUG);
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /**
@@ -170,5 +165,17 @@ HELP
         }
 
         return $options;
+    }
+
+    private function saveLastCronExecution(): void
+    {
+        try {
+            $item = $this->cache->getItem(self::CRON_LAST_EXECUTION_DATA);
+            $item->set(new \DateTime('now', new \DateTimeZone('UTC')));
+
+            $this->cache->save($item);
+        } catch (\Exception $exception) {
+            $this->logger->error('Failed to cache key of last cron command execution', ['exception' => $exception]);
+        }
     }
 }

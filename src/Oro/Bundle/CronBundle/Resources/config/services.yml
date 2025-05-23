@@ -117,3 +117,8 @@ services:
 
     oro_cron.checker.schedule_interval_checker:
         class: Oro\Bundle\CronBundle\Checker\ScheduleIntervalChecker
+
+    oro_cron.state_cache:
+        parent: oro.data.cache
+        tags:
+            - { name: 'cache.pool', namespace: 'oro_cron_state' }
