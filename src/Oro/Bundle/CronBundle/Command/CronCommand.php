@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Oro\Bundle\CronBundle\Command;
@@ -10,6 +11,7 @@ use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\CronBundle\Helper\CronHelper;
 use Oro\Bundle\CronBundle\Tools\CommandRunner;
 use Oro\Bundle\MaintenanceBundle\Maintenance\Mode;
+use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,6 +22,10 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class CronCommand extends Command
 {
+    public const CRON_LAST_EXECUTION_DATA = 'cron_last_execution_data';
+
+    private ?CacheItemPoolInterface $cache = null;
+
     /** @var string */
     protected static $defaultName = 'oro:cron';
 
@@ -49,6 +55,11 @@ class CronCommand extends Command
         $this->environment = $environment;
     }
 
+    public function setCache(CacheItemPoolInterface $cache): void
+    {
+        $this->cache = $cache;
+    }
+
     /** @noinspection PhpMissingParentCallCommonInspection */
     protected function configure()
     {
@@ -68,8 +79,7 @@ are an exception to this rule as they are launched immediately.
   <info>php %command.full_name%</info>
 
 HELP
-            )
-        ;
+            );
     }
 
     /**
@@ -78,6 +88,7 @@ HELP
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->saveLastCronExecution();
         // check for maintenance mode - do not run cron jobs if it is switched on
         if ($this->maintenanceMode->isOn()) {
             $message = 'System is in maintenance mode, aborting';
@@ -163,5 +174,17 @@ HELP
     private function getAllSchedules()
     {
         return new ArrayCollection($this->registry->getRepository('OroCronBundle:Schedule')->findAll());
+    }
+
+    private function saveLastCronExecution(): void
+    {
+        try {
+            $item = $this->cache->getItem(self::CRON_LAST_EXECUTION_DATA);
+            $item->set(new \DateTime('now', new \DateTimeZone('UTC')));
+
+            $this->cache->save($item);
+        } catch (\Exception $exception) {
+            $this->logger->error('Failed to cache key of last cron command execution', ['exception' => $exception]);
+        }
     }
 }
