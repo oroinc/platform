@@ -50,7 +50,7 @@ class TestEntityNameResolverDataLoader implements TestEntityNameResolverDataLoad
         if (ThemeConfiguration::class === $entityClass) {
             return EntityNameProviderInterface::SHORT === $format
                 ? 'Test Theme Configuration'
-                : 'Storefront Test Theme Configuration default';
+                : 'Test Theme Configuration default';
         }
 
         return $this->innerDataLoader->getExpectedEntityName(
