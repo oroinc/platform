@@ -7,17 +7,14 @@ use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EmailOwnerProviderTest extends \PHPUnit\Framework\TestCase
+class EmailOwnerProviderTest extends TestCase
 {
-    /** @var EmailOwnerProviderStorage|\PHPUnit\Framework\MockObject\MockObject */
-    private $storage;
-
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var EmailOwnerProvider */
-    private $provider;
+    private EmailOwnerProviderStorage&MockObject $storage;
+    private EntityManagerInterface&MockObject $em;
+    private EmailOwnerProvider $provider;
 
     #[\Override]
     protected function setUp(): void

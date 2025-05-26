@@ -3,8 +3,9 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Model;
 
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
+use PHPUnit\Framework\TestCase;
 
-class SmtpSettingsTest extends \PHPUnit\Framework\TestCase
+class SmtpSettingsTest extends TestCase
 {
     public function testDefaultSmtpSettings(): void
     {

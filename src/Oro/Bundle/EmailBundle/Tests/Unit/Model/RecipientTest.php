@@ -4,13 +4,14 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Model;
 
 use Oro\Bundle\EmailBundle\Model\Recipient;
 use Oro\Bundle\EmailBundle\Model\RecipientEntity;
+use PHPUnit\Framework\TestCase;
 
-class RecipientTest extends \PHPUnit\Framework\TestCase
+class RecipientTest extends TestCase
 {
     /**
      * @dataProvider recipientProvider
      */
-    public function testGetName(string $email, string $name, string $label, string $expected)
+    public function testGetName(string $email, string $name, string $label, string $expected): void
     {
         $recipientEntity = new RecipientEntity('class', 'id', $label, 'org');
 
@@ -38,8 +39,13 @@ class RecipientTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider recipientLabelProvider
      */
-    public function testGetLabel(string $email, string $name, string $label, string $organization, string $expected)
-    {
+    public function testGetLabel(
+        string $email,
+        string $name,
+        string $label,
+        string $organization,
+        string $expected
+    ): void {
         $recipientEntity = new RecipientEntity('class', 'id', $label, $organization);
 
         $recipient = new Recipient($email, $name, $recipientEntity);

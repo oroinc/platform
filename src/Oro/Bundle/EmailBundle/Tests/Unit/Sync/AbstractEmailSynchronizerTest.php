@@ -22,35 +22,24 @@ use Oro\Bundle\NotificationBundle\NotificationAlert\NotificationAlertManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class AbstractEmailSynchronizerTest extends \PHPUnit\Framework\TestCase
+class AbstractEmailSynchronizerTest extends TestCase
 {
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var NotificationAlertManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $notificationAlertManager;
-
-    /** @var EmailEntityBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailEntityBuilder;
-
-    /** @var KnownEmailAddressCheckerFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $knownEmailAddressCheckerFactory;
-
-    /** @var TestEmailSynchronizer */
-    private $sync;
+    private LoggerInterface&MockObject $logger;
+    private ManagerRegistry&MockObject $doctrine;
+    private EntityManager&MockObject $em;
+    private NotificationAlertManager&MockObject $notificationAlertManager;
+    private EmailEntityBuilder&MockObject $emailEntityBuilder;
+    private KnownEmailAddressCheckerFactory&MockObject $knownEmailAddressCheckerFactory;
+    private TestEmailSynchronizer $sync;
 
     #[\Override]
     protected function setUp(): void

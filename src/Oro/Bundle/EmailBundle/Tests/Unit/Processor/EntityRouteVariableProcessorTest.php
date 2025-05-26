@@ -6,25 +6,18 @@ use Oro\Bundle\EmailBundle\Processor\EntityRouteVariableProcessor;
 use Oro\Bundle\EmailBundle\Provider\UrlProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Twig\Sandbox\TemplateData;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
-class EntityRouteVariableProcessorTest extends \PHPUnit\Framework\TestCase
+class EntityRouteVariableProcessorTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var UrlProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $urlProvider;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var TemplateData|\PHPUnit\Framework\MockObject\MockObject */
-    private $data;
-
-    /** @var EntityRouteVariableProcessor */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private UrlProvider&MockObject $urlProvider;
+    private LoggerInterface&MockObject $logger;
+    private TemplateData&MockObject $data;
+    private EntityRouteVariableProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -41,7 +34,7 @@ class EntityRouteVariableProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessForRouteThatDoesNotRequireEntityId()
+    public function testProcessForRouteThatDoesNotRequireEntityId(): void
     {
         $variable = 'entity.url_index';
         $parentVariable = 'entity';
@@ -71,7 +64,7 @@ class EntityRouteVariableProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($variable, $definition, $this->data);
     }
 
-    public function testProcessForRouteThatRequiresEntityId()
+    public function testProcessForRouteThatRequiresEntityId(): void
     {
         $variable = 'entity.url_update';
         $parentVariable = 'entity';
@@ -103,7 +96,7 @@ class EntityRouteVariableProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($variable, $definition, $this->data);
     }
 
-    public function testProcessWithWrongEntity()
+    public function testProcessWithWrongEntity(): void
     {
         $variable = 'entity.url_update';
         $parentVariable = 'entity';
@@ -135,7 +128,7 @@ class EntityRouteVariableProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($variable, $definition, $this->data);
     }
 
-    public function testProcessWithWrongRoute()
+    public function testProcessWithWrongRoute(): void
     {
         $variable = 'entity.url_index';
         $parentVariable = 'entity';

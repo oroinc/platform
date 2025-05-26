@@ -10,11 +10,12 @@ use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EmailThreadProviderTest extends \PHPUnit\Framework\TestCase
+class EmailThreadProviderTest extends TestCase
 {
     private EmailThreadProvider $provider;
 

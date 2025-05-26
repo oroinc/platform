@@ -14,6 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
 use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Entity\Stub\Localization;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -23,21 +24,14 @@ use Twig\Error\SyntaxError;
 
 class EmailTemplateSyntaxValidatorTest extends ConstraintValidatorTestCase
 {
-    private const TEST_SUBJECT = '{{entity.subject}}';
-    private const TEST_TRANS_SUBJECT = '{{entity.trans.subject}}';
-    private const TEST_CONTENT = '{{entity.content}}';
+    private const string TEST_SUBJECT = '{{entity.subject}}';
+    private const string TEST_TRANS_SUBJECT = '{{entity.trans.subject}}';
+    private const string TEST_CONTENT = '{{entity.content}}';
 
-    /** @var EmailRenderer|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailRenderer;
-
-    /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $localizationManager;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfigProvider;
-
-    /** @var EmailTemplate */
-    private $template;
+    private EmailRenderer&MockObject $emailRenderer;
+    private LocalizationManager&MockObject $localizationManager;
+    private ConfigProvider&MockObject $entityConfigProvider;
+    private EmailTemplate $template;
 
     #[\Override]
     protected function setUp(): void

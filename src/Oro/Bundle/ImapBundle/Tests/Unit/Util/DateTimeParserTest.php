@@ -3,8 +3,9 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Util;
 
 use Oro\Bundle\ImapBundle\Util\DateTimeParser;
+use PHPUnit\Framework\TestCase;
 
-class DateTimeParserTest extends \PHPUnit\Framework\TestCase
+class DateTimeParserTest extends TestCase
 {
     /**
      * @dataProvider parseProvider
@@ -55,7 +56,7 @@ class DateTimeParserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider parseFailureProvider
      */
-    public function testParseFailure(string $strDate, string $exceptionMessage)
+    public function testParseFailure(string $strDate, string $exceptionMessage): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage($exceptionMessage);

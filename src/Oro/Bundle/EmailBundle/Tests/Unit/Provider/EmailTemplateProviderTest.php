@@ -16,10 +16,8 @@ class EmailTemplateProviderTest extends TestCase
 {
     use LoggerAwareTraitTestTrait;
 
-    private EmailTemplateLoaderInterface|MockObject $emailTemplateLoader;
-
-    private EmailTemplateCandidatesProviderInterface|MockObject $emailTemplateCandidatesProvider;
-
+    private EmailTemplateLoaderInterface&MockObject $emailTemplateLoader;
+    private EmailTemplateCandidatesProviderInterface&MockObject $emailTemplateCandidatesProvider;
     private EmailTemplateProvider $provider;
 
     #[\Override]
@@ -42,8 +40,7 @@ class EmailTemplateProviderTest extends TestCase
         $templateContext = ['sample_key' => 'sample_value'];
 
         $emailTemplateCriteria = new EmailTemplateCriteria($templateName);
-        $this->emailTemplateCandidatesProvider
-            ->expects(self::once())
+        $this->emailTemplateCandidatesProvider->expects(self::once())
             ->method('getCandidatesNames')
             ->with($emailTemplateCriteria, $templateContext)
             ->willReturn([]);
@@ -59,21 +56,18 @@ class EmailTemplateProviderTest extends TestCase
         $templateContext = ['sample_key' => 'sample_value'];
 
         $emailTemplateCriteria = new EmailTemplateCriteria($templateName);
-        $this->emailTemplateCandidatesProvider
-            ->expects(self::once())
+        $this->emailTemplateCandidatesProvider->expects(self::once())
             ->method('getCandidatesNames')
             ->with($emailTemplateCriteria, $templateContext)
             ->willReturn([$name1, $name2]);
 
-        $this->emailTemplateLoader
-            ->expects(self::exactly(2))
+        $this->emailTemplateLoader->expects(self::exactly(2))
             ->method('exists')
             ->withConsecutive([$name1], [$name2])
             ->willReturnOnConsecutiveCalls(false, true);
 
         $emailTemplateModel = new EmailTemplateModel();
-        $this->emailTemplateLoader
-            ->expects(self::once())
+        $this->emailTemplateLoader->expects(self::once())
             ->method('getEmailTemplate')
             ->with($name2)
             ->willReturn($emailTemplateModel);
@@ -92,21 +86,18 @@ class EmailTemplateProviderTest extends TestCase
         $templateContext = ['sample_key' => 'sample_value'];
 
         $emailTemplateCriteria = new EmailTemplateCriteria($templateName);
-        $this->emailTemplateCandidatesProvider
-            ->expects(self::once())
+        $this->emailTemplateCandidatesProvider->expects(self::once())
             ->method('getCandidatesNames')
             ->with($emailTemplateCriteria, $templateContext)
             ->willReturn([$name1, $name2]);
 
-        $this->emailTemplateLoader
-            ->expects(self::exactly(2))
+        $this->emailTemplateLoader->expects(self::exactly(2))
             ->method('exists')
             ->withConsecutive([$name1], [$name2])
             ->willReturnOnConsecutiveCalls(false, true);
 
         $emailTemplateModel = new EmailTemplateModel();
-        $this->emailTemplateLoader
-            ->expects(self::once())
+        $this->emailTemplateLoader->expects(self::once())
             ->method('getEmailTemplate')
             ->with($name2)
             ->willReturn($emailTemplateModel);
@@ -125,27 +116,23 @@ class EmailTemplateProviderTest extends TestCase
         $templateContext = ['sample_key' => 'sample_value'];
 
         $emailTemplateCriteria = new EmailTemplateCriteria($templateName);
-        $this->emailTemplateCandidatesProvider
-            ->expects(self::once())
+        $this->emailTemplateCandidatesProvider->expects(self::once())
             ->method('getCandidatesNames')
             ->with($emailTemplateCriteria, $templateContext)
             ->willReturn([$name1, $name2]);
 
-        $this->emailTemplateLoader
-            ->expects(self::exactly(2))
+        $this->emailTemplateLoader->expects(self::exactly(2))
             ->method('exists')
             ->withConsecutive([$name1], [$name2])
             ->willReturnOnConsecutiveCalls(false, false);
 
-        $this->emailTemplateLoader
-            ->expects(self::never())
+        $this->emailTemplateLoader->expects(self::never())
             ->method('getEmailTemplate');
 
         $exception = new LoaderError(
             sprintf('Unable to find one of the following email templates: "%s".', implode('", "', [$name1, $name2]))
         );
-        $this->loggerMock
-            ->expects(self::once())
+        $this->loggerMock->expects(self::once())
             ->method('error')
             ->with(
                 'Failed to load email template "{name}": {message}',

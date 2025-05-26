@@ -6,11 +6,12 @@ use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Sync\AbstractEmailSynchronizer;
 use Oro\Bundle\EmailBundle\Sync\EmailSynchronizationManager;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class EmailSynchronizationManagerTest extends \PHPUnit\Framework\TestCase
+class EmailSynchronizationManagerTest extends TestCase
 {
-    public function testSyncOrigins()
+    public function testSyncOrigins(): void
     {
         $container = $this->createMock(ContainerInterface::class);
 

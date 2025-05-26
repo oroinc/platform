@@ -3,12 +3,13 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailOwnerConfigurationPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class EmailOwnerConfigurationPassTest extends \PHPUnit\Framework\TestCase
+class EmailOwnerConfigurationPassTest extends TestCase
 {
-    public function testProcessWhenNoProviders()
+    public function testProcessWhenNoProviders(): void
     {
         $container = new ContainerBuilder();
         $storageDef = $container->register('oro_email.email.owner.provider.storage');
@@ -22,7 +23,7 @@ class EmailOwnerConfigurationPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $storageDef = $container->register('oro_email.email.owner.provider.storage');

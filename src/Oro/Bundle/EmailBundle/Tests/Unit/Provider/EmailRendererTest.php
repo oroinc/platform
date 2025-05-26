@@ -26,16 +26,11 @@ class EmailRendererTest extends TestCase
 {
     use LoggerAwareTraitTestTrait;
 
-    private TemplateRenderer|MockObject $templateRenderer;
-
-    private TwigEnvironment|MockObject $twigEnvironment;
-
+    private TemplateRenderer&MockObject $templateRenderer;
+    private TwigEnvironment&MockObject $twigEnvironment;
     private EmailTemplateRenderingContext $emailTemplateRenderingContext;
-
-    private EventDispatcherInterface|MockObject $eventDispatcher;
-
-    private HtmlTagHelper|MockObject $htmlTagHelper;
-
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private HtmlTagHelper&MockObject $htmlTagHelper;
     private EmailRenderer $renderer;
 
     #[\Override]
@@ -82,8 +77,7 @@ class EmailRendererTest extends TestCase
             ),
         ];
 
-        $this->eventDispatcher
-            ->expects(self::exactly(2))
+        $this->eventDispatcher->expects(self::exactly(2))
             ->method('dispatch')
             ->willReturnCallback(function (Event $event) use (&$events, $templateContext) {
                 self::assertEquals($event, array_shift($events));
@@ -92,8 +86,7 @@ class EmailRendererTest extends TestCase
                 return $event;
             });
 
-        $this->templateRenderer
-            ->expects(self::exactly(2))
+        $this->templateRenderer->expects(self::exactly(2))
             ->method('renderTemplate')
             ->withConsecutive(
                 [$emailTemplate->getSubject(), $templateParams],
@@ -136,8 +129,7 @@ class EmailRendererTest extends TestCase
             ),
         ];
 
-        $this->eventDispatcher
-            ->expects(self::exactly(2))
+        $this->eventDispatcher->expects(self::exactly(2))
             ->method('dispatch')
             ->willReturnCallback(function (Event $event) use (&$events, $templateContext) {
                 self::assertEquals($event, array_shift($events));
@@ -147,8 +139,7 @@ class EmailRendererTest extends TestCase
             });
 
         $twigError = new Error('Sample TWIG error');
-        $this->templateRenderer
-            ->expects(self::exactly(2))
+        $this->templateRenderer->expects(self::exactly(2))
             ->method('renderTemplate')
             ->withConsecutive(
                 [$emailTemplate->getSubject(), $templateParams],
@@ -159,8 +150,7 @@ class EmailRendererTest extends TestCase
                 self::throwException($twigError)
             );
 
-        $this->loggerMock
-            ->expects(self::once())
+        $this->loggerMock->expects(self::once())
             ->method('error')
             ->with(
                 'Rendering of email template "{email_template_name}" failed. {message}',
@@ -193,8 +183,7 @@ class EmailRendererTest extends TestCase
 
         $subject = 'rendered ' . $emailTemplate->getSubject();
         $content = 'rendered ' . $emailTemplate->getContent();
-        $this->templateRenderer
-            ->expects(self::exactly(2))
+        $this->templateRenderer->expects(self::exactly(2))
             ->method('renderTemplate')
             ->withConsecutive(
                 [$emailTemplate->getSubject(), $templateParams],
@@ -215,23 +204,20 @@ class EmailRendererTest extends TestCase
             ->setContent('sample content');
 
         $sanitizedContent = 'sanitized ' . $emailTemplate->getContent();
-        $this->htmlTagHelper
-            ->expects(self::once())
+        $this->htmlTagHelper->expects(self::once())
             ->method('sanitize')
             ->with($emailTemplate->getContent(), 'default', false)
             ->willReturn($sanitizedContent);
 
         $template = $this->createMock(Template::class);
         $templateWrapper = new TemplateWrapper($this->twigEnvironment, $template);
-        $this->twigEnvironment
-            ->expects(self::once())
+        $this->twigEnvironment->expects(self::once())
             ->method('createTemplate')
             ->with('{% verbatim %}' . $sanitizedContent . '{% endverbatim %}')
             ->willReturn($templateWrapper);
 
         $renderedContent = 'rendered ' . $emailTemplate->getContent();
-        $template
-            ->expects(self::once())
+        $template->expects(self::once())
             ->method('render')
             ->willReturn($renderedContent);
 
@@ -244,8 +230,7 @@ class EmailRendererTest extends TestCase
         $templateParams = ['sample_key' => 'sample_value'];
         $renderedContent = 'rendered ' . $templateContent;
 
-        $this->templateRenderer
-            ->expects(self::once())
+        $this->templateRenderer->expects(self::once())
             ->method('renderTemplate')
             ->with($templateContent)
             ->willReturn($renderedContent);
@@ -258,8 +243,7 @@ class EmailRendererTest extends TestCase
         $templateContent = 'sample content';
         $templateParams = ['sample_key' => 'sample_value'];
 
-        $this->templateRenderer
-            ->expects(self::once())
+        $this->templateRenderer->expects(self::once())
             ->method('validateTemplate')
             ->with($templateContent);
 

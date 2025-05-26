@@ -27,9 +27,8 @@ class ScheduleSendEmailTemplateTest extends TestCase
 {
     use LoggerAwareTraitTestTrait;
 
-    private ValidatorInterface|MockObject $validator;
-    private MessageProducerInterface|MockObject $messageProducer;
-
+    private ValidatorInterface&MockObject $validator;
+    private MessageProducerInterface&MockObject $messageProducer;
     private ScheduleSendEmailTemplate $action;
 
     #[\Override]

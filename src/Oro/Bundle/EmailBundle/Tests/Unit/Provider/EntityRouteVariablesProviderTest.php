@@ -9,18 +9,17 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EntityRouteVariablesProviderTest extends \PHPUnit\Framework\TestCase
+class EntityRouteVariablesProviderTest extends TestCase
 {
-    private const TEST_ENTITY_NAME = TestEntityForVariableProvider::class;
-    private const TEST_EXTEND_ENTITY_NAME = ExtendHelper::ENTITY_NAMESPACE . 'TestEntity';
+    private const string TEST_ENTITY_NAME = TestEntityForVariableProvider::class;
+    private const string TEST_EXTEND_ENTITY_NAME = ExtendHelper::ENTITY_NAMESPACE . 'TestEntity';
 
-    /** @var EntityRouteVariablesProvider */
-    private $provider;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
+    private EntityRouteVariablesProvider $provider;
+    private ConfigManager&MockObject $configManager;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +37,7 @@ class EntityRouteVariablesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetVariableDefinitions()
+    public function testGetVariableDefinitions(): void
     {
         $entityData = [
             'url.index' => [
@@ -92,7 +91,7 @@ class EntityRouteVariablesProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->provider->getVariableDefinitions());
     }
 
-    public function testGetVariableGetters()
+    public function testGetVariableGetters(): void
     {
         $this->assertEquals([], $this->provider->getVariableGetters());
     }
@@ -100,7 +99,7 @@ class EntityRouteVariablesProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider variableProcessorsDataProvider
      */
-    public function testGetVariableProcessors(string $entityClass, array $expected)
+    public function testGetVariableProcessors(string $entityClass, array $expected): void
     {
         $config = new Config(
             new EntityConfigId('extend', self::TEST_ENTITY_NAME),

@@ -3,9 +3,10 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\ImapBundle\DependencyInjection\OroImapExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroImapExtensionTest extends \PHPUnit\Framework\TestCase
+class OroImapExtensionTest extends TestCase
 {
     public function testLoad(): void
     {

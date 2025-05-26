@@ -3,9 +3,10 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Mailer\Checker;
 
 use Oro\Bundle\EmailBundle\Mailer\Checker\ConnectionCheckers;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Transport\Dsn;
 
-class ConnectionCheckersTest extends \PHPUnit\Framework\TestCase
+class ConnectionCheckersTest extends TestCase
 {
     public function testSupportsWhenNoCheckers(): void
     {
@@ -22,20 +23,17 @@ class ConnectionCheckersTest extends \PHPUnit\Framework\TestCase
     {
         $dsn = Dsn::fromString('null://null');
         $checker1 = $this->createMock(ConnectionCheckers::class);
-        $checker1
-            ->expects(self::atLeastOnce())
+        $checker1->expects(self::atLeastOnce())
             ->method('supports')
             ->with($dsn)
             ->willReturn(false);
         $checker2 = $this->createMock(ConnectionCheckers::class);
-        $checker2
-            ->expects(self::atLeastOnce())
+        $checker2->expects(self::atLeastOnce())
             ->method('supports')
             ->with($dsn)
             ->willReturn(true);
         $checker3 = $this->createMock(ConnectionCheckers::class);
-        $checker3
-            ->expects(self::never())
+        $checker3->expects(self::never())
             ->method('supports');
 
         self::assertFalse((new ConnectionCheckers([$checker1]))->supports($dsn));
@@ -47,33 +45,27 @@ class ConnectionCheckersTest extends \PHPUnit\Framework\TestCase
     {
         $dsn = Dsn::fromString('null://null');
         $checker1 = $this->createMock(ConnectionCheckers::class);
-        $checker1
-            ->expects(self::atLeastOnce())
+        $checker1->expects(self::atLeastOnce())
             ->method('supports')
             ->with($dsn)
             ->willReturn(false);
-        $checker1
-            ->expects(self::never())
+        $checker1->expects(self::never())
             ->method('checkConnection');
         $checker2 = $this->createMock(ConnectionCheckers::class);
-        $checker2
-            ->expects(self::atLeastOnce())
+        $checker2->expects(self::atLeastOnce())
             ->method('supports')
             ->with($dsn)
             ->willReturn(true);
-        $checker2
-            ->expects(self::atLeastOnce())
+        $checker2->expects(self::atLeastOnce())
             ->method('checkConnection')
             ->with($dsn)
             ->willReturn(true);
         $checker3 = $this->createMock(ConnectionCheckers::class);
-        $checker3
-            ->expects(self::atLeastOnce())
+        $checker3->expects(self::atLeastOnce())
             ->method('supports')
             ->with($dsn)
             ->willReturn(false);
-        $checker3
-            ->expects(self::never())
+        $checker3->expects(self::never())
             ->method('checkConnection');
 
         self::assertFalse((new ConnectionCheckers([$checker1]))->checkConnection($dsn));

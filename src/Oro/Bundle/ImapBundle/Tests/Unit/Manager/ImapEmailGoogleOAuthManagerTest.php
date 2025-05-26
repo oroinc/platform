@@ -11,20 +11,15 @@ use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOAuthManager;
 use Oro\Bundle\ImapBundle\Provider\OAuthAccessTokenData;
 use Oro\Bundle\ImapBundle\Provider\OAuthProviderInterface;
 use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestUserEmailOrigin;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ImapEmailGoogleOAuthManagerTest extends \PHPUnit\Framework\TestCase
+class ImapEmailGoogleOAuthManagerTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var OAuthProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $oauthProvider;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var ImapEmailGoogleOAuthManager */
-    private $manager;
+    private ManagerRegistry&MockObject $doctrine;
+    private OAuthProviderInterface&MockObject $oauthProvider;
+    private ConfigManager&MockObject $configManager;
+    private ImapEmailGoogleOAuthManager $manager;
 
     #[\Override]
     protected function setUp(): void

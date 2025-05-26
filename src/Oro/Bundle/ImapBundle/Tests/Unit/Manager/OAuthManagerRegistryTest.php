@@ -4,11 +4,13 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager;
 
 use Oro\Bundle\ImapBundle\Manager\OAuthManagerInterface;
 use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class OAuthManagerRegistryTest extends \PHPUnit\Framework\TestCase
+class OAuthManagerRegistryTest extends TestCase
 {
     /**
-     * @return OAuthManagerInterface[]|\PHPUnit\Framework\MockObject\MockObject[]
+     * @return OAuthManagerInterface[]&MockObject[]
      */
     private function getMockedManagers(): array
     {

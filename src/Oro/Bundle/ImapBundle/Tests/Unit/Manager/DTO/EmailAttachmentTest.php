@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager\DTO;
 
 use Oro\Bundle\ImapBundle\Manager\DTO\EmailAttachment;
+use PHPUnit\Framework\TestCase;
 
-class EmailAttachmentTest extends \PHPUnit\Framework\TestCase
+class EmailAttachmentTest extends TestCase
 {
-    public function testGettersAndSetters()
+    public function testGettersAndSetters(): void
     {
         $obj = new EmailAttachment();
         $obj

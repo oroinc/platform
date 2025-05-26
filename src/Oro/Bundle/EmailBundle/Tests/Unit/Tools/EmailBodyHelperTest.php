@@ -3,11 +3,11 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\EmailBundle\Tools\EmailBodyHelper;
+use PHPUnit\Framework\TestCase;
 
-class EmailBodyHelperTest extends \PHPUnit\Framework\TestCase
+class EmailBodyHelperTest extends TestCase
 {
-    /** @var EmailBodyHelper */
-    private $bodyHelper;
+    private EmailBodyHelper $bodyHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -17,7 +17,7 @@ class EmailBodyHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider bodyData
      */
-    public function testGetClearBody(string $bodyText, string $expectedResult)
+    public function testGetClearBody(string $bodyText, string $expectedResult): void
     {
         $this->assertEquals($expectedResult, $this->bodyHelper->getTrimmedClearText($bodyText));
     }

@@ -16,8 +16,7 @@ use PHPUnit\Framework\TestCase;
 
 class EmailTemplateRenderLocalizationAwareEventListenerTest extends TestCase
 {
-    private LocalizationProviderInterface|MockObject $currentLocalizationProvider;
-
+    private LocalizationProviderInterface&MockObject $currentLocalizationProvider;
     private EmailTemplateRenderLocalizationAwareEventListener $listener;
 
     #[\Override]
@@ -34,8 +33,7 @@ class EmailTemplateRenderLocalizationAwareEventListenerTest extends TestCase
         $templateParams = ['entity' => new UserStub(42)];
         $templateContext = ['sample_key' => 'sample_value'];
 
-        $this->currentLocalizationProvider
-            ->expects(self::never())
+        $this->currentLocalizationProvider->expects(self::never())
             ->method(self::anything());
 
         $eventBefore = new EmailTemplateRenderBeforeEvent($emailTemplate, $templateParams, $templateContext);
@@ -60,13 +58,11 @@ class EmailTemplateRenderLocalizationAwareEventListenerTest extends TestCase
         $templateContext = ['localization' => $localization];
         $currentLocalization = new LocalizationStub(100);
 
-        $this->currentLocalizationProvider
-            ->expects(self::once())
+        $this->currentLocalizationProvider->expects(self::once())
             ->method('getCurrentLocalization')
             ->willReturn($currentLocalization);
 
-        $this->currentLocalizationProvider
-            ->expects(self::exactly(2))
+        $this->currentLocalizationProvider->expects(self::exactly(2))
             ->method('setCurrentLocalization')
             ->withConsecutive([$localization], [$currentLocalization]);
 
@@ -91,13 +87,11 @@ class EmailTemplateRenderLocalizationAwareEventListenerTest extends TestCase
         $localization = new LocalizationStub(200);
         $templateContext = ['localization' => $localization];
 
-        $this->currentLocalizationProvider
-            ->expects(self::once())
+        $this->currentLocalizationProvider->expects(self::once())
             ->method('getCurrentLocalization')
             ->willReturn(null);
 
-        $this->currentLocalizationProvider
-            ->expects(self::exactly(2))
+        $this->currentLocalizationProvider->expects(self::exactly(2))
             ->method('setCurrentLocalization')
             ->withConsecutive([$localization], [null]);
 

@@ -31,26 +31,16 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AutoResponseManagerTest extends TestCase
 {
-    private ManagerRegistry|MockObject $registry;
-
-    private EmailModelBuilder|MockObject $emailBuilder;
-
-    private EmailModelSender|MockObject $emailModelSender;
-
-    private TranslatedEmailTemplateProvider|MockObject $translatedEmailTemplateProvider;
-
-    private EmailRenderer|MockObject $emailRenderer;
-
+    private ManagerRegistry&MockObject $registry;
+    private EmailModelBuilder&MockObject $emailBuilder;
+    private EmailModelSender&MockObject $emailModelSender;
+    private TranslatedEmailTemplateProvider&MockObject $translatedEmailTemplateProvider;
+    private EmailRenderer&MockObject $emailRenderer;
     private AutoResponseManager $autoResponseManager;
-
     private Language $language;
-
     private Localization $localization;
-
     private EmailTemplateTranslation $emailTemplateTranslation;
-
     private EmailTemplate $emailTemplate;
-
     private ?array $definitions = null;
 
     #[\Override]
@@ -64,7 +54,7 @@ class AutoResponseManagerTest extends TestCase
         $this->translatedEmailTemplateProvider = $this->createMock(TranslatedEmailTemplateProvider::class);
 
         $translator = $this->createMock(TranslatorInterface::class);
-        $translator
+        $translator->expects(self::any())
             ->method('trans')
             ->willReturnCallback(static fn (string $id) => $id . '_translated');
 
@@ -187,8 +177,7 @@ class AutoResponseManagerTest extends TestCase
             ->setContent($this->emailTemplateTranslation->getContent())
             ->setType($this->emailTemplate->getType());
 
-        $this->translatedEmailTemplateProvider
-            ->expects(self::once())
+        $this->translatedEmailTemplateProvider->expects(self::once())
             ->method('getTranslatedEmailTemplate')
             ->with($autoResponseRule->getTemplate(), $this->localization)
             ->willReturn($translatedEmailTemplate);
@@ -198,8 +187,7 @@ class AutoResponseManagerTest extends TestCase
             ->setContent('rendered ' . $this->emailTemplateTranslation->getContent())
             ->setType($this->emailTemplate->getType());
 
-        $this->emailRenderer
-            ->expects(self::once())
+        $this->emailRenderer->expects(self::once())
             ->method('renderEmailTemplate')
             ->with($translatedEmailTemplate)
             ->willReturn($renderedEmailTemplate);

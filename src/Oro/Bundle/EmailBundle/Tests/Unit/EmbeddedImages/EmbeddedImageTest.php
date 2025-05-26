@@ -3,8 +3,9 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\EmbeddedImages;
 
 use Oro\Bundle\EmailBundle\EmbeddedImages\EmbeddedImage;
+use PHPUnit\Framework\TestCase;
 
-class EmbeddedImageTest extends \PHPUnit\Framework\TestCase
+class EmbeddedImageTest extends TestCase
 {
     public function testGettersWhenOnlyContentProvided(): void
     {

@@ -6,11 +6,12 @@ use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MailboxTest extends \PHPUnit\Framework\TestCase
+class MailboxTest extends TestCase
 {
-    /** @var UserEmailOrigin|\PHPUnit\Framework\MockObject\MockObject */
-    private $origin;
+    private UserEmailOrigin&MockObject $origin;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +25,7 @@ class MailboxTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getAccountTypeDataProvider
      */
-    public function testGetAccountType(bool $skipOrigin, string $accessToken, string $accountType)
+    public function testGetAccountType(bool $skipOrigin, string $accessToken, string $accountType): void
     {
         $mailbox = new Mailbox();
 

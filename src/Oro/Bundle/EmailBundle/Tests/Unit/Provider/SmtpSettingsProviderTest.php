@@ -7,20 +7,15 @@ use Oro\Bundle\DistributionBundle\Handler\ApplicationState;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\EmailBundle\Provider\SmtpSettingsProvider;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class SmtpSettingsProviderTest extends \PHPUnit\Framework\TestCase
+class SmtpSettingsProviderTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $encryptor;
-
-    /** @var ApplicationState|\PHPUnit\Framework\MockObject\MockObject */
-    private $applicationState;
-
-    /** @var SmtpSettingsProvider */
-    private $provider;
+    private ConfigManager&MockObject $configManager;
+    private SymmetricCrypterInterface&MockObject $encryptor;
+    private ApplicationState&MockObject $applicationState;
+    private SmtpSettingsProvider $provider;
 
     #[\Override]
     protected function setUp(): void

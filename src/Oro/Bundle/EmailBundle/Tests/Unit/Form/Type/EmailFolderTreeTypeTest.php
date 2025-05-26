@@ -8,8 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EmailFolderTreeTypeTest extends FormIntegrationTestCase
 {
-    /** @var EmailFolderTreeType */
-    private $emailFolderTreeType;
+    private EmailFolderTreeType $emailFolderTreeType;
 
     #[\Override]
     protected function setUp(): void

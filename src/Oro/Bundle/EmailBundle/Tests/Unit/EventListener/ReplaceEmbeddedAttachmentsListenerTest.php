@@ -8,11 +8,11 @@ use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Event\EmailBodyLoaded;
 use Oro\Bundle\EmailBundle\EventListener\ReplaceEmbeddedAttachmentsListener;
+use PHPUnit\Framework\TestCase;
 
-class ReplaceEmbeddedAttachmentsListenerTest extends \PHPUnit\Framework\TestCase
+class ReplaceEmbeddedAttachmentsListenerTest extends TestCase
 {
-    /** @var ReplaceEmbeddedAttachmentsListener */
-    private $listener;
+    private ReplaceEmbeddedAttachmentsListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +23,7 @@ class ReplaceEmbeddedAttachmentsListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider replaceDataProvider
      */
-    public function testReplace($bodyTemplate, array $attachments)
+    public function testReplace($bodyTemplate, array $attachments): void
     {
         $email     = new Email();
         $emailBody = new EmailBody();
@@ -125,7 +125,7 @@ class ReplaceEmbeddedAttachmentsListenerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testNotSupportedReplace()
+    public function testNotSupportedReplace(): void
     {
         $email     = new Email();
         $emailBody = new EmailBody();

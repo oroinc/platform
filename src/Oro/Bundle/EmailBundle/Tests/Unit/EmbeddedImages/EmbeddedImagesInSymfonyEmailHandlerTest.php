@@ -5,13 +5,14 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\EmbeddedImages;
 use Oro\Bundle\EmailBundle\EmbeddedImages\EmbeddedImage;
 use Oro\Bundle\EmailBundle\EmbeddedImages\EmbeddedImagesExtractor;
 use Oro\Bundle\EmailBundle\EmbeddedImages\EmbeddedImagesInSymfonyEmailHandler;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Email as SymfonyEmail;
 use Symfony\Component\Mime\Part\DataPart;
 
-class EmbeddedImagesInSymfonyEmailHandlerTest extends \PHPUnit\Framework\TestCase
+class EmbeddedImagesInSymfonyEmailHandlerTest extends TestCase
 {
-    private EmbeddedImagesExtractor|\PHPUnit\Framework\MockObject\MockObject $embeddedImagesExtractor;
-
+    private EmbeddedImagesExtractor&MockObject $embeddedImagesExtractor;
     private EmbeddedImagesInSymfonyEmailHandler $handler;
 
     #[\Override]
@@ -39,8 +40,7 @@ class EmbeddedImagesInSymfonyEmailHandlerTest extends \PHPUnit\Framework\TestCas
         $symfonyEmail = (new SymfonyEmail())
             ->html('sample_text');
 
-        $this->embeddedImagesExtractor
-            ->expects(self::once())
+        $this->embeddedImagesExtractor->expects(self::once())
             ->method('extractEmbeddedImages')
             ->willReturn([]);
 
@@ -63,8 +63,7 @@ class EmbeddedImagesInSymfonyEmailHandlerTest extends \PHPUnit\Framework\TestCas
             'base64'
         );
 
-        $this->embeddedImagesExtractor
-            ->expects(self::once())
+        $this->embeddedImagesExtractor->expects(self::once())
             ->method('extractEmbeddedImages')
             ->willReturnCallback(static function (&$body) use ($embeddedImage) {
                 $body .= '_changed';

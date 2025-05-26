@@ -26,43 +26,24 @@ use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
+class EmailActivityListProviderTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityNameResolver;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $urlGenerator;
-
-    /** @var MailboxProcessStorage|\PHPUnit\Framework\MockObject\MockObject */
-    private $mailboxProcessStorage;
-
-    /** @var ActivityAssociationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $activityAssociationHelper;
-
-    /** @var CommentAssociationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $commentAssociationHelper;
-
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /** @var EmailActivityListProvider */
-    private $emailActivityListProvider;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private EntityNameResolver&MockObject $entityNameResolver;
+    private ConfigManager&MockObject $configManager;
+    private UrlGeneratorInterface&MockObject $urlGenerator;
+    private MailboxProcessStorage&MockObject $mailboxProcessStorage;
+    private ActivityAssociationHelper&MockObject $activityAssociationHelper;
+    private CommentAssociationHelper&MockObject $commentAssociationHelper;
+    private FeatureChecker&MockObject $featureChecker;
+    private EmailActivityListProvider $emailActivityListProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -95,7 +76,7 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetActivityOwners()
+    public function testGetActivityOwners(): void
     {
         $organization = new Organization();
         $organization->setName('Org');
@@ -162,7 +143,7 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $activityOwnerArray);
     }
 
-    public function testGetActivityOwnersSeveralOrganizations()
+    public function testGetActivityOwnersSeveralOrganizations(): void
     {
         $organization1 = new Organization();
         $organization1->setName('Org1');
@@ -207,7 +188,7 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($user->getUserIdentifier(), $owner->getUser()->getUserIdentifier());
     }
 
-    public function testFeatureToggleable()
+    public function testFeatureToggleable(): void
     {
         $this->assertInstanceOf(FeatureToggleableInterface::class, $this->emailActivityListProvider);
 
@@ -227,7 +208,7 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getDataProvider
      */
-    public function testGetData(?EntityMetadata $metadata, ?string $expected)
+    public function testGetData(?EntityMetadata $metadata, ?string $expected): void
     {
         $activityList = $this->createMock(ActivityList::class);
         $activityList->expects($this->once())
@@ -292,7 +273,7 @@ class EmailActivityListProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetGroupedEntitiesWithWrongEntityPassed()
+    public function testGetGroupedEntitiesWithWrongEntityPassed(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf(

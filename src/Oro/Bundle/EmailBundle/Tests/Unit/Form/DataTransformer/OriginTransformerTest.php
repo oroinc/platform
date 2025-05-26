@@ -15,7 +15,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 class OriginTransformerTest extends TestCase
 {
-    private const TEST_ID = 101;
+    private const int TEST_ID = 101;
 
     private ManagerRegistry&MockObject $doctrine;
     private OriginTransformer $transformer;
@@ -38,7 +38,7 @@ class OriginTransformerTest extends TestCase
         self::assertEquals(self::TEST_ID, $this->transformer->transform($testOrigin));
     }
 
-    public function testTransformFail()
+    public function testTransformFail(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->transformer->transform('object should be provided');

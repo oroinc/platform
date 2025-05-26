@@ -3,8 +3,9 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Sync;
 
 use Oro\Bundle\EmailBundle\Sync\EmailSyncNotificationAlert;
+use PHPUnit\Framework\TestCase;
 
-class EmailSyncNotificationAlertTest extends \PHPUnit\Framework\TestCase
+class EmailSyncNotificationAlertTest extends TestCase
 {
     public function testGetSourceType(): void
     {

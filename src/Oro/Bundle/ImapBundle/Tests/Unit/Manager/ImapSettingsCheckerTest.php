@@ -8,17 +8,14 @@ use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Manager\ImapSettingsChecker;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ImapSettingsCheckerTest extends \PHPUnit\Framework\TestCase
+class ImapSettingsCheckerTest extends TestCase
 {
-    /** @var ImapConnectorFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $connectorFactory;
-
-    /** @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $encryptor;
-
-    /** @var ImapSettingsChecker */
-    private $checker;
+    private ImapConnectorFactory&MockObject $connectorFactory;
+    private SymmetricCrypterInterface&MockObject $encryptor;
+    private ImapSettingsChecker $checker;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +28,7 @@ class ImapSettingsCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCheckConnectionError()
+    public function testCheckConnectionError(): void
     {
         $value = new UserEmailOrigin();
         $decryptedPassword = 'decrypted_password';
@@ -52,7 +49,7 @@ class ImapSettingsCheckerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->checker->checkConnection($value));
     }
 
-    public function testCheckConnection()
+    public function testCheckConnection(): void
     {
         $value = new UserEmailOrigin();
         $decryptedPassword = 'decrypted_password';

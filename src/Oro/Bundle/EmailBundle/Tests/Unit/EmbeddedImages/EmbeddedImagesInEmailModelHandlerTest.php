@@ -11,13 +11,13 @@ use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as EmailAttachmentModel;
 use Oro\Bundle\EmailBundle\Form\Model\Factory;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EmbeddedImagesInEmailModelHandlerTest extends \PHPUnit\Framework\TestCase
+class EmbeddedImagesInEmailModelHandlerTest extends TestCase
 {
-    private EmbeddedImagesExtractor|\PHPUnit\Framework\MockObject\MockObject $embeddedImagesExtractor;
-
-    private EmailEntityBuilder|\PHPUnit\Framework\MockObject\MockObject $emailEntityBuilder;
-
+    private EmbeddedImagesExtractor&MockObject $embeddedImagesExtractor;
+    private EmailEntityBuilder&MockObject $emailEntityBuilder;
     private EmbeddedImagesInEmailModelHandler $handler;
 
     #[\Override]
@@ -50,8 +50,7 @@ class EmbeddedImagesInEmailModelHandlerTest extends \PHPUnit\Framework\TestCase
         $emailModel = (new EmailModel())
             ->setBody($body);
 
-        $this->embeddedImagesExtractor
-            ->expects(self::once())
+        $this->embeddedImagesExtractor->expects(self::once())
             ->method('extractEmbeddedImages')
             ->with($body)
             ->willReturn([]);
@@ -73,8 +72,7 @@ class EmbeddedImagesInEmailModelHandlerTest extends \PHPUnit\Framework\TestCase
             'sample-content/type',
             'sample_encoding'
         );
-        $this->embeddedImagesExtractor
-            ->expects(self::once())
+        $this->embeddedImagesExtractor->expects(self::once())
             ->method('extractEmbeddedImages')
             ->willReturnCallback(static function (&$body) use ($embeddedImage) {
                 $body .= '_changed';
@@ -83,8 +81,7 @@ class EmbeddedImagesInEmailModelHandlerTest extends \PHPUnit\Framework\TestCase
             });
 
         $emailAttachmentContent = new EmailAttachmentContent();
-        $this->emailEntityBuilder
-            ->expects(self::once())
+        $this->emailEntityBuilder->expects(self::once())
             ->method('attachmentContent')
             ->with($embeddedImage->getEncodedContent(), $embeddedImage->getEncoding())
             ->willReturn($emailAttachmentContent);
@@ -93,8 +90,7 @@ class EmbeddedImagesInEmailModelHandlerTest extends \PHPUnit\Framework\TestCase
             ->setEmbeddedContentId($embeddedImage->getFilename())
             ->setContent($emailAttachmentContent);
 
-        $this->emailEntityBuilder
-            ->expects(self::once())
+        $this->emailEntityBuilder->expects(self::once())
             ->method('attachment')
             ->with($embeddedImage->getFilename(), $embeddedImage->getContentType())
             ->willReturn($emailAttachmentEntity);

@@ -33,44 +33,27 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UserBundle\Entity\Repository\UserRepository;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
+class EmailRecipientsHelperTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclHelper;
-
-    /** @var DQLNameFormatter|\PHPUnit\Framework\MockObject\MockObject */
-    private $dqlNameFormatter;
-
-    /** @var NameFormatter|\PHPUnit\Framework\MockObject\MockObject */
-    private $nameFormatter;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var EmailOwnerProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailOwnerProvider;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var EmailAddressHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $addressHelper;
-
-    /** @var EmailRecipientsHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailRecipientsHelper;
-
-    /** @var Indexer|\PHPUnit\Framework\MockObject\MockObject */
-    private $indexer;
+    private AclHelper&MockObject $aclHelper;
+    private DQLNameFormatter&MockObject $dqlNameFormatter;
+    private NameFormatter&MockObject $nameFormatter;
+    private ConfigManager&MockObject $configManager;
+    private TranslatorInterface&MockObject $translator;
+    private EmailOwnerProvider&MockObject $emailOwnerProvider;
+    private ManagerRegistry&MockObject $registry;
+    private EmailAddressHelper&MockObject $addressHelper;
+    private Indexer&MockObject $indexer;
+    private EmailRecipientsHelper $emailRecipientsHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -102,7 +85,7 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getRecipientsDataProvider
      */
-    public function testGetRecipients(EmailRecipientsProviderArgs $args, array $resultEmails)
+    public function testGetRecipients(EmailRecipientsProviderArgs $args, array $resultEmails): void
     {
         $this->dqlNameFormatter->expects($this->once())
             ->method('getFormattedNameDQL')
@@ -167,8 +150,11 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider filterRecipientsDataProvider
      */
-    public function testFilterRecipients(EmailRecipientsProviderArgs $args, array $recipients, array $expectedResult)
-    {
+    public function testFilterRecipients(
+        EmailRecipientsProviderArgs $args,
+        array $recipients,
+        array $expectedResult
+    ): void {
         $this->assertEquals($expectedResult, EmailRecipientsHelper::filterRecipients($args, $recipients));
     }
 
@@ -207,7 +193,7 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider prepareFormRecipientIdsDataProvider
      */
-    public function testPrepareFormRecipientIds(array $ids, string $expectedResult)
+    public function testPrepareFormRecipientIds(array $ids, string $expectedResult): void
     {
         $this->assertEquals($expectedResult, EmailRecipientsHelper::prepareFormRecipientIds($ids));
     }
@@ -230,7 +216,7 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider extractFormRecipientIdsDataProvider
      */
-    public function testExtractFormRecipientIds(string $value, array $expectedResult)
+    public function testExtractFormRecipientIds(string $value, array $expectedResult): void
     {
         $this->assertEquals($expectedResult, EmailRecipientsHelper::extractFormRecipientIds($value));
     }
@@ -259,7 +245,7 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider recipientsFromResultProvider
      */
-    public function testRecipientsFromResult(array $result, string $entityClass, array $expectedRecipients)
+    public function testRecipientsFromResult(array $result, string $entityClass, array $expectedRecipients): void
     {
         $this->assertEquals(
             $expectedRecipients,
@@ -299,7 +285,7 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider plainRecipientsFromResultProvider
      */
-    public function testPlainRecipientsFromResult(array $result, array $expectedRecipients)
+    public function testPlainRecipientsFromResult(array $result, array $expectedRecipients): void
     {
         $this->assertEquals(
             $expectedRecipients,
@@ -329,7 +315,7 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testCreateRecipientsFromEmails()
+    public function testCreateRecipientsFromEmails(): void
     {
         $emails = [
             'admin@example.com' => '"John Doe" <admin@example.com>',
@@ -381,7 +367,7 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateRecipientsFromEmailsNoRecipientEntity()
+    public function testCreateRecipientsFromEmailsNoRecipientEntity(): void
     {
         $emails = [
             'admin@example.com' => '"John Doe" <admin@example.com>',
@@ -420,7 +406,7 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateRecipientsFromEmailsEmptyEmails()
+    public function testCreateRecipientsFromEmailsEmptyEmails(): void
     {
         $emails = [];
         $object = new \stdClass();
@@ -454,7 +440,7 @@ class EmailRecipientsHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider creteRecipientEntityDataProvider
      */
-    public function testCreateRecipientEntity(object $object, RecipientEntity $recipientEntity)
+    public function testCreateRecipientEntity(object $object, RecipientEntity $recipientEntity): void
     {
         $className = get_class($object);
         $objectMetadata = $this->getEntity(ClassMetadata::class, [

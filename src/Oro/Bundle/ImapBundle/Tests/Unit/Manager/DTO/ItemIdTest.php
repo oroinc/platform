@@ -3,17 +3,18 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Manager\DTO;
 
 use Oro\Bundle\ImapBundle\Manager\DTO\ItemId;
+use PHPUnit\Framework\TestCase;
 
-class ItemIdTest extends \PHPUnit\Framework\TestCase
+class ItemIdTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $obj = new ItemId(10, 20);
         $this->assertEquals(10, $obj->getUid());
         $this->assertEquals(20, $obj->getUidValidity());
     }
 
-    public function testGettersAndSetters()
+    public function testGettersAndSetters(): void
     {
         $obj = new ItemId(1, 2);
         $obj

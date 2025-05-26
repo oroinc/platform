@@ -6,14 +6,14 @@ use Oro\Bundle\EmailBundle\Async\Topic\UpdateVisibilitiesTopic;
 use Oro\Bundle\EmailBundle\Command\UpdateVisibilitiesCommand;
 use Oro\Bundle\MessageQueueBundle\Test\Unit\MessageQueueExtension;
 use Oro\Component\Testing\Command\CommandTestingTrait;
+use PHPUnit\Framework\TestCase;
 
-class UpdateVisibilitiesCommandTest extends \PHPUnit\Framework\TestCase
+class UpdateVisibilitiesCommandTest extends TestCase
 {
     use CommandTestingTrait;
     use MessageQueueExtension;
 
-    /** @var UpdateVisibilitiesCommand */
-    private $command;
+    private UpdateVisibilitiesCommand $command;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +21,7 @@ class UpdateVisibilitiesCommandTest extends \PHPUnit\Framework\TestCase
         $this->command = new UpdateVisibilitiesCommand(self::getMessageProducer());
     }
 
-    public function testExecuteSuccess()
+    public function testExecuteSuccess(): void
     {
         $commandTester = $this->doExecuteCommand($this->command);
 

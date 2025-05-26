@@ -5,11 +5,11 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Provider\EmailBodyEntityNameProvider;
+use PHPUnit\Framework\TestCase;
 
-class EmailBodyEntityNameProviderTest extends \PHPUnit\Framework\TestCase
+class EmailBodyEntityNameProviderTest extends TestCase
 {
-    /** @var EmailBodyEntityNameProvider */
-    private $emailBodyEntityNameProvider;
+    private EmailBodyEntityNameProvider $emailBodyEntityNameProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +20,7 @@ class EmailBodyEntityNameProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getNameProvider
      */
-    public function testGetName(?object $entity, string|bool $expectedResult)
+    public function testGetName(?object $entity, string|bool $expectedResult): void
     {
         $this->assertSame($expectedResult, $this->emailBodyEntityNameProvider->getName(null, null, $entity));
     }
@@ -56,7 +56,7 @@ class EmailBodyEntityNameProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getNameDQLProvider
      */
-    public function testGetNameDQL(string $className, string|bool $expectedResult)
+    public function testGetNameDQL(string $className, string|bool $expectedResult): void
     {
         $this->assertSame(
             $expectedResult,

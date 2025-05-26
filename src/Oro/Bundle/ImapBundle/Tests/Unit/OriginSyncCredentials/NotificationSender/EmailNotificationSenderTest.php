@@ -16,10 +16,8 @@ use PHPUnit\Framework\TestCase;
 class EmailNotificationSenderTest extends TestCase
 {
     private EmailNotificationSender $sender;
-
-    private EmailTemplateSender|MockObject $emailTemplateSender;
-
-    private NotificationSettings|MockObject $notificationSettingsModel;
+    private EmailTemplateSender&MockObject $emailTemplateSender;
+    private NotificationSettings&MockObject $notificationSettingsModel;
 
     #[\Override]
     protected function setUp(): void

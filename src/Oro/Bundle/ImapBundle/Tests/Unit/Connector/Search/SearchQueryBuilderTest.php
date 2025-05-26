@@ -9,21 +9,22 @@ use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryExprOperator;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryMatch;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryValueBuilder;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchStringManagerInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class SearchQueryBuilderTest extends \PHPUnit\Framework\TestCase
+class SearchQueryBuilderTest extends TestCase
 {
     /**
      * @dataProvider simpleProvider
      */
-    public function testFrom(string $value, int $match)
+    public function testFrom(string $value, int $match): void
     {
         $this->simpleFieldTesting('from', $value, $match);
     }
 
-    public function testFromWithClosure()
+    public function testFromWithClosure(): void
     {
         $this->simpleFieldTestingWithClosure('from');
     }
@@ -31,12 +32,12 @@ class SearchQueryBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider simpleProvider
      */
-    public function testTo(string $value, int $match)
+    public function testTo(string $value, int $match): void
     {
         $this->simpleFieldTesting('to', $value, $match);
     }
 
-    public function testToWithClosure()
+    public function testToWithClosure(): void
     {
         $this->simpleFieldTestingWithClosure('to');
     }
@@ -44,12 +45,12 @@ class SearchQueryBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider simpleProvider
      */
-    public function testCc(string $value, int $match)
+    public function testCc(string $value, int $match): void
     {
         $this->simpleFieldTesting('cc', $value, $match);
     }
 
-    public function testCcWithClosure()
+    public function testCcWithClosure(): void
     {
         $this->simpleFieldTestingWithClosure('cc');
     }
@@ -57,12 +58,12 @@ class SearchQueryBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider simpleProvider
      */
-    public function testBcc(string $value, int $match)
+    public function testBcc(string $value, int $match): void
     {
         $this->simpleFieldTesting('bcc', $value, $match);
     }
 
-    public function testBccWithClosure()
+    public function testBccWithClosure(): void
     {
         $this->simpleFieldTestingWithClosure('bcc');
     }
@@ -70,12 +71,12 @@ class SearchQueryBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider simpleProvider
      */
-    public function testParticipants(string $value, int $match)
+    public function testParticipants(string $value, int $match): void
     {
         $this->simpleFieldTesting('participants', $value, $match);
     }
 
-    public function testParticipantsWithClosure()
+    public function testParticipantsWithClosure(): void
     {
         $this->simpleFieldTestingWithClosure('participants');
     }
@@ -83,12 +84,12 @@ class SearchQueryBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider simpleProvider
      */
-    public function testSubject(string $value, int $match)
+    public function testSubject(string $value, int $match): void
     {
         $this->simpleFieldTesting('subject', $value, $match);
     }
 
-    public function testSubjectWithClosure()
+    public function testSubjectWithClosure(): void
     {
         $this->simpleFieldTestingWithClosure('subject');
     }
@@ -96,12 +97,12 @@ class SearchQueryBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider simpleProvider
      */
-    public function testBody(string $value, int $match)
+    public function testBody(string $value, int $match): void
     {
         $this->simpleFieldTesting('body', $value, $match);
     }
 
-    public function testBodyWithClosure()
+    public function testBodyWithClosure(): void
     {
         $this->simpleFieldTestingWithClosure('body');
     }
@@ -109,22 +110,22 @@ class SearchQueryBuilderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider simpleProvider
      */
-    public function testAttachment(string $value, int $match)
+    public function testAttachment(string $value, int $match): void
     {
         $this->simpleFieldTesting('attachment', $value, $match);
     }
 
-    public function testAttachmentWithClosure()
+    public function testAttachmentWithClosure(): void
     {
         $this->simpleFieldTestingWithClosure('attachment');
     }
 
-    public function testSent()
+    public function testSent(): void
     {
         $this->rangeFieldTesting('sent');
     }
 
-    public function testReceived()
+    public function testReceived(): void
     {
         $this->rangeFieldTesting('received');
     }

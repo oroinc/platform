@@ -5,10 +5,11 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Async\MessageFilter;
 use Oro\Bundle\ImapBundle\Async\MessageFilter\ClearInactiveMailboxMessageFilter;
 use Oro\Bundle\ImapBundle\Async\Topic\ClearInactiveMailboxTopic;
 use Oro\Bundle\MessageQueueBundle\Client\MessageBuffer;
+use PHPUnit\Framework\TestCase;
 
-class ClearInactiveMailboxMessageFilterTest extends \PHPUnit\Framework\TestCase
+class ClearInactiveMailboxMessageFilterTest extends TestCase
 {
-    public function testApplyForEmptyBuffer()
+    public function testApplyForEmptyBuffer(): void
     {
         $filter = new ClearInactiveMailboxMessageFilter();
 
@@ -17,7 +18,7 @@ class ClearInactiveMailboxMessageFilterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $buffer->getMessages());
     }
 
-    public function testApply()
+    public function testApply(): void
     {
         $filter = new ClearInactiveMailboxMessageFilter();
         $buffer = new MessageBuffer();

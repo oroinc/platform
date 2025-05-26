@@ -6,16 +6,15 @@ use Oro\Bundle\EmailBundle\Acl\Voter\AclVoter;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoterInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
-class AclVoterTest extends \PHPUnit\Framework\TestCase
+class AclVoterTest extends TestCase
 {
-    /** @var AclVoterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $innerVoter;
-
-    /** @var AclVoter */
-    private $voter;
+    private AclVoterInterface&MockObject $innerVoter;
+    private AclVoter $voter;
 
     #[\Override]
     protected function setUp(): void

@@ -15,12 +15,9 @@ use Psr\Log\LoggerInterface;
 
 class SendEmailTemplateProcessorTest extends TestCase
 {
-    private EntityManagerInterface|MockObject $entityManager;
-
-    private EmailTemplateSender|MockObject $emailTemplateSender;
-
-    private LoggerInterface|MockObject $logger;
-
+    private EntityManagerInterface&MockObject $entityManager;
+    private EmailTemplateSender&MockObject $emailTemplateSender;
+    private LoggerInterface&MockObject $logger;
     private SendEmailTemplateProcessor $processor;
 
     #[\Override]

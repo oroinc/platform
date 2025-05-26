@@ -16,19 +16,15 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class UpdateVisibilitiesProcessorTest extends OrmTestCase
 {
     use MessageQueueExtension;
 
-    /** @var JobRunner|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobRunner;
-
-    /** @var EntityManagerInterface */
-    private $em;
-
-    /** @var UpdateVisibilitiesProcessor */
-    private $processor;
+    private JobRunner&MockObject $jobRunner;
+    private EntityManagerInterface $em;
+    private UpdateVisibilitiesProcessor $processor;
 
     #[\Override]
     protected function setUp(): void

@@ -5,16 +5,15 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Acl\Voter;
 use Oro\Bundle\EmailBundle\Acl\Voter\EmailTemplateVoter;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
-class EmailTemplateVoterTest extends \PHPUnit\Framework\TestCase
+class EmailTemplateVoterTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var EmailTemplateVoter */
-    private $voter;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EmailTemplateVoter $voter;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +27,7 @@ class EmailTemplateVoterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider unsupportedAttributesDataProvider
      */
-    public function testAbstainOnUnsupportedAttribute(array $attributes)
+    public function testAbstainOnUnsupportedAttribute(array $attributes): void
     {
         $template = new EmailTemplate();
 
@@ -47,7 +46,7 @@ class EmailTemplateVoterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportedAttributesDataProvider
      */
-    public function testAbstainOnUnsupportedClass(array $attributes)
+    public function testAbstainOnUnsupportedClass(array $attributes): void
     {
         $object = new \stdClass();
 
@@ -66,7 +65,7 @@ class EmailTemplateVoterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportedAttributesDataProvider
      */
-    public function testGrantedOnExistingNotSystemEmailTemplate(array $attributes)
+    public function testGrantedOnExistingNotSystemEmailTemplate(array $attributes): void
     {
         $template = new EmailTemplate();
         $template->setIsSystem(false);
@@ -86,7 +85,7 @@ class EmailTemplateVoterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportedAttributesDataProvider
      */
-    public function testDeniedOnExistingSystemEmailTemplate(array $attributes)
+    public function testDeniedOnExistingSystemEmailTemplate(array $attributes): void
     {
         $template = new EmailTemplate();
         $template->setIsSystem(true);

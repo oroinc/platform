@@ -11,11 +11,12 @@ use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Oro\Bundle\ImapBundle\Sync\ImapEmailRemoveManager;
 use Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizationProcessor;
 use Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizationProcessorFactory;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class ImapEmailSynchronizationProcessorFactoryTest extends \PHPUnit\Framework\TestCase
+class ImapEmailSynchronizationProcessorFactoryTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         $imapEmailFolderManagerFactory = $this->createMock(ImapEmailFolderManagerFactory::class);
         $em = $this->createMock(EntityManager::class);

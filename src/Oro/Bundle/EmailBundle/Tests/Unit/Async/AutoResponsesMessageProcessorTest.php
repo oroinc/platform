@@ -10,10 +10,11 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\TestCase;
 
-class AutoResponsesMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class AutoResponsesMessageProcessorTest extends TestCase
 {
-    public function testCouldBeConstructedWithRequiredArguments()
+    public function testCouldBeConstructedWithRequiredArguments(): void
     {
         $this->expectNotToPerformAssertions();
 
@@ -23,7 +24,7 @@ class AutoResponsesMessageProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldPublishMessageToProducer()
+    public function testShouldPublishMessageToProducer(): void
     {
         $producer = $this->createMock(MessageProducerInterface::class);
         $producer->expects($this->once())
@@ -61,7 +62,7 @@ class AutoResponsesMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testShouldReturnSubscribedTopics()
+    public function testShouldReturnSubscribedTopics(): void
     {
         $this->assertEquals([SendAutoResponsesTopic::getName()], AutoResponsesMessageProcessor::getSubscribedTopics());
     }

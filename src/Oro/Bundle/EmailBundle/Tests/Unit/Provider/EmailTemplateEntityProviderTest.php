@@ -12,27 +12,18 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EmailTemplateEntityProviderTest extends \PHPUnit\Framework\TestCase
+class EmailTemplateEntityProviderTest extends TestCase
 {
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfigProvider;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $extendConfigProvider;
-
-    /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityClassResolver;
-
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /** @var ExclusionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $exclusionProvider;
-
-    /** @var EmailTemplateEntityProvider */
-    private $provider;
+    private ConfigProvider&MockObject $entityConfigProvider;
+    private ConfigProvider&MockObject $extendConfigProvider;
+    private EntityClassResolver&MockObject $entityClassResolver;
+    private FeatureChecker&MockObject $featureChecker;
+    private ExclusionProviderInterface&MockObject $exclusionProvider;
+    private EmailTemplateEntityProvider $provider;
 
     #[\Override]
     protected function setUp(): void

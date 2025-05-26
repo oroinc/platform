@@ -16,8 +16,7 @@ class ConfigurationTestType extends AbstractType
 {
     public const NAME = 'oro_imap_configuration_test';
 
-    /** @var TokenAccessorInterface */
-    private $tokenAccessor;
+    private TokenAccessorInterface $tokenAccessor;
 
     public function __construct(TokenAccessorInterface $tokenAccessor)
     {

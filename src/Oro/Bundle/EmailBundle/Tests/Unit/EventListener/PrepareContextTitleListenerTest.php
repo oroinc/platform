@@ -7,18 +7,15 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\EventListener\PrepareContextTitleListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class PrepareContextTitleListenerTest extends \PHPUnit\Framework\TestCase
+class PrepareContextTitleListenerTest extends TestCase
 {
-    /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $urlGenerator;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var PrepareContextTitleListener */
-    private $listener;
+    private UrlGeneratorInterface&MockObject $urlGenerator;
+    private ManagerRegistry&MockObject $doctrine;
+    private PrepareContextTitleListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +26,7 @@ class PrepareContextTitleListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new PrepareContextTitleListener($this->urlGenerator, $this->doctrine);
     }
 
-    public function testPrepareContextTitleForNotEmailEntity()
+    public function testPrepareContextTitleForNotEmailEntity(): void
     {
         $item = ['title' => 'title'];
 
@@ -39,7 +36,7 @@ class PrepareContextTitleListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($item, $event->getItem());
     }
 
-    public function testPrepareContextTitle()
+    public function testPrepareContextTitle(): void
     {
         $emailId = 123;
         $emailTitle = 'test email title';

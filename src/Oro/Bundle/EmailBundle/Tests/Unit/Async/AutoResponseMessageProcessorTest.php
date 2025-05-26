@@ -12,11 +12,12 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class AutoResponseMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class AutoResponseMessageProcessorTest extends TestCase
 {
-    public function testCouldBeConstructedWithRequiredArguments()
+    public function testCouldBeConstructedWithRequiredArguments(): void
     {
         $this->expectNotToPerformAssertions();
 
@@ -28,7 +29,7 @@ class AutoResponseMessageProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldSendAutoResponse()
+    public function testShouldSendAutoResponse(): void
     {
         $email = new Email();
 
@@ -74,7 +75,7 @@ class AutoResponseMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testShouldRejectMessageIfEmailWasNotFound()
+    public function testShouldRejectMessageIfEmailWasNotFound(): void
     {
         $repository = $this->createMock(EntityRepository::class);
         $repository->expects($this->once())
@@ -112,7 +113,7 @@ class AutoResponseMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldReturnSubscribedTopics()
+    public function testShouldReturnSubscribedTopics(): void
     {
         $this->assertEquals([SendAutoResponseTopic::getName()], AutoResponseMessageProcessor::getSubscribedTopics());
     }

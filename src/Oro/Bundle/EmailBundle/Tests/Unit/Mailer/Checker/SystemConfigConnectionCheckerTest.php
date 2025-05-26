@@ -5,15 +5,14 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Mailer\Checker;
 use Oro\Bundle\EmailBundle\Mailer\Checker\ConnectionCheckerInterface;
 use Oro\Bundle\EmailBundle\Mailer\Checker\SystemConfigConnectionChecker;
 use Oro\Bundle\EmailBundle\Mailer\Transport\SystemConfigTransportRealDsnProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Transport\Dsn;
 
-class SystemConfigConnectionCheckerTest extends \PHPUnit\Framework\TestCase
+class SystemConfigConnectionCheckerTest extends TestCase
 {
-    private ConnectionCheckerInterface|\PHPUnit\Framework\MockObject\MockObject $connectionCheckers;
-
-    private SystemConfigTransportRealDsnProvider|\PHPUnit\Framework\MockObject\MockObject
-        $systemConfigTransportRealDsnProvider;
-
+    private ConnectionCheckerInterface&MockObject $connectionCheckers;
+    private SystemConfigTransportRealDsnProvider&MockObject $systemConfigTransportRealDsnProvider;
     private SystemConfigConnectionChecker $checker;
 
     #[\Override]
@@ -51,14 +50,12 @@ class SystemConfigConnectionCheckerTest extends \PHPUnit\Framework\TestCase
         $dsn = Dsn::fromString('oro://system-config');
         $realDsn = Dsn::fromString('smtp://example.org');
 
-        $this->systemConfigTransportRealDsnProvider
-            ->expects(self::once())
+        $this->systemConfigTransportRealDsnProvider->expects(self::once())
             ->method('getRealDsn')
             ->with($dsn)
             ->willReturn($realDsn);
 
-        $this->connectionCheckers
-            ->expects(self::once())
+        $this->connectionCheckers->expects(self::once())
             ->method('checkConnection')
             ->with($realDsn)
             ->willReturn(true);

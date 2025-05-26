@@ -6,10 +6,11 @@ use Laminas\Mail\Storage\Exception\InvalidArgumentException;
 use Oro\Bundle\ImapBundle\Mail\Protocol\Exception\InvalidEmailFormatException;
 use Oro\Bundle\ImapBundle\Mail\Protocol\Imap as ImapProtocol;
 use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
+use PHPUnit\Framework\TestCase;
 
-class ImapTest extends \PHPUnit\Framework\TestCase
+class ImapTest extends TestCase
 {
-    public function testCacheForGetNumberByUniqueId()
+    public function testCacheForGetNumberByUniqueId(): void
     {
         $ids = [
             1 => 1,
@@ -37,7 +38,7 @@ class ImapTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(3, $imap->getNumberByUniqueId($id));
     }
 
-    public function testExceptionForGetNumberByUniqueId()
+    public function testExceptionForGetNumberByUniqueId(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('unique id not found');
@@ -64,7 +65,7 @@ class ImapTest extends \PHPUnit\Framework\TestCase
         $imap->getNumberByUniqueId($id);
     }
 
-    public function testCacheForGetNumberByUniqueIdNotArray()
+    public function testCacheForGetNumberByUniqueIdNotArray(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('unique id not found');
@@ -101,18 +102,19 @@ class ImapTest extends \PHPUnit\Framework\TestCase
                 return true;
             });
 
-        self::expectException(InvalidEmailFormatException::class);
+        $this->expectException(InvalidEmailFormatException::class);
         $protocolImap->fetch('test_item', 'from@example.com');
     }
 
-    public function invalidEmailFormatExceptionDataProvider(): iterable
+    public function invalidEmailFormatExceptionDataProvider(): array
     {
-        yield 'OK FETCH completed' => [
-            'readLineTokens' => ['OK', 'FETCH', 'completed.'],
-        ];
-
-        yield 'FAIL FETCH error' => [
-            'readLineTokens' => ['FAIL', 'FETCH', 'error.'],
+        return [
+            'OK FETCH completed' => [
+                'readLineTokens' => ['OK', 'FETCH', 'completed.']
+            ],
+            'FAIL FETCH error' => [
+                'readLineTokens' => ['FAIL', 'FETCH', 'error.']
+            ]
         ];
     }
 }

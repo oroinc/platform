@@ -25,29 +25,20 @@ use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EmailUserFromEmailModelBuilderTest extends \PHPUnit\Framework\TestCase
+class EmailUserFromEmailModelBuilderTest extends TestCase
 {
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityManager;
-
-    /** @var EmailEntityBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailEntityBuilder;
-
-    /** @var EmailOriginHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailOriginHelper;
-
-    /** @var ParentMessageIdProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $parentMessageIdProvider;
-
-    /** @var ActivityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $activityManager;
-
-    /** @var EmailUserFromEmailModelBuilder */
-    private $emailUserFromEmailModelBuilder;
+    private EntityManagerInterface&MockObject $entityManager;
+    private EmailEntityBuilder&MockObject $emailEntityBuilder;
+    private EmailOriginHelper&MockObject $emailOriginHelper;
+    private ParentMessageIdProvider&MockObject $parentMessageIdProvider;
+    private ActivityManager&MockObject $activityManager;
+    private EmailUserFromEmailModelBuilder $emailUserFromEmailModelBuilder;
 
     #[\Override]
     protected function setUp(): void

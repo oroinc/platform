@@ -6,17 +6,18 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class ImapEmailTest extends \PHPUnit\Framework\TestCase
+class ImapEmailTest extends TestCase
 {
-    public function testGetId()
+    public function testGetId(): void
     {
         $imapEmail = new ImapEmail();
         ReflectionUtil::setId($imapEmail, 123);
         $this->assertEquals(123, $imapEmail->getId());
     }
 
-    public function testUidGetterAndSetter()
+    public function testUidGetterAndSetter(): void
     {
         $imapEmail = new ImapEmail();
         $this->assertNull($imapEmail->getUid());
@@ -24,7 +25,7 @@ class ImapEmailTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(123, $imapEmail->getUid());
     }
 
-    public function testEmailGetterAndSetter()
+    public function testEmailGetterAndSetter(): void
     {
         $email = new Email();
 
@@ -34,7 +35,7 @@ class ImapEmailTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($email, $imapEmail->getEmail());
     }
 
-    public function testImapFolderGetterAndSetter()
+    public function testImapFolderGetterAndSetter(): void
     {
         $folder = new ImapEmailFolder();
 

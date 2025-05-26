@@ -5,8 +5,9 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Entity;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class ImapEmailFolderTest extends \PHPUnit\Framework\TestCase
+class ImapEmailFolderTest extends TestCase
 {
     public function testGetId(): void
     {

@@ -7,20 +7,17 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
-class EmailVoterTest extends \PHPUnit\Framework\TestCase
+class EmailVoterTest extends TestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var MailboxManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $mailboxManager;
-
-    /** @var EmailVoter */
-    private $emailVoter;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private MailboxManager&MockObject $mailboxManager;
+    private EmailVoter $emailVoter;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +35,7 @@ class EmailVoterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider voteProvider
      */
-    public function testVote(bool $atLeastOneGranted)
+    public function testVote(bool $atLeastOneGranted): void
     {
         $token = $this->createMock(TokenInterface::class);
         $email = new Email();

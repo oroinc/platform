@@ -16,10 +16,8 @@ class RenderedEmailTemplateProviderTest extends TestCase
 {
     use LoggerAwareTraitTestTrait;
 
-    private EmailTemplateProvider|MockObject $emailTemplateProvider;
-
-    private EmailRenderer|MockObject $emailRenderer;
-
+    private EmailTemplateProvider&MockObject $emailTemplateProvider;
+    private EmailRenderer&MockObject $emailRenderer;
     private RenderedEmailTemplateProvider $provider;
 
     #[\Override]
@@ -42,14 +40,12 @@ class RenderedEmailTemplateProviderTest extends TestCase
         $templateParams = ['sample_key' => 'sample_value'];
         $templateContext = ['localization' => 42];
 
-        $this->emailTemplateProvider
-            ->expects(self::once())
+        $this->emailTemplateProvider->expects(self::once())
             ->method('loadEmailTemplate')
             ->with($templateName, $templateContext)
             ->willReturn(null);
 
-        $this->loggerMock
-            ->expects(self::once())
+        $this->loggerMock->expects(self::once())
             ->method('error')
             ->with(
                 'Could not find email template for the given criteria',
@@ -63,13 +59,12 @@ class RenderedEmailTemplateProviderTest extends TestCase
 
     public function testFindAndRenderEmailTemplate(): void
     {
-        $emailTemplateCriteria = new EmailTemplateCriteria('sample_name', null, ['context_key' => 'context_value']);
+        $emailTemplateCriteria = new EmailTemplateCriteria('sample_name', null);
         $templateParams = ['sample_key' => 'sample_value'];
         $templateContext = ['localization' => 42];
 
         $emailTemplateModel = new EmailTemplateModel();
-        $this->emailTemplateProvider
-            ->expects(self::once())
+        $this->emailTemplateProvider->expects(self::once())
             ->method('loadEmailTemplate')
             ->with($emailTemplateCriteria, $templateContext)
             ->willReturn($emailTemplateModel);
@@ -77,8 +72,7 @@ class RenderedEmailTemplateProviderTest extends TestCase
         $renderedEmailTemplate = (new EmailTemplateModel())
             ->setSubject('Rendered subject')
             ->setContent('Rendered content');
-        $this->emailRenderer
-            ->expects(self::once())
+        $this->emailRenderer->expects(self::once())
             ->method('renderEmailTemplate')
             ->with($emailTemplateModel, $templateParams, $templateContext)
             ->willReturn($renderedEmailTemplate);

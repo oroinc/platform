@@ -9,14 +9,15 @@ use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as EmailAttachmentModel;
 use Oro\Bundle\EmailBundle\Provider\ParentMessageIdProvider;
 use Oro\Bundle\EmailBundle\Sender\EmailFactory;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address as SymfonyAddress;
 use Symfony\Component\Mime\Email as SymfonyEmail;
 use Symfony\Component\Mime\Part\DataPart;
 
-class EmailFactoryTest extends \PHPUnit\Framework\TestCase
+class EmailFactoryTest extends TestCase
 {
-    private ParentMessageIdProvider|\PHPUnit\Framework\MockObject\MockObject $parentMessageIdProvider;
-
+    private ParentMessageIdProvider&MockObject $parentMessageIdProvider;
     private EmailFactory $factory;
 
     #[\Override]
@@ -131,8 +132,7 @@ class EmailFactoryTest extends \PHPUnit\Framework\TestCase
         $emailModel = $this->getEmailModel();
 
         $parentMessageId = 'sample/message/id@example.com';
-        $this->parentMessageIdProvider
-            ->expects(self::once())
+        $this->parentMessageIdProvider->expects(self::once())
             ->method('getParentMessageIdToReply')
             ->with($emailModel)
             ->willReturn('<' . $parentMessageId . '>');

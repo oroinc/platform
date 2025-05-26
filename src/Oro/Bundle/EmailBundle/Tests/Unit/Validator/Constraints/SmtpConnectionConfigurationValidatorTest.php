@@ -9,20 +9,16 @@ use Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker;
 use Oro\Bundle\EmailBundle\Validator\Constraints\SmtpConnectionConfiguration;
 use Oro\Bundle\EmailBundle\Validator\Constraints\SmtpConnectionConfigurationValidator;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class SmtpConnectionConfigurationValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var SmtpSettingsChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $checker;
-
-    /** @var SmtpSettingsFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $smtpSettingsFactory;
-
-    /** @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $encryptor;
+    private SmtpSettingsChecker&MockObject $checker;
+    private SmtpSettingsFactory&MockObject $smtpSettingsFactory;
+    private SymmetricCrypterInterface&MockObject $encryptor;
 
     #[\Override]
     protected function setUp(): void

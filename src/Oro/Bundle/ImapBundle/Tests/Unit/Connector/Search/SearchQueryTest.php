@@ -5,13 +5,14 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Connector\Search;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQuery;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryMatch;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchStringManagerInterface;
+use PHPUnit\Framework\TestCase;
 
-class SearchQueryTest extends \PHPUnit\Framework\TestCase
+class SearchQueryTest extends TestCase
 {
     /**
      * @dataProvider valueProviderForInvalidArguments
      */
-    public function testValueInvalidArguments(SearchQuery $value, int $match)
+    public function testValueInvalidArguments(SearchQuery $value, int $match): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $query = $this->createSearchQuery();
@@ -21,7 +22,7 @@ class SearchQueryTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider itemProviderForInvalidArguments
      */
-    public function testItemInvalidArguments(string $name, SearchQuery $value, int $match)
+    public function testItemInvalidArguments(string $name, SearchQuery $value, int $match): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $query = $this->createSearchQuery();
@@ -31,7 +32,7 @@ class SearchQueryTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isEmptyProvider
      */
-    public function testIsEmpty(SearchQuery $query, bool $expectedResult)
+    public function testIsEmpty(SearchQuery $query, bool $expectedResult): void
     {
         $this->assertEquals($expectedResult, $query->isEmpty());
     }
@@ -39,7 +40,7 @@ class SearchQueryTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isComplexProvider
      */
-    public function testIsComplex(SearchQuery $query, bool $expectedResult)
+    public function testIsComplex(SearchQuery $query, bool $expectedResult): void
     {
         $this->assertEquals($expectedResult, $query->isComplex());
     }

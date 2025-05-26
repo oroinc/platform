@@ -3,8 +3,9 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ImapBundle\Provider\MicrosoftOAuthScopeProvider;
+use PHPUnit\Framework\TestCase;
 
-class MicrosoftOAuthScopeProviderTest extends \PHPUnit\Framework\TestCase
+class MicrosoftOAuthScopeProviderTest extends TestCase
 {
     public function testGetAccessTokenScopes(): void
     {

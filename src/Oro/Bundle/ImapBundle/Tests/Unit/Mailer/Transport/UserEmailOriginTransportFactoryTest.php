@@ -6,20 +6,18 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ImapBundle\Mailer\Transport\DsnFromUserEmailOriginFactory;
 use Oro\Bundle\ImapBundle\Mailer\Transport\UserEmailOriginTransport;
 use Oro\Bundle\ImapBundle\Mailer\Transport\UserEmailOriginTransportFactory;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\Dsn;
 
-class UserEmailOriginTransportFactoryTest extends \PHPUnit\Framework\TestCase
+class UserEmailOriginTransportFactoryTest extends TestCase
 {
-    private Transport|\PHPUnit\Framework\MockObject\MockObject $transportFactory;
-
-    private ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $managerRegistry;
-
-    private DsnFromUserEmailOriginFactory|\PHPUnit\Framework\MockObject\MockObject $dsnFromUserEmailOriginFactory;
-
+    private Transport $transportFactory;
+    private ManagerRegistry&MockObject $managerRegistry;
+    private DsnFromUserEmailOriginFactory&MockObject $dsnFromUserEmailOriginFactory;
     private RequestStack $requestStack;
-
     private UserEmailOriginTransportFactory $factory;
 
     #[\Override]

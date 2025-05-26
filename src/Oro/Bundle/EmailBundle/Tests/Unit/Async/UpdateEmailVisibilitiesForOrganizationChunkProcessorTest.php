@@ -18,22 +18,16 @@ use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\Unit\ORM\Mocks\EntityManagerMock;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 use PHPUnit\Framework\Constraint\StringEndsWith;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class UpdateEmailVisibilitiesForOrganizationChunkProcessorTest extends OrmTestCase
 {
-    private const BUFFER_SIZE = 100;
+    private const int BUFFER_SIZE = 100;
 
-    /** @var EmailAddressVisibilityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailAddressVisibilityManager;
-
-    /** @var JobRunner|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobRunner;
-
-    /** @var EntityManagerMock */
-    private $em;
-
-    /** @var UpdateEmailVisibilitiesForOrganizationChunkProcessor */
-    private $processor;
+    private EmailAddressVisibilityManager&MockObject $emailAddressVisibilityManager;
+    private JobRunner&MockObject $jobRunner;
+    private EntityManagerMock $em;
+    private UpdateEmailVisibilitiesForOrganizationChunkProcessor $processor;
 
     #[\Override]
     protected function setUp(): void

@@ -3,11 +3,12 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailEntityPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class EmailEntityPassTest extends \PHPUnit\Framework\TestCase
+class EmailEntityPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $entityProxyNamespace = 'namespace';
         $entityCacheDir = '/cache/dir';

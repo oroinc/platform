@@ -10,17 +10,14 @@ use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryBuilder;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchStringManagerInterface;
 use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
 use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ImapConnectorTest extends \PHPUnit\Framework\TestCase
+class ImapConnectorTest extends TestCase
 {
-    /** @var Imap|\PHPUnit\Framework\MockObject\MockObject */
-    private $storage;
-
-    /** @var SearchStringManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $searchStringManager;
-
-    /** @var ImapConnector */
-    private $connector;
+    private Imap&MockObject $storage;
+    private SearchStringManagerInterface&MockObject $searchStringManager;
+    private ImapConnector $connector;
 
     #[\Override]
     protected function setUp(): void
@@ -47,13 +44,13 @@ class ImapConnectorTest extends \PHPUnit\Framework\TestCase
         $this->connector = new ImapConnector(new ImapConfig(), $factory);
     }
 
-    public function testGetSearchQueryBuilder()
+    public function testGetSearchQueryBuilder(): void
     {
         $builder = $this->connector->getSearchQueryBuilder();
         $this->assertInstanceOf(SearchQueryBuilder::class, $builder);
     }
 
-    public function testFindItemsWithNoArguments()
+    public function testFindItemsWithNoArguments(): void
     {
         $this->storage->expects($this->never())
             ->method('selectFolder');
@@ -66,7 +63,7 @@ class ImapConnectorTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $result);
     }
 
-    public function testFindItemsWithSearchQuery()
+    public function testFindItemsWithSearchQuery(): void
     {
         $this->storage->expects($this->once())
             ->method('search')
@@ -83,7 +80,7 @@ class ImapConnectorTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.UnusedLocalVariable)
      */
-    public function testFindItemsWithSearchQueryGetMessages()
+    public function testFindItemsWithSearchQueryGetMessages(): void
     {
         $this->storage->expects($this->once())
             ->method('search')
@@ -100,7 +97,7 @@ class ImapConnectorTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testFindUIDs()
+    public function testFindUIDs(): void
     {
         $this->storage->expects($this->once())
             ->method('uidSearch')
@@ -110,7 +107,7 @@ class ImapConnectorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['1', '2'], $result);
     }
 
-    public function testFindFolders()
+    public function testFindFolders(): void
     {
         $folder = $this->createMock(Folder::class);
 
@@ -123,7 +120,7 @@ class ImapConnectorTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $result);
     }
 
-    public function testFindFolder()
+    public function testFindFolder(): void
     {
         $folder = $this->createMock(Folder::class);
 
@@ -136,7 +133,7 @@ class ImapConnectorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($folder, $result);
     }
 
-    public function testGetItem()
+    public function testGetItem(): void
     {
         $msg = new \stdClass();
 
@@ -153,7 +150,7 @@ class ImapConnectorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($msg, $result);
     }
 
-    public function testSetFlags()
+    public function testSetFlags(): void
     {
         $uid = 123;
         $id = 12345;

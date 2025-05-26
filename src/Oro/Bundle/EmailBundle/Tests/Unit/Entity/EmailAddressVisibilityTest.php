@@ -4,8 +4,9 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\EmailBundle\Entity\EmailAddressVisibility;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use PHPUnit\Framework\TestCase;
 
-class EmailAddressVisibilityTest extends \PHPUnit\Framework\TestCase
+class EmailAddressVisibilityTest extends TestCase
 {
     public function testEmailGetterAndSetter(): void
     {

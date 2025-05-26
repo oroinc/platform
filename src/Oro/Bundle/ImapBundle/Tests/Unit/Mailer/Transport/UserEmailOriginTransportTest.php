@@ -22,7 +22,7 @@ use Symfony\Component\Mime\RawMessage;
 
 class UserEmailOriginTransportTest extends TestCase
 {
-    private const ENTITY_ID = 42;
+    private const int ENTITY_ID = 42;
 
     private TransportFactoryInterface&MockObject $transportFactoryBase;
     private DsnFromUserEmailOriginFactory&MockObject $dsnFromUserEmailOriginFactory;

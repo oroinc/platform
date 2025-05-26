@@ -7,18 +7,15 @@ use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class StripHtmlTagsTest extends \PHPUnit\Framework\TestCase
+class StripHtmlTagsTest extends TestCase
 {
-    /** @var StripHtmlTags */
-    private $action;
-
-    /** @var ContextAccessor */
-    private $contextAccessor;
-
-    /** @var HtmlTagHelper */
-    private $helper;
+    private ContextAccessor&MockObject $contextAccessor;
+    private HtmlTagHelper&MockObject $helper;
+    private StripHtmlTags $action;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +27,7 @@ class StripHtmlTagsTest extends \PHPUnit\Framework\TestCase
         $this->action->setDispatcher($this->createMock(EventDispatcherInterface::class));
     }
 
-    public function testInitializeWithNamedOptions()
+    public function testInitializeWithNamedOptions(): void
     {
         $options = [
             'html' => '$.html',
@@ -43,7 +40,7 @@ class StripHtmlTagsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('$.attribute', ReflectionUtil::getPropertyValue($this->action, 'attribute'));
     }
 
-    public function testInitializeWithArrayOptions()
+    public function testInitializeWithArrayOptions(): void
     {
         $options = [
             '$.attribute',
@@ -56,7 +53,7 @@ class StripHtmlTagsTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('$.attribute', ReflectionUtil::getPropertyValue($this->action, 'attribute'));
     }
 
-    public function testInitializeWithMissingOption()
+    public function testInitializeWithMissingOption(): void
     {
         $this->expectException(InvalidParameterException::class);
         $options = [
@@ -66,7 +63,7 @@ class StripHtmlTagsTest extends \PHPUnit\Framework\TestCase
         $this->action->initialize($options);
     }
 
-    public function testExecuteAction()
+    public function testExecuteAction(): void
     {
         $options = [
             'html' => '$.html',
