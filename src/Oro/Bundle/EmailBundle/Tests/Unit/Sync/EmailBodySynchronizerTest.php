@@ -23,34 +23,23 @@ use Oro\Bundle\NotificationBundle\NotificationAlert\NotificationAlertManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EmailBodySynchronizerTest extends \PHPUnit\Framework\TestCase
+class EmailBodySynchronizerTest extends TestCase
 {
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var EmailBodyLoaderSelector|\PHPUnit\Framework\MockObject\MockObject */
-    private $selector;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $dispatcher;
-
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var NotificationAlertManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $notificationAlertManager;
-
-    /** @var EmailBodySynchronizer */
-    private $synchronizer;
+    private LoggerInterface&MockObject $logger;
+    private EmailBodyLoaderSelector&MockObject $selector;
+    private ManagerRegistry&MockObject $doctrine;
+    private EventDispatcherInterface&MockObject $dispatcher;
+    private EntityManager&MockObject $em;
+    private NotificationAlertManager&MockObject $notificationAlertManager;
+    private EmailBodySynchronizer $synchronizer;
 
     #[\Override]
     protected function setUp(): void

@@ -7,17 +7,14 @@ use Oro\Bundle\ApiBundle\Filter\FilterNamesRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FilterNamesRegistryTest extends \PHPUnit\Framework\TestCase
+class FilterNamesRegistryTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FilterNames */
-    private $defaultProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FilterNames */
-    private $firstProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FilterNames */
-    private $secondProvider;
+    private FilterNames&MockObject $defaultProvider;
+    private FilterNames&MockObject $firstProvider;
+    private FilterNames&MockObject $secondProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +37,7 @@ class FilterNamesRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFilterNamesForUnsupportedRequestType()
+    public function testGetFilterNamesForUnsupportedRequestType(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot find a filter names provider for the request "rest,another".');
@@ -50,7 +47,7 @@ class FilterNamesRegistryTest extends \PHPUnit\Framework\TestCase
         $registry->getFilterNames($requestType);
     }
 
-    public function testGetFilterNamesShouldReturnDefaultProviderForNotFirstAndSecondRequestType()
+    public function testGetFilterNamesShouldReturnDefaultProviderForNotFirstAndSecondRequestType(): void
     {
         $registry = $this->getRegistry(
             [
@@ -64,7 +61,7 @@ class FilterNamesRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->defaultProvider, $registry->getFilterNames($requestType));
     }
 
-    public function testGetFilterNamesShouldReturnFirstProviderForFirstRequestType()
+    public function testGetFilterNamesShouldReturnFirstProviderForFirstRequestType(): void
     {
         $registry = $this->getRegistry(
             [
@@ -78,7 +75,7 @@ class FilterNamesRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->firstProvider, $registry->getFilterNames($requestType));
     }
 
-    public function testGetFilterNamesShouldReturnSecondProviderForSecondRequestType()
+    public function testGetFilterNamesShouldReturnSecondProviderForSecondRequestType(): void
     {
         $registry = $this->getRegistry(
             [
@@ -92,7 +89,7 @@ class FilterNamesRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->secondProvider, $registry->getFilterNames($requestType));
     }
 
-    public function testGetFilterNamesShouldReturnDefaultBagIfSpecificBagNotFound()
+    public function testGetFilterNamesShouldReturnDefaultBagIfSpecificBagNotFound(): void
     {
         $registry = $this->getRegistry(
             [

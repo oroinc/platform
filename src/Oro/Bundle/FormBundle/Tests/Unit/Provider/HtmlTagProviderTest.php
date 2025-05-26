@@ -3,15 +3,15 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Yaml;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
+class HtmlTagProviderTest extends TestCase
 {
-    /** @var HtmlTagProvider */
-    private $htmlTagProvider;
+    private HtmlTagProvider $htmlTagProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +21,7 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetScopes()
+    public function testGetScopes(): void
     {
         self::assertEquals(['default', 'additional', 'extra'], $this->htmlTagProvider->getScopes());
     }
@@ -29,7 +29,7 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider allowedRelDataProvider
      */
-    public function testGetAllowedRel(string $scope, array $expectedResult)
+    public function testGetAllowedRel(string $scope, array $expectedResult): void
     {
         $this->assertEquals($expectedResult, $this->htmlTagProvider->getAllowedRel($scope));
     }
@@ -60,7 +60,7 @@ class HtmlTagProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expectedResult, $this->htmlTagProvider->getIframeRegexp($scope));
     }
 
-    public function testGetIframeRegexpBypass()
+    public function testGetIframeRegexpBypass(): void
     {
         $scamUri = 'https://www.scam.com/embed/XWyzuVHRe0A?bypass=https://www.youtube.com/embed/XWyzuVHRe0A';
         $allowedUri = 'https://www.youtube.com/embed/XWyzuVHRe0A';

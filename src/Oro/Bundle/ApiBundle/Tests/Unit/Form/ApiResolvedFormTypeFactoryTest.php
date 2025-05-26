@@ -5,20 +5,17 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Form;
 use Oro\Bundle\ApiBundle\Form\ApiResolvedFormType;
 use Oro\Bundle\ApiBundle\Form\ApiResolvedFormTypeFactory;
 use Oro\Bundle\ApiBundle\Form\FormExtensionCheckerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormTypeInterface;
 use Symfony\Component\Form\ResolvedFormTypeFactoryInterface;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 
-class ApiResolvedFormTypeFactoryTest extends \PHPUnit\Framework\TestCase
+class ApiResolvedFormTypeFactoryTest extends TestCase
 {
-    /** @var ResolvedFormTypeFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $defaultFactory;
-
-    /** @var FormExtensionCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formExtensionChecker;
-
-    /** @var ApiResolvedFormTypeFactory */
-    private $factory;
+    private ResolvedFormTypeFactoryInterface&MockObject $defaultFactory;
+    private FormExtensionCheckerInterface&MockObject $formExtensionChecker;
+    private ApiResolvedFormTypeFactory $factory;
 
     #[\Override]
     protected function setUp(): void

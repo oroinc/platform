@@ -11,11 +11,12 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class UpdateEmailOwnerAssociationsMessageProcessorTest extends TestCase
 {
-    public function testCouldBeConstructedWithRequiredArguments()
+    public function testCouldBeConstructedWithRequiredArguments(): void
     {
         $this->expectNotToPerformAssertions();
 
@@ -26,7 +27,7 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit\Framewor
         );
     }
 
-    public function testShouldProcessUpdateEmailOwner()
+    public function testShouldProcessUpdateEmailOwner(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->never())
@@ -100,7 +101,7 @@ class UpdateEmailOwnerAssociationsMessageProcessorTest extends \PHPUnit\Framewor
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testShouldReturnSubscribedTopics()
+    public function testShouldReturnSubscribedTopics(): void
     {
         $this->assertEquals(
             [UpdateEmailOwnerAssociationsTopic::getName()],

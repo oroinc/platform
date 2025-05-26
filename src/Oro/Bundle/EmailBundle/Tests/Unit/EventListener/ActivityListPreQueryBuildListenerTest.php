@@ -8,14 +8,13 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\EventListener\ActivityListPreQueryBuildListener;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ActivityListPreQueryBuildListenerTest extends \PHPUnit\Framework\TestCase
+class ActivityListPreQueryBuildListenerTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var ActivityListPreQueryBuildListener */
-    private $listener;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private ActivityListPreQueryBuildListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +24,7 @@ class ActivityListPreQueryBuildListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new ActivityListPreQueryBuildListener($this->doctrineHelper);
     }
 
-    public function testPrepareIdsForEmailThreadEventSkippEntity()
+    public function testPrepareIdsForEmailThreadEventSkippEntity(): void
     {
         $targetClass = 'testClass';
         $targetId = 1;
@@ -36,7 +35,7 @@ class ActivityListPreQueryBuildListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getEntity');
     }
 
-    public function testPrepareIdsForEmailThreadWithoutThreadsEvent()
+    public function testPrepareIdsForEmailThreadWithoutThreadsEvent(): void
     {
         $targetClass = Email::class;
         $targetId = 1;
@@ -53,7 +52,7 @@ class ActivityListPreQueryBuildListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([$targetId], $event->getTargetIds());
     }
 
-    public function testPrepareIdsForEmailThreadWithThreadsEvent()
+    public function testPrepareIdsForEmailThreadWithThreadsEvent(): void
     {
         $targetClass = Email::class;
         $targetId = 1;

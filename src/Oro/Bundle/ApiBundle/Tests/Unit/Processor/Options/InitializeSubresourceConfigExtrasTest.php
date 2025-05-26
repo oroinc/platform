@@ -9,8 +9,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 
 class InitializeSubresourceConfigExtrasTest extends OptionsProcessorTestCase
 {
-    /** @var InitializeSubresourceConfigExtras */
-    private $processor;
+    private InitializeSubresourceConfigExtras $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +19,7 @@ class InitializeSubresourceConfigExtrasTest extends OptionsProcessorTestCase
         $this->processor = new InitializeSubresourceConfigExtras();
     }
 
-    public function testProcessWhenConfigExtrasAreAlreadyInitialized()
+    public function testProcessWhenConfigExtrasAreAlreadyInitialized(): void
     {
         $this->context->setConfigExtras([]);
         $this->context->addConfigExtra(new EntityDefinitionConfigExtra());
@@ -36,7 +35,7 @@ class InitializeSubresourceConfigExtrasTest extends OptionsProcessorTestCase
         );
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $this->context->setConfigExtras([]);
 

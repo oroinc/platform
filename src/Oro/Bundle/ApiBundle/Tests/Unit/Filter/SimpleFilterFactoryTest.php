@@ -6,10 +6,11 @@ use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Filter\SimpleFilterFactory;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
+class SimpleFilterFactoryTest extends TestCase
 {
     private function getFilterFactory(
         array $filters = [],
@@ -35,13 +36,13 @@ class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testForUnknownFilter()
+    public function testForUnknownFilter(): void
     {
         $filterFactory = $this->getFilterFactory();
         self::assertNull($filterFactory->createFilter('unknown'));
     }
 
-    public function testForFilterWithoutAdditionalParameters()
+    public function testForFilterWithoutAdditionalParameters(): void
     {
         $filterType = 'string';
 
@@ -57,7 +58,7 @@ class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testForFilterWithAdditionalParameters()
+    public function testForFilterWithAdditionalParameters(): void
     {
         $filterType = 'string';
 
@@ -74,7 +75,7 @@ class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOverrideParameters()
+    public function testOverrideParameters(): void
     {
         $filterType = 'string';
 
@@ -91,7 +92,7 @@ class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWhenFilterTypeDoesNotEqualToDataType()
+    public function testWhenFilterTypeDoesNotEqualToDataType(): void
     {
         $filterType = 'someFilter';
         $dataType = 'integer';
@@ -108,7 +109,7 @@ class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWhenFilterShouldBeCreatedByOwnFactory()
+    public function testWhenFilterShouldBeCreatedByOwnFactory(): void
     {
         $filterType = 'test';
         $filter = new ComparisonFilter($filterType);

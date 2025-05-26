@@ -24,15 +24,13 @@ class EmailTemplateCandidatesProviderTest extends TestCase
         $templateContext = ['sample_key' => 'sample_value'];
 
         $innerProvider1 = $this->createMock(EmailTemplateCandidatesProviderInterface::class);
-        $innerProvider1
-            ->expects(self::once())
+        $innerProvider1->expects(self::once())
             ->method('getCandidatesNames')
             ->with($emailTemplateCriteria, $templateContext)
             ->willReturn(['@foo/sample_value_3', '@foo/sample_value_2']);
 
         $innerProvider2 = $this->createMock(EmailTemplateCandidatesProviderInterface::class);
-        $innerProvider2
-            ->expects(self::once())
+        $innerProvider2->expects(self::once())
             ->method('getCandidatesNames')
             ->with($emailTemplateCriteria, $templateContext)
             ->willReturn(['@bar/sample_value_1']);

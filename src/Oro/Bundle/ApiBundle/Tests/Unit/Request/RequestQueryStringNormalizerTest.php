@@ -8,8 +8,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
 use Oro\Bundle\ApiBundle\Request\RequestQueryStringNormalizer;
+use PHPUnit\Framework\TestCase;
 
-class RequestQueryStringNormalizerTest extends \PHPUnit\Framework\TestCase
+class RequestQueryStringNormalizerTest extends TestCase
 {
     /**
      * @dataProvider normalizeQueryStringDataProvider

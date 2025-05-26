@@ -9,17 +9,14 @@ use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class NormalizeEntityClassTest extends BatchUpdateItemProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
-    private $valueNormalizer;
+    private ValueNormalizer&MockObject $valueNormalizer;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
-    private $resourcesProvider;
-
-    /** @var NormalizeEntityClass */
-    private $processor;
+    private ResourcesProvider&MockObject $resourcesProvider;
+    private NormalizeEntityClass $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +32,7 @@ class NormalizeEntityClassTest extends BatchUpdateItemProcessorTestCase
         );
     }
 
-    public function testProcessWhenClassIsNotSet()
+    public function testProcessWhenClassIsNotSet(): void
     {
         $this->processor->process($this->context);
 
@@ -51,7 +48,7 @@ class NormalizeEntityClassTest extends BatchUpdateItemProcessorTestCase
         );
     }
 
-    public function testProcessWhenClassIsEmpty()
+    public function testProcessWhenClassIsEmpty(): void
     {
         $this->context->setClassName('');
         $this->processor->process($this->context);
@@ -68,7 +65,7 @@ class NormalizeEntityClassTest extends BatchUpdateItemProcessorTestCase
         );
     }
 
-    public function testProcessWhenClassAlreadyNormalized()
+    public function testProcessWhenClassAlreadyNormalized(): void
     {
         $this->valueNormalizer->expects(self::never())
             ->method('normalizeValue');
@@ -79,7 +76,7 @@ class NormalizeEntityClassTest extends BatchUpdateItemProcessorTestCase
         self::assertEquals('Test\Entity', $this->context->getClassName());
     }
 
-    public function testProcessWhenEntityClassIsNotNormalized()
+    public function testProcessWhenEntityClassIsNotNormalized(): void
     {
         $entityType = 'test';
 
@@ -98,7 +95,7 @@ class NormalizeEntityClassTest extends BatchUpdateItemProcessorTestCase
         self::assertEquals('Test\Entity', $this->context->getClassName());
     }
 
-    public function testProcessForNotAccessibleEntityType()
+    public function testProcessForNotAccessibleEntityType(): void
     {
         $this->expectException(ResourceNotAccessibleException::class);
 
@@ -117,7 +114,7 @@ class NormalizeEntityClassTest extends BatchUpdateItemProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForInvalidEntityType()
+    public function testProcessForInvalidEntityType(): void
     {
         $entityType = 'test';
 

@@ -12,6 +12,7 @@ use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Request\DocumentBuilderTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -23,11 +24,8 @@ use Psr\Log\LoggerInterface;
  */
 class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
 {
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var JsonApiDocumentBuilder */
-    private $documentBuilder;
+    private LoggerInterface&MockObject $logger;
+    private JsonApiDocumentBuilder $documentBuilder;
 
     #[\Override]
     protected function setUp(): void
@@ -42,7 +40,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testSetDataObjectWithoutMetadata()
+    public function testSetDataObjectWithoutMetadata(): void
     {
         $object = [
             'id'   => 123,
@@ -62,7 +60,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testSetDataCollectionWithoutMetadata()
+    public function testSetDataCollectionWithoutMetadata(): void
     {
         $object = [
             'id'   => 123,
@@ -89,7 +87,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testSetDataObjectWithMetadata()
+    public function testSetDataObjectWithMetadata(): void
     {
         $object = [
             'id'         => 123,
@@ -237,7 +235,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testSetDataCollectionWithMetadata()
+    public function testSetDataCollectionWithMetadata(): void
     {
         $object = [
             'id'         => 123,
@@ -366,7 +364,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testSetDataObjectWithLinks()
+    public function testSetDataObjectWithLinks(): void
     {
         $object = [
             'code' => 123,
@@ -421,7 +419,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testSetDataCollectionWithLinks()
+    public function testSetDataCollectionWithLinks(): void
     {
         $object = [
             'code' => 123,
@@ -478,7 +476,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testAssociationWithLinks()
+    public function testAssociationWithLinks(): void
     {
         $object = [
             'code'       => 123,
@@ -554,7 +552,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testAssociationWithLinksForRelationship()
+    public function testAssociationWithLinksForRelationship(): void
     {
         $object = [
             'code'       => 123,
@@ -620,7 +618,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testAssociationWithMetaProperties()
+    public function testAssociationWithMetaProperties(): void
     {
         $object = [
             'code'       => 123,
@@ -683,7 +681,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testAssociationWithMetaPropertiesInTargetMetadata()
+    public function testAssociationWithMetaPropertiesInTargetMetadata(): void
     {
         $object = [
             'code'       => 123,
@@ -747,7 +745,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testAssociationWithMetaPropertiesForRelationship()
+    public function testAssociationWithMetaPropertiesForRelationship(): void
     {
         $object = [
             'code'              => 123,
@@ -807,7 +805,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testAssociationWithInheritance()
+    public function testAssociationWithInheritance(): void
     {
         $object = [
             'id'         => 123,
@@ -868,7 +866,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testAssociationWithInheritanceAndSomeInheritedEntitiesDoNotHaveAlias()
+    public function testAssociationWithInheritanceAndSomeInheritedEntitiesDoNotHaveAlias(): void
     {
         $object = [
             'id'         => 123,
@@ -929,7 +927,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testMissingAssociationsAsFields()
+    public function testMissingAssociationsAsFields(): void
     {
         $object = [
             'id' => 123
@@ -962,7 +960,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @dataProvider toOneAssociationAsFieldProvider
      */
-    public function testToOneAssociationAsField(array|int|null $value, array|int|null $expected)
+    public function testToOneAssociationAsField(array|int|null $value, array|int|null $expected): void
     {
         $object = [
             'id'       => 123,
@@ -1015,7 +1013,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @dataProvider toManyAssociationAsFieldProvider
      */
-    public function testToManyAssociationAsField(?array $value, array $expected)
+    public function testToManyAssociationAsField(?array $value, array $expected): void
     {
         $object = [
             'id'         => 123,
@@ -1072,7 +1070,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @dataProvider toOneAssociationAsFieldForIdFieldsOnlyProvider
      */
-    public function testToOneAssociationAsFieldForIdFieldsOnly(array|int|null $value, array|int|null $expected)
+    public function testToOneAssociationAsFieldForIdFieldsOnly(array|int|null $value, array|int|null $expected): void
     {
         $object = [
             'id'       => 123,
@@ -1114,7 +1112,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @dataProvider toManyAssociationAsFieldForIdFieldsOnlyProvider
      */
-    public function testToManyAssociationAsFieldForIdFieldsOnly(?array $value, array $expected)
+    public function testToManyAssociationAsFieldForIdFieldsOnly(?array $value, array $expected): void
     {
         $object = [
             'id'         => 123,
@@ -1163,7 +1161,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @dataProvider toOneCollapsedAssociationAsFieldProvider
      */
-    public function testToOneCollapsedAssociationAsField(array|string|null $value, ?string $expected)
+    public function testToOneCollapsedAssociationAsField(array|string|null $value, ?string $expected): void
     {
         $object = [
             'id'       => 123,
@@ -1214,7 +1212,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @dataProvider toManyCollapsedAssociationAsFieldProvider
      */
-    public function testToManyCollapsedAssociationAsField(?array $value, array $expected)
+    public function testToManyCollapsedAssociationAsField(?array $value, array $expected): void
     {
         $object = [
             'id'         => 123,
@@ -1266,7 +1264,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         ];
     }
 
-    public function testNestedAssociationAsArrayAttribute()
+    public function testNestedAssociationAsArrayAttribute(): void
     {
         $object = [
             'id'          => 1,
@@ -1352,7 +1350,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testNestedObject()
+    public function testNestedObject(): void
     {
         $object = [
             'id'     => 1,
@@ -1387,7 +1385,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testSetErrorObject()
+    public function testSetErrorObject(): void
     {
         $error = new Error();
         $error->setStatusCode(500);
@@ -1411,7 +1409,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testSetErrorObjectForErrorWithMetaProperty()
+    public function testSetErrorObjectForErrorWithMetaProperty(): void
     {
         $error = new Error();
         $error->setStatusCode(500);
@@ -1439,7 +1437,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testSetErrorCollection()
+    public function testSetErrorCollection(): void
     {
         $error1 = new Error();
         $error1->setStatusCode(500);
@@ -1477,7 +1475,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testMetaPropertyWithResultName()
+    public function testMetaPropertyWithResultName(): void
     {
         $object = [
             'id'    => 123,
@@ -1504,7 +1502,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testMetaPropertyThatNotMappedToAnyField()
+    public function testMetaPropertyThatNotMappedToAnyField(): void
     {
         $object = [
             'id'    => 123,
@@ -1528,7 +1526,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testSetDataObjectForEntityWithoutIdentifier()
+    public function testSetDataObjectForEntityWithoutIdentifier(): void
     {
         $object = [
             'name'       => 'Name',
@@ -1563,7 +1561,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testInputOnlyMetaProperty()
+    public function testInputOnlyMetaProperty(): void
     {
         $object = [
             'id'    => 123,
@@ -1587,7 +1585,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testInputOnlyField()
+    public function testInputOnlyField(): void
     {
         $object = [
             'id'     => 123,
@@ -1611,7 +1609,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testInputOnlyAssociation()
+    public function testInputOnlyAssociation(): void
     {
         $object = [
             'id'           => 123,
@@ -1635,7 +1633,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testInputOnlyMetaPropertyForEntityWithoutIdentifier()
+    public function testInputOnlyMetaPropertyForEntityWithoutIdentifier(): void
     {
         $object = [
             'meta1' => 'Meta1'
@@ -1654,7 +1652,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testInputOnlyFieldForEntityWithoutIdentifier()
+    public function testInputOnlyFieldForEntityWithoutIdentifier(): void
     {
         $object = [
             'field1' => 'value1'
@@ -1673,7 +1671,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testInputOnlyAssociationForEntityWithoutIdentifier()
+    public function testInputOnlyAssociationForEntityWithoutIdentifier(): void
     {
         $object = [
             'association1' => 456
@@ -1695,7 +1693,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testAddLinksToCollectionValuedResult()
+    public function testAddLinksToCollectionValuedResult(): void
     {
         $object = [
             'id'    => 1,
@@ -1781,7 +1779,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testAddLinksToSingleValuedResult()
+    public function testAddLinksToSingleValuedResult(): void
     {
         $object = [
             'id'    => 1,
@@ -1865,7 +1863,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testSetDataObjectWithPredefinedMetaProperties()
+    public function testSetDataObjectWithPredefinedMetaProperties(): void
     {
         $object = [
             'id'         => 1,
@@ -2112,7 +2110,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testSetDataCollectionWithPredefinedMetaProperties()
+    public function testSetDataCollectionWithPredefinedMetaProperties(): void
     {
         $object = [
             'id'         => 1,
@@ -2358,7 +2356,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testMetadataForCollectionValuedResult()
+    public function testMetadataForCollectionValuedResult(): void
     {
         $object = [
             'id'   => 1,
@@ -2395,7 +2393,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testSetDataObjectWithIncludedEntityDuplicatesPrimaryEntity()
+    public function testSetDataObjectWithIncludedEntityDuplicatesPrimaryEntity(): void
     {
         $object = [
             'id'        => 1,
@@ -2469,7 +2467,7 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testSetDataCollectionWithIncludedEntityDuplicatesPrimaryEntity()
+    public function testSetDataCollectionWithIncludedEntityDuplicatesPrimaryEntity(): void
     {
         $objects = [
             [

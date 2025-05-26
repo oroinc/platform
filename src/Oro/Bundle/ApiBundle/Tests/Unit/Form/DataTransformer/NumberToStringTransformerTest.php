@@ -3,14 +3,15 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\ApiBundle\Form\DataTransformer\NumberToStringTransformer;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
-class NumberToStringTransformerTest extends \PHPUnit\Framework\TestCase
+class NumberToStringTransformerTest extends TestCase
 {
     /**
      * @dataProvider transformDataProvider
      */
-    public function testTransform(string|int|null $value, string $expected)
+    public function testTransform(string|int|null $value, string $expected): void
     {
         $transformer = new NumberToStringTransformer();
         self::assertSame($expected, $transformer->transform($value));
@@ -25,7 +26,7 @@ class NumberToStringTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testTransformWithInvalidValue()
+    public function testTransformWithInvalidValue(): void
     {
         $this->expectException(TransformationFailedException::class);
         $transformer = new NumberToStringTransformer();
@@ -35,7 +36,7 @@ class NumberToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider reverseTransformDataProvider
      */
-    public function testReverseTransform(?int $scale, string $value, ?string $expected)
+    public function testReverseTransform(?int $scale, string $value, ?string $expected): void
     {
         $transformer = new NumberToStringTransformer($scale);
         self::assertSame($expected, $transformer->reverseTransform($value));
@@ -62,7 +63,7 @@ class NumberToStringTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testReverseTransformWithNotStringValue()
+    public function testReverseTransformWithNotStringValue(): void
     {
         $this->expectException(TransformationFailedException::class);
         $transformer = new NumberToStringTransformer();
@@ -72,7 +73,7 @@ class NumberToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider reverseTransformInvalidValueDataProvider
      */
-    public function testReverseTransformWithInvalidValue(?int $scale, string $value)
+    public function testReverseTransformWithInvalidValue(?int $scale, string $value): void
     {
         $this->expectException(TransformationFailedException::class);
         $transformer = new NumberToStringTransformer($scale);

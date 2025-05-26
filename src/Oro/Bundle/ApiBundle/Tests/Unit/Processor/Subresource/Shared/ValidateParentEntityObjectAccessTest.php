@@ -7,16 +7,14 @@ use Oro\Bundle\ApiBundle\Model\EntityHolderInterface;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityObjectAccess;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ValidateParentEntityObjectAccessTest extends ChangeRelationshipProcessorTestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var ValidateParentEntityObjectAccess */
-    private $processor;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private ValidateParentEntityObjectAccess $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -63,7 +61,7 @@ class ValidateParentEntityObjectAccessTest extends ChangeRelationshipProcessorTe
             ->with('VIEW', self::identicalTo($parentEntity))
             ->willReturn(true);
 
-        $this->context->setParentClassName(get_class($parentEntity));
+        $this->context->setParentClassName($parentEntity::class);
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentEntity($parentEntity);
         $this->processor->process($this->context);
@@ -83,7 +81,7 @@ class ValidateParentEntityObjectAccessTest extends ChangeRelationshipProcessorTe
             ->with('VIEW', self::identicalTo($parentEntity))
             ->willReturn(false);
 
-        $this->context->setParentClassName(get_class($parentEntity));
+        $this->context->setParentClassName($parentEntity::class);
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentEntity($parentEntity);
         $this->processor->process($this->context);
@@ -100,7 +98,7 @@ class ValidateParentEntityObjectAccessTest extends ChangeRelationshipProcessorTe
             ->with('test_acl_resource', self::identicalTo($parentEntity))
             ->willReturn(true);
 
-        $this->context->setParentClassName(get_class($parentEntity));
+        $this->context->setParentClassName($parentEntity::class);
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentEntity($parentEntity);
         $this->processor->process($this->context);
@@ -121,7 +119,7 @@ class ValidateParentEntityObjectAccessTest extends ChangeRelationshipProcessorTe
             ->with('test_acl_resource', self::identicalTo($parentEntity))
             ->willReturn(false);
 
-        $this->context->setParentClassName(get_class($parentEntity));
+        $this->context->setParentClassName($parentEntity::class);
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentEntity($parentEntity);
         $this->processor->process($this->context);
@@ -137,7 +135,7 @@ class ValidateParentEntityObjectAccessTest extends ChangeRelationshipProcessorTe
         $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
 
-        $this->context->setParentClassName(get_class($parentEntity));
+        $this->context->setParentClassName($parentEntity::class);
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentEntity($parentEntity);
         $this->processor->process($this->context);
@@ -158,7 +156,7 @@ class ValidateParentEntityObjectAccessTest extends ChangeRelationshipProcessorTe
             ->with('VIEW', self::identicalTo($parentEntity))
             ->willReturn(true);
 
-        $this->context->setParentClassName(get_class($parentEntity));
+        $this->context->setParentClassName($parentEntity::class);
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentEntity($parentModel);
         $this->processor->process($this->context);
@@ -182,7 +180,7 @@ class ValidateParentEntityObjectAccessTest extends ChangeRelationshipProcessorTe
             ->with('VIEW', self::identicalTo($parentEntity))
             ->willReturn(false);
 
-        $this->context->setParentClassName(get_class($parentEntity));
+        $this->context->setParentClassName($parentEntity::class);
         $this->context->setParentConfig($parentConfig);
         $this->context->setParentEntity($parentModel);
         $this->processor->process($this->context);

@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ApiBundle\Model\NotResolvedIdentifier;
+use PHPUnit\Framework\TestCase;
 
-class NotResolvedIdentifierTest extends \PHPUnit\Framework\TestCase
+class NotResolvedIdentifierTest extends TestCase
 {
-    public function testObject()
+    public function testObject(): void
     {
         $value = 'test';
         $class = 'Test\Class';

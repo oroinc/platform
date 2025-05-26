@@ -13,14 +13,12 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ParameterBag;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class LoadEntitiesByDataLoaderTest extends GetListProcessorOrmRelatedTestCase
 {
-    /** @var DataLoaderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $dataLoader;
-
-    /** @var LoadEntitiesByDataLoader */
-    private $processor;
+    private DataLoaderInterface&MockObject $dataLoader;
+    private LoadEntitiesByDataLoader $processor;
 
     #[\Override]
     protected function setUp(): void

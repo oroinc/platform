@@ -6,15 +6,13 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Processor\Shared\NormalizeErrors;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class NormalizeErrorsTest extends GetProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
-    private $translator;
-
-    /** @var NormalizeErrors */
-    private $processor;
+    private TranslatorInterface&MockObject $translator;
+    private NormalizeErrors $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +24,7 @@ class NormalizeErrorsTest extends GetProcessorTestCase
         $this->processor = new NormalizeErrors($this->translator);
     }
 
-    public function testProcessWithoutErrors()
+    public function testProcessWithoutErrors(): void
     {
         $this->translator->expects(self::never())
             ->method('trans');
@@ -34,7 +32,7 @@ class NormalizeErrorsTest extends GetProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $error = Error::create(new Label('error title'));
 

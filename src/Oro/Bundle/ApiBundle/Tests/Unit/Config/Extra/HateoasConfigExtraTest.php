@@ -3,11 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config\Extra;
 
 use Oro\Bundle\ApiBundle\Config\Extra\HateoasConfigExtra;
+use PHPUnit\Framework\TestCase;
 
-class HateoasConfigExtraTest extends \PHPUnit\Framework\TestCase
+class HateoasConfigExtraTest extends TestCase
 {
-    /** @var HateoasConfigExtra */
-    private $extra;
+    private HateoasConfigExtra $extra;
 
     #[\Override]
     protected function setUp(): void
@@ -15,17 +15,17 @@ class HateoasConfigExtraTest extends \PHPUnit\Framework\TestCase
         $this->extra = new HateoasConfigExtra();
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         self::assertEquals(HateoasConfigExtra::NAME, $this->extra->getName());
     }
 
-    public function testIsPropagable()
+    public function testIsPropagable(): void
     {
         self::assertTrue($this->extra->isPropagable());
     }
 
-    public function testCacheKeyPart()
+    public function testCacheKeyPart(): void
     {
         self::assertEquals(
             HateoasConfigExtra::NAME,

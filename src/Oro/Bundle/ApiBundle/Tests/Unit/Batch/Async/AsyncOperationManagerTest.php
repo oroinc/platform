@@ -15,27 +15,20 @@ use Oro\Bundle\ApiBundle\Batch\Model\BatchError;
 use Oro\Bundle\ApiBundle\Batch\Model\ChunkFile;
 use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
 use Oro\Bundle\GaufretteBundle\FileManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
+class AsyncOperationManagerTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileManager;
-
-    /** @var ErrorManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $errorManager;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var AsyncOperationManager */
-    private $asyncOperationManager;
+    private ManagerRegistry&MockObject $doctrine;
+    private FileManager&MockObject $fileManager;
+    private ErrorManager&MockObject $errorManager;
+    private LoggerInterface&MockObject $logger;
+    private AsyncOperationManager $asyncOperationManager;
 
     #[\Override]
     protected function setUp(): void
@@ -195,8 +188,8 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
     private function expectIncreaseAggregateTimeQuery(
         int $operationId,
         array $summary,
-        ClassMetadata|\PHPUnit\Framework\MockObject\MockObject $metadata,
-        QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $qb
+        ClassMetadata&MockObject $metadata,
+        QueryBuilder&MockObject $qb
     ): void {
         $query = $this->createMock(AbstractQuery::class);
         $qb->expects(self::once())
@@ -239,8 +232,8 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
     private function expectAddErrorsQuery(
         int $operationId,
         array $summary,
-        ClassMetadata|\PHPUnit\Framework\MockObject\MockObject $metadata,
-        QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $qb
+        ClassMetadata&MockObject $metadata,
+        QueryBuilder&MockObject $qb
     ): void {
         $query = $this->createMock(AbstractQuery::class);
         $qb->expects(self::once())
@@ -286,8 +279,8 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
     private function expectSelectSummaryQuery(
         int $operationId,
         ?array $summary,
-        EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $em,
-        QueryBuilder|\PHPUnit\Framework\MockObject\MockObject $qb,
+        EntityManagerInterface&MockObject $em,
+        QueryBuilder&MockObject $qb,
         bool $operationNotFound = false
     ): void {
         $rawSummaryValue = null !== $summary ? 'raw summary value' : null;
@@ -339,7 +332,7 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testMarkAsRunning()
+    public function testMarkAsRunning(): void
     {
         $operationId = 123;
 
@@ -351,7 +344,7 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
         $this->asyncOperationManager->markAsRunning($operationId);
     }
 
-    public function testMarkAsFailed()
+    public function testMarkAsFailed(): void
     {
         $operationId = 123;
 
@@ -372,7 +365,7 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
         $this->asyncOperationManager->markAsFailed($operationId, 'testFile', 'test error');
     }
 
-    public function testIncreaseAggregateTime()
+    public function testIncreaseAggregateTime(): void
     {
         $operationId = 123;
         $previousAggregateTime = 50;
@@ -427,7 +420,7 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
         $this->asyncOperationManager->incrementAggregateTime($operationId, $aggregateTime);
     }
 
-    public function testIncreaseAggregateTimeWhenOperationSummaryIsNull()
+    public function testIncreaseAggregateTimeWhenOperationSummaryIsNull(): void
     {
         $operationId = 123;
         $aggregateTime = 100;
@@ -462,7 +455,7 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
         $this->asyncOperationManager->incrementAggregateTime($operationId, $aggregateTime);
     }
 
-    public function testIncreaseAggregateTimeShouldNotThrowExceptionIfOperationWasNotFound()
+    public function testIncreaseAggregateTimeShouldNotThrowExceptionIfOperationWasNotFound(): void
     {
         $operationId = 123;
         $aggregateTime = 100;
@@ -489,7 +482,7 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
         $this->asyncOperationManager->incrementAggregateTime($operationId, $aggregateTime);
     }
 
-    public function testAddErrors()
+    public function testAddErrors(): void
     {
         $operationId = 123;
         $dataFileName = 'testFile';
@@ -542,7 +535,7 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
         $this->asyncOperationManager->addErrors($operationId, $dataFileName, $errors);
     }
 
-    public function testAddErrorsWhenNoSummary()
+    public function testAddErrorsWhenNoSummary(): void
     {
         $operationId = 123;
         $dataFileName = 'testFile';
@@ -593,7 +586,7 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
         $this->asyncOperationManager->addErrors($operationId, $dataFileName, $errors);
     }
 
-    public function testAddErrorsForEmptyErrorCollection()
+    public function testAddErrorsForEmptyErrorCollection(): void
     {
         $this->errorManager->expects(self::never())
             ->method('writeErrors');
@@ -606,7 +599,7 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
         $this->asyncOperationManager->addErrors(123, 'testFile', []);
     }
 
-    public function testAddErrorsWhenNoSummaryShouldNotThrowExceptionIfOperationWasNotFound()
+    public function testAddErrorsWhenNoSummaryShouldNotThrowExceptionIfOperationWasNotFound(): void
     {
         $operationId = 123;
         $dataFileName = 'testFile';
@@ -640,7 +633,7 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
         $this->asyncOperationManager->addErrors($operationId, $dataFileName, $errors);
     }
 
-    public function testMarkAsFailedWhenWriteErrorsThrowsException()
+    public function testMarkAsFailedWhenWriteErrorsThrowsException(): void
     {
         $operationId = 123;
 
@@ -667,7 +660,7 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
         $this->asyncOperationManager->markAsFailed($operationId, 'testFile', 'test error');
     }
 
-    public function testWhenGetEntityManagerFailed()
+    public function testWhenGetEntityManagerFailed(): void
     {
         $operationId = 123;
         $exception = new \Exception('some error');
@@ -686,7 +679,7 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
         $this->asyncOperationManager->markAsFailed($operationId, 'testFile', 'test error');
     }
 
-    public function testShouldNotThrowExceptionIfOperationWasNotFound()
+    public function testShouldNotThrowExceptionIfOperationWasNotFound(): void
     {
         $operationId = 123;
 
@@ -705,7 +698,7 @@ class AsyncOperationManagerTest extends \PHPUnit\Framework\TestCase
         $this->asyncOperationManager->markAsFailed($operationId, 'testFile', 'test error');
     }
 
-    public function testShouldNotThrowExceptionIfUpdateFailed()
+    public function testShouldNotThrowExceptionIfUpdateFailed(): void
     {
         $operationId = 123;
         $exception = new \Exception('some error');

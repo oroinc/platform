@@ -5,8 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 use Oro\Bundle\ApiBundle\Processor\ListContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use PHPUnit\Framework\TestCase;
 
-class ListContextTest extends \PHPUnit\Framework\TestCase
+class ListContextTest extends TestCase
 {
     private ListContext $context;
 
@@ -32,7 +33,7 @@ class ListContextTest extends \PHPUnit\Framework\TestCase
         return 123;
     }
 
-    public function testTotalCountCallback()
+    public function testTotalCountCallback(): void
     {
         self::assertNull($this->context->getTotalCountCallback());
 

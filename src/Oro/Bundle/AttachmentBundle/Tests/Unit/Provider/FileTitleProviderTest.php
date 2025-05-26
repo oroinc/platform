@@ -4,8 +4,9 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Provider\FileTitleProvider;
+use PHPUnit\Framework\TestCase;
 
-class FileTitleProviderTest extends \PHPUnit\Framework\TestCase
+class FileTitleProviderTest extends TestCase
 {
     public function testGetTitle(): void
     {

@@ -14,19 +14,18 @@ use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailFolderManager;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ImapEmailFolderManagerTest extends \PHPUnit\Framework\TestCase
+class ImapEmailFolderManagerTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var ImapConnector|\PHPUnit\Framework\MockObject\MockObject */
-    private $connector;
-
-    /** @var EntityManagerInterface|mixed|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
+    private ImapConnector&MockObject $connector;
+    private EntityManagerInterface&MockObject $em;
 
     #[\Override]
     protected function setUp(): void
@@ -38,17 +37,33 @@ class ImapEmailFolderManagerTest extends \PHPUnit\Framework\TestCase
     private function mockGetExistingFolders(array $result): void
     {
         $query = $this->createMock(AbstractQuery::class);
-        $query->expects(self::once())->method('getResult')->willReturn($result);
+        $query->expects(self::once())
+            ->method('getResult')
+            ->willReturn($result);
 
         $qb = $this->createMock(QueryBuilder::class);
-        $qb->expects(self::once())->method('select')->willReturn($qb);
-        $qb->expects(self::once())->method('from')->willReturn($qb);
-        $qb->expects(self::once())->method('leftJoin')->willReturn($qb);
-        $qb->expects(self::once())->method('where')->willReturn($qb);
-        $qb->expects(self::once())->method('setParameter')->willReturn($qb);
-        $qb->expects(self::once())->method('getQuery')->willReturn($query);
+        $qb->expects(self::once())
+            ->method('select')
+            ->willReturn($qb);
+        $qb->expects(self::once())
+            ->method('from')
+            ->willReturn($qb);
+        $qb->expects(self::once())
+            ->method('leftJoin')
+            ->willReturn($qb);
+        $qb->expects(self::once())
+            ->method('where')
+            ->willReturn($qb);
+        $qb->expects(self::once())
+            ->method('setParameter')
+            ->willReturn($qb);
+        $qb->expects(self::once())
+            ->method('getQuery')
+            ->willReturn($query);
 
-        $this->em->expects(self::once())->method('createQueryBuilder')->willReturn($qb);
+        $this->em->expects(self::once())
+            ->method('createQueryBuilder')
+            ->willReturn($qb);
     }
 
     private function mockEmRequestsForRefreshFolders($getFoldersWithoutUidValidity, $getExistingFolders): void
@@ -59,16 +74,34 @@ class ImapEmailFolderManagerTest extends \PHPUnit\Framework\TestCase
             ->willReturnOnConsecutiveCalls($getFoldersWithoutUidValidity, $getExistingFolders);
 
         $qb = $this->createMock(QueryBuilder::class);
-        $qb->expects(self::any())->method('select')->willReturn($qb);
-        $qb->expects(self::any())->method('from')->willReturn($qb);
-        $qb->expects(self::any())->method('leftJoin')->willReturn($qb);
-        $qb->expects(self::any())->method('where')->willReturn($qb);
-        $qb->expects(self::any())->method('andWhere')->willReturn($qb);
-        $qb->expects(self::any())->method('setParameter')->willReturn($qb);
-        $qb->expects(self::any())->method('setMaxResults')->willReturn($qb);
-        $qb->expects(self::any())->method('getQuery')->willReturn($query);
+        $qb->expects(self::any())
+            ->method('select')
+            ->willReturn($qb);
+        $qb->expects(self::any())
+            ->method('from')
+            ->willReturn($qb);
+        $qb->expects(self::any())
+            ->method('leftJoin')
+            ->willReturn($qb);
+        $qb->expects(self::any())
+            ->method('where')
+            ->willReturn($qb);
+        $qb->expects(self::any())
+            ->method('andWhere')
+            ->willReturn($qb);
+        $qb->expects(self::any())
+            ->method('setParameter')
+            ->willReturn($qb);
+        $qb->expects(self::any())
+            ->method('setMaxResults')
+            ->willReturn($qb);
+        $qb->expects(self::any())
+            ->method('getQuery')
+            ->willReturn($query);
 
-        $this->em->expects(self::any())->method('createQueryBuilder')->willReturn($qb);
+        $this->em->expects(self::any())
+            ->method('createQueryBuilder')
+            ->willReturn($qb);
     }
 
     private function createRemoteFolder(

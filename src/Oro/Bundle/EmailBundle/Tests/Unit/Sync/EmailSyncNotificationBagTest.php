@@ -4,8 +4,9 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Sync;
 
 use Oro\Bundle\EmailBundle\Sync\EmailSyncNotificationAlert;
 use Oro\Bundle\EmailBundle\Sync\EmailSyncNotificationBag;
+use PHPUnit\Framework\TestCase;
 
-class EmailSyncNotificationBagTest extends \PHPUnit\Framework\TestCase
+class EmailSyncNotificationBagTest extends TestCase
 {
     public function testNotificationBag(): void
     {

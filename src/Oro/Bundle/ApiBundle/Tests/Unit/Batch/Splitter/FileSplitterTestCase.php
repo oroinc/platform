@@ -12,8 +12,11 @@ use Oro\Bundle\ApiBundle\Batch\Model\ChunkFile;
 use Oro\Bundle\ApiBundle\Batch\Splitter\FileSplitterInterface;
 use Oro\Bundle\ApiBundle\Exception\FileSplitterException;
 use Oro\Bundle\GaufretteBundle\FileManager;
+use PHPUnit\Framework\Constraint\Exception;
+use PHPUnit\Framework\Constraint\ExceptionMessage;
+use PHPUnit\Framework\TestCase;
 
-abstract class FileSplitterTestCase extends \PHPUnit\Framework\TestCase
+abstract class FileSplitterTestCase extends TestCase
 {
     /**
      * @return ChunkFile[]
@@ -114,16 +117,16 @@ abstract class FileSplitterTestCase extends \PHPUnit\Framework\TestCase
     ): void {
         self::assertThat(
             $exception,
-            new \PHPUnit\Framework\Constraint\Exception(FileSplitterException::class)
+            new Exception(FileSplitterException::class)
         );
         self::assertThat(
             $exception->getPrevious(),
-            new \PHPUnit\Framework\Constraint\Exception($innerExceptionClass),
+            new Exception($innerExceptionClass),
             'Failed asserting the inner exception.'
         );
         self::assertThat(
             $exception->getPrevious(),
-            new \PHPUnit\Framework\Constraint\ExceptionMessage($innerExceptionMessage),
+            new ExceptionMessage($innerExceptionMessage),
             'Failed asserting the inner exception.'
         );
     }

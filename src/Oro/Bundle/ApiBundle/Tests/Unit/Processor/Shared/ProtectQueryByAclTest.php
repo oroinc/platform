@@ -10,19 +10,15 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelated
 use Oro\Bundle\SecurityBundle\Attribute\Acl;
 use Oro\Bundle\SecurityBundle\Metadata\AclAttributeProvider;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class ProtectQueryByAclTest extends GetListProcessorOrmRelatedTestCase
 {
-    private const DEFAULT_PERMISSION = 'TEST';
+    private const string DEFAULT_PERMISSION = 'TEST';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AclHelper */
-    private $aclHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AclAttributeProvider */
-    private $AclAttributeProvider;
-
-    /** @var ProtectQueryByAcl */
-    private $processor;
+    private AclHelper&MockObject $aclHelper;
+    private AclAttributeProvider&MockObject $AclAttributeProvider;
+    private ProtectQueryByAcl $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +36,7 @@ class ProtectQueryByAclTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    public function testProcessWhenQueryIsNotDoctrineQuery()
+    public function testProcessWhenQueryIsNotDoctrineQuery(): void
     {
         $query = new \stdClass();
 
@@ -52,7 +48,7 @@ class ProtectQueryByAclTest extends GetListProcessorOrmRelatedTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithoutConfig()
+    public function testProcessWithoutConfig(): void
     {
         $query = $this->createMock(QueryBuilder::class);
 
@@ -66,7 +62,7 @@ class ProtectQueryByAclTest extends GetListProcessorOrmRelatedTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenConfigDoesNotContainAclResource()
+    public function testProcessWhenConfigDoesNotContainAclResource(): void
     {
         $config = new EntityDefinitionConfig();
         $query = $this->createMock(QueryBuilder::class);
@@ -81,7 +77,7 @@ class ProtectQueryByAclTest extends GetListProcessorOrmRelatedTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessConfigContainsAclResource()
+    public function testProcessConfigContainsAclResource(): void
     {
         $className = Product::class;
         $permission = 'DELETE';
@@ -110,7 +106,7 @@ class ProtectQueryByAclTest extends GetListProcessorOrmRelatedTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessConfigContainsUnknownAclResource()
+    public function testProcessConfigContainsUnknownAclResource(): void
     {
         $className = Product::class;
         $aclResource = 'acme_test_delete_resource';
@@ -131,7 +127,7 @@ class ProtectQueryByAclTest extends GetListProcessorOrmRelatedTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenAclIsDisabled()
+    public function testProcessWhenAclIsDisabled(): void
     {
         $className = Product::class;
         $config = new EntityDefinitionConfig();

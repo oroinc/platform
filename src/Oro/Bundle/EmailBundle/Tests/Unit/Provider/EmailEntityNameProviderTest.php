@@ -6,11 +6,11 @@ use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Provider\EmailEntityNameProvider;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwner;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
+use PHPUnit\Framework\TestCase;
 
-class EmailEntityNameProviderTest extends \PHPUnit\Framework\TestCase
+class EmailEntityNameProviderTest extends TestCase
 {
-    /** @var EmailEntityNameProvider */
-    private $provider;
+    private EmailEntityNameProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -18,17 +18,17 @@ class EmailEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new EmailEntityNameProvider(PropertyAccess::createPropertyAccessor());
     }
 
-    public function testGetNameDQL()
+    public function testGetNameDQL(): void
     {
         $this->assertFalse($this->provider->getNameDQL('format', 'loc', 'class', 'alias'));
     }
 
-    public function testGetNameNotSupportedFormat()
+    public function testGetNameNotSupportedFormat(): void
     {
         $this->assertFalse($this->provider->getNameDQL('format', 'loc', 'class', 'alias'));
     }
 
-    public function testEmailOwnerInterfaceEmailOnly()
+    public function testEmailOwnerInterfaceEmailOnly(): void
     {
         $owner = new TestEmailOwner();
         $owner->setPrimaryEmail('jdoe@example.com');
@@ -39,7 +39,7 @@ class EmailEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEmailOwnerInterfaceSupportWithoutFields()
+    public function testEmailOwnerInterfaceSupportWithoutFields(): void
     {
         $owner = new TestEmailOwner();
         $owner->setEmailFields([]);
@@ -47,7 +47,7 @@ class EmailEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->provider->getName('email', 'en', $owner));
     }
 
-    public function testEmailOwnerInterfaceSupportWithNotExistingFields()
+    public function testEmailOwnerInterfaceSupportWithNotExistingFields(): void
     {
         $owner = new TestEmailOwner();
         $owner->setEmailFields(['invalid']);
@@ -55,7 +55,7 @@ class EmailEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->provider->getName('email', 'en', $owner));
     }
 
-    public function testMultipleEmails()
+    public function testMultipleEmails(): void
     {
         $owner = (new TestEmailOwner())
             ->setPrimaryEmail('jdoe1@example.com')
@@ -67,7 +67,7 @@ class EmailEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEmailOwnerInterfaceWithFullname()
+    public function testEmailOwnerInterfaceWithFullname(): void
     {
         $owner = (new TestEmailOwner(42))
             ->setPrimaryEmail('jdoe2@example.com');
@@ -78,7 +78,7 @@ class EmailEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEmailOwnerInterfaceWitFirstnameOnly()
+    public function testEmailOwnerInterfaceWitFirstnameOnly(): void
     {
         $owner = (new TestEmailOwner(42))
             ->setPrimaryEmail('jdoe2@example.com')
@@ -90,7 +90,7 @@ class EmailEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEmailOwnerInterfaceWithLastnameOnly()
+    public function testEmailOwnerInterfaceWithLastnameOnly(): void
     {
         $owner = (new TestEmailOwner(42))
             ->setPrimaryEmail('jdoe2@example.com')
@@ -102,7 +102,7 @@ class EmailEntityNameProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testUnsupportedFormat()
+    public function testUnsupportedFormat(): void
     {
         $owner = $this->createMock(EmailOwnerInterface::class);
         $owner->expects($this->never())

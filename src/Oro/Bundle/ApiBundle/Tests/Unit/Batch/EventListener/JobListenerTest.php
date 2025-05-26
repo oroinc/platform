@@ -10,20 +10,17 @@ use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
 use Oro\Bundle\MessageQueueBundle\Entity\Job;
 use Oro\Component\MessageQueue\Event\BeforeSaveJobEvent;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class JobListenerTest extends \PHPUnit\Framework\TestCase
+class JobListenerTest extends TestCase
 {
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var AsyncOperationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $asyncOperationManager;
-
-    /** @var JobListener */
-    private $listener;
+    private EntityManagerInterface&MockObject $em;
+    private AsyncOperationManager&MockObject $asyncOperationManager;
+    private JobListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +37,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new JobListener($doctrine, $this->asyncOperationManager);
     }
 
-    public function testForNotRootJob()
+    public function testForNotRootJob(): void
     {
         $job = new Job();
         $job->setId(123);
@@ -54,7 +51,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
 
-    public function testForNewRootJob()
+    public function testForNewRootJob(): void
     {
         $job = new Job();
 
@@ -66,7 +63,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
 
-    public function testForRootJobNotLinkedToAsyncOperation()
+    public function testForRootJobNotLinkedToAsyncOperation(): void
     {
         $job = new Job();
         $job->setId(123);
@@ -79,7 +76,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
 
-    public function testForRootJobLinkedToNotExistingAsyncOperation()
+    public function testForRootJobLinkedToNotExistingAsyncOperation(): void
     {
         $job = new Job();
         $job->setId(123);
@@ -95,7 +92,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
 
-    public function testForRootJobLinkedToAsyncOperationButNoChanges()
+    public function testForRootJobLinkedToAsyncOperationButNoChanges(): void
     {
         $job = new Job();
         $job->setId(123);
@@ -124,7 +121,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
 
-    public function testForRootJobLinkedToAsyncOperationUpdateProgress()
+    public function testForRootJobLinkedToAsyncOperationUpdateProgress(): void
     {
         $job = new Job();
         $job->setId(123);
@@ -163,7 +160,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
 
-    public function testForRootJobLinkedToAsyncOperationUpdateZeroProgress()
+    public function testForRootJobLinkedToAsyncOperationUpdateZeroProgress(): void
     {
         $job = new Job();
         $job->setId(123);
@@ -203,7 +200,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
 
-    public function testForRootJobLinkedToAsyncOperationUpdateInvalidProgress()
+    public function testForRootJobLinkedToAsyncOperationUpdateInvalidProgress(): void
     {
         $job = new Job();
         $job->setId(123);
@@ -238,7 +235,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
 
-    public function testForRootJobLinkedToAsyncOperationUpdateProgressWhenCreatedAtIsNotSet()
+    public function testForRootJobLinkedToAsyncOperationUpdateProgressWhenCreatedAtIsNotSet(): void
     {
         $job = new Job();
         $job->setId(123);
@@ -272,7 +269,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
 
-    public function testForRootJobLinkedToAsyncOperationUpdateJobId()
+    public function testForRootJobLinkedToAsyncOperationUpdateJobId(): void
     {
         $job = new Job();
         $job->setId(123);
@@ -304,7 +301,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
 
-    public function testForRootJobLinkedToAsyncOperationUpdateStatusToSuccess()
+    public function testForRootJobLinkedToAsyncOperationUpdateStatusToSuccess(): void
     {
         $job = new Job();
         $job->setId(123);
@@ -354,7 +351,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
 
-    public function testForRootJobLinkedToAsyncOperationUpdateStatusToSuccessAndWithExistingSummary()
+    public function testForRootJobLinkedToAsyncOperationUpdateStatusToSuccessAndWithExistingSummary(): void
     {
         $job = new Job();
         $job->setId(123);
@@ -412,7 +409,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
 
-    public function testForRootJobLinkedToAsyncOperationUpdateStatusToFailed()
+    public function testForRootJobLinkedToAsyncOperationUpdateStatusToFailed(): void
     {
         $job = new Job();
         $job->setId(123);
@@ -472,7 +469,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
 
-    public function testForRootJobLinkedToAsyncOperationUpdateStatusToStale()
+    public function testForRootJobLinkedToAsyncOperationUpdateStatusToStale(): void
     {
         $job = new Job();
         $job->setId(123);
@@ -520,7 +517,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
 
-    public function testForRootJobLinkedToAsyncOperationUpdateStatusToCancelled()
+    public function testForRootJobLinkedToAsyncOperationUpdateStatusToCancelled(): void
     {
         $job = new Job();
         $job->setId(123);
@@ -555,7 +552,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
 
-    public function testForRootJobLinkedToAsyncOperationWhenJobStatusChangedToFailedRedelivered()
+    public function testForRootJobLinkedToAsyncOperationWhenJobStatusChangedToFailedRedelivered(): void
     {
         $job = new Job();
         $job->setId(123);
@@ -584,7 +581,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
 
-    public function testForRootJobLinkedToAsyncOperationWhenJobStatusChangedToNew()
+    public function testForRootJobLinkedToAsyncOperationWhenJobStatusChangedToNew(): void
     {
         $job = new Job();
         $job->setId(123);
@@ -613,7 +610,7 @@ class JobListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onBeforeSaveJob(new BeforeSaveJobEvent($job));
     }
 
-    public function testMergeAffectedEntities()
+    public function testMergeAffectedEntities(): void
     {
         $job = new Job();
         $job->setId(123);

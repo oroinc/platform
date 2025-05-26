@@ -14,17 +14,16 @@ use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
+class ApiDocMetadataParserTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
-    private $valueNormalizer;
-
-    /** @var ApiDocMetadataParser */
-    private $parser;
+    private ValueNormalizer&MockObject $valueNormalizer;
+    private ApiDocMetadataParser $parser;
 
     #[\Override]
     protected function setUp(): void
@@ -55,7 +54,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSupportsWithoutMetadata()
+    public function testSupportsWithoutMetadata(): void
     {
         $item = [
             'class'   => null,
@@ -65,7 +64,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->parser->supports($item));
     }
 
-    public function testSupportsWithDirectionAndMetadata()
+    public function testSupportsWithDirectionAndMetadata(): void
     {
         $item = [
             'class'   => null,
@@ -83,7 +82,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->parser->supports($item));
     }
 
-    public function testSupportsWithMetadataButWithoutDirection()
+    public function testSupportsWithMetadataButWithoutDirection(): void
     {
         $item = [
             'class'   => null,
@@ -100,7 +99,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->parser->supports($item));
     }
 
-    public function testSupportsWithUnknownMetadata()
+    public function testSupportsWithUnknownMetadata(): void
     {
         $item = [
             'class'   => null,
@@ -113,7 +112,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->parser->supports($item));
     }
 
-    public function testParseIdentifierFieldWithGeneratorForCreateAction()
+    public function testParseIdentifierFieldWithGeneratorForCreateAction(): void
     {
         $requestType = new RequestType([]);
 
@@ -146,7 +145,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testParseIdentifierFieldWithoutGeneratorForCreateAction()
+    public function testParseIdentifierFieldWithoutGeneratorForCreateAction(): void
     {
         $requestType = new RequestType([]);
 
@@ -177,7 +176,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testParseIdentifierFieldForNotCreateAction()
+    public function testParseIdentifierFieldForNotCreateAction(): void
     {
         $requestType = new RequestType([]);
 
@@ -209,7 +208,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testParseMetaProperty()
+    public function testParseMetaProperty(): void
     {
         $requestType = new RequestType([]);
 
@@ -241,7 +240,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testParseClassNameMetaProperty()
+    public function testParseClassNameMetaProperty(): void
     {
         $requestType = new RequestType([]);
 
@@ -263,7 +262,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $result);
     }
 
-    public function testParseRenamedClassNameMetaProperty()
+    public function testParseRenamedClassNameMetaProperty(): void
     {
         $requestType = new RequestType([]);
 
@@ -285,7 +284,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $result);
     }
 
-    public function testParseNullableField()
+    public function testParseNullableField(): void
     {
         $requestType = new RequestType([]);
 
@@ -319,7 +318,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testParseNotNullableField()
+    public function testParseNotNullableField(): void
     {
         $requestType = new RequestType([]);
 
@@ -352,7 +351,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testParseNullableAssociation()
+    public function testParseNullableAssociation(): void
     {
         $requestType = new RequestType([]);
 
@@ -393,7 +392,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testParseNotNullableAssociation()
+    public function testParseNotNullableAssociation(): void
     {
         $requestType = new RequestType([]);
 
@@ -433,7 +432,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testParseCollectionAssociation()
+    public function testParseCollectionAssociation(): void
     {
         $requestType = new RequestType([]);
 
@@ -474,7 +473,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testParseAssociationAsField()
+    public function testParseAssociationAsField(): void
     {
         $requestType = new RequestType([]);
 
@@ -513,7 +512,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testParseAssociationIsPartOfIdentifierWithGenerator()
+    public function testParseAssociationIsPartOfIdentifierWithGenerator(): void
     {
         $requestType = new RequestType([]);
 
@@ -555,7 +554,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testParseInputOnlyFieldForInputDefinition()
+    public function testParseInputOnlyFieldForInputDefinition(): void
     {
         $requestType = new RequestType([]);
 
@@ -587,7 +586,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testParseInputOnlyFieldForOutputDefinition()
+    public function testParseInputOnlyFieldForOutputDefinition(): void
     {
         $requestType = new RequestType([]);
 
@@ -609,7 +608,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $result);
     }
 
-    public function testParseOutputOnlyFieldForOutputDefinition()
+    public function testParseOutputOnlyFieldForOutputDefinition(): void
     {
         $requestType = new RequestType([]);
 
@@ -641,7 +640,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testParseOutputOnlyFieldForInputDefinition()
+    public function testParseOutputOnlyFieldForInputDefinition(): void
     {
         $requestType = new RequestType([]);
 
@@ -663,7 +662,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $result);
     }
 
-    public function testParseInputOnlyAssociationForInputDefinition()
+    public function testParseInputOnlyAssociationForInputDefinition(): void
     {
         $requestType = new RequestType([]);
 
@@ -702,7 +701,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testParseInputOnlyAssociationForOutputDefinition()
+    public function testParseInputOnlyAssociationForOutputDefinition(): void
     {
         $requestType = new RequestType([]);
 
@@ -728,7 +727,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $result);
     }
 
-    public function testParseOutputOnlyAssociationForOutputDefinition()
+    public function testParseOutputOnlyAssociationForOutputDefinition(): void
     {
         $requestType = new RequestType([]);
 
@@ -767,7 +766,7 @@ class ApiDocMetadataParserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testParseOutputOnlyAssociationForInputDefinition()
+    public function testParseOutputOnlyAssociationForInputDefinition(): void
     {
         $requestType = new RequestType([]);
 

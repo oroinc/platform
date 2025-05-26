@@ -13,8 +13,7 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseEmailTemplateCandidatesProviderTest extends TestCase
 {
-    private DoctrineHelper|MockObject $doctrineHelper;
-
+    private DoctrineHelper&MockObject $doctrineHelper;
     private DatabaseEmailTemplateCandidatesProvider $provider;
 
     #[\Override]
@@ -43,14 +42,12 @@ class DatabaseEmailTemplateCandidatesProviderTest extends TestCase
     {
         $localization = new LocalizationStub(42);
 
-        $this->doctrineHelper
-            ->expects(self::once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntity')
             ->with($localization)
             ->willReturn(true);
 
-        $this->doctrineHelper
-            ->expects(self::once())
+        $this->doctrineHelper->expects(self::once())
             ->method('getSingleEntityIdentifier')
             ->with($localization)
             ->willReturn(42);
@@ -68,14 +65,12 @@ class DatabaseEmailTemplateCandidatesProviderTest extends TestCase
     {
         $object = new \stdClass();
 
-        $this->doctrineHelper
-            ->expects(self::once())
+        $this->doctrineHelper->expects(self::once())
             ->method('isManageableEntity')
             ->with($object)
             ->willReturn(false);
 
-        $this->doctrineHelper
-            ->expects(self::never())
+        $this->doctrineHelper->expects(self::never())
             ->method('getSingleEntityIdentifier');
 
         self::assertEquals(
@@ -88,12 +83,10 @@ class DatabaseEmailTemplateCandidatesProviderTest extends TestCase
     {
         $localization = 42;
 
-        $this->doctrineHelper
-            ->expects(self::never())
+        $this->doctrineHelper->expects(self::never())
             ->method('isManageableEntity');
 
-        $this->doctrineHelper
-            ->expects(self::never())
+        $this->doctrineHelper->expects(self::never())
             ->method('getSingleEntityIdentifier');
 
         self::assertEquals(

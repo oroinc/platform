@@ -21,13 +21,13 @@ use Oro\Component\EntitySerializer\DataNormalizer;
 use Oro\Component\EntitySerializer\DataTransformer;
 use Oro\Component\EntitySerializer\SerializationHelper;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
+class PlainObjectNormalizerTest extends TestCase
 {
-    /** @var ObjectNormalizer */
-    private $objectNormalizer;
+    private ObjectNormalizer $objectNormalizer;
 
     #[\Override]
     protected function setUp(): void
@@ -115,7 +115,7 @@ class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
         return $product;
     }
 
-    public function testNormalizeSimpleObject()
+    public function testNormalizeSimpleObject(): void
     {
         $object = new Entity\Group();
         $object->setId(123);
@@ -132,7 +132,7 @@ class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testNormalizeObjectWithNullToOneRelations()
+    public function testNormalizeObjectWithNullToOneRelations(): void
     {
         $product = new Entity\Product();
         $product->setId(123);
@@ -155,7 +155,7 @@ class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testNormalizeObjectWithToOneRelations()
+    public function testNormalizeObjectWithToOneRelations(): void
     {
         $result = $this->normalizeObject(
             $this->createProductObject()
@@ -176,7 +176,7 @@ class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testNormalizeObjectWithNullToManyRelations()
+    public function testNormalizeObjectWithNullToManyRelations(): void
     {
         $user = new Entity\User();
         $user->setId(123);
@@ -197,7 +197,7 @@ class PlainObjectNormalizerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testNormalizeObjectWithToManyRelations()
+    public function testNormalizeObjectWithToManyRelations(): void
     {
         $result = $this->normalizeObject(
             $this->createProductObject()->getOwner()

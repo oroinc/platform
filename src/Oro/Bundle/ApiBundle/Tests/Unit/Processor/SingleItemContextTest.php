@@ -5,17 +5,14 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class SingleItemContextTest extends \PHPUnit\Framework\TestCase
+class SingleItemContextTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
-    private $configProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
-    private $metadataProvider;
-
-    /** @var SingleItemContext */
-    private $context;
+    private ConfigProvider&MockObject $configProvider;
+    private MetadataProvider&MockObject $metadataProvider;
+    private SingleItemContext $context;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +23,7 @@ class SingleItemContextTest extends \PHPUnit\Framework\TestCase
         $this->context = new SingleItemContext($this->configProvider, $this->metadataProvider);
     }
 
-    public function testId()
+    public function testId(): void
     {
         self::assertNull($this->context->getId());
 

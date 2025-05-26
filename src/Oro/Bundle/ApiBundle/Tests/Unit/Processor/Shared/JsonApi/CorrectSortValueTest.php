@@ -19,14 +19,12 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelated
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
-    private $valueNormalizer;
-
-    /** @var CorrectSortValue */
-    private $processor;
+    private ValueNormalizer&MockObject $valueNormalizer;
+    private CorrectSortValue $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -58,7 +56,7 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
         return $configLoaderFactory->getLoader(ConfigUtil::DEFINITION)->load($config);
     }
 
-    public function testProcessOnExistingQuery()
+    public function testProcessOnExistingQuery(): void
     {
         $qb = $this->createMock(QueryBuilder::class);
 
@@ -68,7 +66,7 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
         self::assertSame($qb, $this->context->getQuery());
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessForNotManageableEntity(): void
     {
         $className = 'Test\Class';
 
@@ -83,7 +81,7 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
     /**
      * @dataProvider processProvider
      */
-    public function testProcess(string $className, ?array $config, array $orderBy, array $expectedOrderBy)
+    public function testProcess(string $className, ?array $config, array $orderBy, array $expectedOrderBy): void
     {
         $sortFilterValue = new FilterValue('sort', $orderBy);
         $filterValueAccessor = $this->createMock(FilterValueAccessorInterface::class);
@@ -226,7 +224,7 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
         string $defaultValue,
         array $normalizedDefaultValue,
         array $expectedOrderBy
-    ) {
+    ): void {
         $sortFilterValue = null;
 
         $this->context->getFilters()->add(
@@ -306,7 +304,7 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
         ];
     }
 
-    public function testProcessNoDefaultValue()
+    public function testProcessNoDefaultValue(): void
     {
         $this->context->getFilters()->add(
             'sort',
@@ -318,7 +316,7 @@ class CorrectSortValueTest extends GetListProcessorOrmRelatedTestCase
         self::assertNull($this->context->getFilterValues()->getOne('sort'));
     }
 
-    public function testProcessNoFilter()
+    public function testProcessNoFilter(): void
     {
         $this->context->setClassName(Entity\User::class);
         $this->processor->process($this->context);

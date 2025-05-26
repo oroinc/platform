@@ -12,14 +12,12 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorOrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Component\EntitySerializer\EntitySerializer;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCase
 {
-    /** @var EntitySerializer|\PHPUnit\Framework\MockObject\MockObject */
-    private $entitySerializer;
-
-    /** @var LoadNestedAssociation */
-    private $processor;
+    private EntitySerializer&MockObject $entitySerializer;
+    private LoadNestedAssociation $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +34,7 @@ class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCas
         );
     }
 
-    public function testProcessWhenResultAlreadyExists()
+    public function testProcessWhenResultAlreadyExists(): void
     {
         $result = ['test'];
 
@@ -47,7 +45,7 @@ class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCas
         self::assertCount(0, $this->context->getSkippedGroups());
     }
 
-    public function testProcessWhenAssociationConfigDoesNotExist()
+    public function testProcessWhenAssociationConfigDoesNotExist(): void
     {
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
@@ -60,7 +58,7 @@ class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCas
         self::assertCount(0, $this->context->getSkippedGroups());
     }
 
-    public function testProcessForNotNestedAssociation()
+    public function testProcessForNotNestedAssociation(): void
     {
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
@@ -74,7 +72,7 @@ class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCas
         self::assertCount(0, $this->context->getSkippedGroups());
     }
 
-    public function testProcessForNestedAssociation()
+    public function testProcessForNestedAssociation(): void
     {
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
@@ -118,7 +116,7 @@ class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCas
         self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
-    public function testProcessForEmptyResultOfNestedAssociation()
+    public function testProcessForEmptyResultOfNestedAssociation(): void
     {
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
@@ -159,7 +157,7 @@ class LoadNestedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCas
         self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
-    public function testProcessForNestedAssociationWhenParentEntityWasNotFound()
+    public function testProcessForNestedAssociationWhenParentEntityWasNotFound(): void
     {
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();

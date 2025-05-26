@@ -3,45 +3,46 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\Model;
 
 use Oro\Bundle\ApiBundle\Batch\Model\BatchSummary;
+use PHPUnit\Framework\TestCase;
 
-class BatchSummaryTest extends \PHPUnit\Framework\TestCase
+class BatchSummaryTest extends TestCase
 {
-    public function testInitialReadCount()
+    public function testInitialReadCount(): void
     {
         $summary = new BatchSummary();
 
         self::assertSame(0, $summary->getReadCount());
     }
 
-    public function testInitialWriteCount()
+    public function testInitialWriteCount(): void
     {
         $summary = new BatchSummary();
 
         self::assertSame(0, $summary->getWriteCount());
     }
 
-    public function testInitialErrorCount()
+    public function testInitialErrorCount(): void
     {
         $summary = new BatchSummary();
 
         self::assertSame(0, $summary->getErrorCount());
     }
 
-    public function testInitialCreateCount()
+    public function testInitialCreateCount(): void
     {
         $summary = new BatchSummary();
 
         self::assertSame(0, $summary->getCreateCount());
     }
 
-    public function testInitialUpdateCount()
+    public function testInitialUpdateCount(): void
     {
         $summary = new BatchSummary();
 
         self::assertSame(0, $summary->getUpdateCount());
     }
 
-    public function testIncrementReadCount()
+    public function testIncrementReadCount(): void
     {
         $summary = new BatchSummary();
 
@@ -51,7 +52,7 @@ class BatchSummaryTest extends \PHPUnit\Framework\TestCase
         self::assertSame(3, $summary->getReadCount());
     }
 
-    public function testIncrementWriteCount()
+    public function testIncrementWriteCount(): void
     {
         $summary = new BatchSummary();
 
@@ -61,7 +62,7 @@ class BatchSummaryTest extends \PHPUnit\Framework\TestCase
         self::assertSame(3, $summary->getWriteCount());
     }
 
-    public function testIncrementErrorCount()
+    public function testIncrementErrorCount(): void
     {
         $summary = new BatchSummary();
 
@@ -71,7 +72,7 @@ class BatchSummaryTest extends \PHPUnit\Framework\TestCase
         self::assertSame(3, $summary->getErrorCount());
     }
 
-    public function testIncrementCreateCount()
+    public function testIncrementCreateCount(): void
     {
         $summary = new BatchSummary();
 
@@ -81,7 +82,7 @@ class BatchSummaryTest extends \PHPUnit\Framework\TestCase
         self::assertSame(3, $summary->getCreateCount());
     }
 
-    public function testIncrementUpdateCount()
+    public function testIncrementUpdateCount(): void
     {
         $summary = new BatchSummary();
 

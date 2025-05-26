@@ -7,16 +7,14 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Form\Type\DataChangesetType;
 use Oro\Bundle\FormBundle\Form\Type\EntityChangesetType;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EntityChangesetTypeTest extends FormIntegrationTestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var EntityChangesetType */
-    private $type;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EntityChangesetType $type;
 
     #[\Override]
     protected function setUp(): void

@@ -8,13 +8,14 @@ use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContex
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
-class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
+class CustomizeLoadedDataContextTest extends TestCase
 {
     private CustomizeLoadedDataContext $context;
 
@@ -24,7 +25,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         $this->context = new CustomizeLoadedDataContext();
     }
 
-    public function testRootClassName()
+    public function testRootClassName(): void
     {
         self::assertNull($this->context->getRootClassName());
 
@@ -33,14 +34,14 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($className, $this->context->getRootClassName());
     }
 
-    public function testClassName()
+    public function testClassName(): void
     {
         $className = 'Test\Class';
         $this->context->setClassName($className);
         self::assertEquals($className, $this->context->getClassName());
     }
 
-    public function testPropertyPath()
+    public function testPropertyPath(): void
     {
         self::assertNull($this->context->getPropertyPath());
 
@@ -49,7 +50,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($propertyPath, $this->context->getPropertyPath());
     }
 
-    public function testParentAction()
+    public function testParentAction(): void
     {
         self::assertNull($this->context->getParentAction());
         self::assertTrue($this->context->has('parentAction'));
@@ -67,7 +68,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame('', $this->context->get('parentAction'));
     }
 
-    public function testRootConfig()
+    public function testRootConfig(): void
     {
         self::assertNull($this->context->getRootConfig());
 
@@ -79,7 +80,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getRootConfig());
     }
 
-    public function testConfig()
+    public function testConfig(): void
     {
         self::assertNull($this->context->getConfig());
 
@@ -91,7 +92,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getConfig());
     }
 
-    public function testSharedData()
+    public function testSharedData(): void
     {
         $sharedData = $this->createMock(ParameterBagInterface::class);
 
@@ -99,7 +100,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($sharedData, $this->context->getSharedData());
     }
 
-    public function testGetNormalizationContext()
+    public function testGetNormalizationContext(): void
     {
         $action = 'test_action';
         $version = '1.2';
@@ -128,7 +129,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($parentAction, $normalizationContext['parentAction']);
     }
 
-    public function testData()
+    public function testData(): void
     {
         $data = ['key' => 'value'];
         $this->context->setData($data);
@@ -142,7 +143,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $this->context->getResult());
     }
 
-    public function testIdentifierOnly()
+    public function testIdentifierOnly(): void
     {
         self::assertFalse($this->context->isIdentifierOnly());
 
@@ -153,13 +154,13 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->context->isIdentifierOnly());
     }
 
-    public function testGetResultFieldNameWithoutConfig()
+    public function testGetResultFieldNameWithoutConfig(): void
     {
         $propertyPath = 'test';
         self::assertEquals($propertyPath, $this->context->getResultFieldName($propertyPath));
     }
 
-    public function testGetResultFieldNameWhenFieldDoesNotExist()
+    public function testGetResultFieldNameWhenFieldDoesNotExist(): void
     {
         $propertyPath = 'test';
         $config = new EntityDefinitionConfig();
@@ -167,7 +168,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($propertyPath, $this->context->getResultFieldName($propertyPath));
     }
 
-    public function testGetResultFieldNameForNotRenamedField()
+    public function testGetResultFieldNameForNotRenamedField(): void
     {
         $propertyPath = 'test';
         $config = new EntityDefinitionConfig();
@@ -176,7 +177,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($propertyPath, $this->context->getResultFieldName($propertyPath));
     }
 
-    public function testGetResultFieldNameForRenamedField()
+    public function testGetResultFieldNameForRenamedField(): void
     {
         $fieldName = 'renamedTest';
         $propertyPath = 'test';
@@ -186,7 +187,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($fieldName, $this->context->getResultFieldName($propertyPath));
     }
 
-    public function testGetResultFieldNameForComputedField()
+    public function testGetResultFieldNameForComputedField(): void
     {
         $fieldName = 'test';
         $config = new EntityDefinitionConfig();
@@ -195,14 +196,14 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($fieldName, $this->context->getResultFieldName($fieldName));
     }
 
-    public function testGetResultFieldValueWithoutConfig()
+    public function testGetResultFieldValueWithoutConfig(): void
     {
         $propertyName = 'test';
         $data = [$propertyName => 'test value'];
         self::assertEquals($data[$propertyName], $this->context->getResultFieldValue($propertyName, $data));
     }
 
-    public function testGetResultFieldValueWhenFieldDoesNotExist()
+    public function testGetResultFieldValueWhenFieldDoesNotExist(): void
     {
         $propertyName = 'test';
         $data = [$propertyName => 'test value'];
@@ -211,7 +212,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($data[$propertyName], $this->context->getResultFieldValue($propertyName, $data));
     }
 
-    public function testGetResultFieldValueForNotRenamedField()
+    public function testGetResultFieldValueForNotRenamedField(): void
     {
         $propertyName = 'test';
         $data = [$propertyName => 'test value'];
@@ -221,7 +222,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($data[$propertyName], $this->context->getResultFieldValue($propertyName, $data));
     }
 
-    public function testGetResultFieldValueForRenamedField()
+    public function testGetResultFieldValueForRenamedField(): void
     {
         $fieldName = 'renamedTest';
         $propertyName = 'test';
@@ -232,7 +233,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($data[$fieldName], $this->context->getResultFieldValue($propertyName, $data));
     }
 
-    public function testGetResultFieldValueWhenDataDoesNotHaveFieldValue()
+    public function testGetResultFieldValueWhenDataDoesNotHaveFieldValue(): void
     {
         $fieldName = 'renamedTest';
         $propertyName = 'test';
@@ -243,14 +244,14 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getResultFieldValue($propertyName, $data));
     }
 
-    public function testGetResultFieldNameForSpecifiedConfigWhenFieldDoesNotExist()
+    public function testGetResultFieldNameForSpecifiedConfigWhenFieldDoesNotExist(): void
     {
         $propertyPath = 'test';
         $config = new EntityDefinitionConfig();
         self::assertEquals($propertyPath, $this->context->getResultFieldName($propertyPath, $config));
     }
 
-    public function testGetResultFieldNameForSpecifiedConfigForNotRenamedField()
+    public function testGetResultFieldNameForSpecifiedConfigForNotRenamedField(): void
     {
         $propertyPath = 'test';
         $config = new EntityDefinitionConfig();
@@ -258,7 +259,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($propertyPath, $this->context->getResultFieldName($propertyPath, $config));
     }
 
-    public function testGetResultFieldNameForSpecifiedConfigForRenamedField()
+    public function testGetResultFieldNameForSpecifiedConfigForRenamedField(): void
     {
         $fieldName = 'renamedTest';
         $propertyPath = 'test';
@@ -267,7 +268,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($fieldName, $this->context->getResultFieldName($propertyPath, $config));
     }
 
-    public function testGetResultFieldNameForSpecifiedConfigForComputedField()
+    public function testGetResultFieldNameForSpecifiedConfigForComputedField(): void
     {
         $fieldName = 'test';
         $config = new EntityDefinitionConfig();
@@ -275,7 +276,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($fieldName, $this->context->getResultFieldName($fieldName, $config));
     }
 
-    public function testGetResultFieldValueByPropertyPathWithoutConfig()
+    public function testGetResultFieldValueByPropertyPathWithoutConfig(): void
     {
         $data = [
             'prop1' => [
@@ -310,7 +311,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetResultFieldValueByPropertyPathWhenFieldDoesNotExist()
+    public function testGetResultFieldValueByPropertyPathWhenFieldDoesNotExist(): void
     {
         $data = [
             'prop1' => [
@@ -344,7 +345,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetResultFieldValueByPropertyPathForNotRenamedField()
+    public function testGetResultFieldValueByPropertyPathForNotRenamedField(): void
     {
         $data = [
             'prop1' => [
@@ -386,7 +387,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetResultFieldValueByPropertyPathForRenamedField()
+    public function testGetResultFieldValueByPropertyPathForRenamedField(): void
     {
         $data = [
             'renamedProp1' => [
@@ -449,7 +450,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsFieldRequestedWithoutConfig()
+    public function testIsFieldRequestedWithoutConfig(): void
     {
         $fieldName = 'test';
         self::assertFalse($this->context->isFieldRequested($fieldName));
@@ -457,7 +458,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->context->isFieldRequested($fieldName, ['another' => 'value']));
     }
 
-    public function testIsFieldRequestedWhenFieldDoesNotExist()
+    public function testIsFieldRequestedWhenFieldDoesNotExist(): void
     {
         $fieldName = 'test';
         $config = new EntityDefinitionConfig();
@@ -467,7 +468,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->context->isFieldRequested($fieldName, ['another' => 'value']));
     }
 
-    public function testIsFieldRequestedWhenFieldExists()
+    public function testIsFieldRequestedWhenFieldExists(): void
     {
         $fieldName = 'test';
         $config = new EntityDefinitionConfig();
@@ -478,7 +479,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->context->isFieldRequested($fieldName, ['another' => 'value']));
     }
 
-    public function testIsFieldRequestedWhenFieldExcluded()
+    public function testIsFieldRequestedWhenFieldExcluded(): void
     {
         $fieldName = 'test';
         $config = new EntityDefinitionConfig();
@@ -489,7 +490,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->context->isFieldRequested($fieldName, ['another' => 'value']));
     }
 
-    public function testIsAtLeastOneFieldRequestedWithoutConfig()
+    public function testIsAtLeastOneFieldRequestedWithoutConfig(): void
     {
         $fieldName = 'test';
         self::assertFalse(
@@ -503,7 +504,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsAtLeastOneFieldRequestedWhenFieldsDoNotExist()
+    public function testIsAtLeastOneFieldRequestedWhenFieldsDoNotExist(): void
     {
         $fieldName = 'test';
         $config = new EntityDefinitionConfig();
@@ -519,7 +520,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsAtLeastOneFieldRequestedWhenFieldsExists()
+    public function testIsAtLeastOneFieldRequestedWhenFieldsExists(): void
     {
         $fieldName = 'test';
         $anotherFieldName = 'anotherField';
@@ -544,7 +545,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsAtLeastOneFieldRequestedWhenAllFieldsExcluded()
+    public function testIsAtLeastOneFieldRequestedWhenAllFieldsExcluded(): void
     {
         $fieldName = 'test';
         $anotherFieldName = 'anotherField';
@@ -569,7 +570,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsAtLeastOneFieldRequestedWhenOneFieldExcluded()
+    public function testIsAtLeastOneFieldRequestedWhenOneFieldExcluded(): void
     {
         $fieldName = 'test';
         $anotherFieldName = 'anotherField';
@@ -597,7 +598,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsFieldRequestedForCollection()
+    public function testIsFieldRequestedForCollection(): void
     {
         $fieldName = 'test';
         $config = new EntityDefinitionConfig();
@@ -654,7 +655,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsAtLeastOneFieldRequestedForCollection()
+    public function testIsAtLeastOneFieldRequestedForCollection(): void
     {
         $fieldName = 'test';
         $config = new EntityDefinitionConfig();
@@ -711,7 +712,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetIdentifierValues()
+    public function testGetIdentifierValues(): void
     {
         self::assertEquals(
             [],
@@ -732,7 +733,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConfigExtras()
+    public function testConfigExtras(): void
     {
         $this->context->setConfigExtras([]);
         self::assertSame([], $this->context->getConfigExtras());
@@ -751,7 +752,7 @@ class CustomizeLoadedDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getConfigExtra('another'));
     }
 
-    public function testHateoas()
+    public function testHateoas(): void
     {
         $this->context->setConfigExtras([]);
         self::assertFalse($this->context->isHateoasEnabled());

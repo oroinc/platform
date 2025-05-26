@@ -3,13 +3,13 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config\Extra;
 
 use Oro\Bundle\ApiBundle\Config\Extra\RootPathConfigExtra;
+use PHPUnit\Framework\TestCase;
 
-class RootPathConfigExtraTest extends \PHPUnit\Framework\TestCase
+class RootPathConfigExtraTest extends TestCase
 {
-    private const PATH = 'test';
+    private const string PATH = 'test';
 
-    /** @var RootPathConfigExtra */
-    private $extra;
+    private RootPathConfigExtra $extra;
 
     #[\Override]
     protected function setUp(): void
@@ -17,22 +17,22 @@ class RootPathConfigExtraTest extends \PHPUnit\Framework\TestCase
         $this->extra = new RootPathConfigExtra(self::PATH);
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         self::assertEquals(RootPathConfigExtra::NAME, $this->extra->getName());
     }
 
-    public function testGetExpandedEntitiesPath()
+    public function testGetExpandedEntitiesPath(): void
     {
         self::assertEquals(self::PATH, $this->extra->getPath());
     }
 
-    public function testIsPropagable()
+    public function testIsPropagable(): void
     {
         self::assertFalse($this->extra->isPropagable());
     }
 
-    public function testCacheKeyPart()
+    public function testCacheKeyPart(): void
     {
         self::assertEquals('path:test', $this->extra->getCacheKeyPart());
     }

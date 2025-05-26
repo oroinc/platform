@@ -5,14 +5,12 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\UpdateList;
 use Oro\Bundle\ApiBundle\Processor\UpdateList\DeleteTargetFileIfAsyncOperationNotStarted;
 use Oro\Bundle\ApiBundle\Processor\UpdateList\StartAsyncOperation;
 use Oro\Bundle\GaufretteBundle\FileManager;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class DeleteTargetFileIfAsyncOperationNotStartedTest extends UpdateListProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FileManager */
-    private $fileManager;
-
-    /** @var DeleteTargetFileIfAsyncOperationNotStarted */
-    private $processor;
+    private FileManager&MockObject $fileManager;
+    private DeleteTargetFileIfAsyncOperationNotStarted $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +21,7 @@ class DeleteTargetFileIfAsyncOperationNotStartedTest extends UpdateListProcessor
         $this->processor = new DeleteTargetFileIfAsyncOperationNotStarted($this->fileManager);
     }
 
-    public function testProcessWhenNoTargetFileName()
+    public function testProcessWhenNoTargetFileName(): void
     {
         $this->fileManager->expects(self::never())
             ->method('hasFile');
@@ -33,7 +31,7 @@ class DeleteTargetFileIfAsyncOperationNotStartedTest extends UpdateListProcessor
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenAsyncOperationStarted()
+    public function testProcessWhenAsyncOperationStarted(): void
     {
         $targetFileName = 'test.data';
 
@@ -49,7 +47,7 @@ class DeleteTargetFileIfAsyncOperationNotStartedTest extends UpdateListProcessor
         self::assertSame($targetFileName, $this->context->getTargetFileName());
     }
 
-    public function testProcessWhenAsyncOperationNotStartedButTargetFileDoesNotExist()
+    public function testProcessWhenAsyncOperationNotStartedButTargetFileDoesNotExist(): void
     {
         $targetFileName = 'test.data';
 
@@ -66,7 +64,7 @@ class DeleteTargetFileIfAsyncOperationNotStartedTest extends UpdateListProcessor
         self::assertNull($this->context->getTargetFileName());
     }
 
-    public function testProcessWhenAsyncOperationNotStartedAndTargetFileExists()
+    public function testProcessWhenAsyncOperationNotStartedAndTargetFileExists(): void
     {
         $targetFileName = 'test.data';
 

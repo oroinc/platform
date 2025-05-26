@@ -14,6 +14,7 @@ use Oro\Bundle\ImapBundle\Connector\Search\SearchQuery;
 use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
 use Oro\Bundle\ImapBundle\Mail\Storage\Message;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -21,11 +22,8 @@ use PHPUnit\Framework\TestCase;
  */
 class ImapEmailManagerTest extends TestCase
 {
-    /** @var ImapConnector|\PHPUnit\Framework\MockObject\MockObject */
-    private $connector;
-
-    /** @var ImapEmailManager */
-    private $manager;
+    private ImapConnector&MockObject $connector;
+    private ImapEmailManager $manager;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +33,7 @@ class ImapEmailManagerTest extends TestCase
         $this->manager = new ImapEmailManager($this->connector);
     }
 
-    public function testSelectFolder()
+    public function testSelectFolder(): void
     {
         $this->connector->expects($this->once())
             ->method('selectFolder')
@@ -117,7 +115,7 @@ class ImapEmailManagerTest extends TestCase
         $this->connector->expects($this->once())
             ->method('getUidValidity')
             ->willReturn(456);
-        $msg = $this->getMessageMock(
+        $msg = $this->getMessage(
             [
                 $this->getHeader('UID', '123'),
                 $this->getHeader('Subject', 'Subject'),
@@ -211,7 +209,7 @@ class ImapEmailManagerTest extends TestCase
             . ' Values: "XThrId1", "XThrId2".'
         );
 
-        $msg = $this->getMessageMock(
+        $msg = $this->getMessage(
             [
                 $this->getHeader('UID', '123'),
                 $this->getHeader('Subject', 'Subject'),
@@ -231,7 +229,7 @@ class ImapEmailManagerTest extends TestCase
 
     public function testConvertToEmailWithMultiValueMessageId(): void
     {
-        $msg = $this->getMessageMock(
+        $msg = $this->getMessage(
             [
                 $this->getHeader('UID', '123'),
                 $this->getHeader('Subject', str_pad('Subject', 1000, '!')),
@@ -251,7 +249,7 @@ class ImapEmailManagerTest extends TestCase
 
     public function testConvertToEmailWithMultiValueAcceptLanguage(): void
     {
-        $msg = $this->getMessageMock(
+        $msg = $this->getMessage(
             [
                 $this->getHeader('UID', '123'),
                 $this->getMultiValueHeader('Accept-Language', 'en-US'),
@@ -270,7 +268,7 @@ class ImapEmailManagerTest extends TestCase
 
     public function testConvertToEmailWithLongSubject(): void
     {
-        $msg = $this->getMessageMock(
+        $msg = $this->getMessage(
             [
                 $this->getHeader('UID', '123'),
                 $this->getHeader('Subject', str_pad('Subject', 1000, '!')),
@@ -281,12 +279,12 @@ class ImapEmailManagerTest extends TestCase
         );
 
         $email = $this->manager->convertToEmail($msg);
-        $this->assertEquals(998, mb_strlen($email->getSubject()));
+        $this->assertEquals(998, mb_strlen((string) $email->getSubject()));
     }
 
     public function testConvertToEmailWithSeveralSubjects(): void
     {
-        $msg = $this->getMessageMock(
+        $msg = $this->getMessage(
             [
                 $this->getHeader('UID', '123'),
                 $this->getMultiValueHeader('Subject', 'Subject1'),
@@ -313,7 +311,7 @@ class ImapEmailManagerTest extends TestCase
 
     public function testConvertToEmailWithReceivedHeader(): void
     {
-        $msg = $this->getMessageMock(
+        $msg = $this->getMessage(
             [
                 $this->getHeader('UID', '123'),
                 $this->getHeader('Date', 'Fri, 31 Jun 2011 10:59:59 +1100'),
@@ -331,7 +329,7 @@ class ImapEmailManagerTest extends TestCase
 
     public function testConvertToEmailWithoutReceivedHeader(): void
     {
-        $msg = $this->getMessageMock(
+        $msg = $this->getMessage(
             [
                 $this->getHeader('UID', '123'),
                 $this->getHeader('Date', 'Fri, 31 Jun 2011 10:59:59 +1100'),
@@ -348,7 +346,7 @@ class ImapEmailManagerTest extends TestCase
 
     public function testConvertToEmailWithoutReceivedAndMessageIDHeadersAndWithInternalDateHeader(): void
     {
-        $msg = $this->getMessageMock(
+        $msg = $this->getMessage(
             [
                 $this->getHeader('UID', '123'),
                 $this->getHeader('Date', 'Fri, 31 Jun 2011 10:59:59 +1100'),
@@ -402,14 +400,7 @@ class ImapEmailManagerTest extends TestCase
         return $header;
     }
 
-    /**
-     * Returns mock of Message object with injected headers
-     *
-     * @param array $headers headers array which will be injected into message mock
-     *
-     * @return Message|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getMessageMock(array $headers)
+    private function getMessage(array $headers): Message&MockObject
     {
         $messageHeaders = new Headers();
         $messageHeaders->addHeaders($headers);

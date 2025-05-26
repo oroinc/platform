@@ -11,8 +11,7 @@ use Oro\Bundle\ApiBundle\Batch\Processor\Update\AddIncludedData;
 
 class AddIncludedDataTest extends BatchUpdateProcessorTestCase
 {
-    /** @var AddIncludedData */
-    private $processor;
+    private AddIncludedData $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +34,7 @@ class AddIncludedDataTest extends BatchUpdateProcessorTestCase
         );
     }
 
-    public function testProcessWhenIncludedDataAlreadyAdded()
+    public function testProcessWhenIncludedDataAlreadyAdded(): void
     {
         $this->context->setProcessed(AddIncludedData::OPERATION_NAME);
         $this->context->setIncludedData($this->getIncludedData([]));
@@ -43,21 +42,21 @@ class AddIncludedDataTest extends BatchUpdateProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenNoIncludedData()
+    public function testProcessWhenNoIncludedData(): void
     {
         $this->context->setResult([['data' => ['type' => 'accounts']]]);
         $this->processor->process($this->context);
         self::assertFalse($this->context->isProcessed(AddIncludedData::OPERATION_NAME));
     }
 
-    public function testProcessWhenNoData()
+    public function testProcessWhenNoData(): void
     {
         $this->context->setIncludedData($this->getIncludedData([]));
         $this->processor->process($this->context);
         self::assertFalse($this->context->isProcessed(AddIncludedData::OPERATION_NAME));
     }
 
-    public function testProcessWhenDataDoesNotHaveRelationships()
+    public function testProcessWhenDataDoesNotHaveRelationships(): void
     {
         $data = [
             ['data' => ['type' => 'accounts']],
@@ -77,7 +76,7 @@ class AddIncludedDataTest extends BatchUpdateProcessorTestCase
         self::assertTrue($this->context->isProcessed(AddIncludedData::OPERATION_NAME));
     }
 
-    public function testProcessWhenDataHaveNotIntersectedRelationships()
+    public function testProcessWhenDataHaveNotIntersectedRelationships(): void
     {
         $data = [
             [
@@ -127,7 +126,7 @@ class AddIncludedDataTest extends BatchUpdateProcessorTestCase
         self::assertTrue($this->context->isProcessed(AddIncludedData::OPERATION_NAME));
     }
 
-    public function testProcessWhenDataHaveIntersectedRelationships()
+    public function testProcessWhenDataHaveIntersectedRelationships(): void
     {
         $data = [
             [
@@ -179,7 +178,7 @@ class AddIncludedDataTest extends BatchUpdateProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessWhenIncludedDataHaveRelationships()
+    public function testProcessWhenIncludedDataHaveRelationships(): void
     {
         $data = [
             [

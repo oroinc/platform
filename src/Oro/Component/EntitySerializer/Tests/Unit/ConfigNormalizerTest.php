@@ -4,8 +4,9 @@ namespace Oro\Component\EntitySerializer\Tests\Unit;
 
 use Oro\Component\EntitySerializer\ConfigConverter;
 use Oro\Component\EntitySerializer\ConfigNormalizer;
+use PHPUnit\Framework\TestCase;
 
-class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
+class ConfigNormalizerTest extends TestCase
 {
     /**
      * @dataProvider normalizeConfigProvider
@@ -17,17 +18,17 @@ class ConfigNormalizerTest extends \PHPUnit\Framework\TestCase
 
         $normalizedConfig = $normalizer->normalizeConfig($config);
 
-        $this->assertEquals(
+        self::assertEquals(
             $expectedConfig,
             $normalizedConfig,
             'normalized config'
         );
-        $this->assertEquals(
+        self::assertEquals(
             $expectedConfig,
             $normalizer->normalizeConfig($normalizedConfig),
             'normalized config should not be changed'
         );
-        $this->assertEquals(
+        self::assertEquals(
             $configObject,
             $configConverter->convertConfig($expectedConfig)->toArray(),
             'config object'

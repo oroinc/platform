@@ -9,15 +9,14 @@ use Liip\ImagineBundle\Model\Binary;
 use Oro\Bundle\AttachmentBundle\Imagine\ImagineFilterService;
 use Oro\Bundle\AttachmentBundle\Provider\ResizedImageProviderInterface;
 use Oro\Bundle\AttachmentBundle\Tools\FilenameExtensionHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ImagineFilterServiceTest extends \PHPUnit\Framework\TestCase
+class ImagineFilterServiceTest extends TestCase
 {
-    private DataManager|\PHPUnit\Framework\MockObject\MockObject $dataManager;
-
-    private CacheManager|\PHPUnit\Framework\MockObject\MockObject $cacheManager;
-
-    private ResizedImageProviderInterface|\PHPUnit\Framework\MockObject\MockObject $resizedImageProvider;
-
+    private DataManager&MockObject $dataManager;
+    private CacheManager&MockObject $cacheManager;
+    private ResizedImageProviderInterface&MockObject $resizedImageProvider;
     private ImagineFilterService $imagineFilterService;
 
     #[\Override]
@@ -29,13 +28,11 @@ class ImagineFilterServiceTest extends \PHPUnit\Framework\TestCase
         $this->resizedImageProvider = $this->createMock(ResizedImageProviderInterface::class);
         $filenameExtensionHelper = new FilenameExtensionHelper(['image/svg']);
 
-        $filterConfiguration
-            ->expects(self::any())
+        $filterConfiguration->expects(self::any())
             ->method('get')
             ->willReturnMap([['jpeg_filter', ['format' => 'jpeg']], ['empty_filter', []]]);
 
-        $this->cacheManager
-            ->expects(self::any())
+        $this->cacheManager->expects(self::any())
             ->method('resolve')
             ->willReturnCallback(static function (string $path, string $filterName, string $resolver) {
                 return '/' . $resolver . '_' . $filterName . '/' . $path;
@@ -60,18 +57,15 @@ class ImagineFilterServiceTest extends \PHPUnit\Framework\TestCase
         string $format
     ): void {
         $resolver = 'sample_resolver';
-        $this->cacheManager
-            ->expects(self::once())
+        $this->cacheManager->expects(self::once())
             ->method('isStored')
             ->with($targetPath, $filterName, $resolver)
             ->willReturn(true);
 
-        $this->resizedImageProvider
-            ->expects(self::never())
+        $this->resizedImageProvider->expects(self::never())
             ->method(self::anything());
 
-        $this->cacheManager
-            ->expects(self::never())
+        $this->cacheManager->expects(self::never())
             ->method('store');
 
         self::assertEquals(
@@ -144,28 +138,24 @@ class ImagineFilterServiceTest extends \PHPUnit\Framework\TestCase
         string $format
     ): void {
         $resolver = 'sample_resolver';
-        $this->cacheManager
-            ->expects(self::once())
+        $this->cacheManager->expects(self::once())
             ->method('isStored')
             ->with($targetPath, $filterName, $resolver)
             ->willReturn(false);
 
         $binary = new Binary('sample_binary', 'image/sample');
-        $this->dataManager
-            ->expects(self::once())
+        $this->dataManager->expects(self::once())
             ->method('find')
             ->with($filterName, $path)
             ->willReturn($binary);
 
         $filteredImageBinary = new Binary('empty_filtered_binary', 'image/sample');
-        $this->resizedImageProvider
-            ->expects(self::once())
+        $this->resizedImageProvider->expects(self::once())
             ->method('getFilteredImageByContent')
             ->with($binary->getContent(), $filterName, $format)
             ->willReturn($filteredImageBinary);
 
-        $this->cacheManager
-            ->expects(self::once())
+        $this->cacheManager->expects(self::once())
             ->method('store')
             ->with($filteredImageBinary, $targetPath, $filterName, $resolver);
 

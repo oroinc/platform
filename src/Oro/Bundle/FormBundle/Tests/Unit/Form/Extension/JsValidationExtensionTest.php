@@ -4,18 +4,17 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension;
 
 use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintsProviderInterface;
 use Oro\Bundle\FormBundle\Form\Extension\JsValidationExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints;
 
-class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
+class JsValidationExtensionTest extends TestCase
 {
-    /** @var ConstraintsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $constraintsProvider;
-
-    /** @var JsValidationExtension */
-    private $extension;
+    private ConstraintsProviderInterface&MockObject $constraintsProvider;
+    private JsValidationExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +32,7 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
         FormInterface $form,
         array $options,
         array $expectedAttributes
-    ) {
+    ): void {
         $this->constraintsProvider->expects($this->once())
             ->method('getFormConstraints')
             ->willReturn([]);
@@ -142,7 +141,7 @@ class JsValidationExtensionTest extends \PHPUnit\Framework\TestCase
         FormInterface $form,
         array $expectedConstraints,
         array $expectedAttributes
-    ) {
+    ): void {
         $this->constraintsProvider->expects($this->once())
             ->method('getFormConstraints')
             ->willReturn($expectedConstraints);

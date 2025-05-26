@@ -3,21 +3,18 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch;
 
 use Oro\Bundle\ApiBundle\Batch\FileLockManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Lock\Exception\ExceptionInterface;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\LockInterface;
 
-class FileLockManagerTest extends \PHPUnit\Framework\TestCase
+class FileLockManagerTest extends TestCase
 {
-    /** @var LockFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $lockFactory;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var FileLockManager */
-    private $fileLockManager;
+    private LockFactory&MockObject $lockFactory;
+    private LoggerInterface&MockObject $logger;
+    private FileLockManager $fileLockManager;
 
     #[\Override]
     protected function setUp(): void

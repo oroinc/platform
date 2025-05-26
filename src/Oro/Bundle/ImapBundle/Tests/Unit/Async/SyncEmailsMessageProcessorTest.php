@@ -9,10 +9,11 @@ use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\TestCase;
 
-class SyncEmailsMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class SyncEmailsMessageProcessorTest extends TestCase
 {
-    public function testCouldBeConstructedWithRequiredArguments()
+    public function testCouldBeConstructedWithRequiredArguments(): void
     {
         $this->expectNotToPerformAssertions();
 
@@ -21,7 +22,7 @@ class SyncEmailsMessageProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldSendMessagesToSyncEmailTopic()
+    public function testShouldSendMessagesToSyncEmailTopic(): void
     {
         $producer = $this->createMock(MessageProducerInterface::class);
         $producer->expects($this->exactly(2))
@@ -41,7 +42,7 @@ class SyncEmailsMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testShouldReturnSubscribedTopics()
+    public function testShouldReturnSubscribedTopics(): void
     {
         $this->assertEquals(
             [SyncEmailsTopic::getName()],

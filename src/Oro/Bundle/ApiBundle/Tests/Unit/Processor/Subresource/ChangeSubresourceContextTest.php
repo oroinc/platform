@@ -17,20 +17,17 @@ use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestMetadataExtra;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ChangeSubresourceContextTest extends \PHPUnit\Framework\TestCase
+class ChangeSubresourceContextTest extends TestCase
 {
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var MetadataProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $metadataProvider;
-
-    /** @var ChangeSubresourceContext */
-    private $context;
+    private ConfigProvider&MockObject $configProvider;
+    private MetadataProvider&MockObject $metadataProvider;
+    private ChangeSubresourceContext $context;
 
     #[\Override]
     protected function setUp(): void

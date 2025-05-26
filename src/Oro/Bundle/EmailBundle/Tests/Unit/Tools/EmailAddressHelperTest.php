@@ -3,14 +3,14 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EmailAddressHelperTest extends \PHPUnit\Framework\TestCase
+class EmailAddressHelperTest extends TestCase
 {
-    /** @var EmailAddressHelper */
-    private $helper;
+    private EmailAddressHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +21,7 @@ class EmailAddressHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider emailAddressProvider
      */
-    public function testExtractPureEmailAddress(string $fullEmailAddress, string $pureEmailAddress, string $name)
+    public function testExtractPureEmailAddress(string $fullEmailAddress, string $pureEmailAddress, string $name): void
     {
         $this->assertEquals($pureEmailAddress, $this->helper->extractPureEmailAddress($fullEmailAddress));
     }
@@ -29,7 +29,7 @@ class EmailAddressHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider emailAddressProvider
      */
-    public function testExtractEmailAddressName(string $fullEmailAddress, string $pureEmailAddress, string $name)
+    public function testExtractEmailAddressName(string $fullEmailAddress, string $pureEmailAddress, string $name): void
     {
         $this->assertEquals($name, $this->helper->extractEmailAddressName($fullEmailAddress));
     }
@@ -37,7 +37,7 @@ class EmailAddressHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildFullEmailAddressProvider
      */
-    public function testBuildFullEmailAddress(?string $pureEmailAddress, ?string $name, string $fullEmailAddress)
+    public function testBuildFullEmailAddress(?string $pureEmailAddress, ?string $name, string $fullEmailAddress): void
     {
         $this->assertEquals($fullEmailAddress, $this->helper->buildFullEmailAddress($pureEmailAddress, $name));
     }
@@ -45,7 +45,7 @@ class EmailAddressHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isFullEmailAddressProvider
      */
-    public function testIsFullEmailAddress(?string $emailAddress, bool $isFull)
+    public function testIsFullEmailAddress(?string $emailAddress, bool $isFull): void
     {
         $this->assertEquals($isFull, $this->helper->isFullEmailAddress($emailAddress));
     }
@@ -53,7 +53,7 @@ class EmailAddressHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider extractEmailAddressFirstNameProvider
      */
-    public function testExtractEmailAddressFirstName(string $emailAddress, string $expected)
+    public function testExtractEmailAddressFirstName(string $emailAddress, string $expected): void
     {
         $this->assertEquals($expected, $this->helper->extractEmailAddressFirstName($emailAddress));
     }
@@ -61,7 +61,7 @@ class EmailAddressHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider extractEmailAddressLastNameProvider
      */
-    public function testExtractEmailAddressLastName(string $emailAddress, string $expected)
+    public function testExtractEmailAddressLastName(string $emailAddress, string $expected): void
     {
         $this->assertEquals($expected, $this->helper->extractEmailAddressLastName($emailAddress));
     }
@@ -132,7 +132,7 @@ class EmailAddressHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider truncateFullEmailAddressProvider
      */
-    public function testTruncateFullEmailAddress(string $email, int $maxLength, string $expected)
+    public function testTruncateFullEmailAddress(string $email, int $maxLength, string $expected): void
     {
         $this->assertEquals($expected, $this->helper->truncateFullEmailAddress($email, $maxLength));
     }

@@ -19,34 +19,23 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationAwareTokenInterfa
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Component\DependencyInjection\ServiceLink;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EmailActivityManagerTest extends \PHPUnit\Framework\TestCase
+class EmailActivityManagerTest extends TestCase
 {
-    /** @var ActivityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $activityManager;
-
-    /** @var EmailActivityListProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailActivityListProvider;
-
-    /** @var EmailThreadProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailThreadProvider;
-
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenStorage;
-
-    /** @var EntityOwnerAccessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityOwnerAccessor;
-
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var EmailActivityManager */
-    private $emailActivityManager;
+    private ActivityManager&MockObject $activityManager;
+    private EmailActivityListProvider&MockObject $emailActivityListProvider;
+    private EmailThreadProvider&MockObject $emailThreadProvider;
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private EntityOwnerAccessor&MockObject $entityOwnerAccessor;
+    private EntityManagerInterface&MockObject $em;
+    private EmailActivityManager $emailActivityManager;
 
     #[\Override]
     protected function setUp(): void

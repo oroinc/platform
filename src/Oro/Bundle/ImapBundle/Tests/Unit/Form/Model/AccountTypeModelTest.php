@@ -4,8 +4,9 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Form\Model;
 
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
+use PHPUnit\Framework\TestCase;
 
-class AccountTypeModelTest extends \PHPUnit\Framework\TestCase
+class AccountTypeModelTest extends TestCase
 {
     public function testAccountType(): void
     {

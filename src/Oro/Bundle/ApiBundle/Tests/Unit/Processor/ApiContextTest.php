@@ -4,8 +4,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use PHPUnit\Framework\TestCase;
 
-class ApiContextTest extends \PHPUnit\Framework\TestCase
+class ApiContextTest extends TestCase
 {
     private ApiContext $context;
 
@@ -15,7 +16,7 @@ class ApiContextTest extends \PHPUnit\Framework\TestCase
         $this->context = new ApiContextStub();
     }
 
-    public function testRequestType()
+    public function testRequestType(): void
     {
         self::assertEquals(new RequestType([]), $this->context->getRequestType());
 
@@ -33,7 +34,7 @@ class ApiContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(new RequestType(['test', 'another']), $this->context->get(ApiContext::REQUEST_TYPE));
     }
 
-    public function testVersion()
+    public function testVersion(): void
     {
         self::assertSame('', $this->context->getVersion());
 
@@ -42,7 +43,7 @@ class ApiContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('test', $this->context->get(ApiContext::VERSION));
     }
 
-    public function testProcessed()
+    public function testProcessed(): void
     {
         self::assertFalse($this->context->isProcessed('test'));
 

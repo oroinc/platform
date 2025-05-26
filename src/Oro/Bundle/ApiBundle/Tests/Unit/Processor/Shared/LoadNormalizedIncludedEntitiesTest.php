@@ -15,20 +15,16 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Component\ChainProcessor\ParameterBag;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
 {
-    private const INCLUDE_ID_META = 'includeId';
-    private const INCLUDE_ID_PROPERTY = '__include_id__';
+    private const string INCLUDE_ID_META = 'includeId';
+    private const string INCLUDE_ID_PROPERTY = '__include_id__';
 
-    /** @var ActionProcessorBagInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $processorBag;
-
-    /** @var ParameterBag */
-    private $sharedData;
-
-    /** @var LoadNormalizedIncludedEntities */
-    private $processor;
+    private ActionProcessorBagInterface&MockObject $processorBag;
+    private ParameterBag $sharedData;
+    private LoadNormalizedIncludedEntities $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -44,18 +40,18 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         $this->processor = new LoadNormalizedIncludedEntities($this->processorBag);
     }
 
-    public function testProcessWithoutIncludedData()
+    public function testProcessWithoutIncludedData(): void
     {
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithoutIncludedEntities()
+    public function testProcessWithoutIncludedEntities(): void
     {
         $this->context->setIncludedData(['key' => 'value']);
         $this->processor->process($this->context);
     }
 
-    public function testProcessForNewIncludedEntityWhenGetActionSuccess()
+    public function testProcessForNewIncludedEntityWhenGetActionSuccess(): void
     {
         $includedEntities = new IncludedEntityCollection();
         $includedEntity = new Group();
@@ -136,7 +132,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         );
     }
 
-    public function testProcessForNewIncludedEntityWhenGetActionSuccessForCompositeId()
+    public function testProcessForNewIncludedEntityWhenGetActionSuccessForCompositeId(): void
     {
         $includedEntities = new IncludedEntityCollection();
         $includedEntity = new Group();
@@ -216,7 +212,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         );
     }
 
-    public function testProcessForExistingIncludedEntityWhenGetActionSuccess()
+    public function testProcessForExistingIncludedEntityWhenGetActionSuccess(): void
     {
         $includedEntities = new IncludedEntityCollection();
         $includedEntity = new Group();
@@ -295,7 +291,7 @@ class LoadNormalizedIncludedEntitiesTest extends FormProcessorTestCase
         );
     }
 
-    public function testProcessWhenGetActionHasErrors()
+    public function testProcessWhenGetActionHasErrors(): void
     {
         $getError = Error::create('test error');
 

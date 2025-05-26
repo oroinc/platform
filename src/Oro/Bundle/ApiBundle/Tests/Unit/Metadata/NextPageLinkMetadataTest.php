@@ -7,10 +7,11 @@ use Oro\Bundle\ApiBundle\Metadata\DataAccessorInterface;
 use Oro\Bundle\ApiBundle\Metadata\ExternalLinkMetadata;
 use Oro\Bundle\ApiBundle\Metadata\NextPageLinkMetadata;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use PHPUnit\Framework\TestCase;
 
-class NextPageLinkMetadataTest extends \PHPUnit\Framework\TestCase
+class NextPageLinkMetadataTest extends TestCase
 {
-    public function testGetHrefWhenThereIsNoMoreRecords()
+    public function testGetHrefWhenThereIsNoMoreRecords(): void
     {
         $queryStringAccessor = $this->createMock(QueryStringAccessorInterface::class);
         $linkMetadata = new NextPageLinkMetadata(
@@ -29,7 +30,7 @@ class NextPageLinkMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertNull($linkMetadata->getHref($dataAccessor));
     }
 
-    public function testGetHrefWhenPaginationIsNotSupported()
+    public function testGetHrefWhenPaginationIsNotSupported(): void
     {
         $queryStringAccessor = $this->createMock(QueryStringAccessorInterface::class);
         $linkMetadata = new NextPageLinkMetadata(
@@ -56,7 +57,7 @@ class NextPageLinkMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertNull($linkMetadata->getHref($dataAccessor));
     }
 
-    public function testGetHrefForFirstPage()
+    public function testGetHrefForFirstPage(): void
     {
         $queryStringAccessor = $this->createMock(QueryStringAccessorInterface::class);
         $linkMetadata = new NextPageLinkMetadata(
@@ -90,7 +91,7 @@ class NextPageLinkMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetHrefForAnotherPage()
+    public function testGetHrefForAnotherPage(): void
     {
         $queryStringAccessor = $this->createMock(QueryStringAccessorInterface::class);
         $linkMetadata = new NextPageLinkMetadata(
@@ -124,7 +125,7 @@ class NextPageLinkMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetHrefWhenNoQueryStringAccessor()
+    public function testGetHrefWhenNoQueryStringAccessor(): void
     {
         $linkMetadata = new NextPageLinkMetadata(
             new ExternalLinkMetadata('http://test.com'),
@@ -153,7 +154,7 @@ class NextPageLinkMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetHrefWhenNoPageNumberInData()
+    public function testGetHrefWhenNoPageNumberInData(): void
     {
         $linkMetadata = new NextPageLinkMetadata(
             new ExternalLinkMetadata('http://test.com'),

@@ -5,14 +5,13 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Autocomplete;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\FormBundle\Autocomplete\FullNameSearchHandler;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FullNameSearchHandlerTest extends \PHPUnit\Framework\TestCase
+class FullNameSearchHandlerTest extends TestCase
 {
-    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityNameResolver;
-
-    /** @var FullNameSearchHandler */
-    private $searchHandler;
+    private EntityNameResolver&MockObject $entityNameResolver;
+    private FullNameSearchHandler $searchHandler;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class FullNameSearchHandlerTest extends \PHPUnit\Framework\TestCase
         $this->searchHandler->setPropertyAccessor(PropertyAccess::createPropertyAccessor());
     }
 
-    public function testConvertItem()
+    public function testConvertItem(): void
     {
         $fullName = 'Mr. John Doe';
 
@@ -47,7 +46,7 @@ class FullNameSearchHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConvertItemFails()
+    public function testConvertItemFails(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Name resolver must be configured');

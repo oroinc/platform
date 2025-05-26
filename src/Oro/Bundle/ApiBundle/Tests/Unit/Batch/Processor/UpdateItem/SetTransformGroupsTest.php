@@ -10,8 +10,7 @@ use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 
 class SetTransformGroupsTest extends BatchUpdateItemProcessorTestCase
 {
-    /** @var SetTransformGroups */
-    private $processor;
+    private SetTransformGroups $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class SetTransformGroupsTest extends BatchUpdateItemProcessorTestCase
         $this->processor = new SetTransformGroups();
     }
 
-    public function testProcessWithoutTargetAction()
+    public function testProcessWithoutTargetAction(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The target action is not defined.');
@@ -29,7 +28,7 @@ class SetTransformGroupsTest extends BatchUpdateItemProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithoutTargetContext()
+    public function testProcessWithoutTargetContext(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The target context is not defined.');
@@ -38,7 +37,7 @@ class SetTransformGroupsTest extends BatchUpdateItemProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForUnknownTargetAction()
+    public function testProcessForUnknownTargetAction(): void
     {
         $targetContext = $this->createMock(Context::class);
         $targetContext->expects(self::never())
@@ -51,7 +50,7 @@ class SetTransformGroupsTest extends BatchUpdateItemProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForCreateTargetAction()
+    public function testProcessForCreateTargetAction(): void
     {
         $targetContext = $this->createMock(Context::class);
         $targetContext->expects(self::once())
@@ -66,7 +65,7 @@ class SetTransformGroupsTest extends BatchUpdateItemProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForUpdateTargetAction()
+    public function testProcessForUpdateTargetAction(): void
     {
         $targetContext = $this->createMock(Context::class);
         $targetContext->expects(self::once())

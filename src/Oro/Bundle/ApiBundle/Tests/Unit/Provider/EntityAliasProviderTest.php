@@ -5,11 +5,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 use Oro\Bundle\ApiBundle\Provider\ConfigCache;
 use Oro\Bundle\ApiBundle\Provider\EntityAliasProvider;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
+use PHPUnit\Framework\TestCase;
 
-class EntityAliasProviderTest extends \PHPUnit\Framework\TestCase
+class EntityAliasProviderTest extends TestCase
 {
-    /** @var EntityAliasProvider */
-    private $entityAliasProvider;
+    private EntityAliasProvider $entityAliasProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -29,14 +29,14 @@ class EntityAliasProviderTest extends \PHPUnit\Framework\TestCase
         $this->entityAliasProvider = new EntityAliasProvider($configCache);
     }
 
-    public function testGetClassNames()
+    public function testGetClassNames(): void
     {
         self::assertEquals(['Test\Entity1'], $this->entityAliasProvider->getClassNames());
         // test that data is cached in memory
         self::assertEquals(['Test\Entity1'], $this->entityAliasProvider->getClassNames());
     }
 
-    public function testGetEntityAliasForExistingEntity()
+    public function testGetEntityAliasForExistingEntity(): void
     {
         self::assertEquals(
             new EntityAlias('entity1', 'entity1_plural'),
@@ -49,14 +49,14 @@ class EntityAliasProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityAliasForExcludedEntity()
+    public function testGetEntityAliasForExcludedEntity(): void
     {
         self::assertFalse($this->entityAliasProvider->getEntityAlias('Test\Entity2'));
         // test that data is cached in memory
         self::assertFalse($this->entityAliasProvider->getEntityAlias('Test\Entity2'));
     }
 
-    public function testGetEntityAliasForNotExistingEntity()
+    public function testGetEntityAliasForNotExistingEntity(): void
     {
         self::assertNull($this->entityAliasProvider->getEntityAlias('Test\Entity3'));
         // test that data is cached in memory

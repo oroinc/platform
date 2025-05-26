@@ -7,8 +7,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
 class CheckNoHateoasLinksTest extends GetListProcessorTestCase
 {
-    /** @var CheckNoHateoasLinks */
-    private $processor;
+    private CheckNoHateoasLinks $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -18,14 +17,14 @@ class CheckNoHateoasLinksTest extends GetListProcessorTestCase
         $this->processor = new CheckNoHateoasLinks();
     }
 
-    public function testProcessWithEmptyRequestHeader()
+    public function testProcessWithEmptyRequestHeader(): void
     {
         $this->processor->process($this->context);
 
         self::assertTrue($this->context->isHateoasEnabled());
     }
 
-    public function testProcessWithNoHateoasInRequestHeader()
+    public function testProcessWithNoHateoasInRequestHeader(): void
     {
         $this->context->getRequestHeaders()->set('X-Include', ['noHateoas']);
         $this->processor->process($this->context);
@@ -33,7 +32,7 @@ class CheckNoHateoasLinksTest extends GetListProcessorTestCase
         self::assertFalse($this->context->isHateoasEnabled());
     }
 
-    public function testProcessWithSeveralRequestHeadersAndNoHateoasExists()
+    public function testProcessWithSeveralRequestHeadersAndNoHateoasExists(): void
     {
         $this->context->getRequestHeaders()->set('X-Include', ['totalCount', 'noHateoas']);
         $this->processor->process($this->context);
@@ -41,7 +40,7 @@ class CheckNoHateoasLinksTest extends GetListProcessorTestCase
         self::assertFalse($this->context->isHateoasEnabled());
     }
 
-    public function testProcessWithRequestHeadersButNoHateoasDoesNotExists()
+    public function testProcessWithRequestHeadersButNoHateoasDoesNotExists(): void
     {
         $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
         $this->processor->process($this->context);

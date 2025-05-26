@@ -5,8 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Oro\Bundle\ApiBundle\Util\ComparisonExpressionsVisitor;
+use PHPUnit\Framework\TestCase;
 
-class ComparisonExpressionsVisitorTest extends \PHPUnit\Framework\TestCase
+class ComparisonExpressionsVisitorTest extends TestCase
 {
     private ComparisonExpressionsVisitor $visitor;
 

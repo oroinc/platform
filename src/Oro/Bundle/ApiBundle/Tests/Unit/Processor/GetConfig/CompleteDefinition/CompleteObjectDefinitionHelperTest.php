@@ -7,14 +7,12 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CompleteAssociat
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CompleteObjectDefinitionHelper;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCase
 {
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var CompleteObjectDefinitionHelper */
-    private $completeObjectDefinitionHelper;
+    private ConfigProvider&MockObject $configProvider;
+    private CompleteObjectDefinitionHelper $completeObjectDefinitionHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +26,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForField()
+    public function testCompleteDefinitionForField(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -55,7 +53,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForCompletedAssociation()
+    public function testCompleteDefinitionForCompletedAssociation(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -107,7 +105,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForAssociationWithoutConfig()
+    public function testCompleteDefinitionForAssociationWithoutConfig(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -140,7 +138,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForAssociation()
+    public function testCompleteDefinitionForAssociation(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -194,7 +192,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForAssociationWithDataType()
+    public function testCompleteDefinitionForAssociationWithDataType(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -248,7 +246,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForAssociationWithCompositeId()
+    public function testCompleteDefinitionForAssociationWithCompositeId(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -308,7 +306,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForIdentifierFieldsOnly()
+    public function testCompleteDefinitionForIdentifierFieldsOnly(): void
     {
         $config = $this->createConfigObject([
             'identifier_field_names' => ['id'],
@@ -350,7 +348,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForIdentifierFieldsOnlyWithRenamedIdFieldInConfig()
+    public function testCompleteDefinitionForIdentifierFieldsOnlyWithRenamedIdFieldInConfig(): void
     {
         $config = $this->createConfigObject([
             'identifier_field_names' => ['renamedId'],
@@ -381,7 +379,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForEnumEntity()
+    public function testCompleteDefinitionForEnumEntity(): void
     {
         $config = $this->createConfigObject([
             'hints' => [
@@ -406,7 +404,7 @@ class CompleteObjectDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForEnumEntityWhenHintAlreadySet()
+    public function testCompleteDefinitionForEnumEntityWhenHintAlreadySet(): void
     {
         $config = $this->createConfigObject([
             'hints' => [

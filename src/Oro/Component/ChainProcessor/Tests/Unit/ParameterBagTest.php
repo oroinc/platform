@@ -3,11 +3,11 @@
 namespace Oro\Component\ChainProcessor\Tests\Unit;
 
 use Oro\Component\ChainProcessor\ParameterBag;
+use PHPUnit\Framework\TestCase;
 
-class ParameterBagTest extends \PHPUnit\Framework\TestCase
+class ParameterBagTest extends TestCase
 {
-    /** @var ParameterBag */
-    private $parameterBag;
+    private ParameterBag $parameterBag;
 
     #[\Override]
     protected function setUp(): void
@@ -15,7 +15,7 @@ class ParameterBagTest extends \PHPUnit\Framework\TestCase
         $this->parameterBag = new ParameterBag();
     }
 
-    public function testHas()
+    public function testHas(): void
     {
         $key = 'test_key';
 
@@ -27,7 +27,7 @@ class ParameterBagTest extends \PHPUnit\Framework\TestCase
         self::assertTrue(isset($this->parameterBag[$key]));
     }
 
-    public function testGetNotExistingValue()
+    public function testGetNotExistingValue(): void
     {
         $key = 'test_key';
 
@@ -35,7 +35,7 @@ class ParameterBagTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->parameterBag[$key]);
     }
 
-    public function testGetExistingValue()
+    public function testGetExistingValue(): void
     {
         $key = 'test_key';
         $val = 'test_val';
@@ -45,7 +45,7 @@ class ParameterBagTest extends \PHPUnit\Framework\TestCase
         self::assertSame($val, $this->parameterBag[$key]);
     }
 
-    public function testGetExistingNullValue()
+    public function testGetExistingNullValue(): void
     {
         $key = 'test_key';
 
@@ -54,7 +54,7 @@ class ParameterBagTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->parameterBag[$key]);
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         $key = 'test_key';
 
@@ -65,7 +65,7 @@ class ParameterBagTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->parameterBag->has($key));
     }
 
-    public function testArraySetAndUnset()
+    public function testArraySetAndUnset(): void
     {
         $key = 'test_key';
 
@@ -76,7 +76,7 @@ class ParameterBagTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->parameterBag->has($key));
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $key = 'test_key';
 
@@ -87,7 +87,7 @@ class ParameterBagTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->parameterBag->has($key));
     }
 
-    public function testCount()
+    public function testCount(): void
     {
         $key = 'test_key';
         $val = 'test_val';
@@ -98,7 +98,7 @@ class ParameterBagTest extends \PHPUnit\Framework\TestCase
         self::assertSame(1, $this->parameterBag->count());
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $key1 = 'test_key1';
         $val1 = 'test_val1';
@@ -112,7 +112,7 @@ class ParameterBagTest extends \PHPUnit\Framework\TestCase
         self::assertSame([$key1 => $val1, $key2 => $val2], $this->parameterBag->toArray());
     }
 
-    public function testIterator()
+    public function testIterator(): void
     {
         $key1 = 'test_key1';
         $val1 = 'test_val1';

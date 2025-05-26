@@ -11,8 +11,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
 class AddIncludedEntitiesToResultDocumentTest extends FormProcessorTestCase
 {
-    /** @var AddIncludedEntitiesToResultDocument */
-    private $processor;
+    private AddIncludedEntitiesToResultDocument $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -21,20 +20,20 @@ class AddIncludedEntitiesToResultDocumentTest extends FormProcessorTestCase
         $this->processor = new AddIncludedEntitiesToResultDocument();
     }
 
-    public function testProcessWithoutIncludedData()
+    public function testProcessWithoutIncludedData(): void
     {
         $this->context->setResponseStatusCode(200);
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithoutIncludedEntities()
+    public function testProcessWithoutIncludedEntities(): void
     {
         $this->context->setIncludedData(['key' => 'value']);
         $this->context->setResponseStatusCode(200);
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithoutResponseDocumentBuilder()
+    public function testProcessWithoutResponseDocumentBuilder(): void
     {
         $this->context->setIncludedData(['key' => 'value']);
         $this->context->setIncludedEntities(new IncludedEntityCollection());
@@ -42,7 +41,7 @@ class AddIncludedEntitiesToResultDocumentTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForSuccessResponse()
+    public function testProcessForSuccessResponse(): void
     {
         $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
         $includedEntities = new IncludedEntityCollection();
@@ -69,7 +68,7 @@ class AddIncludedEntitiesToResultDocumentTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForFailureResponse()
+    public function testProcessForFailureResponse(): void
     {
         $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
         $includedEntities = new IncludedEntityCollection();

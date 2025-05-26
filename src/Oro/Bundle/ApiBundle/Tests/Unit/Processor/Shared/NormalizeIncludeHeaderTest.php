@@ -8,8 +8,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
 class NormalizeIncludeHeaderTest extends GetListProcessorTestCase
 {
-    /** @var NormalizeIncludeHeader */
-    private $processor;
+    private NormalizeIncludeHeader $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -19,14 +18,14 @@ class NormalizeIncludeHeaderTest extends GetListProcessorTestCase
         $this->processor = new NormalizeIncludeHeader();
     }
 
-    public function testProcessWhenNoIncludeHeader()
+    public function testProcessWhenNoIncludeHeader(): void
     {
         $this->processor->process($this->context);
 
         self::assertFalse($this->context->getRequestHeaders()->has(Context::INCLUDE_HEADER));
     }
 
-    public function testProcessWhenIncludeHeaderAlreadyNormalized()
+    public function testProcessWhenIncludeHeaderAlreadyNormalized(): void
     {
         $this->context->getRequestHeaders()->set(Context::INCLUDE_HEADER, ['val1', 'val2']);
 
@@ -38,7 +37,7 @@ class NormalizeIncludeHeaderTest extends GetListProcessorTestCase
         );
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $this->context->getRequestHeaders()->set(Context::INCLUDE_HEADER, 'val1; val2');
 

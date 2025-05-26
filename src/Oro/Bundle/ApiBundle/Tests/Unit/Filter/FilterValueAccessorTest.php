@@ -4,11 +4,12 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessor;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class FilterValueAccessorTest extends \PHPUnit\Framework\TestCase
+class FilterValueAccessorTest extends TestCase
 {
     private FilterValueAccessor $accessor;
 
@@ -18,7 +19,7 @@ class FilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         $this->accessor = new FilterValueAccessor();
     }
 
-    public function testAddNewFilterValueWithoutSourceKey()
+    public function testAddNewFilterValueWithoutSourceKey(): void
     {
         $filterValue = new FilterValue('prm1', 'val1', 'eq');
         $this->accessor->set('prm1', $filterValue);
@@ -32,7 +33,7 @@ class FilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddNewFilterValueWithSourceKey()
+    public function testAddNewFilterValueWithSourceKey(): void
     {
         $filterValue = FilterValue::createFromSource('prm1', 'prm1', 'val1', 'eq');
         $this->accessor->set('prm1', $filterValue);
@@ -46,7 +47,7 @@ class FilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddNewFilterValueWithoutOperator()
+    public function testAddNewFilterValueWithoutOperator(): void
     {
         $filterValue = FilterValue::createFromSource('prm1', 'prm1', 'val1');
         $this->accessor->set('prm1', $filterValue);
@@ -61,7 +62,7 @@ class FilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddNewFilterValueWithCustomOperator()
+    public function testAddNewFilterValueWithCustomOperator(): void
     {
         $filterValue = FilterValue::createFromSource('prm1', 'prm1', 'val1', 'contains');
         $this->accessor->set('prm1', $filterValue);
@@ -76,7 +77,7 @@ class FilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddNewFilterValuesWithSameKeyButDifferentOperators()
+    public function testAddNewFilterValuesWithSameKeyButDifferentOperators(): void
     {
         $filterValue1 = FilterValue::createFromSource('prm1', 'prm1', 'val1');
         $filterValue2 = FilterValue::createFromSource('prm1', 'prm1', 'val2', 'contains');
@@ -93,7 +94,7 @@ class FilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddNewGroupedFilterValueWithoutSourceKey()
+    public function testAddNewGroupedFilterValueWithoutSourceKey(): void
     {
         $filterValue = new FilterValue('path', 'val1', 'eq');
         $this->accessor->set('group[path]', $filterValue);
@@ -107,7 +108,7 @@ class FilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddNewGroupedFilterValueWithSourceKey()
+    public function testAddNewGroupedFilterValueWithSourceKey(): void
     {
         $filterValue = FilterValue::createFromSource('group[path]', 'path', 'val1', 'eq');
         $this->accessor->set('group[path]', $filterValue);
@@ -121,7 +122,7 @@ class FilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddNewGroupedFilterValueWithoutOperator()
+    public function testAddNewGroupedFilterValueWithoutOperator(): void
     {
         $filterValue = FilterValue::createFromSource('group[path]', 'path', 'val1');
         $this->accessor->set('group[path]', $filterValue);
@@ -135,7 +136,7 @@ class FilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddNewGroupedFilterValueWithCustomOperator()
+    public function testAddNewGroupedFilterValueWithCustomOperator(): void
     {
         $filterValue = FilterValue::createFromSource('group[path]', 'path', 'val1', 'contains');
         $this->accessor->set('group[path]', $filterValue);
@@ -149,7 +150,7 @@ class FilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOverrideExistingFilterValue()
+    public function testOverrideExistingFilterValue(): void
     {
         $existingFilterValue = FilterValue::createFromSource('prm1', 'prm1', 'oldValue', 'eq');
         $this->accessor->set('prm1', $existingFilterValue);
@@ -169,7 +170,7 @@ class FilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOverrideExistingGroupedFilterValue()
+    public function testOverrideExistingGroupedFilterValue(): void
     {
         $existingFilterValue = FilterValue::createFromSource('group[path]', 'path', 'oldValue', 'eq');
         $this->accessor->set('group[path]', $existingFilterValue);
@@ -189,7 +190,7 @@ class FilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRemoveExistingFilterValueViaSetMethod()
+    public function testRemoveExistingFilterValueViaSetMethod(): void
     {
         $existingFilterValue = FilterValue::createFromSource('prm1', 'prm1', 'val1', 'eq');
         $this->accessor->set('prm1', $existingFilterValue);
@@ -207,7 +208,7 @@ class FilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRemoveExistingGroupedFilterValueViaSetMethod()
+    public function testRemoveExistingGroupedFilterValueViaSetMethod(): void
     {
         $existingFilterValue = FilterValue::createFromSource('group[path]', 'path', 'val1', 'eq');
         $this->accessor->set('group[path]', $existingFilterValue);
@@ -225,7 +226,7 @@ class FilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRemoveExistingFilterValueViaRemoveMethod()
+    public function testRemoveExistingFilterValueViaRemoveMethod(): void
     {
         $existingFilterValue = FilterValue::createFromSource('prm1', 'prm1', 'val1', 'eq');
         $this->accessor->set('prm1', $existingFilterValue);
@@ -243,7 +244,7 @@ class FilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRemoveExistingGroupedFilterValueViaRemoveMethod()
+    public function testRemoveExistingGroupedFilterValueViaRemoveMethod(): void
     {
         $existingFilterValue = FilterValue::createFromSource('group[path]', 'path', 'val1', 'eq');
         $this->accessor->set('group[path]', $existingFilterValue);
@@ -261,7 +262,7 @@ class FilterValueAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDefaultGroup()
+    public function testDefaultGroup(): void
     {
         $filterValue1 = FilterValue::createFromSource('filter1', 'filter1', 'val1', 'eq');
         $this->accessor->set('filter1', $filterValue1);

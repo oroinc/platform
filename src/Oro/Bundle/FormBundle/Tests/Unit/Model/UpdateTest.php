@@ -5,20 +5,18 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Model;
 use Oro\Bundle\FormBundle\Form\Handler\FormHandlerInterface;
 use Oro\Bundle\FormBundle\Model\Update;
 use Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class UpdateTest extends \PHPUnit\Framework\TestCase
+class UpdateTest extends TestCase
 {
-    public function testUpdateMethods()
+    public function testUpdateMethods(): void
     {
         $data = new \stdClass();
         /** @var FormInterface $form */
         $form = $this->createMock(FormInterface::class);
-        /** @var FormHandlerInterface|MockObject $formHandler */
         $formHandler = $this->createMock(FormHandlerInterface::class);
-        /** @var FormTemplateDataProviderInterface|MockObject $formTemplateDataProvider */
         $formTemplateDataProvider = $this->createMock(FormTemplateDataProviderInterface::class);
         $update = new  Update();
 
@@ -30,7 +28,6 @@ class UpdateTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($data, $update->getFormData());
         $this->assertSame($form, $update->getForm());
 
-        /** @var Request|MockObject $request */
         $request = $this->createMock(Request::class);
 
         $formHandler->expects($this->once())

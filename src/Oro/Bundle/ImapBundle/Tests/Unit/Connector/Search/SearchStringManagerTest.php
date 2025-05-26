@@ -5,17 +5,15 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Connector\Search;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQuery;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryMatch;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchStringManager;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class SearchStringManagerTest extends \PHPUnit\Framework\TestCase
+class SearchStringManagerTest extends TestCase
 {
-    /** @var SearchStringManager */
-    private $searchStringManager;
-
-    /** @var SearchQuery */
-    private $query;
+    private SearchStringManager $searchStringManager;
+    private SearchQuery $query;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +25,7 @@ class SearchStringManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider valueProvider
      */
-    public function testValue($value, $match, $expectedQuery)
+    public function testValue($value, $match, $expectedQuery): void
     {
         $this->query->value($value, $match);
         $this->assertEquals($expectedQuery, $this->query->convertToSearchString());
@@ -36,13 +34,13 @@ class SearchStringManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider itemProvider
      */
-    public function testItem($name, $value, $match, $expectedQuery)
+    public function testItem($name, $value, $match, $expectedQuery): void
     {
         $this->query->item($name, $value, $match);
         $this->assertEquals($expectedQuery, $this->query->convertToSearchString());
     }
 
-    public function testOrOperatorWithTwoOperands()
+    public function testOrOperatorWithTwoOperands(): void
     {
         // val1 OR val2
         $this->query->item('subject', 'val1');
@@ -54,7 +52,7 @@ class SearchStringManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOrOperatorWithNotBeforeFirstOperand()
+    public function testOrOperatorWithNotBeforeFirstOperand(): void
     {
         // NOT val1 OR val2
         $this->query->notOperator();
@@ -67,7 +65,7 @@ class SearchStringManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOrOperatorWithDoubleNotBeforeFirstOperand()
+    public function testOrOperatorWithDoubleNotBeforeFirstOperand(): void
     {
         // NOT NOT val1 OR val2
         $this->query->notOperator();
@@ -81,7 +79,7 @@ class SearchStringManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOrOperatorWithThreeOperands()
+    public function testOrOperatorWithThreeOperands(): void
     {
         // val1 OR val2 OR val3
         $this->query->item('subject', 'val1');
@@ -95,7 +93,7 @@ class SearchStringManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOrOperatorWithSubQuery()
+    public function testOrOperatorWithSubQuery(): void
     {
         // (val1 OR val2 OR val3)
         $subQuery = $this->createSearchQuery();
@@ -112,7 +110,7 @@ class SearchStringManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOrOperatorWithParenthesis()
+    public function testOrOperatorWithParenthesis(): void
     {
         // (val1 OR val2) OR val3
         $this->query->openParenthesis();
@@ -128,7 +126,7 @@ class SearchStringManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOrOperatorWithNestedParenthesis()
+    public function testOrOperatorWithNestedParenthesis(): void
     {
         // (val1 OR (val2 OR val3)) OR val4
         $this->query->openParenthesis();
@@ -148,7 +146,7 @@ class SearchStringManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testComplexQuery()
+    public function testComplexQuery(): void
     {
         $simpleSubQuery = $this->createSearchQuery();
         $simpleSubQuery->value('val1');

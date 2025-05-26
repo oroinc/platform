@@ -8,8 +8,9 @@ use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\ProcessorIterator;
 use Oro\Component\ChainProcessor\ProcessorIteratorFactory;
 use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
+use PHPUnit\Framework\TestCase;
 
-class ProcessorIteratorTest extends \PHPUnit\Framework\TestCase
+class ProcessorIteratorTest extends TestCase
 {
     private const TEST_ACTION = 'test_action';
 

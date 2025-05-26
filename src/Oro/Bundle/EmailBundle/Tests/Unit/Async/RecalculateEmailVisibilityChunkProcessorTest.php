@@ -20,26 +20,17 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class RecalculateEmailVisibilityChunkProcessorTest extends \PHPUnit\Framework\TestCase
+class RecalculateEmailVisibilityChunkProcessorTest extends TestCase
 {
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var EmailRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
-
-    /** @var EmailAddressVisibilityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailAddressVisibilityManager;
-
-    /** @var ActivityListChainProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $activityListProvider;
-
-    /** @var JobRunner|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobRunner;
-
-    /** @var RecalculateEmailVisibilityChunkProcessor */
-    private $processor;
+    private EntityManagerInterface&MockObject $em;
+    private EmailRepository&MockObject $repository;
+    private EmailAddressVisibilityManager&MockObject $emailAddressVisibilityManager;
+    private ActivityListChainProvider&MockObject $activityListProvider;
+    private JobRunner&MockObject $jobRunner;
+    private RecalculateEmailVisibilityChunkProcessor $processor;
 
     #[\Override]
     protected function setUp(): void

@@ -5,8 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Delete;
 use Oro\Bundle\ApiBundle\Processor\Delete\DeleteContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use PHPUnit\Framework\TestCase;
 
-class DeleteContextTest extends \PHPUnit\Framework\TestCase
+class DeleteContextTest extends TestCase
 {
     private DeleteContext $context;
 
@@ -19,7 +20,7 @@ class DeleteContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAllEntities()
+    public function testGetAllEntities(): void
     {
         self::assertSame([], $this->context->getAllEntities());
 

@@ -5,25 +5,27 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Builder;
 use Oro\Bundle\FormBundle\Form\Builder\DataBlockBuilder;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 use Oro\Bundle\UIBundle\Twig\Environment;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\Forms;
 
-class DataBlockBuilderTest extends \PHPUnit\Framework\TestCase
+class DataBlockBuilderTest extends TestCase
 {
-    const TEMPLATE_CODE = '{% set parts = formFieldPath|split(' . ') %}
+    private const string TEMPLATE_CODE = '{% set parts = formFieldPath|split(' . ') %}
 {% set form = parentContext %}
 {% for part in parts %}
     {% set form = attribute(form, part) %}
 {% endfor %}
 
 {{ form_row(form) }}';
-    const TEMPLATE_PATH = '@OroForm/Form/data_block_item.html.twig';
-    private FormFactoryInterface $formFactory;
+    private const string TEMPLATE_PATH = '@OroForm/Form/data_block_item.html.twig';
 
+    private FormFactoryInterface $formFactory;
+    private Environment&MockObject $twig;
     private DataBlockBuilder $builder;
-    private $twig;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +33,6 @@ class DataBlockBuilderTest extends \PHPUnit\Framework\TestCase
         $this->formFactory = Forms::createFormFactoryBuilder()
             ->addTypeExtension(new DataBlockExtension())
             ->getFormFactory();
-
         $this->twig = $this->createMock(Environment::class);
 
         $this->builder = new DataBlockBuilder($this->twig, ['form' => []], 'form');
@@ -45,17 +46,17 @@ class DataBlockBuilderTest extends \PHPUnit\Framework\TestCase
                     'priority' => 20,
                     'subblocks' => [
                         'first' => [
-                            'priority' => 20,
+                            'priority' => 20
                         ],
                         'second' => [
-                            'priority' => 10,
-                        ],
-                    ],
+                            'priority' => 10
+                        ]
+                    ]
                 ],
                 'second' => [
-                    'priority' => 10,
-                ],
-            ],
+                    'priority' => 10
+                ]
+            ]
         ];
         $formItems = [
             'item1' => ['block' => 'first', 'subblock' => 'first'],
@@ -66,59 +67,50 @@ class DataBlockBuilderTest extends \PHPUnit\Framework\TestCase
                     'first' => [
                         'subblocks' => [
                             'second' => [
-                                'priority' => 30,
-                            ],
-                        ],
-                    ],
-                ],
+                                'priority' => 30
+                            ]
+                        ]
+                    ]
+                ]
             ],
             'item3' => [
                 'block' => 'second',
                 'subblock' => 'first',
                 'block_config' => [
                     'second' => [
-                        'title' => 'Changed Second',
-                    ],
-                ],
-            ],
+                        'title' => 'Changed Second'
+                    ]
+                ]
+            ]
         ];
         $expectedBlocks = [
             'First' => [
                 'second' => ['item2'],
-                'first' => ['item1'],
+                'first' => ['item1']
             ],
             'Changed Second' => [
-                'first' => ['item3'],
-            ],
+                'first' => ['item3']
+            ]
         ];
 
         $formBuilder = $this->formFactory->createNamedBuilder('test', FormType::class, null, $formOptions);
         $this->buildForm($formBuilder, $formItems);
         $formView = $formBuilder->getForm()->createView();
 
-        $this->twig
+        $this->twig->expects(self::exactly(3))
             ->method('render')
             ->withConsecutive(
                 [
                     self::TEMPLATE_PATH,
-                    [
-                        'parentContext' => ['form' => []],
-                        'formFieldPath' => 'form.children.item1'
-                    ]
+                    ['parentContext' => ['form' => []], 'formFieldPath' => 'form.children.item1']
                 ],
                 [
                     self::TEMPLATE_PATH,
-                    [
-                        'parentContext' => ['form' => []],
-                        'formFieldPath' => 'form.children.item2'
-                    ]
+                    ['parentContext' => ['form' => []], 'formFieldPath' => 'form.children.item2']
                 ],
                 [
                     self::TEMPLATE_PATH,
-                    [
-                        'parentContext' => ['form' => []],
-                        'formFieldPath' => 'form.children.item3'
-                    ]
+                    ['parentContext' => ['form' => []], 'formFieldPath' => 'form.children.item3']
                 ]
             )
             ->willReturn(self::TEMPLATE_CODE);
@@ -137,28 +129,28 @@ class DataBlockBuilderTest extends \PHPUnit\Framework\TestCase
                     'priority' => 20,
                     'subblocks' => [
                         'first' => [
-                            'priority' => 20,
+                            'priority' => 20
                         ],
                         'second' => [
-                            'priority' => 10,
+                            'priority' => 10
                         ],
                         'third' => [
-                            'priority' => 5,
-                        ],
-                    ],
-                ],
-            ],
+                            'priority' => 5
+                        ]
+                    ]
+                ]
+            ]
         ];
         $formItems = [
             'item1' => ['block' => 'first', 'subblock' => 'first'],
-            'item2' => ['block' => 'first', 'subblock' => 'second'],
+            'item2' => ['block' => 'first', 'subblock' => 'second']
         ];
         $expectedBlocks = [
             'First' => [
                 'first' => ['item1'],
                 'second' => ['item2'],
-                'third' => [['item3', 'item3_2']],
-            ],
+                'third' => [['item3', 'item3_2']]
+            ]
         ];
 
         $formBuilder = $this->formFactory->createNamedBuilder('test', FormType::class, null, $formOptions);
@@ -171,29 +163,20 @@ class DataBlockBuilderTest extends \PHPUnit\Framework\TestCase
         $formView = $formBuilder->getForm()->createView();
         $formView['item3']['item3_1']->setRendered();
 
-        $this->twig
+        $this->twig->expects(self::exactly(3))
             ->method('render')
             ->withConsecutive(
                 [
                     self::TEMPLATE_PATH,
-                    [
-                        'parentContext' => ['form' => []],
-                        'formFieldPath' => 'form.children.item1'
-                    ]
+                    ['parentContext' => ['form' => []], 'formFieldPath' => 'form.children.item1']
                 ],
                 [
                     self::TEMPLATE_PATH,
-                    [
-                        'parentContext' => ['form' => []],
-                        'formFieldPath' => 'form.children.item2'
-                    ]
+                    ['parentContext' => ['form' => []], 'formFieldPath' => 'form.children.item2']
                 ],
                 [
                     self::TEMPLATE_PATH,
-                    [
-                        'parentContext' => ['form' => []],
-                        'formFieldPath' => 'form.children.item3.children.item3_2'
-                    ]
+                    ['parentContext' => ['form' => []], 'formFieldPath' => 'form.children.item3.children.item3_2']
                 ]
             )
             ->willReturn(self::TEMPLATE_CODE);
@@ -205,69 +188,76 @@ class DataBlockBuilderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, $result->toArray());
     }
 
-    /**
-     * @dataProvider layoutProvider
-     */
-    public function testLayout($formOptions, $formItems, $expectedBlocks): void
+    public function testLayout(): void
     {
-        $this->twig
+        $formOptions = [
+            'block_config' => [
+                'first' => [
+                    'priority' => 1,
+                    'subblocks' => [
+                        'first' => null,
+                        'second' => null
+                    ]
+                ],
+                'second' => [
+                    'priority' => 2
+                ]
+            ]
+        ];
+        $formItems = [
+            'item1' => ['block' => 'first', 'subblock' => 'second'],
+            'item2' => ['block' => 'first'],
+            'item3' => ['block' => 'second'],
+            'item4' => ['block' => 'third'],
+            'item5' => ['block' => 'third', 'subblock' => 'first'],
+            'item6' => ['block' => 'third', 'subblock' => 'first'],
+            'item7' => ['block' => 'first', 'subblock' => 'first'],
+            'item8' => []
+        ];
+        $expectedBlocks = [
+            'Second' => [
+                'item3__subblock' => ['item3']
+            ],
+            'First' => [
+                'first' => ['item2', 'item7'],
+                'second' => ['item1']
+            ],
+            'Third' => [
+                'item4__subblock' => ['item4'],
+                'first' => ['item5', 'item6']
+            ]
+        ];
+
+        $this->twig->expects(self::exactly(7))
             ->method('render')
             ->withConsecutive(
                 [
                     self::TEMPLATE_PATH,
-                    [
-                        'parentContext' => ['form' => []],
-                        'formFieldPath' => 'form.children.item1'
-                    ]
+                    ['parentContext' => ['form' => []], 'formFieldPath' => 'form.children.item1']
                 ],
                 [
                     self::TEMPLATE_PATH,
-                    [
-                        'parentContext' => ['form' => []],
-                        'formFieldPath' => 'form.children.item2'
-                    ]
+                    ['parentContext' => ['form' => []], 'formFieldPath' => 'form.children.item2']
                 ],
                 [
                     self::TEMPLATE_PATH,
-                    [
-                        'parentContext' => ['form' => []],
-                        'formFieldPath' => 'form.children.item3'
-                    ]
+                    ['parentContext' => ['form' => []], 'formFieldPath' => 'form.children.item3']
                 ],
                 [
                     self::TEMPLATE_PATH,
-                    [
-                        'parentContext' => ['form' => []],
-                        'formFieldPath' => 'form.children.item4'
-                    ]
+                    ['parentContext' => ['form' => []], 'formFieldPath' => 'form.children.item4']
                 ],
                 [
                     self::TEMPLATE_PATH,
-                    [
-                        'parentContext' => ['form' => []],
-                        'formFieldPath' => 'form.children.item5'
-                    ]
+                    ['parentContext' => ['form' => []], 'formFieldPath' => 'form.children.item5']
                 ],
                 [
                     self::TEMPLATE_PATH,
-                    [
-                        'parentContext' => ['form' => []],
-                        'formFieldPath' => 'form.children.item6'
-                    ]
+                    ['parentContext' => ['form' => []], 'formFieldPath' => 'form.children.item6']
                 ],
                 [
                     self::TEMPLATE_PATH,
-                    [
-                        'parentContext' => ['form' => []],
-                        'formFieldPath' => 'form.children.item7'
-                    ]
-                ],
-                [
-                    self::TEMPLATE_PATH,
-                    [
-                        'parentContext' => ['form' => []],
-                        'formFieldPath' => ''
-                    ]
+                    ['parentContext' => ['form' => []], 'formFieldPath' => 'form.children.item7']
                 ]
             )
             ->willReturn(self::TEMPLATE_CODE);
@@ -279,51 +269,6 @@ class DataBlockBuilderTest extends \PHPUnit\Framework\TestCase
 
         $expected = $this->getBlocks($expectedBlocks);
         self::assertEquals($expected, $result->toArray());
-    }
-
-    public function layoutProvider(): array
-    {
-        return [
-            [
-                [
-                    'block_config' => [
-                        'first' => [
-                            'priority' => 1,
-                            'subblocks' => [
-                                'first' => null,
-                                'second' => null,
-                            ],
-                        ],
-                        'second' => [
-                            'priority' => 2,
-                        ],
-                    ],
-                ],
-                [
-                    'item1' => ['block' => 'first', 'subblock' => 'second'],
-                    'item2' => ['block' => 'first'],
-                    'item3' => ['block' => 'second'],
-                    'item4' => ['block' => 'third'],
-                    'item5' => ['block' => 'third', 'subblock' => 'first'],
-                    'item6' => ['block' => 'third', 'subblock' => 'first'],
-                    'item7' => ['block' => 'first', 'subblock' => 'first'],
-                    'item8' => [],
-                ],
-                [
-                    'Second' => [
-                        'item3__subblock' => ['item3'],
-                    ],
-                    'First' => [
-                        'first' => ['item2', 'item7'],
-                        'second' => ['item1'],
-                    ],
-                    'Third' => [
-                        'item4__subblock' => ['item4'],
-                        'first' => ['item5', 'item6'],
-                    ],
-                ],
-            ],
-        ];
     }
 
     private function buildForm(FormBuilderInterface $formBuilder, array $items = []): void
@@ -354,7 +299,7 @@ class DataBlockBuilderTest extends \PHPUnit\Framework\TestCase
             'title' => $title,
             'description' => null,
             'class' => null,
-            'subblocks' => $sb,
+            'subblocks' => $sb
         ];
     }
 
@@ -367,7 +312,7 @@ class DataBlockBuilderTest extends \PHPUnit\Framework\TestCase
             'descriptionStyle' => null,
             'data' => $this->getData($itemNames),
             'useSpan' => true,
-            'tooltip' => null,
+            'tooltip' => null
         ];
     }
 

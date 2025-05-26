@@ -7,8 +7,9 @@ use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
+use PHPUnit\Framework\TestCase;
 
-class GetContextTest extends \PHPUnit\Framework\TestCase
+class GetContextTest extends TestCase
 {
     private GetContext $context;
 

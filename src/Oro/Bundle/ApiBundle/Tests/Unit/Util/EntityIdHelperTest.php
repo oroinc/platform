@@ -27,7 +27,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         $this->entityIdHelper = new EntityIdHelper();
     }
 
-    public function testSetIdentifierForEntityWithSingleId()
+    public function testSetIdentifierForEntityWithSingleId(): void
     {
         $entityId = 123;
         $entity = $this->createMock(Entity\Group::class);
@@ -42,7 +42,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         $this->entityIdHelper->setEntityIdentifier($entity, $entityId, $entityMetadata);
     }
 
-    public function testSetIdentifierForEntityWithSingleIdWithoutSetter()
+    public function testSetIdentifierForEntityWithSingleIdWithoutSetter(): void
     {
         $entityId = 123;
         $entity = new Entity\EntityWithoutGettersAndSetters();
@@ -54,7 +54,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         self::assertEquals($entityId, $entity->id);
     }
 
-    public function testSetIdentifierForEntityWithCompositeId()
+    public function testSetIdentifierForEntityWithCompositeId(): void
     {
         $entityId = ['id' => 123, 'title' => 'test'];
         $entity = $this->createMock(Entity\CompositeKeyEntity::class);
@@ -73,7 +73,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         $this->entityIdHelper->setEntityIdentifier($entity, $entityId, $entityMetadata);
     }
 
-    public function testSetIdentifierForEntityWithCompositeIdWithRenamedIdentifierFields()
+    public function testSetIdentifierForEntityWithCompositeIdWithRenamedIdentifierFields(): void
     {
         $entityId = ['renamedId' => 123, 'renamedTitle' => 'test'];
         $entity = new Entity\CompositeKeyEntity();
@@ -87,7 +87,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         self::assertEquals($entityId['renamedTitle'], $entity->getTitle());
     }
 
-    public function testSetInvalidIdentifierForEntityWithCompositeId()
+    public function testSetInvalidIdentifierForEntityWithCompositeId(): void
     {
         $entityId = 123;
         $entity = new Entity\CompositeKeyEntity();
@@ -106,7 +106,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         $this->entityIdHelper->setEntityIdentifier($entity, $entityId, $entityMetadata);
     }
 
-    public function testSetIdentifierWithUndefinedFieldMetadataForEntityWithCompositeId()
+    public function testSetIdentifierWithUndefinedFieldMetadataForEntityWithCompositeId(): void
     {
         $entityId = ['id' => 123, 'title1' => 'test'];
         $entity = new Entity\CompositeKeyEntity();
@@ -124,7 +124,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         $this->entityIdHelper->setEntityIdentifier($entity, $entityId, $entityMetadata);
     }
 
-    public function testSetIdentifierWithUndefinedFieldForEntityWithCompositeId()
+    public function testSetIdentifierWithUndefinedFieldForEntityWithCompositeId(): void
     {
         $entityId = ['id' => 123, 'title1' => 'test'];
         $entity = new Entity\CompositeKeyEntity();
@@ -142,7 +142,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         $this->entityIdHelper->setEntityIdentifier($entity, $entityId, $entityMetadata);
     }
 
-    public function testSetIdentifierForEnumEntity()
+    public function testSetIdentifierForEnumEntity(): void
     {
         /** @var EnumOption $entity */
         $entity = (new \ReflectionClass(EnumOption::class))->newInstanceWithoutConstructor();
@@ -156,7 +156,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         self::assertEquals('item', $entity->getInternalId());
     }
 
-    public function testApplyEntityIdentifierRestrictionForSingleIdEntity()
+    public function testApplyEntityIdentifierRestrictionForSingleIdEntity(): void
     {
         $entityClass = Entity\User::class;
         $entityId = 123;
@@ -179,7 +179,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         self::assertEquals($entityId, $parameter->getValue());
     }
 
-    public function testApplyEntityIdentifierRestrictionForSingleIdEntityWithRenamedIdentifierField()
+    public function testApplyEntityIdentifierRestrictionForSingleIdEntityWithRenamedIdentifierField(): void
     {
         $entityClass = Entity\User::class;
         $entityId = 123;
@@ -202,7 +202,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         self::assertEquals($entityId, $parameter->getValue());
     }
 
-    public function testApplyEntityIdentifierRestrictionForSingleIdEntityWithArrayId()
+    public function testApplyEntityIdentifierRestrictionForSingleIdEntityWithArrayId(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(sprintf(
@@ -222,7 +222,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         $this->entityIdHelper->applyEntityIdentifierRestriction($qb, $entityId, $entityMetadata);
     }
 
-    public function testApplyEntityIdentifierRestrictionForCompositeIdEntity()
+    public function testApplyEntityIdentifierRestrictionForCompositeIdEntity(): void
     {
         $entityClass = Entity\CompositeKeyEntity::class;
         $entityId = ['id' => 123, 'title' => 'test'];
@@ -250,7 +250,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         self::assertEquals($entityId['title'], $titleParameter->getValue());
     }
 
-    public function testApplyEntityIdentifierRestrictionForCompositeIdEntityWithRenamedIdentifierFields()
+    public function testApplyEntityIdentifierRestrictionForCompositeIdEntityWithRenamedIdentifierFields(): void
     {
         $entityClass = Entity\CompositeKeyEntity::class;
         $entityId = ['renamedId' => 123, 'renamedTitle' => 'test'];
@@ -278,7 +278,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         self::assertEquals($entityId['renamedTitle'], $titleParameter->getValue());
     }
 
-    public function testApplyEntityIdentifierRestrictionForCompositeIdEntityWithScalarId()
+    public function testApplyEntityIdentifierRestrictionForCompositeIdEntityWithScalarId(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(sprintf(
@@ -299,7 +299,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
         $this->entityIdHelper->applyEntityIdentifierRestriction($qb, $entityId, $entityMetadata);
     }
 
-    public function testApplyEntityIdentifierRestrictionForCompositeIdEntityWithWrongId()
+    public function testApplyEntityIdentifierRestrictionForCompositeIdEntityWithWrongId(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(sprintf(
@@ -323,7 +323,7 @@ class EntityIdHelperTest extends OrmRelatedTestCase
     /**
      * @dataProvider isEntityIdentifierEmptyDataProvider
      */
-    public function testIsEntityIdentifierEmpty(int|string|array|null $id, bool $expected)
+    public function testIsEntityIdentifierEmpty(int|string|array|null $id, bool $expected): void
     {
         self::assertSame($expected, $this->entityIdHelper->isEntityIdentifierEmpty($id));
     }

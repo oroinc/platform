@@ -14,6 +14,7 @@ use Oro\Bundle\LocaleBundle\Manager\LocalizationManager;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Testing\Unit\EntityTrait;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
@@ -24,11 +25,8 @@ class EmailTemplateTranslationCollectionTypeTest extends FormIntegrationTestCase
 {
     use EntityTrait;
 
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $localizationManager;
+    private TranslatorInterface&MockObject $translator;
+    private LocalizationManager&MockObject $localizationManager;
 
     #[\Override]
     protected function getExtensions(): array

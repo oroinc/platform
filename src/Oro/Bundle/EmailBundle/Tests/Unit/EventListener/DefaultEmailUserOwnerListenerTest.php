@@ -10,14 +10,13 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Provider\DefaultUserProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DefaultEmailUserOwnerListenerTest extends \PHPUnit\Framework\TestCase
+class DefaultEmailUserOwnerListenerTest extends TestCase
 {
-    /** @var DefaultUserProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $defaultUserProvider;
-
-    /** @var DefaultEmailUserOwnerListener */
-    private $listener;
+    private DefaultUserProvider&MockObject $defaultUserProvider;
+    private DefaultEmailUserOwnerListener $listener;
 
     #[\Override]
     protected function setUp(): void

@@ -13,8 +13,8 @@ use Symfony\Component\Validator\Constraints\Range;
 
 class RangeConstraintConverterTest extends TestCase
 {
-    private PropertyAccessorInterface|MockObject $propertyAccessor;
-    private FormInterface|MockObject $form;
+    private PropertyAccessorInterface&MockObject $propertyAccessor;
+    private FormInterface&MockObject $form;
     private RangeConstraintConverter $converter;
 
     #[\Override]

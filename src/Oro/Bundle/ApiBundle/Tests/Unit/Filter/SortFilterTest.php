@@ -6,10 +6,11 @@ use Doctrine\Common\Collections\Criteria;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use PHPUnit\Framework\TestCase;
 
-class SortFilterTest extends \PHPUnit\Framework\TestCase
+class SortFilterTest extends TestCase
 {
-    public function testApplyWithoutFilter()
+    public function testApplyWithoutFilter(): void
     {
         $filter = new SortFilter(DataType::ORDER_BY);
         $criteria = new Criteria();
@@ -19,7 +20,7 @@ class SortFilterTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($criteria->getOrderings());
     }
 
-    public function testApplyWithFilter()
+    public function testApplyWithFilter(): void
     {
         $orderingValue = ['id' => 'DESC', 'name' => 'ASC'];
 

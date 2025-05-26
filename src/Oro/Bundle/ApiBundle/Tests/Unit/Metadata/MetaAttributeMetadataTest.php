@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Metadata;
 
 use Oro\Bundle\ApiBundle\Metadata\MetaAttributeMetadata;
+use PHPUnit\Framework\TestCase;
 
-class MetaAttributeMetadataTest extends \PHPUnit\Framework\TestCase
+class MetaAttributeMetadataTest extends TestCase
 {
-    public function testClone()
+    public function testClone(): void
     {
         $propertyMetadata = new MetaAttributeMetadata('testName', 'testDataType', 'testPropertyPath');
 
@@ -15,7 +16,7 @@ class MetaAttributeMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($propertyMetadata, $propertyMetadataClone);
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $propertyMetadata = new MetaAttributeMetadata('testName', 'testDataType', 'testPropertyPath');
 
@@ -29,7 +30,7 @@ class MetaAttributeMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testToArrayWithRequiredPropertiesOnly()
+    public function testToArrayWithRequiredPropertiesOnly(): void
     {
         $propertyMetadata = new MetaAttributeMetadata('testName');
 
@@ -41,7 +42,7 @@ class MetaAttributeMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConstructorWithParameters()
+    public function testConstructorWithParameters(): void
     {
         $propertyMetadata = new MetaAttributeMetadata('name', 'dataType', 'propertyPath');
         self::assertEquals('name', $propertyMetadata->getName());

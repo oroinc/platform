@@ -10,16 +10,17 @@ use Oro\Bundle\ImapBundle\Tests\Unit\Connector\TestFixtures\Imap1;
 use Oro\Bundle\ImapBundle\Tests\Unit\Connector\TestFixtures\Imap2;
 use Oro\Bundle\ImapBundle\Tests\Unit\Connector\TestFixtures\SearchStringManager1;
 use Oro\Bundle\ImapBundle\Tests\Unit\Connector\TestFixtures\SearchStringManager2;
+use PHPUnit\Framework\TestCase;
 
-class ImapServicesFactoryTest extends \PHPUnit\Framework\TestCase
+class ImapServicesFactoryTest extends TestCase
 {
-    public function testMissingDefaultServices()
+    public function testMissingDefaultServices(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         new ImapServicesFactory(['TEST' => ['StorageClass', 'SearchStringManagerClass']]);
     }
 
-    public function testCreateImapServicesForDefaultServices()
+    public function testCreateImapServicesForDefaultServices(): void
     {
         $config = [
             '' => [
@@ -39,7 +40,7 @@ class ImapServicesFactoryTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $services);
     }
 
-    public function testCreateImapServicesForOtherServices()
+    public function testCreateImapServicesForOtherServices(): void
     {
         $config = [
             '' => [

@@ -3,8 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 
 use Oro\Bundle\ApiBundle\Filter\StringComparisonFilter;
+use PHPUnit\Framework\TestCase;
 
-class StringComparisonFilterTest extends \PHPUnit\Framework\TestCase
+class StringComparisonFilterTest extends TestCase
 {
     public function testGetValueNormalizationOptionsWhenAllowEmptyOptionIsNotSet(): void
     {

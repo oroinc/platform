@@ -6,11 +6,11 @@ use Oro\Bundle\FormBundle\Config\BlockConfig;
 use Oro\Bundle\FormBundle\Config\FormConfig;
 use Oro\Bundle\FormBundle\Config\SubBlockConfig;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
-class FormConfigTest extends \PHPUnit\Framework\TestCase
+class FormConfigTest extends TestCase
 {
-    /** @var FormConfig */
-    private $formConfig;
+    private FormConfig $formConfig;
 
     private $blocks = [];
 
@@ -35,7 +35,7 @@ class FormConfigTest extends \PHPUnit\Framework\TestCase
         $this->formConfig = new FormConfig();
     }
 
-    public function testAddBlock()
+    public function testAddBlock(): void
     {
         /** test getBlocks without any adjusted block(s) */
         $this->assertEquals([], $this->formConfig->getBlocks());

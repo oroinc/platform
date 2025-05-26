@@ -3,8 +3,9 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Decoder;
 
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
+use PHPUnit\Framework\TestCase;
 
-class ContentDecoderTest extends \PHPUnit\Framework\TestCase
+class ContentDecoderTest extends TestCase
 {
     /**
      * @dataProvider dataProvider
@@ -15,7 +16,7 @@ class ContentDecoderTest extends \PHPUnit\Framework\TestCase
         ?string $fromEncode,
         ?string $toEncode,
         string $expected
-    ) {
+    ): void {
         $decoder = new ContentDecoder();
         $str = $decoder->decode($str, $contentTransferEncoding, $fromEncode, $toEncode);
 

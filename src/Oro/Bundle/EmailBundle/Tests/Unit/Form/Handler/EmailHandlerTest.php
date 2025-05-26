@@ -8,19 +8,17 @@ use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Form\Type\EmailType;
 use Oro\Bundle\EmailBundle\Sender\EmailModelSender;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class EmailHandlerTest extends \PHPUnit\Framework\TestCase
+class EmailHandlerTest extends TestCase
 {
-    private FormFactoryInterface|MockObject $formFactory;
-
-    private EmailModelSender|MockObject $emailModelSender;
-
-    private LoggerInterface|MockObject $logger;
-
+    private FormFactoryInterface&MockObject $formFactory;
+    private EmailModelSender&MockObject $emailModelSender;
+    private LoggerInterface&MockObject $logger;
     private EmailHandler $handler;
 
     #[\Override]
@@ -42,8 +40,7 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
         $options = ['sample_key' => 'sample_value'];
         $emailModel = new EmailModel();
         $form = $this->createMock(FormInterface::class);
-        $this->formFactory
-            ->expects(self::once())
+        $this->formFactory->expects(self::once())
             ->method('createNamed')
             ->with('oro_email_email', EmailType::class, $emailModel, $options)
             ->willReturn($form);
@@ -57,8 +54,7 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
         $request->setMethod('GET');
 
         $form = $this->createMock(FormInterface::class);
-        $form
-            ->expects(self::never())
+        $form->expects(self::never())
             ->method('submit');
 
         $this->handler->handleRequest($form, $request);
@@ -71,8 +67,7 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
         $request->request->set('_widgetInit', true);
 
         $form = $this->createMock(FormInterface::class);
-        $form
-            ->expects(self::never())
+        $form->expects(self::never())
             ->method('submit');
 
         $this->handler->handleRequest($form, $request);
@@ -89,11 +84,10 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
         $request->setMethod($method);
 
         $form = $this->createMock(FormInterface::class);
-        $form
+        $form->expects(self::atLeastOnce())
             ->method('getName')
             ->willReturn('oro_email_email');
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('submit')
             ->with($data['oro_email_email']);
 
@@ -111,8 +105,7 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
     public function testHandleFormSubmitWhenNotSubmitted(): void
     {
         $form = $this->createMock(FormInterface::class);
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('isSubmitted')
             ->willReturn(false);
 
@@ -122,12 +115,10 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
     public function testHandleFormSubmitWhenSubmittedAndNotValid(): void
     {
         $form = $this->createMock(FormInterface::class);
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('isSubmitted')
             ->willReturn(true);
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('isValid')
             ->willReturn(false);
 
@@ -137,12 +128,10 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
     public function testHandleFormSubmitWhenSubmittedAndValid(): void
     {
         $form = $this->createMock(FormInterface::class);
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('isSubmitted')
             ->willReturn(true);
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('isValid')
             ->willReturn(true);
 
@@ -153,8 +142,7 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
             ->setSubject('testSubject')
             ->setBody('testBody');
 
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('getData')
             ->willReturn($emailModel);
 
@@ -173,12 +161,10 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
     public function testHandleFormSubmitWhenException(): void
     {
         $form = $this->createMock(FormInterface::class);
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('isSubmitted')
             ->willReturn(true);
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('isValid')
             ->willReturn(true);
 
@@ -189,8 +175,7 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
             ->setSubject('testSubject')
             ->setBody('testBody');
 
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('getData')
             ->willReturn($emailModel);
 
@@ -200,8 +185,7 @@ class EmailHandlerTest extends \PHPUnit\Framework\TestCase
             ->with(self::identicalTo($emailModel))
             ->willThrowException($exception);
 
-        $this->logger
-            ->expects(self::once())
+        $this->logger->expects(self::once())
             ->method('error')
             ->with(
                 'Failed to send email model to {email_addresses}: {message}',

@@ -5,14 +5,12 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\NormalizeSorters;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class NormalizeSortersTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var NormalizeSorters */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private NormalizeSorters $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +22,7 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
         $this->processor = new NormalizeSorters($this->doctrineHelper);
     }
 
-    public function testRemoveExcludedSorters()
+    public function testRemoveExcludedSorters(): void
     {
         $sorters = [
             'exclusion_policy' => 'all',
@@ -54,7 +52,7 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
     /**
      * @dataProvider processNotManageableEntityProvider
      */
-    public function testProcessForNotManageableEntity(array $definition, array $sorters, array $expectedSorters)
+    public function testProcessForNotManageableEntity(array $definition, array $sorters, array $expectedSorters): void
     {
         $this->doctrineHelper->expects(self::any())
             ->method('isManageableEntityClass')
@@ -233,7 +231,7 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
     /**
      * @dataProvider processManageableEntityProvider
      */
-    public function testProcessForManageableEntity(array $definition, array $sorters, array $expectedSorters)
+    public function testProcessForManageableEntity(array $definition, array $sorters, array $expectedSorters): void
     {
         $rootMetadata = $this->getClassMetadataMock();
         $toOne1Metadata = $this->getClassMetadataMock();
@@ -366,7 +364,7 @@ class NormalizeSortersTest extends ConfigProcessorTestCase
         ];
     }
 
-    public function testSortersByRenamedField()
+    public function testSortersByRenamedField(): void
     {
         $config = [
             'exclusion_policy'       => 'all',

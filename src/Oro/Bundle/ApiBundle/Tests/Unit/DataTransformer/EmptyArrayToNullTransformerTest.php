@@ -3,11 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\DataTransformer;
 
 use Oro\Bundle\ApiBundle\DataTransformer\EmptyArrayToNullTransformer;
+use PHPUnit\Framework\TestCase;
 
-class EmptyArrayToNullTransformerTest extends \PHPUnit\Framework\TestCase
+class EmptyArrayToNullTransformerTest extends TestCase
 {
-    /** @var EmptyArrayToNullTransformer */
-    private $transformer;
+    private EmptyArrayToNullTransformer $transformer;
 
     #[\Override]
     protected function setUp(): void
@@ -15,7 +15,7 @@ class EmptyArrayToNullTransformerTest extends \PHPUnit\Framework\TestCase
         $this->transformer = new EmptyArrayToNullTransformer();
     }
 
-    public function testTransformNull()
+    public function testTransformNull(): void
     {
         $value = null;
         self::assertNull(
@@ -23,7 +23,7 @@ class EmptyArrayToNullTransformerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testTransformEmptyArray()
+    public function testTransformEmptyArray(): void
     {
         $value = [];
         self::assertNull(
@@ -31,7 +31,7 @@ class EmptyArrayToNullTransformerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testTransformArray()
+    public function testTransformArray(): void
     {
         $value = ['key' => 'value'];
         self::assertSame(

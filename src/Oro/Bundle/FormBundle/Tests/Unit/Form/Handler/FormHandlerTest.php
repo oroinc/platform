@@ -8,29 +8,22 @@ use Oro\Bundle\FormBundle\Event\FormHandler\AfterFormProcessEvent;
 use Oro\Bundle\FormBundle\Event\FormHandler\Events;
 use Oro\Bundle\FormBundle\Event\FormHandler\FormProcessEvent;
 use Oro\Bundle\FormBundle\Form\Handler\FormHandler;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class FormHandlerTest extends \PHPUnit\Framework\TestCase
+class FormHandlerTest extends TestCase
 {
-    private const FORM_DATA = ['field' => 'value'];
+    private const array FORM_DATA = ['field' => 'value'];
 
-    /** @var EventDispatcherInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $eventDispatcher;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $form;
-
-    /** @var Request|\PHPUnit\Framework\MockObject\MockObject */
-    private $request;
-
-    /** @var FormHandler */
-    private $handler;
+    private FormInterface&MockObject $form;
+    private Request $request;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private FormHandler $handler;
 
     #[\Override]
     protected function setUp(): void

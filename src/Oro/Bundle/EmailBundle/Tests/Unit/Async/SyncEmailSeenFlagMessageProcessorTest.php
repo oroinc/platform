@@ -11,11 +11,12 @@ use Oro\Bundle\EmailBundle\Manager\EmailFlagManager;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class SyncEmailSeenFlagMessageProcessorTest extends TestCase
 {
-    public function testCouldBeConstructedWithRequiredArguments()
+    public function testCouldBeConstructedWithRequiredArguments(): void
     {
         $this->expectNotToPerformAssertions();
 
@@ -26,7 +27,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldRejectMessageIfUserEmailEntityWasNotFound()
+    public function testShouldRejectMessageIfUserEmailEntityWasNotFound(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())
@@ -65,7 +66,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(MessageProcessorInterface::REJECT, $result);
     }
 
-    public function testShouldSetSeenIfSeenIsTrue()
+    public function testShouldSetSeenIfSeenIsTrue(): void
     {
         $emailUser = new EmailUser();
 
@@ -100,7 +101,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testShouldSetUnseenIfSeenIsFalse()
+    public function testShouldSetUnseenIfSeenIsFalse(): void
     {
         $emailUser = new EmailUser();
 
@@ -135,7 +136,7 @@ class SyncEmailSeenFlagMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testShouldReturnSubscribedTopics()
+    public function testShouldReturnSubscribedTopics(): void
     {
         self::assertEquals(
             [SyncEmailSeenFlagTopic::getName()],

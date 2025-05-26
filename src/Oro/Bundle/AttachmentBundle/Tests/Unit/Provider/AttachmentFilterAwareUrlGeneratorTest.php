@@ -4,16 +4,18 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\AttachmentBundle\Configurator\Provider\AttachmentHashProvider;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentFilterAwareUrlGenerator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RequestContext;
 
-class AttachmentFilterAwareUrlGeneratorTest extends \PHPUnit\Framework\TestCase
+class AttachmentFilterAwareUrlGeneratorTest extends TestCase
 {
-    private UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject $urlGenerator;
-    private AttachmentHashProvider|\PHPUnit\Framework\MockObject\MockObject $attachmentHashProvider;
-    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
+    private UrlGeneratorInterface&MockObject $urlGenerator;
+    private AttachmentHashProvider&MockObject $attachmentHashProvider;
+    private LoggerInterface&MockObject $logger;
     private AttachmentFilterAwareUrlGenerator $filterAwareGenerator;
 
     #[\Override]

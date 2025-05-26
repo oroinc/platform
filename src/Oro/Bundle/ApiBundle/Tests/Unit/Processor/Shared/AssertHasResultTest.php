@@ -9,8 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AssertHasResultTest extends GetProcessorTestCase
 {
-    /** @var AssertHasResult */
-    private $processor;
+    private AssertHasResult $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -20,13 +19,13 @@ class AssertHasResultTest extends GetProcessorTestCase
         $this->processor = new AssertHasResult();
     }
 
-    public function testProcessWhenResultExists()
+    public function testProcessWhenResultExists(): void
     {
         $this->context->setResult([]);
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenResultDoesNotExistAndNoResponseStatusCode()
+    public function testProcessWhenResultDoesNotExistAndNoResponseStatusCode(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The result does not exist.');
@@ -34,7 +33,7 @@ class AssertHasResultTest extends GetProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenResultDoesNotExistAndResponseShouldHaveContext()
+    public function testProcessWhenResultDoesNotExistAndResponseShouldHaveContext(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The result does not exist.');
@@ -43,7 +42,7 @@ class AssertHasResultTest extends GetProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenResultDoesNotExistAndResponseShouldNotHaveContext()
+    public function testProcessWhenResultDoesNotExistAndResponseShouldNotHaveContext(): void
     {
         $this->context->setResponseStatusCode(Response::HTTP_METHOD_NOT_ALLOWED);
         $this->processor->process($this->context);

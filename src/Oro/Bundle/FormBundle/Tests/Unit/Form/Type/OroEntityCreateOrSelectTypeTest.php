@@ -11,6 +11,7 @@ use Oro\Bundle\FormBundle\Form\Type\OroEntityCreateOrSelectType;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntityType;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
@@ -18,11 +19,8 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 class OroEntityCreateOrSelectTypeTest extends FormIntegrationTestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $managerRegistry;
-
-    /** @var OroEntityCreateOrSelectType */
-    private $formType;
+    private ManagerRegistry&MockObject $managerRegistry;
+    private OroEntityCreateOrSelectType $formType;
 
     #[\Override]
     protected function setUp(): void

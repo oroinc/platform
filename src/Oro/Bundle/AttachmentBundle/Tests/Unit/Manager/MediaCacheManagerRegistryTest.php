@@ -6,20 +6,15 @@ use Oro\Bundle\AttachmentBundle\Acl\FileAccessControlChecker;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\MediaCacheManagerRegistry;
 use Oro\Bundle\GaufretteBundle\FileManager as GaufretteFileManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MediaCacheManagerRegistryTest extends \PHPUnit\Framework\TestCase
+class MediaCacheManagerRegistryTest extends TestCase
 {
-    /** @var FileAccessControlChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileAccessControlChecker;
-
-    /** @var GaufretteFileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $publicMediaCacheManager;
-
-    /** @var GaufretteFileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $protectedMediaCacheManager;
-
-    /** @var MediaCacheManagerRegistry */
-    private $registry;
+    private FileAccessControlChecker&MockObject $fileAccessControlChecker;
+    private GaufretteFileManager&MockObject $publicMediaCacheManager;
+    private GaufretteFileManager&MockObject $protectedMediaCacheManager;
+    private MediaCacheManagerRegistry $registry;
 
     #[\Override]
     protected function setUp(): void
@@ -37,7 +32,7 @@ class MediaCacheManagerRegistryTest extends \PHPUnit\Framework\TestCase
 
     public function testGetManagerForFile(): void
     {
-        $this->fileAccessControlChecker
+        $this->fileAccessControlChecker->expects(self::atLeastOnce())
             ->method('isCoveredByAcl')
             ->withConsecutive([$file1 = new File()], [$file2 = new File()])
             ->willReturnOnConsecutiveCalls(true, false);

@@ -4,11 +4,12 @@ namespace Oro\Component\ChainProcessor\Tests\Unit\DependencyInjection;
 
 use Oro\Component\ChainProcessor\DependencyInjection\ProcessorRegistry;
 use Oro\Component\ChainProcessor\Tests\Unit\ProcessorMock;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
-class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
+class ProcessorRegistryTest extends TestCase
 {
-    public function testGetProcessor()
+    public function testGetProcessor(): void
     {
         $processor1 = new ProcessorMock();
 
@@ -20,6 +21,6 @@ class ProcessorRegistryTest extends \PHPUnit\Framework\TestCase
 
         $processorRegistry = new ProcessorRegistry($container);
 
-        $this->assertSame($processor1, $processorRegistry->getProcessor('processor1'));
+        self::assertSame($processor1, $processorRegistry->getProcessor('processor1'));
     }
 }

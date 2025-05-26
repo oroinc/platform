@@ -19,25 +19,17 @@ use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\GaufretteBundle\FileManager;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class CollectProcessedIncludedEntitiesTest extends BatchUpdateProcessorTestCase
 {
-    private const ASYNC_OPERATION_ID = 123;
+    private const int ASYNC_OPERATION_ID = 123;
 
-    /** @var IncludeMapManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $includeMapManager;
-
-    /** @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject */
-    private $valueNormalizer;
-
-    /** @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityIdTransformerRegistry;
-
-    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileManager;
-
-    /** @var CollectProcessedIncludedEntities */
-    private $processor;
+    private IncludeMapManager&MockObject $includeMapManager;
+    private ValueNormalizer&MockObject $valueNormalizer;
+    private EntityIdTransformerRegistry&MockObject $entityIdTransformerRegistry;
+    private FileManager&MockObject $fileManager;
+    private CollectProcessedIncludedEntities $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -59,7 +51,7 @@ class CollectProcessedIncludedEntitiesTest extends BatchUpdateProcessorTestCase
         );
     }
 
-    public function testProcessWhenItemsAlreadyCollected()
+    public function testProcessWhenItemsAlreadyCollected(): void
     {
         $this->includeMapManager->expects(self::never())
             ->method('moveToProcessed');
@@ -71,7 +63,7 @@ class CollectProcessedIncludedEntitiesTest extends BatchUpdateProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithoutIncludedData()
+    public function testProcessWithoutIncludedData(): void
     {
         $this->includeMapManager->expects(self::never())
             ->method('moveToProcessed');
@@ -82,7 +74,7 @@ class CollectProcessedIncludedEntitiesTest extends BatchUpdateProcessorTestCase
         self::assertFalse($this->context->isProcessed(CollectProcessedIncludedEntities::OPERATION_NAME));
     }
 
-    public function testProcessWhenBatchItemsAreEmpty()
+    public function testProcessWhenBatchItemsAreEmpty(): void
     {
         $this->includeMapManager->expects(self::never())
             ->method('moveToProcessed');
@@ -94,7 +86,7 @@ class CollectProcessedIncludedEntitiesTest extends BatchUpdateProcessorTestCase
         self::assertTrue($this->context->isProcessed(CollectProcessedIncludedEntities::OPERATION_NAME));
     }
 
-    public function testProcessWhenBatchItemProcessed()
+    public function testProcessWhenBatchItemProcessed(): void
     {
         $requestType = new RequestType([RequestType::JSON_API]);
 
@@ -166,7 +158,7 @@ class CollectProcessedIncludedEntitiesTest extends BatchUpdateProcessorTestCase
         self::assertTrue($this->context->isProcessed(CollectProcessedIncludedEntities::OPERATION_NAME));
     }
 
-    public function testProcessWhenBatchItemNotProcessed()
+    public function testProcessWhenBatchItemNotProcessed(): void
     {
         $requestType = new RequestType([RequestType::JSON_API]);
 
@@ -216,7 +208,7 @@ class CollectProcessedIncludedEntitiesTest extends BatchUpdateProcessorTestCase
         self::assertTrue($this->context->isProcessed(CollectProcessedIncludedEntities::OPERATION_NAME));
     }
 
-    public function testProcessWhenIncludedEntityDoesNotHaveMetadata()
+    public function testProcessWhenIncludedEntityDoesNotHaveMetadata(): void
     {
         $requestType = new RequestType([RequestType::JSON_API]);
 
@@ -261,7 +253,7 @@ class CollectProcessedIncludedEntitiesTest extends BatchUpdateProcessorTestCase
         self::assertTrue($this->context->isProcessed(CollectProcessedIncludedEntities::OPERATION_NAME));
     }
 
-    public function testProcessWhenIncludedEntitiesCollectionIsEmpty()
+    public function testProcessWhenIncludedEntitiesCollectionIsEmpty(): void
     {
         $requestType = new RequestType([RequestType::JSON_API]);
 
@@ -297,7 +289,7 @@ class CollectProcessedIncludedEntitiesTest extends BatchUpdateProcessorTestCase
         self::assertTrue($this->context->isProcessed(CollectProcessedIncludedEntities::OPERATION_NAME));
     }
 
-    public function testProcessWhenIncludedEntitiesCollectionIsNull()
+    public function testProcessWhenIncludedEntitiesCollectionIsNull(): void
     {
         $item = $this->createMock(BatchUpdateItem::class);
         $itemStatus = BatchUpdateItemStatus::NO_ERRORS;
@@ -329,7 +321,7 @@ class CollectProcessedIncludedEntitiesTest extends BatchUpdateProcessorTestCase
         self::assertTrue($this->context->isProcessed(CollectProcessedIncludedEntities::OPERATION_NAME));
     }
 
-    public function testProcessForUnsupportedBatchItemAction()
+    public function testProcessForUnsupportedBatchItemAction(): void
     {
         $item = $this->createMock(BatchUpdateItem::class);
         $itemStatus = BatchUpdateItemStatus::NO_ERRORS;
@@ -358,7 +350,7 @@ class CollectProcessedIncludedEntitiesTest extends BatchUpdateProcessorTestCase
         self::assertTrue($this->context->isProcessed(CollectProcessedIncludedEntities::OPERATION_NAME));
     }
 
-    public function testProcessWhenBatchItemHasErrors()
+    public function testProcessWhenBatchItemHasErrors(): void
     {
         $item = $this->createMock(BatchUpdateItem::class);
         $itemStatus = BatchUpdateItemStatus::HAS_ERRORS;

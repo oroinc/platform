@@ -11,15 +11,13 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\SetDataCustomizationHandler;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 
 class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|CustomizeLoadedDataProcessor */
-    private $customizationProcessor;
-
-    /** @var SetDataCustomizationHandler */
-    private $processor;
+    private CustomizeLoadedDataProcessor&MockObject $customizationProcessor;
+    private SetDataCustomizationHandler $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -34,7 +32,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
         $this->processor = new SetDataCustomizationHandler($this->customizationProcessor);
     }
 
-    public function testProcessForEmptyConfig()
+    public function testProcessForEmptyConfig(): void
     {
         $config = [];
 
@@ -46,7 +44,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
         $this->assertConfig([], $configObject);
     }
 
-    public function testProcessForNotCompletedConfig()
+    public function testProcessForNotCompletedConfig(): void
     {
         $config = [
             'fields' => [
@@ -69,7 +67,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForEntityWithoutAssociations()
+    public function testProcessForEntityWithoutAssociations(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -123,7 +121,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
         $assert();
     }
 
-    public function testProcessForGetListTargetAction()
+    public function testProcessForGetListTargetAction(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -169,7 +167,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessForEntityWithAssociations()
+    public function testProcessForEntityWithAssociations(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -283,7 +281,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessForEntityWithCollectionValuedAssociations()
+    public function testProcessForEntityWithCollectionValuedAssociations(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -416,7 +414,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessForEntityWithRenamedAssociations()
+    public function testProcessForEntityWithRenamedAssociations(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -513,7 +511,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
         }
     }
 
-    public function testProcessForEntityWithAssociationAsField()
+    public function testProcessForEntityWithAssociationAsField(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -600,7 +598,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
             $sourceDataItem,
             $processedDataItem,
             $configObject
-        ) {
+        ): void {
             self::assertEquals($this->context->getVersion(), $context->getVersion());
             self::assertEquals($this->context->getRequestType(), $context->getRequestType());
             self::assertEquals($this->context->getClassName(), $context->getClassName());
@@ -641,7 +639,7 @@ class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
             $fieldPath,
             $configObject,
             $childConfigObject
-        ) {
+        ): void {
             self::assertEquals($this->context->getVersion(), $context->getVersion());
             self::assertEquals($this->context->getRequestType(), $context->getRequestType());
             self::assertEquals($this->context->getClassName(), $context->getRootClassName());

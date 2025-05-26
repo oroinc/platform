@@ -5,32 +5,23 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Handler;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Form\Handler\EmailTemplateHandler;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EmailTemplateHandlerTest extends \PHPUnit\Framework\TestCase
+class EmailTemplateHandlerTest extends TestCase
 {
-    private const FORM_DATA = ['field' => 'value'];
+    private const array FORM_DATA = ['field' => 'value'];
 
-    /** @var Form|\PHPUnit\Framework\MockObject\MockObject */
-    private $form;
-
-    /** @var Request */
-    private $request;
-
-    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $manager;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var EmailTemplateHandler */
-    private $handler;
-
-    /** @var EmailTemplate */
-    private $entity;
+    private Form&MockObject $form;
+    private Request $request;
+    private ObjectManager&MockObject $manager;
+    private TranslatorInterface&MockObject $translator;
+    private EmailTemplateHandler $handler;
+    private EmailTemplate $entity;
 
     #[\Override]
     protected function setUp(): void
@@ -46,7 +37,7 @@ class EmailTemplateHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler = new EmailTemplateHandler($this->form, $requestStack, $this->manager, $this->translator);
     }
 
-    public function testProcessUnsupportedRequest()
+    public function testProcessUnsupportedRequest(): void
     {
         $this->form->expects($this->once())
             ->method('setData')
@@ -85,7 +76,7 @@ class EmailTemplateHandlerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testProcessValidData()
+    public function testProcessValidData(): void
     {
         $this->form->expects($this->once())
             ->method('setData')
@@ -112,7 +103,7 @@ class EmailTemplateHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->handler->process($this->entity));
     }
 
-    public function testAddingErrorToNonEditableSystemEntity()
+    public function testAddingErrorToNonEditableSystemEntity(): void
     {
         $this->entity->setIsSystem(true);
         $this->entity->setIsEditable(false);

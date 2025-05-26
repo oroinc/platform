@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Connector;
 
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
+use PHPUnit\Framework\TestCase;
 
-class ImapConfigTest extends \PHPUnit\Framework\TestCase
+class ImapConfigTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $host = 'testHost';
         $port = 'testPort';
@@ -24,7 +25,7 @@ class ImapConfigTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($token, $obj->getAccessToken());
     }
 
-    public function testSettersAndGetters()
+    public function testSettersAndGetters(): void
     {
         $obj = new ImapConfig();
 

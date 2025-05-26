@@ -9,10 +9,11 @@ use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\EventListener\SetUserEmailOriginTransportListener;
 use Oro\Bundle\ImapBundle\Mailer\Transport\UserEmailOriginTransport;
 use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestUserEmailOrigin;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mime\Message;
 
-class SetUserEmailOriginTransportListenerTest extends \PHPUnit\Framework\TestCase
+class SetUserEmailOriginTransportListenerTest extends TestCase
 {
     private SetUserEmailOriginTransportListener $listener;
 

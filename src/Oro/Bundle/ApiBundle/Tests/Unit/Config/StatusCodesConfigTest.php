@@ -4,10 +4,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ApiBundle\Config\StatusCodeConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
+use PHPUnit\Framework\TestCase;
 
-class StatusCodesConfigTest extends \PHPUnit\Framework\TestCase
+class StatusCodesConfigTest extends TestCase
 {
-    public function testToArrayAndClone()
+    public function testToArrayAndClone(): void
     {
         $config = new StatusCodesConfig();
         $code1 = new StatusCodeConfig();
@@ -33,7 +34,7 @@ class StatusCodesConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($config->getCode('code2'), $cloneConfig->getCode('code2'));
     }
 
-    public function testCodes()
+    public function testCodes(): void
     {
         $config = new StatusCodesConfig();
         self::assertFalse($config->hasCodes());
@@ -59,7 +60,7 @@ class StatusCodesConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testAddCode()
+    public function testAddCode(): void
     {
         $config = new StatusCodesConfig();
 

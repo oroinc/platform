@@ -9,10 +9,11 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\TestCase;
 
-class UpdateEmailOwnerAssociationMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class UpdateEmailOwnerAssociationMessageProcessorTest extends TestCase
 {
-    public function testCouldBeConstructedWithRequiredArguments()
+    public function testCouldBeConstructedWithRequiredArguments(): void
     {
         $this->expectNotToPerformAssertions();
 
@@ -22,7 +23,7 @@ class UpdateEmailOwnerAssociationMessageProcessorTest extends \PHPUnit\Framework
         );
     }
 
-    public function testShouldProcessUpdateEmailOwner()
+    public function testShouldProcessUpdateEmailOwner(): void
     {
         $manager = $this->createMock(AssociationManager::class);
         $manager->expects($this->once())
@@ -58,7 +59,7 @@ class UpdateEmailOwnerAssociationMessageProcessorTest extends \PHPUnit\Framework
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testShouldReturnSubscribedTopics()
+    public function testShouldReturnSubscribedTopics(): void
     {
         $this->assertEquals(
             [UpdateEmailOwnerAssociationTopic::getName()],

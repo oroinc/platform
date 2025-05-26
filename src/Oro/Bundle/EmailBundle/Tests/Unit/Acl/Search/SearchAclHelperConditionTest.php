@@ -9,14 +9,13 @@ use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\QueryStringExpressionVisitor;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclConditionDataBuilderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class SearchAclHelperConditionTest extends \PHPUnit\Framework\TestCase
+class SearchAclHelperConditionTest extends TestCase
 {
-    /** @var AclConditionDataBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclConditionDataBuilder;
-
-    /** @var SearchAclHelperCondition */
-    private $searchAclHelperCondition;
+    private AclConditionDataBuilderInterface&MockObject $aclConditionDataBuilder;
+    private SearchAclHelperCondition $searchAclHelperCondition;
 
     #[\Override]
     protected function setUp(): void
@@ -102,7 +101,7 @@ class SearchAclHelperConditionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testAddRestrictionWithNoAccess()
+    public function testAddRestrictionWithNoAccess(): void
     {
         $query = new Query();
         $query->from([]);
@@ -125,7 +124,7 @@ class SearchAclHelperConditionTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $query->getFrom());
     }
 
-    public function testAddRestrictionWithAccessAndExistingExpressions()
+    public function testAddRestrictionWithAccessAndExistingExpressions(): void
     {
         $query = new Query();
         $query->from([]);

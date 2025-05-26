@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -26,17 +27,12 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
  */
 class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
 {
-    private const TEST_PARENT_CLASS_NAME = 'Test\Entity';
-    private const TEST_ASSOCIATION_NAME = 'testAssociation';
+    private const string TEST_PARENT_CLASS_NAME = 'Test\Entity';
+    private const string TEST_ASSOCIATION_NAME = 'testAssociation';
 
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formFactory;
-
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
-    /** @var BuildFormBuilder */
-    private $processor;
+    private FormFactoryInterface&MockObject $formFactory;
+    private ContainerInterface&MockObject $container;
+    private BuildFormBuilder $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -59,7 +55,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $this->context->setAssociationName(self::TEST_ASSOCIATION_NAME);
     }
 
-    public function testProcessWhenFormBuilderAlreadyExists()
+    public function testProcessWhenFormBuilderAlreadyExists(): void
     {
         $formBuilder = $this->createMock(FormBuilderInterface::class);
 
@@ -68,7 +64,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessWhenFormAlreadyExists()
+    public function testProcessWhenFormAlreadyExists(): void
     {
         $form = $this->createMock(FormInterface::class);
 
@@ -78,7 +74,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         self::assertSame($form, $this->context->getForm());
     }
 
-    public function testProcessWhenNoParentEntity()
+    public function testProcessWhenNoParentEntity(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
@@ -93,7 +89,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithDefaultOptions()
+    public function testProcessWithDefaultOptions(): void
     {
         $parentEntity = new \stdClass();
         $formBuilder = $this->createMock(FormBuilderInterface::class);
@@ -132,7 +128,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessWithFormOptionsInContext()
+    public function testProcessWithFormOptionsInContext(): void
     {
         $parentEntity = new \stdClass();
         $formBuilder = $this->createMock(FormBuilderInterface::class);
@@ -173,7 +169,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessForParentApiResourceBasedOnManageableEntity()
+    public function testProcessForParentApiResourceBasedOnManageableEntity(): void
     {
         $parentEntityClass = UserProfile::class;
         $parentBaseEntityClass = User::class;
@@ -216,7 +212,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessForParentApiResourceBasedOnManageableEntityWithCustomProcessorToLoadParentEntity()
+    public function testProcessForParentApiResourceBasedOnManageableEntityWithCustomProcessorToLoadParentEntity(): void
     {
         $parentEntityClass = UserProfile::class;
         $parentBaseEntityClass = User::class;
@@ -259,7 +255,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessWithCustomOptions()
+    public function testProcessWithCustomOptions(): void
     {
         $parentEntity = new \stdClass();
         $formBuilder = $this->createMock(FormBuilderInterface::class);
@@ -307,7 +303,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessWhenAssociationShouldNotBeMapped()
+    public function testProcessWhenAssociationShouldNotBeMapped(): void
     {
         $parentEntity = new \stdClass();
         $formBuilder = $this->createMock(FormBuilderInterface::class);
@@ -347,7 +343,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessForCustomEventSubscriber()
+    public function testProcessForCustomEventSubscriber(): void
     {
         $parentEntity = new \stdClass();
         $formBuilder = $this->createMock(FormBuilderInterface::class);
@@ -398,7 +394,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessForCustomEventSubscriberInjectedAsService()
+    public function testProcessForCustomEventSubscriberInjectedAsService(): void
     {
         $parentEntity = new \stdClass();
         $formBuilder = $this->createMock(FormBuilderInterface::class);
@@ -443,7 +439,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessForCustomEventSubscriberAndCustomFormType()
+    public function testProcessForCustomEventSubscriberAndCustomFormType(): void
     {
         $parentEntity = new \stdClass();
         $formBuilder = $this->createMock(FormBuilderInterface::class);

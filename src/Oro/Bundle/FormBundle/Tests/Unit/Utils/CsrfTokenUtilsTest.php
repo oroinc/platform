@@ -21,12 +21,11 @@ class CsrfTokenUtilsTest extends TestCase
         $form = $this->createMock(FormInterface::class);
         $formConfig = $this->createMock(FormConfigInterface::class);
 
-        $form
+        $form->expects(self::once())
             ->method('getConfig')
             ->willReturn($formConfig);
 
-        $formConfig
-            ->expects(self::once())
+        $formConfig->expects(self::once())
             ->method('getOption')
             ->with('csrf_protection')
             ->willReturn($csrfProtection);
@@ -44,12 +43,11 @@ class CsrfTokenUtilsTest extends TestCase
         $form = $this->createMock(FormInterface::class);
         $formConfig = $this->createMock(FormConfigInterface::class);
 
-        $form
+        $form->expects(self::atLeastOnce())
             ->method('getConfig')
             ->willReturn($formConfig);
 
-        $formConfig
-            ->expects(self::once())
+        $formConfig->expects(self::once())
             ->method('getOption')
             ->with('csrf_protection')
             ->willReturn(false);
@@ -62,14 +60,14 @@ class CsrfTokenUtilsTest extends TestCase
         $form = $this->createMock(FormInterface::class);
         $formConfig = $this->createMock(FormConfigInterface::class);
 
-        $form
+        $form->expects(self::atLeastOnce())
             ->method('getConfig')
             ->willReturn($formConfig);
 
         $tokenId = 'sample_token_id';
         $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
 
-        $formConfig
+        $formConfig->expects(self::exactly(3))
             ->method('getOption')
             ->willReturnMap([
                 ['csrf_protection', null, true],
@@ -78,8 +76,7 @@ class CsrfTokenUtilsTest extends TestCase
             ]);
 
         $csrfToken = new CsrfToken($tokenId, 'sample_value');
-        $csrfTokenManager
-            ->expects(self::once())
+        $csrfTokenManager->expects(self::once())
             ->method('getToken')
             ->with($tokenId)
             ->willReturn($csrfToken);
@@ -92,13 +89,13 @@ class CsrfTokenUtilsTest extends TestCase
         $form = $this->createMock(FormInterface::class);
         $formConfig = $this->createMock(FormConfigInterface::class);
 
-        $form
+        $form->expects(self::atLeastOnce())
             ->method('getConfig')
             ->willReturn($formConfig);
 
         $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
 
-        $formConfig
+        $formConfig->expects(self::exactly(3))
             ->method('getOption')
             ->willReturnMap([
                 ['csrf_protection', null, true],
@@ -107,14 +104,12 @@ class CsrfTokenUtilsTest extends TestCase
             ]);
 
         $formName = 'sample_form_name';
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('getName')
             ->willReturn($formName);
 
         $csrfToken = new CsrfToken($formName, 'sample_value');
-        $csrfTokenManager
-            ->expects(self::once())
+        $csrfTokenManager->expects(self::once())
             ->method('getToken')
             ->with($formName)
             ->willReturn($csrfToken);
@@ -127,13 +122,13 @@ class CsrfTokenUtilsTest extends TestCase
         $form = $this->createMock(FormInterface::class);
         $formConfig = $this->createMock(FormConfigInterface::class);
 
-        $form
+        $form->expects(self::atLeastOnce())
             ->method('getConfig')
             ->willReturn($formConfig);
 
         $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
 
-        $formConfig
+        $formConfig->expects(self::exactly(3))
             ->method('getOption')
             ->willReturnMap([
                 ['csrf_protection', null, true],
@@ -142,26 +137,22 @@ class CsrfTokenUtilsTest extends TestCase
             ]);
 
         $resolvedFormType = $this->createMock(ResolvedFormTypeInterface::class);
-        $formConfig
-            ->expects(self::once())
+        $formConfig->expects(self::once())
             ->method('getType')
             ->willReturn($resolvedFormType);
 
         $innerType = $this->createMock(FormTypeInterface::class);
-        $resolvedFormType
-            ->expects(self::once())
+        $resolvedFormType->expects(self::once())
             ->method('getInnerType')
             ->willReturn($innerType);
 
-        $innerTypeClass = \get_class($innerType);
-        $form
-            ->expects(self::once())
+        $innerTypeClass = $innerType::class;
+        $form->expects(self::once())
             ->method('getName')
             ->willReturn('');
 
         $csrfToken = new CsrfToken($innerTypeClass, 'sample_value');
-        $csrfTokenManager
-            ->expects(self::once())
+        $csrfTokenManager->expects(self::once())
             ->method('getToken')
             ->with($innerTypeClass)
             ->willReturn($csrfToken);
@@ -174,12 +165,11 @@ class CsrfTokenUtilsTest extends TestCase
         $form = $this->createMock(FormInterface::class);
         $formConfig = $this->createMock(FormConfigInterface::class);
 
-        $form
+        $form->expects(self::atLeastOnce())
             ->method('getConfig')
             ->willReturn($formConfig);
 
-        $formConfig
-            ->expects(self::once())
+        $formConfig->expects(self::once())
             ->method('getOption')
             ->with('csrf_protection')
             ->willReturn(false);
@@ -192,12 +182,12 @@ class CsrfTokenUtilsTest extends TestCase
         $form = $this->createMock(FormInterface::class);
         $formConfig = $this->createMock(FormConfigInterface::class);
 
-        $form
+        $form->expects(self::atLeastOnce())
             ->method('getConfig')
             ->willReturn($formConfig);
 
         $csrfFieldName = 'sample_field_name';
-        $formConfig
+        $formConfig->expects(self::exactly(2))
             ->method('getOption')
             ->willReturnMap([
                 ['csrf_protection', null, true],

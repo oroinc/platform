@@ -14,21 +14,16 @@ use Oro\Bundle\EmailBundle\Form\Model\Factory;
 use Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager;
 use Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class EmailAttachmentTransformerTest extends \PHPUnit\Framework\TestCase
+class EmailAttachmentTransformerTest extends TestCase
 {
-    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileManager;
-
-    /** @var AttachmentManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $manager;
-
-    /** @var EmailAttachmentManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailAttachmentManager;
-
-    /** @var EmailAttachmentTransformer */
-    private $emailAttachmentTransformer;
+    private FileManager&MockObject $fileManager;
+    private AttachmentManager&MockObject $manager;
+    private EmailAttachmentManager&MockObject $emailAttachmentManager;
+    private EmailAttachmentTransformer $emailAttachmentTransformer;
 
     #[\Override]
     protected function setUp(): void
@@ -45,7 +40,7 @@ class EmailAttachmentTransformerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEntityToModel()
+    public function testEntityToModel(): void
     {
         $emailAttachment = $this->createMock(EmailAttachment::class);
         $emailAttachment->expects($this->once())
@@ -93,7 +88,7 @@ class EmailAttachmentTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(12, $attachmentModel->getFileSize());
     }
 
-    public function testAttachmentEntityToModel()
+    public function testAttachmentEntityToModel(): void
     {
         $file = new File();
         $file->setOriginalFilename('filename.txt');
@@ -134,7 +129,7 @@ class EmailAttachmentTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(100, $attachmentModel->getFileSize());
     }
 
-    public function testAttachmentEntityToEntity()
+    public function testAttachmentEntityToEntity(): void
     {
         $file = new File();
         $file->setOriginalFilename('filename.txt');
@@ -161,7 +156,7 @@ class EmailAttachmentTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('filename.txt', $emailAttachment->getFileName());
     }
 
-    public function testEntityFromUploadedFile()
+    public function testEntityFromUploadedFile(): void
     {
         $fileContent = "test attachment\n";
 

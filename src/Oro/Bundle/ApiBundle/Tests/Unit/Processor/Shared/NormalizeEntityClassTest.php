@@ -10,17 +10,13 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class NormalizeEntityClassTest extends GetListProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
-    private $valueNormalizer;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
-    private $resourcesProvider;
-
-    /** @var NormalizeEntityClass */
-    private $processor;
+    private ValueNormalizer&MockObject $valueNormalizer;
+    private ResourcesProvider&MockObject $resourcesProvider;
+    private NormalizeEntityClass $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +32,7 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
         );
     }
 
-    public function testProcessWhenClassIsNotSet()
+    public function testProcessWhenClassIsNotSet(): void
     {
         $this->processor->process($this->context);
 
@@ -52,7 +48,7 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
         );
     }
 
-    public function testProcessWhenClassIsEmpty()
+    public function testProcessWhenClassIsEmpty(): void
     {
         $this->context->setClassName('');
         $this->processor->process($this->context);
@@ -69,7 +65,7 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
         );
     }
 
-    public function testProcessWhenClassAlreadyNormalized()
+    public function testProcessWhenClassAlreadyNormalized(): void
     {
         $this->valueNormalizer->expects(self::never())
             ->method('normalizeValue');
@@ -78,7 +74,7 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $entityType = 'test';
 
@@ -97,7 +93,7 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
         self::assertSame('Test\Class', $this->context->getClassName());
     }
 
-    public function testProcessForNotAccessibleEntityType()
+    public function testProcessForNotAccessibleEntityType(): void
     {
         $this->expectException(ResourceNotAccessibleException::class);
 
@@ -116,7 +112,7 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForInvalidEntityType()
+    public function testProcessForInvalidEntityType(): void
     {
         $entityType = 'test';
 

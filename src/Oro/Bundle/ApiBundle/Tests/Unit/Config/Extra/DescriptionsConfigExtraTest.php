@@ -3,8 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config\Extra;
 
 use Oro\Bundle\ApiBundle\Config\Extra\DescriptionsConfigExtra;
+use PHPUnit\Framework\TestCase;
 
-class DescriptionsConfigExtraTest extends \PHPUnit\Framework\TestCase
+class DescriptionsConfigExtraTest extends TestCase
 {
     public function testDocumentationAction(): void
     {

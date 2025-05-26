@@ -7,14 +7,12 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Create\PersistEntity;
 use Oro\Bundle\ApiBundle\Processor\Create\SaveEntity;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class PersistEntityTest extends CreateProcessorTestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var PersistEntity */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private PersistEntity $processor;
 
     #[\Override]
     protected function setUp(): void

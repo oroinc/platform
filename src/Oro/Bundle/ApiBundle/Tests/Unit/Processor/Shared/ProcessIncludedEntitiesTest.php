@@ -18,24 +18,16 @@ use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Component\ChainProcessor\ParameterBag;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Response;
 
 class ProcessIncludedEntitiesTest extends FormProcessorTestCase
 {
-    /** @var ActionProcessorBagInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $processorBag;
-
-    /** @var ErrorCompleterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $errorCompleter;
-
-    /** @var ExceptionTextExtractorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $exceptionTextExtractor;
-
-    /** @var ParameterBag */
-    private $sharedData;
-
-    /** @var ProcessIncludedEntities */
-    private $processor;
+    private ActionProcessorBagInterface&MockObject $processorBag;
+    private ErrorCompleterInterface&MockObject $errorCompleter;
+    private ExceptionTextExtractorInterface&MockObject $exceptionTextExtractor;
+    private ParameterBag $sharedData;
+    private ProcessIncludedEntities $processor;
 
     #[\Override]
     protected function setUp(): void

@@ -9,17 +9,13 @@ use Oro\Bundle\ApiBundle\Batch\Model\IncludedData;
 use Oro\Bundle\ApiBundle\Batch\Processor\Update\LoadIncludedData;
 use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\GaufretteBundle\FileManager;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class LoadIncludedDataTest extends BatchUpdateProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|IncludeAccessorRegistry */
-    private $includeAccessorRegistry;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|IncludeMapManager */
-    private $includeMapManager;
-
-    /** @var LoadIncludedData */
-    private $processor;
+    private IncludeAccessorRegistry&MockObject $includeAccessorRegistry;
+    private IncludeMapManager&MockObject $includeMapManager;
+    private LoadIncludedData $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +28,7 @@ class LoadIncludedDataTest extends BatchUpdateProcessorTestCase
         $this->processor = new LoadIncludedData($this->includeAccessorRegistry, $this->includeMapManager);
     }
 
-    public function testProcessWhenIncludedDataAlreadyLoaded()
+    public function testProcessWhenIncludedDataAlreadyLoaded(): void
     {
         $this->includeAccessorRegistry->expects(self::never())
             ->method('getAccessor');
@@ -42,7 +38,7 @@ class LoadIncludedDataTest extends BatchUpdateProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenPrimaryDataWereNotLoaded()
+    public function testProcessWhenPrimaryDataWereNotLoaded(): void
     {
         $this->includeAccessorRegistry->expects(self::never())
             ->method('getAccessor');
@@ -51,7 +47,7 @@ class LoadIncludedDataTest extends BatchUpdateProcessorTestCase
         self::assertFalse($this->context->isProcessed(LoadIncludedData::OPERATION_NAME));
     }
 
-    public function testProcessWhenIncludeAccessorNotFound()
+    public function testProcessWhenIncludeAccessorNotFound(): void
     {
         $this->includeAccessorRegistry->expects(self::once())
             ->method('getAccessor')
@@ -66,7 +62,7 @@ class LoadIncludedDataTest extends BatchUpdateProcessorTestCase
         self::assertFalse($this->context->hasSkippedGroups());
     }
 
-    public function testProcessWhenIncludedDataSuccessfullyLoaded()
+    public function testProcessWhenIncludedDataSuccessfullyLoaded(): void
     {
         $operationId = 123;
         $data = [['data' => ['type' => 'accounts']]];
@@ -98,7 +94,7 @@ class LoadIncludedDataTest extends BatchUpdateProcessorTestCase
         self::assertFalse($this->context->hasSkippedGroups());
     }
 
-    public function testProcessWhenIncludedDataCannotBeLoaded()
+    public function testProcessWhenIncludedDataCannotBeLoaded(): void
     {
         $operationId = 123;
         $data = [['data' => ['type' => 'accounts']]];

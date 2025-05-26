@@ -3,11 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config\Extra;
 
 use Oro\Bundle\ApiBundle\Config\Extra\SortersConfigExtra;
+use PHPUnit\Framework\TestCase;
 
-class SortersConfigExtraTest extends \PHPUnit\Framework\TestCase
+class SortersConfigExtraTest extends TestCase
 {
-    /** @var SortersConfigExtra */
-    private $extra;
+    private SortersConfigExtra $extra;
 
     #[\Override]
     protected function setUp(): void
@@ -15,22 +15,22 @@ class SortersConfigExtraTest extends \PHPUnit\Framework\TestCase
         $this->extra = new SortersConfigExtra();
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         self::assertEquals(SortersConfigExtra::NAME, $this->extra->getName());
     }
 
-    public function testIsPropagable()
+    public function testIsPropagable(): void
     {
         self::assertFalse($this->extra->isPropagable());
     }
 
-    public function testCacheKeyPart()
+    public function testCacheKeyPart(): void
     {
         self::assertEquals(SortersConfigExtra::NAME, $this->extra->getCacheKeyPart());
     }
 
-    public function testConfigType()
+    public function testConfigType(): void
     {
         self::assertEquals('sorters', $this->extra->getConfigType());
     }

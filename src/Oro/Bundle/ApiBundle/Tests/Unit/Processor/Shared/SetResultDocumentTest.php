@@ -8,8 +8,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 
 class SetResultDocumentTest extends GetProcessorTestCase
 {
-    /** @var SetResultDocument */
-    private $processor;
+    private SetResultDocument $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +18,7 @@ class SetResultDocumentTest extends GetProcessorTestCase
         $this->processor = new SetResultDocument();
     }
 
-    public function testProcessWhenResultExistsButNoResponseDocumentBuilder()
+    public function testProcessWhenResultExistsButNoResponseDocumentBuilder(): void
     {
         $result = [];
         $this->context->setResult($result);
@@ -27,7 +26,7 @@ class SetResultDocumentTest extends GetProcessorTestCase
         self::assertSame($result, $this->context->getResult());
     }
 
-    public function testProcessWhenResponseDocumentBuilderExists()
+    public function testProcessWhenResponseDocumentBuilderExists(): void
     {
         $resultDocument = [];
         $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
@@ -41,7 +40,7 @@ class SetResultDocumentTest extends GetProcessorTestCase
         self::assertNull($this->context->getResponseDocumentBuilder());
     }
 
-    public function testProcessWhenBothResultAndResponseDocumentBuilderExists()
+    public function testProcessWhenBothResultAndResponseDocumentBuilderExists(): void
     {
         $result = ['result'];
         $resultDocument = ['resultDocument'];

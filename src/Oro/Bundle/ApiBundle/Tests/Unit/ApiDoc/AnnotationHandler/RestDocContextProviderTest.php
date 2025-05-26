@@ -19,23 +19,20 @@ use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Route;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
+class RestDocContextProviderTest extends TestCase
 {
-    private const VERSION = '1.2';
+    private const string VERSION = '1.2';
 
-    /** @var RequestType */
-    private $requestType;
-
-    /** @var ActionProcessorBagInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $processorBag;
-
-    /** @var RestDocContextProvider */
-    private $contextProvider;
+    private RequestType $requestType;
+    private ActionProcessorBagInterface&MockObject $processorBag;
+    private RestDocContextProvider $contextProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -82,7 +79,7 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetContext()
+    public function testGetContext(): void
     {
         $action = 'test_action';
         $entityClass = 'Test\Entity';
@@ -122,7 +119,7 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetContextForSubresource()
+    public function testGetContextForSubresource(): void
     {
         $action = 'test_action';
         $entityClass = 'Test\Entity';
@@ -172,7 +169,7 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetContextForOptions()
+    public function testGetContextForOptions(): void
     {
         $action = 'test_action';
         $entityClass = 'Test\Entity';
@@ -214,7 +211,7 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetContextForOptionsForItemWithoutIdController()
+    public function testGetContextForOptionsForItemWithoutIdController(): void
     {
         $action = 'test_action';
         $entityClass = 'Test\Entity';
@@ -256,7 +253,7 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetContextForOptionsWithActionType()
+    public function testGetContextForOptionsWithActionType(): void
     {
         $action = 'test_action';
         $entityClass = 'Test\Entity';
@@ -304,7 +301,7 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetContextForOptionsWithInvalidActionType()
+    public function testGetContextForOptionsWithInvalidActionType(): void
     {
         $action = 'test_action';
         $entityClass = 'Test\Entity';
@@ -343,7 +340,7 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
         $this->contextProvider->getContext($action, $entityClass, null, $route);
     }
 
-    public function testGetConfig()
+    public function testGetConfig(): void
     {
         $context = $this->createMock(Context::class);
         $config = new EntityDefinitionConfig();
@@ -354,7 +351,7 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
         self::assertSame($config, $this->contextProvider->getConfig($context));
     }
 
-    public function testGetConfigWhenNoConfig()
+    public function testGetConfigWhenNoConfig(): void
     {
         $context = $this->createMock(Context::class);
         $context->expects(self::once())
@@ -373,7 +370,7 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
         $this->contextProvider->getConfig($context);
     }
 
-    public function testGetConfigForSubresourceWhenNoConfig()
+    public function testGetConfigForSubresourceWhenNoConfig(): void
     {
         $context = $this->createMock(SubresourceContext::class);
         $context->expects(self::once())
@@ -397,7 +394,7 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
         $this->contextProvider->getConfig($context);
     }
 
-    public function testGetMetadata()
+    public function testGetMetadata(): void
     {
         $context = $this->createMock(Context::class);
         $metadata = new EntityMetadata('Test\Entity');
@@ -408,7 +405,7 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
         self::assertSame($metadata, $this->contextProvider->getMetadata($context));
     }
 
-    public function testGetMetadataWhenNoMetadata()
+    public function testGetMetadataWhenNoMetadata(): void
     {
         $context = $this->createMock(Context::class);
         $context->expects(self::once())
@@ -427,7 +424,7 @@ class RestDocContextProviderTest extends \PHPUnit\Framework\TestCase
         $this->contextProvider->getMetadata($context);
     }
 
-    public function testGetMetadataForSubresourceWhenNoMetadata()
+    public function testGetMetadataForSubresourceWhenNoMetadata(): void
     {
         $context = $this->createMock(SubresourceContext::class);
         $context->expects(self::once())

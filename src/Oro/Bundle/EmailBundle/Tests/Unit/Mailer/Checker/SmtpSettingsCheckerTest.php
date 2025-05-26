@@ -7,14 +7,14 @@ use Oro\Bundle\EmailBundle\Mailer\Checker\ConnectionCheckerInterface;
 use Oro\Bundle\EmailBundle\Mailer\Checker\SmtpConnectionChecker;
 use Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker;
 use Oro\Bundle\EmailBundle\Mailer\Transport\DsnFromSmtpSettingsFactory;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Transport\Dsn;
 
-class SmtpSettingsCheckerTest extends \PHPUnit\Framework\TestCase
+class SmtpSettingsCheckerTest extends TestCase
 {
-    private DsnFromSmtpSettingsFactory|\PHPUnit\Framework\MockObject\MockObject $dsnFromSmtpSettingsFactory;
-
-    private ConnectionCheckerInterface|\PHPUnit\Framework\MockObject\MockObject $connectionChecker;
-
+    private DsnFromSmtpSettingsFactory&MockObject $dsnFromSmtpSettingsFactory;
+    private ConnectionCheckerInterface&MockObject $connectionChecker;
     private SmtpSettingsChecker $smtpSettingsChecker;
 
     #[\Override]

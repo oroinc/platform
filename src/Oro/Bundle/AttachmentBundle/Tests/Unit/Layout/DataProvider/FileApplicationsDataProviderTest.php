@@ -9,15 +9,14 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\TestFrameworkBundle\Entity\Item;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FileApplicationsDataProviderTest extends \PHPUnit\Framework\TestCase
+class FileApplicationsDataProviderTest extends TestCase
 {
-    private FileApplicationsProvider|\PHPUnit\Framework\MockObject\MockObject $fileApplicationsProvider;
-
-    private CurrentApplicationProviderInterface|\PHPUnit\Framework\MockObject\MockObject $currentApplicationProvider;
-
-    private ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $configProvider;
-
+    private FileApplicationsProvider&MockObject $fileApplicationsProvider;
+    private CurrentApplicationProviderInterface&MockObject $currentApplicationProvider;
+    private ConfigProvider&MockObject $configProvider;
     private FileApplicationsDataProvider $dataProvider;
 
     #[\Override]
@@ -48,20 +47,17 @@ class FileApplicationsDataProviderTest extends \PHPUnit\Framework\TestCase
 
         $config = new Config(new FieldConfigId('attachment', $className, $fieldName), $scopeOptions);
 
-        $this->configProvider
-            ->expects(self::once())
+        $this->configProvider->expects(self::once())
             ->method('getConfig')
             ->with($className, $fieldName)
             ->willReturn($config);
 
-        $this->fileApplicationsProvider
-            ->expects(self::any())
+        $this->fileApplicationsProvider->expects(self::any())
             ->method('getFileApplicationsForField')
             ->with($className, $fieldName)
             ->willReturn($applications);
 
-        $this->currentApplicationProvider
-            ->expects(self::any())
+        $this->currentApplicationProvider->expects(self::any())
             ->method('isApplicationsValid')
             ->with($applications)
             ->willReturn($isApplicationsValid);

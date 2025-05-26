@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\JsonApi\CompleteStatusCodes;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig\ConfigProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -17,11 +18,8 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class CompleteStatusCodesTest extends ConfigProcessorTestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var CompleteStatusCodes */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private CompleteStatusCodes $processor;
 
     #[\Override]
     protected function setUp(): void

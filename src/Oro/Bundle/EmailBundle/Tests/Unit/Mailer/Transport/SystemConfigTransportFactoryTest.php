@@ -4,17 +4,19 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Mailer\Transport;
 
 use Oro\Bundle\EmailBundle\Mailer\Transport\SystemConfigTransportFactory;
 use Oro\Bundle\EmailBundle\Mailer\Transport\SystemConfigTransportRealDsnProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
-class SystemConfigTransportFactoryTest extends \PHPUnit\Framework\TestCase
+class SystemConfigTransportFactoryTest extends TestCase
 {
-    private Transport|\PHPUnit\Framework\MockObject\MockObject $transportFactory;
-    private SystemConfigTransportRealDsnProvider $systemConfigTransportRealDsnProvider;
+    private SystemConfigTransportRealDsnProvider&MockObject $systemConfigTransportRealDsnProvider;
+    private Transport $transportFactory;
+    private TransportFactoryInterface&MockObject $transportFactoryBase;
     private SystemConfigTransportFactory $factory;
-    private TransportFactoryInterface $transportFactoryBase;
 
     #[\Override]
     protected function setUp(): void
@@ -53,19 +55,16 @@ class SystemConfigTransportFactoryTest extends \PHPUnit\Framework\TestCase
     {
         $dsn = Dsn::fromString('oro://system-config');
         $realDsn = Dsn::fromString('smtp://example.org');
-        $this->systemConfigTransportRealDsnProvider
-            ->expects(self::once())
+        $this->systemConfigTransportRealDsnProvider->expects(self::once())
             ->method('getRealDsn')
             ->with($dsn)
             ->willReturn($realDsn);
 
         $expectedTransport = $this->createMock(Transport\TransportInterface::class);
-        $this->transportFactoryBase
-            ->expects(self::once())
+        $this->transportFactoryBase->expects(self::once())
             ->method('supports')
             ->willReturn(true);
-        $this->transportFactoryBase
-            ->expects(self::once())
+        $this->transportFactoryBase->expects(self::once())
             ->method('create')
             ->willReturn($expectedTransport);
 

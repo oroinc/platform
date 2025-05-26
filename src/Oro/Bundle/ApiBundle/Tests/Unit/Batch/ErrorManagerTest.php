@@ -11,26 +11,21 @@ use Oro\Bundle\ApiBundle\Batch\Model\BatchError;
 use Oro\Bundle\ApiBundle\Batch\Model\ChunkFile;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\GaufretteBundle\FileManager;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Yaml\Yaml;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ErrorManagerTest extends \PHPUnit\Framework\TestCase
+class ErrorManagerTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
-    private $logger;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FileManager */
-    private $fileManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FileLockManager */
-    private $fileLockManager;
-
-    /** @var ErrorManager */
-    private $errorManager;
+    private LoggerInterface&MockObject $logger;
+    private FileManager&MockObject $fileManager;
+    private FileLockManager&MockObject $fileLockManager;
+    private ErrorManager $errorManager;
 
     #[\Override]
     protected function setUp(): void
@@ -47,7 +42,7 @@ class ErrorManagerTest extends \PHPUnit\Framework\TestCase
         return new ChunkFile($fileName, $fileIndex, 0);
     }
 
-    public function testGetTotalErrorCount()
+    public function testGetTotalErrorCount(): void
     {
         $operationId = 100;
         $indexContent = file_get_contents('Fixtures/error_manager/read_index.json', true);
@@ -66,7 +61,7 @@ class ErrorManagerTest extends \PHPUnit\Framework\TestCase
         self::assertSame(16, $count);
     }
 
-    public function testGetTotalErrorCountWhenErrorIndexFileDoesNotExist()
+    public function testGetTotalErrorCountWhenErrorIndexFileDoesNotExist(): void
     {
         $operationId = 100;
 
@@ -84,7 +79,7 @@ class ErrorManagerTest extends \PHPUnit\Framework\TestCase
         self::assertSame(0, $count);
     }
 
-    public function testGetTotalErrorCountWhenErrorIndexFileLoadingFailed()
+    public function testGetTotalErrorCountWhenErrorIndexFileLoadingFailed(): void
     {
         $operationId = 100;
 
@@ -112,7 +107,7 @@ class ErrorManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider readErrorsDataProvider
      */
-    public function testReadErrors(int $offset, int $limit, int $operationId, int $indexesInvolved, array $result)
+    public function testReadErrors(int $offset, int $limit, int $operationId, int $indexesInvolved, array $result): void
     {
         $indexContent = file_get_contents('Fixtures/error_manager/read_index.json', true);
 
@@ -214,7 +209,7 @@ class ErrorManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testReadErrorsWhenErrorIndexFileDoesNotExist()
+    public function testReadErrorsWhenErrorIndexFileDoesNotExist(): void
     {
         $operationId = 100;
 
@@ -231,7 +226,7 @@ class ErrorManagerTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $this->errorManager->readErrors($this->fileManager, $operationId, 0, 10));
     }
 
-    public function testReadErrorsWhenErrorIndexFileLoadingFailed()
+    public function testReadErrorsWhenErrorIndexFileLoadingFailed(): void
     {
         $operationId = 100;
 
@@ -255,7 +250,7 @@ class ErrorManagerTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $this->errorManager->readErrors($this->fileManager, $operationId, 0, 10));
     }
 
-    public function testWriteErrorsWhenErrorsCollectionIsEmpty()
+    public function testWriteErrorsWhenErrorsCollectionIsEmpty(): void
     {
         $this->fileManager->expects(self::never())
             ->method('writeToStorage');
@@ -277,7 +272,7 @@ class ErrorManagerTest extends \PHPUnit\Framework\TestCase
         int $chunkFileIndex,
         array $errors,
         array $data
-    ) {
+    ): void {
         foreach ($data as &$testFile) {
             $testFile = rtrim(file_get_contents(__DIR__ . '/Fixtures/error_manager/' . $testFile), "\n\n");
         }
@@ -357,7 +352,7 @@ class ErrorManagerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testWriteErrorsWhenNewErrorsAreAddedToExistingChunkErrorsFile()
+    public function testWriteErrorsWhenNewErrorsAreAddedToExistingChunkErrorsFile(): void
     {
         $operationId = 123;
         $chunkFileName = 'api_data_file';
@@ -411,7 +406,7 @@ class ErrorManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWriteErrorsWhenUpdateErrorIndexFailed()
+    public function testWriteErrorsWhenUpdateErrorIndexFailed(): void
     {
         $operationId = 123;
         $chunkFileName = 'api_chunk_file_name_1';
@@ -483,7 +478,7 @@ class ErrorManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWriteErrorsWhenUpdateErrorIndexFailedBecauseLockCannotBeAcquired()
+    public function testWriteErrorsWhenUpdateErrorIndexFailedBecauseLockCannotBeAcquired(): void
     {
         $operationId = 123;
         $chunkFileName = 'api_chunk_file_name_1';
@@ -530,7 +525,7 @@ class ErrorManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSerializeAndDeserializeError()
+    public function testSerializeAndDeserializeError(): void
     {
         $operationId = 123;
         $chunkFileName = 'api_chunk_file_name_1';

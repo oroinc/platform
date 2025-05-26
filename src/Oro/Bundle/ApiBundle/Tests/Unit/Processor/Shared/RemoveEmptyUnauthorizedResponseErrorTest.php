@@ -8,8 +8,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\UnhandledError\UnhandledErrorProce
 
 class RemoveEmptyUnauthorizedResponseErrorTest extends UnhandledErrorProcessorTestCase
 {
-    /** @var RemoveEmptyUnauthorizedResponseError */
-    private $processor;
+    private RemoveEmptyUnauthorizedResponseError $processor;
 
     #[\Override]
     protected function setUp(): void

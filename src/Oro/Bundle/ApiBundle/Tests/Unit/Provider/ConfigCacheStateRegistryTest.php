@@ -6,17 +6,14 @@ use Oro\Bundle\ApiBundle\Provider\ConfigCacheStateRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Config\Cache\ConfigCacheStateInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ConfigCacheStateRegistryTest extends \PHPUnit\Framework\TestCase
+class ConfigCacheStateRegistryTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigCacheStateInterface */
-    private $defaultState;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigCacheStateInterface */
-    private $firstState;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigCacheStateInterface */
-    private $secondState;
+    private ConfigCacheStateInterface&MockObject $defaultState;
+    private ConfigCacheStateInterface&MockObject $firstState;
+    private ConfigCacheStateInterface&MockObject $secondState;
 
     #[\Override]
     protected function setUp(): void
@@ -34,7 +31,7 @@ class ConfigCacheStateRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetConfigCacheStateForUnsupportedRequestType()
+    public function testGetConfigCacheStateForUnsupportedRequestType(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot find a config cache state service for the request "rest,another".');
@@ -44,7 +41,7 @@ class ConfigCacheStateRegistryTest extends \PHPUnit\Framework\TestCase
         $registry->getConfigCacheState($requestType);
     }
 
-    public function testGetConfigCacheStateShouldReturnDefaultStateForNotFirstAndSecondRequestType()
+    public function testGetConfigCacheStateShouldReturnDefaultStateForNotFirstAndSecondRequestType(): void
     {
         $registry = $this->getRegistry(
             [
@@ -60,7 +57,7 @@ class ConfigCacheStateRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->defaultState, $registry->getConfigCacheState($requestType));
     }
 
-    public function testGetConfigCacheStateShouldReturnFirstStateForFirstRequestType()
+    public function testGetConfigCacheStateShouldReturnFirstStateForFirstRequestType(): void
     {
         $registry = $this->getRegistry(
             [
@@ -76,7 +73,7 @@ class ConfigCacheStateRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->firstState, $registry->getConfigCacheState($requestType));
     }
 
-    public function testGetConfigCacheStateShouldReturnSecondStateForSecondRequestType()
+    public function testGetConfigCacheStateShouldReturnSecondStateForSecondRequestType(): void
     {
         $registry = $this->getRegistry(
             [
@@ -92,7 +89,7 @@ class ConfigCacheStateRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->secondState, $registry->getConfigCacheState($requestType));
     }
 
-    public function testGetConfigCacheStateShouldReturnDefaultStateIfSpecificStateNotFound()
+    public function testGetConfigCacheStateShouldReturnDefaultStateIfSpecificStateNotFound(): void
     {
         $registry = $this->getRegistry(
             [

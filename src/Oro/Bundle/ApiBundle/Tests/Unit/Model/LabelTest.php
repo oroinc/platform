@@ -3,12 +3,13 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ApiBundle\Model\Label;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LabelTest extends \PHPUnit\Framework\TestCase
+class LabelTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
-    private $translator;
+    private TranslatorInterface&MockObject $translator;
 
     #[\Override]
     protected function setUp(): void
@@ -16,7 +17,7 @@ class LabelTest extends \PHPUnit\Framework\TestCase
         $this->translator = $this->createMock(TranslatorInterface::class);
     }
 
-    public function testName()
+    public function testName(): void
     {
         $label = new Label('test');
         self::assertEquals('test', $label->getName());
@@ -27,7 +28,7 @@ class LabelTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('Label: test1', (string)$label);
     }
 
-    public function testTrans()
+    public function testTrans(): void
     {
         $label = new Label('test');
 
@@ -39,7 +40,7 @@ class LabelTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('translated', $label->trans($this->translator));
     }
 
-    public function testTransWhenNoTranslation()
+    public function testTransWhenNoTranslation(): void
     {
         $label = new Label('test');
 
@@ -51,7 +52,7 @@ class LabelTest extends \PHPUnit\Framework\TestCase
         self::assertSame('', $label->trans($this->translator));
     }
 
-    public function testTransWithDomain()
+    public function testTransWithDomain(): void
     {
         $label = new Label('test', 'test_domain');
 

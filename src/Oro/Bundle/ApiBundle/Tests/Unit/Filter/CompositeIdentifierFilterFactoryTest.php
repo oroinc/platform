@@ -5,14 +5,13 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 use Oro\Bundle\ApiBundle\Filter\CompositeIdentifierFilter;
 use Oro\Bundle\ApiBundle\Filter\CompositeIdentifierFilterFactory;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CompositeIdentifierFilterFactoryTest extends \PHPUnit\Framework\TestCase
+class CompositeIdentifierFilterFactoryTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerRegistry */
-    private $entityIdTransformerRegistry;
-
-    /** @var CompositeIdentifierFilterFactory */
-    private $factory;
+    private EntityIdTransformerRegistry&MockObject $entityIdTransformerRegistry;
+    private CompositeIdentifierFilterFactory $factory;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +23,7 @@ class CompositeIdentifierFilterFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateFilter()
+    public function testCreateFilter(): void
     {
         $dataType = 'string';
 

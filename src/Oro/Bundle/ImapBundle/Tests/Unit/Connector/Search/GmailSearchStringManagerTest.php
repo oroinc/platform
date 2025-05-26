@@ -5,14 +5,12 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Connector\Search;
 use Oro\Bundle\ImapBundle\Connector\Search\GmailSearchStringManager;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQuery;
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryMatch;
+use PHPUnit\Framework\TestCase;
 
-class GmailSearchStringManagerTest extends \PHPUnit\Framework\TestCase
+class GmailSearchStringManagerTest extends TestCase
 {
-    /** @var GmailSearchStringManager */
-    private $searchStringManager;
-
-    /** @var SearchQuery */
-    private $query;
+    private GmailSearchStringManager $searchStringManager;
+    private SearchQuery $query;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +22,7 @@ class GmailSearchStringManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider valueProvider
      */
-    public function testValue($value, $match, $expectedQuery)
+    public function testValue($value, $match, $expectedQuery): void
     {
         $this->query->value($value, $match);
         $this->assertEquals($expectedQuery, $this->query->convertToSearchString());
@@ -33,43 +31,43 @@ class GmailSearchStringManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider itemProvider
      */
-    public function testItem($name, $value, $match, $expectedQuery)
+    public function testItem($name, $value, $match, $expectedQuery): void
     {
         $this->query->item($name, $value, $match);
         $this->assertEquals($expectedQuery, $this->query->convertToSearchString());
     }
 
-    public function testAndOperator()
+    public function testAndOperator(): void
     {
         $this->query->andOperator();
         $this->assertEquals('""', $this->query->convertToSearchString());
     }
 
-    public function testOrOperator()
+    public function testOrOperator(): void
     {
         $this->query->orOperator();
         $this->assertEquals('"OR"', $this->query->convertToSearchString());
     }
 
-    public function testNotOperator()
+    public function testNotOperator(): void
     {
         $this->query->notOperator();
         $this->assertEquals('"-"', $this->query->convertToSearchString());
     }
 
-    public function testOpenParenthesis()
+    public function testOpenParenthesis(): void
     {
         $this->query->openParenthesis();
         $this->assertEquals('"("', $this->query->convertToSearchString());
     }
 
-    public function testCloseParenthesis()
+    public function testCloseParenthesis(): void
     {
         $this->query->closeParenthesis();
         $this->assertEquals('")"', $this->query->convertToSearchString());
     }
 
-    public function testComplexQuery()
+    public function testComplexQuery(): void
     {
         $simpleSubQuery = $this->createSearchQuery();
         $simpleSubQuery->value('val1');

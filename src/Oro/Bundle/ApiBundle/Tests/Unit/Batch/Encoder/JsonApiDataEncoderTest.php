@@ -3,8 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\Encoder;
 
 use Oro\Bundle\ApiBundle\Batch\Encoder\JsonDataEncoder;
+use PHPUnit\Framework\TestCase;
 
-class JsonApiDataEncoderTest extends \PHPUnit\Framework\TestCase
+class JsonApiDataEncoderTest extends TestCase
 {
     private function getEncoder(): JsonDataEncoder
     {
@@ -14,12 +15,12 @@ class JsonApiDataEncoderTest extends \PHPUnit\Framework\TestCase
         return $encoder;
     }
 
-    public function testEncodeItemsEmptyItems()
+    public function testEncodeItemsEmptyItems(): void
     {
         self::assertEquals('[]', $this->getEncoder()->encodeItems([]));
     }
 
-    public function testEncode()
+    public function testEncode(): void
     {
         $items = [
             [
@@ -38,7 +39,7 @@ class JsonApiDataEncoderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($resultJson, $this->getEncoder()->encodeItems($items));
     }
 
-    public function testEncodeWithHeaderSection()
+    public function testEncodeWithHeaderSection(): void
     {
         $items = [
             [

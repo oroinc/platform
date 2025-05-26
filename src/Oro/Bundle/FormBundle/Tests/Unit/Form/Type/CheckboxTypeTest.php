@@ -3,6 +3,7 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\CheckboxType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType as ParentCheckboxType;
 use Symfony\Component\Form\FormBuilder;
@@ -11,7 +12,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 
-class CheckboxTypeTest extends \PHPUnit\Framework\TestCase
+class CheckboxTypeTest extends TestCase
 {
     /**
      * @var CheckboxType
@@ -24,28 +25,25 @@ class CheckboxTypeTest extends \PHPUnit\Framework\TestCase
         $this->type = new CheckboxType();
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $this->assertEquals(ParentCheckboxType::class, $this->type->getParent());
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals(CheckboxType::NAME, $this->type->getName());
     }
 
-    public function testGetBlockPrefix()
+    public function testGetBlockPrefix(): void
     {
         $this->assertEquals(CheckboxType::NAME, $this->type->getBlockPrefix());
     }
 
     /**
      * @dataProvider buildFormProvider
-     *
-     * @param mixed $data
-     * @param mixed $expected
      */
-    public function testBuildForm($data, $expected)
+    public function testBuildForm(string $data, ?string $expected): void
     {
         $eventDispatcher = new EventDispatcher();
         $builder = new FormBuilder(

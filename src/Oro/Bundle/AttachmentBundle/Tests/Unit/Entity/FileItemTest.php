@@ -6,13 +6,13 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Entity\FileItem;
 use Oro\Bundle\FormBundle\Entity\EmptyItem;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 
-class FileItemTest extends \PHPUnit\Framework\TestCase
+class FileItemTest extends TestCase
 {
     use EntityTestCaseTrait;
 
-    /** @var FileItem */
-    private $entity;
+    private FileItem $entity;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +20,7 @@ class FileItemTest extends \PHPUnit\Framework\TestCase
         $this->entity = new FileItem();
     }
 
-    public function testAccessors()
+    public function testAccessors(): void
     {
         $properties = [
             ['id', 1],
@@ -32,7 +32,7 @@ class FileItemTest extends \PHPUnit\Framework\TestCase
         self::assertPropertyAccessors($this->entity, $properties);
     }
 
-    public function testIsEmpty()
+    public function testIsEmpty(): void
     {
         $this->assertInstanceof(EmptyItem::class, $this->entity);
         $this->assertTrue($this->entity->isEmpty());

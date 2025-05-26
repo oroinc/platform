@@ -12,11 +12,11 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Tests\Unit\Stub\FieldDqlExpressionProviderStub;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class NestedTreeComparisonExpressionTest extends OrmRelatedTestCase
 {
-    /** @var TreeListener|\PHPUnit\Framework\MockObject\MockObject */
-    private $treeListener;
+    private TreeListener&MockObject $treeListener;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +25,7 @@ class NestedTreeComparisonExpressionTest extends OrmRelatedTestCase
         $this->treeListener = $this->createMock(TreeListener::class);
     }
 
-    private function expectGetConfiguration(array $config)
+    private function expectGetConfiguration(array $config): void
     {
         $this->treeListener->expects(self::any())
             ->method('getConfiguration')
@@ -33,7 +33,7 @@ class NestedTreeComparisonExpressionTest extends OrmRelatedTestCase
             ->willReturn($config);
     }
 
-    public function testWalkComparisonExpression()
+    public function testWalkComparisonExpression(): void
     {
         $this->expectGetConfiguration([
             'root'  => 'rootField',
@@ -93,7 +93,7 @@ class NestedTreeComparisonExpressionTest extends OrmRelatedTestCase
         );
     }
 
-    public function testWalkComparisonExpressionForAssociation()
+    public function testWalkComparisonExpressionForAssociation(): void
     {
         $this->treeListener->expects(self::any())
             ->method('getConfiguration')
@@ -156,7 +156,7 @@ class NestedTreeComparisonExpressionTest extends OrmRelatedTestCase
         );
     }
 
-    public function testWalkComparisonExpressionWithoutRootField()
+    public function testWalkComparisonExpressionWithoutRootField(): void
     {
         $this->expectGetConfiguration([
             'left'  => 'leftField',
@@ -214,7 +214,7 @@ class NestedTreeComparisonExpressionTest extends OrmRelatedTestCase
         );
     }
 
-    public function testWalkComparisonExpressionWhenIncludeRootIsTrue()
+    public function testWalkComparisonExpressionWhenIncludeRootIsTrue(): void
     {
         $this->expectGetConfiguration([
             'root'  => 'rootField',

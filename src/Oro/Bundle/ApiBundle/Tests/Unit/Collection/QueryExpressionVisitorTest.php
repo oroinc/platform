@@ -19,6 +19,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\FieldDqlExpressionProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -29,8 +30,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
  */
 class QueryExpressionVisitorTest extends OrmRelatedTestCase
 {
-    /** @var FieldDqlExpressionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldDqlExpressionProvider;
+    private FieldDqlExpressionProviderInterface&MockObject $fieldDqlExpressionProvider;
 
     #[\Override]
     protected function setUp(): void

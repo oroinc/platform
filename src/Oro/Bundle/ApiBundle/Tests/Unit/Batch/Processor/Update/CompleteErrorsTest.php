@@ -11,14 +11,12 @@ use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class CompleteErrorsTest extends BatchUpdateProcessorTestCase
 {
-    /** @var ErrorCompleterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $errorCompleter;
-
-    /** @var CompleteErrors */
-    private $processor;
+    private ErrorCompleterInterface&MockObject $errorCompleter;
+    private CompleteErrors $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -36,12 +34,12 @@ class CompleteErrorsTest extends BatchUpdateProcessorTestCase
         $this->processor = new CompleteErrors($errorCompleterRegistry);
     }
 
-    public function testProcessWithoutErrors()
+    public function testProcessWithoutErrors(): void
     {
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithErrorsInBatchUpdateContext()
+    public function testProcessWithErrorsInBatchUpdateContext(): void
     {
         $error = new Error();
 
@@ -53,7 +51,7 @@ class CompleteErrorsTest extends BatchUpdateProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithErrorsInBatchItem()
+    public function testProcessWithErrorsInBatchItem(): void
     {
         $error = new Error();
 
@@ -92,7 +90,7 @@ class CompleteErrorsTest extends BatchUpdateProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithErrorsInBatchItemButEntityClassWasNotResolved()
+    public function testProcessWithErrorsInBatchItemButEntityClassWasNotResolved(): void
     {
         $error = new Error();
 
@@ -125,7 +123,7 @@ class CompleteErrorsTest extends BatchUpdateProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithErrorsInBatchItemButExceptionOccurredWhenGetMetadata()
+    public function testProcessWithErrorsInBatchItemButExceptionOccurredWhenGetMetadata(): void
     {
         $error = new Error();
 
@@ -159,7 +157,7 @@ class CompleteErrorsTest extends BatchUpdateProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithErrorsInBatchItemButNoEntityClass()
+    public function testProcessWithErrorsInBatchItemButNoEntityClass(): void
     {
         $error = new Error();
 
@@ -192,7 +190,7 @@ class CompleteErrorsTest extends BatchUpdateProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testRemoveDuplicates()
+    public function testRemoveDuplicates(): void
     {
         $item = $this->createMock(BatchUpdateItem::class);
         $itemContext = new BatchUpdateItemContext();

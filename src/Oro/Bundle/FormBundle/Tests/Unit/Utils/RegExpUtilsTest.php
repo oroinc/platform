@@ -3,8 +3,9 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Utils;
 
 use Oro\Bundle\FormBundle\Utils\RegExpUtils;
+use PHPUnit\Framework\TestCase;
 
-class RegExpUtilsTest extends \PHPUnit\Framework\TestCase
+class RegExpUtilsTest extends TestCase
 {
     public function testValidateRegExpWhenInvalid(): void
     {

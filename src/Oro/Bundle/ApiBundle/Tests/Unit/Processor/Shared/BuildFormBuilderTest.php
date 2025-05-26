@@ -16,6 +16,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
@@ -33,17 +34,10 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class BuildFormBuilderTest extends FormProcessorTestCase
 {
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formFactory;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
-    /** @var BuildFormBuilder */
-    private $processor;
+    private FormFactoryInterface&MockObject $formFactory;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private ContainerInterface&MockObject $container;
+    private BuildFormBuilder $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -86,7 +80,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         return $associationMetadata;
     }
 
-    public function testProcessWhenFormBuilderAlreadyExists()
+    public function testProcessWhenFormBuilderAlreadyExists(): void
     {
         $formBuilder = $this->createMock(FormBuilderInterface::class);
 
@@ -95,7 +89,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessWhenFormAlreadyExists()
+    public function testProcessWhenFormAlreadyExists(): void
     {
         $form = $this->createMock(FormInterface::class);
 
@@ -105,7 +99,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($form, $this->context->getForm());
     }
 
-    public function testProcessWhenNoEntity()
+    public function testProcessWhenNoEntity(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
@@ -121,7 +115,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForCustomForm()
+    public function testProcessForCustomForm(): void
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
@@ -161,7 +155,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
@@ -240,7 +234,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessForExistingEntity()
+    public function testProcessForExistingEntity(): void
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
@@ -320,7 +314,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessWithFormOptionsInContext()
+    public function testProcessWithFormOptionsInContext(): void
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
@@ -369,7 +363,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessForClassNameMetaProperty()
+    public function testProcessForClassNameMetaProperty(): void
     {
         $formBuilder = $this->createMock(FormBuilderInterface::class);
 
@@ -397,7 +391,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessForRenamedClassNameMetaProperty()
+    public function testProcessForRenamedClassNameMetaProperty(): void
     {
         $formBuilder = $this->createMock(FormBuilderInterface::class);
 
@@ -426,7 +420,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessForApiResourceBasedOnManageableEntity()
+    public function testProcessForApiResourceBasedOnManageableEntity(): void
     {
         $entityClass = UserProfile::class;
         $parentEntityClass = User::class;
@@ -478,7 +472,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessForApiResourceBasedOnManageableEntityWithCustomProcessorToLoadEntity()
+    public function testProcessForApiResourceBasedOnManageableEntityWithCustomProcessorToLoadEntity(): void
     {
         $entityClass = UserProfile::class;
         $parentEntityClass = User::class;
@@ -525,7 +519,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessForIgnoredField()
+    public function testProcessForIgnoredField(): void
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
@@ -572,7 +566,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessForFieldIgnoredOnlyForGetActions()
+    public function testProcessForFieldIgnoredOnlyForGetActions(): void
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
@@ -618,7 +612,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessForIgnoredAssociation()
+    public function testProcessForIgnoredAssociation(): void
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
@@ -665,7 +659,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessForAssociationIgnoredOnlyForGetActions()
+    public function testProcessForAssociationIgnoredOnlyForGetActions(): void
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
@@ -711,7 +705,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessForCustomEventSubscriber()
+    public function testProcessForCustomEventSubscriber(): void
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
@@ -758,7 +752,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessForCustomEventSubscriberInjectedAsService()
+    public function testProcessForCustomEventSubscriberInjectedAsService(): void
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
@@ -799,7 +793,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessForOutputOnlyField()
+    public function testProcessForOutputOnlyField(): void
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
@@ -844,7 +838,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessForOutputOnlyAssociation()
+    public function testProcessForOutputOnlyAssociation(): void
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
@@ -889,7 +883,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessForEnabledFullValidation()
+    public function testProcessForEnabledFullValidation(): void
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
@@ -930,7 +924,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessForDisabledFullValidation()
+    public function testProcessForDisabledFullValidation(): void
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
@@ -964,7 +958,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessForAssociationThatRepresentedAsField()
+    public function testProcessForAssociationThatRepresentedAsField(): void
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
@@ -1011,7 +1005,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessForRenamedAssociationThatRepresentedAsField()
+    public function testProcessForRenamedAssociationThatRepresentedAsField(): void
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
@@ -1059,7 +1053,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessForAssociationThatRepresentedAsFieldWithCustomFormType()
+    public function testProcessForAssociationThatRepresentedAsFieldWithCustomFormType(): void
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
@@ -1107,7 +1101,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessForAssociationThatRepresentedAsFieldAndMappedOptionIsFalse()
+    public function testProcessForAssociationThatRepresentedAsFieldAndMappedOptionIsFalse(): void
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();
@@ -1154,7 +1148,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         self::assertSame($formBuilder, $this->context->getFormBuilder());
     }
 
-    public function testProcessForAssociationThatRepresentedAsFieldWithCustomDataClass()
+    public function testProcessForAssociationThatRepresentedAsFieldWithCustomDataClass(): void
     {
         $entityClass = 'Test\Entity';
         $data = new \stdClass();

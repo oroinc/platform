@@ -13,13 +13,14 @@ use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DocumentBuilderTestCase extends \PHPUnit\Framework\TestCase
+class DocumentBuilderTestCase extends TestCase
 {
-    /** @var RequestType */
-    protected $requestType;
+    protected RequestType $requestType;
 
-    protected function getValueNormalizer(): ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject
+    protected function getValueNormalizer(): ValueNormalizer&MockObject
     {
         $valueNormalizer = $this->createMock(ValueNormalizer::class);
         $valueNormalizer->expects(self::any())
@@ -39,7 +40,7 @@ class DocumentBuilderTestCase extends \PHPUnit\Framework\TestCase
         return $valueNormalizer;
     }
 
-    protected function getEntityIdTransformer(): EntityIdTransformerInterface|\PHPUnit\Framework\MockObject\MockObject
+    protected function getEntityIdTransformer(): EntityIdTransformerInterface&MockObject
     {
         $entityIdTransformer = $this->createMock(EntityIdTransformerInterface::class);
         $entityIdTransformer->expects(self::any())
@@ -53,7 +54,7 @@ class DocumentBuilderTestCase extends \PHPUnit\Framework\TestCase
 
     protected function getEntityIdTransformerRegistry(
         EntityIdTransformerInterface $entityIdTransformer
-    ): EntityIdTransformerRegistry|\PHPUnit\Framework\MockObject\MockObject {
+    ): EntityIdTransformerRegistry&MockObject {
         $entityIdTransformerRegistry = $this->createMock(EntityIdTransformerRegistry::class);
         $entityIdTransformerRegistry->expects(self::any())
             ->method('getEntityIdTransformer')

@@ -15,10 +15,8 @@ class EmailExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    private EmailTemplateCandidatesProviderInterface|MockObject $emailTemplateCandidatesProvider;
-
+    private EmailTemplateCandidatesProviderInterface&MockObject $emailTemplateCandidatesProvider;
     private EmailTemplateRenderingContext $emailTemplateRenderingContext;
-
     private EmailExtension $extension;
 
     #[\Override]
@@ -41,8 +39,7 @@ class EmailExtensionTest extends TestCase
     {
         $templateName = 'sample_name';
         $templateNames = ['@db:/sample_name', 'sample_name'];
-        $this->emailTemplateCandidatesProvider
-            ->expects(self::once())
+        $this->emailTemplateCandidatesProvider->expects(self::once())
             ->method('getCandidatesNames')
             ->with(new EmailTemplateCriteria($templateName), [])
             ->willReturn($templateNames);
@@ -62,8 +59,7 @@ class EmailExtensionTest extends TestCase
         $templateName = 'sample_name';
         $localizationId = 42;
         $templateNames = ['@db:localization=' . $localizationId . '/sample_name', '@db:/sample_name', 'sample_name'];
-        $this->emailTemplateCandidatesProvider
-            ->expects(self::once())
+        $this->emailTemplateCandidatesProvider->expects(self::once())
             ->method('getCandidatesNames')
             ->with(new EmailTemplateCriteria($templateName), ['localization' => $localizationId])
             ->willReturn($templateNames);
@@ -83,8 +79,7 @@ class EmailExtensionTest extends TestCase
         $templateName = 'sample_name';
         $localizationId = 42;
         $templateNames = ['@db:localization=' . $localizationId . '/sample_name', '@db:/sample_name', 'sample_name'];
-        $this->emailTemplateCandidatesProvider
-            ->expects(self::once())
+        $this->emailTemplateCandidatesProvider->expects(self::once())
             ->method('getCandidatesNames')
             ->with(
                 new EmailTemplateCriteria($templateName),

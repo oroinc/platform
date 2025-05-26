@@ -8,17 +8,13 @@ use Oro\Bundle\ApiBundle\Processor\Shared\LoadTitleMetaPropertyForCollection;
 use Oro\Bundle\ApiBundle\Provider\EntityTitleProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class LoadTitleMetaPropertyForCollectionTest extends GetListProcessorTestCase
 {
-    /** @var EntityTitleProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityTitleProvider;
-
-    /** @var ExpandedAssociationExtractor|\PHPUnit\Framework\MockObject\MockObject */
-    private $expandedAssociationExtractor;
-
-    /** @var LoadTitleMetaPropertyForCollection */
-    private $processor;
+    private EntityTitleProviderInterface&MockObject $entityTitleProvider;
+    private ExpandedAssociationExtractor&MockObject $expandedAssociationExtractor;
+    private LoadTitleMetaPropertyForCollection $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +34,7 @@ class LoadTitleMetaPropertyForCollectionTest extends GetListProcessorTestCase
     /**
      * The all other tests are in {@see LoadTitleMetaPropertyForSingleItemTest}
      */
-    public function testProcessForPrimaryEntityOnly()
+    public function testProcessForPrimaryEntityOnly(): void
     {
         $config = new EntityDefinitionConfig();
         $config->setIdentifierFieldNames(['id']);

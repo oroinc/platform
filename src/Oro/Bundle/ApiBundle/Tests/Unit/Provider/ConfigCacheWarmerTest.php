@@ -16,8 +16,9 @@ use Oro\Component\Config\Loader\CumulativeResourceLoaderCollection;
 use Oro\Component\Config\Loader\FolderYamlCumulativeFileLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 
-class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
+class ConfigCacheWarmerTest extends TestCase
 {
     use TempDirExtension;
 
@@ -321,7 +322,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testWarmUpWithDefaultConfigFile()
+    public function testWarmUpWithDefaultConfigFile(): void
     {
         $configFiles = [
             'default' => ['api.yml']
@@ -361,7 +362,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedResult, $result);
     }
 
-    public function testWarmUpWithSeveralTypesOfConfigFilesInAdditionalToDefaultConfigFile()
+    public function testWarmUpWithSeveralTypesOfConfigFilesInAdditionalToDefaultConfigFile(): void
     {
         $configFiles = [
             'default' => ['api.yml'],
@@ -443,7 +444,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testWarmUpForConfigWithSeveralConfigFiles()
+    public function testWarmUpForConfigWithSeveralConfigFiles(): void
     {
         $configFiles = [
             'default' => ['api.yml'],
@@ -543,7 +544,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedResultSecond, $resultSecond, 'second');
     }
 
-    public function testWarmUpByConfigKey()
+    public function testWarmUpByConfigKey(): void
     {
         $configFiles = [
             'default' => ['api.yml'],
@@ -588,7 +589,7 @@ class ConfigCacheWarmerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testWarmUpShouldSaveResourcesWhenDebugIsEnabled()
+    public function testWarmUpShouldSaveResourcesWhenDebugIsEnabled(): void
     {
         $configFiles = [
             'default' => ['api.yml'],

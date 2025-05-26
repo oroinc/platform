@@ -29,6 +29,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -40,41 +41,26 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class CompleteDescriptionsTest extends ConfigProcessorTestCase
 {
-    private const ID_DESCRIPTION = 'The unique identifier of a resource.';
-    private const REQUIRED_ID_DESCRIPTION = '<p>The unique identifier of a resource.</p>'
+    private const string ID_DESCRIPTION = 'The unique identifier of a resource.';
+    private const string REQUIRED_ID_DESCRIPTION = '<p>The unique identifier of a resource.</p>'
         . '<p><strong>The required field.</strong></p>';
-    private const CREATED_AT_DESCRIPTION = 'The date and time of resource record creation.';
-    private const UPDATED_AT_DESCRIPTION = 'The date and time of the last update of the resource record.';
-    private const OWNER_DESCRIPTION = 'An owner record represents'
+    private const string CREATED_AT_DESCRIPTION = 'The date and time of resource record creation.';
+    private const string UPDATED_AT_DESCRIPTION = 'The date and time of the last update of the resource record.';
+    private const string OWNER_DESCRIPTION = 'An owner record represents'
         . ' the ownership capabilities of the record.';
-    private const ORGANIZATION_DESCRIPTION = 'An organization record represents'
+    private const string ORGANIZATION_DESCRIPTION = 'An organization record represents'
         . ' a real enterprise, business, firm, company or another organization to which the users belong.';
-    private const FIELD_FILTER_DESCRIPTION = 'Filter records by \'%s\' field.';
-    private const ASSOCIATION_FILTER_DESCRIPTION = 'Filter records by \'%s\' relationship.';
+    private const string FIELD_FILTER_DESCRIPTION = 'Filter records by \'%s\' field.';
+    private const string ASSOCIATION_FILTER_DESCRIPTION = 'Filter records by \'%s\' relationship.';
 
-    /** @var ResourcesProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $resourcesProvider;
-
-    /** @var EntityDescriptionProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityDescriptionProvider;
-
-    /** @var ResourceDocProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $resourceDocProvider;
-
-    /** @var ResourceDocParserInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $resourceDocParser;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var ConfigProviderMock */
-    private $ownershipConfigProvider;
-
-    /** @var CompleteDescriptions */
-    private $processor;
+    private ResourcesProvider&MockObject $resourcesProvider;
+    private EntityDescriptionProvider&MockObject $entityDescriptionProvider;
+    private ResourceDocProvider&MockObject $resourceDocProvider;
+    private ResourceDocParserInterface&MockObject $resourceDocParser;
+    private TranslatorInterface&MockObject $translator;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private ConfigProviderMock $ownershipConfigProvider;
+    private CompleteDescriptions $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -131,7 +117,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         $this->context->setClassName(TestEntity::class);
     }
 
-    public function testWithoutTargetAction()
+    public function testWithoutTargetAction(): void
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -158,7 +144,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testIdentifierDescriptionWhenItDoesNotExist()
+    public function testIdentifierDescriptionWhenItDoesNotExist(): void
     {
         $config = [];
 
@@ -174,7 +160,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testIdentifierDescriptionWhenItAlreadyExists()
+    public function testIdentifierDescriptionWhenItAlreadyExists(): void
     {
         $config = [
             'identifier_description' => 'identifier description'
@@ -192,7 +178,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testIdentifierField()
+    public function testIdentifierField(): void
     {
         $config = [
             'identifier_field_names' => ['id'],
@@ -223,7 +209,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testIdentifierFieldForUpdateAction()
+    public function testIdentifierFieldForUpdateAction(): void
     {
         $config = [
             'identifier_field_names' => ['id'],
@@ -254,7 +240,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testIdentifierFieldForCreateActionAndNotManageableEntity()
+    public function testIdentifierFieldForCreateActionAndNotManageableEntity(): void
     {
         $config = [
             'identifier_field_names' => ['id'],
@@ -290,7 +276,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testIdentifierFieldForCreateActionAndManageableEntityWithoutIdGenerator()
+    public function testIdentifierFieldForCreateActionAndManageableEntityWithoutIdGenerator(): void
     {
         $config = [
             'identifier_field_names' => ['id'],
@@ -334,7 +320,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testIdentifierFieldForCreateActionAndManageableEntityWithIdGenerator()
+    public function testIdentifierFieldForCreateActionAndManageableEntityWithIdGenerator(): void
     {
         $config = [
             'identifier_field_names' => ['id'],
@@ -381,7 +367,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testIdentifierFieldForCreateActionAndManageableEntityWithIdGeneratorButApiIdNotEqualEntityId()
+    public function testIdentifierFieldForCreateActionAndManageableEntityWithIdGeneratorButApiIdNotEqualEntityId(): void
     {
         $config = [
             'identifier_field_names' => ['id'],
@@ -428,7 +414,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testIdentifierFieldWhenIdentifierDescriptionIsSet()
+    public function testIdentifierFieldWhenIdentifierDescriptionIsSet(): void
     {
         $config = [
             'identifier_field_names' => ['id'],
@@ -460,7 +446,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testIdentifierFieldForUpdateActionWhenIdentifierDescriptionIsSet()
+    public function testIdentifierFieldForUpdateActionWhenIdentifierDescriptionIsSet(): void
     {
         $config = [
             'identifier_field_names' => ['id'],
@@ -493,7 +479,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testIdentifierFieldWhenItAlreadyHasDescription()
+    public function testIdentifierFieldWhenItAlreadyHasDescription(): void
     {
         $config = [
             'identifier_field_names' => ['id'],
@@ -526,7 +512,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testRenamedIdentifierField()
+    public function testRenamedIdentifierField(): void
     {
         $config = [
             'identifier_field_names' => ['id1'],
@@ -557,7 +543,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testCompositeIdentifierField()
+    public function testCompositeIdentifierField(): void
     {
         $config = [
             'identifier_field_names' => ['id1', 'id2'],
@@ -588,7 +574,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testIdentifierFieldDoesNotExist()
+    public function testIdentifierFieldDoesNotExist(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -615,7 +601,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testCreatedAtField()
+    public function testCreatedAtField(): void
     {
         $config = [
             'fields' => [
@@ -642,7 +628,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testCreatedAtFieldWhenItAlreadyHasDescription()
+    public function testCreatedAtFieldWhenItAlreadyHasDescription(): void
     {
         $config = [
             'fields' => [
@@ -671,7 +657,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testUpdatedAtField()
+    public function testUpdatedAtField(): void
     {
         $config = [
             'fields' => [
@@ -700,7 +686,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testUpdatedAtFieldWhenItAlreadyHasDescription()
+    public function testUpdatedAtFieldWhenItAlreadyHasDescription(): void
     {
         $config = [
             'fields' => [
@@ -729,7 +715,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testOwnershipFieldsForNonConfigurableEntity()
+    public function testOwnershipFieldsForNonConfigurableEntity(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -756,7 +742,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testOwnershipFieldsWithoutConfiguration()
+    public function testOwnershipFieldsWithoutConfiguration(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -788,7 +774,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testOwnerField()
+    public function testOwnerField(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -822,7 +808,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testOrganizationField()
+    public function testOrganizationField(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -856,7 +842,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testRenamedOwnerField()
+    public function testRenamedOwnerField(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -891,7 +877,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testRenamedOrganizationField()
+    public function testRenamedOrganizationField(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -926,7 +912,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testOwnerFieldWithAdditionalDescription()
+    public function testOwnerFieldWithAdditionalDescription(): void
     {
         $entityClass = TestEntity::class;
         $targetAction = 'get_list';
@@ -968,7 +954,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testOrganizationFieldWithAdditionalDescription()
+    public function testOrganizationFieldWithAdditionalDescription(): void
     {
         $entityClass = TestEntity::class;
         $targetAction = 'get_list';
@@ -1010,7 +996,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFieldDescriptionWhenItExistsInConfig()
+    public function testFieldDescriptionWhenItExistsInConfig(): void
     {
         $entityClass = TestEntity::class;
         $config = [
@@ -1041,7 +1027,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFieldDescriptionWhenItIsLabelObject()
+    public function testFieldDescriptionWhenItIsLabelObject(): void
     {
         $entityClass = TestEntity::class;
         $config = [
@@ -1077,7 +1063,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFieldDescriptionWhenItExistsInConfigAndContainsInheritDocPlaceholder()
+    public function testFieldDescriptionWhenItExistsInConfigAndContainsInheritDocPlaceholder(): void
     {
         $entityClass = TestEntity::class;
         $config = [
@@ -1113,7 +1099,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFieldDescriptionForRenamedFieldWhenItExistsInConfigAndContainsInheritDocPlaceholder()
+    public function testFieldDescriptionForRenamedFieldWhenItExistsInConfigAndContainsInheritDocPlaceholder(): void
     {
         $entityClass = TestEntity::class;
         $config = [
@@ -1151,7 +1137,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFieldDescriptionWhenItExistsInConfigAndContainsDescriptionInheritDocPlaceholder()
+    public function testFieldDescriptionWhenItExistsInConfigAndContainsDescriptionInheritDocPlaceholder(): void
     {
         $entityClass = TestEntity::class;
         $config = [
@@ -1187,7 +1173,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFieldDescriptionWhenItExistsInDocFile()
+    public function testFieldDescriptionWhenItExistsInDocFile(): void
     {
         $entityClass = TestEntity::class;
         $targetAction = 'get_list';
@@ -1222,7 +1208,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFieldDescriptionWhenItExistsInDocFileAndContainsInheritDocPlaceholder()
+    public function testFieldDescriptionWhenItExistsInDocFileAndContainsInheritDocPlaceholder(): void
     {
         $entityClass = TestEntity::class;
         $targetAction = 'get_list';
@@ -1259,7 +1245,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFieldDescriptionWhenItExistsInDocFileAndContainsInheritDocPlaceholderAndWhenItExistsInConfig()
+    public function testFieldDescrWhenItExistsInDocFileAndContainsInheritDocPlaceholderAndWhenItExistsInConfig(): void
     {
         $entityClass = TestEntityWithInherit::class;
         $targetAction = 'get_list';
@@ -1301,7 +1287,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFilterDescriptionWhenItExistsInConfigForEntityWithInherit()
+    public function testFilterDescriptionWhenItExistsInConfigForEntityWithInherit(): void
     {
         $entityClass = TestEntityWithInherit::class;
         $config = [
@@ -1343,7 +1329,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFieldDescriptionWhenItExistsInDocFileAndContainsInheritDocPlaceholderButNoAndCommonDescription()
+    public function testFieldDescrWhenItExistsInDocFileAndContainsInheritDocPlaceholderButNoAndCommonDescription(): void
     {
         $entityClass = TestEntity::class;
         $targetAction = 'get_list';
@@ -1384,7 +1370,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFieldDescriptionWhenItDoesNotExistInDocFileButExistCommonDescription()
+    public function testFieldDescriptionWhenItDoesNotExistInDocFileButExistCommonDescription(): void
     {
         $entityClass = TestEntity::class;
         $targetAction = 'get_list';
@@ -1421,7 +1407,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFieldDescriptionWhenItDoesNotExistInDocFileButExistCommonDescriptionWithInheritDocPlaceholder()
+    public function testFieldDescrWhenItDoesNotExistInDocFileButExistCommonDescriptionWithInheritDocPlaceholder(): void
     {
         $entityClass = TestEntity::class;
         $targetAction = 'get_list';
@@ -1462,7 +1448,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFieldDescriptionWhenItAndCommonDescriptionDoNotExistInDocFile()
+    public function testFieldDescriptionWhenItAndCommonDescriptionDoNotExistInDocFile(): void
     {
         $entityClass = TestEntity::class;
         $targetAction = 'get_list';
@@ -1503,7 +1489,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFieldDescriptionForNestedField()
+    public function testFieldDescriptionForNestedField(): void
     {
         $entityClass = TestEntity::class;
         $targetAction = 'get_list';
@@ -1548,7 +1534,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFieldDescriptionForNestedFieldWhenFieldIsRenamed()
+    public function testFieldDescriptionForNestedFieldWhenFieldIsRenamed(): void
     {
         $entityClass = TestEntity::class;
         $targetAction = 'get_list';
@@ -1595,7 +1581,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFieldDescriptionForRenamedNestedField()
+    public function testFieldDescriptionForRenamedNestedField(): void
     {
         $entityClass = TestEntity::class;
         $targetAction = 'get_list';
@@ -1643,7 +1629,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFieldDescriptionForAssociationField()
+    public function testFieldDescriptionForAssociationField(): void
     {
         $entityClass = TestEntity::class;
         $targetAction = 'get_list';
@@ -1690,7 +1676,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFilterDescriptionWhenItExistsInConfig()
+    public function testFilterDescriptionWhenItExistsInConfig(): void
     {
         $entityClass = TestEntity::class;
         $config = [
@@ -1727,7 +1713,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFilterDescriptionWhenItIsLabelObject()
+    public function testFilterDescriptionWhenItIsLabelObject(): void
     {
         $entityClass = TestEntity::class;
         $config = [
@@ -1769,7 +1755,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFilterDescriptionWhenItExistsInDocFile()
+    public function testFilterDescriptionWhenItExistsInDocFile(): void
     {
         $entityClass = TestEntity::class;
         $config = [
@@ -1809,7 +1795,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFilterDescriptionForRegularField()
+    public function testFilterDescriptionForRegularField(): void
     {
         $entityClass = TestEntity::class;
         $config = [
@@ -1849,7 +1835,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testFilterDescriptionForAssociation()
+    public function testFilterDescriptionForAssociation(): void
     {
         $entityClass = TestEntity::class;
         $config = [
@@ -1893,7 +1879,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testEntityDocumentationForGetListActionWhenThereIsMaxResultsLimit()
+    public function testEntityDocumentationForGetListActionWhenThereIsMaxResultsLimit(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1919,7 +1905,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testEntityDocumentationForDeleteListActionWhenThereIsMaxResultsLimit()
+    public function testEntityDocumentationForDeleteListActionWhenThereIsMaxResultsLimit(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1945,7 +1931,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testRequestDependedContentForEntityDocumentation()
+    public function testRequestDependedContentForEntityDocumentation(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1967,7 +1953,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testRequestDependedContentForFieldDescription()
+    public function testRequestDependedContentForFieldDescription(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1997,7 +1983,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testRequestDependedContentForFilterDescription()
+    public function testRequestDependedContentForFilterDescription(): void
     {
         $filters = new FiltersConfig();
         $filter1 = $filters->addField('field1');
@@ -2012,7 +1998,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         self::assertEquals('JSON API', $filter1->getDescription());
     }
 
-    public function testPrimaryResourceDescriptionWhenItExistsInConfig()
+    public function testPrimaryResourceDescriptionWhenItExistsInConfig(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -2033,7 +2019,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testSubresourceDescriptionWhenItExistsInConfig()
+    public function testSubresourceDescriptionWhenItExistsInConfig(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -2056,7 +2042,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testPrimaryResourceDescriptionWhenItIsLabelObject()
+    public function testPrimaryResourceDescriptionWhenItIsLabelObject(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -2082,7 +2068,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testSubresourceDescriptionWhenItIsLabelObject()
+    public function testSubresourceDescriptionWhenItIsLabelObject(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -2110,7 +2096,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testPrimaryResourceDescriptionWhenEntityDescriptionProviderReturnsNull()
+    public function testPrimaryResourceDescriptionWhenEntityDescriptionProviderReturnsNull(): void
     {
         $entityClass = TestEntity::class;
         $targetAction = 'get';
@@ -2144,7 +2130,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testPrimaryResourceDescriptionWhenEntityDescriptionProviderReturnsNullForCollectionResource()
+    public function testPrimaryResourceDescriptionWhenEntityDescriptionProviderReturnsNullForCollectionResource(): void
     {
         $entityClass = TestEntity::class;
         $targetAction = 'get_list';
@@ -2179,7 +2165,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testPrimaryResourceDescriptionLoadedByEntityDescriptionProvider()
+    public function testPrimaryResourceDescriptionLoadedByEntityDescriptionProvider(): void
     {
         $entityClass = TestEntity::class;
         $targetAction = 'get';
@@ -2213,7 +2199,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testSubresourceDescriptionLoadedByEntityDescriptionProvider()
+    public function testSubresourceDescriptionLoadedByEntityDescriptionProvider(): void
     {
         $parentEntityClass = TestEntity::class;
         $associationName = 'testAssociation';
@@ -2249,7 +2235,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testPrimaryResourceDescriptionLoadedByEntityDescriptionProviderForCollectionResource()
+    public function testPrimaryResourceDescriptionLoadedByEntityDescriptionProviderForCollectionResource(): void
     {
         $entityClass = TestEntity::class;
         $targetAction = 'get_list';
@@ -2284,7 +2270,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testSubresourceDescriptionLoadedByEntityDescriptionProviderForCollectionResource()
+    public function testSubresourceDescriptionLoadedByEntityDescriptionProviderForCollectionResource(): void
     {
         $parentEntityClass = TestEntity::class;
         $associationName = 'testAssociation';
@@ -2321,7 +2307,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testPrimaryResourceRegisterDocumentationResources()
+    public function testPrimaryResourceRegisterDocumentationResources(): void
     {
         $entityClass = TestEntity::class;
         $targetAction = 'get_list';
@@ -2355,7 +2341,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testSubresourceRegisterDocumentationResources()
+    public function testSubresourceRegisterDocumentationResources(): void
     {
         $parentEntityClass = TestEntity::class;
         $associationName = 'testAssociation';
@@ -2391,7 +2377,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testPrimaryResourceDocumentationWhenItExistsInConfig()
+    public function testPrimaryResourceDocumentationWhenItExistsInConfig(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -2412,7 +2398,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testSubresourceDocumentationWhenItExistsInConfig()
+    public function testSubresourceDocumentationWhenItExistsInConfig(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -2435,7 +2421,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testPrimaryResourceDocumentationWithInheritDocPlaceholder()
+    public function testPrimaryResourceDocumentationWithInheritDocPlaceholder(): void
     {
         $entityClass = TestEntity::class;
         $config = [
@@ -2463,7 +2449,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testPrimaryResourceDocumentationWithDescriptionInheritDocPlaceholder()
+    public function testPrimaryResourceDocumentationWithDescriptionInheritDocPlaceholder(): void
     {
         $entityClass = TestEntity::class;
         $config = [
@@ -2491,7 +2477,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testPrimaryResourceDocumentationLoadedByResourceDocProvider()
+    public function testPrimaryResourceDocumentationLoadedByResourceDocProvider(): void
     {
         $entityClass = TestEntity::class;
         $targetAction = 'get_list';
@@ -2530,7 +2516,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testSubresourceDocumentationLoadedByResourceDocProvider()
+    public function testSubresourceDocumentationLoadedByResourceDocProvider(): void
     {
         $parentEntityClass = TestEntity::class;
         $associationName = 'testAssociation';
@@ -2566,7 +2552,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testSubresourceDocumentationLoadedByResourceDocProviderForCollectionResource()
+    public function testSubresourceDocumentationLoadedByResourceDocProviderForCollectionResource(): void
     {
         $parentEntityClass = TestEntity::class;
         $associationName = 'testAssociation';
@@ -2603,7 +2589,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testChangeSubresourceDocumentationWithoutCustomRequestDocumentationAction()
+    public function testChangeSubresourceDocumentationWithoutCustomRequestDocumentationAction(): void
     {
         $parentEntityClass = TestEntity::class;
         $associationName = 'testAssociation';
@@ -2653,7 +2639,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testChangeSubresourceDocumentationWithCustomRequestDocumentationAction()
+    public function testChangeSubresourceDocumentationWithCustomRequestDocumentationAction(): void
     {
         $parentEntityClass = TestEntity::class;
         $associationName = 'testAssociation';
@@ -2711,7 +2697,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         string $mainText,
         ?string $inheritDocText,
         string $expectedText
-    ) {
+    ): void {
         $entityClass = TestEntity::class;
         $config = [
             'exclusion_policy' => 'all',
@@ -2797,7 +2783,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
     /**
      * @dataProvider upsertTargetActionDataProvider
      */
-    public function testPrimaryResourceDocumentationWhenUpsertOperationIsAllowedById(string $targetAction)
+    public function testPrimaryResourceDocumentationWhenUpsertOperationIsAllowedById(string $targetAction): void
     {
         /** @var EntityDefinitionConfig $configObject */
         $configObject = $this->createConfigObject([
@@ -2828,7 +2814,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
     /**
      * @dataProvider upsertTargetActionDataProvider
      */
-    public function testPrimaryResourceDocumentationWhenUpsertOperationIsDisabled(string $targetAction)
+    public function testPrimaryResourceDocumentationWhenUpsertOperationIsDisabled(string $targetAction): void
     {
         /** @var EntityDefinitionConfig $configObject */
         $configObject = $this->createConfigObject([
@@ -2859,7 +2845,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         return [['create'], ['update']];
     }
 
-    public function testPrimaryResourceDocumentationWhenUpsertOperationIsAllowedByIdAndGroupsOfFieldsForCreate()
+    public function testPrimaryResourceDocumentationWhenUpsertOperationIsAllowedByIdAndGroupsOfFieldsForCreate(): void
     {
         /** @var EntityDefinitionConfig $configObject */
         $configObject = $this->createConfigObject([
@@ -2894,7 +2880,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testPrimaryResourceDocumentationWhenUpsertOperationIsAllowedByIdAndGroupsOfFieldsForUpdate()
+    public function testPrimaryResourceDocumentationWhenUpsertOperationIsAllowedByIdAndGroupsOfFieldsForUpdate(): void
     {
         /** @var EntityDefinitionConfig $configObject */
         $configObject = $this->createConfigObject([
@@ -2924,7 +2910,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testPrimaryResourceDocumentationWhenUpsertOperationIsAllowedByGroupsOfFieldsForCreate()
+    public function testPrimaryResourceDocumentationWhenUpsertOperationIsAllowedByGroupsOfFieldsForCreate(): void
     {
         /** @var EntityDefinitionConfig $configObject */
         $configObject = $this->createConfigObject([
@@ -2957,7 +2943,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testPrimaryResourceDocumentationWhenUpsertOperationIsAllowedByGroupsOfFieldsForUpdate()
+    public function testPrimaryResourceDocumentationWhenUpsertOperationIsAllowedByGroupsOfFieldsForUpdate(): void
     {
         /** @var EntityDefinitionConfig $configObject */
         $configObject = $this->createConfigObject([
@@ -2983,7 +2969,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testPrimaryResourceDocumentationWhenUpsertOperationIsAllowedByFieldsForCreate()
+    public function testPrimaryResourceDocumentationWhenUpsertOperationIsAllowedByFieldsForCreate(): void
     {
         /** @var EntityDefinitionConfig $configObject */
         $configObject = $this->createConfigObject([
@@ -3016,7 +3002,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testPrimaryResourceDocumentationWhenUpsertOperationIsAllowedByFieldsForUpdate()
+    public function testPrimaryResourceDocumentationWhenUpsertOperationIsAllowedByFieldsForUpdate(): void
     {
         /** @var EntityDefinitionConfig $configObject */
         $configObject = $this->createConfigObject([
@@ -3042,7 +3028,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testPrimaryResourceDocumentationWhenUpsertOperationIsAllowedByOneGroupOfFieldsForCreate()
+    public function testPrimaryResourceDocumentationWhenUpsertOperationIsAllowedByOneGroupOfFieldsForCreate(): void
     {
         /** @var EntityDefinitionConfig $configObject */
         $configObject = $this->createConfigObject([
@@ -3070,7 +3056,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testPrimaryResourceDocumentationWhenUpsertOperationIsAllowedByOneGroupOfFieldsForUpdate()
+    public function testPrimaryResourceDocumentationWhenUpsertOperationIsAllowedByOneGroupOfFieldsForUpdate(): void
     {
         /** @var EntityDefinitionConfig $configObject */
         $configObject = $this->createConfigObject([
@@ -3095,7 +3081,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testPrimaryResourceDocumentationWhenUpsertOperationIsAllowedByOneFieldForCreate()
+    public function testPrimaryResourceDocumentationWhenUpsertOperationIsAllowedByOneFieldForCreate(): void
     {
         /** @var EntityDefinitionConfig $configObject */
         $configObject = $this->createConfigObject([
@@ -3123,7 +3109,7 @@ class CompleteDescriptionsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testPrimaryResourceDocumentationWhenUpsertOperationIsAllowedByOneFieldForUpdate()
+    public function testPrimaryResourceDocumentationWhenUpsertOperationIsAllowedByOneFieldForUpdate(): void
     {
         /** @var EntityDefinitionConfig $configObject */
         $configObject = $this->createConfigObject([

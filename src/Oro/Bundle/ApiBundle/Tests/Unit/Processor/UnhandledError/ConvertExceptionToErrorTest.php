@@ -8,8 +8,7 @@ use Oro\Bundle\ApiBundle\Processor\UnhandledError\ConvertExceptionToError;
 
 class ConvertExceptionToErrorTest extends UnhandledErrorProcessorTestCase
 {
-    /** @var ConvertExceptionToError */
-    private $processor;
+    private ConvertExceptionToError $processor;
 
     #[\Override]
     protected function setUp(): void

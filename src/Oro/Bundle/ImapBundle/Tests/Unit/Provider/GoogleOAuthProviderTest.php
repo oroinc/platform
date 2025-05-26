@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Provider;
 
-use Http\Client\Common\HttpMethodsClientInterface;
 use HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface;
 use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
-use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMap;
 use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMapInterface;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ImapBundle\Exception\OAuthAccessTokenFailureException;
 use Oro\Bundle\ImapBundle\Exception\RefreshOAuthAccessTokenFailureException;
 use Oro\Bundle\ImapBundle\Provider\GoogleOAuthProvider;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
@@ -20,19 +20,12 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
-class GoogleOAuthProviderTest extends \PHPUnit\Framework\TestCase
+class GoogleOAuthProviderTest extends TestCase
 {
-    /** @var HttpMethodsClientInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $httpClient;
-
-    /** @var ResourceOwnerMap|\PHPUnit\Framework\MockObject\MockObject */
-    private $resourceOwnerMap;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var GoogleOAuthProvider */
-    private $provider;
+    private HttpClientInterface&MockObject $httpClient;
+    private ResourceOwnerMapInterface&MockObject $resourceOwnerMap;
+    private ConfigManager&MockObject $configManager;
+    private GoogleOAuthProvider $provider;
 
     #[\Override]
     protected function setUp(): void

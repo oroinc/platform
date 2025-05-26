@@ -6,6 +6,8 @@ use Oro\Bundle\ApiBundle\EventListener\UnauthorizedApiRequestListener;
 use Oro\Bundle\ApiBundle\Request\ApiRequestHelper;
 use Oro\Bundle\ApiBundle\Request\Rest\RequestActionHandler;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -13,16 +15,11 @@ use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class UnauthorizedApiRequestListenerTest extends \PHPUnit\Framework\TestCase
+class UnauthorizedApiRequestListenerTest extends TestCase
 {
-    /** @var RequestActionHandler|\PHPUnit\Framework\MockObject\MockObject */
-    private $handler;
-
-    /** @var ApiRequestHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $apiRequestHelper;
-
-    /** @var UnauthorizedApiRequestListener */
-    private $listener;
+    private RequestActionHandler&MockObject $handler;
+    private ApiRequestHelper&MockObject $apiRequestHelper;
+    private UnauthorizedApiRequestListener $listener;
 
     #[\Override]
     protected function setUp(): void

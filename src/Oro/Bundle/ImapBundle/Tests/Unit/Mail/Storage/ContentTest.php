@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Mail\Storage;
 
 use Oro\Bundle\ImapBundle\Mail\Storage\Content;
+use PHPUnit\Framework\TestCase;
 
-class ContentTest extends \PHPUnit\Framework\TestCase
+class ContentTest extends TestCase
 {
-    public function testConstructorAndGetters()
+    public function testConstructorAndGetters(): void
     {
         $content = 'testContent';
         $contentType = 'testContentType';

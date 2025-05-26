@@ -6,21 +6,18 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Form\Extension\TooltipFormExtension;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class TooltipFormExtensionTest extends \PHPUnit\Framework\TestCase
+class TooltipFormExtensionTest extends TestCase
 {
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var Translator|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var TooltipFormExtension */
-    private $extension;
+    private ConfigProvider&MockObject $configProvider;
+    private Translator&MockObject $translator;
+    private TooltipFormExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +28,7 @@ class TooltipFormExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new TooltipFormExtension($this->configProvider, $this->translator);
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
@@ -48,7 +45,7 @@ class TooltipFormExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->configureOptions($resolver);
     }
 
-    public function testBuildView()
+    public function testBuildView(): void
     {
         $options = [
             'tooltip'                 => 'test',
@@ -87,7 +84,7 @@ class TooltipFormExtensionTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testModifyFormTooltipField()
+    public function testModifyFormTooltipField(): void
     {
         $tooltip = 'Custom Tooltip';
 
@@ -118,7 +115,7 @@ class TooltipFormExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($tooltip, $view->vars['tooltip']);
     }
 
-    public function testModifyEntityConfigTooltipFieldWithTooltipTranslation()
+    public function testModifyEntityConfigTooltipFieldWithTooltipTranslation(): void
     {
         $tooltip = 'Custom Tooltip';
 
@@ -164,7 +161,7 @@ class TooltipFormExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($tooltip, $view->vars['tooltip']);
     }
 
-    public function testModifyEntityConfigTooltipFieldWithoutTooltipTranslation()
+    public function testModifyEntityConfigTooltipFieldWithoutTooltipTranslation(): void
     {
         $form = $this->createMock(FormInterface::class);
         $parentForm = $this->createMock(FormInterface::class);
@@ -206,7 +203,7 @@ class TooltipFormExtensionTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayNotHasKey('tooltip', $view->vars);
     }
 
-    public function testBuildViewWithoutParentForm()
+    public function testBuildViewWithoutParentForm(): void
     {
         $form = $this->createMock(FormInterface::class);
         $form->expects($this->any())

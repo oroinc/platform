@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Security\Http\Firewall\ContextListener;
 use Oro\Bundle\ApiBundle\Security\Http\Firewall\ExceptionListener;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Oro\Bundle\SecurityBundle\Http\Firewall\ExceptionListener as BaseExceptionListener;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
@@ -16,13 +17,10 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
+class SecurityFirewallCompilerPassTest extends TestCase
 {
-    /** @var SecurityFirewallCompilerPass */
-    private $compiler;
-
-    /** @var ContainerBuilder */
-    private $container;
+    private SecurityFirewallCompilerPass $compiler;
+    private ContainerBuilder $container;
 
     #[\Override]
     protected function setUp(): void
@@ -51,7 +49,7 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function assertFirewallMap()
+    private function assertFirewallMap(): void
     {
         $firewallMap = $this->container->getDefinition('security.firewall.map');
         self::assertEquals(FeatureDependedFirewallMap::class, $firewallMap->getClass());
@@ -73,7 +71,7 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessOnEmptySecurityConfig()
+    public function testProcessOnEmptySecurityConfig(): void
     {
         $this->container->prependExtensionConfig('security', []);
 
@@ -81,7 +79,7 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->assertFirewallMap();
     }
 
-    public function testProcessOnEmptySecurityFirewallsConfig()
+    public function testProcessOnEmptySecurityFirewallsConfig(): void
     {
         $this->container->prependExtensionConfig('security', ['firewalls' => []]);
 
@@ -89,7 +87,7 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->assertFirewallMap();
     }
 
-    public function testProcessOnNonStatelessFirewall()
+    public function testProcessOnNonStatelessFirewall(): void
     {
         $this->container->prependExtensionConfig(
             'security',
@@ -100,7 +98,7 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->assertFirewallMap();
     }
 
-    public function testProcessOnStatelessButWithoutContextFirewall()
+    public function testProcessOnStatelessButWithoutContextFirewall(): void
     {
         $this->container->prependExtensionConfig(
             'security',
@@ -111,7 +109,7 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->assertFirewallMap();
     }
 
-    public function testProcessOnStatelessButWithoutMapContext()
+    public function testProcessOnStatelessButWithoutMapContext(): void
     {
         $this->container->prependExtensionConfig(
             'security',
@@ -122,7 +120,7 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->assertFirewallMap();
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $this->container->prependExtensionConfig(
             'security',
@@ -174,7 +172,7 @@ class SecurityFirewallCompilerPassTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('security.access_listener', (string)$listeners[1]);
     }
 
-    public function testProcessWithRememberMeListener()
+    public function testProcessWithRememberMeListener(): void
     {
         $this->container->prependExtensionConfig(
             'security',

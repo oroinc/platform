@@ -5,13 +5,14 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Twig;
 use Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration;
 use Oro\Bundle\AttachmentBundle\Twig\WebpStrategyExtension;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WebpStrategyExtensionTest extends \PHPUnit\Framework\TestCase
+class WebpStrategyExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    private WebpConfiguration|\PHPUnit\Framework\MockObject\MockObject $webpConfiguration;
-
+    private WebpConfiguration&MockObject $webpConfiguration;
     private WebpStrategyExtension $extension;
 
     #[\Override]

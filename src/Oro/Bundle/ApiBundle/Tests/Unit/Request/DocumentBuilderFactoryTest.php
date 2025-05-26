@@ -6,12 +6,13 @@ use Oro\Bundle\ApiBundle\Request\DocumentBuilderFactory;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
-class DocumentBuilderFactoryTest extends \PHPUnit\Framework\TestCase
+class DocumentBuilderFactoryTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
-    private $container;
+    private ContainerInterface&MockObject $container;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +29,7 @@ class DocumentBuilderFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldReturnDocumentBuilderIfItExistsForSpecificRequestType()
+    public function testShouldReturnDocumentBuilderIfItExistsForSpecificRequestType(): void
     {
         $factory = $this->getDocumentBuilderFactory([
             ['documentBuilder1', 'rest&json_api'],
@@ -48,7 +49,7 @@ class DocumentBuilderFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldReturnDefaultDocumentBuilderIfNoDocumentBuilderForSpecificRequestType()
+    public function testShouldReturnDefaultDocumentBuilderIfNoDocumentBuilderForSpecificRequestType(): void
     {
         $factory = $this->getDocumentBuilderFactory([
             ['documentBuilder1', 'rest&json_api'],
@@ -68,7 +69,7 @@ class DocumentBuilderFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldThrowExceptionIfNoDocumentBuilderForSpecificRequestTypeAndNoDefaultDocumentBuilder()
+    public function testShouldThrowExceptionIfNoDocumentBuilderForSpecificRequestTypeAndNoDefaultDocumentBuilder(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot find a document builder for the request "another".');

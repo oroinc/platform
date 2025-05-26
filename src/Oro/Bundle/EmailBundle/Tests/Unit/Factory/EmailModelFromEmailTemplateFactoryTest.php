@@ -23,15 +23,10 @@ use PHPUnit\Framework\TestCase;
 class EmailModelFromEmailTemplateFactoryTest extends TestCase
 {
     private EmailTemplateContextProvider $emailTemplateContextProvider;
-
-    private RenderedEmailTemplateProvider|MockObject $renderedEmailTemplateProvider;
-
-    private EmailOriginHelper|MockObject $emailOriginHelper;
-
-    private EntityOwnerAccessor|MockObject $entityOwnerAccessor;
-
+    private RenderedEmailTemplateProvider&MockObject $renderedEmailTemplateProvider;
+    private EmailOriginHelper&MockObject $emailOriginHelper;
+    private EntityOwnerAccessor&MockObject $entityOwnerAccessor;
     private EmailModelFromEmailTemplateFactory $factory;
-
     private From $from;
 
     #[\Override]
@@ -51,9 +46,10 @@ class EmailModelFromEmailTemplateFactoryTest extends TestCase
             $this->entityOwnerAccessor
         );
 
-        $emailModelFactory
+        $emailModelFactory->expects(self::any())
             ->method('getEmail')
             ->willReturn(new EmailModel());
+
         $this->from = From::emailAddress('no-reply@example.com');
     }
 
@@ -64,8 +60,7 @@ class EmailModelFromEmailTemplateFactoryTest extends TestCase
         $templateParams = ['sample_key' => 'sample_value'];
         $templateContext = ['localization' => new Localization()];
 
-        $this->emailTemplateContextProvider
-            ->expects(self::once())
+        $this->emailTemplateContextProvider->expects(self::once())
             ->method('getTemplateContext')
             ->with($this->from, [$recipient], $templateName, $templateParams)
             ->willReturn($templateContext);
@@ -75,15 +70,13 @@ class EmailModelFromEmailTemplateFactoryTest extends TestCase
             ->setContent('sample_content')
             ->setType(EmailTemplateInterface::TYPE_TEXT);
 
-        $this->renderedEmailTemplateProvider
-            ->expects(self::once())
+        $this->renderedEmailTemplateProvider->expects(self::once())
             ->method('findAndRenderEmailTemplate')
             ->with($templateName, $templateParams, $templateContext)
             ->willReturn($emailTemplateModel);
 
         $emailOrigin = $this->createMock(EmailOrigin::class);
-        $this->emailOriginHelper
-            ->expects(self::once())
+        $this->emailOriginHelper->expects(self::once())
             ->method('getEmailOrigin')
             ->with($this->from->toString(), null)
             ->willReturn($emailOrigin);
@@ -109,8 +102,7 @@ class EmailModelFromEmailTemplateFactoryTest extends TestCase
         $templateParams = ['sample_key' => 'sample_value'];
         $templateContext = ['localization' => new Localization()];
 
-        $this->emailTemplateContextProvider
-            ->expects(self::once())
+        $this->emailTemplateContextProvider->expects(self::once())
             ->method('getTemplateContext')
             ->with($this->from, [$recipient], $templateName, $templateParams)
             ->willReturn($templateContext);
@@ -118,15 +110,13 @@ class EmailModelFromEmailTemplateFactoryTest extends TestCase
         $emailTemplateModel = (new EmailTemplateModel($templateName, 'sample_content'))
             ->setSubject('sample_subject');
 
-        $this->renderedEmailTemplateProvider
-            ->expects(self::once())
+        $this->renderedEmailTemplateProvider->expects(self::once())
             ->method('findAndRenderEmailTemplate')
             ->with($templateName, $templateParams, $templateContext)
             ->willReturn($emailTemplateModel);
 
         $emailOrigin = $this->createMock(EmailOrigin::class);
-        $this->emailOriginHelper
-            ->expects(self::once())
+        $this->emailOriginHelper->expects(self::once())
             ->method('getEmailOrigin')
             ->with($this->from->toString(), null)
             ->willReturn($emailOrigin);
@@ -153,8 +143,7 @@ class EmailModelFromEmailTemplateFactoryTest extends TestCase
         $templateParams = ['sample_key' => 'sample_value'];
         $templateContext = ['localization' => new Localization()];
 
-        $this->emailTemplateContextProvider
-            ->expects(self::once())
+        $this->emailTemplateContextProvider->expects(self::once())
             ->method('getTemplateContext')
             ->with($this->from, [$recipient1, $recipient2], $templateName, $templateParams)
             ->willReturn($templateContext);
@@ -162,15 +151,13 @@ class EmailModelFromEmailTemplateFactoryTest extends TestCase
         $emailTemplateModel = (new EmailTemplateModel($templateName, 'sample_content'))
             ->setSubject('sample_subject');
 
-        $this->renderedEmailTemplateProvider
-            ->expects(self::once())
+        $this->renderedEmailTemplateProvider->expects(self::once())
             ->method('findAndRenderEmailTemplate')
             ->with($templateName, $templateParams, $templateContext)
             ->willReturn($emailTemplateModel);
 
         $emailOrigin = $this->createMock(EmailOrigin::class);
-        $this->emailOriginHelper
-            ->expects(self::once())
+        $this->emailOriginHelper->expects(self::once())
             ->method('getEmailOrigin')
             ->with($this->from->toString(), null)
             ->willReturn($emailOrigin);
@@ -197,8 +184,7 @@ class EmailModelFromEmailTemplateFactoryTest extends TestCase
         $emailTemplateCriteria = new EmailTemplateCriteria($templateName);
         $templateContext = ['localization' => new Localization()];
 
-        $this->emailTemplateContextProvider
-            ->expects(self::once())
+        $this->emailTemplateContextProvider->expects(self::once())
             ->method('getTemplateContext')
             ->with($this->from, [$recipient1], $emailTemplateCriteria, $templateParams)
             ->willReturn($templateContext);
@@ -206,15 +192,13 @@ class EmailModelFromEmailTemplateFactoryTest extends TestCase
         $emailTemplateModel = (new EmailTemplateModel($templateName, 'sample_content'))
             ->setSubject('sample_subject');
 
-        $this->renderedEmailTemplateProvider
-            ->expects(self::once())
+        $this->renderedEmailTemplateProvider->expects(self::once())
             ->method('findAndRenderEmailTemplate')
             ->with($emailTemplateCriteria, $templateParams)
             ->willReturn($emailTemplateModel);
 
         $emailOrigin = $this->createMock(EmailOrigin::class);
-        $this->emailOriginHelper
-            ->expects(self::once())
+        $this->emailOriginHelper->expects(self::once())
             ->method('getEmailOrigin')
             ->with($this->from->toString(), null)
             ->willReturn($emailOrigin);
@@ -241,8 +225,7 @@ class EmailModelFromEmailTemplateFactoryTest extends TestCase
         $emailTemplateCriteria = new EmailTemplateCriteria($templateName, 'Acme\\Bundle\\Entity\\SampleEntity');
         $templateContext = ['localization' => new Localization()];
 
-        $this->emailTemplateContextProvider
-            ->expects(self::once())
+        $this->emailTemplateContextProvider->expects(self::once())
             ->method('getTemplateContext')
             ->with($this->from, [$recipient1], $emailTemplateCriteria, $templateParams)
             ->willReturn($templateContext);
@@ -250,22 +233,19 @@ class EmailModelFromEmailTemplateFactoryTest extends TestCase
         $emailTemplateModel = (new EmailTemplateModel($templateName, 'sample_content'))
             ->setSubject('sample_subject');
 
-        $this->renderedEmailTemplateProvider
-            ->expects(self::once())
+        $this->renderedEmailTemplateProvider->expects(self::once())
             ->method('findAndRenderEmailTemplate')
             ->with($emailTemplateCriteria, $templateParams, $templateContext)
             ->willReturn($emailTemplateModel);
 
         $organization = $this->createMock(Organization::class);
-        $this->entityOwnerAccessor
-            ->expects(self::once())
+        $this->entityOwnerAccessor->expects(self::once())
             ->method('getOrganization')
             ->with($templateParams['entity'])
             ->willReturn($organization);
 
         $emailOrigin = $this->createMock(EmailOrigin::class);
-        $this->emailOriginHelper
-            ->expects(self::once())
+        $this->emailOriginHelper->expects(self::once())
             ->method('getEmailOrigin')
             ->with($this->from->toString(), $organization)
             ->willReturn($emailOrigin);
@@ -293,8 +273,7 @@ class EmailModelFromEmailTemplateFactoryTest extends TestCase
         $emailTemplateCriteria = new EmailTemplateCriteria($templateName);
         $templateContext = ['localization' => new Localization()];
 
-        $this->emailTemplateContextProvider
-            ->expects(self::once())
+        $this->emailTemplateContextProvider->expects(self::once())
             ->method('getTemplateContext')
             ->with($this->from, [$recipient1], $emailTemplateCriteria, $templateParams)
             ->willReturn($templateContext);
@@ -302,22 +281,19 @@ class EmailModelFromEmailTemplateFactoryTest extends TestCase
         $emailTemplateModel = (new EmailTemplateModel($templateName, 'sample_content'))
             ->setSubject('sample_subject');
 
-        $this->renderedEmailTemplateProvider
-            ->expects(self::once())
+        $this->renderedEmailTemplateProvider->expects(self::once())
             ->method('findAndRenderEmailTemplate')
             ->with($emailTemplateCriteria, $templateParams, $templateContext)
             ->willReturn($emailTemplateModel);
 
         $organization = $this->createMock(Organization::class);
-        $this->entityOwnerAccessor
-            ->expects(self::once())
+        $this->entityOwnerAccessor->expects(self::once())
             ->method('getOrganization')
             ->with($templateParams['entity'])
             ->willReturn($organization);
 
         $emailOrigin = $this->createMock(EmailOrigin::class);
-        $this->emailOriginHelper
-            ->expects(self::once())
+        $this->emailOriginHelper->expects(self::once())
             ->method('getEmailOrigin')
             ->with($this->from->toString(), $organization)
             ->willReturn($emailOrigin);

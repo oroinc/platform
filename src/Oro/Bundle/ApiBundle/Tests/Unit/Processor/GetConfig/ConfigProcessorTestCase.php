@@ -9,8 +9,10 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Config\ConfigExtensionRegistryTrait;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ConfigProcessorTestCase extends \PHPUnit\Framework\TestCase
+class ConfigProcessorTestCase extends TestCase
 {
     use ConfigExtensionRegistryTrait;
 
@@ -47,9 +49,8 @@ class ConfigProcessorTestCase extends \PHPUnit\Framework\TestCase
             : $config;
     }
 
-    protected function getClassMetadataMock(
-        ?string $className = null
-    ): ClassMetadata|\PHPUnit\Framework\MockObject\MockObject {
+    protected function getClassMetadataMock(?string $className = null): ClassMetadata&MockObject
+    {
         if ($className) {
             $classMetadata = $this->getMockBuilder(ClassMetadata::class)
                 ->setConstructorArgs([$className])

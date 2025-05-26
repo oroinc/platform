@@ -9,14 +9,12 @@ use Oro\Bundle\ApiBundle\Util\FieldDqlExpressionProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class FieldDqlExpressionProviderTest extends OrmRelatedTestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var FieldDqlExpressionProvider */
-    private $fieldDqlExpressionProvider;
+    private ConfigManager&MockObject $configManager;
+    private FieldDqlExpressionProvider $fieldDqlExpressionProvider;
 
     #[\Override]
     protected function setUp(): void

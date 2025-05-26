@@ -5,6 +5,8 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Form;
 use Oro\Bundle\ApiBundle\Form\FormExtension;
 use Oro\Bundle\ApiBundle\Form\Type\BooleanType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Stub\AbstractFormTypeExtensionStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
@@ -12,10 +14,9 @@ use Symfony\Component\Form\FormTypeGuesserChain;
 use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\FormTypeInterface;
 
-class FormExtensionTest extends \PHPUnit\Framework\TestCase
+class FormExtensionTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
-    private $container;
+    private ContainerInterface&MockObject $container;
 
     #[\Override]
     protected function setUp(): void

@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class RestrictedNameContainerType extends AbstractType
 {
     #[\Override]
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $options['name_options']['constraints'][] = new Assert\Length(['min' => 5]);
         $options['name_options']['constraints'][] = new Assert\NotBlank();
@@ -21,7 +21,7 @@ class RestrictedNameContainerType extends AbstractType
     }
 
     #[\Override]
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(['name_options' => []]);
     }

@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CaptchaServiceSelectTypeTest extends TypeTestCase
 {
-    private CaptchaServiceRegistry|MockObject $serviceRegistry;
+    private CaptchaServiceRegistry&MockObject $serviceRegistry;
 
     #[\Override]
     protected function setUp(): void

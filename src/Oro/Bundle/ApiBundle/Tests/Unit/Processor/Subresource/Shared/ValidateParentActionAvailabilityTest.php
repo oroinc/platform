@@ -6,14 +6,12 @@ use Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentActionAvailability;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class ValidateParentActionAvailabilityTest extends GetSubresourceProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
-    private $resourcesProvider;
-
-    /** @var ValidateParentActionAvailability */
-    private $processor;
+    private ResourcesProvider&MockObject $resourcesProvider;
+    private ValidateParentActionAvailability $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +23,7 @@ class ValidateParentActionAvailabilityTest extends GetSubresourceProcessorTestCa
         $this->processor = new ValidateParentActionAvailability($this->resourcesProvider);
     }
 
-    public function testProcessWhenActionIsExcluded()
+    public function testProcessWhenActionIsExcluded(): void
     {
         $this->expectException(ActionNotAllowedException::class);
         $parentEntityClass = 'Test\Class';
@@ -40,7 +38,7 @@ class ValidateParentActionAvailabilityTest extends GetSubresourceProcessorTestCa
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenActionIsNotExcluded()
+    public function testProcessWhenActionIsNotExcluded(): void
     {
         $parentEntityClass = 'Test\Class';
 

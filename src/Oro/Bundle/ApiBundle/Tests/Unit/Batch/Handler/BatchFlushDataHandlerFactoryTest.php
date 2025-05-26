@@ -7,17 +7,14 @@ use Oro\Bundle\ApiBundle\Batch\Handler\BatchFlushDataHandlerFactory;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandlerInterface;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class BatchFlushDataHandlerFactoryTest extends \PHPUnit\Framework\TestCase
+class BatchFlushDataHandlerFactoryTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FlushDataHandlerInterface */
-    private $flushDataHandler;
-
-    /** @var BatchFlushDataHandlerFactory */
-    private $factory;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private FlushDataHandlerInterface&MockObject $flushDataHandler;
+    private BatchFlushDataHandlerFactory $factory;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +25,7 @@ class BatchFlushDataHandlerFactoryTest extends \PHPUnit\Framework\TestCase
         $this->factory = new BatchFlushDataHandlerFactory($this->doctrineHelper, $this->flushDataHandler);
     }
 
-    public function testCreateHandlerForManageableEntity()
+    public function testCreateHandlerForManageableEntity(): void
     {
         $entityClass = 'Test\Entity';
 
@@ -44,7 +41,7 @@ class BatchFlushDataHandlerFactoryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->flushDataHandler, ReflectionUtil::getPropertyValue($handler, 'flushDataHandler'));
     }
 
-    public function testCreateHandlerForNotManageableEntity()
+    public function testCreateHandlerForNotManageableEntity(): void
     {
         $entityClass = 'Test\Entity';
 

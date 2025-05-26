@@ -14,8 +14,7 @@ use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
 
 class EntityInstantiatorTest extends OrmRelatedTestCase
 {
-    /** @var EntityInstantiator */
-    private $entityInstantiator;
+    private EntityInstantiator $entityInstantiator;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +24,7 @@ class EntityInstantiatorTest extends OrmRelatedTestCase
         $this->entityInstantiator = new EntityInstantiator($this->doctrineHelper);
     }
 
-    public function testInstantiateEntityWithoutConstructor()
+    public function testInstantiateEntityWithoutConstructor(): void
     {
         self::assertInstanceOf(
             Group::class,
@@ -33,7 +32,7 @@ class EntityInstantiatorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testInstantiateObjectWithoutConstructor()
+    public function testInstantiateObjectWithoutConstructor(): void
     {
         $this->notManageableClassNames = [Group::class];
 
@@ -43,7 +42,7 @@ class EntityInstantiatorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testInstantiateEntityThatHasConstructorWithRequiredArguments()
+    public function testInstantiateEntityThatHasConstructorWithRequiredArguments(): void
     {
         self::assertInstanceOf(
             Category::class,
@@ -51,7 +50,7 @@ class EntityInstantiatorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testInstantiateObjectThatHasConstructorWithRequiredArguments()
+    public function testInstantiateObjectThatHasConstructorWithRequiredArguments(): void
     {
         $this->notManageableClassNames = [Category::class];
 
@@ -61,7 +60,7 @@ class EntityInstantiatorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testInstantiateEntityThatHasConstructorWithoutRequiredArgumentsAndWithToManyAssociation()
+    public function testInstantiateEntityThatHasConstructorWithoutRequiredArgumentsAndWithToManyAssociation(): void
     {
         /** @var User $entity */
         $entity = $this->entityInstantiator->instantiate(User::class);
@@ -69,7 +68,7 @@ class EntityInstantiatorTest extends OrmRelatedTestCase
         self::assertInstanceOf(ArrayCollection::class, $entity->getGroups());
     }
 
-    public function testInstantiateObjectThatHasConstructorWithoutRequiredArgumentsAndWithToManyAssociation()
+    public function testInstantiateObjectThatHasConstructorWithoutRequiredArgumentsAndWithToManyAssociation(): void
     {
         $this->notManageableClassNames = [User::class];
 
@@ -79,7 +78,7 @@ class EntityInstantiatorTest extends OrmRelatedTestCase
         self::assertInstanceOf(ArrayCollection::class, $object->getGroups());
     }
 
-    public function testInstantiateEntityThatHasConstructorWithRequiredArgumentsAndWithToManyAssociation()
+    public function testInstantiateEntityThatHasConstructorWithRequiredArgumentsAndWithToManyAssociation(): void
     {
         /** @var Company $entity */
         $entity = $this->entityInstantiator->instantiate(Company::class);
@@ -87,7 +86,7 @@ class EntityInstantiatorTest extends OrmRelatedTestCase
         self::assertInstanceOf(ArrayCollection::class, $entity->getGroups());
     }
 
-    public function testInstantiateObjectThatHasConstructorWithRequiredArgumentsAndWithToManyAssociation()
+    public function testInstantiateObjectThatHasConstructorWithRequiredArgumentsAndWithToManyAssociation(): void
     {
         $this->notManageableClassNames = [Company::class];
 
@@ -97,7 +96,7 @@ class EntityInstantiatorTest extends OrmRelatedTestCase
         self::assertNull($object->getGroups());
     }
 
-    public function testInstantiateModelInheritedFromEntityWithoutOwnConstructor()
+    public function testInstantiateModelInheritedFromEntityWithoutOwnConstructor(): void
     {
         $this->notManageableClassNames = [UserProfile::class];
 
@@ -107,7 +106,7 @@ class EntityInstantiatorTest extends OrmRelatedTestCase
         self::assertInstanceOf(ArrayCollection::class, $entity->getGroups());
     }
 
-    public function testInstantiateModelInheritedFromEntityWhenModelHasOwnConstructorWithRequiredParameters()
+    public function testInstantiateModelInheritedFromEntityWhenModelHasOwnConstructorWithRequiredParameters(): void
     {
         $this->notManageableClassNames = [UserProfileWithConstructor::class];
 

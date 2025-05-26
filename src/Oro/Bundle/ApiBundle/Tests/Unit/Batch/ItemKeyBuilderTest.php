@@ -3,8 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch;
 
 use Oro\Bundle\ApiBundle\Batch\ItemKeyBuilder;
+use PHPUnit\Framework\TestCase;
 
-class ItemKeyBuilderTest extends \PHPUnit\Framework\TestCase
+class ItemKeyBuilderTest extends TestCase
 {
     private ItemKeyBuilder $itemKeyBuilder;
 

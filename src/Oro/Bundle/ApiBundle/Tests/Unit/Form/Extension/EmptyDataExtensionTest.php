@@ -4,17 +4,16 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Extension;
 
 use Oro\Bundle\ApiBundle\Form\Extension\EmptyDataExtension;
 use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 
-class EmptyDataExtensionTest extends \PHPUnit\Framework\TestCase
+class EmptyDataExtensionTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityInstantiator */
-    private $entityInstantiator;
-
-    /** @var EmptyDataExtension */
-    private $emptyDataExtension;
+    private EntityInstantiator&MockObject $entityInstantiator;
+    private EmptyDataExtension $emptyDataExtension;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +39,7 @@ class EmptyDataExtensionTest extends \PHPUnit\Framework\TestCase
         return $emptyDataNormalizer;
     }
 
-    public function testGetExtendedTypes()
+    public function testGetExtendedTypes(): void
     {
         self::assertEquals([FormType::class], EmptyDataExtension::getExtendedTypes());
     }
@@ -52,7 +51,7 @@ class EmptyDataExtensionTest extends \PHPUnit\Framework\TestCase
         string|int|null $expected,
         ?string $viewData,
         mixed $emptyData
-    ) {
+    ): void {
         $options = [
             'data_class' => null,
             'empty_data' => $emptyData
@@ -131,7 +130,7 @@ class EmptyDataExtensionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testEmptyDataNormalizerForCompoundField()
+    public function testEmptyDataNormalizerForCompoundField(): void
     {
         $options = [
             'data_class' => null,
@@ -147,7 +146,7 @@ class EmptyDataExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $emptyDataNormalizer($form, ''));
     }
 
-    public function testEmptyDataNormalizerForEmptyOptionalCompoundFieldWithDataClass()
+    public function testEmptyDataNormalizerForEmptyOptionalCompoundFieldWithDataClass(): void
     {
         $options = ['data_class' => 'Test\Class'];
 
@@ -167,7 +166,7 @@ class EmptyDataExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertNull($emptyDataNormalizer($form, ''));
     }
 
-    public function testEmptyDataNormalizerForEmptyRequiredCompoundFieldWithDataClass()
+    public function testEmptyDataNormalizerForEmptyRequiredCompoundFieldWithDataClass(): void
     {
         $options = ['data_class' => 'Test\Class'];
 
@@ -190,7 +189,7 @@ class EmptyDataExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertSame($object, $emptyDataNormalizer($form, ''));
     }
 
-    public function testEmptyDataNormalizerForNotEmptyCompoundFieldWithDataClass()
+    public function testEmptyDataNormalizerForNotEmptyCompoundFieldWithDataClass(): void
     {
         $options = ['data_class' => 'Test\Class'];
 
@@ -210,7 +209,7 @@ class EmptyDataExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertSame($object, $emptyDataNormalizer($form, ''));
     }
 
-    public function testEmptyDataNormalizerForNotEmptyCompoundFieldWithDataClassAndExistingEmptyDataNormalizer()
+    public function testEmptyDataNormalizerForNotEmptyCompoundFieldWithDataClassAndExistingEmptyDataNormalizer(): void
     {
         $object = new \stdClass();
         $options = [

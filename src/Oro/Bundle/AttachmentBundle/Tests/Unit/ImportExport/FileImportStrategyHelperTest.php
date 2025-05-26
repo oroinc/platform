@@ -12,6 +12,8 @@ use Oro\Bundle\AttachmentBundle\Validator\ConfigMultipleFileValidator;
 use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -21,23 +23,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class FileImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
+class FileImportStrategyHelperTest extends TestCase
 {
-    private const FIELD_NAME = 'sampleField';
-    private const ENTITY_CLASS = 'SampleClass';
+    private const string FIELD_NAME = 'sampleField';
+    private const string ENTITY_CLASS = 'SampleClass';
 
-    private FieldHelper|\PHPUnit\Framework\MockObject\MockObject $fieldHelper;
-
-    private DatabaseHelper|\PHPUnit\Framework\MockObject\MockObject $databaseHelper;
-
-    private DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject $doctrineHelper;
-
-    private ConfigFileValidator|\PHPUnit\Framework\MockObject\MockObject $configFileValidator;
-
-    private ConfigMultipleFileValidator|\PHPUnit\Framework\MockObject\MockObject $configMultipleFileValidator;
-
-    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
-
+    private FieldHelper&MockObject $fieldHelper;
+    private DatabaseHelper&MockObject $databaseHelper;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private ConfigFileValidator&MockObject $configFileValidator;
+    private ConfigMultipleFileValidator&MockObject $configMultipleFileValidator;
+    private TranslatorInterface&MockObject $translator;
     private FileImportStrategyHelper $helper;
 
     #[\Override]
@@ -415,8 +411,7 @@ class FileImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
         $url = 'http://example.org/image.png';
         $externalFile = new ExternalFile($url);
         $errorMessage = 'sample error';
-        $this->configFileValidator
-            ->expects(self::once())
+        $this->configFileValidator->expects(self::once())
             ->method('validateExternalFileUrl')
             ->with($url)
             ->willReturn(new ConstraintViolationList([$this->createViolation($errorMessage)]));
@@ -453,8 +448,7 @@ class FileImportStrategyHelperTest extends \PHPUnit\Framework\TestCase
     {
         $url = 'http://example.org/image.png';
         $externalFile = new ExternalFile($url);
-        $this->configFileValidator
-            ->expects(self::once())
+        $this->configFileValidator->expects(self::once())
             ->method('validateExternalFileUrl')
             ->with($url)
             ->willReturn(new ConstraintViolationList());

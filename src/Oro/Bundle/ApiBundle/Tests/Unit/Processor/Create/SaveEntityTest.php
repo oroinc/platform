@@ -10,17 +10,13 @@ use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandlerContext;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandlerInterface;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class SaveEntityTest extends FormProcessorTestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var FlushDataHandlerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $flushDataHandler;
-
-    /** @var SaveEntity */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private FlushDataHandlerInterface&MockObject $flushDataHandler;
+    private SaveEntity $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -34,7 +30,7 @@ class SaveEntityTest extends FormProcessorTestCase
         $this->processor = new SaveEntity($this->doctrineHelper, $this->flushDataHandler);
     }
 
-    public function testProcessWhenEntityAlreadySaved()
+    public function testProcessWhenEntityAlreadySaved(): void
     {
         $this->doctrineHelper->expects(self::never())
             ->method('getManageableEntityClass');
@@ -49,7 +45,7 @@ class SaveEntityTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenNoEntity()
+    public function testProcessWhenNoEntity(): void
     {
         $this->doctrineHelper->expects(self::never())
             ->method('getManageableEntityClass');
@@ -64,7 +60,7 @@ class SaveEntityTest extends FormProcessorTestCase
         self::assertFalse($this->context->isProcessed(SaveEntity::OPERATION_NAME));
     }
 
-    public function testProcessForNotSupportedEntity()
+    public function testProcessForNotSupportedEntity(): void
     {
         $this->doctrineHelper->expects(self::never())
             ->method('getManageableEntityClass');
@@ -80,7 +76,7 @@ class SaveEntityTest extends FormProcessorTestCase
         self::assertFalse($this->context->isProcessed(SaveEntity::OPERATION_NAME));
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessForNotManageableEntity(): void
     {
         $entity = new \stdClass();
 
@@ -100,7 +96,7 @@ class SaveEntityTest extends FormProcessorTestCase
         self::assertFalse($this->context->isProcessed(SaveEntity::OPERATION_NAME));
     }
 
-    public function testProcessForManageableEntity()
+    public function testProcessForManageableEntity(): void
     {
         $entity = new \stdClass();
 
@@ -130,7 +126,7 @@ class SaveEntityTest extends FormProcessorTestCase
         self::assertTrue($this->context->isProcessed(SaveEntity::OPERATION_NAME));
     }
 
-    public function testProcessWhenEntityAlreadyExists()
+    public function testProcessWhenEntityAlreadyExists(): void
     {
         $entity = new \stdClass();
 

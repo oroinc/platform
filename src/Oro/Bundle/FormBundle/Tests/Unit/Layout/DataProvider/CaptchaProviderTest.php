@@ -9,9 +9,10 @@ use PHPUnit\Framework\TestCase;
 
 class CaptchaProviderTest extends TestCase
 {
-    private CaptchaSettingsProviderInterface|MockObject $captchaSettingsProvider;
+    private CaptchaSettingsProviderInterface&MockObject $captchaSettingsProvider;
     private CaptchaProvider $provider;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->captchaSettingsProvider = $this->createMock(CaptchaSettingsProviderInterface::class);

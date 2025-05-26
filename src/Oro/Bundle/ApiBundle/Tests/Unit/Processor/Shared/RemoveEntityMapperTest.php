@@ -8,8 +8,7 @@ use Oro\Bundle\ApiBundle\Util\EntityMapper;
 
 class RemoveEntityMapperTest extends FormProcessorTestCase
 {
-    /** @var RemoveEntityMapper */
-    private $processor;
+    private RemoveEntityMapper $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +18,7 @@ class RemoveEntityMapperTest extends FormProcessorTestCase
         $this->processor = new RemoveEntityMapper();
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $this->context->setEntityMapper($this->createMock(EntityMapper::class));
         $this->processor->process($this->context);

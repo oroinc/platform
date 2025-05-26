@@ -15,6 +15,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\EntitySerializer\DataTransformer;
 use Oro\Component\EntitySerializer\DataTransformerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -22,17 +23,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
 {
-    /** @var ExtendedAssociationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $extendedAssociationProvider;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var DataTransformerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $dataTransformer;
-
-    /** @var BuildCustomTypes */
-    private $processor;
+    private ExtendedAssociationProvider&MockObject $extendedAssociationProvider;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private DataTransformerInterface&MockObject $dataTransformer;
+    private BuildCustomTypes $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -59,7 +53,7 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessWithoutConfig()
+    public function testProcessWithoutConfig(): void
     {
         $data = [
             'field1' => 123
@@ -69,7 +63,7 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithoutCustomFields()
+    public function testProcessWithoutCustomFields(): void
     {
         $data = [
             'field1' => 123
@@ -89,7 +83,7 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessPercent100()
+    public function testProcessPercent100(): void
     {
         $data = [
             'field1' => 123.4,
@@ -112,7 +106,7 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessNestedObject()
+    public function testProcessNestedObject(): void
     {
         $data = [
             'field1' => 'val1',
@@ -152,7 +146,7 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessNestedObjectWithRenamedFields()
+    public function testProcessNestedObjectWithRenamedFields(): void
     {
         $data = [
             'renamedField1' => 'val1',
@@ -198,7 +192,7 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessNestedObjectWithNotSupportedPropertyPath()
+    public function testProcessNestedObjectWithNotSupportedPropertyPath(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The "field1.field11" property path is not supported.');
@@ -215,7 +209,7 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessNestedObjectWithDataTransformer()
+    public function testProcessNestedObjectWithDataTransformer(): void
     {
         $data = [
             'field1' => 'val1',
@@ -257,7 +251,7 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessNestedObjectWithEmptyData()
+    public function testProcessNestedObjectWithEmptyData(): void
     {
         $data = [
             'field1' => '',
@@ -310,7 +304,7 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessNestedAssociation()
+    public function testProcessNestedAssociation(): void
     {
         $data = [
             'targetEntityClass' => 'Test\TargetEntity',
@@ -344,7 +338,7 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessNestedAssociationWithRenamedFields()
+    public function testProcessNestedAssociationWithRenamedFields(): void
     {
         $data = [
             'renamedTargetEntityClass' => 'Test\TargetEntity',
@@ -382,7 +376,7 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessForExcludedExtendedAssociation()
+    public function testProcessForExcludedExtendedAssociation(): void
     {
         $entityClass = 'Test\Class';
         $data = [
@@ -424,7 +418,7 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessForExtendedAssociation()
+    public function testProcessForExtendedAssociation(): void
     {
         $entityClass = 'Test\Class';
         $data = [
@@ -465,7 +459,7 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessWhenExtendedAssociationValueIsAlreadySet()
+    public function testProcessWhenExtendedAssociationValueIsAlreadySet(): void
     {
         $data = [
             'association'  => ['__class' => 'Test\Target1', 'id' => 1],
@@ -492,7 +486,7 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessForUnsupportedExtendedAssociation()
+    public function testProcessForUnsupportedExtendedAssociation(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Unsupported type of extended association: unknown.');
@@ -515,7 +509,7 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForExtendedAssociationWhenModelIsInheritedFromEntity()
+    public function testProcessForExtendedAssociationWhenModelIsInheritedFromEntity(): void
     {
         $data = [
             'association1' => null,
@@ -555,7 +549,7 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessForManyToOneExtendedAssociation()
+    public function testProcessForManyToOneExtendedAssociation(): void
     {
         $entityClass = 'Test\Class';
         $data = [
@@ -596,7 +590,7 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessForManyToOneExtendedAssociationWhenAllDependedAssociationsAreNull()
+    public function testProcessForManyToOneExtendedAssociationWhenAllDependedAssociationsAreNull(): void
     {
         $entityClass = 'Test\Class';
         $data = [
@@ -634,7 +628,7 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessForManyToOneExtendedAssociationWhenAllTargetsAreNotAccessibleViaApi()
+    public function testProcessForManyToOneExtendedAssociationWhenAllTargetsAreNotAccessibleViaApi(): void
     {
         $entityClass = 'Test\Class';
         $data = [
@@ -664,7 +658,7 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessForManyToManyExtendedAssociation()
+    public function testProcessForManyToManyExtendedAssociation(): void
     {
         $entityClass = 'Test\Class';
         $data = [
@@ -708,7 +702,7 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessForManyToManyExtendedAssociationWhenAllDependedAssociationsAreEmpty()
+    public function testProcessForManyToManyExtendedAssociationWhenAllDependedAssociationsAreEmpty(): void
     {
         $entityClass = 'Test\Class';
         $data = [
@@ -746,7 +740,7 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessForManyToManyExtendedAssociationWhenAllTargetsAreNotAccessibleViaApi()
+    public function testProcessForManyToManyExtendedAssociationWhenAllTargetsAreNotAccessibleViaApi(): void
     {
         $entityClass = 'Test\Class';
         $data = [
@@ -778,7 +772,7 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessForMultipleManyToOneExtendedAssociation()
+    public function testProcessForMultipleManyToOneExtendedAssociation(): void
     {
         $entityClass = 'Test\Class';
         $data = [
@@ -822,7 +816,7 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessForMultipleManyToOneExtendedAssociationWhenAllDependedAssociationsAreNull()
+    public function testProcessForMultipleManyToOneExtendedAssociationWhenAllDependedAssociationsAreNull(): void
     {
         $entityClass = 'Test\Class';
         $data = [
@@ -860,7 +854,7 @@ class BuildCustomTypesTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessForMultipleManyToOneExtendedAssociationWhenAllTargetsAreNotAccessibleViaApi()
+    public function testProcessForMultipleManyToOneExtendedAssociationWhenAllTargetsAreNotAccessibleViaApi(): void
     {
         $entityClass = 'Test\Class';
         $data = [

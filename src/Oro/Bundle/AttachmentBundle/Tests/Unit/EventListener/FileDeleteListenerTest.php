@@ -11,18 +11,16 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\EventListener\FileDeleteListener;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class FileDeleteListenerTest extends \PHPUnit\Framework\TestCase
+class FileDeleteListenerTest extends TestCase
 {
-    private FileManager|\PHPUnit\Framework\MockObject\MockObject $fileManager;
-
-    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
-
-    private EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject $entityManager;
-
+    private FileManager&MockObject $fileManager;
+    private LoggerInterface&MockObject $logger;
+    private EntityManagerInterface&MockObject $entityManager;
     private File $file;
-
     private FileDeleteListener $listener;
 
     #[\Override]

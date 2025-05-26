@@ -7,11 +7,12 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager as EntityConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ExtendFieldFileFormOptionsProviderTest extends \PHPUnit\Framework\TestCase
+class ExtendFieldFileFormOptionsProviderTest extends TestCase
 {
-    private EntityConfigManager|\PHPUnit\Framework\MockObject\MockObject $entityConfigManager;
-
+    private EntityConfigManager&MockObject $entityConfigManager;
     private ExtendFieldFileFormOptionsProvider $provider;
 
     #[\Override]
@@ -28,8 +29,7 @@ class ExtendFieldFileFormOptionsProviderTest extends \PHPUnit\Framework\TestCase
         $fieldName = 'avatar';
         $fieldType = 'string';
         $formFieldConfig = new Config(new FieldConfigId('form', $className, $fieldName, $fieldType));
-        $this->entityConfigManager
-            ->expects(self::once())
+        $this->entityConfigManager->expects(self::once())
             ->method('getFieldConfig')
             ->with('form', $className, $fieldName)
             ->willReturn($formFieldConfig);
@@ -52,8 +52,7 @@ class ExtendFieldFileFormOptionsProviderTest extends \PHPUnit\Framework\TestCase
             new FieldConfigId('form', $className, $fieldName, $fieldType),
             $attachmentConfigValues
         );
-        $this->entityConfigManager
-            ->expects(self::exactly(2))
+        $this->entityConfigManager->expects(self::exactly(2))
             ->method('getFieldConfig')
             ->withConsecutive(['form', $className, $fieldName], ['attachment', $className, $fieldName])
             ->willReturnOnConsecutiveCalls($formFieldConfig, $attachmentFieldConfig);

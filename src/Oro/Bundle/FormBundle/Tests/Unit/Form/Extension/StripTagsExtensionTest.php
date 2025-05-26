@@ -5,17 +5,16 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension;
 use Oro\Bundle\FormBundle\Form\Extension\StripTagsExtension;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class StripTagsExtensionTest extends \PHPUnit\Framework\TestCase
+class StripTagsExtensionTest extends TestCase
 {
-    /** @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $htmlTagHelper;
-
-    /** @var StripTagsExtension */
-    private $formExtension;
+    private HtmlTagHelper&MockObject $htmlTagHelper;
+    private StripTagsExtension $formExtension;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +28,7 @@ class StripTagsExtensionTest extends \PHPUnit\Framework\TestCase
         $this->formExtension = new StripTagsExtension($container);
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
@@ -43,7 +42,7 @@ class StripTagsExtensionTest extends \PHPUnit\Framework\TestCase
      *
      * @dataProvider buildFormDataProvider
      */
-    public function testBuildForm($stripTags)
+    public function testBuildForm($stripTags): void
     {
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects($this->exactly((int)$stripTags))

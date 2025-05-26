@@ -4,20 +4,21 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class UserEmailOriginTest extends \PHPUnit\Framework\TestCase
+class UserEmailOriginTest extends TestCase
 {
-    public function testGetId()
+    public function testGetId(): void
     {
         $origin = new UserEmailOrigin();
         ReflectionUtil::setId($origin, 123);
         $this->assertEquals(123, $origin->getId());
     }
 
-    public function testImapHostGetterAndSetter()
+    public function testImapHostGetterAndSetter(): void
     {
         $origin = new UserEmailOrigin();
         $this->assertNull($origin->getImapHost());
@@ -25,7 +26,7 @@ class UserEmailOriginTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test', $origin->getImapHost());
     }
 
-    public function testImapPortGetterAndSetter()
+    public function testImapPortGetterAndSetter(): void
     {
         $origin = new UserEmailOrigin();
         $this->assertEquals(null, $origin->getImapPort());
@@ -33,7 +34,7 @@ class UserEmailOriginTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(123, $origin->getImapPort());
     }
 
-    public function testSslGetterAndSetter()
+    public function testSslGetterAndSetter(): void
     {
         $origin = new UserEmailOrigin();
         $this->assertNull($origin->getImapEncryption());
@@ -41,7 +42,7 @@ class UserEmailOriginTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test', $origin->getImapEncryption());
     }
 
-    public function testUserGetterAndSetter()
+    public function testUserGetterAndSetter(): void
     {
         $origin = new UserEmailOrigin();
         $this->assertNull($origin->getUser());
@@ -49,7 +50,7 @@ class UserEmailOriginTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test', $origin->getUser());
     }
 
-    public function testPasswordGetterAndSetter()
+    public function testPasswordGetterAndSetter(): void
     {
         $origin = new UserEmailOrigin();
         $this->assertNull($origin->getPassword());
@@ -57,7 +58,7 @@ class UserEmailOriginTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test', $origin->getPassword());
     }
 
-    public function testSmtpHostGetterAndSetter()
+    public function testSmtpHostGetterAndSetter(): void
     {
         $origin = new UserEmailOrigin();
         $this->assertNull($origin->getSmtpHost());
@@ -65,7 +66,7 @@ class UserEmailOriginTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test', $origin->getSmtpHost());
     }
 
-    public function testSmtpPortGetterAndSetter()
+    public function testSmtpPortGetterAndSetter(): void
     {
         $origin = new UserEmailOrigin();
         $this->assertEquals(null, $origin->getSmtpPort());
@@ -76,7 +77,7 @@ class UserEmailOriginTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider setDataProviderSmtpConfiguredSuccess
      */
-    public function testIsSmtpConfiguredSuccess(string $password, string $accessToken)
+    public function testIsSmtpConfiguredSuccess(string $password, string $accessToken): void
     {
         $origin = new UserEmailOrigin();
         $origin->setSmtpHost('host');
@@ -103,7 +104,7 @@ class UserEmailOriginTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testIsSmtpConfiguredFailure()
+    public function testIsSmtpConfiguredFailure(): void
     {
         $origin = new UserEmailOrigin();
         $origin->setSmtpHost('');
@@ -133,7 +134,7 @@ class UserEmailOriginTest extends \PHPUnit\Framework\TestCase
         string $password,
         string $accessToken,
         bool $expectedResult
-    ) {
+    ): void {
         $origin = new UserEmailOrigin();
         $origin->setImapHost($host);
         $origin->setImapPort($port);

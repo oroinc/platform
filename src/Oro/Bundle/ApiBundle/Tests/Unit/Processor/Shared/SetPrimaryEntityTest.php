@@ -9,8 +9,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
 class SetPrimaryEntityTest extends FormProcessorTestCase
 {
-    /** @var SetPrimaryEntity */
-    private $processor;
+    private SetPrimaryEntity $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -20,18 +19,18 @@ class SetPrimaryEntityTest extends FormProcessorTestCase
         $this->processor = new SetPrimaryEntity();
     }
 
-    public function testProcessWithoutIncludedData()
+    public function testProcessWithoutIncludedData(): void
     {
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithoutIncludedEntities()
+    public function testProcessWithoutIncludedEntities(): void
     {
         $this->context->setIncludedData(['key' => 'value']);
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithoutPrimaryEntity()
+    public function testProcessWithoutPrimaryEntity(): void
     {
         $includedEntities = new IncludedEntityCollection();
 
@@ -42,7 +41,7 @@ class SetPrimaryEntityTest extends FormProcessorTestCase
         self::assertNull($includedEntities->getPrimaryEntityMetadata());
     }
 
-    public function testProcessWithPrimaryEntity()
+    public function testProcessWithPrimaryEntity(): void
     {
         $primaryEntity = new \stdClass();
         $primaryEntityMetadata = new EntityMetadata('Test\Entity');

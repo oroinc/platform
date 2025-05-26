@@ -8,10 +8,9 @@ use Oro\Bundle\ApiBundle\Processor\DeleteList\SetDeleteLimit;
 
 class SetDeleteLimitTest extends DeleteListProcessorTestCase
 {
-    private const MAX_DELETE_ENTITIES_LIMIT = 100;
+    private const int MAX_DELETE_ENTITIES_LIMIT = 100;
 
-    /** @var SetDeleteLimit */
-    private $processor;
+    private SetDeleteLimit $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class SetDeleteLimitTest extends DeleteListProcessorTestCase
         $this->processor = new SetDeleteLimit(self::MAX_DELETE_ENTITIES_LIMIT);
     }
 
-    public function testProcessWhenQueryIsAlreadyBuilt()
+    public function testProcessWhenQueryIsAlreadyBuilt(): void
     {
         $this->context->setQuery(new \stdClass());
 
@@ -30,14 +29,14 @@ class SetDeleteLimitTest extends DeleteListProcessorTestCase
         self::assertEquals($context, $this->context);
     }
 
-    public function testProcessWhenCriteriaObjectDoesNotExist()
+    public function testProcessWhenCriteriaObjectDoesNotExist(): void
     {
         $context = clone $this->context;
         $this->processor->process($this->context);
         self::assertEquals($context, $this->context);
     }
 
-    public function testProcessWhenLimitIsAlreadySet()
+    public function testProcessWhenLimitIsAlreadySet(): void
     {
         $maxResults = 2;
 
@@ -50,7 +49,7 @@ class SetDeleteLimitTest extends DeleteListProcessorTestCase
         self::assertSame($maxResults, $criteria->getMaxResults());
     }
 
-    public function testProcessWhenLimitIsRemoved()
+    public function testProcessWhenLimitIsRemoved(): void
     {
         $maxResults = -1;
 
@@ -63,7 +62,7 @@ class SetDeleteLimitTest extends DeleteListProcessorTestCase
         self::assertSame($maxResults, $criteria->getMaxResults());
     }
 
-    public function testProcessWhenNoLimitInConfig()
+    public function testProcessWhenNoLimitInConfig(): void
     {
         $criteria = new Criteria();
 
@@ -76,7 +75,7 @@ class SetDeleteLimitTest extends DeleteListProcessorTestCase
         self::assertSame(self::MAX_DELETE_ENTITIES_LIMIT, $criteria->getMaxResults());
     }
 
-    public function testProcessWhenLimitExistsInConfig()
+    public function testProcessWhenLimitExistsInConfig(): void
     {
         $maxResults = 2;
 
@@ -92,7 +91,7 @@ class SetDeleteLimitTest extends DeleteListProcessorTestCase
         self::assertSame($maxResults, $criteria->getMaxResults());
     }
 
-    public function testProcessWhenLimitIsRemovedByConfig()
+    public function testProcessWhenLimitIsRemovedByConfig(): void
     {
         $criteria = new Criteria();
 

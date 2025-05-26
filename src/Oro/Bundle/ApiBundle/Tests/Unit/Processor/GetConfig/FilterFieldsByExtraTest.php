@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\FilterFieldsByExtra;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -17,14 +18,9 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
  */
 class FilterFieldsByExtraTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
-    private $valueNormalizer;
-
-    /** @var FilterFieldsByExtra */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private ValueNormalizer&MockObject $valueNormalizer;
+    private FilterFieldsByExtra $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +36,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForNotCompletedConfig()
+    public function testProcessForNotCompletedConfig(): void
     {
         $config = [
             'fields' => [
@@ -55,7 +51,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenNoFields()
+    public function testProcessWhenNoFields(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -76,7 +72,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForDisabledFieldset()
+    public function testProcessForDisabledFieldset(): void
     {
         $this->expectException(NotSupportedConfigOperationException::class);
         $this->expectExceptionMessage(
@@ -95,7 +91,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForDisabledFieldsetForEntityIdentifier()
+    public function testProcessForDisabledFieldsetForEntityIdentifier(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -113,7 +109,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessForNotManageableEntity()
+    public function testProcessForNotManageableEntity(): void
     {
         $config = [
             'identifier_field_names' => ['id'],
@@ -251,7 +247,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessForManageableEntity()
+    public function testProcessForManageableEntity(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -420,7 +416,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessWhenTargetEntityUsesTableInheritance()
+    public function testProcessWhenTargetEntityUsesTableInheritance(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -513,7 +509,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForRenamedIdentifierFieldOfManageableEntity()
+    public function testProcessForRenamedIdentifierFieldOfManageableEntity(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -591,7 +587,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForRenamedIdentifierFieldOfManageableEntityAndConfigHasIdentifierFields()
+    public function testProcessForRenamedIdentifierFieldOfManageableEntityAndConfigHasIdentifierFields(): void
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -670,7 +666,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForSubresourceWithDisabledFieldset()
+    public function testProcessForSubresourceWithDisabledFieldset(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -745,7 +741,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForSubresourceWithDisabledFieldsetAndAdditionalFieldsFilter()
+    public function testProcessForSubresourceWithDisabledFieldsetAndAdditionalFieldsFilter(): void
     {
         $this->expectException(NotSupportedConfigOperationException::class);
         $this->expectExceptionMessage(
@@ -789,7 +785,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessWhenEmptyValueForNotManageableEntity()
+    public function testProcessWhenEmptyValueForNotManageableEntity(): void
     {
         $config = [
             'identifier_field_names' => ['id'],
@@ -899,7 +895,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessWhenEmptyValueForManageableEntity()
+    public function testProcessWhenEmptyValueForManageableEntity(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1036,7 +1032,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessWhenNullValueForManageableEntity()
+    public function testProcessWhenNullValueForManageableEntity(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1161,7 +1157,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessWhenEmptyValueWhenTargetEntityUsesTableInheritance()
+    public function testProcessWhenEmptyValueWhenTargetEntityUsesTableInheritance(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1259,7 +1255,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessWhenNullValueWhenTargetEntityUsesTableInheritance()
+    public function testProcessWhenNullValueWhenTargetEntityUsesTableInheritance(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1349,7 +1345,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForNotManageableEntityWhenThereIsFieldsFilterWithNullValue()
+    public function testProcessForNotManageableEntityWhenThereIsFieldsFilterWithNullValue(): void
     {
         $config = [
             'identifier_field_names' => ['id'],
@@ -1421,7 +1417,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForManageableEntityWhenThereIsFieldsFilterWithNullValue()
+    public function testProcessForManageableEntityWhenThereIsFieldsFilterWithNullValue(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1521,7 +1517,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWhenThereIsFieldsFilterForBothEntityTypeAndEntityClass()
+    public function testProcessWhenThereIsFieldsFilterForBothEntityTypeAndEntityClass(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1579,7 +1575,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWhenThereIsFieldsFilterForBothEntityTypeAndEntityClassAndFirstOneIsNull()
+    public function testProcessWhenThereIsFieldsFilterForBothEntityTypeAndEntityClassAndFirstOneIsNull(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1640,7 +1636,7 @@ class FilterFieldsByExtraTest extends ConfigProcessorTestCase
     }
 
 
-    public function testProcessWhenThereIsFieldsFilterForBothEntityTypeAndEntityClassAndSecondOneIsNull()
+    public function testProcessWhenThereIsFieldsFilterForBothEntityTypeAndEntityClassAndSecondOneIsNull(): void
     {
         $config = [
             'exclusion_policy' => 'all',

@@ -10,23 +10,18 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Route;
 
-class RestDocIdentifierHandlerTest extends \PHPUnit\Framework\TestCase
+class RestDocIdentifierHandlerTest extends TestCase
 {
-    private const VIEW = 'test_view';
+    private const string VIEW = 'test_view';
 
-    /** @var RequestType */
-    private $requestType;
-
-    /** @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject */
-    private $valueNormalizer;
-
-    /** @var ApiDocDataTypeConverter|\PHPUnit\Framework\MockObject\MockObject */
-    private $dataTypeConverter;
-
-    /** @var RestDocIdentifierHandler */
-    private $identifierHandler;
+    private RequestType $requestType;
+    private ValueNormalizer&MockObject $valueNormalizer;
+    private ApiDocDataTypeConverter&MockObject $dataTypeConverter;
+    private RestDocIdentifierHandler $identifierHandler;
 
     #[\Override]
     protected function setUp(): void
@@ -51,7 +46,7 @@ class RestDocIdentifierHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHandleForSingleIdentifier()
+    public function testHandleForSingleIdentifier(): void
     {
         $annotation = new ApiDoc([]);
         $route = new Route('/test_route');
@@ -84,7 +79,7 @@ class RestDocIdentifierHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHandleForCompositeIdentifier()
+    public function testHandleForCompositeIdentifier(): void
     {
         $annotation = new ApiDoc([]);
         $route = new Route('/test_route');
@@ -120,7 +115,7 @@ class RestDocIdentifierHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHandleWhenNoIdentifier()
+    public function testHandleWhenNoIdentifier(): void
     {
         $annotation = new ApiDoc([]);
         $route = new Route('/test_route');

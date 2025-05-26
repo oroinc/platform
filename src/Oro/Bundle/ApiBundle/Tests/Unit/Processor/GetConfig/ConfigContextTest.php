@@ -10,11 +10,12 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigSection;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ConfigContextTest extends \PHPUnit\Framework\TestCase
+class ConfigContextTest extends TestCase
 {
     private ConfigContext $context;
 
@@ -24,14 +25,14 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
         $this->context = new ConfigContext();
     }
 
-    public function testClassName()
+    public function testClassName(): void
     {
         $this->context->setClassName('test');
         self::assertEquals('test', $this->context->getClassName());
         self::assertEquals('test', $this->context->get('class'));
     }
 
-    public function testTargetAction()
+    public function testTargetAction(): void
     {
         self::assertNull($this->context->getTargetAction());
 
@@ -40,7 +41,7 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('test', $this->context->get('targetAction'));
     }
 
-    public function testIsCollection()
+    public function testIsCollection(): void
     {
         self::assertFalse($this->context->isCollection());
 
@@ -49,7 +50,7 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->context->get('collection'));
     }
 
-    public function testParentClassName()
+    public function testParentClassName(): void
     {
         self::assertNull($this->context->getParentClassName());
 
@@ -58,7 +59,7 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('test', $this->context->get('parentClass'));
     }
 
-    public function testAssociationName()
+    public function testAssociationName(): void
     {
         self::assertNull($this->context->getAssociationName());
 
@@ -67,7 +68,7 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('test', $this->context->get('association'));
     }
 
-    public function testMaxRelatedEntities()
+    public function testMaxRelatedEntities(): void
     {
         self::assertNull($this->context->getMaxRelatedEntities());
 
@@ -80,7 +81,7 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->context->has('maxRelatedEntities'));
     }
 
-    public function testRequestedExclusionPolicy()
+    public function testRequestedExclusionPolicy(): void
     {
         self::assertNull($this->context->getRequestedExclusionPolicy());
         self::assertTrue($this->context->has('requested_exclusion_policy'));
@@ -107,7 +108,7 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->get('requested_exclusion_policy'));
     }
 
-    public function testExplicitlyConfiguredFieldNames()
+    public function testExplicitlyConfiguredFieldNames(): void
     {
         self::assertSame([], $this->context->getExplicitlyConfiguredFieldNames());
 
@@ -118,7 +119,7 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $this->context->getExplicitlyConfiguredFieldNames());
     }
 
-    public function testExtras()
+    public function testExtras(): void
     {
         self::assertSame([], $this->context->getExtras());
         self::assertSame([], $this->context->get('extra'));
@@ -148,7 +149,7 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $this->context->get('extra'));
     }
 
-    public function testSetExtra()
+    public function testSetExtra(): void
     {
         self::assertSame([], $this->context->getExtras());
         self::assertSame([], $this->context->get('extra'));
@@ -172,7 +173,7 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('val2', $this->context->get('test_attr'));
     }
 
-    public function testGetPropagableExtras()
+    public function testGetPropagableExtras(): void
     {
         self::assertSame([], $this->context->getPropagableExtras());
 
@@ -190,7 +191,7 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $this->context->getPropagableExtras());
     }
 
-    public function testConfigSections()
+    public function testConfigSections(): void
     {
         self::assertFalse($this->context->hasConfigSection('test'));
         self::assertNull($this->context->getConfigSection('test'));
@@ -205,7 +206,7 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->context->hasConfigSection('test'));
     }
 
-    public function testFilters()
+    public function testFilters(): void
     {
         self::assertFalse($this->context->hasFilters());
         self::assertNull($this->context->getFilters());
@@ -221,7 +222,7 @@ class ConfigContextTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->context->hasFilters());
     }
 
-    public function testSorters()
+    public function testSorters(): void
     {
         self::assertFalse($this->context->hasSorters());
         self::assertNull($this->context->getSorters());

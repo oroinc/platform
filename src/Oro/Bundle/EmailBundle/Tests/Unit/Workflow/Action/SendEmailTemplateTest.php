@@ -31,10 +31,9 @@ class SendEmailTemplateTest extends TestCase
 {
     use LoggerAwareTraitTestTrait;
 
-    private ContextAccessor|MockObject $contextAccessor;
-    private ValidatorInterface|MockObject $validator;
-    private EmailTemplateSender|MockObject $emailTemplateSender;
-
+    private ContextAccessor&MockObject $contextAccessor;
+    private ValidatorInterface&MockObject $validator;
+    private EmailTemplateSender&MockObject $emailTemplateSender;
     private SendEmailTemplate $action;
 
     #[\Override]

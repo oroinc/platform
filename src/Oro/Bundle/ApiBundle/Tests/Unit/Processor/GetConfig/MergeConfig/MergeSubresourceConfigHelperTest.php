@@ -6,20 +6,15 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\MergeConfig\MergeActionConfigHelper
 use Oro\Bundle\ApiBundle\Processor\GetConfig\MergeConfig\MergeFilterConfigHelper;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\MergeConfig\MergeSorterConfigHelper;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\MergeConfig\MergeSubresourceConfigHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MergeSubresourceConfigHelperTest extends \PHPUnit\Framework\TestCase
+class MergeSubresourceConfigHelperTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MergeActionConfigHelper */
-    private $mergeActionConfigHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MergeFilterConfigHelper */
-    private $mergeFilterConfigHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MergeSorterConfigHelper */
-    private $mergeSorterConfigHelper;
-
-    /** @var MergeSubresourceConfigHelper */
-    private $mergeSubresourceConfigHelper;
+    private MergeActionConfigHelper&MockObject $mergeActionConfigHelper;
+    private MergeFilterConfigHelper&MockObject $mergeFilterConfigHelper;
+    private MergeSorterConfigHelper&MockObject $mergeSorterConfigHelper;
+    private MergeSubresourceConfigHelper $mergeSubresourceConfigHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +30,7 @@ class MergeSubresourceConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMergeEmptySubresourceConfig()
+    public function testMergeEmptySubresourceConfig(): void
     {
         $config = [];
         $subresourceConfig = [];
@@ -60,7 +55,7 @@ class MergeSubresourceConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMergeSubresourceActionConfig()
+    public function testMergeSubresourceActionConfig(): void
     {
         $config = [
             'key' => 'val'
@@ -113,7 +108,7 @@ class MergeSubresourceConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMergeSubresourceFiltersConfig()
+    public function testMergeSubresourceFiltersConfig(): void
     {
         $config = [
             'key' => 'val'
@@ -174,7 +169,7 @@ class MergeSubresourceConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMergeSubresourceSortersConfig()
+    public function testMergeSubresourceSortersConfig(): void
     {
         $config = [
             'key' => 'val'

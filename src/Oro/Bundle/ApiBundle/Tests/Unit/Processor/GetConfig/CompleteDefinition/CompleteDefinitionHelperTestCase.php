@@ -9,8 +9,10 @@ use Oro\Bundle\ApiBundle\Config\Extension\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\Loader\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CompleteDefinitionHelperTestCase extends \PHPUnit\Framework\TestCase
+class CompleteDefinitionHelperTestCase extends TestCase
 {
     protected const TEST_CLASS_NAME = 'Test\Class';
     protected const TEST_VERSION = '1.1';
@@ -54,9 +56,8 @@ class CompleteDefinitionHelperTestCase extends \PHPUnit\Framework\TestCase
         );
     }
 
-    protected function getClassMetadataMock(
-        ?string $className = null
-    ): ClassMetadata|\PHPUnit\Framework\MockObject\MockObject {
+    protected function getClassMetadataMock(?string $className = null): ClassMetadata&MockObject
+    {
         if ($className) {
             $classMetadata = $this->getMockBuilder(ClassMetadata::class)
                 ->setConstructorArgs([$className])

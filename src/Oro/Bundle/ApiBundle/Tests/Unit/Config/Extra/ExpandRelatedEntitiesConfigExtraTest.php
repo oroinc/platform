@@ -4,13 +4,13 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config\Extra;
 
 use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
+use PHPUnit\Framework\TestCase;
 
-class ExpandRelatedEntitiesConfigExtraTest extends \PHPUnit\Framework\TestCase
+class ExpandRelatedEntitiesConfigExtraTest extends TestCase
 {
-    private const EXPANDED_ENTITIES = ['product', 'product.owner', 'category.owner', 'category'];
+    private const array EXPANDED_ENTITIES = ['product', 'product.owner', 'category.owner', 'category'];
 
-    /** @var ExpandRelatedEntitiesConfigExtra */
-    private $extra;
+    private ExpandRelatedEntitiesConfigExtra $extra;
 
     #[\Override]
     protected function setUp(): void
@@ -18,12 +18,12 @@ class ExpandRelatedEntitiesConfigExtraTest extends \PHPUnit\Framework\TestCase
         $this->extra = new ExpandRelatedEntitiesConfigExtra(self::EXPANDED_ENTITIES);
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         self::assertEquals(ExpandRelatedEntitiesConfigExtra::NAME, $this->extra->getName());
     }
 
-    public function testGetExpandedEntities()
+    public function testGetExpandedEntities(): void
     {
         self::assertEquals(
             self::EXPANDED_ENTITIES,
@@ -31,7 +31,7 @@ class ExpandRelatedEntitiesConfigExtraTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsExpandRequested()
+    public function testIsExpandRequested(): void
     {
         self::assertTrue($this->extra->isExpandRequested('product'));
         self::assertTrue($this->extra->isExpandRequested('product.owner'));
@@ -43,7 +43,7 @@ class ExpandRelatedEntitiesConfigExtraTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->extra->isExpandRequested('product.owner.another'));
     }
 
-    public function testConfigureContext()
+    public function testConfigureContext(): void
     {
         $context = new ConfigContext();
         $this->extra->configureContext($context);
@@ -53,12 +53,12 @@ class ExpandRelatedEntitiesConfigExtraTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsPropagable()
+    public function testIsPropagable(): void
     {
         self::assertFalse($this->extra->isPropagable());
     }
 
-    public function testCacheKeyPart()
+    public function testCacheKeyPart(): void
     {
         self::assertEquals(
             'expand:product,product.owner,category.owner,category',

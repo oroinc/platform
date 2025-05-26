@@ -4,16 +4,15 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Model;
 
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\AttachmentBundle\Model\FileContentProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FileContentProviderTest extends \PHPUnit\Framework\TestCase
+class FileContentProviderTest extends TestCase
 {
-    private const TEST_FILE_NAME = 'some_file.txt';
+    private const string TEST_FILE_NAME = 'some_file.txt';
 
-    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileManager;
-
-    /** @var FileContentProvider */
-    private $fileContentProvider;
+    private FileManager&MockObject $fileManager;
+    private FileContentProvider $fileContentProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +25,7 @@ class FileContentProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetData()
+    public function testGetData(): void
     {
         $data = 'some data';
 

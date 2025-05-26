@@ -25,26 +25,19 @@ use Oro\Bundle\ApiBundle\Request\ApiResourceSubresourcesCollection;
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
+class LoadFromConfigBagTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
-    private $configProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
-    private $metadataProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigBagRegistry */
-    private $configBagRegistry;
-
-    /** @var CollectSubresourcesContext */
-    private $context;
-
-    /** @var LoadFromConfigBag */
-    private $processor;
+    private ConfigProvider&MockObject $configProvider;
+    private MetadataProvider&MockObject $metadataProvider;
+    private ConfigBagRegistry&MockObject $configBagRegistry;
+    private CollectSubresourcesContext $context;
+    private LoadFromConfigBag $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -146,7 +139,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
             ->willReturn($entityMetadata);
     }
 
-    public function testProcessDisabledSubresources()
+    public function testProcessDisabledSubresources(): void
     {
         $entityClass = 'Test\Class';
         $resource = new ApiResource($entityClass);
@@ -170,7 +163,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessResourceWithoutSubresourceConfigs()
+    public function testProcessResourceWithoutSubresourceConfigs(): void
     {
         $entityClass = 'Test\Class';
         $resource = new ApiResource($entityClass);
@@ -200,7 +193,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessResourceWithoutEntityConfig()
+    public function testProcessResourceWithoutEntityConfig(): void
     {
         $entityClass = 'Test\Class';
         $targetEntityClass = 'Test\TargetClass';
@@ -254,7 +247,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessExcludedSubresource()
+    public function testProcessExcludedSubresource(): void
     {
         $entityClass = 'Test\Class';
         $targetEntityClass = 'Test\TargetClass';
@@ -298,7 +291,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessSubresourceCreatedBasedOnAssociation()
+    public function testProcessSubresourceCreatedBasedOnAssociation(): void
     {
         $entityClass = 'Test\Class';
         $targetEntityClass = 'Test\TargetClass';
@@ -352,7 +345,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessSubresourceCreatedBasedOnRenamedAssociation()
+    public function testProcessSubresourceCreatedBasedOnRenamedAssociation(): void
     {
         $entityClass = 'Test\Class';
         $targetEntityClass = 'Test\TargetClass';
@@ -407,7 +400,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessCustomSubresource()
+    public function testProcessCustomSubresource(): void
     {
         $entityClass = 'Test\Class';
         $targetEntityClass = 'Test\TargetClass';
@@ -461,7 +454,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessCustomSubresourceWhenGetActionIsExcluded()
+    public function testProcessCustomSubresourceWhenGetActionIsExcluded(): void
     {
         $entityClass = 'Test\Class';
         $targetEntityClass = 'Test\TargetClass';
@@ -519,7 +512,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessCustomSubresourceWithUnaccessibleTarget()
+    public function testProcessCustomSubresourceWithUnaccessibleTarget(): void
     {
         $entityClass = 'Test\Class';
         $targetEntityClass = 'Test\TargetClass';
@@ -577,7 +570,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessCustomSubresourceWithoutTargetClass()
+    public function testProcessCustomSubresourceWithoutTargetClass(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(
@@ -615,7 +608,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessCustomSubresourceWithEntityIdentifierAndNoAcceptableTargetClassNames()
+    public function testProcessCustomSubresourceWithEntityIdentifierAndNoAcceptableTargetClassNames(): void
     {
         $entityClass = 'Test\Class';
         $targetEntityClass = EntityIdentifier::class;
@@ -670,7 +663,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessCustomSubresourceWhenItIsExcluded()
+    public function testProcessCustomSubresourceWhenItIsExcluded(): void
     {
         $entityClass = 'Test\Class';
         $targetEntityClass = 'Test\TargetClass';
@@ -725,7 +718,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessCustomSubresourceWhenItsActionIsExcludedOnEntityLevel()
+    public function testProcessCustomSubresourceWhenItsActionIsExcludedOnEntityLevel(): void
     {
         $entityClass = 'Test\Class';
         $targetEntityClass = 'Test\TargetClass';
@@ -783,7 +776,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessCustomSubresourceWhenSomeActionsAreExcludedOnEntityLevelButNotActionForThisSubresource()
+    public function testProcessCustomSubresourceWhenSomeActionsAreExcludedOnEntityLevelButNotActionForThisSubres(): void
     {
         $entityClass = 'Test\Class';
         $targetEntityClass = 'Test\TargetClass';

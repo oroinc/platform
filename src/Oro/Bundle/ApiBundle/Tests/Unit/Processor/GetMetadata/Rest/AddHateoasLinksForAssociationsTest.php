@@ -15,15 +15,13 @@ use Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetMetadata\MetadataProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class AddHateoasLinksForAssociationsTest extends MetadataProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|SubresourcesProvider */
-    private $subresourcesProvider;
-
-    /** @var AddHateoasLinksForAssociations */
-    private $processor;
+    private SubresourcesProvider&MockObject $subresourcesProvider;
+    private AddHateoasLinksForAssociations $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -43,13 +41,13 @@ class AddHateoasLinksForAssociationsTest extends MetadataProcessorTestCase
         );
     }
 
-    public function testProcessWhenNotEntityMetadataInResult()
+    public function testProcessWhenNotEntityMetadataInResult(): void
     {
         $this->processor->process($this->context);
         self::assertFalse($this->context->hasResult());
     }
 
-    public function testProcessWhenLinksAlreadyExistsInAssociationMetadata()
+    public function testProcessWhenLinksAlreadyExistsInAssociationMetadata(): void
     {
         $existingSelfLinkMetadata = new ExternalLinkMetadata('url1');
         $existingRelatedLinkMetadata = new ExternalLinkMetadata('url2');
@@ -74,7 +72,7 @@ class AddHateoasLinksForAssociationsTest extends MetadataProcessorTestCase
         self::assertSame($existingRelatedLinkMetadata, $associationMetadata->getRelationshipLink('related'));
     }
 
-    public function testProcessWhenLinksDoNotExistInAssociationMetadata()
+    public function testProcessWhenLinksDoNotExistInAssociationMetadata(): void
     {
         $entityMetadata = new EntityMetadata($this->context->getClassName());
         $associationMetadata = $entityMetadata->addAssociation(new AssociationMetadata('association1'));
@@ -115,7 +113,7 @@ class AddHateoasLinksForAssociationsTest extends MetadataProcessorTestCase
         );
     }
 
-    public function testProcessWhenGetSubresourceActionIsDisabledForAssociation()
+    public function testProcessWhenGetSubresourceActionIsDisabledForAssociation(): void
     {
         $entityMetadata = new EntityMetadata($this->context->getClassName());
         $associationMetadata = $entityMetadata->addAssociation(new AssociationMetadata('association1'));
@@ -146,7 +144,7 @@ class AddHateoasLinksForAssociationsTest extends MetadataProcessorTestCase
         );
     }
 
-    public function testProcessWhenGetRelationshipActionIsDisabledForAssociation()
+    public function testProcessWhenGetRelationshipActionIsDisabledForAssociation(): void
     {
         $entityMetadata = new EntityMetadata($this->context->getClassName());
         $associationMetadata = $entityMetadata->addAssociation(new AssociationMetadata('association1'));
@@ -177,7 +175,7 @@ class AddHateoasLinksForAssociationsTest extends MetadataProcessorTestCase
         );
     }
 
-    public function testProcessWhenAssociationDoesNotHaveSubresources()
+    public function testProcessWhenAssociationDoesNotHaveSubresources(): void
     {
         $entityMetadata = new EntityMetadata($this->context->getClassName());
         $associationMetadata = $entityMetadata->addAssociation(new AssociationMetadata('association1'));
@@ -195,7 +193,7 @@ class AddHateoasLinksForAssociationsTest extends MetadataProcessorTestCase
         self::assertCount(0, $associationMetadata->getRelationshipLinks());
     }
 
-    public function testProcessWhenEntityDoesNotHaveSubresources()
+    public function testProcessWhenEntityDoesNotHaveSubresources(): void
     {
         $entityMetadata = new EntityMetadata($this->context->getClassName());
         $associationMetadata = $entityMetadata->addAssociation(new AssociationMetadata('association1'));

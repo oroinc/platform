@@ -7,14 +7,12 @@ use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntities;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class NormalizeEntitiesTest extends GetListProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectNormalizer */
-    private $objectNormalizer;
-
-    /** @var NormalizeEntities */
-    private $processor;
+    private ObjectNormalizer&MockObject $objectNormalizer;
+    private NormalizeEntities $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +24,7 @@ class NormalizeEntitiesTest extends GetListProcessorTestCase
         $this->processor = new NormalizeEntities($this->objectNormalizer);
     }
 
-    public function testProcessWhenNoData()
+    public function testProcessWhenNoData(): void
     {
         $this->objectNormalizer->expects(self::never())
             ->method('normalizeObjects');
@@ -35,7 +33,7 @@ class NormalizeEntitiesTest extends GetListProcessorTestCase
         self::assertFalse($this->context->hasResult());
     }
 
-    public function testProcessWhenEmptyData()
+    public function testProcessWhenEmptyData(): void
     {
         $this->objectNormalizer->expects(self::never())
             ->method('normalizeObjects');
@@ -45,7 +43,7 @@ class NormalizeEntitiesTest extends GetListProcessorTestCase
         self::assertSame([], $this->context->getResult());
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $data = [new \stdClass()];
         $normalizedData = [['key' => 'value']];
@@ -62,7 +60,7 @@ class NormalizeEntitiesTest extends GetListProcessorTestCase
         self::assertSame($normalizedData, $this->context->getResult());
     }
 
-    public function testProcessWithNormalizedConfig()
+    public function testProcessWithNormalizedConfig(): void
     {
         $data = [new \stdClass()];
         $normalizedData = [['key' => 'value']];

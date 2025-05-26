@@ -5,8 +5,9 @@ namespace Oro\Component\EntitySerializer\Tests\Unit;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Component\EntitySerializer\AssociationQuery;
 use Oro\Component\EntitySerializer\ConfigConverter;
+use PHPUnit\Framework\TestCase;
 
-class ConfigConverterTest extends \PHPUnit\Framework\TestCase
+class ConfigConverterTest extends TestCase
 {
     /**
      * @dataProvider convertConfigProvider
@@ -15,7 +16,7 @@ class ConfigConverterTest extends \PHPUnit\Framework\TestCase
     {
         $configConverter = new ConfigConverter();
 
-        $this->assertEquals(
+        self::assertEquals(
             $expectedConfig,
             $configConverter->convertConfig($config)->toArray()
         );
@@ -288,7 +289,7 @@ class ConfigConverterTest extends \PHPUnit\Framework\TestCase
         $configConverter = new ConfigConverter();
         $convertedConfig = $configConverter->convertConfig($config);
 
-        $this->assertSame(
+        self::assertSame(
             $associationQuery,
             $convertedConfig->getField($associationName)->get('association_query')
         );

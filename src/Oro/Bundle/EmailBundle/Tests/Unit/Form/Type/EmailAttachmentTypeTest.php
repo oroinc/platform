@@ -9,21 +9,18 @@ use Oro\Bundle\EmailBundle\Entity\EmailAttachment as EmailAttachmentEntity;
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentType;
 use Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class EmailAttachmentTypeTest extends \PHPUnit\Framework\TestCase
+class EmailAttachmentTypeTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var EmailAttachmentTransformer|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailAttachmentTransformer;
-
-    /** @var EmailAttachmentType */
-    private $emailAttachmentType;
+    private ManagerRegistry&MockObject $doctrine;
+    private EmailAttachmentTransformer&MockObject $emailAttachmentTransformer;
+    private EmailAttachmentType $emailAttachmentType;
 
     #[\Override]
     protected function setUp(): void
@@ -34,7 +31,7 @@ class EmailAttachmentTypeTest extends \PHPUnit\Framework\TestCase
         $this->emailAttachmentType = new EmailAttachmentType($this->doctrine, $this->emailAttachmentTransformer);
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
@@ -50,7 +47,7 @@ class EmailAttachmentTypeTest extends \PHPUnit\Framework\TestCase
         $type->configureOptions($resolver);
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $builder = $this->createMock(FormBuilder::class);
         $builder->expects($this->exactly(3))
@@ -71,7 +68,7 @@ class EmailAttachmentTypeTest extends \PHPUnit\Framework\TestCase
         $repoReturnObject,
         $attachmentEntityToEntityCalls,
         $entityFromUploadedFileCalls
-    ) {
+    ): void {
         $attachment = $this->createMock(EmailAttachment::class);
         $attachment->expects($this->once())
             ->method('setEmailAttachment');

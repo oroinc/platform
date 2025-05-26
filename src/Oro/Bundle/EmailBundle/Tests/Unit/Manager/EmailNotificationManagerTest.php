@@ -17,22 +17,19 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class EmailNotificationManagerTest extends \PHPUnit\Framework\TestCase
+class EmailNotificationManagerTest extends TestCase
 {
-    /** @var EmailRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
-
-    /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $urlGenerator;
-
-    /** @var EmailNotificationManager */
-    private $emailNotificationManager;
+    private EmailRepository&MockObject $repository;
+    private UrlGeneratorInterface&MockObject $urlGenerator;
+    private EmailNotificationManager $emailNotificationManager;
 
     #[\Override]
     protected function setUp(): void

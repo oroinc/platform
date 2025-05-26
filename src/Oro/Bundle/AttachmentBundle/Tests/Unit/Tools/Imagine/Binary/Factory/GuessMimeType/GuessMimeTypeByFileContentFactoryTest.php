@@ -5,18 +5,15 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Tools\Imagine\Binary\Factory\Gu
 use Liip\ImagineBundle\Binary\MimeTypeGuesserInterface;
 use Liip\ImagineBundle\Model\Binary;
 use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\GuessMimeType\GuessMimeTypeByFileContentFactory;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\MimeTypesInterface;
 
-class GuessMimeTypeByFileContentFactoryTest extends \PHPUnit\Framework\TestCase
+class GuessMimeTypeByFileContentFactoryTest extends TestCase
 {
-    /** @var MimeTypeGuesserInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $mimeTypeGuesser;
-
-    /** @var MimeTypesInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $mimeTypes;
-
-    /** @var GuessMimeTypeByFileContentFactory */
-    private $factory;
+    private MimeTypeGuesserInterface&MockObject $mimeTypeGuesser;
+    private MimeTypesInterface&MockObject $mimeTypes;
+    private GuessMimeTypeByFileContentFactory $factory;
 
     #[\Override]
     protected function setUp(): void

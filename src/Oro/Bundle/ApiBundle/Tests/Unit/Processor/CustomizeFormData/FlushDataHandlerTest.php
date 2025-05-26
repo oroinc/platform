@@ -32,11 +32,10 @@ use Symfony\Component\Form\FormInterface;
  */
 class FlushDataHandlerTest extends TestCase
 {
-    private CustomizeFormDataEventDispatcher|MockObject $customizeFormDataEventDispatcher;
-    private ProcessorInterface|MockObject $formErrorsCollector;
-    private ProcessorInterface|MockObject $formErrorsCollectorForSubresource;
-    private LoggerInterface|MockObject $logger;
-
+    private CustomizeFormDataEventDispatcher&MockObject $customizeFormDataEventDispatcher;
+    private ProcessorInterface&MockObject $formErrorsCollector;
+    private ProcessorInterface&MockObject $formErrorsCollectorForSubresource;
+    private LoggerInterface&MockObject $logger;
     private FlushDataHandler $handler;
 
     #[\Override]
@@ -70,7 +69,7 @@ class FlushDataHandlerTest extends TestCase
         ?FormInterface $form,
         ?IncludedEntityCollection $itemIncludedEntities = null,
         bool $noHasErrorsExpectation = false
-    ): FormContext {
+    ): FormContext&MockObject {
         $context = $this->createMock(FormContext::class);
         $context->expects(self::any())
             ->method('getForm')
@@ -128,7 +127,7 @@ class FlushDataHandlerTest extends TestCase
 
     private function expectsFlush(
         array &$calls,
-        EntityManagerInterface|MockObject $em,
+        EntityManagerInterface&MockObject $em,
         ?\Throwable $exception = null
     ): void {
         $connection = $this->createMock(Connection::class);
@@ -661,10 +660,8 @@ class FlushDataHandlerTest extends TestCase
     public function testFlushDataWhenFormErrorsAddedInPreFlushDataHandlers(): void
     {
         $form1 = $this->getForm();
-        /** @var FormContext|MockObject $entityContext1 */
         $entityContext1 = $this->getFormContext($form1, null, true);
         $form2 = $this->getForm();
-        /** @var FormContext|MockObject $entityContext2 */
         $entityContext2 = $this->getFormContext($form2, null, true);
 
         $entityContext1->expects(self::once())
@@ -727,10 +724,8 @@ class FlushDataHandlerTest extends TestCase
     public function testFlushDataWhenFormErrorsAddedInPostFlushDataHandlers(): void
     {
         $form1 = $this->getForm();
-        /** @var FormContext|MockObject $entityContext1 */
         $entityContext1 = $this->getFormContext($form1, null, true);
         $form2 = $this->getForm();
-        /** @var FormContext|MockObject $entityContext2 */
         $entityContext2 = $this->getFormContext($form2, null, true);
 
         $entityContext1->expects(self::exactly(2))
@@ -799,10 +794,8 @@ class FlushDataHandlerTest extends TestCase
     public function testFlushDataWhenFormErrorsAddedInPostSaveDataHandlers(): void
     {
         $form1 = $this->getForm();
-        /** @var FormContext|MockObject $entityContext1 */
         $entityContext1 = $this->getFormContext($form1, null, true);
         $form2 = $this->getForm();
-        /** @var FormContext|MockObject $entityContext2 */
         $entityContext2 = $this->getFormContext($form2, null, true);
 
         $entityContext1->expects(self::exactly(2))
@@ -1253,7 +1246,6 @@ class FlushDataHandlerTest extends TestCase
     {
         $form1 = $this->getForm();
 
-        /** @var FormContext|MockObject $entityContext1 */
         $entityContext1 = $this->getFormContext($form1);
         $entityContext1->expects(self::once())
             ->method('get')

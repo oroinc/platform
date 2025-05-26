@@ -12,19 +12,16 @@ use Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class AddHateoasLinksTest extends GetProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|UrlGeneratorInterface */
-    private $urlGenerator;
+    private UrlGeneratorInterface&MockObject $urlGenerator;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
-    private $resourcesProvider;
-
-    /** @var AddHateoasLinks */
-    private $processor;
+    private ResourcesProvider&MockObject $resourcesProvider;
+    private AddHateoasLinks $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -46,7 +43,7 @@ class AddHateoasLinksTest extends GetProcessorTestCase
         );
     }
 
-    public function testProcessWhenNoDocumentBuilder()
+    public function testProcessWhenNoDocumentBuilder(): void
     {
         $this->resourcesProvider->expects(self::never())
             ->method('getResourceExcludeActions');
@@ -56,7 +53,7 @@ class AddHateoasLinksTest extends GetProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForNotSuccessResponse()
+    public function testProcessForNotSuccessResponse(): void
     {
         $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
 
@@ -74,7 +71,7 @@ class AddHateoasLinksTest extends GetProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForSuccessResponse()
+    public function testProcessForSuccessResponse(): void
     {
         $entityClass = 'Test\Entity';
         $entityAlias = 'test_entity';
@@ -107,7 +104,7 @@ class AddHateoasLinksTest extends GetProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForSuccessResponseButGetListActionIsDisabled()
+    public function testProcessForSuccessResponseButGetListActionIsDisabled(): void
     {
         $entityClass = 'Test\Entity';
         $documentBuilder = $this->createMock(DocumentBuilderInterface::class);

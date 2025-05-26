@@ -19,7 +19,7 @@ use Twig\Source;
 
 class DatabaseEmailTemplateLoaderTest extends TestCase
 {
-    private const LOCALIZATION_ID = 42;
+    private const int LOCALIZATION_ID = 42;
 
     private TranslatedEmailTemplateProvider&MockObject $translatedEmailTemplateProvider;
     private EmailTemplateRepository&MockObject $emailTemplateRepo;

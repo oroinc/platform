@@ -12,7 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CaptchaProtectedFormSelectTypeTest extends TypeTestCase
 {
-    private CaptchaProtectedFormsRegistry|MockObject $formsRegistry;
+    private CaptchaProtectedFormsRegistry&MockObject $formsRegistry;
 
     #[\Override]
     protected function setUp(): void

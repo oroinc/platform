@@ -10,14 +10,12 @@ use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\EntityMetadataFactory;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\MetadataHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class EntityMetadataFactoryTest extends LoaderTestCase
 {
-    /** @var MetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $metadataFactory;
-
-    /** @var EntityMetadataFactory */
-    private $entityMetadataFactory;
+    private MetadataFactory&MockObject $metadataFactory;
+    private EntityMetadataFactory $entityMetadataFactory;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +28,7 @@ class EntityMetadataFactoryTest extends LoaderTestCase
         );
     }
 
-    public function testCreateAndAddMetaPropertyMetadata()
+    public function testCreateAndAddMetaPropertyMetadata(): void
     {
         $entityMetadata = new EntityMetadata('Test\Entity');
         $field = new EntityDefinitionFieldConfig();
@@ -58,7 +56,7 @@ class EntityMetadataFactoryTest extends LoaderTestCase
         self::assertEquals($expected, $result);
     }
 
-    public function testCreateAndAddMetaPropertyMetadataWhenResultNameExistsInConfig()
+    public function testCreateAndAddMetaPropertyMetadataWhenResultNameExistsInConfig(): void
     {
         $entityMetadata = new EntityMetadata('Test\Entity');
         $field = new EntityDefinitionFieldConfig();
@@ -86,7 +84,7 @@ class EntityMetadataFactoryTest extends LoaderTestCase
         self::assertEquals($expected, $result);
     }
 
-    public function testCreateAndAddFieldMetadata()
+    public function testCreateAndAddFieldMetadata(): void
     {
         $entityMetadata = new EntityMetadata('Test\Entity');
         $entityMetadata->setIdentifierFieldNames(['id']);
@@ -118,7 +116,7 @@ class EntityMetadataFactoryTest extends LoaderTestCase
         self::assertEquals($expected, $result);
     }
 
-    public function testCreateAndAddAssociationMetadata()
+    public function testCreateAndAddAssociationMetadata(): void
     {
         $entityMetadata = new EntityMetadata('Test\Entity');
         $field = new EntityDefinitionFieldConfig();

@@ -6,8 +6,9 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestMetadataExtra;
+use PHPUnit\Framework\TestCase;
 
-class MetadataContextTest extends \PHPUnit\Framework\TestCase
+class MetadataContextTest extends TestCase
 {
     private MetadataContext $context;
 
@@ -17,7 +18,7 @@ class MetadataContextTest extends \PHPUnit\Framework\TestCase
         $this->context = new MetadataContext();
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         self::assertTrue($this->context->has('requestType'));
 
@@ -25,14 +26,14 @@ class MetadataContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $this->context->get('extra'));
     }
 
-    public function testClassName()
+    public function testClassName(): void
     {
         $this->context->setClassName('test');
         self::assertEquals('test', $this->context->getClassName());
         self::assertEquals('test', $this->context->get('class'));
     }
 
-    public function testTargetAction()
+    public function testTargetAction(): void
     {
         self::assertNull($this->context->getTargetAction());
         self::assertFalse($this->context->has('targetAction'));
@@ -47,7 +48,7 @@ class MetadataContextTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->context->has('targetAction'));
     }
 
-    public function testParentAction()
+    public function testParentAction(): void
     {
         self::assertNull($this->context->getParentAction());
         self::assertTrue($this->context->has('parentAction'));
@@ -64,14 +65,14 @@ class MetadataContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame('', $this->context->get('parentAction'));
     }
 
-    public function testConfig()
+    public function testConfig(): void
     {
         $config = new EntityDefinitionConfig();
         $this->context->setConfig($config);
         self::assertSame($config, $this->context->getConfig());
     }
 
-    public function testExtras()
+    public function testExtras(): void
     {
         self::assertSame([], $this->context->getExtras());
         self::assertFalse($this->context->hasExtra('test'));
@@ -87,7 +88,7 @@ class MetadataContextTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->context->hasExtra('test'));
     }
 
-    public function testSetExtras()
+    public function testSetExtras(): void
     {
         $extra = $this->createMock(MetadataExtraInterface::class);
         $extra->expects(self::once())
@@ -101,7 +102,7 @@ class MetadataContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['test'], $this->context->get('extra'));
     }
 
-    public function testSetInvalidExtras()
+    public function testSetInvalidExtras(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -111,7 +112,7 @@ class MetadataContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setExtras([new \stdClass()]);
     }
 
-    public function testWithExcludedProperties()
+    public function testWithExcludedProperties(): void
     {
         self::assertFalse($this->context->getWithExcludedProperties());
 

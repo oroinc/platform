@@ -4,14 +4,15 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Model;
 
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\FormBundle\Model\AutocompleteRequest;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-class AutocompleteRequestTest extends \PHPUnit\Framework\TestCase
+class AutocompleteRequestTest extends TestCase
 {
     /**
      * @dataProvider createDataProvider
      */
-    public function testCreate(Request $request, array $expected)
+    public function testCreate(Request $request, array $expected): void
     {
         $autocompleteRequest = new AutocompleteRequest($request);
 

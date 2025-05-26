@@ -8,14 +8,13 @@ use Laminas\Mail\Headers;
 use Laminas\Mail\Storage\Part;
 use Oro\Bundle\ImapBundle\Mail\Storage\Body;
 use Oro\Bundle\ImapBundle\Mail\Storage\Content;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class BodyTest extends \PHPUnit\Framework\TestCase
+class BodyTest extends TestCase
 {
-    /** @var Part|\PHPUnit\Framework\MockObject\MockObject */
-    private $part;
-
-    /** @var Body */
-    private $body;
+    private Part&MockObject $part;
+    private Body $body;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +24,7 @@ class BodyTest extends \PHPUnit\Framework\TestCase
         $this->body = new Body($this->part);
     }
 
-    public function testGetHeaders()
+    public function testGetHeaders(): void
     {
         $headers = $this->createMock(Headers::class);
         $headers->expects($this->any())
@@ -44,7 +43,7 @@ class BodyTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($headers, $result);
     }
 
-    public function testGetHeader()
+    public function testGetHeader(): void
     {
         $header = $this->createMock(Headers::class);
         $header->expects($this->any())
@@ -64,7 +63,7 @@ class BodyTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($header, $result);
     }
 
-    public function testGetContentSinglePartText()
+    public function testGetContentSinglePartText(): void
     {
         $contentValue = 'testContent';
         $contentType = 'type/testContentType';
@@ -82,7 +81,7 @@ class BodyTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testGetContentSinglePartHtml()
+    public function testGetContentSinglePartHtml(): void
     {
         $contentValue = '<p>testContent</p>';
         $contentType = 'type/testContentType';
@@ -100,7 +99,7 @@ class BodyTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testGetContentMultipartText()
+    public function testGetContentMultipartText(): void
     {
         $this->part->expects($this->any())
             ->method('isMultipart')
@@ -135,7 +134,7 @@ class BodyTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function mockIterator(\PHPUnit\Framework\MockObject\MockObject $obj, $iterationResult1, $iterationResult2)
+    private function mockIterator(MockObject $obj, $iterationResult1, $iterationResult2)
     {
         $obj->expects($this->exactly(3))
             ->method('current')
@@ -150,7 +149,7 @@ class BodyTest extends \PHPUnit\Framework\TestCase
     }
 
     private function preparePartMock(
-        \PHPUnit\Framework\MockObject\MockObject $obj,
+        MockObject $obj,
         $contentValue,
         $contentType,
         $contentTransferEncoding,

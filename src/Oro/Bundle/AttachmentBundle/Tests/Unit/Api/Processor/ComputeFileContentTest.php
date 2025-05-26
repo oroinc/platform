@@ -8,18 +8,14 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeLoadedData\CustomizeLoade
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\AttachmentBundle\Api\Processor\ComputeFileContent;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
 class ComputeFileContentTest extends CustomizeLoadedDataProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $fileManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var ComputeFileContent */
-    private $processor;
+    private FileManager&MockObject $fileManager;
+    private LoggerInterface&MockObject $logger;
+    private ComputeFileContent $processor;
 
     #[\Override]
     protected function setUp(): void

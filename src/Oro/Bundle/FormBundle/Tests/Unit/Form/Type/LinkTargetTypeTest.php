@@ -3,13 +3,13 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\LinkTargetType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class LinkTargetTypeTest extends \PHPUnit\Framework\TestCase
+class LinkTargetTypeTest extends TestCase
 {
-    /** @var LinkTargetType */
-    private $type;
+    private LinkTargetType $type;
 
     #[\Override]
     protected function setUp(): void

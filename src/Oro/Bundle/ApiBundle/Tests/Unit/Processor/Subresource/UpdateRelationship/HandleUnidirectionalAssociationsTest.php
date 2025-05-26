@@ -8,15 +8,13 @@ use Oro\Bundle\ApiBundle\Form\Handler\UnidirectionalAssociationHandler;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\UnidirectionalAssociationCompleter;
 use Oro\Bundle\ApiBundle\Processor\Subresource\UpdateRelationship\HandleUnidirectionalAssociations;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\FormInterface;
 
 class HandleUnidirectionalAssociationsTest extends ChangeRelationshipProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|UnidirectionalAssociationHandler */
-    private $handler;
-
-    /** @var HandleUnidirectionalAssociations */
-    private $processor;
+    private UnidirectionalAssociationHandler&MockObject $handler;
+    private HandleUnidirectionalAssociations $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +26,7 @@ class HandleUnidirectionalAssociationsTest extends ChangeRelationshipProcessorTe
         $this->processor = new HandleUnidirectionalAssociations($this->handler);
     }
 
-    public function testProcessWhenNoParentConfig()
+    public function testProcessWhenNoParentConfig(): void
     {
         $this->handler->expects(self::never())
             ->method('handleUpdate');
@@ -40,7 +38,7 @@ class HandleUnidirectionalAssociationsTest extends ChangeRelationshipProcessorTe
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenNoUnidirectionalAssociations()
+    public function testProcessWhenNoUnidirectionalAssociations(): void
     {
         $parentConfig = new EntityDefinitionConfig();
 
@@ -53,7 +51,7 @@ class HandleUnidirectionalAssociationsTest extends ChangeRelationshipProcessorTe
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenCurrentAssociationIsNotUnidirectionalAssociation()
+    public function testProcessWhenCurrentAssociationIsNotUnidirectionalAssociation(): void
     {
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->set(
@@ -70,7 +68,7 @@ class HandleUnidirectionalAssociationsTest extends ChangeRelationshipProcessorTe
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithUnidirectionalAssociations()
+    public function testProcessWithUnidirectionalAssociations(): void
     {
         $parentConfig = new EntityDefinitionConfig();
         $parentConfig->set(

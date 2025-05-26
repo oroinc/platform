@@ -4,9 +4,10 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\FormBundle\DependencyInjection\Configuration;
 use Oro\Bundle\FormBundle\DependencyInjection\OroFormExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroFormExtensionTest extends \PHPUnit\Framework\TestCase
+class OroFormExtensionTest extends TestCase
 {
     public function testLoad(): void
     {

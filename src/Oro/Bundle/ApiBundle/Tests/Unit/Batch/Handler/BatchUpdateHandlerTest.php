@@ -16,21 +16,16 @@ use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
+use PHPUnit\Framework\TestCase;
 
-class BatchUpdateHandlerTest extends \PHPUnit\Framework\TestCase
+class BatchUpdateHandlerTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|BatchUpdateProcessor */
-    private $processor;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|BatchUpdateItemProcessor */
-    private $itemProcessor;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FileManager */
-    private $fileManager;
-
-    /** @var BatchUpdateHandler */
-    private $handler;
+    private BatchUpdateProcessor&MockObject $processor;
+    private BatchUpdateItemProcessor&MockObject $itemProcessor;
+    private FileManager&MockObject $fileManager;
+    private BatchUpdateHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -48,7 +43,7 @@ class BatchUpdateHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler = new BatchUpdateHandler($this->processor, $this->itemProcessor);
     }
 
-    private function assertBatchUpdateContext(BatchUpdateContext $context, BatchUpdateRequest $request)
+    private function assertBatchUpdateContext(BatchUpdateContext $context, BatchUpdateRequest $request): void
     {
         self::assertEquals($request->getVersion(), $context->getVersion());
         self::assertEquals($request->getRequestType(), $context->getRequestType());
@@ -59,7 +54,7 @@ class BatchUpdateHandlerTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($context->isSoftErrorsHandling());
     }
 
-    public function testHandle()
+    public function testHandle(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -142,7 +137,7 @@ class BatchUpdateHandlerTest extends \PHPUnit\Framework\TestCase
         self::assertSame(0, $response->getSummary()->getUpdateCount(), 'Summary.UpdateCount');
     }
 
-    public function testHandleWhenInitializeGroupFoundsErrors()
+    public function testHandleWhenInitializeGroupFoundsErrors(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -191,7 +186,7 @@ class BatchUpdateHandlerTest extends \PHPUnit\Framework\TestCase
         self::assertSame(0, $response->getSummary()->getUpdateCount(), 'Summary.UpdateCount');
     }
 
-    public function testHandleWhenInitializeGroupRequestsRetry()
+    public function testHandleWhenInitializeGroupRequestsRetry(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -239,7 +234,7 @@ class BatchUpdateHandlerTest extends \PHPUnit\Framework\TestCase
         self::assertSame(0, $response->getSummary()->getUpdateCount(), 'Summary.UpdateCount');
     }
 
-    public function testHandleWhenSaveDataGroupFoundsErrors()
+    public function testHandleWhenSaveDataGroupFoundsErrors(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -316,7 +311,7 @@ class BatchUpdateHandlerTest extends \PHPUnit\Framework\TestCase
         self::assertSame(0, $response->getSummary()->getUpdateCount(), 'Summary.UpdateCount');
     }
 
-    public function testHandleWhenSaveDataGroupRequestsRetry()
+    public function testHandleWhenSaveDataGroupRequestsRetry(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -393,7 +388,7 @@ class BatchUpdateHandlerTest extends \PHPUnit\Framework\TestCase
         self::assertSame(0, $response->getSummary()->getUpdateCount(), 'Summary.UpdateCount');
     }
 
-    public function testHandleWhenInitializeItemGroupFoundsErrors()
+    public function testHandleWhenInitializeItemGroupFoundsErrors(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);

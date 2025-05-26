@@ -6,6 +6,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Validator\Constraints\MailboxOrigin;
 use Oro\Bundle\EmailBundle\Validator\Constraints\MailboxOriginValidator;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -13,8 +14,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MailboxOriginValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
+    private TranslatorInterface&MockObject $translator;
 
     #[\Override]
     protected function setUp(): void

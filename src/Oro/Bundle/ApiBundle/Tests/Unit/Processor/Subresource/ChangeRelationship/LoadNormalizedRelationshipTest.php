@@ -17,17 +17,13 @@ use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Component\ChainProcessor\ParameterBag;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class LoadNormalizedRelationshipTest extends ChangeRelationshipProcessorTestCase
 {
-    /** @var ActionProcessorBagInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $processorBag;
-
-    /** @var ParameterBag */
-    private $sharedData;
-
-    /** @var LoadNormalizedRelationship */
-    private $processor;
+    private ActionProcessorBagInterface&MockObject $processorBag;
+    private ParameterBag $sharedData;
+    private LoadNormalizedRelationship $processor;
 
     #[\Override]
     protected function setUp(): void

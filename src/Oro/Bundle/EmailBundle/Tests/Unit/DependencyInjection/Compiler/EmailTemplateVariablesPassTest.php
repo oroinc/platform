@@ -3,18 +3,19 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailTemplateVariablesPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class EmailTemplateVariablesPassTest extends \PHPUnit\Framework\TestCase
+class EmailTemplateVariablesPassTest extends TestCase
 {
-    private const CHAIN_PROVIDER_SERVICE = 'oro_email.emailtemplate.variable_provider';
-    private const PROVIDER_TAG           = 'oro_email.emailtemplate.variable_provider';
+    private const string CHAIN_PROVIDER_SERVICE = 'oro_email.emailtemplate.variable_provider';
+    private const string PROVIDER_TAG = 'oro_email.emailtemplate.variable_provider';
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $chainProvider = $container->register(self::CHAIN_PROVIDER_SERVICE)
@@ -59,7 +60,7 @@ class EmailTemplateVariablesPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessForProviderWithoutScope()
+    public function testProcessForProviderWithoutScope(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -77,7 +78,7 @@ class EmailTemplateVariablesPassTest extends \PHPUnit\Framework\TestCase
         $compiler->process($container);
     }
 
-    public function testProcessForProviderWithInvalidScope()
+    public function testProcessForProviderWithInvalidScope(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(

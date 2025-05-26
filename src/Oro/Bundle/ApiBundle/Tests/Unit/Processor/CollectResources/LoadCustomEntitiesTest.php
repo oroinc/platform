@@ -9,14 +9,13 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LoadCustomEntitiesTest extends \PHPUnit\Framework\TestCase
+class LoadCustomEntitiesTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
-    private $configManager;
-
-    /** @var LoadCustomEntities */
-    private $processor;
+    private ConfigManager&MockObject $configManager;
+    private LoadCustomEntities $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +34,7 @@ class LoadCustomEntitiesTest extends \PHPUnit\Framework\TestCase
         return $config;
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $context = new CollectResourcesContext();
 

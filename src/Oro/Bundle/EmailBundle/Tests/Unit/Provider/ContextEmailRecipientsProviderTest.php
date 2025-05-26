@@ -7,14 +7,13 @@ use Oro\Bundle\EmailBundle\Model\Recipient;
 use Oro\Bundle\EmailBundle\Provider\ContextEmailRecipientsProvider;
 use Oro\Bundle\EmailBundle\Provider\RelatedEmailsProvider;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ContextEmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
+class ContextEmailRecipientsProviderTest extends TestCase
 {
-    /** @var RelatedEmailsProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $relatedEmailsProvider;
-
-    /** @var ContextEmailRecipientsProvider */
-    private $emailRecipientsProvider;
+    private RelatedEmailsProvider&MockObject $relatedEmailsProvider;
+    private ContextEmailRecipientsProvider $emailRecipientsProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -24,12 +23,12 @@ class ContextEmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
         $this->emailRecipientsProvider = new ContextEmailRecipientsProvider($this->relatedEmailsProvider);
     }
 
-    public function testGetSectionShouldReturnContextSection()
+    public function testGetSectionShouldReturnContextSection(): void
     {
         $this->assertEquals('oro.email.autocomplete.contexts', $this->emailRecipientsProvider->getSection());
     }
 
-    public function testGetRecipientsShouldReturnEmptyArrayIfRelatedEntityIsNull()
+    public function testGetRecipientsShouldReturnEmptyArrayIfRelatedEntityIsNull(): void
     {
         $args = new EmailRecipientsProviderArgs(null, 'em', 100);
         $this->assertEmpty($this->emailRecipientsProvider->getRecipients($args));
@@ -42,7 +41,7 @@ class ContextEmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
         EmailRecipientsProviderArgs $args,
         array $relatedEmails,
         array $expectedRecipients
-    ) {
+    ): void {
         $this->relatedEmailsProvider->expects($this->once())
             ->method('getRecipients')
             ->willReturn($relatedEmails);

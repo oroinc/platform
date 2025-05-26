@@ -9,23 +9,15 @@ use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\EntityMetadataLoader;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataLoader;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\LoadMetadata;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class LoadMetadataTest extends MetadataProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectMetadataLoader */
-    private $objectMetadataLoader;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityMetadataLoader */
-    private $entityMetadataLoader;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AssociationMetadataLoader */
-    private $associationMetadataLoader;
-
-    /** @var LoadMetadata */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private ObjectMetadataLoader&MockObject $objectMetadataLoader;
+    private EntityMetadataLoader&MockObject $entityMetadataLoader;
+    private AssociationMetadataLoader&MockObject $associationMetadataLoader;
+    private LoadMetadata $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -45,7 +37,7 @@ class LoadMetadataTest extends MetadataProcessorTestCase
         );
     }
 
-    public function testProcessForAlreadyLoadedMetadata()
+    public function testProcessForAlreadyLoadedMetadata(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
 
@@ -58,7 +50,7 @@ class LoadMetadataTest extends MetadataProcessorTestCase
         self::assertSame($metadata, $this->context->getResult());
     }
 
-    public function testProcessForNotManageableEntityWithoutFieldsInConfig()
+    public function testProcessForNotManageableEntityWithoutFieldsInConfig(): void
     {
         $config = new EntityDefinitionConfig();
 
@@ -92,7 +84,7 @@ class LoadMetadataTest extends MetadataProcessorTestCase
         self::assertSame($entityMetadata, $this->context->getResult());
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessForNotManageableEntity(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('field1');
@@ -128,7 +120,7 @@ class LoadMetadataTest extends MetadataProcessorTestCase
         self::assertSame($entityMetadata, $this->context->getResult());
     }
 
-    public function testProcessForManageableEntity()
+    public function testProcessForManageableEntity(): void
     {
         $config = new EntityDefinitionConfig();
 

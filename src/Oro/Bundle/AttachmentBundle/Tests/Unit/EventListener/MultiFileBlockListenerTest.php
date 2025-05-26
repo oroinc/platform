@@ -13,25 +13,21 @@ use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
 use Oro\Bundle\UIBundle\Event\BeforeViewRenderEvent;
 use Oro\Bundle\UIBundle\Twig\UiExtension;
 use Oro\Bundle\UIBundle\View\ScrollData;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormView;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
+class MultiFileBlockListenerTest extends TestCase
 {
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var AttributeManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $attributeManager;
-
-    /** @var MultiFileBlockListener */
-    private $listener;
+    private TranslatorInterface&MockObject $translator;
+    private ConfigProvider&MockObject $configProvider;
+    private AttributeManager&MockObject $attributeManager;
+    private MultiFileBlockListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -47,7 +43,7 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnBeforeValueRender()
+    public function testOnBeforeValueRender(): void
     {
         $entity = new TestEntity1();
         $fieldValue = 'value1';
@@ -61,7 +57,7 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('value1', $event->getFieldViewValue());
     }
 
-    public function testOnBeforeValueRenderWithMultiFile()
+    public function testOnBeforeValueRenderWithMultiFile(): void
     {
         $entity = new TestEntity1();
         $fieldValue = 'value1';
@@ -75,7 +71,7 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('value1', $event->getFieldViewValue());
     }
 
-    public function testOnBeforeValueRenderWithMultiImage()
+    public function testOnBeforeValueRenderWithMultiImage(): void
     {
         $entity = new TestEntity1();
         $fieldValue = 'value1';
@@ -89,7 +85,7 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('value1', $event->getFieldViewValue());
     }
 
-    public function testOnBeforeValueRenderWithFile()
+    public function testOnBeforeValueRenderWithFile(): void
     {
         $entity = new TestEntity1();
         $fieldValue = 'value1';
@@ -111,7 +107,7 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnBeforeValueRenderWithImage()
+    public function testOnBeforeValueRenderWithImage(): void
     {
         $entity = new TestEntity1();
         $fieldValue = 'value1';
@@ -133,10 +129,10 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnBeforeViewRenderWithotEntity()
+    public function testOnBeforeViewRenderWithotEntity(): void
     {
         $event = new BeforeViewRenderEvent(
-            $this->createMock(\Twig\Environment::class),
+            $this->createMock(Environment::class),
             [],
             null
         );
@@ -155,10 +151,10 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $event->getData());
     }
 
-    public function testOnBeforeViewRenderWithoutConfigs()
+    public function testOnBeforeViewRenderWithoutConfigs(): void
     {
         $event = new BeforeViewRenderEvent(
-            $this->createMock(\Twig\Environment::class),
+            $this->createMock(Environment::class),
             [],
             new TestEntity1()
         );
@@ -181,9 +177,9 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testOnBeforeViewRender()
+    public function testOnBeforeViewRender(): void
     {
-        $twig = $this->createMock(\Twig\Environment::class);
+        $twig = $this->createMock(Environment::class);
 
         $entity = new TestEntity1();
 
@@ -303,12 +299,12 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnBeforeFormRenderWithoutEntity()
+    public function testOnBeforeFormRenderWithoutEntity(): void
     {
         $event = new BeforeFormRenderEvent(
             $this->createMock(FormView::class),
             [],
-            $this->createMock(\Twig\Environment::class),
+            $this->createMock(Environment::class),
             null
         );
 
@@ -326,12 +322,12 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([], $event->getFormData());
     }
 
-    public function testOnBeforeFormRenderWithoutConfigs()
+    public function testOnBeforeFormRenderWithoutConfigs(): void
     {
         $event = new BeforeFormRenderEvent(
             $this->createMock(FormView::class),
             [],
-            $this->createMock(\Twig\Environment::class),
+            $this->createMock(Environment::class),
             new TestEntity1()
         );
 
@@ -353,12 +349,12 @@ class MultiFileBlockListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider onBeforeFormRenderProvider
      */
-    public function testOnBeforeFormRender(array $inputData, array $expectedResult)
+    public function testOnBeforeFormRender(array $inputData, array $expectedResult): void
     {
         $event = new BeforeFormRenderEvent(
             $this->createMock(FormView::class),
             $inputData,
-            $this->createMock(\Twig\Environment::class),
+            $this->createMock(Environment::class),
             new TestEntity1()
         );
 

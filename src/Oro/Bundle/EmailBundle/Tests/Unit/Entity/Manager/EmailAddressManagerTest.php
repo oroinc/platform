@@ -7,14 +7,13 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailAddressProxy;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EmailAddressManagerTest extends \PHPUnit\Framework\TestCase
+class EmailAddressManagerTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var EmailAddressManager */
-    private $emailAddressManager;
+    private ManagerRegistry&MockObject $doctrine;
+    private EmailAddressManager $emailAddressManager;
 
     #[\Override]
     protected function setUp(): void

@@ -4,13 +4,13 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\Provider\EmailEntityAliasProvider;
+use PHPUnit\Framework\TestCase;
 
-class EmailEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
+class EmailEntityAliasProviderTest extends TestCase
 {
-    private const EMAIL_ADDRESS_PROXY_CLASS = 'Test\EmailAddressProxy';
+    private const string EMAIL_ADDRESS_PROXY_CLASS = 'Test\EmailAddressProxy';
 
-    /** @var EmailEntityAliasProvider */
-    private $entityAliasProvider;
+    private EmailEntityAliasProvider $entityAliasProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +23,7 @@ class EmailEntityAliasProviderTest extends \PHPUnit\Framework\TestCase
         $this->entityAliasProvider = new EmailEntityAliasProvider($emailAddressManager);
     }
 
-    public function testGetEntityAlias()
+    public function testGetEntityAlias(): void
     {
         $this->assertNull($this->entityAliasProvider->getEntityAlias(\stdClass::class));
 

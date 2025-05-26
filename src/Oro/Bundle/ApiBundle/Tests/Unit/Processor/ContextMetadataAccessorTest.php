@@ -11,14 +11,13 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ContextMetadataAccessorTest extends \PHPUnit\Framework\TestCase
+class ContextMetadataAccessorTest extends TestCase
 {
-    /** @var Context|\PHPUnit\Framework\MockObject\MockObject */
-    private $context;
-
-    /** @var ContextMetadataAccessor */
-    private $metadataAccessor;
+    private Context&MockObject $context;
+    private ContextMetadataAccessor $metadataAccessor;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +27,7 @@ class ContextMetadataAccessorTest extends \PHPUnit\Framework\TestCase
         $this->metadataAccessor = new ContextMetadataAccessor($this->context);
     }
 
-    public function testGetMetadataForContextClass()
+    public function testGetMetadataForContextClass(): void
     {
         $className = User::class;
         $config = new EntityDefinitionConfig();
@@ -47,7 +46,7 @@ class ContextMetadataAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertSame($metadata, $this->metadataAccessor->getMetadata($className));
     }
 
-    public function testGetMetadataForContextClassForCaseWhenApiResourceIsBasedOnManageableEntity()
+    public function testGetMetadataForContextClassForCaseWhenApiResourceIsBasedOnManageableEntity(): void
     {
         $className = User::class;
         $config = new EntityDefinitionConfig();
@@ -66,7 +65,7 @@ class ContextMetadataAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertSame($metadata, $this->metadataAccessor->getMetadata($className));
     }
 
-    public function testGetMetadataForNotContextClass()
+    public function testGetMetadataForNotContextClass(): void
     {
         $config = new EntityDefinitionConfig();
 
@@ -82,7 +81,7 @@ class ContextMetadataAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->metadataAccessor->getMetadata(Product::class));
     }
 
-    public function testGetMetadataForFormDataClass()
+    public function testGetMetadataForFormDataClass(): void
     {
         $className = User::class;
         $formDataClass = Contact::class;
@@ -103,13 +102,12 @@ class ContextMetadataAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertSame($metadata, $this->metadataAccessor->getMetadata($formDataClass));
     }
 
-    public function testGetMetadataForNotFormDataClass()
+    public function testGetMetadataForNotFormDataClass(): void
     {
         $className = User::class;
         $formDataClass = Contact::class;
         $config = new EntityDefinitionConfig();
         $config->setFormOption('data_class', $formDataClass);
-        $metadata = new EntityMetadata($className);
 
         $this->context->expects(self::once())
             ->method('getClassName')

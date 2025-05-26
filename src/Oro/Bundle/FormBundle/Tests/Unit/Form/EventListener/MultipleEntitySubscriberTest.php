@@ -12,14 +12,16 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Form\EventListener\MultipleEntitySubscriber;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\EventListener\Stub\ChildEntity;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\EventListener\Stub\ParentEntity;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Test\FormInterface;
 
-class MultipleEntitySubscriberTest extends \PHPUnit\Framework\TestCase
+class MultipleEntitySubscriberTest extends TestCase
 {
-    public function testSubscribedEvents()
+    public function testSubscribedEvents(): void
     {
         $this->assertEquals(
             [
@@ -33,7 +35,7 @@ class MultipleEntitySubscriberTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider postSetDataProvider
      */
-    public function testPostSetData(?Collection $data, array $expectedAddedData, array $expectedRemovedData)
+    public function testPostSetData(?Collection $data, array $expectedAddedData, array $expectedRemovedData): void
     {
         $doctrineHelper = $this->createMock(DoctrineHelper::class);
         $subscriber = new MultipleEntitySubscriber($doctrineHelper);
@@ -111,7 +113,7 @@ class MultipleEntitySubscriberTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testPostSubmitForNotEntity()
+    public function testPostSubmitForNotEntity(): void
     {
         $fieldName = 'children';
 
@@ -143,7 +145,7 @@ class MultipleEntitySubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($parent, $removed->getParent());
     }
 
-    public function testPostSubmitForManyToMany()
+    public function testPostSubmitForManyToMany(): void
     {
         $fieldName = 'children';
 
@@ -192,7 +194,7 @@ class MultipleEntitySubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($parent, $removed->getParent());
     }
 
-    public function testPostSubmitForManyToManyWithoutParentData()
+    public function testPostSubmitForManyToManyWithoutParentData(): void
     {
         $fieldName = 'children';
 
@@ -218,7 +220,7 @@ class MultipleEntitySubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($added->getParent());
     }
 
-    public function testPostSubmitForOneToMany()
+    public function testPostSubmitForOneToMany(): void
     {
         $fieldName = 'children';
 
@@ -272,7 +274,7 @@ class MultipleEntitySubscriberTest extends \PHPUnit\Framework\TestCase
         Collection $children,
         array $added,
         array $removed
-    ): FormInterface|\PHPUnit\Framework\MockObject\MockObject {
+    ): FormInterface&MockObject {
         $form = $this->createMock(FormInterface::class);
         $formConfig = $this->createMock(FormConfigInterface::class);
         $parentForm = $this->createMock(FormInterface::class);

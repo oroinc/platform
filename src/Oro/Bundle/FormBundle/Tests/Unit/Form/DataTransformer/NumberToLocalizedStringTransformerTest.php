@@ -4,11 +4,12 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\FormBundle\Form\DataTransformer\NumberToLocalizedStringTransformer;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class NumberToLocalizedStringTransformerTest extends \PHPUnit\Framework\TestCase
+class NumberToLocalizedStringTransformerTest extends TestCase
 {
-    /** @var NumberFormatter|\PHPUnit\Framework\MockObject\MockObject */
-    private $numberFormatter;
+    private NumberFormatter&MockObject $numberFormatter;
 
     #[\Override]
     protected function setUp(): void

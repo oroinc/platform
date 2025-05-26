@@ -3,11 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config\Extra;
 
 use Oro\Bundle\ApiBundle\Config\Extra\DataTransformersConfigExtra;
+use PHPUnit\Framework\TestCase;
 
-class DataTransformersConfigExtraTest extends \PHPUnit\Framework\TestCase
+class DataTransformersConfigExtraTest extends TestCase
 {
-    /** @var DataTransformersConfigExtra */
-    private $extra;
+    private DataTransformersConfigExtra $extra;
 
     #[\Override]
     protected function setUp(): void
@@ -15,17 +15,17 @@ class DataTransformersConfigExtraTest extends \PHPUnit\Framework\TestCase
         $this->extra = new DataTransformersConfigExtra();
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         self::assertEquals(DataTransformersConfigExtra::NAME, $this->extra->getName());
     }
 
-    public function testIsPropagable()
+    public function testIsPropagable(): void
     {
         self::assertTrue($this->extra->isPropagable());
     }
 
-    public function testCacheKeyPart()
+    public function testCacheKeyPart(): void
     {
         self::assertEquals(DataTransformersConfigExtra::NAME, $this->extra->getCacheKeyPart());
     }

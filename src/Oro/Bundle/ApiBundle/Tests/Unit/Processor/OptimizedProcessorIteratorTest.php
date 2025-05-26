@@ -11,14 +11,15 @@ use Oro\Component\ChainProcessor\ProcessorBagInterface;
 use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 use Oro\Component\ChainProcessor\Tests\Unit\NotDisabledApplicableChecker;
 use Oro\Component\ChainProcessor\Tests\Unit\ProcessorMock;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class OptimizedProcessorIteratorTest extends \PHPUnit\Framework\TestCase
+class OptimizedProcessorIteratorTest extends TestCase
 {
-    private const TEST_ACTION = 'test_action';
+    private const string TEST_ACTION = 'test_action';
 
     private function getProcessorIterator(
         array $processors,

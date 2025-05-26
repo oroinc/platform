@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -17,19 +18,12 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
  */
 class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
 {
-    private const TARGET_ACTION = 'create';
+    private const string TARGET_ACTION = 'create';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
-    private $resourcesProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderInterface */
-    private $entityOverrideProvider;
-
-    /** @var ExcludeNotAccessibleRelations */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private ResourcesProvider&MockObject $resourcesProvider;
+    private EntityOverrideProviderInterface&MockObject $entityOverrideProvider;
+    private ExcludeNotAccessibleRelations $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -56,7 +50,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
         $this->context->setExtras([new DisabledAssociationsConfigExtra()]);
     }
 
-    public function testProcessForNotCompletedConfig()
+    public function testProcessForNotCompletedConfig(): void
     {
         $config = [
             'fields' => [
@@ -80,7 +74,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWhenNoFields()
+    public function testProcessWhenNoFields(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -101,7 +95,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessForNotManageableEntity(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -132,7 +126,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessForManageableEntity()
+    public function testProcessForManageableEntity(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -215,7 +209,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWhenTargetEntityDoesNotHaveAccessibleApiResource()
+    public function testProcessWhenTargetEntityDoesNotHaveAccessibleApiResource(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -267,7 +261,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForArrayAssociation()
+    public function testProcessForArrayAssociation(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -321,7 +315,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForArrayAssociationAndTargetEntityDoesNotHaveApiResource()
+    public function testProcessForArrayAssociationAndTargetEntityDoesNotHaveApiResource(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -376,7 +370,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWhenTargetEntityUsesTableInheritance()
+    public function testProcessWhenTargetEntityUsesTableInheritance(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -430,7 +424,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForArrayAssociationWhenTargetEntityUsesTableInheritance()
+    public function testProcessForArrayAssociationWhenTargetEntityUsesTableInheritance(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -488,7 +482,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWhenTargetEntityUsesTableInheritanceAndNoAccessibleApiResourceForAnyConcreteTarget()
+    public function testProcessWhenTargetEntityUsesTableInheritanceAndNoAccessibleApiResourceForAnyTarget(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -544,7 +538,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForArrayAssociationAndTargetUsesTableInheritanceAndNoApiResourceForAnyConcreteTarget()
+    public function testProcessForArrayAssociationAndTargetUsesTableInheritanceAndNoApiResourceForAnyTarget(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -603,7 +597,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForAssociationToOverriddenEntity()
+    public function testProcessForAssociationToOverriddenEntity(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -658,7 +652,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForArrayAssociationToOverriddenEntity()
+    public function testProcessForArrayAssociationToOverriddenEntity(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -717,7 +711,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForAssociationToOverriddenEntityInTableInheritanceSubClass()
+    public function testProcessForAssociationToOverriddenEntityInTableInheritanceSubClass(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -783,7 +777,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForArrayAssociationToOverriddenEntityInTableInheritanceSubClass()
+    public function testProcessForArrayAssociationToOverriddenEntityInTableInheritanceSubClass(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -853,7 +847,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForNotManageableTargetEntity()
+    public function testProcessForNotManageableTargetEntity(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -899,7 +893,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForNotManageableTargetEntityThatDoesNotHaveAccessibleApiResource()
+    public function testProcessForNotManageableTargetEntityThatDoesNotHaveAccessibleApiResource(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -946,7 +940,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForNotManageableTargetEntityWhenSeveralTargetClassesAreAllowed()
+    public function testProcessForNotManageableTargetEntityWhenSeveralTargetClassesAreAllowed(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -990,7 +984,7 @@ class ExcludeNotAccessibleRelationsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForDisabledAssociation()
+    public function testProcessForDisabledAssociation(): void
     {
         $config = [
             'exclusion_policy' => 'all',

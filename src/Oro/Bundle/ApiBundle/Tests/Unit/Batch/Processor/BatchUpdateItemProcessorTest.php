@@ -11,20 +11,15 @@ use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 use Oro\Component\Testing\Logger\BufferingLogger;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class BatchUpdateItemProcessorTest extends \PHPUnit\Framework\TestCase
+class BatchUpdateItemProcessorTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorRegistryInterface */
-    private $processorRegistry;
-
-    /** @var ProcessorBagConfigBuilder */
-    private $processorBagConfigBuilder;
-
-    /** @var ProcessorBag */
-    private $processorBag;
-
-    /** @var BatchUpdateItemProcessor */
-    private $processor;
+    private ProcessorRegistryInterface&MockObject $processorRegistry;
+    private ProcessorBagConfigBuilder $processorBagConfigBuilder;
+    private ProcessorBag $processorBag;
+    private BatchUpdateItemProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -61,7 +56,7 @@ class BatchUpdateItemProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @param array $processors [processorId => groupName, ...]
      *
-     * @return ProcessorInterface[]|\PHPUnit\Framework\MockObject\MockObject[]
+     * @return ProcessorInterface[]&MockObject[]
      */
     private function addProcessors(array $processors): array
     {
@@ -85,12 +80,12 @@ class BatchUpdateItemProcessorTest extends \PHPUnit\Framework\TestCase
         return $createdProcessors;
     }
 
-    public function testCreateContextObject()
+    public function testCreateContextObject(): void
     {
         self::assertInstanceOf(BatchUpdateItemContext::class, $this->processor->createContext());
     }
 
-    public function testGetLogContext()
+    public function testGetLogContext(): void
     {
         $logger = $this->setLogger();
 
@@ -139,7 +134,7 @@ class BatchUpdateItemProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetLogContextWhenContextDoesNotContainEntityId()
+    public function testGetLogContextWhenContextDoesNotContainEntityId(): void
     {
         $logger = $this->setLogger();
 

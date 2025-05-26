@@ -92,7 +92,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testCompleteDefinitionForFields()
+    public function testCompleteDefinitionForFields(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -194,7 +194,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForFieldReplacedWithComputedField()
+    public function testCompleteDefinitionForFieldReplacedWithComputedField(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -259,7 +259,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForCompletedAssociation()
+    public function testCompleteDefinitionForCompletedAssociation(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -349,7 +349,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForAssociationWithoutConfig()
+    public function testCompleteDefinitionForAssociationWithoutConfig(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -421,7 +421,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForAssociation()
+    public function testCompleteDefinitionForAssociation(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -515,7 +515,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForNewAssociation()
+    public function testCompleteDefinitionForNewAssociation(): void
     {
         $config = $this->createConfigObject([]);
         $context = new ConfigContext();
@@ -605,7 +605,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForRenamedAssociation()
+    public function testCompleteDefinitionForRenamedAssociation(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -702,7 +702,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForExcludedAssociation()
+    public function testCompleteDefinitionForExcludedAssociation(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -797,7 +797,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForNotExcludedAssociation()
+    public function testCompleteDefinitionForNotExcludedAssociation(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -891,7 +891,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForIgnoredAssociation()
+    public function testCompleteDefinitionForIgnoredAssociation(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -986,7 +986,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForAssociationReplacedWithComputedField()
+    public function testCompleteDefinitionForAssociationReplacedWithComputedField(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -1056,7 +1056,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForAssociationWithDataType()
+    public function testCompleteDefinitionForAssociationWithDataType(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -1153,7 +1153,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForAssociationWithCompositeId()
+    public function testCompleteDefinitionForAssociationWithCompositeId(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -1253,7 +1253,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForAssociationDoesNotExistInEntityAndConfiguredByTargetClassAndTargetType()
+    public function testCompleteDefinitionForAssocDoesNotExistInEntityAndConfiguredByTargetClassAndTargetType(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -1334,7 +1334,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForAssociationWithTargetClassAndTargetTypeAndDataType()
+    public function testCompleteDefinitionForAssociationWithTargetClassAndTargetTypeAndDataType(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -1422,7 +1422,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testCompleteDefinitionForAssociationToOverriddenEntity()
+    public function testCompleteDefinitionForAssociationToOverriddenEntity(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -1523,7 +1523,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForTranslatableEntity()
+    public function testCompleteDefinitionForTranslatableEntity(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -1587,7 +1587,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForTranslatableEntityWhenTranslatableHintAlreadySet()
+    public function testCompleteDefinitionForTranslatableEntityWhenTranslatableHintAlreadySet(): void
     {
         $config = $this->createConfigObject([
             'hints'  => ['HINT_TRANSLATABLE'],
@@ -1652,7 +1652,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForTranslatableEntityWhenTranslatableHintDisabled()
+    public function testCompleteDefinitionForTranslatableEntityWhenTranslatableHintDisabled(): void
     {
         $config = $this->createConfigObject([
             'disable_meta_properties' => false,
@@ -1715,7 +1715,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForIdentifierFieldsOnly()
+    public function testCompleteDefinitionForIdentifierFieldsOnly(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -1763,7 +1763,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForIdentifierFieldsOnlyAndHasConfiguredIdFields()
+    public function testCompleteDefinitionForIdentifierFieldsOnlyAndHasConfiguredIdFields(): void
     {
         $config = $this->createConfigObject([
             'identifier_field_names' => ['field1'],
@@ -1811,7 +1811,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForIdentifierFieldsOnlyWithIgnoredPropertyPath()
+    public function testCompleteDefinitionForIdentifierFieldsOnlyWithIgnoredPropertyPath(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -1858,7 +1858,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForIdentifierFieldsOnlyWithReplacedField()
+    public function testCompleteDefinitionForIdentifierFieldsOnlyWithReplacedField(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -1905,7 +1905,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForIdentifierFieldsOnlyWhenNoIdFieldInConfig()
+    public function testCompleteDefinitionForIdentifierFieldsOnlyWhenNoIdFieldInConfig(): void
     {
         $config = $this->createConfigObject([
             'fields' => []
@@ -1944,7 +1944,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForIdentifierFieldsOnlyWhenNoIdFieldInConfigAndHasConfiguredIdFields()
+    public function testCompleteDefinitionForIdentifierFieldsOnlyWhenNoIdFieldInConfigAndHasConfiguredIdFields(): void
     {
         $config = $this->createConfigObject([
             'identifier_field_names' => ['field1'],
@@ -1983,7 +1983,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForIdentifierFieldsOnlyWithRenamedIdFieldInConfig()
+    public function testCompleteDefinitionForIdentifierFieldsOnlyWithRenamedIdFieldInConfig(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -2028,7 +2028,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForIdentifierFieldsOnlyWithRenamedIdFieldInConfigAndHasConfiguredIdFields()
+    public function testCompleteDefinitionForIdFieldsOnlyWithRenamedIdFieldInConfigAndHasConfiguredIdFields(): void
     {
         $config = $this->createConfigObject([
             'identifier_field_names' => ['field1'],
@@ -2073,7 +2073,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForIdentifierFieldsOnlyWhenIdFieldIsExcluded()
+    public function testCompleteDefinitionForIdentifierFieldsOnlyWhenIdFieldIsExcluded(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The identifier field "id" for "Test\Class" entity must not be excluded.');
@@ -2110,7 +2110,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
     }
 
-    public function testCompleteDefinitionForTableInheritanceEntity()
+    public function testCompleteDefinitionForTableInheritanceEntity(): void
     {
         $config = $this->createConfigObject([]);
         $context = new ConfigContext();
@@ -2160,7 +2160,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForTableInheritanceEntityWhenClassNameFieldAlreadyExists()
+    public function testCompleteDefinitionForTableInheritanceEntityWhenClassNameFieldAlreadyExists(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -2211,7 +2211,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForTableInheritanceEntityWhenClassNameFieldAlreadyExistsAndRenamed()
+    public function testCompleteDefinitionForTableInheritanceEntityWhenClassNameFieldAlreadyExistsAndRenamed(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -2266,7 +2266,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCompleteDefinitionForTableInheritanceAssociation()
+    public function testCompleteDefinitionForTableInheritanceAssociation(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -2356,7 +2356,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         bool $usesIdGenerator,
         array $config,
         array $expectedConfig
-    ) {
+    ): void {
         $config = $this->createConfigObject($config);
         $context = new ConfigContext();
         $context->setTargetAction($targetAction);
@@ -2506,7 +2506,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         ];
     }
 
-    public function testCompleteCustomIdentifierWhenIdFieldIsExcluded()
+    public function testCompleteCustomIdentifierWhenIdFieldIsExcluded(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The identifier field "field" for "Test\Class" entity must not be excluded.');
@@ -2553,7 +2553,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
     }
 
-    public function testCompleteCustomIdentifierWhenIdFieldIsNotDefined()
+    public function testCompleteCustomIdentifierWhenIdFieldIsNotDefined(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The identifier field "unknownField" for "Test\Class" entity is not defined.');
@@ -2597,7 +2597,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
     }
 
-    public function testShouldThrowCorrectExceptionWhenDependsOnNameOfUndefinedPropertyAndGetConfigThrowException()
+    public function testShouldThrowCorrectExceptionWhenDependsOnNameOfUndefinedPropAndGetConfigThrowException(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -2647,7 +2647,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
     }
 
-    public function testShouldThrowCorrectExceptionWhenDependsOnNotFullyConfiguredFieldReplacement()
+    public function testShouldThrowCorrectExceptionWhenDependsOnNotFullyConfiguredFieldReplacement(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -2703,7 +2703,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
     }
 
-    public function testShouldThrowCorrectExceptionWhenPropertyPathPointsToFieldItself()
+    public function testShouldThrowCorrectExceptionWhenPropertyPathPointsToFieldItself(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -2757,7 +2757,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         $this->completeEntityDefinitionHelper->completeDefinition($config, $context);
     }
 
-    public function testCustomFieldsExclusionPolicyForFieldsOfNonConfigurableEntity()
+    public function testCustomFieldsExclusionPolicyForFieldsOfNonConfigurableEntity(): void
     {
         $config = $this->createConfigObject([
             'exclusion_policy' => 'custom_fields',
@@ -2834,7 +2834,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCustomFieldsExclusionPolicyForFieldsOfCustomEntity()
+    public function testCustomFieldsExclusionPolicyForFieldsOfCustomEntity(): void
     {
         $config = $this->createConfigObject([
             'exclusion_policy' => 'custom_fields',
@@ -2918,7 +2918,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testCustomFieldsExclusionPolicyForFieldsOfExtendSystemEntity()
+    public function testCustomFieldsExclusionPolicyForFieldsOfExtendSystemEntity(): void
     {
         $config = $this->createConfigObject([
             'exclusion_policy' => 'custom_fields',
@@ -3031,7 +3031,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testCustomFieldsExclusionPolicyForAssociationOfNonConfigurableEntity()
+    public function testCustomFieldsExclusionPolicyForAssociationOfNonConfigurableEntity(): void
     {
         $config = $this->createConfigObject([
             'exclusion_policy' => 'custom_fields',
@@ -3139,7 +3139,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testCustomFieldsExclusionPolicyForAssociationOfCustomEntity()
+    public function testCustomFieldsExclusionPolicyForAssociationOfCustomEntity(): void
     {
         $config = $this->createConfigObject([
             'exclusion_policy' => 'custom_fields',
@@ -3251,7 +3251,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testCustomFieldsExclusionPolicyForConfiguredExplicitlyAssociationOfExtendSystemEntity()
+    public function testCustomFieldsExclusionPolicyForConfiguredExplicitlyAssociationOfExtendSystemEntity(): void
     {
         $config = $this->createConfigObject([
             'exclusion_policy' => 'custom_fields',
@@ -3369,7 +3369,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testCustomFieldsExclusionPolicyForNotConfiguredExplicitlySystemAssociationOfExtendSystemEntity()
+    public function testCustomFieldsExclusionPolicyForNotConfiguredExplicitlySystemAssocOfExtendSystemEntity(): void
     {
         $config = $this->createConfigObject([
             'exclusion_policy' => 'custom_fields',
@@ -3493,7 +3493,7 @@ class CompleteEntityDefinitionHelperTest extends CompleteDefinitionHelperTestCas
         );
     }
 
-    public function testCustomFieldsExclusionPolicyForNotConfiguredExplicitlyCustomAssociationOfExtendSystemEntity()
+    public function testCustomFieldsExclusionPolicyForNotConfiguredExplicitlyCustomAssocOfExtendSystemEntity(): void
     {
         $config = $this->createConfigObject([
             'exclusion_policy' => 'custom_fields',

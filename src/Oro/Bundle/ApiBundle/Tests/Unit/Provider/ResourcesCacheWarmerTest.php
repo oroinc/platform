@@ -8,17 +8,14 @@ use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Version;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ResourcesCacheWarmerTest extends \PHPUnit\Framework\TestCase
+class ResourcesCacheWarmerTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
-    private $resourcesProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|SubresourcesProvider */
-    private $subresourcesProvider;
-
-    /** @var ResourcesCacheWarmer */
-    private $cacheWarmer;
+    private ResourcesProvider&MockObject $resourcesProvider;
+    private SubresourcesProvider&MockObject $subresourcesProvider;
+    private ResourcesCacheWarmer $cacheWarmer;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +30,7 @@ class ResourcesCacheWarmerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWarmUp()
+    public function testWarmUp(): void
     {
         $version = Version::LATEST;
         $requestType = new RequestType(['rest']);
@@ -50,12 +47,12 @@ class ResourcesCacheWarmerTest extends \PHPUnit\Framework\TestCase
         $this->cacheWarmer->warmUp('test');
     }
 
-    public function testIsOptional()
+    public function testIsOptional(): void
     {
         self::assertTrue($this->cacheWarmer->isOptional());
     }
 
-    public function testWarmUpCache()
+    public function testWarmUpCache(): void
     {
         $version = Version::LATEST;
         $requestType = new RequestType(['rest']);
@@ -70,7 +67,7 @@ class ResourcesCacheWarmerTest extends \PHPUnit\Framework\TestCase
         $this->cacheWarmer->warmUpCache();
     }
 
-    public function testClearCache()
+    public function testClearCache(): void
     {
         $this->resourcesProvider->expects(self::once())
             ->method('clearCache');

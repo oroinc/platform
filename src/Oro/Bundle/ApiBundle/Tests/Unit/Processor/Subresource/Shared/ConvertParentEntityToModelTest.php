@@ -10,8 +10,7 @@ use Oro\Bundle\ApiBundle\Util\EntityMapper;
 
 class ConvertParentEntityToModelTest extends ChangeRelationshipProcessorTestCase
 {
-    /** @var ConvertParentEntityToModel */
-    private $processor;
+    private ConvertParentEntityToModel $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class ConvertParentEntityToModelTest extends ChangeRelationshipProcessorTestCase
         $this->processor = new ConvertParentEntityToModel();
     }
 
-    public function testProcessWhenNoEntity()
+    public function testProcessWhenNoEntity(): void
     {
         $entityClass = Entity\User::class;
         $config = new EntityDefinitionConfig();
@@ -38,7 +37,7 @@ class ConvertParentEntityToModelTest extends ChangeRelationshipProcessorTestCase
         self::assertFalse($this->context->hasParentEntity());
     }
 
-    public function testProcessWhenNoEntityMapper()
+    public function testProcessWhenNoEntityMapper(): void
     {
         $entityClass = Entity\User::class;
         $entity = new \stdClass();
@@ -52,7 +51,7 @@ class ConvertParentEntityToModelTest extends ChangeRelationshipProcessorTestCase
         self::assertSame($entity, $this->context->getParentEntity());
     }
 
-    public function testProcessWhenEntityShouldBeConvertedToModel()
+    public function testProcessWhenEntityShouldBeConvertedToModel(): void
     {
         $entityClass = Entity\User::class;
         $entity = new \stdClass();

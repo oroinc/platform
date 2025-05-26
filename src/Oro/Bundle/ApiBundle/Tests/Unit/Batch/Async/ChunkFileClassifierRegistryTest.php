@@ -7,11 +7,12 @@ use Oro\Bundle\ApiBundle\Batch\Async\ChunkFileClassifierRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
-class ChunkFileClassifierRegistryTest extends \PHPUnit\Framework\TestCase
+class ChunkFileClassifierRegistryTest extends TestCase
 {
-    public function testEmptyClassifiers()
+    public function testEmptyClassifiers(): void
     {
         $registry = new ChunkFileClassifierRegistry(
             [],
@@ -22,7 +23,7 @@ class ChunkFileClassifierRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertNull($registry->getClassifier(new RequestType(['rest'])));
     }
 
-    public function testClassifierFound()
+    public function testClassifierFound(): void
     {
         $classifier1 = $this->createMock(ChunkFileClassifierInterface::class);
         $classifier2 = $this->createMock(ChunkFileClassifierInterface::class);
@@ -44,7 +45,7 @@ class ChunkFileClassifierRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($classifier2, $registry->getClassifier(new RequestType(['second'])));
     }
 
-    public function testClassifierNotFound()
+    public function testClassifierNotFound(): void
     {
         $classifier1 = $this->createMock(ChunkFileClassifierInterface::class);
         $classifier2 = $this->createMock(ChunkFileClassifierInterface::class);

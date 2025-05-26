@@ -7,14 +7,12 @@ use Oro\Bundle\ApiBundle\Processor\Shared\SetHttpAllowHeaderForList;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class SetHttpAllowHeaderForListTest extends GetListProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
-    private $resourcesProvider;
-
-    /** @var SetHttpAllowHeaderForList */
-    private $processor;
+    private ResourcesProvider&MockObject $resourcesProvider;
+    private SetHttpAllowHeaderForList $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +24,7 @@ class SetHttpAllowHeaderForListTest extends GetListProcessorTestCase
         $this->processor = new SetHttpAllowHeaderForList($this->resourcesProvider);
     }
 
-    public function testProcessWhenResponseStatusCodeIsNot405()
+    public function testProcessWhenResponseStatusCodeIsNot405(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -42,7 +40,7 @@ class SetHttpAllowHeaderForListTest extends GetListProcessorTestCase
         self::assertFalse($this->context->getResponseHeaders()->has('Allow'));
     }
 
-    public function testProcessWhenAllowResponseHeaderAlreadySet()
+    public function testProcessWhenAllowResponseHeaderAlreadySet(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -59,7 +57,7 @@ class SetHttpAllowHeaderForListTest extends GetListProcessorTestCase
         self::assertEquals('GET', $this->context->getResponseHeaders()->get('Allow'));
     }
 
-    public function testProcessWhenAtLeastOneAllowedHttpMethodExists()
+    public function testProcessWhenAtLeastOneAllowedHttpMethodExists(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -77,7 +75,7 @@ class SetHttpAllowHeaderForListTest extends GetListProcessorTestCase
         self::assertEquals('OPTIONS, GET, PATCH, POST', $this->context->getResponseHeaders()->get('Allow'));
     }
 
-    public function testProcessWhenNoAllowedHttpMethods()
+    public function testProcessWhenNoAllowedHttpMethods(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -101,7 +99,7 @@ class SetHttpAllowHeaderForListTest extends GetListProcessorTestCase
         self::assertFalse($this->context->getResponseHeaders()->has('Allow'));
     }
 
-    public function testProcessWhenEntityDoesNotHaveIdentifierFields()
+    public function testProcessWhenEntityDoesNotHaveIdentifierFields(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
 

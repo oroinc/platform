@@ -3,13 +3,13 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension\JsValidation;
 
 use Oro\Bundle\FormBundle\Form\Extension\JsValidation\RepeatedTypeExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormInterface;
 
-class RepeatedTypeExtensionTest extends \PHPUnit\Framework\TestCase
+class RepeatedTypeExtensionTest extends TestCase
 {
-    /** @var RepeatedTypeExtension */
-    private $extension;
+    private RepeatedTypeExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +25,7 @@ class RepeatedTypeExtensionTest extends \PHPUnit\Framework\TestCase
         array $options,
         array $expectedVars,
         array $expectedChildrenVars
-    ) {
+    ): void {
         $form = $this->createMock(FormInterface::class);
 
         $this->extension->finishView($view, $form, $options);

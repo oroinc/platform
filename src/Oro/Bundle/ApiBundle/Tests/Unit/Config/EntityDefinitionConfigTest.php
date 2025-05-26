@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
  */
 class EntityDefinitionConfigTest extends TestCase
 {
-    public function testKey()
+    public function testKey(): void
     {
         $config = new EntityDefinitionConfig();
         self::assertNull($config->getKey());
@@ -29,7 +29,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertNull($config->getKey());
     }
 
-    public function testClone()
+    public function testClone(): void
     {
         $config = new EntityDefinitionConfig();
         $config->setKey('some key');
@@ -46,7 +46,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertNotSame($objValue, $configClone->get('test_object'));
     }
 
-    public function testCloneWithUpsertConfig()
+    public function testCloneWithUpsertConfig(): void
     {
         $config = new EntityDefinitionConfig();
         $config->getUpsertConfig()->setAllowedById(true);
@@ -58,7 +58,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertNotSame($config->getUpsertConfig(), $configClone->getUpsertConfig());
     }
 
-    public function testCustomAttribute()
+    public function testCustomAttribute(): void
     {
         $attrName = 'test';
 
@@ -86,7 +86,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertSame([], $config->keys());
     }
 
-    public function testResourceClass()
+    public function testResourceClass(): void
     {
         $config = new EntityDefinitionConfig();
         self::assertNull($config->getResourceClass());
@@ -105,7 +105,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testParentResourceClass()
+    public function testParentResourceClass(): void
     {
         $config = new EntityDefinitionConfig();
         self::assertNull($config->getParentResourceClass());
@@ -124,7 +124,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testDescription()
+    public function testDescription(): void
     {
         $config = new EntityDefinitionConfig();
         self::assertFalse($config->hasDescription());
@@ -147,7 +147,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testDocumentation()
+    public function testDocumentation(): void
     {
         $config = new EntityDefinitionConfig();
         self::assertFalse($config->hasDocumentation());
@@ -170,7 +170,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testDocumentationResources()
+    public function testDocumentationResources(): void
     {
         $config = new EntityDefinitionConfig();
         self::assertFalse($config->hasDocumentationResources());
@@ -198,7 +198,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testAclResource()
+    public function testAclResource(): void
     {
         $config = new EntityDefinitionConfig();
         self::assertFalse($config->hasAclResource());
@@ -215,7 +215,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertEquals(['acl_resource' => null], $config->toArray());
     }
 
-    public function testFields()
+    public function testFields(): void
     {
         $config = new EntityDefinitionConfig();
         self::assertFalse($config->hasFields());
@@ -237,7 +237,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testFindField()
+    public function testFindField(): void
     {
         $config = new EntityDefinitionConfig();
 
@@ -321,7 +321,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertNull($config->findFieldByPath('realReplacedField', true));
     }
 
-    public function testFindFieldByPathForChildFields()
+    public function testFindFieldByPathForChildFields(): void
     {
         $config = new EntityDefinitionConfig();
 
@@ -339,7 +339,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertSame($field111, $config->findFieldByPath(['field1', 'realField11', 'field111'], true));
     }
 
-    public function testGetOrAddField()
+    public function testGetOrAddField(): void
     {
         $config = new EntityDefinitionConfig();
 
@@ -350,7 +350,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertSame($field, $field1);
     }
 
-    public function testAddField()
+    public function testAddField(): void
     {
         $config = new EntityDefinitionConfig();
 
@@ -363,7 +363,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertNotSame($field, $field1);
     }
 
-    public function testExclusionPolicy()
+    public function testExclusionPolicy(): void
     {
         $config = new EntityDefinitionConfig();
         self::assertFalse($config->hasExclusionPolicy());
@@ -408,7 +408,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertTrue($config->isEmpty());
     }
 
-    public function testIsIdentifierOnlyRequested()
+    public function testIsIdentifierOnlyRequested(): void
     {
         $config = new EntityDefinitionConfig();
         self::assertFalse($config->isIdentifierOnlyRequested());
@@ -424,7 +424,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertFalse($config->isIdentifierOnlyRequested());
     }
 
-    public function testIsIdentifierOnlyRequestedWithCompositeIdentifier()
+    public function testIsIdentifierOnlyRequestedWithCompositeIdentifier(): void
     {
         $config = new EntityDefinitionConfig();
 
@@ -443,7 +443,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertFalse($config->isIdentifierOnlyRequested());
     }
 
-    public function testCollapsed()
+    public function testCollapsed(): void
     {
         $config = new EntityDefinitionConfig();
         self::assertFalse($config->isCollapsed());
@@ -457,7 +457,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testPageSize()
+    public function testPageSize(): void
     {
         $config = new EntityDefinitionConfig();
         self::assertFalse($config->hasPageSize());
@@ -484,7 +484,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testSortingFlag()
+    public function testSortingFlag(): void
     {
         $config = new EntityDefinitionConfig();
         self::assertFalse($config->hasDisableSorting());
@@ -501,7 +501,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testInclusionFlag()
+    public function testInclusionFlag(): void
     {
         $config = new EntityDefinitionConfig();
         self::assertFalse($config->hasDisableInclusion());
@@ -518,7 +518,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testFieldsetFlag()
+    public function testFieldsetFlag(): void
     {
         $config = new EntityDefinitionConfig();
         self::assertFalse($config->hasDisableFieldset());
@@ -535,7 +535,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testMetaPropertiesFlag()
+    public function testMetaPropertiesFlag(): void
     {
         $config = new EntityDefinitionConfig();
         self::assertFalse($config->hasDisableMetaProperties());
@@ -552,7 +552,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testMetaProperties()
+    public function testMetaProperties(): void
     {
         $config = new EntityDefinitionConfig();
         self::assertFalse($config->hasDisableMetaProperties());
@@ -614,7 +614,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertSame([], $config->getDisabledMetaProperties());
     }
 
-    public function testPartialLoadFlag()
+    public function testPartialLoadFlag(): void
     {
         $config = new EntityDefinitionConfig();
         self::assertTrue($config->isPartialLoadEnabled());
@@ -628,7 +628,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testIdentifierFieldNames()
+    public function testIdentifierFieldNames(): void
     {
         $config = new EntityDefinitionConfig();
         self::assertEquals([], $config->getIdentifierFieldNames());
@@ -642,7 +642,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testOrderBy()
+    public function testOrderBy(): void
     {
         $config = new EntityDefinitionConfig();
         self::assertFalse($config->hasOrderBy());
@@ -659,7 +659,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertSame([], $config->toArray());
     }
 
-    public function testMaxResults()
+    public function testMaxResults(): void
     {
         $config = new EntityDefinitionConfig();
         self::assertFalse($config->hasMaxResults());
@@ -686,7 +686,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testFormType()
+    public function testFormType(): void
     {
         $config = new EntityDefinitionConfig();
         self::assertNull($config->getFormType());
@@ -700,7 +700,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testFormOptions()
+    public function testFormOptions(): void
     {
         $config = new EntityDefinitionConfig();
         self::assertNull($config->getFormOptions());
@@ -726,7 +726,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertSame('', $config->getFormOption('key', ''));
     }
 
-    public function testSetFormOption()
+    public function testSetFormOption(): void
     {
         $config = new EntityDefinitionConfig();
 
@@ -744,7 +744,7 @@ class EntityDefinitionConfigTest extends TestCase
         );
     }
 
-    public function testFormConstraints()
+    public function testFormConstraints(): void
     {
         $config = new EntityDefinitionConfig();
 
@@ -760,7 +760,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertEquals([new NotNull(), new NotBlank()], $config->getFormConstraints());
     }
 
-    public function testRemoveFormConstraint()
+    public function testRemoveFormConstraint(): void
     {
         $config = new EntityDefinitionConfig();
 
@@ -786,7 +786,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertNull($config->getFormOptions());
     }
 
-    public function testFormEventSubscribers()
+    public function testFormEventSubscribers(): void
     {
         $config = new EntityDefinitionConfig();
         self::assertNull($config->getFormEventSubscribers());
@@ -800,7 +800,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testSetNullToFormEventSubscribers()
+    public function testSetNullToFormEventSubscribers(): void
     {
         $config = new EntityDefinitionConfig();
         $config->setFormEventSubscribers(['subscriber1']);
@@ -810,7 +810,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testHints()
+    public function testHints(): void
     {
         $config = new EntityDefinitionConfig();
         self::assertSame([], $config->getHints());
@@ -829,7 +829,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertSame([], $config->toArray());
     }
 
-    public function testIdentifierDescription()
+    public function testIdentifierDescription(): void
     {
         $config = new EntityDefinitionConfig();
         self::assertFalse($config->hasIdentifierDescription());
@@ -852,7 +852,7 @@ class EntityDefinitionConfigTest extends TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testUpsertConfig()
+    public function testUpsertConfig(): void
     {
         $config = new EntityDefinitionConfig();
         self::assertInstanceOf(UpsertConfig::class, $config->getUpsertConfig());

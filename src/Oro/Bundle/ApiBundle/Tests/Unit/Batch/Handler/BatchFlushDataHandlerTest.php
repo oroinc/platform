@@ -16,19 +16,16 @@ use Oro\Bundle\ApiBundle\Processor\Update\UpdateContext;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class BatchFlushDataHandlerTest extends \PHPUnit\Framework\TestCase
+class BatchFlushDataHandlerTest extends TestCase
 {
-    private const ENTITY_CLASS = 'Test\Entity';
+    private const string ENTITY_CLASS = 'Test\Entity';
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var FlushDataHandlerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $flushDataHandler;
-
-    /** @var BatchFlushDataHandler */
-    private $handler;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private FlushDataHandlerInterface&MockObject $flushDataHandler;
+    private BatchFlushDataHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -44,10 +41,10 @@ class BatchFlushDataHandlerTest extends \PHPUnit\Framework\TestCase
     }
 
     private function prepareBatchUpdateItemContext(
-        BatchUpdateItem|\PHPUnit\Framework\MockObject\MockObject $item,
+        BatchUpdateItem&MockObject $item,
         string $targetAction,
         bool $hasErrors,
-        Context|\PHPUnit\Framework\MockObject\MockObject|null $itemTargetContext,
+        Context|MockObject|null $itemTargetContext,
         ?object $itemEntity,
         ?bool $isExistingEntity = null
     ): void {
@@ -84,7 +81,7 @@ class BatchFlushDataHandlerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testStartFlushData()
+    public function testStartFlushData(): void
     {
         $em = $this->createMock(EntityManagerInterface::class);
 
@@ -96,7 +93,7 @@ class BatchFlushDataHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->startFlushData([$this->createMock(BatchUpdateItem::class)]);
     }
 
-    public function testStartFlushDataWhenHandlerIsAlreadyStarted()
+    public function testStartFlushDataWhenHandlerIsAlreadyStarted(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The flush data already started.');
@@ -112,7 +109,7 @@ class BatchFlushDataHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->startFlushData([$this->createMock(BatchUpdateItem::class)]);
     }
 
-    public function testFinishFlushData()
+    public function testFinishFlushData(): void
     {
         $em = $this->createMock(EntityManagerInterface::class);
 
@@ -128,7 +125,7 @@ class BatchFlushDataHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->finishFlushData($items);
     }
 
-    public function testFinishFlushDataWhenHandlerIsNotStarted()
+    public function testFinishFlushDataWhenHandlerIsNotStarted(): void
     {
         $this->doctrineHelper->expects(self::never())
             ->method('getEntityManagerForClass');
@@ -136,7 +133,7 @@ class BatchFlushDataHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->finishFlushData([$this->createMock(BatchUpdateItem::class)]);
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $em = $this->createMock(EntityManagerInterface::class);
 
@@ -153,7 +150,7 @@ class BatchFlushDataHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->clear();
     }
 
-    public function testClearWhenHandlerIsNotStarted()
+    public function testClearWhenHandlerIsNotStarted(): void
     {
         $this->doctrineHelper->expects(self::never())
             ->method('getEntityManagerForClass');
@@ -164,7 +161,7 @@ class BatchFlushDataHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testFlushDataWhenNoError()
+    public function testFlushDataWhenNoError(): void
     {
         $sharedData = $this->createMock(ParameterBagInterface::class);
 
@@ -273,7 +270,7 @@ class BatchFlushDataHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->flushData($items);
     }
 
-    public function testFlushDataWhenNoErrorForNotManageableEntity()
+    public function testFlushDataWhenNoErrorForNotManageableEntity(): void
     {
         $sharedData = $this->createMock(ParameterBagInterface::class);
 
@@ -351,7 +348,7 @@ class BatchFlushDataHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->flushData($items);
     }
 
-    public function testFlushDataWhenFlushFailed()
+    public function testFlushDataWhenFlushFailed(): void
     {
         $em = $this->createMock(EntityManagerInterface::class);
         $exception = new \Exception('some error');
@@ -372,7 +369,7 @@ class BatchFlushDataHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler->flushData($items);
     }
 
-    public function testFlushDataWhenHandlerNotStarted()
+    public function testFlushDataWhenHandlerNotStarted(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The flush data is not started.');

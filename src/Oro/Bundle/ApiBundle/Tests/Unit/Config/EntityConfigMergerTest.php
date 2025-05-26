@@ -5,14 +5,13 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 use Oro\Bundle\ApiBundle\Config\Definition\ConfigurationSettingsInterface;
 use Oro\Bundle\ApiBundle\Config\EntityConfigMerger;
 use Oro\Bundle\ApiBundle\Config\Extension\ConfigExtensionRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityConfigMergerTest extends \PHPUnit\Framework\TestCase
+class EntityConfigMergerTest extends TestCase
 {
-    /** @var ConfigExtensionRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $configExtensionRegistry;
-
-    /** @var EntityConfigMerger */
-    private $entityConfigMerger;
+    private ConfigExtensionRegistry&MockObject $configExtensionRegistry;
+    private EntityConfigMerger $entityConfigMerger;
 
     #[\Override]
     protected function setUp(): void

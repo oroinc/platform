@@ -40,7 +40,7 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
         return $metadata;
     }
 
-    public function testTransform()
+    public function testTransform(): void
     {
         $metadata = $this->getAssociationMetadata([Group::class]);
         $transformer = $this->getNestedAssociationTransformer($metadata);
@@ -50,7 +50,7 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
     /**
      * @dataProvider reverseTransformForEmptyValueDataProvider
      */
-    public function testReverseTransformForEmptyValue(array|string|null $value)
+    public function testReverseTransformForEmptyValue(array|string|null $value): void
     {
         $metadata = $this->getAssociationMetadata([Group::class]);
         $transformer = $this->getNestedAssociationTransformer($metadata);
@@ -66,7 +66,7 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
         ];
     }
 
-    public function testReverseTransform()
+    public function testReverseTransform(): void
     {
         $metadata = $this->getAssociationMetadata([Group::class]);
         $transformer = $this->getNestedAssociationTransformer($metadata);
@@ -95,7 +95,7 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
         );
     }
 
-    public function testReverseTransformForModelInheritedFromManageableEntity()
+    public function testReverseTransformForModelInheritedFromManageableEntity(): void
     {
         $this->notManageableClassNames = [UserProfile::class];
 
@@ -127,7 +127,7 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
         );
     }
 
-    public function testReverseTransformForEntityWithCompositeKey()
+    public function testReverseTransformForEntityWithCompositeKey(): void
     {
         $metadata = $this->getAssociationMetadata([CompositeKeyEntity::class]);
         $transformer = $this->getNestedAssociationTransformer($metadata);
@@ -162,7 +162,7 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
         );
     }
 
-    public function testReverseTransformWhenEntityNotFound()
+    public function testReverseTransformWhenEntityNotFound(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage(
@@ -185,7 +185,7 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
         $transformer->reverseTransform($value);
     }
 
-    public function testReverseTransformWhenEntityWithCompositeKeyNotFound()
+    public function testReverseTransformWhenEntityWithCompositeKeyNotFound(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage(sprintf(
@@ -214,7 +214,7 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
         $transformer->reverseTransform($value);
     }
 
-    public function testReverseTransformWhenInvalidValueType()
+    public function testReverseTransformWhenInvalidValueType(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('Expected an array.');
@@ -224,7 +224,7 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
         $transformer->reverseTransform(123);
     }
 
-    public function testReverseTransformWhenValueDoesNotHaveClass()
+    public function testReverseTransformWhenValueDoesNotHaveClass(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('Expected an array with "class" element.');
@@ -234,7 +234,7 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
         $transformer->reverseTransform(['id' => 123]);
     }
 
-    public function testReverseTransformWhenValueDoesNotHaveId()
+    public function testReverseTransformWhenValueDoesNotHaveId(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('Expected an array with "id" element.');
@@ -244,7 +244,7 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
         $transformer->reverseTransform(['class' => Group::class]);
     }
 
-    public function testReverseTransformWhenAnyEntityTypeShouldBeRejected()
+    public function testReverseTransformWhenAnyEntityTypeShouldBeRejected(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('There are no acceptable classes.');
@@ -255,7 +255,7 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
         $transformer->reverseTransform(['class' => Group::class, 'id' => 123]);
     }
 
-    public function testReverseTransformForNotAcceptableEntity()
+    public function testReverseTransformForNotAcceptableEntity(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage(sprintf(
@@ -270,7 +270,7 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
         $transformer->reverseTransform(['class' => User::class, 'id' => 123]);
     }
 
-    public function testReverseTransformForNotManageableEntity()
+    public function testReverseTransformForNotManageableEntity(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage(
@@ -284,7 +284,7 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
         $transformer->reverseTransform(['class' => Group::class, 'id' => 123]);
     }
 
-    public function testReverseTransformWhenAnyEntityTypeIsAcceptable()
+    public function testReverseTransformWhenAnyEntityTypeIsAcceptable(): void
     {
         $metadata = $this->getAssociationMetadata([]);
         $transformer = $this->getNestedAssociationTransformer($metadata);
@@ -313,7 +313,7 @@ class NestedAssociationTransformerTest extends OrmRelatedTestCase
         );
     }
 
-    public function testReverseTransformWhenDoctrineIsNotAbleToLoadEntity()
+    public function testReverseTransformWhenDoctrineIsNotAbleToLoadEntity(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage(sprintf(

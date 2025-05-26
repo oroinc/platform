@@ -6,17 +6,18 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestEmailOrigin;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class EmailOriginTest extends \PHPUnit\Framework\TestCase
+class EmailOriginTest extends TestCase
 {
-    public function testIdGetter()
+    public function testIdGetter(): void
     {
         $entity = new TestEmailOrigin();
         ReflectionUtil::setId($entity, 1);
         $this->assertEquals(1, $entity->getId());
     }
 
-    public function testFolderGetterAndSetter()
+    public function testFolderGetterAndSetter(): void
     {
         $folder1 = new EmailFolder();
         $folder1->setType('inbox');
@@ -46,7 +47,7 @@ class EmailOriginTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($entity->getFolder('sent'));
     }
 
-    public function testIsActive()
+    public function testIsActive(): void
     {
         $entity = new TestEmailOrigin();
 

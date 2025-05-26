@@ -6,13 +6,14 @@ use Oro\Bundle\ApiBundle\Provider\EntityAliasStorage;
 use Oro\Bundle\EntityBundle\Exception\DuplicateEntityAliasException;
 use Oro\Bundle\EntityBundle\Exception\InvalidEntityAliasException;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
+use PHPUnit\Framework\TestCase;
 
-class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
+class EntityAliasStorageTest extends TestCase
 {
     /**
      * @dataProvider validAliasDataProvider
      */
-    public function testValidateValidEntityAlias(string $value)
+    public function testValidateValidEntityAlias(string $value): void
     {
         $storage = new EntityAliasStorage(['api.yml']);
 
@@ -37,7 +38,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidAliasDataProvider
      */
-    public function testValidateInvalidEntityAlias(string $value)
+    public function testValidateInvalidEntityAlias(string $value): void
     {
         $storage = new EntityAliasStorage(['api.yml']);
 
@@ -61,7 +62,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidAliasDataProvider
      */
-    public function testValidateInvalidEntityPluralAlias(string $value)
+    public function testValidateInvalidEntityPluralAlias(string $value): void
     {
         $storage = new EntityAliasStorage(['api.yml']);
 
@@ -92,7 +93,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetDuplicateAliasHelpMessageForEmptyConfigFiles()
+    public function testGetDuplicateAliasHelpMessageForEmptyConfigFiles(): void
     {
         $storage = new EntityAliasStorage([]);
 
@@ -116,7 +117,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDuplicateAliasHelpMessageForOneConfigFile()
+    public function testGetDuplicateAliasHelpMessageForOneConfigFile(): void
     {
         $storage = new EntityAliasStorage(['api.yml']);
 
@@ -141,7 +142,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDuplicateAliasHelpMessageForTwoConfigFiles()
+    public function testGetDuplicateAliasHelpMessageForTwoConfigFiles(): void
     {
         $storage = new EntityAliasStorage(['first.yml', 'second.yml']);
 
@@ -166,7 +167,7 @@ class EntityAliasStorageTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDuplicateAliasHelpMessageForThreeAndMoreConfigFiles()
+    public function testGetDuplicateAliasHelpMessageForThreeAndMoreConfigFiles(): void
     {
         $storage = new EntityAliasStorage(['first.yml', 'second.yml', 'third.yml']);
 

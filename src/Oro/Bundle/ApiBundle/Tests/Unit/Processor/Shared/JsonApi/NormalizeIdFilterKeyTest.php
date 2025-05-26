@@ -11,8 +11,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelated
 
 class NormalizeIdFilterKeyTest extends GetListProcessorOrmRelatedTestCase
 {
-    /** @var NormalizeIdFilterKey */
-    private $processor;
+    private NormalizeIdFilterKey $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +21,7 @@ class NormalizeIdFilterKeyTest extends GetListProcessorOrmRelatedTestCase
         $this->processor = new NormalizeIdFilterKey($this->doctrineHelper);
     }
 
-    public function testProcessForNotManageableEntityWithoutIdentifier()
+    public function testProcessForNotManageableEntityWithoutIdentifier(): void
     {
         $className = 'Test\Class';
         $config = new EntityDefinitionConfig();
@@ -34,7 +33,7 @@ class NormalizeIdFilterKeyTest extends GetListProcessorOrmRelatedTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForNotManageableEntityWithIdentifier()
+    public function testProcessForNotManageableEntityWithIdentifier(): void
     {
         $className = 'Test\Class';
         $config = new EntityDefinitionConfig();
@@ -65,7 +64,7 @@ class NormalizeIdFilterKeyTest extends GetListProcessorOrmRelatedTestCase
         $this->assertFilters($filters, $this->context->getFilters());
     }
 
-    public function testProcessForNotManageableEntityWithIdFilterAndAnotherFilterWithIdPropertyPathEqualsToId()
+    public function testProcessForNotManageableEntityWithIdFilterAndAnotherFilterWithIdPropertyPathEqualsToId(): void
     {
         $className = 'Test\Class';
         $config = new EntityDefinitionConfig();
@@ -112,7 +111,7 @@ class NormalizeIdFilterKeyTest extends GetListProcessorOrmRelatedTestCase
     /**
      * @dataProvider processProvider
      */
-    public function testProcessForManageableEntityWithoutConfig(string $className, array $filters)
+    public function testProcessForManageableEntityWithoutConfig(string $className, array $filters): void
     {
         foreach (array_keys($filters) as $fieldName) {
             $filter = new ComparisonFilter('integer');
@@ -130,7 +129,7 @@ class NormalizeIdFilterKeyTest extends GetListProcessorOrmRelatedTestCase
     /**
      * @dataProvider processProvider
      */
-    public function testProcessForManageableEntityWithConfig(string $className, array $filters)
+    public function testProcessForManageableEntityWithConfig(string $className, array $filters): void
     {
         $config = new EntityDefinitionConfig();
         $idFieldName = $this->doctrineHelper->getSingleEntityIdentifierFieldName($className);
@@ -150,7 +149,7 @@ class NormalizeIdFilterKeyTest extends GetListProcessorOrmRelatedTestCase
         $this->assertFilters($filters, $this->context->getFilters());
     }
 
-    public function testProcessForManageableEntityWithRenamedIdentifier()
+    public function testProcessForManageableEntityWithRenamedIdentifier(): void
     {
         $className = Entity\User::class;
         $config = new EntityDefinitionConfig();

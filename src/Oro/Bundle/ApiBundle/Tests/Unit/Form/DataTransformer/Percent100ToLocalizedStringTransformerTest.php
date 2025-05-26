@@ -3,8 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\ApiBundle\Form\DataTransformer\Percent100ToLocalizedStringTransformer;
+use PHPUnit\Framework\TestCase;
 
-class Percent100ToLocalizedStringTransformerTest extends \PHPUnit\Framework\TestCase
+class Percent100ToLocalizedStringTransformerTest extends TestCase
 {
     private static function assertFloatSame(?float $expected, ?float $actual): void
     {

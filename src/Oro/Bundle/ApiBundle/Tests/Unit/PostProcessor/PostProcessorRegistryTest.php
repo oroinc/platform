@@ -7,20 +7,15 @@ use Oro\Bundle\ApiBundle\PostProcessor\PostProcessorRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class PostProcessorRegistryTest extends \PHPUnit\Framework\TestCase
+class PostProcessorRegistryTest extends TestCase
 {
-    /** @var PostProcessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $postProcessor1;
-
-    /** @var PostProcessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $postProcessor2;
-
-    /** @var PostProcessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $postProcessor3;
-
-    /** @var PostProcessorRegistry */
-    private $registry;
+    private PostProcessorInterface&MockObject $postProcessor1;
+    private PostProcessorInterface&MockObject $postProcessor2;
+    private PostProcessorInterface&MockObject $postProcessor3;
+    private PostProcessorRegistry $registry;
 
     #[\Override]
     protected function setUp(): void
@@ -48,7 +43,7 @@ class PostProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPostProcessorNames()
+    public function testGetPostProcessorNames(): void
     {
         self::assertSame(
             ['type1', 'type2'],
@@ -56,7 +51,7 @@ class PostProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPostProcessorWhenItExistsForSpecificRequestType()
+    public function testGetPostProcessorWhenItExistsForSpecificRequestType(): void
     {
         self::assertSame(
             $this->postProcessor2,
@@ -64,7 +59,7 @@ class PostProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPostProcessorWhenItDoesNotExistForSpecificRequestTypeButExistsForAnyRequestType()
+    public function testGetPostProcessorWhenItDoesNotExistForSpecificRequestTypeButExistsForAnyRequestType(): void
     {
         self::assertSame(
             $this->postProcessor1,
@@ -72,14 +67,14 @@ class PostProcessorRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetPostProcessorWhenItDoesNotExistForSpecificRequestTypeAndDoesNotExistForAnyRequestType()
+    public function testGetPostProcessorWhenItDoesNotExistForSpecificRequestTypeAndDoesNotExistForAnyRequestType(): void
     {
         self::assertNull(
             $this->registry->getPostProcessor('type2', new RequestType(['another']))
         );
     }
 
-    public function testGetPostProcessorForUnknownPostProcessor()
+    public function testGetPostProcessorForUnknownPostProcessor(): void
     {
         self::assertNull(
             $this->registry->getPostProcessor('undefined', new RequestType(['rest', 'json_api']))

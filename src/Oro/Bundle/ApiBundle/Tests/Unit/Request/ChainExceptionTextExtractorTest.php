@@ -4,17 +4,17 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
 use Oro\Bundle\ApiBundle\Request\ChainExceptionTextExtractor;
 use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ChainExceptionTextExtractorTest extends \PHPUnit\Framework\TestCase
+class ChainExceptionTextExtractorTest extends TestCase
 {
-    /** @var ChainExceptionTextExtractor */
-    private $chainExtractor;
-
-    /** @var ExceptionTextExtractorInterface[]|\PHPUnit\Framework\MockObject\MockObject[] */
-    private $extractors;
+    private ChainExceptionTextExtractor $chainExtractor;
+    /** @var ExceptionTextExtractorInterface[]&MockObject[] */
+    private array $extractors;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +26,7 @@ class ChainExceptionTextExtractorTest extends \PHPUnit\Framework\TestCase
         $this->chainExtractor = new ChainExceptionTextExtractor($this->extractors);
     }
 
-    public function testGetExceptionStatusCodeByFirstExtractor()
+    public function testGetExceptionStatusCodeByFirstExtractor(): void
     {
         $exception = new \Exception();
 
@@ -40,7 +40,7 @@ class ChainExceptionTextExtractorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(400, $this->chainExtractor->getExceptionStatusCode($exception));
     }
 
-    public function testGetExceptionStatusCodeBySecondExtractor()
+    public function testGetExceptionStatusCodeBySecondExtractor(): void
     {
         $exception = new \Exception();
 
@@ -56,7 +56,7 @@ class ChainExceptionTextExtractorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(401, $this->chainExtractor->getExceptionStatusCode($exception));
     }
 
-    public function testGetExceptionStatusCodeWhenFirstExtractorReturnsZero()
+    public function testGetExceptionStatusCodeWhenFirstExtractorReturnsZero(): void
     {
         $exception = new \Exception();
 
@@ -70,7 +70,7 @@ class ChainExceptionTextExtractorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(0, $this->chainExtractor->getExceptionStatusCode($exception));
     }
 
-    public function testGetExceptionStatusCodeNone()
+    public function testGetExceptionStatusCodeNone(): void
     {
         $exception = new \Exception();
 
@@ -86,7 +86,7 @@ class ChainExceptionTextExtractorTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->chainExtractor->getExceptionStatusCode($exception));
     }
 
-    public function testGetExceptionCodeByFirstExtractor()
+    public function testGetExceptionCodeByFirstExtractor(): void
     {
         $exception = new \Exception();
 
@@ -100,7 +100,7 @@ class ChainExceptionTextExtractorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('code1', $this->chainExtractor->getExceptionCode($exception));
     }
 
-    public function testGetExceptionCodeBySecondExtractor()
+    public function testGetExceptionCodeBySecondExtractor(): void
     {
         $exception = new \Exception();
 
@@ -116,7 +116,7 @@ class ChainExceptionTextExtractorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('code2', $this->chainExtractor->getExceptionCode($exception));
     }
 
-    public function testGetExceptionCodeWhenFirstExtractorReturnsEmptyString()
+    public function testGetExceptionCodeWhenFirstExtractorReturnsEmptyString(): void
     {
         $exception = new \Exception();
 
@@ -130,7 +130,7 @@ class ChainExceptionTextExtractorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('', $this->chainExtractor->getExceptionCode($exception));
     }
 
-    public function testGetExceptionCodeNone()
+    public function testGetExceptionCodeNone(): void
     {
         $exception = new \Exception();
 
@@ -146,7 +146,7 @@ class ChainExceptionTextExtractorTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->chainExtractor->getExceptionCode($exception));
     }
 
-    public function testGetExceptionTypeByFirstExtractor()
+    public function testGetExceptionTypeByFirstExtractor(): void
     {
         $exception = new \Exception();
 
@@ -160,7 +160,7 @@ class ChainExceptionTextExtractorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('type1', $this->chainExtractor->getExceptionType($exception));
     }
 
-    public function testGetExceptionTypeBySecondExtractor()
+    public function testGetExceptionTypeBySecondExtractor(): void
     {
         $exception = new \Exception();
 
@@ -176,7 +176,7 @@ class ChainExceptionTextExtractorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('type2', $this->chainExtractor->getExceptionType($exception));
     }
 
-    public function testGetExceptionTypeWhenFirstExtractorReturnsEmptyString()
+    public function testGetExceptionTypeWhenFirstExtractorReturnsEmptyString(): void
     {
         $exception = new \Exception();
 
@@ -190,7 +190,7 @@ class ChainExceptionTextExtractorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('', $this->chainExtractor->getExceptionType($exception));
     }
 
-    public function testGetExceptionTypeNone()
+    public function testGetExceptionTypeNone(): void
     {
         $exception = new \Exception();
 
@@ -206,7 +206,7 @@ class ChainExceptionTextExtractorTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->chainExtractor->getExceptionType($exception));
     }
 
-    public function testGetExceptionTextByFirstExtractor()
+    public function testGetExceptionTextByFirstExtractor(): void
     {
         $exception = new \Exception();
 
@@ -220,7 +220,7 @@ class ChainExceptionTextExtractorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('text1', $this->chainExtractor->getExceptionText($exception));
     }
 
-    public function testGetExceptionTextBySecondExtractor()
+    public function testGetExceptionTextBySecondExtractor(): void
     {
         $exception = new \Exception();
 
@@ -236,7 +236,7 @@ class ChainExceptionTextExtractorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('text2', $this->chainExtractor->getExceptionText($exception));
     }
 
-    public function testGetExceptionTextWhenFirstExtractorReturnsEmptyString()
+    public function testGetExceptionTextWhenFirstExtractorReturnsEmptyString(): void
     {
         $exception = new \Exception();
 
@@ -250,7 +250,7 @@ class ChainExceptionTextExtractorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('', $this->chainExtractor->getExceptionText($exception));
     }
 
-    public function testGetExceptionTextNone()
+    public function testGetExceptionTextNone(): void
     {
         $exception = new \Exception();
 

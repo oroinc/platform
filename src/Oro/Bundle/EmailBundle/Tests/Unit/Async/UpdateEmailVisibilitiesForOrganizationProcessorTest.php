@@ -16,23 +16,19 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 
 class UpdateEmailVisibilitiesForOrganizationProcessorTest extends OrmTestCase
 {
     use MessageQueueExtension;
 
-    private const CHUNK_SIZE = 10000;
-    private const JOB_NAME = 'oro:email:update-visibilities:emails';
+    private const int CHUNK_SIZE = 10000;
+    private const string JOB_NAME = 'oro:email:update-visibilities:emails';
 
-    /** @var JobRunner|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobRunner;
-
-    /** @var EntityManagerInterface */
-    private $em;
-
-    /** @var UpdateEmailVisibilitiesForOrganizationProcessor */
-    private $processor;
+    private JobRunner&MockObject $jobRunner;
+    private EntityManagerInterface $em;
+    private UpdateEmailVisibilitiesForOrganizationProcessor $processor;
 
     #[\Override]
     protected function setUp(): void

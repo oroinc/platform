@@ -7,26 +7,21 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Shared\LoadTitleMetaProperty;
-use Oro\Bundle\ApiBundle\Processor\Shared\LoadTitleMetaPropertyForCollection;
 use Oro\Bundle\ApiBundle\Processor\Shared\LoadTitleMetaPropertyForSingleItem;
 use Oro\Bundle\ApiBundle\Provider\EntityTitleProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
 {
-    /** @var EntityTitleProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityTitleProvider;
-
-    /** @var ExpandedAssociationExtractor|\PHPUnit\Framework\MockObject\MockObject */
-    private $expandedAssociationExtractor;
-
-    /** @var LoadTitleMetaPropertyForCollection */
-    private $processor;
+    private EntityTitleProviderInterface&MockObject $entityTitleProvider;
+    private ExpandedAssociationExtractor&MockObject $expandedAssociationExtractor;
+    private LoadTitleMetaPropertyForSingleItem $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -54,34 +49,34 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
         return $config;
     }
 
-    private function addTitleMetaProperty(EntityDefinitionConfig $config)
+    private function addTitleMetaProperty(EntityDefinitionConfig $config): void
     {
         $titleField = $config->addField('__title__');
         $titleField->setMetaProperty(true);
         $titleField->setMetaPropertyResultName('title');
     }
 
-    public function testProcessForNullData()
+    public function testProcessForNullData(): void
     {
         $this->processor->process($this->context);
         self::assertFalse($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
-    public function testProcessForEmptyData()
+    public function testProcessForEmptyData(): void
     {
         $this->context->setResult([]);
         $this->processor->process($this->context);
         self::assertFalse($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
-    public function testProcessForNotArrayData()
+    public function testProcessForNotArrayData(): void
     {
         $this->context->setResult(123);
         $this->processor->process($this->context);
         self::assertFalse($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
-    public function testProcessWhenTitleMetaPropertyWasNotRequested()
+    public function testProcessWhenTitleMetaPropertyWasNotRequested(): void
     {
         $config = $this->getConfig();
 
@@ -92,7 +87,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
         self::assertFalse($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
-    public function testProcessWhenTitlesAreAlreadyProcessed()
+    public function testProcessWhenTitlesAreAlreadyProcessed(): void
     {
         $config = $this->getConfig();
         $this->addTitleMetaProperty($config);
@@ -105,7 +100,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
         self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
-    public function testProcessForPrimaryEntityOnly()
+    public function testProcessForPrimaryEntityOnly(): void
     {
         $config = $this->getConfig();
         $this->addTitleMetaProperty($config);
@@ -139,7 +134,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
         self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
-    public function testProcessForExpandedEntities()
+    public function testProcessForExpandedEntities(): void
     {
         $config = $this->getConfig();
         $this->addTitleMetaProperty($config);
@@ -213,7 +208,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
         self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
-    public function testProcessForExpandedEntitiesWithDisabledTitleMetaProperty()
+    public function testProcessForExpandedEntitiesWithDisabledTitleMetaProperty(): void
     {
         $config = $this->getConfig();
         $this->addTitleMetaProperty($config);
@@ -278,7 +273,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
         self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
-    public function testProcessForExpandedEnumEntities()
+    public function testProcessForExpandedEnumEntities(): void
     {
         $config = $this->getConfig();
         $this->addTitleMetaProperty($config);
@@ -352,7 +347,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
         self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
-    public function testProcessForResourceBasedOnAnotherResource()
+    public function testProcessForResourceBasedOnAnotherResource(): void
     {
         $config = $this->getConfig();
         $config->setParentResourceClass('Test\ParentEntity');
@@ -396,7 +391,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
         self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
-    public function testProcessForEntitiesWithRenamedIdentifierFields()
+    public function testProcessForEntitiesWithRenamedIdentifierFields(): void
     {
         $config = $this->getConfig(['renamedId']);
         $config->getField('renamedId')->setPropertyPath('realId');
@@ -473,7 +468,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
         self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
-    public function testProcessForAssociationWithoutConfiguredIdentifierField()
+    public function testProcessForAssociationWithoutConfiguredIdentifierField(): void
     {
         $config = $this->getConfig();
         $this->addTitleMetaProperty($config);
@@ -545,7 +540,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
         self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
-    public function testProcessForAssociationWithoutConfiguredIdentifierFieldNames()
+    public function testProcessForAssociationWithoutConfiguredIdentifierFieldNames(): void
     {
         $config = $this->getConfig();
         $this->addTitleMetaProperty($config);
@@ -608,7 +603,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
         self::assertTrue($this->context->isProcessed(LoadTitleMetaProperty::OPERATION_NAME));
     }
 
-    public function testProcessForEntitiesWithCompositeIdentifier()
+    public function testProcessForEntitiesWithCompositeIdentifier(): void
     {
         $config = $this->getConfig(['renamedId1', 'id2']);
         $config->getField('renamedId1')->setPropertyPath('id1');
@@ -702,7 +697,7 @@ class LoadTitleMetaPropertyForSingleItemTest extends GetProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessForMultiTargetAssociation()
+    public function testProcessForMultiTargetAssociation(): void
     {
         $config = $this->getConfig();
         $this->addTitleMetaProperty($config);

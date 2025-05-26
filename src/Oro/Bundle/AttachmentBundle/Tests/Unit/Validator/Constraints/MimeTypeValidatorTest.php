@@ -9,13 +9,13 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class MimeTypeValidatorTest extends ConstraintValidatorTestCase
 {
-    private const ALLOWED_FILE_MIME_TYPES = [
+    private const array ALLOWED_FILE_MIME_TYPES = [
         'application/vnd.ms-excel',
         'application/pdf',
         'image/png'
     ];
 
-    private const ALLOWED_IMAGE_MIME_TYPES = [
+    private const array ALLOWED_IMAGE_MIME_TYPES = [
         'image/gif',
         'image/png'
     ];

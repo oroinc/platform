@@ -8,14 +8,13 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityConfigListenerTest extends \PHPUnit\Framework\TestCase
+class EntityConfigListenerTest extends TestCase
 {
-    /** @var TemplateRendererConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailRendererConfigProvider;
-
-    /** @var EntityConfigListener */
-    private $listener;
+    private TemplateRendererConfigProviderInterface&MockObject $emailRendererConfigProvider;
+    private EntityConfigListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +27,7 @@ class EntityConfigListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider changeSetProvider
      */
-    public function testPreFlush(string $scope, array $changeSet, bool $shouldClearCache)
+    public function testPreFlush(string $scope, array $changeSet, bool $shouldClearCache): void
     {
         $config = new Config(new FieldConfigId($scope, 'Test\Entity', 'testField'));
 

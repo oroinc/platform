@@ -7,17 +7,14 @@ use Oro\Bundle\ApiBundle\Util\MandatoryFieldProviderInterface;
 use Oro\Bundle\ApiBundle\Util\MandatoryFieldProviderRegistry;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MandatoryFieldProviderRegistryTest extends \PHPUnit\Framework\TestCase
+class MandatoryFieldProviderRegistryTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MandatoryFieldProviderInterface */
-    private $provider1;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MandatoryFieldProviderInterface */
-    private $provider2;
-
-    /** @var MandatoryFieldProviderRegistry */
-    private $registry;
+    private MandatoryFieldProviderInterface&MockObject $provider1;
+    private MandatoryFieldProviderInterface&MockObject $provider2;
+    private MandatoryFieldProviderRegistry $registry;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +37,7 @@ class MandatoryFieldProviderRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFieldsShouldBeMergedAndMadeUnique()
+    public function testFieldsShouldBeMergedAndMadeUnique(): void
     {
         $entityClass = 'Test\Class';
 
@@ -59,7 +56,7 @@ class MandatoryFieldProviderRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFieldsShouldSkipNotSuitableProviders()
+    public function testFieldsShouldSkipNotSuitableProviders(): void
     {
         $entityClass = 'Test\Class';
 
@@ -76,7 +73,7 @@ class MandatoryFieldProviderRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFieldsShouldReturnEmptyArrayIfNoMandatoryFields()
+    public function testFieldsShouldReturnEmptyArrayIfNoMandatoryFields(): void
     {
         $entityClass = 'Test\Class';
 

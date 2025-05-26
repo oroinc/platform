@@ -5,17 +5,15 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\FormBundle\Form\Type\OroEncodedPlaceholderPasswordType;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OroEncodedPlaceholderPasswordTypeTest extends FormIntegrationTestCase
 {
-    /** @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $crypter;
-
-    /** @var OroEncodedPlaceholderPasswordType */
-    private $formType;
+    private SymmetricCrypterInterface&MockObject $crypter;
+    private OroEncodedPlaceholderPasswordType $formType;
 
     #[\Override]
     protected function setUp(): void

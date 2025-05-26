@@ -7,26 +7,17 @@ use Oro\Bundle\ApiBundle\Request\EntityIdResolverRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityIdResolverRegistryTest extends \PHPUnit\Framework\TestCase
+class EntityIdResolverRegistryTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdResolverInterface */
-    private $resolver1;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdResolverInterface */
-    private $resolver2;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdResolverInterface */
-    private $resolver3;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdResolverInterface */
-    private $resolver4;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdResolverInterface */
-    private $resolver5;
-
-    /** @var EntityIdResolverRegistry */
-    private $registry;
+    private EntityIdResolverInterface&MockObject $resolver1;
+    private EntityIdResolverInterface&MockObject $resolver2;
+    private EntityIdResolverInterface&MockObject $resolver3;
+    private EntityIdResolverInterface&MockObject $resolver4;
+    private EntityIdResolverInterface&MockObject $resolver5;
+    private EntityIdResolverRegistry $registry;
 
     #[\Override]
     protected function setUp(): void
@@ -68,28 +59,28 @@ class EntityIdResolverRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetResolverWhenNoResolverForGivenId()
+    public function testGetResolverWhenNoResolverForGivenId(): void
     {
         self::assertNull(
             $this->registry->getResolver('id3', 'Class1', new RequestType(['json_api']))
         );
     }
 
-    public function testGetResolverWhenNoResolverForGivenClass()
+    public function testGetResolverWhenNoResolverForGivenClass(): void
     {
         self::assertNull(
             $this->registry->getResolver('id1', 'Class3', new RequestType(['json_api']))
         );
     }
 
-    public function testGetResolverWhenNoResolverForGivenRequestType()
+    public function testGetResolverWhenNoResolverForGivenRequestType(): void
     {
         self::assertNull(
             $this->registry->getResolver('id1', 'Class2', new RequestType(['rest']))
         );
     }
 
-    public function testGetResolverSpecificForRequestType()
+    public function testGetResolverSpecificForRequestType(): void
     {
         self::assertSame(
             $this->resolver2,
@@ -97,7 +88,7 @@ class EntityIdResolverRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetResolverDefault()
+    public function testGetResolverDefault(): void
     {
         self::assertSame(
             $this->resolver3,
@@ -105,7 +96,7 @@ class EntityIdResolverRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetResolverDefaultWhenOnlyDefaultResolverExistForClass()
+    public function testGetResolverDefaultWhenOnlyDefaultResolverExistForClass(): void
     {
         self::assertSame(
             $this->resolver5,
@@ -113,14 +104,14 @@ class EntityIdResolverRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetResolverWhenNoDefaultResolver()
+    public function testGetResolverWhenNoDefaultResolver(): void
     {
         self::assertNull(
             $this->registry->getResolver('id1', 'Class2', new RequestType(['another']))
         );
     }
 
-    public function testGetDescriptions()
+    public function testGetDescriptions(): void
     {
         $this->resolver1->expects(self::never())
             ->method('getDescription');

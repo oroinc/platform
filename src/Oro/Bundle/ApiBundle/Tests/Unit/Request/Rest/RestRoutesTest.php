@@ -3,13 +3,14 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\Rest;
 
 use Oro\Bundle\ApiBundle\Request\Rest\RestRoutes;
+use PHPUnit\Framework\TestCase;
 
-class RestRoutesTest extends \PHPUnit\Framework\TestCase
+class RestRoutesTest extends TestCase
 {
-    private const ITEM_ROUTE = 'item_route';
-    private const LIST_ROUTE = 'list_route';
-    private const SUBRESOURCE_ROUTE = 'subresource_route';
-    private const RELATIONSHIP_ROUTE = 'relationship_route';
+    private const string ITEM_ROUTE = 'item_route';
+    private const string LIST_ROUTE = 'list_route';
+    private const string SUBRESOURCE_ROUTE = 'subresource_route';
+    private const string RELATIONSHIP_ROUTE = 'relationship_route';
 
     private RestRoutes $routes;
 
@@ -24,22 +25,22 @@ class RestRoutesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetItemRouteName()
+    public function testGetItemRouteName(): void
     {
         self::assertEquals(self::ITEM_ROUTE, $this->routes->getItemRouteName());
     }
 
-    public function testGetListRouteName()
+    public function testGetListRouteName(): void
     {
         self::assertEquals(self::LIST_ROUTE, $this->routes->getListRouteName());
     }
 
-    public function testGetSubresourceRouteName()
+    public function testGetSubresourceRouteName(): void
     {
         self::assertEquals(self::SUBRESOURCE_ROUTE, $this->routes->getSubresourceRouteName());
     }
 
-    public function testGetRelationshipRouteName()
+    public function testGetRelationshipRouteName(): void
     {
         self::assertEquals(self::RELATIONSHIP_ROUTE, $this->routes->getRelationshipRouteName());
     }

@@ -6,12 +6,13 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LoaderTestCase extends \PHPUnit\Framework\TestCase
+class LoaderTestCase extends TestCase
 {
-    protected function getClassMetadataMock(
-        ?string $className = null
-    ): ClassMetadata|\PHPUnit\Framework\MockObject\MockObject {
+    protected function getClassMetadataMock(?string $className = null): ClassMetadata&MockObject
+    {
         if ($className) {
             $classMetadata = $this->getMockBuilder(ClassMetadata::class)
                 ->setConstructorArgs([$className])

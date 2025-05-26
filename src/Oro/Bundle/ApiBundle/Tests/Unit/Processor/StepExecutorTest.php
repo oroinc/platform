@@ -6,14 +6,13 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\ByStepNormalizeResultActionProcessor;
 use Oro\Bundle\ApiBundle\Processor\ByStepNormalizeResultContext;
 use Oro\Bundle\ApiBundle\Processor\StepExecutor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class StepExecutorTest extends \PHPUnit\Framework\TestCase
+class StepExecutorTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $processor;
-
-    /** @var StepExecutor */
-    private $stepExecutor;
+    private ByStepNormalizeResultActionProcessor&MockObject $processor;
+    private StepExecutor $stepExecutor;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class StepExecutorTest extends \PHPUnit\Framework\TestCase
         $this->stepExecutor = new StepExecutor($this->processor);
     }
 
-    public function testExecuteStepNoResetErrors()
+    public function testExecuteStepNoResetErrors(): void
     {
         $stepName = 'testStep';
         $context = new ByStepNormalizeResultContext();
@@ -42,7 +41,7 @@ class StepExecutorTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($context->hasErrors());
     }
 
-    public function testExecuteStepWithResetErrors()
+    public function testExecuteStepWithResetErrors(): void
     {
         $stepName = 'testStep';
         $context = new ByStepNormalizeResultContext();
@@ -61,7 +60,7 @@ class StepExecutorTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($context->hasErrors());
     }
 
-    public function testExecuteStepWithResetErrorsAndNewErrorsOccurred()
+    public function testExecuteStepWithResetErrorsAndNewErrorsOccurred(): void
     {
         $stepName = 'testStep';
         $context = new ByStepNormalizeResultContext();
@@ -84,7 +83,7 @@ class StepExecutorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('some error2', $errors[1]->getTitle());
     }
 
-    public function testExecuteStepWithResetErrorsAndNoExistingErrorsButNewErrorsOccurred()
+    public function testExecuteStepWithResetErrorsAndNoExistingErrorsButNewErrorsOccurred(): void
     {
         $stepName = 'testStep';
         $context = new ByStepNormalizeResultContext();

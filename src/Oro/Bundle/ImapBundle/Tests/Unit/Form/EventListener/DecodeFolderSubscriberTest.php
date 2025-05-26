@@ -3,12 +3,12 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Form\EventListener;
 
 use Oro\Bundle\ImapBundle\Form\EventListener\DecodeFolderSubscriber;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormEvent;
 
-class DecodeFolderSubscriberTest extends \PHPUnit\Framework\TestCase
+class DecodeFolderSubscriberTest extends TestCase
 {
-    /** @var DecodeFolderSubscriber */
-    private $listener;
+    private DecodeFolderSubscriber $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -16,7 +16,7 @@ class DecodeFolderSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->listener = new DecodeFolderSubscriber();
     }
 
-    public function testDecodeFolderNoData()
+    public function testDecodeFolderNoData(): void
     {
         $formEvent = $this->createMock(FormEvent::class);
         $formEvent->expects($this->once())
@@ -27,7 +27,7 @@ class DecodeFolderSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->listener->decodeFolders($formEvent);
     }
 
-    public function testDecodeFolderEmptyData()
+    public function testDecodeFolderEmptyData(): void
     {
         $formEvent = $this->createMock(FormEvent::class);
         $formEvent->expects($this->once())
@@ -38,7 +38,7 @@ class DecodeFolderSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->listener->decodeFolders($formEvent);
     }
 
-    public function testDecodeFolderNoKeyData()
+    public function testDecodeFolderNoKeyData(): void
     {
         $formEvent = $this->createMock(FormEvent::class);
         $formEvent->expects($this->once())
@@ -49,7 +49,7 @@ class DecodeFolderSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->listener->decodeFolders($formEvent);
     }
 
-    public function testDecodeFolder()
+    public function testDecodeFolder(): void
     {
         $formEvent = $this->createMock(FormEvent::class);
         $folders = ['f1' => 1];

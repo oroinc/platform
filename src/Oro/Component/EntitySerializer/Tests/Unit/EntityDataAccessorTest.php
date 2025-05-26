@@ -6,12 +6,13 @@ use Oro\Component\EntitySerializer\EntityDataAccessor;
 use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\TestEntity;
 use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\TestEntityWithArrayAccess;
 use Oro\Component\EntitySerializer\Tests\Unit\Fixtures\Entity\TestEntityWithMagicMethods;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EntityDataAccessorTest extends \PHPUnit\Framework\TestCase
+class EntityDataAccessorTest extends TestCase
 {
     protected EntityDataAccessor $entityDataAccessor;
 

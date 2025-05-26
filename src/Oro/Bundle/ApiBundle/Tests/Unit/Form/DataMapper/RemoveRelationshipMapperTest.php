@@ -9,6 +9,8 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\EntityWithoutGettersAndSette
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
@@ -19,16 +21,11 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class RemoveRelationshipMapperTest extends \PHPUnit\Framework\TestCase
+class RemoveRelationshipMapperTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
-    private $dispatcher;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|PropertyAccessorInterface */
-    private $propertyAccessor;
-
-    /** @var RemoveRelationshipMapper */
-    private $mapper;
+    private EventDispatcherInterface&MockObject $dispatcher;
+    private PropertyAccessorInterface&MockObject $propertyAccessor;
+    private RemoveRelationshipMapper $mapper;
 
     #[\Override]
     protected function setUp(): void
@@ -56,7 +53,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         return $form;
     }
 
-    public function testMapDataToFormsPassesObjectRefIfByReference()
+    public function testMapDataToFormsPassesObjectRefIfByReference(): void
     {
         $car = new \stdClass();
         $engine = new \stdClass();
@@ -79,7 +76,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         self::assertSame($engine, $form->getData());
     }
 
-    public function testMapDataToFormsPassesObjectCloneIfNotByReference()
+    public function testMapDataToFormsPassesObjectCloneIfNotByReference(): void
     {
         $car = new \stdClass();
         $engine = new \stdClass();
@@ -101,7 +98,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($engine, $form->getData());
     }
 
-    public function testMapDataToFormsIgnoresEmptyPropertyPath()
+    public function testMapDataToFormsIgnoresEmptyPropertyPath(): void
     {
         $car = new \stdClass();
 
@@ -116,7 +113,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         self::assertNull($form->getData());
     }
 
-    public function testMapDataToFormsIgnoresUnmapped()
+    public function testMapDataToFormsIgnoresUnmapped(): void
     {
         $car = new \stdClass();
         $propertyPath = new PropertyPath('engine');
@@ -135,7 +132,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         self::assertNull($form->getData());
     }
 
-    public function testMapDataToFormsSetsDefaultDataIfPassedDataIsNull()
+    public function testMapDataToFormsSetsDefaultDataIfPassedDataIsNull(): void
     {
         $default = new \stdClass();
         $propertyPath = new PropertyPath('engine');
@@ -160,7 +157,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         $this->mapper->mapDataToForms(null, new \ArrayIterator([$form]));
     }
 
-    public function testMapDataToFormsCollectionShouldBeIgnored()
+    public function testMapDataToFormsCollectionShouldBeIgnored(): void
     {
         $car = new \stdClass();
         $doors = new ArrayCollection([new \stdClass()]);
@@ -181,7 +178,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         self::assertNull($form->getData());
     }
 
-    public function testMapFormsToDataWritesBackIfNotByReference()
+    public function testMapFormsToDataWritesBackIfNotByReference(): void
     {
         $car = new \stdClass();
         $engine = new \stdClass();
@@ -200,7 +197,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
     }
 
-    public function testMapFormsToDataWritesBackIfByReferenceButNoReference()
+    public function testMapFormsToDataWritesBackIfByReferenceButNoReference(): void
     {
         $car = new \stdClass();
         $engine = new \stdClass();
@@ -219,7 +216,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
     }
 
-    public function testMapFormsToDataWritesBackIfByReferenceAndReference()
+    public function testMapFormsToDataWritesBackIfByReferenceAndReference(): void
     {
         $car = new \stdClass();
         $engine = new \stdClass();
@@ -243,7 +240,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
     }
 
-    public function testMapFormsToDataIgnoresUnmapped()
+    public function testMapFormsToDataIgnoresUnmapped(): void
     {
         $car = new \stdClass();
         $engine = new \stdClass();
@@ -262,7 +259,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
     }
 
-    public function testMapFormsToDataIgnoresUnsubmittedForms()
+    public function testMapFormsToDataIgnoresUnsubmittedForms(): void
     {
         $car = new \stdClass();
         $engine = new \stdClass();
@@ -280,7 +277,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
     }
 
-    public function testMapFormsToDataIgnoresEmptyData()
+    public function testMapFormsToDataIgnoresEmptyData(): void
     {
         $car = new \stdClass();
         $propertyPath = new PropertyPath('engine');
@@ -297,7 +294,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
     }
 
-    public function testMapFormsToDataIgnoresUnsynchronized()
+    public function testMapFormsToDataIgnoresUnsynchronized(): void
     {
         $car = new \stdClass();
         $engine = new \stdClass();
@@ -315,7 +312,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
     }
 
-    public function testMapFormsToDataIgnoresDisabled()
+    public function testMapFormsToDataIgnoresDisabled(): void
     {
         $car = new \stdClass();
         $engine = new \stdClass();
@@ -334,7 +331,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $car);
     }
 
-    public function testMapFormsToDataElementsShouldBeRemovedFromCollectionWhenAdderAndRemoverExist()
+    public function testMapFormsToDataElementsShouldBeRemovedFromCollectionWhenAdderAndRemoverExist(): void
     {
         $group1 = new Group();
         $group1->setName('group1');
@@ -365,7 +362,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, $user->getGroups());
     }
 
-    public function testMapFormsToDataElementsShouldBeRemovedFromCollectionWhenAdderAndRemoverDoNotExist()
+    public function testMapFormsToDataElementsShouldBeRemovedFromCollectionWhenAdderAndRemoverDoNotExist(): void
     {
         $group1 = new Group();
         $group1->setName('group1');
@@ -396,7 +393,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, $user->groups);
     }
 
-    public function testMapFormsToDataCollectionShouldBeReplacedWhenItDoesNotBelongsRootDataObject()
+    public function testMapFormsToDataCollectionShouldBeReplacedWhenItDoesNotBelongsRootDataObject(): void
     {
         $group1 = new Group();
         $group1->setName('group1');
@@ -430,7 +427,7 @@ class RemoveRelationshipMapperTest extends \PHPUnit\Framework\TestCase
         $this->mapper->mapFormsToData(new \ArrayIterator([$form]), $product);
     }
 
-    public function testMapFormsToDataElementsShouldBeAddedToCollectionInCaseOfExtendedToManyAssociation()
+    public function testMapFormsToDataElementsShouldBeAddedToCollectionInCaseOfExtendedToManyAssociation(): void
     {
         $group1 = new Group();
         $group1->setName('group1');

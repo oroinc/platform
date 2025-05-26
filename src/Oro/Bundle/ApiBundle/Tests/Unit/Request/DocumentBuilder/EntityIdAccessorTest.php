@@ -9,17 +9,14 @@ use Oro\Bundle\ApiBundle\Request\DocumentBuilder\EntityIdAccessor;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
+class EntityIdAccessorTest extends TestCase
 {
-    /** @var EntityIdTransformerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityIdTransformerRegistry;
-
-    /** @var EntityIdTransformerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityIdTransformer;
-
-    /** @var EntityIdAccessor */
-    private $entityIdAccessor;
+    private EntityIdTransformerRegistry&MockObject $entityIdTransformerRegistry;
+    private EntityIdTransformerInterface&MockObject $entityIdTransformer;
+    private EntityIdAccessor $entityIdAccessor;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +30,7 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityIdForEntityWithSingleId()
+    public function testGetEntityIdForEntityWithSingleId(): void
     {
         $entity = ['id' => 123, 'name' => 'val'];
         $metadata = new EntityMetadata('Test\Entity');
@@ -55,7 +52,7 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityIdForEntityWithSingleZeroId()
+    public function testGetEntityIdForEntityWithSingleZeroId(): void
     {
         $entity = ['id' => 0, 'name' => 'val'];
         $metadata = new EntityMetadata('Test\Entity');
@@ -77,7 +74,7 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityIdForEntityWithSingleIdWhenTransformedValueIsNotString()
+    public function testGetEntityIdForEntityWithSingleIdWhenTransformedValueIsNotString(): void
     {
         $entity = ['id' => 123, 'name' => 'val'];
         $metadata = new EntityMetadata('Test\Entity');
@@ -99,7 +96,7 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityIdForEntityWithSingleIdAndEntityDoesNotHaveIdProperty()
+    public function testGetEntityIdForEntityWithSingleIdAndEntityDoesNotHaveIdProperty(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
@@ -119,7 +116,7 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
         $this->entityIdAccessor->getEntityId($entity, $metadata, $requestType);
     }
 
-    public function testGetEntityIdForEntityWithCompositeId()
+    public function testGetEntityIdForEntityWithCompositeId(): void
     {
         $entity = ['id1' => 123, 'id2' => 456, 'name' => 'val'];
         $metadata = new EntityMetadata('Test\Entity');
@@ -141,7 +138,7 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityIdForEntityWithCompositeIdAndEntityDoesNotHaveOneOfIdProperty()
+    public function testGetEntityIdForEntityWithCompositeIdAndEntityDoesNotHaveOneOfIdProperty(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
@@ -161,7 +158,7 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
         $this->entityIdAccessor->getEntityId($entity, $metadata, $requestType);
     }
 
-    public function testGetEntityIdWhenMetadataDoesNotHaveIdInfo()
+    public function testGetEntityIdWhenMetadataDoesNotHaveIdInfo(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The "Test\Entity" entity does not have an identifier.');
@@ -178,7 +175,7 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
         $this->entityIdAccessor->getEntityId($entity, $metadata, $requestType);
     }
 
-    public function testGetEntityIdWhenIdValueIsNull()
+    public function testGetEntityIdWhenIdValueIsNull(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The identifier value for "Test\Entity" entity must not be empty.');
@@ -200,7 +197,7 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
         $this->entityIdAccessor->getEntityId($entity, $metadata, $requestType);
     }
 
-    public function testGetEntityIdWhenIdValueIsEmpty()
+    public function testGetEntityIdWhenIdValueIsEmpty(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The identifier value for "Test\Entity" entity must not be empty.');
@@ -222,7 +219,7 @@ class EntityIdAccessorTest extends \PHPUnit\Framework\TestCase
         $this->entityIdAccessor->getEntityId($entity, $metadata, $requestType);
     }
 
-    public function testGetEntityIdWhenSingleEntityIdIsProvidedInsteadOfEntityObject()
+    public function testGetEntityIdWhenSingleEntityIdIsProvidedInsteadOfEntityObject(): void
     {
         $entityId = 123;
         $metadata = new EntityMetadata('Test\Entity');

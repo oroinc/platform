@@ -5,11 +5,12 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Provider;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\ResizedImagePathProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ResizedImagePathProviderTest extends \PHPUnit\Framework\TestCase
+class ResizedImagePathProviderTest extends TestCase
 {
-    private FileUrlProviderInterface|\PHPUnit\Framework\MockObject\MockObject $fileUrlProvider;
-
+    private FileUrlProviderInterface&MockObject $fileUrlProvider;
     private ResizedImagePathProvider $provider;
 
     #[\Override]
@@ -22,28 +23,37 @@ class ResizedImagePathProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetPathForResizedImage(): void
     {
-        $this->fileUrlProvider
-            ->expects(self::once())
+        $entity = new File();
+        $width = 10;
+        $height = 20;
+        $format = 'sample_format';
+        $url = 'sample/url';
+
+        $this->fileUrlProvider->expects(self::once())
             ->method('getResizedImageUrl')
-            ->with($entity = new File(), $width = 10, $height = 20, $format = 'sample_format')
-            ->willReturn('sample/url');
+            ->with($entity, $width, $height, $format)
+            ->willReturn($url);
 
         self::assertEquals(
-            '/sample/url',
+            '/' . $url,
             $this->provider->getPathForResizedImage($entity, $width, $height, $format)
         );
     }
 
     public function testGetPathForFilteredImage(): void
     {
-        $this->fileUrlProvider
-            ->expects(self::once())
+        $entity = new File();
+        $filter = 'sample-filter';
+        $format = 'sample_format';
+        $url = 'sample/url';
+
+        $this->fileUrlProvider->expects(self::once())
             ->method('getFilteredImageUrl')
-            ->with($entity = new File(), $filter = 'sample-filter', $format = 'sample_format')
-            ->willReturn($url = 'sample/url');
+            ->with($entity, $filter, $format)
+            ->willReturn($url);
 
         self::assertEquals(
-            '/sample/url',
+            '/' . $url,
             $this->provider->getPathForFilteredImage($entity, $filter, $format)
         );
     }

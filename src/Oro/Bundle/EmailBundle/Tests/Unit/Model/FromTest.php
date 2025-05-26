@@ -3,8 +3,9 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Model;
 
 use Oro\Bundle\EmailBundle\Model\From;
+use PHPUnit\Framework\TestCase;
 
-class FromTest extends \PHPUnit\Framework\TestCase
+class FromTest extends TestCase
 {
     /**
      * @dataProvider gettersDataProvider

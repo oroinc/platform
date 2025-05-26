@@ -12,8 +12,7 @@ use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
 class ExecuteTargetProcessorTest extends BatchUpdateItemProcessorTestCase
 {
-    /** @var ExecuteTargetProcessor */
-    private $processor;
+    private ExecuteTargetProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +29,7 @@ class ExecuteTargetProcessorTest extends BatchUpdateItemProcessorTestCase
         );
     }
 
-    public function testProcessWhenNoTargetProcessor()
+    public function testProcessWhenNoTargetProcessor(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The target processor is not defined.');
@@ -38,7 +37,7 @@ class ExecuteTargetProcessorTest extends BatchUpdateItemProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenNoTargetContext()
+    public function testProcessWhenNoTargetContext(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The target context is not defined.');
@@ -47,7 +46,7 @@ class ExecuteTargetProcessorTest extends BatchUpdateItemProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenNoFirstGroupInTargetContext()
+    public function testProcessWhenNoFirstGroupInTargetContext(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The target first group is not defined.');
@@ -59,7 +58,7 @@ class ExecuteTargetProcessorTest extends BatchUpdateItemProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenNoLastGroupInTargetContext()
+    public function testProcessWhenNoLastGroupInTargetContext(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The target last group is not defined.');
@@ -72,7 +71,7 @@ class ExecuteTargetProcessorTest extends BatchUpdateItemProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenNoErrorsOccurredWhenProcessingTargetProcessor()
+    public function testProcessWhenNoErrorsOccurredWhenProcessingTargetProcessor(): void
     {
         $targetProcessor = $this->createMock(ActionProcessorInterface::class);
 
@@ -90,7 +89,7 @@ class ExecuteTargetProcessorTest extends BatchUpdateItemProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWhenSomeErrorsOccurredWhenProcessingTargetProcessor()
+    public function testProcessWhenSomeErrorsOccurredWhenProcessingTargetProcessor(): void
     {
         $targetProcessor = $this->createMock(ActionProcessorInterface::class);
 

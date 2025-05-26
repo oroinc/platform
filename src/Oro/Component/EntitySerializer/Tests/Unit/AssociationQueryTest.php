@@ -4,8 +4,9 @@ namespace Oro\Component\EntitySerializer\Tests\Unit;
 
 use Doctrine\ORM\QueryBuilder;
 use Oro\Component\EntitySerializer\AssociationQuery;
+use PHPUnit\Framework\TestCase;
 
-class AssociationQueryTest extends \PHPUnit\Framework\TestCase
+class AssociationQueryTest extends TestCase
 {
     public function testCreateForCollectionQuery(): void
     {

@@ -5,11 +5,12 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Tools\Imagine\Binary\Filter\Bas
 use Liip\ImagineBundle\Imagine\Filter\FilterManager;
 use Liip\ImagineBundle\Model\Binary;
 use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Filter\Basic\BasicImagineBinaryFilter;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class BasicImagineBinaryFilterTest extends \PHPUnit\Framework\TestCase
+class BasicImagineBinaryFilterTest extends TestCase
 {
-    private FilterManager|\PHPUnit\Framework\MockObject\MockObject $filterManager;
-
+    private FilterManager&MockObject $filterManager;
     private BasicImagineBinaryFilter $filter;
 
     #[\Override]
@@ -28,8 +29,7 @@ class BasicImagineBinaryFilterTest extends \PHPUnit\Framework\TestCase
 
         $resultBinary = new Binary('sample_result_binary', 'image/png');
 
-        $this->filterManager
-            ->expects(self::once())
+        $this->filterManager->expects(self::once())
             ->method('applyFilter')
             ->with($binary, $filter, $runtimeConfig)
             ->willReturn($resultBinary);
@@ -44,8 +44,7 @@ class BasicImagineBinaryFilterTest extends \PHPUnit\Framework\TestCase
 
         $resultBinary = new Binary('sample_result_binary', 'image/png');
 
-        $this->filterManager
-            ->expects(self::once())
+        $this->filterManager->expects(self::once())
             ->method('apply')
             ->with($binary, $runtimeConfig)
             ->willReturn($resultBinary);

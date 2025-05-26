@@ -10,6 +10,8 @@ use Oro\Bundle\AttachmentBundle\Provider\FileApplicationsProvider;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
@@ -17,33 +19,20 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class FileVoterTest extends \PHPUnit\Framework\TestCase
+class FileVoterTest extends TestCase
 {
-    private const PARENT_ENTITY_CLASS = \stdClass::class;
-    private const PARENT_ENTITY_ID = 1;
-    private const PARENT_ENTITY_FIELD_NAME = 'sampleField';
-    private const FILE_ID = 10;
+    private const string PARENT_ENTITY_CLASS = \stdClass::class;
+    private const int PARENT_ENTITY_ID = 1;
+    private const string PARENT_ENTITY_FIELD_NAME = 'sampleField';
+    private const int FILE_ID = 10;
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var FileAccessControlChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileAccessControlChecker;
-
-    /** @var FileApplicationsProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileApplicationsProvider;
-
-    /** @var CurrentApplicationProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $currentApplicationProvider;
-
-    /** @var TokenInterface */
-    private $token;
-
-    /** @var FileVoter */
-    private $voter;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private FileAccessControlChecker&MockObject $fileAccessControlChecker;
+    private FileApplicationsProvider&MockObject $fileApplicationsProvider;
+    private CurrentApplicationProviderInterface&MockObject $currentApplicationProvider;
+    private TokenInterface $token;
+    private FileVoter $voter;
 
     #[\Override]
     protected function setUp(): void

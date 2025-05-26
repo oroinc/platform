@@ -9,20 +9,15 @@ use Oro\Bundle\ApiBundle\Util\QueryModifierInterface;
 use Oro\Bundle\ApiBundle\Util\QueryModifierRegistry;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class QueryModifierRegistryTest extends \PHPUnit\Framework\TestCase
+class QueryModifierRegistryTest extends TestCase
 {
-    /** @var QueryModifierInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $queryModifier1;
-
-    /** @var QueryModifierInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $queryModifier2;
-
-    /** @var QueryModifierWithOptionsStub|\PHPUnit\Framework\MockObject\MockObject */
-    private $queryModifier3;
-
-    /** @var QueryModifierRegistry */
-    private $registry;
+    private QueryModifierInterface&MockObject $queryModifier1;
+    private QueryModifierInterface&MockObject $queryModifier2;
+    private QueryModifierWithOptionsStub&MockObject $queryModifier3;
+    private QueryModifierRegistry $registry;
 
     #[\Override]
     protected function setUp(): void
@@ -48,7 +43,7 @@ class QueryModifierRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldExecuteAllSuitableQueryModifiers()
+    public function testShouldExecuteAllSuitableQueryModifiers(): void
     {
         $options = ['key' => 'value'];
 
@@ -71,7 +66,7 @@ class QueryModifierRegistryTest extends \PHPUnit\Framework\TestCase
         $this->registry->modifyQuery($qb, $skipRootEntity, new RequestType(['rest', 'json_api']), $options);
     }
 
-    public function testShouldSkipNotSuitableQueryModifiers()
+    public function testShouldSkipNotSuitableQueryModifiers(): void
     {
         $qb = $this->createMock(QueryBuilder::class);
         $skipRootEntity = true;

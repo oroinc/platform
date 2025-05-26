@@ -8,16 +8,15 @@ use Oro\Bundle\AttachmentBundle\Imagine\Provider\ImagineUrlProvider;
 use Oro\Bundle\AttachmentBundle\Imagine\Provider\ImagineUrlProviderInterface;
 use Oro\Bundle\AttachmentBundle\Imagine\Provider\WebpAwareImagineUrlProvider;
 use Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class WebpAwareImagineUrlProviderTest extends \PHPUnit\Framework\TestCase
+class WebpAwareImagineUrlProviderTest extends TestCase
 {
-    private FilterConfiguration|\PHPUnit\Framework\MockObject\MockObject $filterConfiguration;
-
-    private ImagineUrlProviderInterface|\PHPUnit\Framework\MockObject\MockObject $innerImagineUrlProvider;
-
-    private WebpConfiguration|\PHPUnit\Framework\MockObject\MockObject $webpConfiguration;
-
+    private FilterConfiguration&MockObject $filterConfiguration;
+    private ImagineUrlProviderInterface&MockObject $innerImagineUrlProvider;
+    private WebpConfiguration&MockObject $webpConfiguration;
     private WebpAwareImagineUrlProvider $provider;
 
     #[\Override]
@@ -33,24 +32,21 @@ class WebpAwareImagineUrlProviderTest extends \PHPUnit\Framework\TestCase
             $this->webpConfiguration
         );
 
-        $this->filterConfiguration
-            ->expects(self::any())
+        $this->filterConfiguration->expects(self::any())
             ->method('get')
             ->willReturnMap([['jpeg_filter', ['format' => 'jpeg']], ['empty_filter', []]]);
     }
 
     public function testGetFilteredImageUrlNotAddsWebpWhenNotEnabledForAll(): void
     {
-        $this->webpConfiguration
-            ->expects(self::once())
+        $this->webpConfiguration->expects(self::once())
             ->method('isEnabledForAll')
             ->willReturn(false);
 
         $file = new File();
         $filename = 'sample.jpg';
         $filterName = 'empty_filter';
-        $this->innerImagineUrlProvider
-            ->expects(self::once())
+        $this->innerImagineUrlProvider->expects(self::once())
             ->method('getFilteredImageUrl')
             ->with($file, $filterName, '')
             ->willReturn($filename);
@@ -60,16 +56,14 @@ class WebpAwareImagineUrlProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFilteredImageUrlNotAddsWebpWhenFormatAndEnabledForAll(): void
     {
-        $this->webpConfiguration
-            ->expects(self::never())
+        $this->webpConfiguration->expects(self::never())
             ->method('isEnabledForAll');
 
         $file = new File();
         $filename = 'sample.jpg';
         $format = 'sample_format';
         $filterName = 'empty_filter';
-        $this->innerImagineUrlProvider
-            ->expects(self::once())
+        $this->innerImagineUrlProvider->expects(self::once())
             ->method('getFilteredImageUrl')
             ->with($file, $filterName, $format)
             ->willReturn($filename);
@@ -79,16 +73,14 @@ class WebpAwareImagineUrlProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFilteredImageUrlNotAddsWebpWhenNoFormatAndEnabledForAllButFilterHasFormat(): void
     {
-        $this->webpConfiguration
-            ->expects(self::once())
+        $this->webpConfiguration->expects(self::once())
             ->method('isEnabledForAll')
             ->willReturn(true);
 
         $file = new File();
         $filename = 'sample.jpg';
         $filterName = 'jpeg_filter';
-        $this->innerImagineUrlProvider
-            ->expects(self::once())
+        $this->innerImagineUrlProvider->expects(self::once())
             ->method('getFilteredImageUrl')
             ->with($file, $filterName, '')
             ->willReturn($filename);
@@ -98,16 +90,14 @@ class WebpAwareImagineUrlProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFilteredImageUrlAddsWebpWhenNoFormatAndEnabledForAll(): void
     {
-        $this->webpConfiguration
-            ->expects(self::once())
+        $this->webpConfiguration->expects(self::once())
             ->method('isEnabledForAll')
             ->willReturn(true);
 
         $file = new File();
         $filename = 'sample.jpg';
         $filterName = 'empty_filter';
-        $this->innerImagineUrlProvider
-            ->expects(self::once())
+        $this->innerImagineUrlProvider->expects(self::once())
             ->method('getFilteredImageUrl')
             ->with($file, $filterName, 'webp')
             ->willReturn($filename);

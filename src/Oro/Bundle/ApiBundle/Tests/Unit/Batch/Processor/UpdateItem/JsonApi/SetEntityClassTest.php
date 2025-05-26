@@ -7,8 +7,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Batch\Processor\UpdateItem\BatchUpdateItemPr
 
 class SetEntityClassTest extends BatchUpdateItemProcessorTestCase
 {
-    /** @var SetEntityClass */
-    private $processor;
+    private SetEntityClass $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +17,7 @@ class SetEntityClassTest extends BatchUpdateItemProcessorTestCase
         $this->processor = new SetEntityClass();
     }
 
-    public function testProcessWithoutRequestData()
+    public function testProcessWithoutRequestData(): void
     {
         $this->processor->process($this->context);
 
@@ -28,7 +27,7 @@ class SetEntityClassTest extends BatchUpdateItemProcessorTestCase
     /**
      * @dataProvider invalidRequestDataProvider
      */
-    public function testProcessWithInvalidRequestData(array $data)
+    public function testProcessWithInvalidRequestData(array $data): void
     {
         $this->context->setRequestData($data);
         $this->processor->process($this->context);
@@ -44,7 +43,7 @@ class SetEntityClassTest extends BatchUpdateItemProcessorTestCase
         ];
     }
 
-    public function testProcessWithValidRequestData()
+    public function testProcessWithValidRequestData(): void
     {
         $data = [
             'data' => [

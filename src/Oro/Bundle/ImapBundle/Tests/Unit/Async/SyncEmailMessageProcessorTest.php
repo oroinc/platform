@@ -8,10 +8,11 @@ use Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizer;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\TestCase;
 
-class SyncEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class SyncEmailMessageProcessorTest extends TestCase
 {
-    public function testCouldBeConstructedWithRequiredArguments()
+    public function testCouldBeConstructedWithRequiredArguments(): void
     {
         $this->expectNotToPerformAssertions();
 
@@ -20,7 +21,7 @@ class SyncEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldExecuteSyncOriginsWithIds()
+    public function testShouldExecuteSyncOriginsWithIds(): void
     {
         $synchronizer = $this->createMock(ImapEmailSynchronizer::class);
         $synchronizer->expects($this->once())
@@ -37,7 +38,7 @@ class SyncEmailMessageProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(MessageProcessorInterface::ACK, $result);
     }
 
-    public function testShouldReturnSubscribedTopics()
+    public function testShouldReturnSubscribedTopics(): void
     {
         $this->assertEquals(
             [SyncEmailTopic::getName()],

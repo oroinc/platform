@@ -14,7 +14,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CaptchaExtensionTest extends TestCase
 {
-    private CaptchaSettingsProviderInterface|MockObject $captchaSettingsProvider;
+    private CaptchaSettingsProviderInterface&MockObject $captchaSettingsProvider;
     private CaptchaExtension $extension;
 
     #[\Override]
@@ -25,7 +25,7 @@ class CaptchaExtensionTest extends TestCase
         $this->extension = new CaptchaExtension($this->captchaSettingsProvider);
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = new OptionsResolver();
         $this->extension->configureOptions($resolver);
@@ -33,7 +33,7 @@ class CaptchaExtensionTest extends TestCase
         $this->assertTrue($resolver->hasDefault('captcha_protection_enabled'));
     }
 
-    public function testBuildFormHasCaptcha()
+    public function testBuildFormHasCaptcha(): void
     {
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects($this->once())
@@ -47,7 +47,7 @@ class CaptchaExtensionTest extends TestCase
         $this->extension->buildForm($builder, []);
     }
 
-    public function testBuildFormProtectionInactive()
+    public function testBuildFormProtectionInactive(): void
     {
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects($this->once())
@@ -65,7 +65,7 @@ class CaptchaExtensionTest extends TestCase
         $this->extension->buildForm($builder, []);
     }
 
-    public function testBuildFormNotProtectedForm()
+    public function testBuildFormNotProtectedForm(): void
     {
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects($this->any())
@@ -91,7 +91,7 @@ class CaptchaExtensionTest extends TestCase
         $this->extension->buildForm($builder, []);
     }
 
-    public function testBuildFormProtectedForm()
+    public function testBuildFormProtectedForm(): void
     {
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects($this->any())
@@ -116,7 +116,7 @@ class CaptchaExtensionTest extends TestCase
         $this->extension->buildForm($builder, []);
     }
 
-    public function testBuildFormWithCaptchaEnabledVaiOption()
+    public function testBuildFormWithCaptchaEnabledVaiOption(): void
     {
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects($this->any())
@@ -139,7 +139,7 @@ class CaptchaExtensionTest extends TestCase
         $this->extension->buildForm($builder, ['captcha_protection_enabled' => true]);
     }
 
-    private function assertCaptchaFieldAdded(FormBuilderInterface|MockObject $builder): void
+    private function assertCaptchaFieldAdded(FormBuilderInterface&MockObject $builder): void
     {
         $builder->expects($this->once())
             ->method('addEventListener')

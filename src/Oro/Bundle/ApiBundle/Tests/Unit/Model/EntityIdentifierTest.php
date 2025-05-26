@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
+use PHPUnit\Framework\TestCase;
 
-class EntityIdentifierTest extends \PHPUnit\Framework\TestCase
+class EntityIdentifierTest extends TestCase
 {
-    public function testConstructorWithoutArguments()
+    public function testConstructorWithoutArguments(): void
     {
         $entityIdentifier = new EntityIdentifier();
         self::assertNull($entityIdentifier->getId());
@@ -14,14 +15,14 @@ class EntityIdentifierTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $entityIdentifier->getAttributes());
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $entityIdentifier = new EntityIdentifier('id', 'class');
         self::assertEquals('id', $entityIdentifier->getId());
         self::assertEquals('class', $entityIdentifier->getClass());
     }
 
-    public function testId()
+    public function testId(): void
     {
         $entityIdentifier = new EntityIdentifier();
         self::assertNull($entityIdentifier->getId());
@@ -30,7 +31,7 @@ class EntityIdentifierTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('test', $entityIdentifier->getId());
     }
 
-    public function testClass()
+    public function testClass(): void
     {
         $entityIdentifier = new EntityIdentifier();
         self::assertNull($entityIdentifier->getClass());
@@ -39,7 +40,7 @@ class EntityIdentifierTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('test', $entityIdentifier->getClass());
     }
 
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $entityIdentifier = new EntityIdentifier();
 
@@ -53,7 +54,7 @@ class EntityIdentifierTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $entityIdentifier->getAttributes());
     }
 
-    public function testGetUnknownAttribute()
+    public function testGetUnknownAttribute(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "name" attribute does not exist.');
@@ -62,7 +63,7 @@ class EntityIdentifierTest extends \PHPUnit\Framework\TestCase
         $entityIdentifier->getAttribute('name');
     }
 
-    public function testArrayAccess()
+    public function testArrayAccess(): void
     {
         $entityIdentifier = new EntityIdentifier();
 
@@ -76,7 +77,7 @@ class EntityIdentifierTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $entityIdentifier->getAttributes());
     }
 
-    public function testArrayAccessGetForUnknownAttribute()
+    public function testArrayAccessGetForUnknownAttribute(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "name" attribute does not exist.');

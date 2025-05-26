@@ -14,7 +14,7 @@ use Symfony\Component\Form\FormInterface;
 
 class UserEmailConfigHandlerTest extends TestCase
 {
-    private const FORM_FIELD_NAME = 'oro_email___user_mailbox';
+    private const string FORM_FIELD_NAME = 'oro_email___user_mailbox';
 
     private ConfigManager&MockObject $configManager;
     private ConfigChangeSet&MockObject $changeSet;

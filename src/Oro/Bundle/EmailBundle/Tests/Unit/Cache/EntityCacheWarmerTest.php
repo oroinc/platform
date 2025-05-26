@@ -5,11 +5,12 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Cache;
 use Oro\Bundle\EmailBundle\Cache\EntityCacheWarmer;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Twig\Environment;
 
-class EntityCacheWarmerTest extends \PHPUnit\Framework\TestCase
+class EntityCacheWarmerTest extends TestCase
 {
     private function getRenderParameters(string $ext): array
     {
@@ -47,7 +48,7 @@ class EntityCacheWarmerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testWarmUpAndIsOptional()
+    public function testWarmUpAndIsOptional(): void
     {
         $oroProvider = $this->createMock(EmailOwnerProviderInterface::class);
         $oroProvider->expects($this->any())

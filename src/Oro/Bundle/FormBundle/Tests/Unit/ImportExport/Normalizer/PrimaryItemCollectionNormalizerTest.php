@@ -5,14 +5,13 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\ImportExport\Normalizer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\FormBundle\ImportExport\Serializer\Normalizer\PrimaryItemCollectionNormalizer;
 use Oro\Bundle\ImportExportBundle\Serializer\Serializer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class PrimaryItemCollectionNormalizerTest extends \PHPUnit\Framework\TestCase
+class PrimaryItemCollectionNormalizerTest extends TestCase
 {
-    /** @var Serializer|\PHPUnit\Framework\MockObject\MockObject */
-    private $serializer;
-
-    /** @var PrimaryItemCollectionNormalizer */
-    private $normalizer;
+    private Serializer&MockObject $serializer;
+    private PrimaryItemCollectionNormalizer $normalizer;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +25,7 @@ class PrimaryItemCollectionNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsNormalizationDataProvider
      */
-    public function testSupportsNormalization(object|string $data, bool $expectedResult)
+    public function testSupportsNormalization(object|string $data, bool $expectedResult): void
     {
         $this->assertEquals($expectedResult, $this->normalizer->supportsNormalization($data));
     }
@@ -46,7 +45,7 @@ class PrimaryItemCollectionNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider supportsDenormalizationDataProvider
      */
-    public function testSupportsDenormalization(string $type, bool $expectedResult)
+    public function testSupportsDenormalization(string $type, bool $expectedResult): void
     {
         $this->assertEquals($expectedResult, $this->normalizer->supportsDenormalization([], $type));
     }
@@ -65,7 +64,7 @@ class PrimaryItemCollectionNormalizerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $format = null;
         $context = ['context'];
@@ -99,7 +98,7 @@ class PrimaryItemCollectionNormalizerTest extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-    public function testDenormalizeWithItemType()
+    public function testDenormalizeWithItemType(): void
     {
         $format = null;
         $context = ['context'];

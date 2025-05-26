@@ -7,13 +7,13 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\ImageResizeManagerInterface;
 use Oro\Bundle\AttachmentBundle\Manager\WebpAwareImageResizeManager;
 use Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WebpAwareImageResizeManagerTest extends \PHPUnit\Framework\TestCase
+class WebpAwareImageResizeManagerTest extends TestCase
 {
-    private ImageResizeManagerInterface|\PHPUnit\Framework\MockObject\MockObject $innerImageResizeManager;
-
-    private WebpConfiguration|\PHPUnit\Framework\MockObject\MockObject $webpConfiguration;
-
+    private ImageResizeManagerInterface&MockObject $innerImageResizeManager;
+    private WebpConfiguration&MockObject $webpConfiguration;
     private WebpAwareImageResizeManager $manager;
 
     #[\Override]
@@ -34,8 +34,7 @@ class WebpAwareImageResizeManagerTest extends \PHPUnit\Framework\TestCase
         $forceUpdate = true;
         $binary = new Binary('sample_binary', 'image/png');
 
-        $this->innerImageResizeManager
-            ->expects(self::once())
+        $this->innerImageResizeManager->expects(self::once())
             ->method('resize')
             ->with($file, $width, $height, $format, $forceUpdate)
             ->willReturn($binary);
@@ -51,13 +50,11 @@ class WebpAwareImageResizeManagerTest extends \PHPUnit\Framework\TestCase
         $forceUpdate = true;
         $binary = new Binary('sample_binary', 'image/png');
 
-        $this->webpConfiguration
-            ->expects(self::once())
+        $this->webpConfiguration->expects(self::once())
             ->method('isEnabledIfSupported')
             ->willReturn(false);
 
-        $this->innerImageResizeManager
-            ->expects(self::once())
+        $this->innerImageResizeManager->expects(self::once())
             ->method('resize')
             ->with($file, $width, $height, '', $forceUpdate)
             ->willReturn($binary);
@@ -74,13 +71,11 @@ class WebpAwareImageResizeManagerTest extends \PHPUnit\Framework\TestCase
         $binary1 = new Binary('sample_binary', 'image/png');
         $binary2 = new Binary('sample_binary', 'image/png');
 
-        $this->webpConfiguration
-            ->expects(self::once())
+        $this->webpConfiguration->expects(self::once())
             ->method('isEnabledIfSupported')
             ->willReturn(true);
 
-        $this->innerImageResizeManager
-            ->expects(self::exactly(2))
+        $this->innerImageResizeManager->expects(self::exactly(2))
             ->method('resize')
             ->withConsecutive(
                 [$file, $width, $height, 'webp', $forceUpdate],
@@ -99,8 +94,7 @@ class WebpAwareImageResizeManagerTest extends \PHPUnit\Framework\TestCase
         $forceUpdate = true;
         $binary = new Binary('sample_binary', 'image/png');
 
-        $this->innerImageResizeManager
-            ->expects(self::once())
+        $this->innerImageResizeManager->expects(self::once())
             ->method('applyFilter')
             ->with($file, $filterName, $format, $forceUpdate)
             ->willReturn($binary);
@@ -115,13 +109,11 @@ class WebpAwareImageResizeManagerTest extends \PHPUnit\Framework\TestCase
         $forceUpdate = true;
         $binary = new Binary('sample_binary', 'image/png');
 
-        $this->webpConfiguration
-            ->expects(self::once())
+        $this->webpConfiguration->expects(self::once())
             ->method('isEnabledIfSupported')
             ->willReturn(false);
 
-        $this->innerImageResizeManager
-            ->expects(self::once())
+        $this->innerImageResizeManager->expects(self::once())
             ->method('applyFilter')
             ->with($file, $filterName, '', $forceUpdate)
             ->willReturn($binary);
@@ -137,13 +129,11 @@ class WebpAwareImageResizeManagerTest extends \PHPUnit\Framework\TestCase
         $binary1 = new Binary('sample_binary', 'image/png');
         $binary2 = new Binary('sample_binary', 'image/png');
 
-        $this->webpConfiguration
-            ->expects(self::once())
+        $this->webpConfiguration->expects(self::once())
             ->method('isEnabledIfSupported')
             ->willReturn(true);
 
-        $this->innerImageResizeManager
-            ->expects(self::exactly(2))
+        $this->innerImageResizeManager->expects(self::exactly(2))
             ->method('applyFilter')
             ->withConsecutive(
                 [$file, $filterName, 'webp', $forceUpdate],

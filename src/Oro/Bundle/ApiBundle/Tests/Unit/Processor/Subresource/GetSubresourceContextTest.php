@@ -5,8 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource;
 use Oro\Bundle\ApiBundle\Processor\Subresource\GetSubresource\GetSubresourceContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use PHPUnit\Framework\TestCase;
 
-class GetSubresourceContextTest extends \PHPUnit\Framework\TestCase
+class GetSubresourceContextTest extends TestCase
 {
     private GetSubresourceContext $context;
 
@@ -32,7 +33,7 @@ class GetSubresourceContextTest extends \PHPUnit\Framework\TestCase
         return 123;
     }
 
-    public function testTotalCountCallback()
+    public function testTotalCountCallback(): void
     {
         self::assertNull($this->context->getTotalCountCallback());
 

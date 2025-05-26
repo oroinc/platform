@@ -9,25 +9,18 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class LoggedUserVariablesProviderTest extends \PHPUnit\Framework\TestCase
+class LoggedUserVariablesProviderTest extends TestCase
 {
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityNameResolver;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $htmlTagHelper;
-
-    /** @var LoggedUserVariablesProvider */
-    private $provider;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private EntityNameResolver&MockObject $entityNameResolver;
+    private ConfigManager&MockObject $configManager;
+    private HtmlTagHelper&MockObject $htmlTagHelper;
+    private LoggedUserVariablesProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -51,7 +44,7 @@ class LoggedUserVariablesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetVariableDefinitionsWithoutLoggedUser()
+    public function testGetVariableDefinitionsWithoutLoggedUser(): void
     {
         $this->tokenAccessor->expects($this->once())
             ->method('getUser')
@@ -64,7 +57,7 @@ class LoggedUserVariablesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetVariableDefinitionsForNonOroUser()
+    public function testGetVariableDefinitionsForNonOroUser(): void
     {
         $user = $this->createMock(UserInterface::class);
 
@@ -89,7 +82,7 @@ class LoggedUserVariablesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetVariableDefinitions()
+    public function testGetVariableDefinitions(): void
     {
         $organization = new Organization();
         $user = new User();
@@ -119,7 +112,7 @@ class LoggedUserVariablesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetVariableValuesWithoutLoggedUser()
+    public function testGetVariableValuesWithoutLoggedUser(): void
     {
         $this->tokenAccessor->expects($this->once())
             ->method('getOrganization')
@@ -142,7 +135,7 @@ class LoggedUserVariablesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetVariableValuesForNonOroUser()
+    public function testGetVariableValuesForNonOroUser(): void
     {
         $user = $this->createMock(UserInterface::class);
         $user->expects($this->once())
@@ -170,7 +163,7 @@ class LoggedUserVariablesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetVariableValues()
+    public function testGetVariableValues(): void
     {
         $organization = new Organization();
         $organization->setName('TestOrg');

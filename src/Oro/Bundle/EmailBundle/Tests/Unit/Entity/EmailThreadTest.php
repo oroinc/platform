@@ -5,10 +5,11 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
+use PHPUnit\Framework\TestCase;
 
-class EmailThreadTest extends \PHPUnit\Framework\TestCase
+class EmailThreadTest extends TestCase
 {
-    public function testEmailsGetterAndSetter()
+    public function testEmailsGetterAndSetter(): void
     {
         $email = $this->createMock(Email::class);
 
@@ -18,7 +19,7 @@ class EmailThreadTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($email, $entity->getEmails()->first());
     }
 
-    public function testBeforeSave()
+    public function testBeforeSave(): void
     {
         $createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
         $entity = new Email();
@@ -31,7 +32,7 @@ class EmailThreadTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider propertiesDataProvider
      */
-    public function testSettersAndGetters(string $property, mixed $value)
+    public function testSettersAndGetters(string $property, mixed $value): void
     {
         $emailThread = new EmailThread();
 

@@ -10,15 +10,14 @@ use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\NormalizeResultContext;
 use Oro\Bundle\ApiBundle\Util\ActionGroupExecutor;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ActionGroupExecutorTest extends \PHPUnit\Framework\TestCase
+class ActionGroupExecutorTest extends TestCase
 {
-    /** @var ActionGroupRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $actionGroupRegistry;
-
-    /** @var ActionGroupExecutor */
-    private $actionGroupExecutor;
+    private ActionGroupRegistry&MockObject $actionGroupRegistry;
+    private ActionGroupExecutor $actionGroupExecutor;
 
     #[\Override]
     protected function setUp(): void
@@ -37,7 +36,7 @@ class ActionGroupExecutorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $name = 'test_action_group';
         $data = new ActionData(['param1' => 'val1']);
@@ -58,7 +57,7 @@ class ActionGroupExecutorTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($context->hasErrors());
     }
 
-    public function testExecuteWithErrors()
+    public function testExecuteWithErrors(): void
     {
         $name = 'test_action_group';
         $data = new ActionData(['param1' => 'val1']);
@@ -87,7 +86,7 @@ class ActionGroupExecutorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testExecuteWithErrorsAndCustomErrorTitle()
+    public function testExecuteWithErrorsAndCustomErrorTitle(): void
     {
         $name = 'test_action_group';
         $data = new ActionData(['param1' => 'val1']);
@@ -117,7 +116,7 @@ class ActionGroupExecutorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testExecuteWithForbiddenActionGroupException()
+    public function testExecuteWithForbiddenActionGroupException(): void
     {
         $name = 'test_action_group';
         $data = new ActionData(['param1' => 'val1']);

@@ -6,17 +6,14 @@ use Oro\Bundle\ApiBundle\Provider\ResourceChecker;
 use Oro\Bundle\ApiBundle\Provider\ResourceCheckerConfigProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ResourceCheckerTest extends \PHPUnit\Framework\TestCase
+class ResourceCheckerTest extends TestCase
 {
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /** @var ResourceCheckerConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var ResourceChecker */
-    private $resourceChecker;
+    private FeatureChecker&MockObject $featureChecker;
+    private ResourceCheckerConfigProvider&MockObject $configProvider;
+    private ResourceChecker $resourceChecker;
 
     #[\Override]
     protected function setUp(): void

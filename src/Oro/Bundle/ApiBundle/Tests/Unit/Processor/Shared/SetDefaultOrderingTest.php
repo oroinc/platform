@@ -8,14 +8,12 @@ use Oro\Bundle\ApiBundle\Processor\Shared\SetDefaultOrdering;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group as Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class SetDefaultOrderingTest extends GetListProcessorTestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var SetDefaultOrdering */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private SetDefaultOrdering $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +27,7 @@ class SetDefaultOrderingTest extends GetListProcessorTestCase
         $this->context->setConfig(new EntityDefinitionConfig());
     }
 
-    public function testProcessWhenSetDefaultOrderingIsAlreadyProcessed()
+    public function testProcessWhenSetDefaultOrderingIsAlreadyProcessed(): void
     {
         $this->doctrineHelper->expects(self::never())
             ->method('getManageableEntityClass');
@@ -44,7 +42,7 @@ class SetDefaultOrderingTest extends GetListProcessorTestCase
         self::assertTrue($this->context->isProcessed(SetDefaultOrdering::OPERATION_NAME));
     }
 
-    public function testProcessWhenCriteriaObjectDoesNotExist()
+    public function testProcessWhenCriteriaObjectDoesNotExist(): void
     {
         $this->doctrineHelper->expects(self::never())
             ->method('getManageableEntityClass');
@@ -56,7 +54,7 @@ class SetDefaultOrderingTest extends GetListProcessorTestCase
         self::assertTrue($this->context->isProcessed(SetDefaultOrdering::OPERATION_NAME));
     }
 
-    public function testProcessWhenCriteriaObjectAlreadyHasOrdering()
+    public function testProcessWhenCriteriaObjectAlreadyHasOrdering(): void
     {
         $ordering = ['field1' => 'DESC'];
 
@@ -75,7 +73,7 @@ class SetDefaultOrderingTest extends GetListProcessorTestCase
         self::assertTrue($this->context->isProcessed(SetDefaultOrdering::OPERATION_NAME));
     }
 
-    public function testProcessForManageableEntity()
+    public function testProcessForManageableEntity(): void
     {
         $this->doctrineHelper->expects(self::once())
             ->method('getManageableEntityClass')
@@ -92,7 +90,7 @@ class SetDefaultOrderingTest extends GetListProcessorTestCase
         self::assertTrue($this->context->isProcessed(SetDefaultOrdering::OPERATION_NAME));
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessForNotManageableEntity(): void
     {
         $config = $this->context->getConfig();
         $config->setIdentifierFieldNames(['renamedId']);

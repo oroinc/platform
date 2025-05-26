@@ -9,18 +9,15 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class AddActivityTargetTest extends \PHPUnit\Framework\TestCase
+class AddActivityTargetTest extends TestCase
 {
-    /** @var ContextAccessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextAccessor;
-
-    /** @var ActivityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $activityManager;
-
-    /** @var AddActivityTarget */
-    private $action;
+    private ContextAccessor&MockObject $contextAccessor;
+    private ActivityManager&MockObject $activityManager;
+    private AddActivityTarget $action;
 
     #[\Override]
     protected function setUp(): void

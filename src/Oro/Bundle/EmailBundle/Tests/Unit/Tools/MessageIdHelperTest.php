@@ -3,9 +3,10 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\EmailBundle\Tools\MessageIdHelper;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Message;
 
-class MessageIdHelperTest extends \PHPUnit\Framework\TestCase
+class MessageIdHelperTest extends TestCase
 {
     public function testGetMessageId(): void
     {

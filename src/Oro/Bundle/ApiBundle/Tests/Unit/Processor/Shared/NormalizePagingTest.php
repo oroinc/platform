@@ -14,7 +14,7 @@ class NormalizePagingTest extends GetListProcessorTestCase
         return new NormalizePaging($maxEntitiesLimit);
     }
 
-    public function testProcessWhenQueryIsAlreadyBuilt()
+    public function testProcessWhenQueryIsAlreadyBuilt(): void
     {
         $this->context->setQuery(new \stdClass());
         $context = clone $this->context;
@@ -23,7 +23,7 @@ class NormalizePagingTest extends GetListProcessorTestCase
         self::assertEquals($context, $this->context);
     }
 
-    public function testProcessWhenCriteriaObjectDoesNotExist()
+    public function testProcessWhenCriteriaObjectDoesNotExist(): void
     {
         $processor = $this->getProcessor(-1);
         $processor->process($this->context);
@@ -31,7 +31,7 @@ class NormalizePagingTest extends GetListProcessorTestCase
         self::assertNull($this->context->getCriteria());
     }
 
-    public function testProcessOnDisabledPaging()
+    public function testProcessOnDisabledPaging(): void
     {
         $criteria = new Criteria();
         $criteria->setFirstResult(12);
@@ -46,7 +46,7 @@ class NormalizePagingTest extends GetListProcessorTestCase
         self::assertNull($criteria->getFirstResult());
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $criteria = new Criteria();
         $criteria->setFirstResult(2);
@@ -61,7 +61,7 @@ class NormalizePagingTest extends GetListProcessorTestCase
         self::assertSame(2, $criteria->getFirstResult());
     }
 
-    public function testProcessWhenUnlimitedMaxResults()
+    public function testProcessWhenUnlimitedMaxResults(): void
     {
         $criteria = new Criteria();
         $criteria->setFirstResult(2);
@@ -79,7 +79,7 @@ class NormalizePagingTest extends GetListProcessorTestCase
         self::assertSame(2, $criteria->getFirstResult());
     }
 
-    public function testProcessWhenMaxResultsGreaterThanRequestedPageSize()
+    public function testProcessWhenMaxResultsGreaterThanRequestedPageSize(): void
     {
         $criteria = new Criteria();
         $criteria->setFirstResult(2);
@@ -97,7 +97,7 @@ class NormalizePagingTest extends GetListProcessorTestCase
         self::assertSame(2, $criteria->getFirstResult());
     }
 
-    public function testProcessWhenMaxResultsLessThanRequestedPageSize()
+    public function testProcessWhenMaxResultsLessThanRequestedPageSize(): void
     {
         $criteria = new Criteria();
         $criteria->setFirstResult(2);
@@ -115,7 +115,7 @@ class NormalizePagingTest extends GetListProcessorTestCase
         self::assertSame(2, $criteria->getFirstResult());
     }
 
-    public function testProcessWhenUnlimitedPageSizeRequestedButThereIsMaxResultsLimit()
+    public function testProcessWhenUnlimitedPageSizeRequestedButThereIsMaxResultsLimit(): void
     {
         $criteria = new Criteria();
         $criteria->setFirstResult(1);
@@ -133,7 +133,7 @@ class NormalizePagingTest extends GetListProcessorTestCase
         self::assertSame(1, $criteria->getFirstResult());
     }
 
-    public function testProcessWithMaxEntitiesLimit()
+    public function testProcessWithMaxEntitiesLimit(): void
     {
         $criteria = new Criteria();
         $criteria->setFirstResult(1);
@@ -148,7 +148,7 @@ class NormalizePagingTest extends GetListProcessorTestCase
         self::assertSame(1, $criteria->getFirstResult());
     }
 
-    public function testProcessWithMaxEntitiesLimitAndMaxResultsInConfig()
+    public function testProcessWithMaxEntitiesLimitAndMaxResultsInConfig(): void
     {
         $criteria = new Criteria();
         $criteria->setFirstResult(1);

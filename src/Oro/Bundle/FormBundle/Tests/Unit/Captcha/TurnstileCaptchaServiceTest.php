@@ -16,13 +16,12 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class TurnstileCaptchaServiceTest extends TestCase
 {
-    private HTTPClientInterface|MockObject $httpClient;
-    private LoggerInterface|MockObject $logger;
-    private ConfigManager|MockObject $configManager;
-    private SymmetricCrypterInterface|MockObject $crypter;
-    private RequestStack|MockObject $requestStack;
-    private Request|MockObject $request;
-
+    private HTTPClientInterface&MockObject $httpClient;
+    private LoggerInterface&MockObject $logger;
+    private ConfigManager&MockObject $configManager;
+    private SymmetricCrypterInterface&MockObject $crypter;
+    private RequestStack&MockObject $requestStack;
+    private Request&MockObject $request;
     private TurnstileCaptchaService $captchaService;
 
     #[\Override]
@@ -44,7 +43,7 @@ class TurnstileCaptchaServiceTest extends TestCase
         );
     }
 
-    public function testIsConfiguredReturnsTrueWhenKeysArePresent()
+    public function testIsConfiguredReturnsTrueWhenKeysArePresent(): void
     {
         $this->configManager->expects($this->any())
             ->method('get')
@@ -67,7 +66,7 @@ class TurnstileCaptchaServiceTest extends TestCase
         $this->assertTrue($this->captchaService->isConfigured());
     }
 
-    public function testIsConfiguredReturnsFalseWhenKeysAreAbsent()
+    public function testIsConfiguredReturnsFalseWhenKeysAreAbsent(): void
     {
         $this->configManager->expects($this->any())
             ->method('get')
@@ -76,7 +75,7 @@ class TurnstileCaptchaServiceTest extends TestCase
         $this->assertFalse($this->captchaService->isConfigured());
     }
 
-    public function testIsVerifiedReturnsTrueWhenVerificationSucceeds()
+    public function testIsVerifiedReturnsTrueWhenVerificationSucceeds(): void
     {
         $this->requestStack->expects($this->once())
             ->method('getCurrentRequest')
@@ -110,7 +109,7 @@ class TurnstileCaptchaServiceTest extends TestCase
         $this->assertTrue($this->captchaService->isVerified('responseValue'));
     }
 
-    public function testIsVerifiedReturnsFalseWhenVerificationFails()
+    public function testIsVerifiedReturnsFalseWhenVerificationFails(): void
     {
         $this->requestStack->expects($this->once())
             ->method('getCurrentRequest')
@@ -144,7 +143,7 @@ class TurnstileCaptchaServiceTest extends TestCase
         $this->assertFalse($this->captchaService->isVerified('responseValue'));
     }
 
-    public function testIsVerifiedReturnsFalseWhenExceptionIsThrown()
+    public function testIsVerifiedReturnsFalseWhenExceptionIsThrown(): void
     {
         $this->requestStack->expects($this->once())
             ->method('getCurrentRequest')

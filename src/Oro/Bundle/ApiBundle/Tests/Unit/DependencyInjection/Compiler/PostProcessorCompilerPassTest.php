@@ -4,22 +4,18 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\PostProcessorCompilerPass;
 use Oro\Bundle\ApiBundle\PostProcessor\PostProcessorRegistry;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class PostProcessorCompilerPassTest extends \PHPUnit\Framework\TestCase
+class PostProcessorCompilerPassTest extends TestCase
 {
-    /** @var PostProcessorCompilerPass */
-    private $compiler;
-
-    /** @var ContainerBuilder */
-    private $container;
-
-    /** @var Definition */
-    private $registry;
+    private PostProcessorCompilerPass $compiler;
+    private ContainerBuilder $container;
+    private Definition $registry;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +29,7 @@ class PostProcessorCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWhenNoPostProcessors()
+    public function testProcessWhenNoPostProcessors(): void
     {
         $this->compiler->process($this->container);
 
@@ -46,7 +42,7 @@ class PostProcessorCompilerPassTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $serviceLocatorDef->getArgument(0));
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $postProcessor1 = $this->container->setDefinition('post_processor1', new Definition());
         $postProcessor1->addTag(

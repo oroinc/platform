@@ -7,15 +7,15 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\ExternalLinkMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaAttributeMetadata;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
+class AssociationMetadataTest extends TestCase
 {
-    /** @var EntityMetadata */
-    private $entityMetadata;
+    private EntityMetadata $entityMetadata;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +24,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         $this->entityMetadata->setInheritedType(true);
     }
 
-    public function testClone()
+    public function testClone(): void
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName('testName');
@@ -49,7 +49,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertNotSame($targetEntityMetadata, $associationMetadataClone->getTargetMetadata());
     }
 
-    public function testCloneWithoutTargetMetadata()
+    public function testCloneWithoutTargetMetadata(): void
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName('testName');
@@ -60,7 +60,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertNull($associationMetadataClone->getTargetMetadata());
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName('testName');
@@ -120,7 +120,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testToArrayWithRequiredPropertiesOnly()
+    public function testToArrayWithRequiredPropertiesOnly(): void
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName('testName');
@@ -137,7 +137,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testToArrayInputOnlyAssociation()
+    public function testToArrayInputOnlyAssociation(): void
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName('testName');
@@ -156,7 +156,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testToArrayOutputOnlyAssociation()
+    public function testToArrayOutputOnlyAssociation(): void
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName('testName');
@@ -175,7 +175,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testToArrayHiddenField()
+    public function testToArrayHiddenField(): void
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName('testName');
@@ -194,7 +194,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testToArrayWhenEmptyAcceptableTargetsAllowedAndAcceptableTargetClassNamesAreNotEmpty()
+    public function testToArrayWhenEmptyAcceptableTargetsAllowedAndAcceptableTargetClassNamesAreNotEmpty(): void
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName('testName');
@@ -213,7 +213,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testToArrayWhenEmptyAcceptableTargetsNotAllowedAndAcceptableTargetClassNamesAreNotEmpty()
+    public function testToArrayWhenEmptyAcceptableTargetsNotAllowedAndAcceptableTargetClassNamesAreNotEmpty(): void
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName('testName');
@@ -233,7 +233,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testToArrayWhenEmptyAcceptableTargetsNotAllowedAndAcceptableTargetClassNamesAreEmpty()
+    public function testToArrayWhenEmptyAcceptableTargetsNotAllowedAndAcceptableTargetClassNamesAreEmpty(): void
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName('testName');
@@ -252,13 +252,13 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testNameInConstructor()
+    public function testNameInConstructor(): void
     {
         $associationMetadata = new AssociationMetadata('associationName');
         self::assertEquals('associationName', $associationMetadata->getName());
     }
 
-    public function testName()
+    public function testName(): void
     {
         $associationMetadata = new AssociationMetadata();
 
@@ -267,7 +267,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('associationName', $associationMetadata->getName());
     }
 
-    public function testPropertyPath()
+    public function testPropertyPath(): void
     {
         $associationMetadata = new AssociationMetadata();
 
@@ -282,7 +282,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('name', $associationMetadata->getPropertyPath());
     }
 
-    public function testDataType()
+    public function testDataType(): void
     {
         $associationMetadata = new AssociationMetadata();
 
@@ -291,7 +291,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('associationType', $associationMetadata->getDataType());
     }
 
-    public function testDirection()
+    public function testDirection(): void
     {
         $associationMetadata = new AssociationMetadata();
 
@@ -314,7 +314,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($associationMetadata->isOutput());
     }
 
-    public function testHidden()
+    public function testHidden(): void
     {
         $associationMetadata = new AssociationMetadata();
 
@@ -327,7 +327,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($associationMetadata->isOutput());
     }
 
-    public function testTargetClassName()
+    public function testTargetClassName(): void
     {
         $associationMetadata = new AssociationMetadata();
 
@@ -336,7 +336,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('targetClassName', $associationMetadata->getTargetClassName());
     }
 
-    public function testBaseTargetClassName()
+    public function testBaseTargetClassName(): void
     {
         $associationMetadata = new AssociationMetadata();
 
@@ -345,7 +345,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('targetClassName', $associationMetadata->getBaseTargetClassName());
     }
 
-    public function testAcceptableTargetClassName()
+    public function testAcceptableTargetClassName(): void
     {
         $associationMetadata = new AssociationMetadata();
 
@@ -363,7 +363,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAcceptableTargetClassNames()
+    public function testAcceptableTargetClassNames(): void
     {
         $associationMetadata = new AssociationMetadata();
 
@@ -372,7 +372,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($associationMetadata->isEmptyAcceptableTargetsAllowed());
     }
 
-    public function testAssociationType()
+    public function testAssociationType(): void
     {
         $associationMetadata = new AssociationMetadata();
 
@@ -381,7 +381,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('manyToOne', $associationMetadata->getAssociationType());
     }
 
-    public function testCollection()
+    public function testCollection(): void
     {
         $associationMetadata = new AssociationMetadata();
 
@@ -390,7 +390,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($associationMetadata->isCollection());
     }
 
-    public function testNullable()
+    public function testNullable(): void
     {
         $associationMetadata = new AssociationMetadata();
 
@@ -399,7 +399,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($associationMetadata->isNullable());
     }
 
-    public function testCollapsed()
+    public function testCollapsed(): void
     {
         $associationMetadata = new AssociationMetadata();
 
@@ -408,7 +408,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($associationMetadata->isCollapsed());
     }
 
-    public function testTargetMetadata()
+    public function testTargetMetadata(): void
     {
         $associationMetadata = new AssociationMetadata();
 
@@ -417,7 +417,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($this->entityMetadata, $associationMetadata->getTargetMetadata());
     }
 
-    public function testLinks()
+    public function testLinks(): void
     {
         $associationMetadata = new AssociationMetadata();
         self::assertCount(0, $associationMetadata->getLinks());
@@ -443,7 +443,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($associationMetadata->hasLink('link2'));
     }
 
-    public function testRelationshipLinks()
+    public function testRelationshipLinks(): void
     {
         $associationMetadata = new AssociationMetadata();
         self::assertCount(0, $associationMetadata->getRelationshipLinks());
@@ -469,7 +469,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($associationMetadata->hasRelationshipLink('link2'));
     }
 
-    public function testMetaProperties()
+    public function testMetaProperties(): void
     {
         $associationMetadata = new AssociationMetadata();
         self::assertCount(0, $associationMetadata->getMetaProperties());
@@ -495,7 +495,7 @@ class AssociationMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($associationMetadata->hasMetaProperty('metaProperty2'));
     }
 
-    public function testRelationshipMetaProperties()
+    public function testRelationshipMetaProperties(): void
     {
         $associationMetadata = new AssociationMetadata();
         self::assertCount(0, $associationMetadata->getRelationshipMetaProperties());

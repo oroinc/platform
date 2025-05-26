@@ -13,6 +13,7 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,17 +22,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigurationGmailTypeTest extends FormIntegrationTestCase
 {
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $userConfigManager;
-
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var OAuthManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $oauthManagerRegistry;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private ConfigManager&MockObject $userConfigManager;
+    private RequestStack&MockObject $requestStack;
+    private OAuthManagerRegistry&MockObject $oauthManagerRegistry;
 
     #[\Override]
     protected function setUp(): void

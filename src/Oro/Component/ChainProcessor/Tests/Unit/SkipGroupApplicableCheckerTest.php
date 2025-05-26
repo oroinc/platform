@@ -8,10 +8,11 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorIterator;
 use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 use Oro\Component\ChainProcessor\SkipGroupApplicableChecker;
+use PHPUnit\Framework\TestCase;
 
-class SkipGroupApplicableCheckerTest extends \PHPUnit\Framework\TestCase
+class SkipGroupApplicableCheckerTest extends TestCase
 {
-    public function testSkipGroupApplicableChecker()
+    public function testSkipGroupApplicableChecker(): void
     {
         $context = new Context();
         $processors = [
@@ -44,10 +45,7 @@ class SkipGroupApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return ChainApplicableChecker
-     */
-    protected function getApplicableChecker()
+    private function getApplicableChecker(): ChainApplicableChecker
     {
         $checker = new ChainApplicableChecker();
         $checker->addChecker(new SkipGroupApplicableChecker());
@@ -55,35 +53,26 @@ class SkipGroupApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         return $checker;
     }
 
-    /**
-     * @param callable[] $callbacks
-     *
-     * @return ProcessorRegistryInterface
-     */
-    protected function getProcessorRegistry(array $callbacks = [])
+    private function getProcessorRegistry(array $callbacks = []): ProcessorRegistryInterface
     {
         $processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
-        $processorRegistry->expects($this->any())
+        $processorRegistry->expects(self::any())
             ->method('getProcessor')
-            ->willReturnCallback(
-                function ($processorId) use ($callbacks) {
-                    return new ProcessorMock(
-                        $processorId,
-                        isset($callbacks[$processorId]) ? $callbacks[$processorId] : null
-                    );
-                }
-            );
+            ->willReturnCallback(function ($processorId) use ($callbacks) {
+                return new ProcessorMock(
+                    $processorId,
+                    $callbacks[$processorId] ?? null
+                );
+            });
 
         return $processorRegistry;
     }
 
-    /**
-     * @param string[]         $expectedProcessorIds
-     * @param \Iterator        $processors
-     * @param ContextInterface $context
-     */
-    protected function assertProcessors(array $expectedProcessorIds, \Iterator $processors, ContextInterface $context)
-    {
+    private function assertProcessors(
+        array $expectedProcessorIds,
+        \Iterator $processors,
+        ContextInterface $context
+    ): void {
         $processorIds = [];
         /** @var ProcessorMock $processor */
         foreach ($processors as $processor) {
@@ -91,6 +80,6 @@ class SkipGroupApplicableCheckerTest extends \PHPUnit\Framework\TestCase
             $processorIds[] = $processor->getProcessorId();
         }
 
-        $this->assertEquals($expectedProcessorIds, $processorIds);
+        self::assertEquals($expectedProcessorIds, $processorIds);
     }
 }

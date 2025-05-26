@@ -13,11 +13,12 @@ use Oro\Bundle\ApiBundle\Batch\Processor\BatchUpdateItemProcessor;
 use Oro\Bundle\ApiBundle\Batch\Processor\Update\BatchUpdateContext;
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class BatchUpdateContextTest extends \PHPUnit\Framework\TestCase
+class BatchUpdateContextTest extends TestCase
 {
     private BatchUpdateContext $context;
 
@@ -27,17 +28,17 @@ class BatchUpdateContextTest extends \PHPUnit\Framework\TestCase
         $this->context = new BatchUpdateContext();
     }
 
-    public function testShouldSummaryBeInitialized()
+    public function testShouldSummaryBeInitialized(): void
     {
         self::assertInstanceOf(BatchSummary::class, $this->context->getSummary());
     }
 
-    public function testShouldAffectedEntitiesBeInitialized()
+    public function testShouldAffectedEntitiesBeInitialized(): void
     {
         self::assertInstanceOf(BatchAffectedEntities::class, $this->context->getAffectedEntities());
     }
 
-    public function testGetOperationIdWhenItIsNotSet()
+    public function testGetOperationIdWhenItIsNotSet(): void
     {
         try {
             $this->context->getOperationId();
@@ -46,14 +47,14 @@ class BatchUpdateContextTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testOperationId()
+    public function testOperationId(): void
     {
         $operationId = 123;
         $this->context->setOperationId($operationId);
         self::assertSame($operationId, $this->context->getOperationId());
     }
 
-    public function testHasUnexpectedErrors()
+    public function testHasUnexpectedErrors(): void
     {
         self::assertFalse($this->context->hasUnexpectedErrors());
 
@@ -64,7 +65,7 @@ class BatchUpdateContextTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->context->hasUnexpectedErrors());
     }
 
-    public function testRetryAgain()
+    public function testRetryAgain(): void
     {
         self::assertFalse($this->context->isRetryAgain());
         self::assertNull($this->context->getRetryReason());
@@ -79,7 +80,7 @@ class BatchUpdateContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getRetryReason());
     }
 
-    public function testGetFileManagerWhenItIsNotSet()
+    public function testGetFileManagerWhenItIsNotSet(): void
     {
         try {
             $this->context->getFileManager();
@@ -88,14 +89,14 @@ class BatchUpdateContextTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testFileManager()
+    public function testFileManager(): void
     {
         $fileManager = $this->createMock(FileManager::class);
         $this->context->setFileManager($fileManager);
         self::assertSame($fileManager, $this->context->getFileManager());
     }
 
-    public function testGetFileWhenItIsNotSet()
+    public function testGetFileWhenItIsNotSet(): void
     {
         try {
             $this->context->getFile();
@@ -104,14 +105,14 @@ class BatchUpdateContextTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testFile()
+    public function testFile(): void
     {
         $file = new ChunkFile('api_1_chunk', 0, 0);
         $this->context->setFile($file);
         self::assertSame($file, $this->context->getFile());
     }
 
-    public function testSupportedEntityClasses()
+    public function testSupportedEntityClasses(): void
     {
         self::assertSame([], $this->context->getSupportedEntityClasses());
 
@@ -119,7 +120,7 @@ class BatchUpdateContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame(['Test\Class'], $this->context->getSupportedEntityClasses());
     }
 
-    public function testIncludedData()
+    public function testIncludedData(): void
     {
         self::assertNull($this->context->getIncludedData());
 
@@ -131,7 +132,7 @@ class BatchUpdateContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getIncludedData());
     }
 
-    public function testBatchItems()
+    public function testBatchItems(): void
     {
         self::assertNull($this->context->getBatchItems());
 
@@ -145,7 +146,7 @@ class BatchUpdateContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getBatchItems());
     }
 
-    public function testGetBatchItemsProcessedWithoutErrors()
+    public function testGetBatchItemsProcessedWithoutErrors(): void
     {
         self::assertSame([], iterator_to_array($this->context->getBatchItemsProcessedWithoutErrors()));
 
@@ -174,7 +175,7 @@ class BatchUpdateContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], iterator_to_array($this->context->getBatchItemsProcessedWithoutErrors()));
     }
 
-    public function testProcessedItemStatuses()
+    public function testProcessedItemStatuses(): void
     {
         $item1 = $this->createMock(BatchUpdateItem::class);
         $item1->expects(self::any())
@@ -204,7 +205,7 @@ class BatchUpdateContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getProcessedItemStatus($item1));
     }
 
-    public function testFlushDataHandler()
+    public function testFlushDataHandler(): void
     {
         self::assertNull($this->context->getFlushDataHandler());
 
@@ -216,7 +217,7 @@ class BatchUpdateContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getFlushDataHandler());
     }
 
-    public function testSharedData()
+    public function testSharedData(): void
     {
         self::assertInstanceOf(ParameterBagInterface::class, $this->context->getSharedData());
 

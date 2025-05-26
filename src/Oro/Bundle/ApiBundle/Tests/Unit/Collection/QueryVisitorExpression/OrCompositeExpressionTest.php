@@ -5,10 +5,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection\QueryVisitorExpression;
 use Doctrine\ORM\Query\Expr\Comparison;
 use Doctrine\ORM\Query\Expr\Orx;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\OrCompositeExpression;
+use PHPUnit\Framework\TestCase;
 
-class OrCompositeExpressionTest extends \PHPUnit\Framework\TestCase
+class OrCompositeExpressionTest extends TestCase
 {
-    public function testWalkCompositeExpression()
+    public function testWalkCompositeExpression(): void
     {
         $expression = new OrCompositeExpression();
         $expressionList = [

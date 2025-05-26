@@ -14,26 +14,18 @@ use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigSection;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
-    private $configProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderInterface */
-    private $entityOverrideProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|CompleteCustomDataTypeHelper */
-    private $customDataTypeHelper;
-
-    /** @var ExpandRelatedEntities */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private ConfigProvider&MockObject $configProvider;
+    private EntityOverrideProviderInterface&MockObject $entityOverrideProvider;
+    private CompleteCustomDataTypeHelper&MockObject $customDataTypeHelper;
+    private ExpandRelatedEntities $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -72,7 +64,7 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         return $config;
     }
 
-    public function testProcessWhenConfigAlreadyCompleted()
+    public function testProcessWhenConfigAlreadyCompleted(): void
     {
         $this->doctrineHelper->expects(self::never())
             ->method('isManageableEntityClass');
@@ -82,7 +74,7 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForDisabledInclusion()
+    public function testProcessForDisabledInclusion(): void
     {
         $this->expectException(NotSupportedConfigOperationException::class);
         $this->expectExceptionMessage(
@@ -97,7 +89,7 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessForNotManageableEntity(): void
     {
         $config = [
             'fields' => [
@@ -186,7 +178,7 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessForManageableEntity()
+    public function testProcessForManageableEntity(): void
     {
         $config = [
             'fields' => [
@@ -308,7 +300,7 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForManageableEntityWithPropertyPath()
+    public function testProcessForManageableEntityWithPropertyPath(): void
     {
         $entityDefinition = $this->createConfigObject([
             'fields' => [
@@ -390,7 +382,7 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForManageableEntityWithMaxResultsAndOrderBy()
+    public function testProcessForManageableEntityWithMaxResultsAndOrderBy(): void
     {
         $entityDefinition = $this->createConfigObject([
             'fields' => [
@@ -458,7 +450,7 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWhenThirdLevelEntityShouldBeExpanded()
+    public function testProcessWhenThirdLevelEntityShouldBeExpanded(): void
     {
         $config = [];
 
@@ -522,7 +514,7 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForAssociationDoesNotExistInEntityAndConfiguredByTargetClassAndTargetType()
+    public function testProcessForAssociationDoesNotExistInEntityAndConfiguredByTargetClassAndTargetType(): void
     {
         $config = [
             'fields' => [
@@ -578,7 +570,7 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForAssociationWithTargetClassAndDataType()
+    public function testProcessForAssociationWithTargetClassAndDataType(): void
     {
         $config = [
             'fields' => [
@@ -647,7 +639,7 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForManageableEntityWithAssociationToOverriddenEntity()
+    public function testProcessForManageableEntityWithAssociationToOverriddenEntity(): void
     {
         $this->context->setExtras([
             new ExpandRelatedEntitiesConfigExtra(['association1'])
@@ -711,7 +703,7 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWhenPropertyNameIsUsedInsteadOfFieldName()
+    public function testProcessWhenPropertyNameIsUsedInsteadOfFieldName(): void
     {
         $entityDefinition = $this->createConfigObject([
             'fields' => [
@@ -762,7 +754,7 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForRenamedField()
+    public function testProcessForRenamedField(): void
     {
         $entityDefinition = $this->createConfigObject([
             'fields' => [

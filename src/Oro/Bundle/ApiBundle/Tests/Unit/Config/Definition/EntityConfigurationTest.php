@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Config\Definition\ApiConfiguration;
 use Oro\Bundle\ApiBundle\Config\Definition\EntityConfiguration;
 use Oro\Bundle\ApiBundle\Config\Definition\EntityDefinitionConfiguration;
 use Oro\Bundle\ApiBundle\Tests\Unit\Config\ConfigExtensionRegistryTrait;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
@@ -16,14 +17,14 @@ use Symfony\Component\Yaml\Yaml;
 /**
  * Tests extensions config tree definitions
  */
-class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
+class EntityConfigurationTest extends TestCase
 {
     use ConfigExtensionRegistryTrait;
 
     /**
      * @dataProvider loadConfigurationDataProvider
      */
-    public function testLoadConfiguration(array $config, array $expected, ?string $error = null)
+    public function testLoadConfiguration(array $config, array $expected, ?string $error = null): void
     {
         if (null !== $error) {
             $this->expectException(InvalidConfigurationException::class);
@@ -56,7 +57,7 @@ class EntityConfigurationTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider loadConfigurationMergeDataProvider
      */
-    public function testMergeConfiguration(array $configs, array $expected)
+    public function testMergeConfiguration(array $configs, array $expected): void
     {
         $configExtensionRegistry = $this->createConfigExtensionRegistry();
         $configuration = new EntityConfiguration(

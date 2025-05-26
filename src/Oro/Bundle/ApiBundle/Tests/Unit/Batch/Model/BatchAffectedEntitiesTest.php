@@ -3,8 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\Model;
 
 use Oro\Bundle\ApiBundle\Batch\Model\BatchAffectedEntities;
+use PHPUnit\Framework\TestCase;
 
-class BatchAffectedEntitiesTest extends \PHPUnit\Framework\TestCase
+class BatchAffectedEntitiesTest extends TestCase
 {
     public function testEmpty(): void
     {

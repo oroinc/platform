@@ -10,6 +10,7 @@ use Oro\Bundle\AttachmentBundle\Tools\ExternalFileFactory;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -22,14 +23,12 @@ use Symfony\Component\Validator\Validation;
  */
 class ExternalFileTypeTest extends FormIntegrationTestCase
 {
-    private const URL = 'http://example.org/image.png';
-    private const URL_NOT_ACCESSIBLE = 'http://example.org/image2.png';
-    private const URL_INVALID = 'invalid_url';
+    private const string URL = 'http://example.org/image.png';
+    private const string URL_NOT_ACCESSIBLE = 'http://example.org/image2.png';
+    private const string URL_INVALID = 'invalid_url';
 
-    private ExternalFileFactory|\PHPUnit\Framework\MockObject\MockObject $externalFileFactory;
-
-    private ConfigFileValidator|\PHPUnit\Framework\MockObject\MockObject $configFileValidator;
-
+    private ExternalFileFactory&MockObject $externalFileFactory;
+    private ConfigFileValidator&MockObject $configFileValidator;
     private ExternalFileType $type;
 
     #[\Override]
@@ -116,8 +115,7 @@ class ExternalFileTypeTest extends FormIntegrationTestCase
         self::assertNull($form->getData());
 
         $externalFile = new ExternalFile(self::URL);
-        $this->externalFileFactory
-            ->expects(self::once())
+        $this->externalFileFactory->expects(self::once())
             ->method('createFromUrl')
             ->willReturn($externalFile);
 
@@ -136,8 +134,7 @@ class ExternalFileTypeTest extends FormIntegrationTestCase
         self::assertSame($externalFile, $form->getData());
 
         $newExternalFile = new ExternalFile(self::URL_NOT_ACCESSIBLE);
-        $this->externalFileFactory
-            ->expects(self::once())
+        $this->externalFileFactory->expects(self::once())
             ->method('createFromUrl')
             ->willReturn($newExternalFile);
 
@@ -155,8 +152,7 @@ class ExternalFileTypeTest extends FormIntegrationTestCase
 
         self::assertSame($externalFile, $form->getData());
 
-        $this->externalFileFactory
-            ->expects(self::never())
+        $this->externalFileFactory->expects(self::never())
             ->method('createFromUrl');
 
         $form->submit(self::URL);
@@ -174,13 +170,11 @@ class ExternalFileTypeTest extends FormIntegrationTestCase
 
         self::assertSame($externalFile, $form->getData());
 
-        $this->configFileValidator
-            ->expects(self::once())
+        $this->configFileValidator->expects(self::once())
             ->method('validateExternalFileUrl')
             ->willReturn(new ConstraintViolationList());
 
-        $this->externalFileFactory
-            ->expects(self::once())
+        $this->externalFileFactory->expects(self::once())
             ->method('createFromUrl')
             ->willThrowException(new ExternalFileNotAccessibleException(self::URL_NOT_ACCESSIBLE, 'Not Found'));
 
@@ -207,8 +201,7 @@ class ExternalFileTypeTest extends FormIntegrationTestCase
 
         self::assertSame($externalFile, $form->getData());
 
-        $this->configFileValidator
-            ->expects(self::once())
+        $this->configFileValidator->expects(self::once())
             ->method('validateExternalFileUrl')
             ->willReturn(
                 new ConstraintViolationList(
@@ -225,8 +218,7 @@ class ExternalFileTypeTest extends FormIntegrationTestCase
                 )
             );
 
-        $this->externalFileFactory
-            ->expects(self::never())
+        $this->externalFileFactory->expects(self::never())
             ->method('createFromUrl');
 
         $form->submit(self::URL_INVALID);
@@ -250,13 +242,11 @@ class ExternalFileTypeTest extends FormIntegrationTestCase
 
         self::assertNull($form->getData());
 
-        $this->configFileValidator
-            ->expects(self::once())
+        $this->configFileValidator->expects(self::once())
             ->method('validateExternalFileUrl')
             ->willReturn(new ConstraintViolationList());
 
-        $this->externalFileFactory
-            ->expects(self::once())
+        $this->externalFileFactory->expects(self::once())
             ->method('createFromUrl')
             ->willThrowException(new ExternalFileNotAccessibleException(self::URL_NOT_ACCESSIBLE, 'Not Found'));
 
@@ -281,8 +271,7 @@ class ExternalFileTypeTest extends FormIntegrationTestCase
 
         self::assertNull($form->getData());
 
-        $this->configFileValidator
-            ->expects(self::once())
+        $this->configFileValidator->expects(self::once())
             ->method('validateExternalFileUrl')
             ->willReturn(
                 new ConstraintViolationList(
@@ -299,8 +288,7 @@ class ExternalFileTypeTest extends FormIntegrationTestCase
                 )
             );
 
-        $this->externalFileFactory
-            ->expects(self::never())
+        $this->externalFileFactory->expects(self::never())
             ->method('createFromUrl');
 
         $form->submit(self::URL_INVALID);

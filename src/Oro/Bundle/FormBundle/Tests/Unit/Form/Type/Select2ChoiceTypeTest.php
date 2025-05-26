@@ -32,7 +32,7 @@ class Select2ChoiceTypeTest extends TypeTestCase
     {
         $form = $this->factory->create(Select2Type::class);
 
-        $this->assertEquals(ChoiceType::class, get_class($form->getConfig()->getType()->getParent()->getInnerType()));
+        $this->assertEquals(ChoiceType::class, $form->getConfig()->getType()->getParent()->getInnerType()::class);
     }
 
     public function testSelectSingle()

@@ -24,14 +24,14 @@ class AllValidatorTest extends ConstraintValidatorTestCase
         return new AllValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new All(new NotBlank()));
 
         $this->assertNoViolation();
     }
 
-    public function testThrowsExceptionIfNotTraversable()
+    public function testThrowsExceptionIfNotTraversable(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->validator->validate('test', new All(new NotBlank()));
@@ -40,7 +40,7 @@ class AllValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidArguments
      */
-    public function testWalkSingleConstraint(array|\ArrayObject $array)
+    public function testWalkSingleConstraint(array|\ArrayObject $array): void
     {
         $constraint = new NotBlank();
 
@@ -57,7 +57,7 @@ class AllValidatorTest extends ConstraintValidatorTestCase
     /**
      * @dataProvider getValidArguments
      */
-    public function testWalkMultipleConstraints(array|\ArrayObject $array)
+    public function testWalkMultipleConstraints(array|\ArrayObject $array): void
     {
         $constraints = [new NotBlank(), new NotNull()];
 
@@ -79,7 +79,7 @@ class AllValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function testShouldKeepLazyCollectionUninitialized()
+    public function testShouldKeepLazyCollectionUninitialized(): void
     {
         /** @var AbstractLazyCollection $collection */
         $collection = $this->getMockForAbstractClass(AbstractLazyCollection::class);

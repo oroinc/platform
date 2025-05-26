@@ -17,14 +17,12 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class HandleFieldsFilterTest extends GetProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
-    private $valueNormalizer;
-
-    /** @var HandleFieldsFilter */
-    private $processor;
+    private ValueNormalizer&MockObject $valueNormalizer;
+    private HandleFieldsFilter $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -48,7 +46,7 @@ class HandleFieldsFilterTest extends GetProcessorTestCase
         );
     }
 
-    public function testProcessWhenNoFieldsFilterAlreadyHandled()
+    public function testProcessWhenNoFieldsFilterAlreadyHandled(): void
     {
         $configExtra = new FilterFieldsConfigExtra([]);
         $this->context->addConfigExtra($configExtra);
@@ -57,14 +55,14 @@ class HandleFieldsFilterTest extends GetProcessorTestCase
         self::assertSame($configExtra, $this->context->getConfigExtra(FilterFieldsConfigExtra::NAME));
     }
 
-    public function testProcessWhenNoFieldsFilterValue()
+    public function testProcessWhenNoFieldsFilterValue(): void
     {
         $this->processor->process($this->context);
 
         self::assertFalse($this->context->hasConfigExtra(FilterFieldsConfigExtra::NAME));
     }
 
-    public function testProcessForFieldsFilterWithEmptyValue()
+    public function testProcessForFieldsFilterWithEmptyValue(): void
     {
         $filterValue = FilterValue::createFromSource('fields[entity]', 'entity', '');
 
@@ -84,7 +82,7 @@ class HandleFieldsFilterTest extends GetProcessorTestCase
         );
     }
 
-    public function testProcessForFieldsFilter()
+    public function testProcessForFieldsFilter(): void
     {
         $filterValue = FilterValue::createFromSource('fields[entity]', 'entity', 'field1');
 
@@ -107,7 +105,7 @@ class HandleFieldsFilterTest extends GetProcessorTestCase
         );
     }
 
-    public function testProcessForUnknownEntityType()
+    public function testProcessForUnknownEntityType(): void
     {
         $filterValue = FilterValue::createFromSource('fields[entity]', 'entity', 'field1');
 
@@ -133,7 +131,7 @@ class HandleFieldsFilterTest extends GetProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function testProcessForWrongFieldsFilterValue()
+    public function testProcessForWrongFieldsFilterValue(): void
     {
         $filterValue = FilterValue::createFromSource('fields[entity]', 'entity', 'field1');
 
@@ -182,7 +180,7 @@ class HandleFieldsFilterTest extends GetProcessorTestCase
         );
     }
 
-    public function testProcessForFieldsFilterValueWithEmptyEntityType()
+    public function testProcessForFieldsFilterValueWithEmptyEntityType(): void
     {
         $filterValue = FilterValue::createFromSource('fields[]', '', 'field1');
 
@@ -203,7 +201,7 @@ class HandleFieldsFilterTest extends GetProcessorTestCase
         );
     }
 
-    public function testProcessForFieldsFilterValueWithEmptyEntityTypeBecauseItIsSpecifiedAsNotGroupedFilter()
+    public function testProcessForFieldsFilterValueWithEmptyEntityTypeBecauseItIsSpecifiedAsNotGroupedFilter(): void
     {
         $filterValue = FilterValue::createFromSource('fields', 'fields', 'field1');
 

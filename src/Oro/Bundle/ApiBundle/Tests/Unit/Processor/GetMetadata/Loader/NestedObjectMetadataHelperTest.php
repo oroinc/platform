@@ -12,20 +12,17 @@ use Oro\Bundle\ApiBundle\Model\FakeEntity;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\MetadataHelper;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\NestedObjectMetadataHelper;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataFactory;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
+class NestedObjectMetadataHelperTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataHelper */
-    private $metadataHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectMetadataFactory */
-    private $objectMetadataFactory;
-
-    /** @var NestedObjectMetadataHelper */
-    private $nestedObjectMetadataHelper;
+    private MetadataHelper&MockObject $metadataHelper;
+    private ObjectMetadataFactory&MockObject $objectMetadataFactory;
+    private NestedObjectMetadataHelper $nestedObjectMetadataHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -39,7 +36,7 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddNestedObjectAssociation()
+    public function testAddNestedObjectAssociation(): void
     {
         $config = new EntityDefinitionConfig();
 
@@ -85,7 +82,7 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
         self::assertSame($targetEntityMetadata, $result->getTargetMetadata());
     }
 
-    public function testAddNestedObjectAssociationWithInheritData()
+    public function testAddNestedObjectAssociationWithInheritData(): void
     {
         $config = new EntityDefinitionConfig();
 
@@ -130,7 +127,7 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
         self::assertSame($targetEntityMetadata, $result->getTargetMetadata());
     }
 
-    public function testAddNestedObjectAssociationShouldThrowExceptionWhenNoDataClassFormOption()
+    public function testAddNestedObjectAssociationShouldThrowExceptionWhenNoDataClassFormOption(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
@@ -161,7 +158,7 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddNestedObjectAssociationShouldThrowExceptionWhenDataClassFormOptionUsedWithInheritData()
+    public function testAddNestedObjectAssociationShouldThrowExceptionWhenDataClassFormOptionUsedWithInheritData(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
@@ -193,7 +190,7 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetLinkedFieldWhenTargetFieldIsLinkedToAssociationField()
+    public function testGetLinkedFieldWhenTargetFieldIsLinkedToAssociationField(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
@@ -221,7 +218,7 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetLinkedFieldWhenTargetFieldIsLinkedToAssociation()
+    public function testGetLinkedFieldWhenTargetFieldIsLinkedToAssociation(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
@@ -248,7 +245,7 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetLinkedFieldWhenTargetFieldIsLinkedToField()
+    public function testGetLinkedFieldWhenTargetFieldIsLinkedToField(): void
     {
         $parentConfig = new EntityDefinitionConfig();
         $parentClassName = 'Test\ParentClass';
@@ -269,7 +266,7 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
         self::assertSame($linkedField, $result);
     }
 
-    public function testGetLinkedFieldFoComputedField()
+    public function testGetLinkedFieldFoComputedField(): void
     {
         $parentConfig = new EntityDefinitionConfig();
         $parentClassName = 'Test\ParentClass';
@@ -288,7 +285,7 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
         self::assertSame($targetField, $result);
     }
 
-    public function testSetTargetPropertyPathWhenFormPropertyPathEqualsToFieldName()
+    public function testSetTargetPropertyPathWhenFormPropertyPathEqualsToFieldName(): void
     {
         $fieldName = 'testField';
         $propertyMetadata = new FieldMetadata($fieldName);
@@ -309,7 +306,7 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($fieldName, $propertyMetadata->getPropertyPath());
     }
 
-    public function testSetTargetPropertyPathWhenFormPropertyPathIsNotEqualToFieldName()
+    public function testSetTargetPropertyPathWhenFormPropertyPathIsNotEqualToFieldName(): void
     {
         $fieldName = 'testField';
         $propertyMetadata = new FieldMetadata($fieldName);
@@ -331,7 +328,7 @@ class NestedObjectMetadataHelperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($formPropertyPath, $propertyMetadata->getPropertyPath());
     }
 
-    public function testGetLinkedFieldForRenamedField()
+    public function testGetLinkedFieldForRenamedField(): void
     {
         $parentConfig = new EntityDefinitionConfig();
         $parentClassName = 'Test\ParentClass';

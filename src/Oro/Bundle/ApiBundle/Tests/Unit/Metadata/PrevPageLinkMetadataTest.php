@@ -7,10 +7,11 @@ use Oro\Bundle\ApiBundle\Metadata\DataAccessorInterface;
 use Oro\Bundle\ApiBundle\Metadata\ExternalLinkMetadata;
 use Oro\Bundle\ApiBundle\Metadata\PrevPageLinkMetadata;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use PHPUnit\Framework\TestCase;
 
-class PrevPageLinkMetadataTest extends \PHPUnit\Framework\TestCase
+class PrevPageLinkMetadataTest extends TestCase
 {
-    public function testGetHrefWhenPaginationIsNotSupported()
+    public function testGetHrefWhenPaginationIsNotSupported(): void
     {
         $queryStringAccessor = $this->createMock(QueryStringAccessorInterface::class);
         $linkMetadata = new PrevPageLinkMetadata(
@@ -29,7 +30,7 @@ class PrevPageLinkMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertNull($linkMetadata->getHref($dataAccessor));
     }
 
-    public function testGetHrefForFirstPage()
+    public function testGetHrefForFirstPage(): void
     {
         $queryStringAccessor = $this->createMock(QueryStringAccessorInterface::class);
         $linkMetadata = new PrevPageLinkMetadata(
@@ -56,7 +57,7 @@ class PrevPageLinkMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertNull($linkMetadata->getHref($dataAccessor));
     }
 
-    public function testGetHrefForSecondPage()
+    public function testGetHrefForSecondPage(): void
     {
         $queryStringAccessor = $this->createMock(QueryStringAccessorInterface::class);
         $linkMetadata = new PrevPageLinkMetadata(
@@ -87,7 +88,7 @@ class PrevPageLinkMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetHrefForAnotherPage()
+    public function testGetHrefForAnotherPage(): void
     {
         $queryStringAccessor = $this->createMock(QueryStringAccessorInterface::class);
         $linkMetadata = new PrevPageLinkMetadata(
@@ -118,7 +119,7 @@ class PrevPageLinkMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetHrefWhenNoQueryStringAccessor()
+    public function testGetHrefWhenNoQueryStringAccessor(): void
     {
         $linkMetadata = new PrevPageLinkMetadata(
             new ExternalLinkMetadata('http://test.com'),

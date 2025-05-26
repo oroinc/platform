@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Connector\Search;
 
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryExprValue;
+use PHPUnit\Framework\TestCase;
 
-class SearchQueryExprValueTest extends \PHPUnit\Framework\TestCase
+class SearchQueryExprValueTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $value = 'testValue';
         $match = 1;
@@ -16,7 +17,7 @@ class SearchQueryExprValueTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($match, $obj->getMatch());
     }
 
-    public function testSettersAndGetters()
+    public function testSettersAndGetters(): void
     {
         $obj = new SearchQueryExprValue('1', 0);
 

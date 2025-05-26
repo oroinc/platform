@@ -3,6 +3,8 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Mailer;
 
 use Oro\Bundle\EmailBundle\Mailer\Mailer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\TransportInterface;
@@ -14,10 +16,9 @@ use Symfony\Component\Mime\Message;
 use Symfony\Component\Mime\Part\MessagePart;
 use Symfony\Component\Mime\RawMessage;
 
-class MailerTest extends \PHPUnit\Framework\TestCase
+class MailerTest extends TestCase
 {
-    private TransportInterface|\PHPUnit\Framework\MockObject\MockObject $transport;
-
+    private TransportInterface&MockObject $transport;
     private Mailer $mailer;
 
     #[\Override]

@@ -11,14 +11,12 @@ use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class NormalizeEntityIdTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerInterface */
-    private $entityIdTransformer;
-
-    /** @var NormalizeEntityId */
-    private $processor;
+    private EntityIdTransformerInterface&MockObject $entityIdTransformer;
+    private NormalizeEntityId $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -41,7 +39,7 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
         return new CreateContext($this->configProvider, $this->metadataProvider);
     }
 
-    public function testProcessWhenIdAlreadyNormalized()
+    public function testProcessWhenIdAlreadyNormalized(): void
     {
         $this->context->setClassName('Test\Class');
         $this->context->setId(123);
@@ -52,7 +50,7 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenEnumIdAlreadyNormalized()
+    public function testProcessWhenEnumIdAlreadyNormalized(): void
     {
         $this->context->setClassName('Extend\Entity\EV_Test_Enum');
         $this->context->setId('test_enum.option1');
@@ -63,7 +61,7 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenEntityHasIdentifierGenerator()
+    public function testProcessWhenEntityHasIdentifierGenerator(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setHasIdentifierGenerator(true);
@@ -78,7 +76,7 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setHasIdentifierGenerator(false);
@@ -98,7 +96,7 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessForEnum()
+    public function testProcessForEnum(): void
     {
         $metadata = new EntityMetadata('Extend\Entity\EV_Test_Enum');
         $metadata->setHasIdentifierGenerator(false);
@@ -118,7 +116,7 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessForInvalidId()
+    public function testProcessForInvalidId(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setHasIdentifierGenerator(false);
@@ -145,7 +143,7 @@ class NormalizeEntityIdTest extends FormProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessForNotResolvedId()
+    public function testProcessForNotResolvedId(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setHasIdentifierGenerator(false);

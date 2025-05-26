@@ -7,6 +7,8 @@ use Oro\Bundle\FormBundle\Model\UpdateFactory;
 use Oro\Bundle\FormBundle\Model\UpdateHandlerFacade;
 use Oro\Bundle\FormBundle\Model\UpdateInterface;
 use Oro\Bundle\UIBundle\Route\Router;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -15,31 +17,16 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
 
-class UpdateHandlerFacadeTest extends \PHPUnit\Framework\TestCase
+class UpdateHandlerFacadeTest extends TestCase
 {
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var Session|\PHPUnit\Framework\MockObject\MockObject */
-    private $session;
-
-    /** @var Router|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var UpdateFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $updateFactory;
-
-    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $form;
-
-    /** @var object */
-    private $data;
-
-    /** @var UpdateHandlerFacade */
-    private $facade;
+    private RequestStack&MockObject $requestStack;
+    private Session&MockObject $session;
+    private Router&MockObject $router;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private UpdateFactory&MockObject $updateFactory;
+    private FormInterface&MockObject $form;
+    private object $data;
+    private UpdateHandlerFacade $facade;
 
     #[\Override]
     protected function setUp(): void
@@ -63,7 +50,7 @@ class UpdateHandlerFacadeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testUpdateHandledWithoutWidget()
+    public function testUpdateHandledWithoutWidget(): void
     {
         $update = $this->defaultUpdateBuilding();
 
@@ -106,7 +93,7 @@ class UpdateHandlerFacadeTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($redirectResponse, $result);
     }
 
-    public function testUpdateHandledWithoutRequestArgument()
+    public function testUpdateHandledWithoutRequestArgument(): void
     {
         $update = $this->defaultUpdateBuilding();
 
@@ -235,7 +222,7 @@ class UpdateHandlerFacadeTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testUpdateNotHandled()
+    public function testUpdateNotHandled(): void
     {
         $update = $this->defaultUpdateBuilding();
 
@@ -278,7 +265,7 @@ class UpdateHandlerFacadeTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(['form' => $formView, 'entity' => $this->data, 'isWidgetContext' => true], $result);
     }
 
-    public function testUpdateNotHandledEntityFromProviderNotOverride()
+    public function testUpdateNotHandledEntityFromProviderNotOverride(): void
     {
         $update = $this->defaultUpdateBuilding();
 
@@ -322,10 +309,7 @@ class UpdateHandlerFacadeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return UpdateInterface|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function defaultUpdateBuilding()
+    private function defaultUpdateBuilding(): UpdateInterface&MockObject
     {
         $update = $this->createMock(UpdateInterface::class);
 

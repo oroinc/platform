@@ -3,9 +3,10 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Mailer\Checker;
 
 use Oro\Bundle\EmailBundle\Mailer\Checker\SmtpConnectionChecker;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Transport\Dsn;
 
-class SmtpConnectionCheckerTest extends \PHPUnit\Framework\TestCase
+class SmtpConnectionCheckerTest extends TestCase
 {
     /**
      * @dataProvider supportsDataProvider

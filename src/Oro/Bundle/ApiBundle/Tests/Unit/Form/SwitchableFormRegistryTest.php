@@ -7,18 +7,20 @@ use Oro\Bundle\ApiBundle\Form\FormExtensionState;
 use Oro\Bundle\ApiBundle\Form\SwitchableFormRegistry;
 use Oro\Bundle\ApiBundle\Form\Type\BooleanType;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormExtensionInterface;
 use Symfony\Component\Form\ResolvedFormTypeFactoryInterface;
 use Symfony\Component\Form\ResolvedFormTypeInterface;
 
-class SwitchableFormRegistryTest extends \PHPUnit\Framework\TestCase
+class SwitchableFormRegistryTest extends TestCase
 {
     private function expectSwitchFormExtension(
         array &$switchCalls,
-        SwitchableDependencyInjectionExtension|\PHPUnit\Framework\MockObject\MockObject $extension,
-        FormExtensionState|\PHPUnit\Framework\MockObject\MockObject $formExtensionState
+        SwitchableDependencyInjectionExtension&MockObject $extension,
+        FormExtensionState&MockObject $formExtensionState
     ): void {
         $switchCalls = [];
         $extension->expects(self::exactly(2))
@@ -38,7 +40,7 @@ class SwitchableFormRegistryTest extends \PHPUnit\Framework\TestCase
             });
     }
 
-    public function testConstructorWithSeveralFormExtensions()
+    public function testConstructorWithSeveralFormExtensions(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected only one form extension.');
@@ -55,7 +57,7 @@ class SwitchableFormRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConstructorWithUnexpectedFormExtensions()
+    public function testConstructorWithUnexpectedFormExtensions(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf(
@@ -74,7 +76,7 @@ class SwitchableFormRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldBePossibleToSetTypesAndGuesser()
+    public function testShouldBePossibleToSetTypesAndGuesser(): void
     {
         $extension = $this->createMock(SwitchableDependencyInjectionExtension::class);
 
@@ -90,7 +92,7 @@ class SwitchableFormRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertNull(ReflectionUtil::getPropertyValue($formRegistry, 'guesser'));
     }
 
-    public function testSwitchToDefaultFormExtensionWhenThisExtensionIsAlreadyActive()
+    public function testSwitchToDefaultFormExtensionWhenThisExtensionIsAlreadyActive(): void
     {
         $extension = $this->createMock(SwitchableDependencyInjectionExtension::class);
         $formExtensionState = $this->createMock(FormExtensionState::class);
@@ -113,7 +115,7 @@ class SwitchableFormRegistryTest extends \PHPUnit\Framework\TestCase
         $formRegistry->switchToDefaultFormExtension();
     }
 
-    public function testSwitchToApiAndThenToDefaultFormExtension()
+    public function testSwitchToApiAndThenToDefaultFormExtension(): void
     {
         $extension = $this->createMock(SwitchableDependencyInjectionExtension::class);
         $formExtensionState = $this->createMock(FormExtensionState::class);
@@ -152,7 +154,7 @@ class SwitchableFormRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSeveralSwitchToApiAndThenToDefaultFormExtension()
+    public function testSeveralSwitchToApiAndThenToDefaultFormExtension(): void
     {
         $extension = $this->createMock(SwitchableDependencyInjectionExtension::class);
         $formExtensionState = $this->createMock(FormExtensionState::class);
@@ -201,7 +203,7 @@ class SwitchableFormRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetTypeShouldReturnKnownApiFormType()
+    public function testGetTypeShouldReturnKnownApiFormType(): void
     {
         $extension = $this->createMock(SwitchableDependencyInjectionExtension::class);
         $resolvedTypeFactory = $this->createMock(ResolvedFormTypeFactoryInterface::class);
@@ -234,7 +236,7 @@ class SwitchableFormRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetTypeShouldThrowExceptionForNotKnownApiFormType()
+    public function testGetTypeShouldThrowExceptionForNotKnownApiFormType(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -257,7 +259,7 @@ class SwitchableFormRegistryTest extends \PHPUnit\Framework\TestCase
         $formRegistry->getType(BooleanType::class);
     }
 
-    public function testGetTypeShouldReturnAnyDefaultFormType()
+    public function testGetTypeShouldReturnAnyDefaultFormType(): void
     {
         $extension = $this->createMock(SwitchableDependencyInjectionExtension::class);
         $resolvedTypeFactory = $this->createMock(ResolvedFormTypeFactoryInterface::class);

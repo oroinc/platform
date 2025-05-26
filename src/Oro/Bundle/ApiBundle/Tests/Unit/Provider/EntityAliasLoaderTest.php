@@ -8,11 +8,12 @@ use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasStorage;
 use Oro\Bundle\EntityBundle\Provider\EntityClassProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityAliasLoaderTest extends \PHPUnit\Framework\TestCase
+class EntityAliasLoaderTest extends TestCase
 {
-    /** @var EntityOverrideProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityOverrideProvider;
+    private EntityOverrideProviderInterface&MockObject $entityOverrideProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +21,7 @@ class EntityAliasLoaderTest extends \PHPUnit\Framework\TestCase
         $this->entityOverrideProvider = $this->createMock(EntityOverrideProviderInterface::class);
     }
 
-    public function testEmptyLoader()
+    public function testEmptyLoader(): void
     {
         $storage = new EntityAliasStorage();
         $loader = new EntityAliasLoader([], [], $this->entityOverrideProvider);
@@ -29,7 +30,7 @@ class EntityAliasLoaderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $storage->getAll());
     }
 
-    public function testLoadWhenSeveralProvidersReturnSameClass()
+    public function testLoadWhenSeveralProvidersReturnSameClass(): void
     {
         $classProvider1 = $this->createMock(EntityClassProviderInterface::class);
         $classProvider1->expects(self::once())
@@ -67,7 +68,7 @@ class EntityAliasLoaderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testThatEarlierAliasProviderWins()
+    public function testThatEarlierAliasProviderWins(): void
     {
         $classProvider1 = $this->createMock(EntityClassProviderInterface::class);
         $classProvider1->expects(self::once())
@@ -99,7 +100,7 @@ class EntityAliasLoaderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEntityAliasCanBeDisabled()
+    public function testEntityAliasCanBeDisabled(): void
     {
         $classProvider1 = $this->createMock(EntityClassProviderInterface::class);
         $classProvider1->expects(self::once())
@@ -126,7 +127,7 @@ class EntityAliasLoaderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $storage->getAll());
     }
 
-    public function testOverriddenEntityIsNotLoaded()
+    public function testOverriddenEntityIsNotLoaded(): void
     {
         $classProvider1 = $this->createMock(EntityClassProviderInterface::class);
         $classProvider1->expects(self::once())

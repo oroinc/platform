@@ -4,9 +4,10 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\EmailBundle\DependencyInjection\OroEmailExtension;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroEmailExtensionTest extends \PHPUnit\Framework\TestCase
+class OroEmailExtensionTest extends TestCase
 {
     public function testLoad(): void
     {

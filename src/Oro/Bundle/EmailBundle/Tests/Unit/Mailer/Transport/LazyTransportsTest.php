@@ -3,6 +3,8 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Mailer\Transport;
 
 use Oro\Bundle\EmailBundle\Mailer\Transport\LazyTransports;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport;
@@ -10,9 +12,9 @@ use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Message;
 
-class LazyTransportsTest extends \PHPUnit\Framework\TestCase
+class LazyTransportsTest extends TestCase
 {
-    private TransportFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $transportFactory;
+    private TransportFactoryInterface&MockObject $transportFactory;
     private Transport $transport;
 
     #[\Override]
@@ -24,8 +26,7 @@ class LazyTransportsTest extends \PHPUnit\Framework\TestCase
 
     public function testConstructDoesNotCreateTransports(): void
     {
-        $this->transportFactory
-            ->expects(self::never())
+        $this->transportFactory->expects(self::never())
             ->method(self::anything());
 
         new LazyTransports($this->transport, ['main' => 'null://null']);
@@ -35,20 +36,17 @@ class LazyTransportsTest extends \PHPUnit\Framework\TestCase
     {
         $transportsDsns = ['main' => 'null://null'];
         $mainTransport = $this->createMock(TransportInterface::class);
-        $this->transportFactory
-            ->expects(self::once())
+        $this->transportFactory->expects(self::once())
             ->method('supports')
             ->willReturn(true);
-        $this->transportFactory
-            ->expects(self::once())
+        $this->transportFactory->expects(self::once())
             ->method('create')
             ->willReturn($mainTransport);
 
         $message = new Message();
         $envelope = $this->createMock(Envelope::class);
         $expectedSentMessage = $this->createMock(SentMessage::class);
-        $mainTransport
-            ->expects(self::exactly(2))
+        $mainTransport->expects(self::exactly(2))
             ->method('send')
             ->with($message, $envelope)
             ->willReturn($expectedSentMessage);
@@ -64,8 +62,7 @@ class LazyTransportsTest extends \PHPUnit\Framework\TestCase
     public function testToStringDoesNotCreateTransports(): void
     {
         $transportsDsns = ['main' => 'null://null', 'another' => 'native://default'];
-        $this->transportFactory
-            ->expects(self::never())
+        $this->transportFactory->expects(self::never())
             ->method(self::anything());
 
         $lazyTransports = new LazyTransports($this->transport, $transportsDsns);

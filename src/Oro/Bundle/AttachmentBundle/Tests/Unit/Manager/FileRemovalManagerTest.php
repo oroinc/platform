@@ -9,15 +9,14 @@ use Oro\Bundle\AttachmentBundle\Manager\FileRemovalManager;
 use Oro\Bundle\AttachmentBundle\Manager\MediaCacheManagerRegistryInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileNamesProviderInterface;
 use Oro\Bundle\GaufretteBundle\FileManager as GaufretteFileManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FileRemovalManagerTest extends \PHPUnit\Framework\TestCase
+class FileRemovalManagerTest extends TestCase
 {
-    private FileRemovalManagerConfigInterface|\PHPUnit\Framework\MockObject\MockObject $configuration;
-
-    private FileNamesProviderInterface|\PHPUnit\Framework\MockObject\MockObject $fileNamesProvider;
-
-    private MediaCacheManagerRegistryInterface|\PHPUnit\Framework\MockObject\MockObject $mediaCacheManagerRegistry;
-
+    private FileRemovalManagerConfigInterface&MockObject $configuration;
+    private FileNamesProviderInterface&MockObject $fileNamesProvider;
+    private MediaCacheManagerRegistryInterface&MockObject $mediaCacheManagerRegistry;
     private FileRemovalManager $fileRemovalManager;
 
     #[\Override]
@@ -39,8 +38,7 @@ class FileRemovalManagerTest extends \PHPUnit\Framework\TestCase
         $file = new File();
         $file->setExternalUrl('http://example.org/image.png');
 
-        $this->mediaCacheManagerRegistry
-            ->expects(self::never())
+        $this->mediaCacheManagerRegistry->expects(self::never())
             ->method(self::anything());
 
         $this->fileRemovalManager->removeFiles($file);

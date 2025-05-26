@@ -4,10 +4,11 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\AttachmentBundle\DependencyInjection\Configuration;
 use Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 
-class ConfigurationTest extends \PHPUnit\Framework\TestCase
+class ConfigurationTest extends TestCase
 {
     private function processConfiguration(array $config): array
     {

@@ -10,17 +10,14 @@ use Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\BatchUpdateItemContext;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class BatchUpdateItemTest extends \PHPUnit\Framework\TestCase
+class BatchUpdateItemTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|BatchUpdateItemProcessor */
-    private $processor;
-
-    /** @var BatchUpdateContext */
-    private $updateContext;
-
-    /** @var BatchUpdateItem */
-    private $batchUpdateItem;
+    private BatchUpdateItemProcessor&MockObject $processor;
+    private BatchUpdateContext $updateContext;
+    private BatchUpdateItem $batchUpdateItem;
 
     #[\Override]
     protected function setUp(): void
@@ -41,12 +38,12 @@ class BatchUpdateItemTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetIndex()
+    public function testGetIndex(): void
     {
         self::assertSame(123, $this->batchUpdateItem->getIndex());
     }
 
-    public function testGetContext()
+    public function testGetContext(): void
     {
         $context = $this->batchUpdateItem->getContext();
         self::assertEquals($this->updateContext->getVersion(), $context->getVersion());
@@ -59,19 +56,19 @@ class BatchUpdateItemTest extends \PHPUnit\Framework\TestCase
         self::assertSame($context, $this->batchUpdateItem->getContext());
     }
 
-    public function testGetIncludedData()
+    public function testGetIncludedData(): void
     {
         $includedData = $this->createMock(IncludedData::class);
         $this->updateContext->setIncludedData($includedData);
         self::assertSame($includedData, $this->batchUpdateItem->getIncludedData());
     }
 
-    public function testGetIncludedDataWhenIncludedDataNotExist()
+    public function testGetIncludedDataWhenIncludedDataNotExist(): void
     {
         self::assertNull($this->batchUpdateItem->getIncludedData());
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $data = ['test'];
 
@@ -86,7 +83,7 @@ class BatchUpdateItemTest extends \PHPUnit\Framework\TestCase
         $this->batchUpdateItem->initialize($data);
     }
 
-    public function testTransformWhenNoErrorsOccurred()
+    public function testTransformWhenNoErrorsOccurred(): void
     {
         $result = ['test'];
 
@@ -102,7 +99,7 @@ class BatchUpdateItemTest extends \PHPUnit\Framework\TestCase
         self::assertSame($result, $this->batchUpdateItem->getContext()->getResult());
     }
 
-    public function testTransformWhenSomeErrorsOccurred()
+    public function testTransformWhenSomeErrorsOccurred(): void
     {
         $this->processor->expects(self::once())
             ->method('process')

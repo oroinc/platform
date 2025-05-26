@@ -11,23 +11,17 @@ use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataFactory;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataLoader;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectNestedAssociationMetadataFactory;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectNestedObjectMetadataFactory;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class ObjectMetadataLoaderTest extends LoaderTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectMetadataFactory */
-    private $objectMetadataFactory;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectNestedObjectMetadataFactory */
-    private $nestedObjectMetadataFactory;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectNestedAssociationMetadataFactory */
-    private $nestedAssociationMetadataFactory;
-
-    /** @var ObjectMetadataLoader */
-    private $objectMetadataLoader;
+    private ObjectMetadataFactory&MockObject $objectMetadataFactory;
+    private ObjectNestedObjectMetadataFactory&MockObject $nestedObjectMetadataFactory;
+    private ObjectNestedAssociationMetadataFactory&MockObject $nestedAssociationMetadataFactory;
+    private ObjectMetadataLoader $objectMetadataLoader;
 
     #[\Override]
     protected function setUp(): void
@@ -43,7 +37,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         );
     }
 
-    public function testForExcludedField()
+    public function testForExcludedField(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
@@ -72,7 +66,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForExcludedFieldWhenExcludedPropertiesShouldNotBeIgnored()
+    public function testForExcludedFieldWhenExcludedPropertiesShouldNotBeIgnored(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
@@ -108,7 +102,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForField()
+    public function testForField(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
@@ -143,7 +137,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForMetaProperty()
+    public function testForMetaProperty(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
@@ -180,7 +174,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         self::assertFalse($entityMetadata->isInheritedType());
     }
 
-    public function testForClassMetaProperty()
+    public function testForClassMetaProperty(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
@@ -217,7 +211,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         self::assertTrue($entityMetadata->isInheritedType());
     }
 
-    public function testForAssociation()
+    public function testForAssociation(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
@@ -254,7 +248,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForNestedObject()
+    public function testForNestedObject(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
@@ -292,7 +286,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForNestedAssociation()
+    public function testForNestedAssociation(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
@@ -329,7 +323,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForFieldWithConfiguredDirection()
+    public function testForFieldWithConfiguredDirection(): void
     {
         $entityClass = 'Test\Class';
         $fieldName = 'testField';
@@ -369,7 +363,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         self::assertTrue($fieldMetadata->isOutput());
     }
 
-    public function testForMetaPropertyWithConfiguredDirection()
+    public function testForMetaPropertyWithConfiguredDirection(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
@@ -411,7 +405,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         self::assertTrue($propertyMetadata->isOutput());
     }
 
-    public function testForAssociationWithConfiguredDirection()
+    public function testForAssociationWithConfiguredDirection(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
@@ -453,7 +447,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         self::assertTrue($associationMetadata->isOutput());
     }
 
-    public function testForNestedObjectWithConfiguredDirection()
+    public function testForNestedObjectWithConfiguredDirection(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
@@ -496,7 +490,7 @@ class ObjectMetadataLoaderTest extends LoaderTestCase
         self::assertTrue($associationMetadata->isOutput());
     }
 
-    public function testForNestedAssociationWithConfiguredDirection()
+    public function testForNestedAssociationWithConfiguredDirection(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();

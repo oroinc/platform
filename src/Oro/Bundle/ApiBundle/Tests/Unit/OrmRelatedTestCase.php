@@ -7,17 +7,13 @@ use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class OrmRelatedTestCase extends OrmTestCase
 {
-    /** @var EntityManagerInterface */
-    protected $em;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ManagerRegistry */
-    protected $doctrine;
-
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
+    protected EntityManagerInterface $em;
+    protected ManagerRegistry&MockObject $doctrine;
+    protected DoctrineHelper|MockObject $doctrineHelper;
 
     /** @var string[] */
     protected $notManageableClassNames = [];

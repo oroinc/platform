@@ -8,15 +8,13 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\RecognizeAssociationType;
 use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Response;
 
 class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|SubresourcesProvider */
-    private $subresourcesProvider;
-
-    /** @var RecognizeAssociationType */
-    private $processor;
+    private SubresourcesProvider&MockObject $subresourcesProvider;
+    private RecognizeAssociationType $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +28,7 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
         );
     }
 
-    public function testProcessWhenEntityClassNameIsAlreadySet()
+    public function testProcessWhenEntityClassNameIsAlreadySet(): void
     {
         $this->subresourcesProvider->expects(self::never())
             ->method('getSubresource');
@@ -39,7 +37,7 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenAssociationNameIsEmpty()
+    public function testProcessWhenAssociationNameIsEmpty(): void
     {
         $this->context->setAssociationName('');
         $this->processor->process($this->context);
@@ -55,7 +53,7 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
         );
     }
 
-    public function testProcessForUnknownParentEntity()
+    public function testProcessForUnknownParentEntity(): void
     {
         $parentEntityClass = 'Test\ParentClass';
         $associationName = 'testAssociation';
@@ -86,7 +84,7 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
         );
     }
 
-    public function testProcessForUnknownAssociation()
+    public function testProcessForUnknownAssociation(): void
     {
         $parentEntityClass = 'Test\ParentClass';
         $associationName = 'testAssociation';
@@ -117,7 +115,7 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
         );
     }
 
-    public function testProcessForExcludedAssociation()
+    public function testProcessForExcludedAssociation(): void
     {
         $this->expectException(ActionNotAllowedException::class);
         $parentEntityClass = 'Test\ParentClass';
@@ -143,7 +141,7 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForKnownAssociation()
+    public function testProcessForKnownAssociation(): void
     {
         $parentEntityClass = 'Test\ParentClass';
         $associationName = 'testAssociation';
@@ -176,7 +174,7 @@ class RecognizeAssociationTypeTest extends GetSubresourceProcessorTestCase
         );
     }
 
-    public function testProcessForSubresourceWithEmptyTargetClass()
+    public function testProcessForSubresourceWithEmptyTargetClass(): void
     {
         $parentEntityClass = 'Test\ParentClass';
         $associationName = 'testAssociation';

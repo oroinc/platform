@@ -5,8 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Options;
 use Oro\Bundle\ApiBundle\Processor\Options\OptionsContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use PHPUnit\Framework\TestCase;
 
-class OptionsContextTest extends \PHPUnit\Framework\TestCase
+class OptionsContextTest extends TestCase
 {
     private OptionsContext $context;
 
@@ -19,7 +20,7 @@ class OptionsContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testActionType()
+    public function testActionType(): void
     {
         $this->context->setActionType('item');
         self::assertEquals('item', $this->context->getActionType());
@@ -38,7 +39,7 @@ class OptionsContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('relationship', $this->context->get('actionType'));
     }
 
-    public function testGetActionTypeWhenItDoesNotSet()
+    public function testGetActionTypeWhenItDoesNotSet(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('The action type is not set yet.');
@@ -46,7 +47,7 @@ class OptionsContextTest extends \PHPUnit\Framework\TestCase
         $this->context->getActionType();
     }
 
-    public function testSetInvalidActionType()
+    public function testSetInvalidActionType(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -56,7 +57,7 @@ class OptionsContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setActionType('another');
     }
 
-    public function testId()
+    public function testId(): void
     {
         self::assertNull($this->context->getId());
 

@@ -3,11 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\DataTransformer;
 
 use Oro\Bundle\ApiBundle\DataTransformer\MoneyToStringTransformer;
+use PHPUnit\Framework\TestCase;
 
-class MoneyToStringTransformerTest extends \PHPUnit\Framework\TestCase
+class MoneyToStringTransformerTest extends TestCase
 {
-    /** @var MoneyToStringTransformer */
-    private $transformer;
+    private MoneyToStringTransformer $transformer;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class MoneyToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider transformDataProvider
      */
-    public function testTransform(?string $value, ?string $expected)
+    public function testTransform(?string $value, ?string $expected): void
     {
         self::assertSame($expected, $this->transformer->transform($value, [], []));
     }

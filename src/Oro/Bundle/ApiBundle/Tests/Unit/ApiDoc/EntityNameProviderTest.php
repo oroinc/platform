@@ -5,20 +5,17 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc;
 use Doctrine\Inflector\Rules\English\InflectorFactory;
 use Oro\Bundle\ApiBundle\ApiDoc\EntityDescriptionProvider;
 use Oro\Bundle\ApiBundle\ApiDoc\EntityNameProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityNameProviderTest extends \PHPUnit\Framework\TestCase
+class EntityNameProviderTest extends TestCase
 {
-    /** @var EntityDescriptionProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityDescriptionProvider;
-
-    /** @var EntityNameProvider */
-    private $entityNameProvider;
+    private EntityDescriptionProvider&MockObject $entityDescriptionProvider;
+    private EntityNameProvider $entityNameProvider;
 
     #[\Override]
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->entityDescriptionProvider = $this->createMock(EntityDescriptionProvider::class);
 
         $this->entityNameProvider = new EntityNameProvider(

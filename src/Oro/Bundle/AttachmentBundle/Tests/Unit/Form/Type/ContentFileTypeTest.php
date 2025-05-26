@@ -16,9 +16,8 @@ use Symfony\Component\Validator\Validation;
 
 final class ContentFileTypeTest extends FormIntegrationTestCase
 {
-    private ContentFileType $formType;
-
     private ContentFileDataTransformerInterface&MockObject $contentFileDataTransformer;
+    private ContentFileType $formType;
 
     #[\Override]
     protected function setUp(): void

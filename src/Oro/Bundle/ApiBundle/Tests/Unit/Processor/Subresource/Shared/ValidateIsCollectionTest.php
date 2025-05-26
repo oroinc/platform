@@ -9,8 +9,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcesso
 
 class ValidateIsCollectionTest extends GetSubresourceProcessorTestCase
 {
-    /** @var ValidateIsCollection */
-    private $processor;
+    private ValidateIsCollection $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -20,13 +19,13 @@ class ValidateIsCollectionTest extends GetSubresourceProcessorTestCase
         $this->processor = new ValidateIsCollection();
     }
 
-    public function testProcessWhenIsCollectionFlagIsTrue()
+    public function testProcessWhenIsCollectionFlagIsTrue(): void
     {
         $this->context->setIsCollection(true);
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenIsCollectionFlagIsFalse()
+    public function testProcessWhenIsCollectionFlagIsFalse(): void
     {
         $this->expectException(ActionNotAllowedException::class);
         $this->context->setAction(ApiAction::ADD_RELATIONSHIP);

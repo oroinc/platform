@@ -3,10 +3,11 @@
 namespace Oro\Component\ChainProcessor\Tests\Unit;
 
 use Oro\Component\ChainProcessor\ProcessorBagConfigProvider;
+use PHPUnit\Framework\TestCase;
 
-class ProcessorBagConfigProviderTest extends \PHPUnit\Framework\TestCase
+class ProcessorBagConfigProviderTest extends TestCase
 {
-    public function testProcessorBagConfigProvider()
+    public function testProcessorBagConfigProvider(): void
     {
         $groups = ['action1' => ['group1']];
         $processors = [

@@ -9,10 +9,11 @@ use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\EmailAddress;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\TestCase;
 
-class EmailUserTest extends \PHPUnit\Framework\TestCase
+class EmailUserTest extends TestCase
 {
-    public function testGetterSetter()
+    public function testGetterSetter(): void
     {
         $emailUser = new EmailUser();
         $email = new Email();
@@ -44,7 +45,7 @@ class EmailUserTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($emailUser->isEmailPrivate());
     }
 
-    public function testBeforeSave()
+    public function testBeforeSave(): void
     {
         $emailUser = new EmailUser();
         $emailUser->beforeSave();
@@ -55,7 +56,7 @@ class EmailUserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider outgoingEmailUserProvider
      */
-    public function testIsOutgoing(EmailUser $emailUser)
+    public function testIsOutgoing(EmailUser $emailUser): void
     {
         $this->assertTrue($emailUser->isOutgoing());
         $this->assertFalse($emailUser->isIncoming());
@@ -101,7 +102,7 @@ class EmailUserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider incomingEmailUserProvider
      */
-    public function testIsIncoming(EmailUser $emailUser)
+    public function testIsIncoming(EmailUser $emailUser): void
     {
         $this->assertTrue($emailUser->isIncoming());
         $this->assertFalse($emailUser->isOutgoing());
@@ -150,7 +151,7 @@ class EmailUserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider incomingAndOutgoingProvider
      */
-    public function testIsIncomingAndOutgoing(EmailUser $emailUser)
+    public function testIsIncomingAndOutgoing(EmailUser $emailUser): void
     {
         $this->assertTrue($emailUser->isIncoming());
         $this->assertTrue($emailUser->isOutgoing());

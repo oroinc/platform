@@ -9,8 +9,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
 class AssertNotHasErrorsTest extends GetListProcessorTestCase
 {
-    /** @var AssertNotHasErrors */
-    private $processor;
+    private AssertNotHasErrors $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -20,12 +19,12 @@ class AssertNotHasErrorsTest extends GetListProcessorTestCase
         $this->processor = new AssertNotHasErrors();
     }
 
-    public function testProcessWithoutErrorsInContext()
+    public function testProcessWithoutErrorsInContext(): void
     {
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithErrorsInContext()
+    public function testProcessWithErrorsInContext(): void
     {
         $this->expectException(UnhandledErrorsException::class);
         $this->context->addError(Error::createValidationError('some error'));

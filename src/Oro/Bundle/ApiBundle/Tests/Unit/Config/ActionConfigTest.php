@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 use Oro\Bundle\ApiBundle\Config\ActionConfig;
 use Oro\Bundle\ApiBundle\Config\ActionFieldConfig;
 use Oro\Bundle\ApiBundle\Config\UpsertConfig;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 
@@ -12,15 +13,15 @@ use Symfony\Component\Validator\Constraints\NotNull;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ActionConfigTest extends \PHPUnit\Framework\TestCase
+class ActionConfigTest extends TestCase
 {
-    public function testIsEmpty()
+    public function testIsEmpty(): void
     {
         $config = new ActionConfig();
         self::assertTrue($config->isEmpty());
     }
 
-    public function testClone()
+    public function testClone(): void
     {
         $config = new ActionConfig();
         self::assertTrue($config->isEmpty());
@@ -37,7 +38,7 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertNotSame($objValue, $configClone->get('test_object'));
     }
 
-    public function testCloneWithUpsertConfig()
+    public function testCloneWithUpsertConfig(): void
     {
         $config = new ActionConfig();
         $config->getUpsertConfig()->setAllowedById(true);
@@ -49,7 +50,7 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertNotSame($config->getUpsertConfig(), $configClone->getUpsertConfig());
     }
 
-    public function testExcluded()
+    public function testExcluded(): void
     {
         $config = new ActionConfig();
         self::assertFalse($config->hasExcluded());
@@ -66,7 +67,7 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['exclude' => false], $config->toArray());
     }
 
-    public function testCustomAttribute()
+    public function testCustomAttribute(): void
     {
         $attrName = 'test';
 
@@ -94,7 +95,7 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $config->keys());
     }
 
-    public function testDescription()
+    public function testDescription(): void
     {
         $config = new ActionConfig();
         self::assertFalse($config->hasDescription());
@@ -117,7 +118,7 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testDocumentation()
+    public function testDocumentation(): void
     {
         $config = new ActionConfig();
         self::assertFalse($config->hasDocumentation());
@@ -140,7 +141,7 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testAclResource()
+    public function testAclResource(): void
     {
         $config = new ActionConfig();
         self::assertFalse($config->hasAclResource());
@@ -157,7 +158,7 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['acl_resource' => null], $config->toArray());
     }
 
-    public function testMaxResults()
+    public function testMaxResults(): void
     {
         $config = new ActionConfig();
         self::assertFalse($config->hasMaxResults());
@@ -189,7 +190,7 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testPageSize()
+    public function testPageSize(): void
     {
         $config = new ActionConfig();
         self::assertFalse($config->hasPageSize());
@@ -221,7 +222,7 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testOrderBy()
+    public function testOrderBy(): void
     {
         $config = new ActionConfig();
         self::assertEquals([], $config->getOrderBy());
@@ -235,7 +236,7 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testSortingFlag()
+    public function testSortingFlag(): void
     {
         $config = new ActionConfig();
         self::assertFalse($config->hasDisableSorting());
@@ -252,7 +253,7 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testInclusionFlag()
+    public function testInclusionFlag(): void
     {
         $config = new ActionConfig();
         self::assertFalse($config->hasDisableInclusion());
@@ -269,7 +270,7 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testFieldsetFlag()
+    public function testFieldsetFlag(): void
     {
         $config = new ActionConfig();
         self::assertFalse($config->hasDisableFieldset());
@@ -286,7 +287,7 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testMetaPropertiesFlag()
+    public function testMetaPropertiesFlag(): void
     {
         $config = new ActionConfig();
         self::assertFalse($config->hasDisableMetaProperties());
@@ -303,7 +304,7 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testMetaProperties()
+    public function testMetaProperties(): void
     {
         $config = new ActionConfig();
         self::assertFalse($config->hasDisableMetaProperties());
@@ -365,7 +366,7 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $config->getDisabledMetaProperties());
     }
 
-    public function testFormType()
+    public function testFormType(): void
     {
         $config = new ActionConfig();
         self::assertNull($config->getFormType());
@@ -379,7 +380,7 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testFormOptions()
+    public function testFormOptions(): void
     {
         $config = new ActionConfig();
         self::assertNull($config->getFormOptions());
@@ -405,7 +406,7 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertSame('', $config->getFormOption('key', ''));
     }
 
-    public function testSetFormOption()
+    public function testSetFormOption(): void
     {
         $config = new ActionConfig();
 
@@ -423,7 +424,7 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFormConstraints()
+    public function testFormConstraints(): void
     {
         $config = new ActionConfig();
 
@@ -439,7 +440,7 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([new NotNull(), new NotBlank()], $config->getFormConstraints());
     }
 
-    public function testRemoveFormConstraint()
+    public function testRemoveFormConstraint(): void
     {
         $config = new ActionConfig();
 
@@ -465,7 +466,7 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertNull($config->getFormOptions());
     }
 
-    public function testFormEventSubscribers()
+    public function testFormEventSubscribers(): void
     {
         $config = new ActionConfig();
         self::assertNull($config->getFormEventSubscribers());
@@ -479,7 +480,7 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testSetNullToFormEventSubscribers()
+    public function testSetNullToFormEventSubscribers(): void
     {
         $config = new ActionConfig();
         $config->setFormEventSubscribers(['subscriber1']);
@@ -489,7 +490,7 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testFields()
+    public function testFields(): void
     {
         $config = new ActionConfig();
         self::assertFalse($config->hasFields());
@@ -513,7 +514,7 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testGetOrAddField()
+    public function testGetOrAddField(): void
     {
         $config = new ActionConfig();
 
@@ -524,7 +525,7 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertSame($field, $field1);
     }
 
-    public function testAddField()
+    public function testAddField(): void
     {
         $config = new ActionConfig();
 
@@ -537,7 +538,7 @@ class ActionConfigTest extends \PHPUnit\Framework\TestCase
         self::assertNotSame($field, $field1);
     }
 
-    public function testUpsertConfig()
+    public function testUpsertConfig(): void
     {
         $config = new ActionConfig();
         self::assertInstanceOf(UpsertConfig::class, $config->getUpsertConfig());

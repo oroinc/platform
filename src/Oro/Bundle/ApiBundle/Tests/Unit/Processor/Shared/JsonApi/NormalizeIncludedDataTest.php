@@ -29,6 +29,7 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
 use Oro\Bundle\ApiBundle\Util\UpsertCriteriaBuilder;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
@@ -38,23 +39,12 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  */
 class NormalizeIncludedDataTest extends FormProcessorTestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var EntityInstantiator|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityInstantiator;
-
-    /** @var AclProtectedEntityLoader|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityLoader;
-
-    /** @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject */
-    private $valueNormalizer;
-
-    /** @var EntityIdTransformerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityIdTransformer;
-
-    /** @var NormalizeIncludedData */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EntityInstantiator&MockObject $entityInstantiator;
+    private AclProtectedEntityLoader&MockObject $entityLoader;
+    private ValueNormalizer&MockObject $valueNormalizer;
+    private EntityIdTransformerInterface&MockObject $entityIdTransformer;
+    private NormalizeIncludedData $processor;
 
     #[\Override]
     protected function setUp(): void

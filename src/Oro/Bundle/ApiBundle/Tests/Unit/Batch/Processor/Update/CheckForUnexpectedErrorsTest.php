@@ -7,8 +7,7 @@ use Oro\Bundle\ApiBundle\Model\Error;
 
 class CheckForUnexpectedErrorsTest extends BatchUpdateProcessorTestCase
 {
-    /** @var CheckForUnexpectedErrors */
-    private $processor;
+    private CheckForUnexpectedErrors $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -18,14 +17,14 @@ class CheckForUnexpectedErrorsTest extends BatchUpdateProcessorTestCase
         $this->processor = new CheckForUnexpectedErrors();
     }
 
-    public function testProcessWithoutErrorsInContext()
+    public function testProcessWithoutErrorsInContext(): void
     {
         $this->processor->process($this->context);
 
         self::assertFalse($this->context->hasUnexpectedErrors());
     }
 
-    public function testProcessWithErrorsInContext()
+    public function testProcessWithErrorsInContext(): void
     {
         $this->context->addError(Error::create('some error'));
         $this->processor->process($this->context);

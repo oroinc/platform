@@ -7,12 +7,13 @@ use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
 use Oro\Bundle\ApiBundle\ApiDoc\RestRouteOptionsResolver;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Route;
 
-class RestChainRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
+class RestChainRouteOptionsResolverTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|RestDocViewDetector */
-    private $docViewDetector;
+    private RestDocViewDetector&MockObject $docViewDetector;
 
     #[\Override]
     protected function setUp(): void
@@ -37,7 +38,7 @@ class RestChainRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testEmptyChainResolver()
+    public function testEmptyChainResolver(): void
     {
         $route = $this->createMock(Route::class);
         $routes = $this->createMock(RouteCollectionAccessor::class);
@@ -49,7 +50,7 @@ class RestChainRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
         $chainRouteOptionsResolver->resolve($route, $routes);
     }
 
-    public function testEmptyView()
+    public function testEmptyView(): void
     {
         $route = $this->createMock(Route::class);
         $routes = $this->createMock(RouteCollectionAccessor::class);
@@ -69,7 +70,7 @@ class RestChainRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
         $chainRouteOptionsResolver->resolve($route, $routes);
     }
 
-    public function testResolve()
+    public function testResolve(): void
     {
         $route = $this->createMock(Route::class);
         $routes = $this->createMock(RouteCollectionAccessor::class);
@@ -115,7 +116,7 @@ class RestChainRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
         $chainRouteOptionsResolver->resolve($route, $routes);
     }
 
-    public function testResolveForViewWithUnderlyingView()
+    public function testResolveForViewWithUnderlyingView(): void
     {
         $route = $this->createMock(Route::class);
         $routes = $this->createMock(RouteCollectionAccessor::class);
@@ -153,7 +154,7 @@ class RestChainRouteOptionsResolverTest extends \PHPUnit\Framework\TestCase
         $chainRouteOptionsResolver->resolve($route, $routes);
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $resolver1 = $this->createMock(RouteOptionsResolverInterface::class);
         $resolver2 = $this->createMock(RestRouteOptionsResolver::class);

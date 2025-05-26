@@ -3,13 +3,13 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\ImapBundle\DependencyInjection\Compiler\CredentialsNotificationSenderPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class CredentialsNotificationSenderPassTest extends \PHPUnit\Framework\TestCase
+class CredentialsNotificationSenderPassTest extends TestCase
 {
-    /** @var CredentialsNotificationSenderPass */
-    private $compiler;
+    private CredentialsNotificationSenderPass $compiler;
 
     #[\Override]
     protected function setUp(): void
@@ -17,14 +17,14 @@ class CredentialsNotificationSenderPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new CredentialsNotificationSenderPass();
     }
 
-    public function testProcessNoMainService()
+    public function testProcessNoMainService(): void
     {
         $container = new ContainerBuilder();
 
         $this->compiler->process($container);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $issueManagerDef = $container->register('oro_imap.origin_credentials.issue_manager');
@@ -52,7 +52,7 @@ class CredentialsNotificationSenderPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWhenNoSenders()
+    public function testProcessWhenNoSenders(): void
     {
         $container = new ContainerBuilder();
         $issueManagerDef = $container->register('oro_imap.origin_credentials.issue_manager');

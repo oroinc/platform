@@ -6,12 +6,13 @@ use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettingsFactory;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class SmtpSettingsFactoryTest extends \PHPUnit\Framework\TestCase
+class SmtpSettingsFactoryTest extends TestCase
 {
     public function testWithoutRequestValues(): void
     {

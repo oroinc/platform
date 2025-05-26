@@ -7,20 +7,15 @@ use Oro\Bundle\ApiBundle\ApiDoc\DocumentationProviderInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChainDocumentationProviderTest extends \PHPUnit\Framework\TestCase
+class ChainDocumentationProviderTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DocumentationProviderInterface */
-    private $provider1;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DocumentationProviderInterface */
-    private $provider2;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DocumentationProviderInterface */
-    private $provider3;
-
-    /** @var ChainDocumentationProvider */
-    private $chainProvider;
+    private DocumentationProviderInterface&MockObject $provider1;
+    private DocumentationProviderInterface&MockObject $provider2;
+    private DocumentationProviderInterface&MockObject $provider3;
+    private ChainDocumentationProvider $chainProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -42,7 +37,7 @@ class ChainDocumentationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDocumentation()
+    public function testGetDocumentation(): void
     {
         $requestType = new RequestType(['test']);
 
@@ -61,7 +56,7 @@ class ChainDocumentationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDocumentationWhenSomeProviderDoesNotReturnDocumentation()
+    public function testGetDocumentationWhenSomeProviderDoesNotReturnDocumentation(): void
     {
         $requestType = new RequestType(['test']);
 

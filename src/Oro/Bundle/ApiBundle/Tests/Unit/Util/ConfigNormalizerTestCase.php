@@ -4,8 +4,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use PHPUnit\Framework\TestCase;
 
-class ConfigNormalizerTestCase extends \PHPUnit\Framework\TestCase
+class ConfigNormalizerTestCase extends TestCase
 {
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)

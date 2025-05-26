@@ -4,22 +4,18 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition;
+use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CompleteEntityDefinitionHelper;
+use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CompleteObjectDefinitionHelper;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class CompleteDefinitionTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|CompleteDefinition\CompleteEntityDefinitionHelper */
-    private $entityDefinitionHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|CompleteDefinition\CompleteObjectDefinitionHelper */
-    private $objectDefinitionHelper;
-
-    /** @var CompleteDefinition */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private CompleteDefinition\CompleteEntityDefinitionHelper&MockObject $entityDefinitionHelper;
+    private CompleteDefinition\CompleteObjectDefinitionHelper&MockObject $objectDefinitionHelper;
+    private CompleteDefinition $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -27,8 +23,8 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         parent::setUp();
 
         $this->doctrineHelper = $this->createMock(DoctrineHelper::class);
-        $this->entityDefinitionHelper = $this->createMock(CompleteDefinition\CompleteEntityDefinitionHelper::class);
-        $this->objectDefinitionHelper = $this->createMock(CompleteDefinition\CompleteObjectDefinitionHelper::class);
+        $this->entityDefinitionHelper = $this->createMock(CompleteEntityDefinitionHelper::class);
+        $this->objectDefinitionHelper = $this->createMock(CompleteObjectDefinitionHelper::class);
 
         $this->processor = new CompleteDefinition(
             $this->doctrineHelper,
@@ -37,7 +33,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWhenConfigAlreadyCompleted()
+    public function testProcessWhenConfigAlreadyCompleted(): void
     {
         $definition = new EntityDefinitionConfig();
         $definition->setExcludeNone();
@@ -57,7 +53,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         self::assertEquals(ConfigUtil::EXCLUSION_POLICY_NONE, $definition->getExclusionPolicy());
     }
 
-    public function testProcessForManageableEntity()
+    public function testProcessForManageableEntity(): void
     {
         $definition = new EntityDefinitionConfig();
 
@@ -78,7 +74,7 @@ class CompleteDefinitionTest extends ConfigProcessorTestCase
         self::assertTrue($definition->isExcludeAll());
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessForNotManageableEntity(): void
     {
         $definition = new EntityDefinitionConfig();
 

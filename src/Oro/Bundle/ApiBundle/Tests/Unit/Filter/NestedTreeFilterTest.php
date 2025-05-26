@@ -11,10 +11,11 @@ use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\NestedTreeFilter;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use PHPUnit\Framework\TestCase;
 
-class NestedTreeFilterTest extends \PHPUnit\Framework\TestCase
+class NestedTreeFilterTest extends TestCase
 {
-    public function testForAssociation()
+    public function testForAssociation(): void
     {
         $this->expectException(InvalidFilterException::class);
         $this->expectExceptionMessage('This filter is not supported for associations.');
@@ -26,7 +27,7 @@ class NestedTreeFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testUnsupportedOperator()
+    public function testUnsupportedOperator(): void
     {
         $this->expectException(InvalidFilterOperatorException::class);
         $this->expectExceptionMessage('The operator "neq" is not supported.');
@@ -35,7 +36,7 @@ class NestedTreeFilterTest extends \PHPUnit\Framework\TestCase
         $filter->apply(new Criteria(), new FilterValue('path', 'value', FilterOperator::NEQ));
     }
 
-    public function testWithoutOperator()
+    public function testWithoutOperator(): void
     {
         $this->expectException(InvalidFilterOperatorException::class);
         $this->expectExceptionMessage('The operator "eq" is not supported.');
@@ -47,7 +48,7 @@ class NestedTreeFilterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider filterDataProvider
      */
-    public function testFilter(FilterValue $filterValue, Comparison $expectation, ?string $field = null)
+    public function testFilter(FilterValue $filterValue, Comparison $expectation, ?string $field = null): void
     {
         $supportedOperators = [
             FilterOperator::GT,

@@ -6,14 +6,13 @@ use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEntityType;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeValueContext;
 use Oro\Bundle\ApiBundle\Provider\EntityAliasResolverRegistry;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class NormalizeEntityTypeTest extends \PHPUnit\Framework\TestCase
+class NormalizeEntityTypeTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityAliasResolverRegistry */
-    private $entityAliasResolverRegistry;
-
-    /** @var NormalizeEntityType */
-    private $processor;
+    private EntityAliasResolverRegistry&MockObject $entityAliasResolverRegistry;
+    private NormalizeEntityType $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +27,7 @@ class NormalizeEntityTypeTest extends \PHPUnit\Framework\TestCase
         return sprintf('%1$s(,%1$s)*', $requirement);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $context = new NormalizeValueContext();
         $context->setResult('Test\Class');
@@ -49,7 +48,7 @@ class NormalizeEntityTypeTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('alias', $context->getResult());
     }
 
-    public function testProcessForArray()
+    public function testProcessForArray(): void
     {
         $context = new NormalizeValueContext();
         $context->setArrayAllowed(true);
@@ -77,7 +76,7 @@ class NormalizeEntityTypeTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['alias1', 'alias2'], $context->getResult());
     }
 
-    public function testProcessForAlreadyNormalizedAlias()
+    public function testProcessForAlreadyNormalizedAlias(): void
     {
         $context = new NormalizeValueContext();
         $context->setResult('alias');
@@ -95,7 +94,7 @@ class NormalizeEntityTypeTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('alias', $context->getResult());
     }
 
-    public function testProcessWhenNoValueToNormalize()
+    public function testProcessWhenNoValueToNormalize(): void
     {
         $context = new NormalizeValueContext();
 
@@ -104,7 +103,7 @@ class NormalizeEntityTypeTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($context->hasResult());
     }
 
-    public function testProcessForAlreadyResolvedRequirement()
+    public function testProcessForAlreadyResolvedRequirement(): void
     {
         $context = new NormalizeValueContext();
         $context->setRequirement('test');

@@ -3,11 +3,12 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Event;
 
 use Oro\Bundle\EmailBundle\Event\BeforeMessageEvent;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mime\Address as SymfonyAddress;
 use Symfony\Component\Mime\RawMessage;
 
-class BeforeMessageEventTest extends \PHPUnit\Framework\TestCase
+class BeforeMessageEventTest extends TestCase
 {
     public function testGetMessage(): void
     {

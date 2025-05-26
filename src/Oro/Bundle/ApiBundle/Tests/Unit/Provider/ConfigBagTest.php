@@ -5,8 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 use Oro\Bundle\ApiBundle\Provider\ConfigBag;
 use Oro\Bundle\ApiBundle\Provider\ConfigCache;
 use Oro\Bundle\ApiBundle\Request\Version;
+use PHPUnit\Framework\TestCase;
 
-class ConfigBagTest extends \PHPUnit\Framework\TestCase
+class ConfigBagTest extends TestCase
 {
     public function getConfigBag(int $numberOfGetConfigCalls = 1): ConfigBag
     {
@@ -32,7 +33,7 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
         return new ConfigBag($configCache, $configFile);
     }
 
-    public function testGetClassNames()
+    public function testGetClassNames(): void
     {
         $version = Version::LATEST;
         $expectedEntityClasses = ['Test\Class1', 'Test\Class2'];
@@ -44,7 +45,7 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedEntityClasses, $configBag->getClassNames($version));
     }
 
-    public function testNoConfig()
+    public function testNoConfig(): void
     {
         $className = 'Test\UnknownClass';
         $version = Version::LATEST;
@@ -59,7 +60,7 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getConfigProvider
      */
-    public function testGetConfig(string $className, string $version, array $expectedConfig)
+    public function testGetConfig(string $className, string $version, array $expectedConfig): void
     {
         $configBag = $this->getConfigBag();
 
@@ -76,7 +77,7 @@ class ConfigBagTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $className = 'Test\Class2';
         $version = Version::LATEST;

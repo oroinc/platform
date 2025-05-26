@@ -8,10 +8,11 @@ use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\GtComparisonExpression;
 use Oro\Bundle\ApiBundle\Tests\Unit\Stub\FieldDqlExpressionProviderStub;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use PHPUnit\Framework\TestCase;
 
-class GtComparisonExpressionTest extends \PHPUnit\Framework\TestCase
+class GtComparisonExpressionTest extends TestCase
 {
-    public function testWalkComparisonExpression()
+    public function testWalkComparisonExpression(): void
     {
         $expression = new GtComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor(

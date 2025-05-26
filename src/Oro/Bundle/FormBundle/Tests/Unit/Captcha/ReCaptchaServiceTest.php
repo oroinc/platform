@@ -17,10 +17,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class ReCaptchaServiceTest extends TestCase
 {
-    private ReCaptchaClientFactory|MockObject $reCaptchaClientFactory;
-    private ConfigManager|MockObject $configManager;
-    private RequestStack|MockObject $requestStack;
-    private SymmetricCrypterInterface|MockObject $crypter;
+    private ReCaptchaClientFactory&MockObject $reCaptchaClientFactory;
+    private ConfigManager&MockObject $configManager;
+    private RequestStack&MockObject $requestStack;
+    private SymmetricCrypterInterface&MockObject $crypter;
     private ReCaptchaService $captchaService;
 
     #[\Override]
@@ -39,7 +39,7 @@ class ReCaptchaServiceTest extends TestCase
         );
     }
 
-    public function testIsConfiguredReturnsTrueWhenKeysArePresent()
+    public function testIsConfiguredReturnsTrueWhenKeysArePresent(): void
     {
         $this->configManager->expects($this->any())
             ->method('get')
@@ -63,7 +63,7 @@ class ReCaptchaServiceTest extends TestCase
         $this->assertTrue($this->captchaService->isConfigured());
     }
 
-    public function testIsConfiguredReturnsFalseWhenKeysAreAbsent()
+    public function testIsConfiguredReturnsFalseWhenKeysAreAbsent(): void
     {
         $this->configManager->expects($this->any())
             ->method('get')
@@ -75,7 +75,7 @@ class ReCaptchaServiceTest extends TestCase
     /**
      * @dataProvider verificationDataProvider
      */
-    public function testIsVerified(bool $isSuccess)
+    public function testIsVerified(bool $isSuccess): void
     {
         $secret = 'captchaResponseValue';
 
@@ -149,7 +149,7 @@ class ReCaptchaServiceTest extends TestCase
         ];
     }
 
-    public function testGetFormTypeReturnsReCaptchaType()
+    public function testGetFormTypeReturnsReCaptchaType(): void
     {
         $this->assertEquals(ReCaptchaType::class, $this->captchaService->getFormType());
     }

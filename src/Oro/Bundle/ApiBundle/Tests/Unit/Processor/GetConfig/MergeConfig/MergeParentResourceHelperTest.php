@@ -12,21 +12,18 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\MergeConfig\MergeParentResourceHelper;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigSection;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class MergeParentResourceHelperTest extends \PHPUnit\Framework\TestCase
+class MergeParentResourceHelperTest extends TestCase
 {
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var ConfigContext */
-    private $context;
-
-    /** @var MergeParentResourceHelper */
-    private $mergeParentResourceHelper;
+    private ConfigProvider&MockObject $configProvider;
+    private ConfigContext $context;
+    private MergeParentResourceHelper $mergeParentResourceHelper;
 
     #[\Override]
     protected function setUp(): void

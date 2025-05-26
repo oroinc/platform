@@ -12,14 +12,13 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EmailUserVirtualRelationsProviderTest extends \PHPUnit\Framework\TestCase
+class EmailUserVirtualRelationsProviderTest extends TestCase
 {
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var EmailUserVirtualRelationsProvider */
-    private $provider;
+    private ConfigProvider&MockObject $configProvider;
+    private EmailUserVirtualRelationsProvider $provider;
 
     #[\Override]
     protected function setUp(): void

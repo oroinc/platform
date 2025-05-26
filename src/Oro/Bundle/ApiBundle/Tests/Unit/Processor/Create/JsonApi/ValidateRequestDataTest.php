@@ -10,14 +10,12 @@ use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Create\CreateProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class ValidateRequestDataTest extends CreateProcessorTestCase
 {
-    /** @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject */
-    private $valueNormalizer;
-
-    /** @var ValidateRequestData */
-    private $processor;
+    private ValueNormalizer&MockObject $valueNormalizer;
+    private ValidateRequestData $processor;
 
     #[\Override]
     protected function setUp(): void

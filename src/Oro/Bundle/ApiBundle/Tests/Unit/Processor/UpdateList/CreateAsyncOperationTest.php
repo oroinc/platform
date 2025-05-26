@@ -7,19 +7,16 @@ use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
 use Oro\Bundle\ApiBundle\Processor\UpdateList\CreateAsyncOperation;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class CreateAsyncOperationTest extends UpdateListProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    private $doctrineHelper;
+    private DoctrineHelper&MockObject $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface */
-    private $authorizationChecker;
-
-    /** @var CreateAsyncOperation */
-    private $processor;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private CreateAsyncOperation $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +29,7 @@ class CreateAsyncOperationTest extends UpdateListProcessorTestCase
         $this->processor = new CreateAsyncOperation($this->doctrineHelper, $this->authorizationChecker);
     }
 
-    public function testProcessWhenAsyncOperationIsAlreadyCreated()
+    public function testProcessWhenAsyncOperationIsAlreadyCreated(): void
     {
         $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
@@ -43,7 +40,7 @@ class CreateAsyncOperationTest extends UpdateListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithoutTargetFileName()
+    public function testProcessWithoutTargetFileName(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The target file name was not set to the context.');
@@ -56,7 +53,7 @@ class CreateAsyncOperationTest extends UpdateListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenNoCreatePermissionForAsyncOperation()
+    public function testProcessWhenNoCreatePermissionForAsyncOperation(): void
     {
         $this->expectException(AccessDeniedException::class);
         $this->expectExceptionMessage('No access to create the asynchronous operation.');
@@ -75,7 +72,7 @@ class CreateAsyncOperationTest extends UpdateListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenNoViewPermissionForAsyncOperation()
+    public function testProcessWhenNoViewPermissionForAsyncOperation(): void
     {
         $this->expectException(AccessDeniedException::class);
         $this->expectExceptionMessage('No access to create the asynchronous operation.');
@@ -97,7 +94,7 @@ class CreateAsyncOperationTest extends UpdateListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $action = 'create';
         $entityClass = 'Test\Entity';

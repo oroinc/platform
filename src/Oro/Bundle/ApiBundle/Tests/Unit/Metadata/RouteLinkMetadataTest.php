@@ -6,14 +6,15 @@ use Oro\Bundle\ApiBundle\Exception\LinkHrefResolvingFailedException;
 use Oro\Bundle\ApiBundle\Metadata\DataAccessorInterface;
 use Oro\Bundle\ApiBundle\Metadata\MetaAttributeMetadata;
 use Oro\Bundle\ApiBundle\Metadata\RouteLinkMetadata;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
 use Symfony\Component\Routing\Exception\MissingMandatoryParametersException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class RouteLinkMetadataTest extends \PHPUnit\Framework\TestCase
+class RouteLinkMetadataTest extends TestCase
 {
-    /** @var UrlGeneratorInterface */
-    private $urlGenerator;
+    private UrlGeneratorInterface&MockObject $urlGenerator;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +22,7 @@ class RouteLinkMetadataTest extends \PHPUnit\Framework\TestCase
         $this->urlGenerator = $this->createMock(UrlGeneratorInterface::class);
     }
 
-    public function testClone()
+    public function testClone(): void
     {
         $linkMetadata = new RouteLinkMetadata(
             $this->urlGenerator,
@@ -36,7 +37,7 @@ class RouteLinkMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($linkMetadata, $linkMetadataClone);
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $linkMetadata = new RouteLinkMetadata(
             $this->urlGenerator,
@@ -61,7 +62,7 @@ class RouteLinkMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testToArrayWithRequiredPropertiesOnly()
+    public function testToArrayWithRequiredPropertiesOnly(): void
     {
         $linkMetadata = new RouteLinkMetadata($this->urlGenerator, 'testRouteName');
 
@@ -73,7 +74,7 @@ class RouteLinkMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetHrefWithoutRouteParams()
+    public function testGetHrefWithoutRouteParams(): void
     {
         $linkMetadata = new RouteLinkMetadata($this->urlGenerator, 'routeName');
         $url = 'http://test.com/api';
@@ -94,7 +95,7 @@ class RouteLinkMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($url, $linkMetadata->getHref($dataAccessor));
     }
 
-    public function testGetHrefWhenAllRouteParamsAreResolved()
+    public function testGetHrefWhenAllRouteParamsAreResolved(): void
     {
         $linkMetadata = new RouteLinkMetadata(
             $this->urlGenerator,
@@ -132,7 +133,7 @@ class RouteLinkMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($url, $linkMetadata->getHref($dataAccessor));
     }
 
-    public function testGetHrefWhenOnlyPartOfRouteParamsAreResolvedButThereAreDefaultValuesInDefaultParams()
+    public function testGetHrefWhenOnlyPartOfRouteParamsAreResolvedButThereAreDefaultValuesInDefaultParams(): void
     {
         $linkMetadata = new RouteLinkMetadata(
             $this->urlGenerator,
@@ -167,7 +168,7 @@ class RouteLinkMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($url, $linkMetadata->getHref($dataAccessor));
     }
 
-    public function testGetHrefWhenOnlyPartOfRouteParamsAreResolvedAndInvalidParameterExceptionIsThrown()
+    public function testGetHrefWhenOnlyPartOfRouteParamsAreResolvedAndInvalidParameterExceptionIsThrown(): void
     {
         $this->expectException(LinkHrefResolvingFailedException::class);
         $this->expectExceptionMessage('Cannot build URL for a link. Reason: an error');
@@ -205,7 +206,7 @@ class RouteLinkMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertNull($linkMetadata->getHref($dataAccessor));
     }
 
-    public function testGetHrefWhenOnlyPartOfRouteParamsAreResolvedAndMissingMandatoryParametersExceptionIsThrown()
+    public function testGetHrefWhenOnlyPartOfRouteParamsAreResolvedAndMissingMandatoryParametersExIsThrown(): void
     {
         $this->expectException(LinkHrefResolvingFailedException::class);
         $this->expectExceptionMessage('Cannot build URL for a link. Reason: an error');
@@ -243,7 +244,7 @@ class RouteLinkMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertNull($linkMetadata->getHref($dataAccessor));
     }
 
-    public function testGetHrefWhenUnhandledExceptionIsThrown()
+    public function testGetHrefWhenUnhandledExceptionIsThrown(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $exception = new \InvalidArgumentException('an error');
@@ -266,7 +267,7 @@ class RouteLinkMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertNull($linkMetadata->getHref($dataAccessor));
     }
 
-    public function testMetaProperties()
+    public function testMetaProperties(): void
     {
         $linkMetadata = new RouteLinkMetadata($this->urlGenerator, 'routeName');
         self::assertCount(0, $linkMetadata->getMetaProperties());

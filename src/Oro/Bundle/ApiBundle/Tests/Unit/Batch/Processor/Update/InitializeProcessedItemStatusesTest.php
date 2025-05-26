@@ -7,8 +7,7 @@ use Oro\Bundle\ApiBundle\Batch\Processor\Update\InitializeProcessedItemStatuses;
 
 class InitializeProcessedItemStatusesTest extends BatchUpdateProcessorTestCase
 {
-    /** @var InitializeProcessedItemStatuses */
-    private $processor;
+    private InitializeProcessedItemStatuses $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +17,7 @@ class InitializeProcessedItemStatusesTest extends BatchUpdateProcessorTestCase
         $this->processor = new InitializeProcessedItemStatuses();
     }
 
-    public function testProcessWhenStatusesAreAlreadyInitialized()
+    public function testProcessWhenStatusesAreAlreadyInitialized(): void
     {
         $processedItemStatuses = [BatchUpdateItemStatus::HAS_ERRORS];
         $this->context->setProcessedItemStatuses($processedItemStatuses);
@@ -27,13 +26,13 @@ class InitializeProcessedItemStatusesTest extends BatchUpdateProcessorTestCase
         self::assertSame($processedItemStatuses, $this->context->getProcessedItemStatuses());
     }
 
-    public function testProcessWhenNoDataRecords()
+    public function testProcessWhenNoDataRecords(): void
     {
         $this->processor->process($this->context);
         self::assertNull($this->context->getProcessedItemStatuses());
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $this->context->setResult([['key' => 'val1'], ['key' => 'val2']]);
         $this->processor->process($this->context);

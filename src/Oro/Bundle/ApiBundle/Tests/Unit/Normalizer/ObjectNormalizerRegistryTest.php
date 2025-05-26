@@ -7,17 +7,14 @@ use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizerRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ObjectNormalizerRegistryTest extends \PHPUnit\Framework\TestCase
+class ObjectNormalizerRegistryTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectNormalizerInterface */
-    private $normalizer1;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectNormalizerInterface */
-    private $normalizer2;
-
-    /** @var ObjectNormalizerRegistry */
-    private $registry;
+    private ObjectNormalizerInterface&MockObject $normalizer1;
+    private ObjectNormalizerInterface&MockObject $normalizer2;
+    private ObjectNormalizerRegistry $registry;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +35,7 @@ class ObjectNormalizerRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetObjectNormalizerWhenItExistsForSpecificRequestType()
+    public function testGetObjectNormalizerWhenItExistsForSpecificRequestType(): void
     {
         self::assertSame(
             $this->normalizer2,
@@ -46,7 +43,7 @@ class ObjectNormalizerRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetObjectNormalizerWhenItDoesNotExistForSpecificRequestTypeButExistsForAnyRequestType()
+    public function testGetObjectNormalizerWhenItDoesNotExistForSpecificRequestTypeButExistsForAnyRequestType(): void
     {
         self::assertSame(
             $this->normalizer1,
@@ -54,7 +51,7 @@ class ObjectNormalizerRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetObjectNormalizerWhenItDoesNotExistForSpecificClass()
+    public function testGetObjectNormalizerWhenItDoesNotExistForSpecificClass(): void
     {
         self::assertNull(
             $this->registry->getObjectNormalizer(new \stdClass(), new RequestType(['another']))

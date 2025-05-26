@@ -4,17 +4,17 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Provider\FileIconProvider;
+use PHPUnit\Framework\TestCase;
 
-class FileIconProviderTest extends \PHPUnit\Framework\TestCase
+class FileIconProviderTest extends TestCase
 {
-    private const JPEG_ICON = 'jpeg-icon';
-    private const DEFAULT_ICON = 'default-icon';
-    private const JPEG_EXT = 'jpeg';
-    private const DEFAULT_EXT = 'default';
-    private const FILE_ICONS = [self::JPEG_EXT => self::JPEG_ICON, self::DEFAULT_EXT => self::DEFAULT_ICON];
+    private const string JPEG_ICON = 'jpeg-icon';
+    private const string DEFAULT_ICON = 'default-icon';
+    private const string JPEG_EXT = 'jpeg';
+    private const string DEFAULT_EXT = 'default';
+    private const array FILE_ICONS = [self::JPEG_EXT => self::JPEG_ICON, self::DEFAULT_EXT => self::DEFAULT_ICON];
 
-    /** @var FileIconProvider */
-    private $provider;
+    private FileIconProvider $provider;
 
     #[\Override]
     protected function setUp(): void

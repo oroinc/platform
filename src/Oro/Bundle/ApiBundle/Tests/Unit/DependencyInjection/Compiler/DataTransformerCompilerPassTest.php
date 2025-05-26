@@ -4,22 +4,18 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\ApiBundle\DataTransformer\DataTransformerRegistry;
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DataTransformerCompilerPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class DataTransformerCompilerPassTest extends \PHPUnit\Framework\TestCase
+class DataTransformerCompilerPassTest extends TestCase
 {
-    /** @var DataTransformerCompilerPass */
-    private $compiler;
-
-    /** @var ContainerBuilder */
-    private $container;
-
-    /** @var Definition */
-    private $registry;
+    private DataTransformerCompilerPass $compiler;
+    private ContainerBuilder $container;
+    private Definition $registry;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +29,7 @@ class DataTransformerCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWhenNoDataTransformers()
+    public function testProcessWhenNoDataTransformers(): void
     {
         $this->compiler->process($this->container);
 
@@ -46,7 +42,7 @@ class DataTransformerCompilerPassTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $serviceLocatorDef->getArgument(0));
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $transformer1 = $this->container->setDefinition('transformer1', new Definition());
         $transformer1->addTag(

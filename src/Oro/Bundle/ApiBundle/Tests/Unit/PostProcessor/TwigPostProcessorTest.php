@@ -4,15 +4,14 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\PostProcessor;
 
 use Oro\Bundle\ApiBundle\PostProcessor\TwigPostProcessor;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Twig\Environment;
 
-class TwigPostProcessorTest extends \PHPUnit\Framework\TestCase
+class TwigPostProcessorTest extends TestCase
 {
-    /** @var Environment|\PHPUnit\Framework\MockObject\MockObject */
-    private $twig;
-
-    /** @var TwigPostProcessor */
-    private $postProcessor;
+    private Environment&MockObject $twig;
+    private TwigPostProcessor $postProcessor;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +25,7 @@ class TwigPostProcessorTest extends \PHPUnit\Framework\TestCase
         $this->postProcessor = new TwigPostProcessor($container);
     }
 
-    public function testProcessForNullValue()
+    public function testProcessForNullValue(): void
     {
         $this->twig->expects(self::never())
             ->method('render');
@@ -34,7 +33,7 @@ class TwigPostProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->postProcessor->process(null, ['template' => 'twig_template', 'option1' => 'value1']));
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $value = 'test';
         $renderedValue = 'rendered';

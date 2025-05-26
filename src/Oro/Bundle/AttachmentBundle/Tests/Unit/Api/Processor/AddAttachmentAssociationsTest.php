@@ -7,14 +7,12 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig\ConfigProcessorTestCase;
 use Oro\Bundle\AttachmentBundle\Api\AttachmentAssociationProvider;
 use Oro\Bundle\AttachmentBundle\Api\Processor\AddAttachmentAssociations;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class AddAttachmentAssociationsTest extends ConfigProcessorTestCase
 {
-    /** @var AttachmentAssociationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $attachmentAssociationProvider;
-
-    /** @var AddAttachmentAssociations */
-    private $processor;
+    private AttachmentAssociationProvider&MockObject $attachmentAssociationProvider;
+    private AddAttachmentAssociations $processor;
 
     #[\Override]
     protected function setUp(): void

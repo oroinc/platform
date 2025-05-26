@@ -15,26 +15,19 @@ use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class UpdateListStartChunkJobsMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class UpdateListStartChunkJobsMessageProcessorTest extends TestCase
 {
-    private const BATCH_SIZE = 3000;
+    private const int BATCH_SIZE = 3000;
 
-    /** @var JobRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobRepository;
-
-    /** @var AsyncOperationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $operationManager;
-
-    /** @var UpdateListProcessingHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $processingHelper;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var UpdateListStartChunkJobsMessageProcessor */
-    private $processor;
+    private JobRepository&MockObject $jobRepository;
+    private AsyncOperationManager&MockObject $operationManager;
+    private UpdateListProcessingHelper&MockObject $processingHelper;
+    private LoggerInterface&MockObject $logger;
+    private UpdateListStartChunkJobsMessageProcessor $processor;
 
     #[\Override]
     protected function setUp(): void

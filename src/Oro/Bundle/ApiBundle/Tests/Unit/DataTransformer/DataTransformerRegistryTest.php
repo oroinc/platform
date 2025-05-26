@@ -7,20 +7,15 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\EntitySerializer\DataTransformerInterface;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class DataTransformerRegistryTest extends \PHPUnit\Framework\TestCase
+class DataTransformerRegistryTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DataTransformerInterface */
-    private $transformer1;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DataTransformerInterface */
-    private $transformer2;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DataTransformerInterface */
-    private $transformer3;
-
-    /** @var DataTransformerRegistry */
-    private $registry;
+    private DataTransformerInterface&MockObject $transformer1;
+    private DataTransformerInterface&MockObject $transformer2;
+    private DataTransformerInterface&MockObject $transformer3;
+    private DataTransformerRegistry $registry;
 
     #[\Override]
     protected function setUp(): void
@@ -48,7 +43,7 @@ class DataTransformerRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDataTransformerWhenItExistsForSpecificRequestType()
+    public function testGetDataTransformerWhenItExistsForSpecificRequestType(): void
     {
         self::assertSame(
             $this->transformer2,
@@ -56,7 +51,7 @@ class DataTransformerRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDataTransformerWhenItDoesNotExistForSpecificRequestTypeButExistsForAnyRequestType()
+    public function testGetDataTransformerWhenItDoesNotExistForSpecificRequestTypeButExistsForAnyRequestType(): void
     {
         self::assertSame(
             $this->transformer1,
@@ -64,14 +59,14 @@ class DataTransformerRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDataTransformerWhenItDoesNotExistForSpecificRequestTypeAndDoesNotExistForAnyRequestType()
+    public function testGetDataTransformerWhenItDoesNotExistForAnyRequestType(): void
     {
         self::assertNull(
             $this->registry->getDataTransformer('dataType2', new RequestType(['another']))
         );
     }
 
-    public function testGetDataTransformerForDataTypeWithoutTransformer()
+    public function testGetDataTransformerForDataTypeWithoutTransformer(): void
     {
         self::assertNull(
             $this->registry->getDataTransformer('undefined', new RequestType(['rest', 'json_api']))

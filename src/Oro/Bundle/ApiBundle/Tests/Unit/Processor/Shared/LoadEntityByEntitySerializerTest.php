@@ -16,21 +16,15 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Component\ChainProcessor\ParameterBag;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 use Oro\Component\EntitySerializer\EntitySerializer;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class LoadEntityByEntitySerializerTest extends GetProcessorOrmRelatedTestCase
 {
-    /** @var EntitySerializer|\PHPUnit\Framework\MockObject\MockObject */
-    private $serializer;
-
-    /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityClassResolver;
-
-    /** @var QueryHintResolverInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $queryHintResolver;
-
-    /** @var LoadEntityByEntitySerializer */
-    private $processor;
+    private EntitySerializer&MockObject $serializer;
+    private EntityClassResolver&MockObject $entityClassResolver;
+    private QueryHintResolverInterface&MockObject $queryHintResolver;
+    private LoadEntityByEntitySerializer $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -49,7 +43,7 @@ class LoadEntityByEntitySerializerTest extends GetProcessorOrmRelatedTestCase
         );
     }
 
-    public function testProcessWhenEntityAlreadyLoaded()
+    public function testProcessWhenEntityAlreadyLoaded(): void
     {
         $resultEntity = new Product();
 
@@ -59,7 +53,7 @@ class LoadEntityByEntitySerializerTest extends GetProcessorOrmRelatedTestCase
         self::assertSame($resultEntity, $this->context->getResult());
     }
 
-    public function testProcessWithUnsupportedQuery()
+    public function testProcessWithUnsupportedQuery(): void
     {
         $this->context->setQuery(new \stdClass());
         $this->processor->process($this->context);
@@ -67,7 +61,7 @@ class LoadEntityByEntitySerializerTest extends GetProcessorOrmRelatedTestCase
         self::assertFalse($this->context->hasResult());
     }
 
-    public function testProcessWithoutConfig()
+    public function testProcessWithoutConfig(): void
     {
         $entityClass = Group::class;
 
@@ -84,7 +78,7 @@ class LoadEntityByEntitySerializerTest extends GetProcessorOrmRelatedTestCase
         self::assertFalse($this->context->hasResult());
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $entityClass = Group::class;
         $entityData = ['id' => 123];
@@ -120,7 +114,7 @@ class LoadEntityByEntitySerializerTest extends GetProcessorOrmRelatedTestCase
         self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
-    public function testProcessWhenReturnedSeveralEntities()
+    public function testProcessWhenReturnedSeveralEntities(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The result must have one or zero items.');
@@ -159,7 +153,7 @@ class LoadEntityByEntitySerializerTest extends GetProcessorOrmRelatedTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenEntityNotFound()
+    public function testProcessWhenEntityNotFound(): void
     {
         $entityClass = Group::class;
         $entityAlias = 'test';
@@ -221,7 +215,7 @@ class LoadEntityByEntitySerializerTest extends GetProcessorOrmRelatedTestCase
         self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
-    public function testProcessWhenNoAccessToEntity()
+    public function testProcessWhenNoAccessToEntity(): void
     {
         $this->expectException(AccessDeniedException::class);
         $this->expectExceptionMessage('No access to the entity.');

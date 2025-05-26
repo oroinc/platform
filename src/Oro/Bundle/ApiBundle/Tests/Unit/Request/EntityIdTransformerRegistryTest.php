@@ -10,20 +10,15 @@ use Oro\Bundle\ApiBundle\Request\NullEntityIdTransformer;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityIdTransformerRegistryTest extends \PHPUnit\Framework\TestCase
+class EntityIdTransformerRegistryTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerInterface */
-    private $transformer1;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerInterface */
-    private $transformer2;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdResolverRegistry */
-    private $entityIdResolverRegistry;
-
-    /** @var EntityIdTransformerRegistry */
-    private $registry;
+    private EntityIdTransformerInterface&MockObject $transformer1;
+    private EntityIdTransformerInterface&MockObject $transformer2;
+    private EntityIdResolverRegistry&MockObject $entityIdResolverRegistry;
+    private EntityIdTransformerRegistry $registry;
 
     #[\Override]
     protected function setUp(): void
@@ -48,7 +43,7 @@ class EntityIdTransformerRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityIdTransformerForKnownRequestType()
+    public function testGetEntityIdTransformerForKnownRequestType(): void
     {
         $requestType = new RequestType(['rest', 'json_api']);
         self::assertEquals(
@@ -61,7 +56,7 @@ class EntityIdTransformerRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityIdTransformerForUnknownRequestType()
+    public function testGetEntityIdTransformerForUnknownRequestType(): void
     {
         $requestType = new RequestType(['another']);
         self::assertEquals(

@@ -6,15 +6,14 @@ use Oro\Bundle\AttachmentBundle\Configurator\AttachmentFilterConfiguration;
 use Oro\Bundle\AttachmentBundle\Configurator\Provider\AttachmentHashProvider;
 use Oro\Bundle\AttachmentBundle\Configurator\Provider\AttachmentPostProcessorsProvider;
 use Oro\Bundle\AttachmentBundle\Provider\FilterRuntimeConfigProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AttachmentHashProviderTest extends \PHPUnit\Framework\TestCase
+class AttachmentHashProviderTest extends TestCase
 {
-    private AttachmentPostProcessorsProvider|\PHPUnit\Framework\MockObject\MockObject $attachmentPostProcessorsProvider;
-
-    private AttachmentFilterConfiguration|\PHPUnit\Framework\MockObject\MockObject $attachmentFilterConfiguration;
-
-    private FilterRuntimeConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject $filterRuntimeConfigProvider;
-
+    private AttachmentPostProcessorsProvider&MockObject $attachmentPostProcessorsProvider;
+    private AttachmentFilterConfiguration&MockObject $attachmentFilterConfiguration;
+    private FilterRuntimeConfigProviderInterface&MockObject $filterRuntimeConfigProvider;
     private AttachmentHashProvider $provider;
 
     #[\Override]
@@ -33,23 +32,20 @@ class AttachmentHashProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFilterConfigHashUsesModifiedConfigWhenIsPostProcessingEnabled(): void
     {
-        $this->attachmentPostProcessorsProvider
-            ->expects(self::once())
+        $this->attachmentPostProcessorsProvider->expects(self::once())
             ->method('isPostProcessingEnabled')
             ->willReturn(true);
 
         $filterName = 'sample_filter';
         $filterConfig = ['sample_key' => 'sample_value'];
-        $this->attachmentFilterConfiguration
-            ->expects(self::once())
+        $this->attachmentFilterConfiguration->expects(self::once())
             ->method('get')
             ->with($filterName)
             ->willReturn($filterConfig);
 
         $format = 'sample_format';
         $runtimeConfig = ['quality' => 50];
-        $this->filterRuntimeConfigProvider
-            ->expects(self::once())
+        $this->filterRuntimeConfigProvider->expects(self::once())
             ->method('getRuntimeConfigForFilter')
             ->with($filterName, $format)
             ->willReturn($runtimeConfig);
@@ -62,23 +58,20 @@ class AttachmentHashProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFilterConfigHashUsesModifiedConfigWhenIsPostProcessingDisabled(): void
     {
-        $this->attachmentPostProcessorsProvider
-            ->expects(self::once())
+        $this->attachmentPostProcessorsProvider->expects(self::once())
             ->method('isPostProcessingEnabled')
             ->willReturn(false);
 
         $filterName = 'sample_filter';
         $filterConfig = ['sample_key' => 'sample_value'];
-        $this->attachmentFilterConfiguration
-            ->expects(self::once())
+        $this->attachmentFilterConfiguration->expects(self::once())
             ->method('getOriginal')
             ->with($filterName)
             ->willReturn($filterConfig);
 
         $format = 'sample_format';
         $runtimeConfig = ['sample_key' => 'sample_runtime_value'];
-        $this->filterRuntimeConfigProvider
-            ->expects(self::once())
+        $this->filterRuntimeConfigProvider->expects(self::once())
             ->method('getRuntimeConfigForFilter')
             ->with($filterName, $format)
             ->willReturn($runtimeConfig);
