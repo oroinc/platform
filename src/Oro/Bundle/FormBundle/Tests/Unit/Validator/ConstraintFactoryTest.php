@@ -3,16 +3,17 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Validator;
 
 use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\When;
 
-class ConstraintFactoryTest extends \PHPUnit\Framework\TestCase
+class ConstraintFactoryTest extends TestCase
 {
     /**
      * @dataProvider createDataProvider
      */
-    public function testCreate(object $expected, string $name, ?array $options)
+    public function testCreate(object $expected, string $name, ?array $options): void
     {
         $factory = new ConstraintFactory();
         $this->assertEquals($expected, $factory->create($name, $options));
@@ -34,7 +35,7 @@ class ConstraintFactoryTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testCreateInvalidConstraint()
+    public function testCreateInvalidConstraint(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $factory = new ConstraintFactory();
@@ -44,7 +45,7 @@ class ConstraintFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider constraintsProvider
      */
-    public function testParse(array $constraints, array $expected)
+    public function testParse(array $constraints, array $expected): void
     {
         $factory = new ConstraintFactory();
         $this->assertEquals($expected, $factory->parse($constraints));
@@ -106,7 +107,7 @@ class ConstraintFactoryTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidConstraintsProvider
      */
-    public function testParseWithInvalidArgument(array $constraints)
+    public function testParseWithInvalidArgument(array $constraints): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $factory = new ConstraintFactory();

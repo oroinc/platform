@@ -5,6 +5,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\EventListener;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\FormBundle\Entity\EmptyItem;
 use Oro\Bundle\FormBundle\Form\EventListener\CollectionTypeSubscriber;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -13,7 +14,7 @@ use Symfony\Component\Form\Test\FormInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class CollectionTypeSubscriberTest extends \PHPUnit\Framework\TestCase
+class CollectionTypeSubscriberTest extends TestCase
 {
     private CollectionTypeSubscriber $subscriber;
 

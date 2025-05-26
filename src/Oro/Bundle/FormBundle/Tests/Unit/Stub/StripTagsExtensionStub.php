@@ -6,13 +6,14 @@ use Oro\Bundle\FormBundle\Form\Extension\StripTagsExtension;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class StripTagsExtensionStub extends StripTagsExtension
 {
     public function __construct(TestCase $testCase)
     {
-        /** @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject $htmlTagHelper */
+        /** @var HtmlTagHelper&MockObject $htmlTagHelper */
         $htmlTagHelper = $testCase->getMockBuilder(HtmlTagHelper::class)
             ->disableOriginalConstructor()
             ->getMock();

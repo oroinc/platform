@@ -9,11 +9,8 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class NumberTypeExtensionTest extends FormIntegrationTestCase
 {
-    private const UNFORMATTED_VALUE = 1234.123456789;
-    private const FORMATTED_VALUE = '1,234.123456789';
-
-    /** @var NumberFormatter|\PHPUnit\Framework\MockObject\MockObject */
-    private $numberFormatter;
+    private const float UNFORMATTED_VALUE = 1234.123456789;
+    private const string FORMATTED_VALUE = '1,234.123456789';
 
     #[\Override]
     protected function setUp(): void
@@ -40,32 +37,17 @@ class NumberTypeExtensionTest extends FormIntegrationTestCase
     #[\Override]
     protected function getTypeExtensions(): array
     {
+        $numberFormatter = $this->createMock(NumberFormatter::class);
+        $numberFormatter->expects(self::any())
+            ->method('formatDecimal')
+            ->with(self::UNFORMATTED_VALUE, [\NumberFormatter::GROUPING_USED => true])
+            ->willReturn(self::FORMATTED_VALUE);
+
         return array_merge(
-            parent::getExtensions(),
+            parent::getTypeExtensions(),
             [
-                new NumberTypeExtension($this->getNumberFormatter()),
+                new NumberTypeExtension($numberFormatter),
             ]
         );
-    }
-
-    /**
-     * @return NumberFormatter|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private function getNumberFormatter()
-    {
-        if (!$this->numberFormatter) {
-            $this->numberFormatter = $this->createMock(NumberFormatter::class);
-
-            $attributes = [
-                \NumberFormatter::GROUPING_USED => true
-            ];
-
-            $this->numberFormatter->expects(self::any())
-                ->method('formatDecimal')
-                ->with(self::UNFORMATTED_VALUE, $attributes)
-                ->willReturn(self::FORMATTED_VALUE);
-        }
-
-        return $this->numberFormatter;
     }
 }

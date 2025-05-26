@@ -18,8 +18,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class DisableFieldsEventSubscriberTest extends TestCase
 {
-    private ExpressionLanguage|MockObject $expressionLanguage;
-
+    private ExpressionLanguage&MockObject $expressionLanguage;
     private DisableFieldsEventSubscriber $subscriber;
 
     #[\Override]
@@ -49,23 +48,19 @@ class DisableFieldsEventSubscriberTest extends TestCase
         $event = new FormEvent($form, $data);
 
         $formConfig = $this->createMock(FormConfigInterface::class);
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('getConfig')
             ->willReturn($formConfig);
 
-        $formConfig
-            ->expects(self::once())
+        $formConfig->expects(self::once())
             ->method('getOption')
             ->with('disable_fields_if')
             ->willReturn([]);
 
-        $form
-            ->expects(self::never())
+        $form->expects(self::never())
             ->method('add');
 
-        $this->expressionLanguage
-            ->expects(self::never())
+        $this->expressionLanguage->expects(self::never())
             ->method('evaluate');
 
         $this->subscriber->onPreSubmit($event);
@@ -78,30 +73,25 @@ class DisableFieldsEventSubscriberTest extends TestCase
         $event = new FormEvent($form, $data);
 
         $formConfig = $this->createMock(FormConfigInterface::class);
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('getConfig')
             ->willReturn($formConfig);
 
         $fieldName = 'missingField';
-        $formConfig
-            ->expects(self::once())
+        $formConfig->expects(self::once())
             ->method('getOption')
             ->with('disable_fields_if')
             ->willReturn([$fieldName => 'true']);
 
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('has')
             ->with($fieldName)
             ->willReturn(false);
 
-        $form
-            ->expects(self::never())
+        $form->expects(self::never())
             ->method('add');
 
-        $this->expressionLanguage
-            ->expects(self::never())
+        $this->expressionLanguage->expects(self::never())
             ->method('evaluate');
 
         $this->subscriber->onPreSubmit($event);
@@ -114,33 +104,28 @@ class DisableFieldsEventSubscriberTest extends TestCase
         $event = new FormEvent($form, $data);
 
         $formConfig = $this->createMock(FormConfigInterface::class);
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('getConfig')
             ->willReturn($formConfig);
 
         $fieldName = 'sampleField';
         $condition = 'some.condition == true';
-        $formConfig
-            ->expects(self::once())
+        $formConfig->expects(self::once())
             ->method('getOption')
             ->with('disable_fields_if')
             ->willReturn([$fieldName => $condition]);
 
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('has')
             ->with($fieldName)
             ->willReturn(true);
 
-        $this->expressionLanguage
-            ->expects(self::once())
+        $this->expressionLanguage->expects(self::once())
             ->method('evaluate')
             ->with($condition, ['form' => $form, 'data' => $data])
             ->willReturn(false);
 
-        $form
-            ->expects(self::never())
+        $form->expects(self::never())
             ->method('add');
 
         $this->subscriber->onPreSubmit($event);
@@ -153,57 +138,48 @@ class DisableFieldsEventSubscriberTest extends TestCase
         $event = new FormEvent($form, $data);
 
         $formConfig = $this->createMock(FormConfigInterface::class);
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('getConfig')
             ->willReturn($formConfig);
 
         $fieldName = 'sampleField';
         $condition = 'some.condition == true';
-        $formConfig
-            ->expects(self::once())
+        $formConfig->expects(self::once())
             ->method('getOption')
             ->with('disable_fields_if')
             ->willReturn([$fieldName => $condition]);
 
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('has')
             ->with($fieldName)
             ->willReturn(true);
 
         $formField = $this->createMock(FormInterface::class);
         $formFieldConfig = $this->createMock(FormConfigInterface::class);
-        $formField
-            ->expects(self::once())
+        $formField->expects(self::once())
             ->method('getConfig')
             ->willReturn($formFieldConfig);
 
         $resolvedFormFieldType = $this->createMock(ResolvedFormTypeInterface::class);
-        $formFieldConfig
-            ->expects(self::once())
+        $formFieldConfig->expects(self::once())
             ->method('getType')
             ->willReturn($resolvedFormFieldType);
 
-        $resolvedFormFieldType
-            ->expects(self::once())
+        $resolvedFormFieldType->expects(self::once())
             ->method('getInnerType')
             ->willReturn(new FormType());
 
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('get')
             ->with($fieldName)
             ->willReturn($formField);
 
-        $this->expressionLanguage
-            ->expects(self::once())
+        $this->expressionLanguage->expects(self::once())
             ->method('evaluate')
             ->with($condition, ['form' => $form, 'data' => $data])
             ->willReturn(true);
 
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('add')
             ->with($fieldName, FormType::class, ['disabled' => true]);
 
@@ -217,19 +193,16 @@ class DisableFieldsEventSubscriberTest extends TestCase
         $event = new FormEvent($form, $data);
 
         $formConfig = $this->createMock(FormConfigInterface::class);
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('getConfig')
             ->willReturn($formConfig);
 
-        $formConfig
-            ->expects(self::once())
+        $formConfig->expects(self::once())
             ->method('getOption')
             ->with('disable_fields_if')
             ->willReturn([]);
 
-        $this->expressionLanguage
-            ->expects(self::never())
+        $this->expressionLanguage->expects(self::never())
             ->method('evaluate');
 
         $this->subscriber->onPostSubmit($event);
@@ -242,26 +215,22 @@ class DisableFieldsEventSubscriberTest extends TestCase
         $event = new FormEvent($form, $data);
 
         $formConfig = $this->createMock(FormConfigInterface::class);
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('getConfig')
             ->willReturn($formConfig);
 
         $fieldName = 'missingField';
-        $formConfig
-            ->expects(self::once())
+        $formConfig->expects(self::once())
             ->method('getOption')
             ->with('disable_fields_if')
             ->willReturn([$fieldName => 'true']);
 
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('has')
             ->with($fieldName)
             ->willReturn(false);
 
-        $this->expressionLanguage
-            ->expects(self::never())
+        $this->expressionLanguage->expects(self::never())
             ->method('evaluate');
 
         $this->subscriber->onPostSubmit($event);
@@ -274,27 +243,23 @@ class DisableFieldsEventSubscriberTest extends TestCase
         $event = new FormEvent($form, $data);
 
         $formConfig = $this->createMock(FormConfigInterface::class);
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('getConfig')
             ->willReturn($formConfig);
 
         $fieldName = 'sampleField';
         $condition = 'some.condition == true';
-        $formConfig
-            ->expects(self::once())
+        $formConfig->expects(self::once())
             ->method('getOption')
             ->with('disable_fields_if')
             ->willReturn([$fieldName => $condition]);
 
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('has')
             ->with($fieldName)
             ->willReturn(true);
 
-        $this->expressionLanguage
-            ->expects(self::once())
+        $this->expressionLanguage->expects(self::once())
             ->method('evaluate')
             ->with($condition, ['form' => $form, 'data' => $data])
             ->willReturn(false);
@@ -311,27 +276,23 @@ class DisableFieldsEventSubscriberTest extends TestCase
         $event = new FormEvent($form, $data);
 
         $formConfig = $this->createMock(FormConfigInterface::class);
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('getConfig')
             ->willReturn($formConfig);
 
         $fieldName = 'sampleField';
         $condition = 'some.condition == true';
-        $formConfig
-            ->expects(self::once())
+        $formConfig->expects(self::once())
             ->method('getOption')
             ->with('disable_fields_if')
             ->willReturn([$fieldName => $condition]);
 
-        $form
-            ->expects(self::once())
+        $form->expects(self::once())
             ->method('has')
             ->with($fieldName)
             ->willReturn(true);
 
-        $this->expressionLanguage
-            ->expects(self::once())
+        $this->expressionLanguage->expects(self::once())
             ->method('evaluate')
             ->with($condition, ['form' => $form, 'data' => $data])
             ->willReturn(true);

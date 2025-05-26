@@ -5,15 +5,14 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityChangesetTransformer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
-class EntityChangesetTransformerTest extends \PHPUnit\Framework\TestCase
+class EntityChangesetTransformerTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var EntityChangesetTransformer */
-    private $transformer;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EntityChangesetTransformer $transformer;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class EntityChangesetTransformerTest extends \PHPUnit\Framework\TestCase
         $this->transformer = new EntityChangesetTransformer($this->doctrineHelper, \stdClass::class);
     }
 
-    public function testTransform()
+    public function testTransform(): void
     {
         $data = ['some random data'];
         $this->assertEquals($data, $this->transformer->transform($data));
@@ -32,7 +31,7 @@ class EntityChangesetTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider transformDataProvider
      */
-    public function testReverseTransform(mixed $expected, mixed $value)
+    public function testReverseTransform(mixed $expected, mixed $value): void
     {
         if (!$expected) {
             $expected = new ArrayCollection();
@@ -65,7 +64,7 @@ class EntityChangesetTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testReverseTransformException()
+    public function testReverseTransformException(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "array", "string" given');

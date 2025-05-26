@@ -17,49 +17,30 @@ use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 use Oro\Bundle\SearchBundle\Query\Result;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class SearchHandlerTest extends \PHPUnit\Framework\TestCase
+class SearchHandlerTest extends TestCase
 {
-    private const TEST_ID_FIELD = 'id';
-    private const TEST_ENTITY_CLASS = 'FooEntityClass';
-    private const TEST_ENTITY_SEARCH_ALIAS = 'foo_entity';
+    private const string TEST_ID_FIELD = 'id';
+    private const string TEST_ENTITY_CLASS = 'FooEntityClass';
+    private const string TEST_ENTITY_SEARCH_ALIAS = 'foo_entity';
 
-    /** @var array */
-    private $testProperties = ['name', 'email', 'property.path'];
-
-    /** @var array */
-    private $testSearchConfig = [self::TEST_ENTITY_CLASS => ['alias' => self::TEST_ENTITY_SEARCH_ALIAS]];
-
-    /** @var Indexer|\PHPUnit\Framework\MockObject\MockObject */
-    private $indexer;
-
-    /** @var EntityRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityRepository;
-
-    /** @var QueryBuilder|\PHPUnit\Framework\MockObject\MockObject */
-    private $queryBuilder;
-
-    /** @var AbstractQuery|\PHPUnit\Framework\MockObject\MockObject */
-    private $query;
-
-    /** @var Expr|\PHPUnit\Framework\MockObject\MockObject */
-    private $expr;
-
-    /** @var Result|\PHPUnit\Framework\MockObject\MockObject */
-    private $searchResult;
-
-    /** @var SearchHandler */
-    private $searchHandler;
-
-    /** @var AclHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclHelper;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
+    private array $testProperties = ['name', 'email', 'property.path'];
+    private array $testSearchConfig = [self::TEST_ENTITY_CLASS => ['alias' => self::TEST_ENTITY_SEARCH_ALIAS]];
+    private Indexer&MockObject $indexer;
+    private EntityRepository&MockObject $entityRepository;
+    private QueryBuilder&MockObject $queryBuilder;
+    private AbstractQuery&MockObject $query;
+    private Expr&MockObject $expr;
+    private Result&MockObject $searchResult;
+    private SearchHandler $searchHandler;
+    private AclHelper&MockObject $aclHelper;
+    private LoggerInterface&MockObject $logger;
 
     #[\Override]
     protected function setUp(): void
@@ -174,17 +155,17 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-    public function testGetProperties()
+    public function testGetProperties(): void
     {
         $this->assertEquals($this->testProperties, $this->searchHandler->getProperties());
     }
 
-    public function testGetEntityName()
+    public function testGetEntityName(): void
     {
         $this->assertEquals(self::TEST_ENTITY_CLASS, $this->searchHandler->getEntityName());
     }
 
-    public function testSearchDefault()
+    public function testSearchDefault(): void
     {
         $this->indexer->expects($this->once())
             ->method('simpleSearch')
@@ -275,7 +256,7 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSearchHasMore()
+    public function testSearchHasMore(): void
     {
         $this->indexer->expects($this->once())
             ->method('simpleSearch')
@@ -347,7 +328,7 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider convertItemProvider
      */
-    public function testConvertItem(\stdClass $item, array $expectedItem)
+    public function testConvertItem(\stdClass $item, array $expectedItem): void
     {
         $this->assertEquals($expectedItem, $this->searchHandler->convertItem($item));
     }
@@ -396,7 +377,7 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testSearchByIds()
+    public function testSearchByIds(): void
     {
         $searchQuery = '1,2';
         $searchIds = ['1', '2'];
@@ -445,7 +426,7 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->searchHandler->search($searchQuery, 1, 10, true));
     }
 
-    public function testSearchByIdsExceptionLogged()
+    public function testSearchByIdsExceptionLogged(): void
     {
         $searchQuery = 'some-wrong-query-string';
         $searchIds = ['some-wrong-query-string'];
@@ -492,7 +473,7 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->searchHandler->search($searchQuery, 1, 10, true));
     }
 
-    public function testSearchByIdsWithEmptyString()
+    public function testSearchByIdsWithEmptyString(): void
     {
         $searchQuery = '1,,2';
         $searchIds = [0 => '1', 2 => '2'];
@@ -541,7 +522,7 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->searchHandler->search($searchQuery, 1, 10, true));
     }
 
-    public function testSearchByIdsEmptySearch()
+    public function testSearchByIdsEmptySearch(): void
     {
         $searchQuery = '';
         $expected = [
@@ -555,7 +536,7 @@ class SearchHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->searchHandler->search($searchQuery, 1, 10, true));
     }
 
-    public function testSearchByIdsIncorrectSearchString()
+    public function testSearchByIdsIncorrectSearchString(): void
     {
         $searchQuery = ',';
         $expected = [

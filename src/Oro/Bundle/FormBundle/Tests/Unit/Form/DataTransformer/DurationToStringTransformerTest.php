@@ -3,10 +3,11 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\FormBundle\Form\DataTransformer\DurationToStringTransformer;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
-class DurationToStringTransformerTest extends \PHPUnit\Framework\TestCase
+class DurationToStringTransformerTest extends TestCase
 {
     private DurationToStringTransformer $transformer;
 
@@ -19,7 +20,7 @@ class DurationToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider transformDataProvider
      */
-    public function testTransform(int|float $value, string $expectedValue)
+    public function testTransform(int|float $value, string $expectedValue): void
     {
         $this->assertEquals($expectedValue, $this->transformer->transform($value));
     }
@@ -42,7 +43,7 @@ class DurationToStringTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testTransformFailsWhenUnexpectedType()
+    public function testTransformFailsWhenUnexpectedType(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage('Expected argument of type "scalar", "array" given');
@@ -50,7 +51,7 @@ class DurationToStringTransformerTest extends \PHPUnit\Framework\TestCase
         $this->transformer->transform([]);
     }
 
-    public function testTransformFailsWithBigNumbers()
+    public function testTransformFailsWithBigNumbers(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('Duration too long to convert.');
@@ -61,7 +62,7 @@ class DurationToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider reverseTransformDataProvider
      */
-    public function testReverseTransform(string $value, int $expectedValue)
+    public function testReverseTransform(string $value, int $expectedValue): void
     {
         $this->assertEquals($expectedValue, $this->transformer->reverseTransform($value));
     }
@@ -163,7 +164,7 @@ class DurationToStringTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider reverseTransformEmptyDataProvider
      */
-    public function testReverseTransformReturnsNullWhenEmpty(?string $value)
+    public function testReverseTransformReturnsNullWhenEmpty(?string $value): void
     {
         $this->assertNull($this->transformer->reverseTransform($value));
     }
@@ -177,7 +178,7 @@ class DurationToStringTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testReverseTransformFailsWhenUnexpectedType()
+    public function testReverseTransformFailsWhenUnexpectedType(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->transformer->reverseTransform([]);

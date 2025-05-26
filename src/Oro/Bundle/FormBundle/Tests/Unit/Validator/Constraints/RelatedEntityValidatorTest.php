@@ -7,15 +7,13 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\FormBundle\Validator\Constraints\RelatedEntity;
 use Oro\Bundle\FormBundle\Validator\Constraints\RelatedEntityValidator;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class RelatedEntityValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $entityClassNameHelper;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EntityClassNameHelper&MockObject $entityClassNameHelper;
 
     #[\Override]
     protected function setUp(): void

@@ -4,21 +4,21 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Config;
 
 use Oro\Bundle\FormBundle\Config\BlockConfig;
 use Oro\Bundle\FormBundle\Config\SubBlockConfig;
+use PHPUnit\Framework\TestCase;
 
-class BlockConfigTest extends \PHPUnit\Framework\TestCase
+class BlockConfigTest extends TestCase
 {
-    /** @var BlockConfig */
-    private $blockConfig;
+    private BlockConfig $blockConfig;
 
-    private $blockCode = 'datagrid';
+    private string $blockCode = 'datagrid';
 
-    private $testCode = 'testCode';
-    private $testTitle = 'testTitle';
-    private $testDescription = 'testDescription';
+    private string $testCode = 'testCode';
+    private string $testTitle = 'testTitle';
+    private string $testDescription = 'testDescription';
 
-    private $testClass = 'Test\Class';
+    private string $testClass = 'Test\Class';
 
-    private $testBlockConfig = [
+    private array $testBlockConfig = [
         'block_config' => [
             'type' => [
                 'title'     => 'Doctrine Type',
@@ -39,9 +39,9 @@ class BlockConfigTest extends \PHPUnit\Framework\TestCase
         ]
     ];
 
-    private $testSubBlocks = [];
+    private array $testSubBlocks = [];
 
-    private $testSubBlocksConfig = [
+    private array $testSubBlocksConfig = [
         'common' => [
             'title'       => 'Common Setting',
             'priority'    => 3,
@@ -68,7 +68,7 @@ class BlockConfigTest extends \PHPUnit\Framework\TestCase
         $this->blockConfig = new BlockConfig($this->blockCode);
     }
 
-    public function testProperties()
+    public function testProperties(): void
     {
         /** test getCode */
         $this->assertEquals($this->blockCode, $this->blockConfig->getCode());
@@ -123,7 +123,7 @@ class BlockConfigTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSubBlockProperties()
+    public function testSubBlockProperties(): void
     {
         /** test setSubBlock */
         $subblocks = [];
@@ -188,7 +188,7 @@ class BlockConfigTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testBlockConfig()
+    public function testBlockConfig(): void
     {
         self::assertNull($this->blockConfig->getBlockConfig());
         $this->blockConfig->setBlockConfig($this->testBlockConfig);

@@ -3,17 +3,16 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Validator;
 
 use Oro\Bundle\FormBundle\Validator\DoctrineInitializer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\Form\Util\OrderedHashMap;
 use Symfony\Component\Validator\ObjectInitializerInterface;
 
-class DoctrineInitializerTest extends \PHPUnit\Framework\TestCase
+class DoctrineInitializerTest extends TestCase
 {
-    /** @var ObjectInitializerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $innerInitializer;
-
-    /** @var DoctrineInitializer */
-    private $doctrineInitializer;
+    private ObjectInitializerInterface&MockObject $innerInitializer;
+    private DoctrineInitializer $doctrineInitializer;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +25,7 @@ class DoctrineInitializerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider predefinedNotManageableObjectsProvider
      */
-    public function testInitializeForPredefinedNotManageableObjects(object $object)
+    public function testInitializeForPredefinedNotManageableObjects(object $object): void
     {
         $this->innerInitializer->expects(self::never())
             ->method('initialize');
@@ -42,7 +41,7 @@ class DoctrineInitializerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testInitializeForNotPredefinedObject()
+    public function testInitializeForNotPredefinedObject(): void
     {
         $object = new \stdClass();
 

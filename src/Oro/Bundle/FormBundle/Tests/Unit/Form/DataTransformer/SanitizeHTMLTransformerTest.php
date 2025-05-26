@@ -4,18 +4,13 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\FormBundle\Form\DataTransformer\SanitizeHTMLTransformer;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class SanitizeHTMLTransformerTest extends \PHPUnit\Framework\TestCase
+class SanitizeHTMLTransformerTest extends TestCase
 {
-    /**
-     * @var HtmlTagHelper|\PHPUnit\Framework\MockObject\MockObject
-     */
-    private $htmlTagHelper;
-
-    /**
-     * @var SanitizeHTMLTransformer
-     */
-    private $transformer;
+    private HtmlTagHelper&MockObject $htmlTagHelper;
+    private SanitizeHTMLTransformer $transformer;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +20,7 @@ class SanitizeHTMLTransformerTest extends \PHPUnit\Framework\TestCase
         $this->transformer = new SanitizeHTMLTransformer($this->htmlTagHelper);
     }
 
-    public function testTransform()
+    public function testTransform(): void
     {
         $value = '<p class="classname">sometext</p>';
         $expected = 'sometext';
@@ -38,7 +33,7 @@ class SanitizeHTMLTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $this->transformer->transform($value));
     }
 
-    public function testReverseTransform()
+    public function testReverseTransform(): void
     {
         $value = '<p class="classname">sometext</p>';
         $expected = 'sometext';

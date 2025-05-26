@@ -3,16 +3,16 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension;
 
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class DataBlockExtensionTest extends \PHPUnit\Framework\TestCase
+class DataBlockExtensionTest extends TestCase
 {
     private array $options = ['block' => 1, 'subblock' => 1, 'block_config' => 1, 'tooltip' => 1];
 
-    /** @var DataBlockExtension */
-    private $formExtension;
+    private DataBlockExtension $formExtension;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +20,7 @@ class DataBlockExtensionTest extends \PHPUnit\Framework\TestCase
         $this->formExtension = new DataBlockExtension();
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = new OptionsResolver();
         $this->formExtension->configureOptions($resolver);
@@ -35,7 +35,7 @@ class DataBlockExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testBuildView()
+    public function testBuildView(): void
     {
         $formView = new FormView();
 

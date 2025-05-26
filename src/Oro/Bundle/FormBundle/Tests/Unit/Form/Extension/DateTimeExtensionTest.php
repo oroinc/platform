@@ -3,11 +3,12 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension;
 
 use Oro\Bundle\FormBundle\Form\Extension\DateTimeExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class DateTimeExtensionTest extends \PHPUnit\Framework\TestCase
+class DateTimeExtensionTest extends TestCase
 {
     /**
      * @dataProvider configureOptionsDataProvider

@@ -4,21 +4,20 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\Type\DownloadLinksType;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class DownloadLinksTypeTest extends \PHPUnit\Framework\TestCase
+class DownloadLinksTypeTest extends TestCase
 {
     use TempDirExtension;
 
-    /** @var Packages|\PHPUnit\Framework\MockObject\MockObject */
-    private $assetHelper;
-
-    /** @var DownloadLinksType */
-    private $type;
+    private Packages&MockObject $assetHelper;
+    private DownloadLinksType $type;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +27,7 @@ class DownloadLinksTypeTest extends \PHPUnit\Framework\TestCase
         $this->type = new DownloadLinksType($this->assetHelper);
     }
 
-    public function testConfigureOptionsWithoutSource()
+    public function testConfigureOptionsWithoutSource(): void
     {
         $this->expectException(MissingOptionsException::class);
         $this->expectExceptionMessage('The required option "source" is missing.');
@@ -38,7 +37,7 @@ class DownloadLinksTypeTest extends \PHPUnit\Framework\TestCase
         $resolver->resolve([]);
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = new OptionsResolver();
         $this->type->configureOptions($resolver);
@@ -57,7 +56,7 @@ class DownloadLinksTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider optionsProvider
      */
-    public function testFinishView(array $files, array $options, array $expected)
+    public function testFinishView(array $files, array $options, array $expected): void
     {
         $testDir = $this->getTempDir('download_dir');
 

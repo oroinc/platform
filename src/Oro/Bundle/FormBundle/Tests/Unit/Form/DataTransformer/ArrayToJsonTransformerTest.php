@@ -3,12 +3,13 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\FormBundle\Form\DataTransformer\ArrayToJsonTransformer;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ArrayToJsonTransformerTest extends \PHPUnit\Framework\TestCase
+class ArrayToJsonTransformerTest extends TestCase
 {
     private function getTestTransformer(bool $allowNull = false): ArrayToJsonTransformer
     {

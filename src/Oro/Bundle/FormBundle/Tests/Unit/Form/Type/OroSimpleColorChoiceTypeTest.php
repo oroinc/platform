@@ -12,8 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OroSimpleColorChoiceTypeTest extends FormIntegrationTestCase
 {
-    /** @var OroSimpleColorChoiceType */
-    private $formType;
+    private OroSimpleColorChoiceType $formType;
 
     #[\Override]
     protected function setUp(): void

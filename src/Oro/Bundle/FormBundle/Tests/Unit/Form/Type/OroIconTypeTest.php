@@ -9,8 +9,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class OroIconTypeTest extends FormIntegrationTestCase
 {
-    /** @var OroIconType */
-    private $type;
+    private OroIconType $type;
 
     #[\Override]
     protected function setUp(): void

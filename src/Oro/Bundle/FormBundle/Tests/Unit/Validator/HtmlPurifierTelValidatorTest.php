@@ -3,14 +3,12 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Validator;
 
 use Oro\Bundle\FormBundle\Validator\HtmlPurifierTelValidator;
+use PHPUnit\Framework\TestCase;
 
-class HtmlPurifierTelValidatorTest extends \PHPUnit\Framework\TestCase
+class HtmlPurifierTelValidatorTest extends TestCase
 {
-    /** @var \HTMLPurifier_URI */
-    private $uri;
-
-    /** @var HtmlPurifierTelValidator */
-    private $validator;
+    private \HTMLPurifier_URI $uri;
+    private HtmlPurifierTelValidator $validator;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +21,7 @@ class HtmlPurifierTelValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider phoneProvider
      */
-    public function testPhones(string $phone, bool $expectedValue)
+    public function testPhones(string $phone, bool $expectedValue): void
     {
         $this->uri->path = $phone;
         $this->assertEquals($expectedValue, $this->validator->doValidate($this->uri, null, null));

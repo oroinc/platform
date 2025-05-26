@@ -6,16 +6,16 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreateOrSelectTransformer;
 use Oro\Bundle\FormBundle\Form\Type\OroEntityCreateOrSelectType;
 use Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\TestEntity;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
-class EntityCreateOrSelectTransformerTest extends \PHPUnit\Framework\TestCase
+class EntityCreateOrSelectTransformerTest extends TestCase
 {
-    private const CLASS_NAME = 'TestClass';
-    private const DEFAULT_MODE = 'default';
+    private const string CLASS_NAME = 'TestClass';
+    private const string DEFAULT_MODE = 'default';
 
-    /** @var EntityCreateOrSelectTransformer */
-    private $transformer;
+    private EntityCreateOrSelectTransformer $transformer;
 
     #[\Override]
     protected function setUp(): void
@@ -37,7 +37,7 @@ class EntityCreateOrSelectTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider transformDataProvider
      */
-    public function testTransform(?object $value, array $expected)
+    public function testTransform(?object $value, array $expected): void
     {
         $this->assertEquals($expected, $this->transformer->transform($value));
     }
@@ -75,7 +75,7 @@ class EntityCreateOrSelectTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider transformExceptionDataProvider
      */
-    public function testTransformException(string $value, string $exception, string $message)
+    public function testTransformException(string $value, string $exception, string $message): void
     {
         $this->expectException($exception);
         $this->expectExceptionMessage($message);
@@ -97,7 +97,7 @@ class EntityCreateOrSelectTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider reverseTransformDataProvider
      */
-    public function testReverseTransform(?array $value, ?object $expected)
+    public function testReverseTransform(?array $value, ?object $expected): void
     {
         $this->assertEquals($expected, $this->transformer->reverseTransform($value));
     }
@@ -135,7 +135,7 @@ class EntityCreateOrSelectTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider reverseTransformExceptionDataProvider
      */
-    public function testReverseTransformException(object|array $value, string $exception, string $message)
+    public function testReverseTransformException(object|array $value, string $exception, string $message): void
     {
         $this->expectException($exception);
         $this->expectExceptionMessage($message);

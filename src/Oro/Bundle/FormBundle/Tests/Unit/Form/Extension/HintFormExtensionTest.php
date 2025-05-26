@@ -3,14 +3,15 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension;
 
 use Oro\Bundle\FormBundle\Form\Extension\HintFormExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class HintFormExtensionTest extends \PHPUnit\Framework\TestCase
+class HintFormExtensionTest extends TestCase
 {
-    /** @var Form|\PHPUnit\Framework\MockObject\MockObject */
-    private $form;
+    private Form&MockObject $form;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +19,7 @@ class HintFormExtensionTest extends \PHPUnit\Framework\TestCase
         $this->form = $this->createMock(Form::class);
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
@@ -32,7 +33,7 @@ class HintFormExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->configureOptions($resolver);
     }
 
-    public function testBuildView()
+    public function testBuildView(): void
     {
         $options = [
             'hint' => 'test',
@@ -54,7 +55,7 @@ class HintFormExtensionTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testParentForm()
+    public function testParentForm(): void
     {
         $view = new FormView();
         $this->form->expects($this->any())

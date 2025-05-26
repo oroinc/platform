@@ -11,8 +11,7 @@ use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class OroPlaceholderPasswordTypeTest extends FormIntegrationTestCase
 {
-    /** @var OroPlaceholderPasswordType */
-    private $formType;
+    private OroPlaceholderPasswordType $formType;
 
     #[\Override]
     protected function setUp(): void

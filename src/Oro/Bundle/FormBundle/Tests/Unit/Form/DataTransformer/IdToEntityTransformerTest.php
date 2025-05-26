@@ -7,19 +7,16 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\FormBundle\Form\DataTransformer\IdToEntityTransformer;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class IdToEntityTransformerTest extends \PHPUnit\Framework\TestCase
+class IdToEntityTransformerTest extends TestCase
 {
-    private const ENTITY_NAME = \stdClass::class;
+    private const string ENTITY_NAME = \stdClass::class;
 
-    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $objectManager;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var IdToEntityTransformer */
-    private $transformer;
+    private ObjectManager&MockObject $objectManager;
+    private ManagerRegistry&MockObject $registry;
+    private IdToEntityTransformer $transformer;
 
     #[\Override]
     protected function setUp(): void

@@ -35,41 +35,40 @@ class ValidationGroupSequenceExtensionTest extends FormIntegrationTestCase
         $this->assertFormOptionEqual($expectedValidationGroups, 'validation_groups', $form);
     }
 
-    public function buildFormDataProvider(): iterable
+    public function buildFormDataProvider(): array
     {
-        yield 'no validation groups' => [[], null];
-
-        yield 'empty validation groups' => [['validation_groups' => []], null];
-
-        yield 'not array' => [['validation_groups' => 'group1'], ['group1']];
-
-        yield 'group sequence' => [
-            ['validation_groups' => new GroupSequence(['group1', 'group2'])],
-            new GroupSequence(['group1', 'group2']),
-        ];
-
-        yield 'simple validation groups' => [['validation_groups' => ['group1', 'group2']], ['group1', 'group2']];
-
-        yield 'with nested validation groups' => [
-            ['validation_groups' => [['group1', 'group2'], 'group3']],
-            [new GroupSequence(['group1', 'group2']), 'group3'],
-        ];
-
-        yield 'with nested groups and with group sequence' => [
-            ['validation_groups' => [['group1', 'group2'], new GroupSequence(['group3', 'group4'])]],
-            [new GroupSequence(['group1', 'group2']), new GroupSequence(['group3', 'group4'])],
-        ];
-
         $closure = static fn () => ['from_closure'];
-        yield 'with closure, nested groups and with group sequence' => [
-            [
-                'validation_groups' => [
-                    $closure,
-                    ['group1', 'group2'],
-                    new GroupSequence(['group3', 'group4']),
-                ],
+
+        return [
+            'no validation groups' => [
+                [],
+                null
             ],
-            [$closure, new GroupSequence(['group1', 'group2']), new GroupSequence(['group3', 'group4'])],
+            'empty validation groups' => [
+                ['validation_groups' => []],
+                null
+            ],
+            'not array' => [
+                ['validation_groups' => 'group1'],
+                ['group1']
+            ],
+            'group sequence' => [
+                ['validation_groups' => new GroupSequence(['group1', 'group2'])],
+                new GroupSequence(['group1', 'group2'])
+            ],
+            'simple validation groups' => [['validation_groups' => ['group1', 'group2']], ['group1', 'group2']],
+            'with nested validation groups' => [
+                ['validation_groups' => [['group1', 'group2'], 'group3']],
+                [new GroupSequence(['group1', 'group2']), 'group3']
+            ],
+            'with nested groups and with group sequence' => [
+                ['validation_groups' => [['group1', 'group2'], new GroupSequence(['group3', 'group4'])]],
+                [new GroupSequence(['group1', 'group2']), new GroupSequence(['group3', 'group4'])]
+            ],
+            'with closure, nested groups and with group sequence' => [
+                ['validation_groups' => [$closure, ['group1', 'group2'], new GroupSequence(['group3', 'group4'])]],
+                [$closure, new GroupSequence(['group1', 'group2']), new GroupSequence(['group3', 'group4'])]
+            ]
         ];
     }
 }

@@ -9,25 +9,20 @@ use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\__CG__\ItemStubProxy;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\FormBundle\Form\DataTransformer\RelatedEntityTransformer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class RelatedEntityTransformerTest extends \PHPUnit\Framework\TestCase
+class RelatedEntityTransformerTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var EntityClassNameHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityClassNameHelper;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var RelatedEntityTransformer */
-    private $transformer;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EntityClassNameHelper&MockObject $entityClassNameHelper;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private RelatedEntityTransformer $transformer;
 
     #[\Override]
     protected function setUp(): void
@@ -46,7 +41,7 @@ class RelatedEntityTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider transformDataProvider
      */
-    public function testTransform(?object $value, ?array $expectedValue)
+    public function testTransform(?object $value, ?array $expectedValue): void
     {
         $this->doctrineHelper->expects($this->any())
             ->method('getSingleEntityIdentifier')
@@ -76,7 +71,7 @@ class RelatedEntityTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testTransformForNotObject()
+    public function testTransformForNotObject(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->transformer->transform('invalid_value');
@@ -85,7 +80,7 @@ class RelatedEntityTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider reverseTransformForEmptyValueDataProvider
      */
-    public function testReverseTransformForEmptyValue(mixed $value)
+    public function testReverseTransformForEmptyValue(mixed $value): void
     {
         $this->assertNull($this->transformer->reverseTransform($value));
     }
@@ -102,7 +97,7 @@ class RelatedEntityTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider reverseTransformForNonTransformableValueDataProvider
      */
-    public function testReverseTransformForNonTransformableValue(mixed $value)
+    public function testReverseTransformForNonTransformableValue(mixed $value): void
     {
         $this->assertSame($value, $this->transformer->reverseTransform($value));
     }
@@ -116,7 +111,7 @@ class RelatedEntityTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testReverseTransform()
+    public function testReverseTransform(): void
     {
         $value  = ['id' => 123, 'entity' => 'Test\Entity'];
         $entity = new \stdClass();
@@ -144,7 +139,7 @@ class RelatedEntityTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($entity, $this->transformer->reverseTransform($value));
     }
 
-    public function testReverseTransformByEntityAlias()
+    public function testReverseTransformByEntityAlias(): void
     {
         $value  = ['id' => 123, 'entity' => 'alias'];
         $entity = new \stdClass();
@@ -172,7 +167,7 @@ class RelatedEntityTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($entity, $this->transformer->reverseTransform($value));
     }
 
-    public function testReverseTransformNotFound()
+    public function testReverseTransformNotFound(): void
     {
         $value = ['id' => 123, 'entity' => 'Test\Entity'];
 
@@ -197,7 +192,7 @@ class RelatedEntityTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($value, $this->transformer->reverseTransform($value));
     }
 
-    public function testReverseTransformEntityException()
+    public function testReverseTransformEntityException(): void
     {
         $value = ['id' => 123, 'entity' => 'Test\Entity'];
 
@@ -217,7 +212,7 @@ class RelatedEntityTransformerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($value, $this->transformer->reverseTransform($value));
     }
 
-    public function testReverseTransformNoViewPermissions()
+    public function testReverseTransformNoViewPermissions(): void
     {
         $value  = ['id' => 123, 'entity' => 'Test\Entity'];
         $entity = new \stdClass();

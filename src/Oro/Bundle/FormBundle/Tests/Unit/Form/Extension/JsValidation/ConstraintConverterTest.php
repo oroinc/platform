@@ -12,10 +12,8 @@ use Symfony\Component\Validator\Constraints\Type;
 
 class ConstraintConverterTest extends TestCase
 {
-    private ConstraintConverterInterface|MockObject $exactConverter;
-
-    private FormInterface|MockObject $form;
-
+    private ConstraintConverterInterface&MockObject $exactConverter;
+    private FormInterface&MockObject $form;
     private ConstraintConverter $converter;
 
     #[\Override]
@@ -32,31 +30,21 @@ class ConstraintConverterTest extends TestCase
     public function testSupports(bool $expected, bool $exactConverterSupports): void
     {
         $constraint = $this->createMock(Constraint::class);
-        $this->exactConverter
-            ->expects(self::once())
+        $this->exactConverter->expects(self::once())
             ->method('supports')
-            ->with(
-                $constraint,
-                $this->form
-            )
+            ->with($constraint, $this->form)
             ->willReturn($exactConverterSupports);
-        $this->exactConverter
-            ->expects(self::never())
+        $this->exactConverter->expects(self::never())
             ->method('convertConstraint');
 
         self::assertSame($expected, $this->converter->supports($constraint, $this->form));
     }
 
-    public function supportsDataProvider(): \Generator
+    public function supportsDataProvider(): array
     {
-        yield [
-            'expected' => true,
-            'exactConverterSupports' => true,
-        ];
-
-        yield [
-            'expected' => false,
-            'exactConverterSupports' => false,
+        return [
+            ['expected' => true, 'exactConverterSupports' => true],
+            ['expected' => false, 'exactConverterSupports' => false]
         ];
     }
 
@@ -64,21 +52,13 @@ class ConstraintConverterTest extends TestCase
     {
         $constraint = new Type(['type' => 'string']);
 
-        $this->exactConverter
-            ->expects(self::once())
+        $this->exactConverter->expects(self::once())
             ->method('supports')
-            ->with(
-                $constraint,
-                $this->form
-            )
+            ->with($constraint, $this->form)
             ->willReturn(true);
-        $this->exactConverter
-            ->expects(self::once())
+        $this->exactConverter->expects(self::once())
             ->method('convertConstraint')
-            ->with(
-                $constraint,
-                $this->form
-            )
+            ->with($constraint, $this->form)
             ->willReturn($constraint);
 
         self::assertSame($constraint, $this->converter->convertConstraint($constraint, $this->form));
@@ -95,21 +75,13 @@ class ConstraintConverterTest extends TestCase
             ['jsValidation' => ['type' => $constraintName, 'options' => $options]]
         );
 
-        $this->exactConverter
-            ->expects(self::once())
+        $this->exactConverter->expects(self::once())
             ->method('supports')
-            ->with(
-                $constraint,
-                $this->form
-            )
+            ->with($constraint, $this->form)
             ->willReturn(true);
-        $this->exactConverter
-            ->expects(self::once())
+        $this->exactConverter->expects(self::once())
             ->method('convertConstraint')
-            ->with(
-                $constraint,
-                $this->form
-            )
+            ->with($constraint, $this->form)
             ->willReturn($constraint);
 
         self::assertSame($constraint, $this->converter->convertConstraint($constraint, $this->form));

@@ -6,11 +6,12 @@ use Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry;
 use Oro\Bundle\FormBundle\Model\FormTemplateDataProviderResolver;
 use Oro\Bundle\FormBundle\Provider\CallbackFormTemplateDataProvider;
 use Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FormTemplateDataProviderResolverTest extends \PHPUnit\Framework\TestCase
+class FormTemplateDataProviderResolverTest extends TestCase
 {
-    private FormTemplateDataProviderRegistry|\PHPUnit\Framework\MockObject\MockObject $formTemplateDataProviderRegistry;
-
+    private FormTemplateDataProviderRegistry&MockObject $formTemplateDataProviderRegistry;
     private FormTemplateDataProviderResolver $resolver;
 
     #[\Override]
