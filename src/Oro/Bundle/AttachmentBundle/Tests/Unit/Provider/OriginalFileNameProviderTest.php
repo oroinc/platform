@@ -7,22 +7,22 @@ use Oro\Bundle\AttachmentBundle\Provider\FileNameProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\OriginalFileNameProvider;
 use Oro\Bundle\AttachmentBundle\Tools\FilenameExtensionHelper;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class OriginalFileNameProviderTest extends \PHPUnit\Framework\TestCase
+class OriginalFileNameProviderTest extends TestCase
 {
-    private const FEATURE_NAME = 'attachment_original_filenames';
-    private const FILTER = 'sample_filter';
-    private const FORMAT = 'sample_format';
-    private const WIDTH = 42;
-    private const HEIGHT = 142;
+    private const string FEATURE_NAME = 'attachment_original_filenames';
+    private const string FILTER = 'sample_filter';
+    private const string FORMAT = 'sample_format';
+    private const int WIDTH = 42;
+    private const int HEIGHT = 142;
 
-    private FileNameProviderInterface|\PHPUnit\Framework\MockObject\MockObject $innerProvider;
-
-    private FeatureChecker|\PHPUnit\Framework\MockObject\MockObject $featureChecker;
-
+    private FileNameProviderInterface&MockObject $innerProvider;
+    private FeatureChecker&MockObject $featureChecker;
     private OriginalFileNameProvider $provider;
 
     #[\Override]

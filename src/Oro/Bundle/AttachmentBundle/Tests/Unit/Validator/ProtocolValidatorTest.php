@@ -3,13 +3,14 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Validator;
 
 use Oro\Bundle\AttachmentBundle\Validator\ProtocolValidator;
+use PHPUnit\Framework\TestCase;
 
-class ProtocolValidatorTest extends \PHPUnit\Framework\TestCase
+class ProtocolValidatorTest extends TestCase
 {
     /**
      * @dataProvider protocolDataProvider
      */
-    public function testIsSupportedProtocol($isSupported, $protocol)
+    public function testIsSupportedProtocol($isSupported, $protocol): void
     {
         $validator = new ProtocolValidator();
         self::assertEquals($isSupported, $validator->isSupportedProtocol($protocol));

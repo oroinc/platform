@@ -10,24 +10,19 @@ use Oro\Bundle\AttachmentBundle\EventListener\FileListener;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class FileListenerTest extends \PHPUnit\Framework\TestCase
+class FileListenerTest extends TestCase
 {
-    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileManager;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var FileListener */
-    private $listener;
+    private FileManager&MockObject $fileManager;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private EntityManagerInterface&MockObject $em;
+    private FileListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -49,14 +44,13 @@ class FileListenerTest extends \PHPUnit\Framework\TestCase
             ->with($entity)
             ->willReturn(true);
 
+        $unitOfWork = $this->createMock(UnitOfWork::class);
         $this->em->expects(self::once())
             ->method('getUnitOfWork')
-            ->willReturn($unitOfWork = $this->createMock(UnitOfWork::class));
-
+            ->willReturn($unitOfWork);
         $unitOfWork->expects(self::once())
             ->method('clearEntityChangeSet')
             ->with(spl_object_hash($entity));
-
         $this->em->expects(self::once())
             ->method('refresh')
             ->with($entity);

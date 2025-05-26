@@ -5,13 +5,13 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Provider;
 use Oro\Bundle\AttachmentBundle\Provider\FilterRuntimeConfigProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\WebpAwareFilterRuntimeConfigProvider;
 use Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WebpAwareFilterRuntimeConfigProviderTest extends \PHPUnit\Framework\TestCase
+class WebpAwareFilterRuntimeConfigProviderTest extends TestCase
 {
-    private FilterRuntimeConfigProviderInterface $innerFilterRuntimeConfigProvider;
-
-    private WebpConfiguration|\PHPUnit\Framework\MockObject\MockObject $webpConfiguration;
-
+    private FilterRuntimeConfigProviderInterface&MockObject $innerFilterRuntimeConfigProvider;
+    private WebpConfiguration&MockObject $webpConfiguration;
     private WebpAwareFilterRuntimeConfigProvider $provider;
 
     #[\Override]
@@ -32,8 +32,7 @@ class WebpAwareFilterRuntimeConfigProviderTest extends \PHPUnit\Framework\TestCa
         $format = 'not_webp';
         $runtimeConfig = ['sample_key' => 'sample_value'];
 
-        $this->innerFilterRuntimeConfigProvider
-            ->expects(self::once())
+        $this->innerFilterRuntimeConfigProvider->expects(self::once())
             ->method('getRuntimeConfigForFilter')
             ->with($filterName, $format)
             ->willReturn($runtimeConfig);
@@ -47,13 +46,11 @@ class WebpAwareFilterRuntimeConfigProviderTest extends \PHPUnit\Framework\TestCa
         $format = 'webp';
         $runtimeConfig = ['sample_key' => 'sample_value'];
 
-        $this->webpConfiguration
-            ->expects(self::once())
+        $this->webpConfiguration->expects(self::once())
             ->method('isDisabled')
             ->willReturn(true);
 
-        $this->innerFilterRuntimeConfigProvider
-            ->expects(self::once())
+        $this->innerFilterRuntimeConfigProvider->expects(self::once())
             ->method('getRuntimeConfigForFilter')
             ->with($filterName, $format)
             ->willReturn($runtimeConfig);
@@ -67,19 +64,16 @@ class WebpAwareFilterRuntimeConfigProviderTest extends \PHPUnit\Framework\TestCa
         $format = 'webp';
         $runtimeConfig = ['sample_key' => 'sample_value'];
 
-        $this->webpConfiguration
-            ->expects(self::once())
+        $this->webpConfiguration->expects(self::once())
             ->method('isDisabled')
             ->willReturn(false);
 
         $webpQuality = 50;
-        $this->webpConfiguration
-            ->expects(self::once())
+        $this->webpConfiguration->expects(self::once())
             ->method('getWebpQuality')
             ->willReturn($webpQuality);
 
-        $this->innerFilterRuntimeConfigProvider
-            ->expects(self::once())
+        $this->innerFilterRuntimeConfigProvider->expects(self::once())
             ->method('getRuntimeConfigForFilter')
             ->with($filterName, $format)
             ->willReturn($runtimeConfig);

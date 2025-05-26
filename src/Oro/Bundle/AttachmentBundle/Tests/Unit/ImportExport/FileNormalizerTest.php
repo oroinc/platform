@@ -12,6 +12,8 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -19,17 +21,13 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class FileNormalizerTest extends \PHPUnit\Framework\TestCase
+class FileNormalizerTest extends TestCase
 {
     use EntityTrait;
 
-    private AttachmentManager|\PHPUnit\Framework\MockObject\MockObject $attachmentManager;
-
-    private FileManager|\PHPUnit\Framework\MockObject\MockObject $fileManager;
-
-    private AttachmentEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-        $attachmentEntityConfigProvider;
-
+    private AttachmentManager&MockObject $attachmentManager;
+    private FileManager&MockObject $fileManager;
+    private AttachmentEntityConfigProviderInterface&MockObject $attachmentEntityConfigProvider;
     private FileNormalizer $normalizer;
 
     #[\Override]

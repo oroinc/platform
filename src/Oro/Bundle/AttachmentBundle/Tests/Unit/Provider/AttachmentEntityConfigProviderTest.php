@@ -5,18 +5,15 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Provider;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager as EntityConfigManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class AttachmentEntityConfigProviderTest extends \PHPUnit\Framework\TestCase
+class AttachmentEntityConfigProviderTest extends TestCase
 {
-    /** @var EntityConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityConfigManager;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var AttachmentEntityConfigProvider */
-    private $provider;
+    private EntityConfigManager&MockObject $entityConfigManager;
+    private LoggerInterface&MockObject $logger;
+    private AttachmentEntityConfigProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -29,9 +26,12 @@ class AttachmentEntityConfigProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFieldConfigWhenNoConfig(): void
     {
+        $entityClass = 'SampleClass';
+        $fieldName = 'sampleFieldName';
+
         $this->entityConfigManager->expects(self::once())
             ->method('hasConfig')
-            ->with($entityClass = 'SampleClass', $fieldName = 'sampleFieldName')
+            ->with($entityClass, $fieldName)
             ->willReturn(false);
 
         $this->logger->expects(self::once())
@@ -46,11 +46,13 @@ class AttachmentEntityConfigProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFieldConfig(): void
     {
-        $config = $this->createMock(ConfigInterface::class);
+        $entityClass = 'SampleClass';
+        $fieldName = 'sampleFieldName';
 
+        $config = $this->createMock(ConfigInterface::class);
         $this->entityConfigManager->expects(self::once())
             ->method('hasConfig')
-            ->with($entityClass = 'SampleClass', $fieldName = 'sampleFieldName')
+            ->with($entityClass, $fieldName)
             ->willReturn(true);
         $this->entityConfigManager->expects(self::once())
             ->method('getFieldConfig')
@@ -62,9 +64,11 @@ class AttachmentEntityConfigProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityConfigWhenNoConfig(): void
     {
+        $entityClass = 'SampleClass';
+
         $this->entityConfigManager->expects(self::once())
             ->method('hasConfig')
-            ->with($entityClass = 'SampleClass')
+            ->with($entityClass)
             ->willReturn(false);
 
         $this->logger->expects(self::once())
@@ -79,11 +83,12 @@ class AttachmentEntityConfigProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetEntityConfig(): void
     {
-        $config = $this->createMock(ConfigInterface::class);
+        $entityClass = 'SampleClass';
 
+        $config = $this->createMock(ConfigInterface::class);
         $this->entityConfigManager->expects(self::once())
             ->method('hasConfig')
-            ->with($entityClass = 'SampleClass')
+            ->with($entityClass)
             ->willReturn(true);
         $this->entityConfigManager->expects(self::once())
             ->method('getEntityConfig')

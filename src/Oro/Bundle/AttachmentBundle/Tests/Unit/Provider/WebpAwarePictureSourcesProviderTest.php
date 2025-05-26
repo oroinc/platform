@@ -6,17 +6,17 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\WebpAwarePictureSourcesProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
+class WebpAwarePictureSourcesProviderTest extends TestCase
 {
-    private PictureSourcesProviderInterface|\PHPUnit\Framework\MockObject\MockObject $innerProvider;
-
-    private AttachmentManager|\PHPUnit\Framework\MockObject\MockObject $attachmentManager;
-
+    private PictureSourcesProviderInterface&MockObject $innerProvider;
+    private AttachmentManager&MockObject $attachmentManager;
     private WebpAwarePictureSourcesProvider $provider;
 
     #[\Override]
@@ -34,8 +34,7 @@ class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFilteredPictureSourcesNoFile(): void
     {
-        $this->innerProvider
-            ->expects(self::once())
+        $this->innerProvider->expects(self::once())
             ->method('getFilteredPictureSources')
             ->with(null, 'filter_name')
             ->willReturn([
@@ -58,8 +57,7 @@ class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
             ->setExternalUrl('http://example.org/image.png');
         $filterName = 'original';
 
-        $this->innerProvider
-            ->expects(self::once())
+        $this->innerProvider->expects(self::once())
             ->method('getFilteredPictureSources')
             ->with($image, $filterName)
             ->willReturn([
@@ -83,8 +81,7 @@ class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
         $filterName = 'original';
         $filteredImageUrl = '/url/to/image.jpg';
 
-        $this->innerProvider
-            ->expects(self::once())
+        $this->innerProvider->expects(self::once())
             ->method('getFilteredPictureSources')
             ->with($image, $filterName)
             ->willReturn([
@@ -92,11 +89,9 @@ class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
                 'sources' => [],
             ]);
 
-        $this->attachmentManager
-            ->expects(self::never())
+        $this->attachmentManager->expects(self::never())
             ->method('getFilteredImageUrl');
-        $this->attachmentManager
-            ->expects(self::once())
+        $this->attachmentManager->expects(self::once())
             ->method('isWebpEnabledIfSupported')
             ->willReturn(false);
 
@@ -117,8 +112,7 @@ class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
         $filterName = 'original';
         $filteredImageUrl = '/url/to/image.jpg';
 
-        $this->innerProvider
-            ->expects(self::once())
+        $this->innerProvider->expects(self::once())
             ->method('getFilteredPictureSources')
             ->with($image, $filterName)
             ->willReturn([
@@ -126,11 +120,9 @@ class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
                 'sources' => [],
             ]);
 
-        $this->attachmentManager
-            ->expects(self::never())
+        $this->attachmentManager->expects(self::never())
             ->method('getFilteredImageUrl');
-        $this->attachmentManager
-            ->expects(self::never())
+        $this->attachmentManager->expects(self::never())
             ->method('isWebpEnabledIfSupported');
 
         self::assertEquals(
@@ -150,8 +142,7 @@ class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
         $filteredImageUrl = '/url/to/image.jpg';
         $webpFilteredImageUrl = '/url/to/image.jpg.webp';
 
-        $this->innerProvider
-            ->expects(self::once())
+        $this->innerProvider->expects(self::once())
             ->method('getFilteredPictureSources')
             ->with($image, $filterName)
             ->willReturn([
@@ -159,12 +150,10 @@ class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
                 'sources' => [],
             ]);
 
-        $this->attachmentManager
-            ->expects(self::once())
+        $this->attachmentManager->expects(self::once())
             ->method('isWebpEnabledIfSupported')
             ->willReturn(true);
-        $this->attachmentManager
-            ->expects(self::once())
+        $this->attachmentManager->expects(self::once())
             ->method('getFilteredImageUrl')
             ->with($image, $filterName, 'webp', UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn($webpFilteredImageUrl);
@@ -191,8 +180,7 @@ class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
         $filterName = 'original';
         $filteredImageUrl = '/url/to/image.svg';
 
-        $this->innerProvider
-            ->expects(self::once())
+        $this->innerProvider->expects(self::once())
             ->method('getFilteredPictureSources')
             ->with($image, $filterName)
             ->willReturn([
@@ -200,12 +188,10 @@ class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
                 'sources' => [],
             ]);
 
-        $this->attachmentManager
-            ->expects(self::once())
+        $this->attachmentManager->expects(self::once())
             ->method('isWebpEnabledIfSupported')
             ->willReturn(true);
-        $this->attachmentManager
-            ->expects(self::never())
+        $this->attachmentManager->expects(self::never())
             ->method('getFilteredImageUrl')
             ->with(self::anything());
 
@@ -222,8 +208,7 @@ class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
     {
         $width = 42;
         $height = 24;
-        $this->innerProvider
-            ->expects(self::once())
+        $this->innerProvider->expects(self::once())
             ->method('getResizedPictureSources')
             ->with(null, $width, $height)
             ->willReturn([
@@ -247,8 +232,7 @@ class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
         $width = 42;
         $height = 24;
 
-        $this->innerProvider
-            ->expects(self::once())
+        $this->innerProvider->expects(self::once())
             ->method('getResizedPictureSources')
             ->with($image, $width, $height)
             ->willReturn([
@@ -273,8 +257,7 @@ class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
         $height = 24;
         $resizedImageUrl = '/42/24/image.jpg';
 
-        $this->innerProvider
-            ->expects(self::once())
+        $this->innerProvider->expects(self::once())
             ->method('getResizedPictureSources')
             ->with($image, $width, $height)
             ->willReturn([
@@ -282,11 +265,9 @@ class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
                 'sources' => [],
             ]);
 
-        $this->attachmentManager
-            ->expects(self::never())
+        $this->attachmentManager->expects(self::never())
             ->method('getResizedImageUrl');
-        $this->attachmentManager
-            ->expects(self::once())
+        $this->attachmentManager->expects(self::once())
             ->method('isWebpEnabledIfSupported')
             ->willReturn(false);
 
@@ -308,8 +289,7 @@ class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
         $height = 24;
         $resizedImageUrl = '/42/24/image.jpg';
 
-        $this->innerProvider
-            ->expects(self::once())
+        $this->innerProvider->expects(self::once())
             ->method('getResizedPictureSources')
             ->with($image, $width, $height)
             ->willReturn([
@@ -317,11 +297,9 @@ class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
                 'sources' => [],
             ]);
 
-        $this->attachmentManager
-            ->expects(self::never())
+        $this->attachmentManager->expects(self::never())
             ->method('getResizedImageUrl');
-        $this->attachmentManager
-            ->expects(self::never())
+        $this->attachmentManager->expects(self::never())
             ->method('isWebpEnabledIfSupported');
 
         self::assertEquals(
@@ -342,8 +320,7 @@ class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
         $resizedImageUrl = '/42/24/image.jpg';
         $webpResizedImageUrl = '/url/to/image.webp';
 
-        $this->innerProvider
-            ->expects(self::once())
+        $this->innerProvider->expects(self::once())
             ->method('getResizedPictureSources')
             ->with($image, $width, $height)
             ->willReturn([
@@ -351,12 +328,10 @@ class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
                 'sources' => [],
             ]);
 
-        $this->attachmentManager
-            ->expects(self::once())
+        $this->attachmentManager->expects(self::once())
             ->method('isWebpEnabledIfSupported')
             ->willReturn(true);
-        $this->attachmentManager
-            ->expects(self::once())
+        $this->attachmentManager->expects(self::once())
             ->method('getResizedImageUrl')
             ->with($image, $width, $height, 'webp', UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn($webpResizedImageUrl);
@@ -384,8 +359,7 @@ class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
         $height = 24;
         $resizedImageUrl = '/42/24/image.svg';
 
-        $this->innerProvider
-            ->expects(self::once())
+        $this->innerProvider->expects(self::once())
             ->method('getResizedPictureSources')
             ->with($image, $width, $height)
             ->willReturn([
@@ -393,12 +367,10 @@ class WebpAwarePictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
                 'sources' => [],
             ]);
 
-        $this->attachmentManager
-            ->expects(self::once())
+        $this->attachmentManager->expects(self::once())
             ->method('isWebpEnabledIfSupported')
             ->willReturn(true);
-        $this->attachmentManager
-            ->expects(self::never())
+        $this->attachmentManager->expects(self::never())
             ->method('getResizedImageUrl')
             ->with(self::anything());
 

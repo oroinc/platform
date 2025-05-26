@@ -11,23 +11,21 @@ use Oro\Bundle\AttachmentBundle\Provider\ResizedImagePathProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\ResizedImageProviderInterface;
 use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\ImagineBinaryByFileContentFactoryInterface;
 use Oro\Bundle\GaufretteBundle\FileManager as GaufretteFileManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ImageResizeManagerTest extends \PHPUnit\Framework\TestCase
+class ImageResizeManagerTest extends TestCase
 {
-    private const WIDTH = 10;
-    private const HEIGHT = 20;
-    private const FILTER = 'sample-filter';
-    private const FORMAT = 'sample_format';
-    private const STORAGE_PATH = 'sample/storagePath';
+    private const int WIDTH = 10;
+    private const int HEIGHT = 20;
+    private const string FILTER = 'sample-filter';
+    private const string FORMAT = 'sample_format';
+    private const string STORAGE_PATH = 'sample/storagePath';
 
-    private ResizedImageProviderInterface|\PHPUnit\Framework\MockObject\MockObject $resizedImageProvider;
-
-    private ResizedImagePathProviderInterface|\PHPUnit\Framework\MockObject\MockObject $resizedImagePathProvider;
-
-    private MediaCacheManagerRegistryInterface|\PHPUnit\Framework\MockObject\MockObject $mediaCacheManagerRegistry;
-
-    private ImagineBinaryByFileContentFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $imagineBinaryFactory;
-
+    private ResizedImageProviderInterface&MockObject $resizedImageProvider;
+    private ResizedImagePathProviderInterface&MockObject $resizedImagePathProvider;
+    private MediaCacheManagerRegistryInterface&MockObject $mediaCacheManagerRegistry;
+    private ImagineBinaryByFileContentFactoryInterface&MockObject $imagineBinaryFactory;
     private ImageResizeManager $manager;
 
     #[\Override]
@@ -62,17 +60,20 @@ class ImageResizeManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testResizeWhenAlreadyExists(): void
     {
-        $this->mockMediaCacheManager($file = new File(), $rawResizedImage = 'raw-image');
+        $file = new File();
+        $rawResizedImage = 'raw-image';
+        $this->getMediaCacheManager($file, $rawResizedImage);
 
         $this->resizedImagePathProvider->expects(self::once())
             ->method('getPathForResizedImage')
             ->with($file, self::WIDTH, self::HEIGHT, self::FORMAT)
             ->willReturn(self::STORAGE_PATH);
 
+        $imageBinary = $this->createMock(BinaryInterface::class);
         $this->imagineBinaryFactory->expects(self::once())
             ->method('createImagineBinary')
             ->with($rawResizedImage)
-            ->willReturn($imageBinary = $this->createMock(BinaryInterface::class));
+            ->willReturn($imageBinary);
 
         self::assertSame(
             $imageBinary,
@@ -80,14 +81,13 @@ class ImageResizeManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function mockMediaCacheManager(
-        File $file,
-        string $rawResizedImage
-    ): GaufretteFileManager|\PHPUnit\Framework\MockObject\MockObject {
+    private function getMediaCacheManager(File $file, string $rawResizedImage): GaufretteFileManager&MockObject
+    {
+        $mediaCacheManager = $this->createMock(GaufretteFileManager::class);
         $this->mediaCacheManagerRegistry->expects(self::once())
             ->method('getManagerForFile')
             ->with($file)
-            ->willReturn($mediaCacheManager = $this->createMock(GaufretteFileManager::class));
+            ->willReturn($mediaCacheManager);
 
         $mediaCacheManager->expects(self::any())
             ->method('getFileContent')
@@ -113,17 +113,20 @@ class ImageResizeManagerTest extends \PHPUnit\Framework\TestCase
 
     public function testApplyFilterWhenAlreadyExists(): void
     {
-        $this->mockMediaCacheManager($file = new File(), $rawResizedImage = 'raw-image');
+        $file = new File();
+        $rawResizedImage = 'raw-image';
+        $this->getMediaCacheManager($file, $rawResizedImage);
 
         $this->resizedImagePathProvider->expects(self::once())
             ->method('getPathForFilteredImage')
             ->with($file, self::FILTER, self::FORMAT)
             ->willReturn(self::STORAGE_PATH);
 
+        $imageBinary = $this->createMock(BinaryInterface::class);
         $this->imagineBinaryFactory->expects(self::once())
             ->method('createImagineBinary')
             ->with($rawResizedImage)
-            ->willReturn($imageBinary = $this->createMock(BinaryInterface::class));
+            ->willReturn($imageBinary);
 
         self::assertSame(
             $imageBinary,
@@ -136,7 +139,8 @@ class ImageResizeManagerTest extends \PHPUnit\Framework\TestCase
      */
     public function testResizeWhenFails(string $rawResizedImage, bool $forceUpdate): void
     {
-        $this->mockMediaCacheManager($file = new File(), $rawResizedImage);
+        $file = new File();
+        $this->getMediaCacheManager($file, $rawResizedImage);
 
         $this->resizedImagePathProvider->expects(self::once())
             ->method('getPathForResizedImage')
@@ -170,21 +174,24 @@ class ImageResizeManagerTest extends \PHPUnit\Framework\TestCase
      */
     public function testResize(string $rawResizedImage, bool $forceUpdate): void
     {
-        $mediaCacheManager = $this->mockMediaCacheManager($file = new File(), $rawResizedImage);
+        $file = new File();
+        $mediaCacheManager = $this->getMediaCacheManager($file, $rawResizedImage);
 
         $this->resizedImagePathProvider->expects(self::once())
             ->method('getPathForResizedImage')
             ->with($file, self::WIDTH, self::HEIGHT, self::FORMAT)
             ->willReturn(self::STORAGE_PATH);
 
+        $imageBinary = $this->createMock(BinaryInterface::class);
         $this->resizedImageProvider->expects(self::once())
             ->method('getResizedImage')
             ->with($file, self::WIDTH, self::HEIGHT, self::FORMAT)
-            ->willReturn($imageBinary = $this->createMock(BinaryInterface::class));
+            ->willReturn($imageBinary);
 
+        $newResizedImage = 'new-sample-image';
         $imageBinary->expects(self::once())
             ->method('getContent')
-            ->willReturn($newResizedImage = 'new-sample-image');
+            ->willReturn($newResizedImage);
 
         $mediaCacheManager->expects(self::once())
             ->method('writeToStorage')
@@ -201,7 +208,8 @@ class ImageResizeManagerTest extends \PHPUnit\Framework\TestCase
      */
     public function testApplyFilterWhenFails(string $rawResizedImage, bool $forceUpdate): void
     {
-        $this->mockMediaCacheManager($file = new File(), $rawResizedImage);
+        $file = new File();
+        $this->getMediaCacheManager($file, $rawResizedImage);
 
         $this->resizedImagePathProvider->expects(self::once())
             ->method('getPathForFilteredImage')
@@ -221,21 +229,24 @@ class ImageResizeManagerTest extends \PHPUnit\Framework\TestCase
      */
     public function testApplyFilter(string $rawResizedImage, bool $forceUpdate): void
     {
-        $mediaCacheManager = $this->mockMediaCacheManager($file = new File(), $rawResizedImage);
+        $file = new File();
+        $mediaCacheManager = $this->getMediaCacheManager($file, $rawResizedImage);
 
         $this->resizedImagePathProvider->expects(self::once())
             ->method('getPathForFilteredImage')
             ->with($file, self::FILTER, self::FORMAT)
             ->willReturn(self::STORAGE_PATH);
 
+        $imageBinary = $this->createMock(BinaryInterface::class);
         $this->resizedImageProvider->expects(self::once())
             ->method('getFilteredImage')
             ->with($file, self::FILTER, self::FORMAT)
-            ->willReturn($imageBinary = $this->createMock(BinaryInterface::class));
+            ->willReturn($imageBinary);
 
+        $newResizedImage = 'new-sample-image';
         $imageBinary->expects(self::once())
             ->method('getContent')
-            ->willReturn($newResizedImage = 'new-sample-image');
+            ->willReturn($newResizedImage);
 
         $mediaCacheManager->expects(self::once())
             ->method('writeToStorage')
@@ -252,7 +263,8 @@ class ImageResizeManagerTest extends \PHPUnit\Framework\TestCase
      */
     public function testApplyFilterWhenFilterInAnotherFormat(string $rawResizedImage, bool $forceUpdate): void
     {
-        $mediaCacheManager = $this->mockMediaCacheManager($file = new File(), $rawResizedImage);
+        $file = new File();
+        $mediaCacheManager = $this->getMediaCacheManager($file, $rawResizedImage);
 
         $this->resizedImagePathProvider->expects(self::once())
             ->method('getPathForFilteredImage')

@@ -14,7 +14,7 @@ class TestTemplate extends Template
     }
 
     #[\Override]
-    protected function doDisplay(array $context, array $blocks = array())
+    protected function doDisplay(array $context, array $blocks = [])
     {
         yield 'test';
     }

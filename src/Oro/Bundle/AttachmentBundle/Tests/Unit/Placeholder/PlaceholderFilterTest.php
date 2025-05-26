@@ -5,17 +5,14 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Placeholder;
 use Oro\Bundle\AttachmentBundle\Placeholder\PlaceholderFilter;
 use Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
+class PlaceholderFilterTest extends TestCase
 {
-    /** @var AttachmentAssociationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $attachmentAssociationHelper;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var PlaceholderFilter */
-    private $filter;
+    private AttachmentAssociationHelper&MockObject $attachmentAssociationHelper;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private PlaceholderFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -35,10 +32,10 @@ class PlaceholderFilterTest extends \PHPUnit\Framework\TestCase
         bool $isNewRecord,
         bool $isManaged,
         bool $expected
-    ) {
+    ): void {
         $this->attachmentAssociationHelper->expects(is_object($entity) && !$isNewRecord ? self::once() : self::never())
             ->method('isAttachmentAssociationEnabled')
-            ->with(is_object($entity) ? get_class($entity) : null)
+            ->with(is_object($entity) ? $entity::class : null)
             ->willReturn($attachmentAssociationHelperReturn);
 
         $this->doctrineHelper->expects(is_object($entity) && $isManaged ? self::once() : self::never())

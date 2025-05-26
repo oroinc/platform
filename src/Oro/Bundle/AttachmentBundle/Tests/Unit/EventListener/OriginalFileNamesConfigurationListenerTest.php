@@ -4,22 +4,19 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\AttachmentBundle\EventListener\OriginalFileNamesConfigurationListener;
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class OriginalFileNamesConfigurationListenerTest extends \PHPUnit\Framework\TestCase
+class OriginalFileNamesConfigurationListenerTest extends TestCase
 {
-    /** @var Session|\PHPUnit\Framework\MockObject\MockObject */
-    private $session;
-
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var OriginalFileNamesConfigurationListener */
-    private $listener;
+    private Session&MockObject $session;
+    private RequestStack&MockObject $requestStack;
+    private OriginalFileNamesConfigurationListener $listener;
 
     #[\Override]
     protected function setUp(): void

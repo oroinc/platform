@@ -5,24 +5,21 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Validator\Constraints;
 use Oro\Bundle\AttachmentBundle\Provider\FileConstraintsProvider;
 use Oro\Bundle\AttachmentBundle\Validator\Constraints\FileConstraintFromSystemConfig;
 use Oro\Bundle\AttachmentBundle\Validator\Constraints\FileConstraintFromSystemConfigValidator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\FileValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-class FileConstraintFromSystemConfigValidatorTest extends \PHPUnit\Framework\TestCase
+class FileConstraintFromSystemConfigValidatorTest extends TestCase
 {
-    private const MAX_SIZE = 1024;
-    private const MAX_SIZE2 = 2048;
-    private const MIME_TYPES = ['mime/type1'];
-    private const MIME_TYPES2 = ['mime/type2'];
+    private const int MAX_SIZE = 1024;
+    private const int MAX_SIZE2 = 2048;
+    private const array MIME_TYPES = ['mime/type1'];
+    private const array MIME_TYPES2 = ['mime/type2'];
 
-    /** @var FileConstraintsProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileConstraintsProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FileValidator */
-    private $fileValidator;
-
-    /** @var FileConstraintFromSystemConfigValidator */
-    private $validator;
+    private FileConstraintsProvider&MockObject $fileConstraintsProvider;
+    private FileValidator&MockObject $fileValidator;
+    private FileConstraintFromSystemConfigValidator $validator;
 
     #[\Override]
     protected function setUp(): void

@@ -6,18 +6,17 @@ use Liip\ImagineBundle\Binary\BinaryInterface;
 use Liip\ImagineBundle\Imagine\Cache\Resolver\ResolverInterface;
 use Oro\Bundle\AttachmentBundle\Imagine\Cache\Resolver\GaufretteResolver;
 use Oro\Bundle\GaufretteBundle\FileManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RequestContext;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class GaufretteResolverTest extends \PHPUnit\Framework\TestCase
+class GaufretteResolverTest extends TestCase
 {
-    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileManager;
-
-    /** @var RequestContext|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestContext;
+    private FileManager&MockObject $fileManager;
+    private RequestContext&MockObject $requestContext;
 
     #[\Override]
     protected function setUp(): void

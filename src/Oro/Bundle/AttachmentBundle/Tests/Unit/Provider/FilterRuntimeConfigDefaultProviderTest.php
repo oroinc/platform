@@ -3,8 +3,9 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\AttachmentBundle\Provider\FilterRuntimeConfigDefaultProvider;
+use PHPUnit\Framework\TestCase;
 
-class FilterRuntimeConfigDefaultProviderTest extends \PHPUnit\Framework\TestCase
+class FilterRuntimeConfigDefaultProviderTest extends TestCase
 {
     /**
      * @dataProvider getRuntimeConfigForFilterDataProvider

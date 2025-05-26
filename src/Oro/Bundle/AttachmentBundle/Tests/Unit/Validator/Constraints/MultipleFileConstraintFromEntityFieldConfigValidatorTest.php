@@ -7,13 +7,13 @@ use Oro\Bundle\AttachmentBundle\Entity\FileItem;
 use Oro\Bundle\AttachmentBundle\Provider\MultipleFileConstraintsProvider;
 use Oro\Bundle\AttachmentBundle\Validator\Constraints\MultipleFileConstraintFromEntityFieldConfig;
 use Oro\Bundle\AttachmentBundle\Validator\Constraints\MultipleFileConstraintFromEntityFieldConfigValidator;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class MultipleFileConstraintFromEntityFieldConfigValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var MultipleFileConstraintsProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $constraintsProvider;
+    private MultipleFileConstraintsProvider&MockObject $constraintsProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +36,7 @@ class MultipleFileConstraintFromEntityFieldConfigValidatorTest extends Constrain
         $this->expectExceptionMessage(sprintf(
             'Expected instance of %s, got %s',
             MultipleFileConstraintFromEntityFieldConfig::class,
-            get_class($constraint)
+            $constraint::class
         ));
 
         $this->validator->validate(new \stdClass(), $constraint);

@@ -5,12 +5,13 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Provider;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Provider\PictureSourcesProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class PictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
+class PictureSourcesProviderTest extends TestCase
 {
-    private AttachmentManager|\PHPUnit\Framework\MockObject\MockObject $attachmentManager;
-
+    private AttachmentManager&MockObject $attachmentManager;
     private PictureSourcesProvider $provider;
 
     #[\Override]
@@ -39,8 +40,7 @@ class PictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
         $filterName = 'original';
         $filteredImageUrl = '/url/to/image.jpg';
 
-        $this->attachmentManager
-            ->expects(self::once())
+        $this->attachmentManager->expects(self::once())
             ->method('getFilteredImageUrl')
             ->with($image, $filterName, '', UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn($filteredImageUrl);
@@ -73,8 +73,7 @@ class PictureSourcesProviderTest extends \PHPUnit\Framework\TestCase
         $height = 24;
         $filteredImageUrl = '/url/to/image.jpg';
 
-        $this->attachmentManager
-            ->expects(self::once())
+        $this->attachmentManager->expects(self::once())
             ->method('getResizedImageUrl')
             ->with($image, $width, $height, '', UrlGeneratorInterface::ABSOLUTE_PATH)
             ->willReturn($filteredImageUrl);

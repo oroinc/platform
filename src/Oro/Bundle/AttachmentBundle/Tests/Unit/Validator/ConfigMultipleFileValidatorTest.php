@@ -5,16 +5,15 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Validator;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigMultipleFileValidator;
 use Oro\Bundle\AttachmentBundle\Validator\Constraints\MultipleFileConstraintFromEntityFieldConfig;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class ConfigMultipleFileValidatorTest extends \PHPUnit\Framework\TestCase
+class ConfigMultipleFileValidatorTest extends TestCase
 {
-    /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $validator;
-
-    /** @var ConfigMultipleFileValidator */
-    private $configValidator;
+    private ValidatorInterface&MockObject $validator;
+    private ConfigMultipleFileValidator $configValidator;
 
     #[\Override]
     protected function setUp(): void

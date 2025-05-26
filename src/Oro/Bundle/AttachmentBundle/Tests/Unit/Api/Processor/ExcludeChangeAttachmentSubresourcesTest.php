@@ -11,17 +11,14 @@ use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\AttachmentBundle\Api\AttachmentAssociationProvider;
 use Oro\Bundle\AttachmentBundle\Api\Processor\ExcludeChangeAttachmentSubresources;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ExcludeChangeAttachmentSubresourcesTest extends \PHPUnit\Framework\TestCase
+class ExcludeChangeAttachmentSubresourcesTest extends TestCase
 {
-    /** @var AttachmentAssociationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $attachmentAssociationProvider;
-
-    /** @var ExcludeChangeAttachmentSubresources */
-    private $processor;
-
-    /** @var CollectSubresourcesContext */
-    private $context;
+    private AttachmentAssociationProvider&MockObject $attachmentAssociationProvider;
+    private ExcludeChangeAttachmentSubresources $processor;
+    private CollectSubresourcesContext $context;
 
     #[\Override]
     protected function setUp(): void

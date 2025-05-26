@@ -5,19 +5,16 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Configurator;
 use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 use Oro\Bundle\AttachmentBundle\Configurator\AttachmentFilterConfiguration;
 use Oro\Bundle\AttachmentBundle\Configurator\Provider\AttachmentPostProcessorsProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AttachmentFilterConfigurationTest extends \PHPUnit\Framework\TestCase
+class AttachmentFilterConfigurationTest extends TestCase
 {
-    private const FILTER_NAME = 'filter_name';
+    private const string FILTER_NAME = 'filter_name';
 
-    /** @var AttachmentFilterConfiguration */
-    private $attachmentFilterConfiguration;
-
-    /** @var FilterConfiguration|\PHPUnit\Framework\MockObject\MockObject */
-    private $filterConfiguration;
-
-    /** @var AttachmentPostProcessorsProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $attachmentPostProcessorsProvider;
+    private FilterConfiguration&MockObject $filterConfiguration;
+    private AttachmentPostProcessorsProvider&MockObject $attachmentPostProcessorsProvider;
+    private AttachmentFilterConfiguration $attachmentFilterConfiguration;
 
     #[\Override]
     protected function setUp(): void

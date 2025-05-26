@@ -6,22 +6,19 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Statement;
 use Doctrine\DBAL\Types\Types;
 use Oro\Bundle\AttachmentBundle\Migration\SetAllowedMimeTypesForImageFieldQuery;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class SetAllowedMimeTypesForImageFieldQueryTest extends \PHPUnit\Framework\TestCase
+class SetAllowedMimeTypesForImageFieldQueryTest extends TestCase
 {
-    private const CLASS_NAME = 'Test\Entity';
-    private const FIELD_NAME = 'testField';
-    private const MIME_TYPES = ['testType1', 'testType2'];
+    private const string CLASS_NAME = 'Test\Entity';
+    private const string FIELD_NAME = 'testField';
+    private const array MIME_TYPES = ['testType1', 'testType2'];
 
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
-
-    /** @var SetAllowedMimeTypesForImageFieldQuery */
-    private $updateAttachmentOptionQuery;
+    private LoggerInterface&MockObject $logger;
+    private Connection&MockObject $connection;
+    private SetAllowedMimeTypesForImageFieldQuery $updateAttachmentOptionQuery;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +33,7 @@ class SetAllowedMimeTypesForImageFieldQueryTest extends \PHPUnit\Framework\TestC
         );
     }
 
-    public function testExecuteWithoutRowResult()
+    public function testExecuteWithoutRowResult(): void
     {
         $this->connection->expects(self::once())
             ->method('fetchAssociative')
@@ -50,7 +47,7 @@ class SetAllowedMimeTypesForImageFieldQueryTest extends \PHPUnit\Framework\TestC
         $this->updateAttachmentOptionQuery->execute($this->logger);
     }
 
-    public function testExecuteWithMimeTypes()
+    public function testExecuteWithMimeTypes(): void
     {
         $this->connection->expects(self::once())
             ->method('fetchAssociative')
@@ -78,7 +75,7 @@ class SetAllowedMimeTypesForImageFieldQueryTest extends \PHPUnit\Framework\TestC
         $this->updateAttachmentOptionQuery->getDescription();
     }
 
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $this->connection->expects(self::once())
             ->method('fetchAssociative')
@@ -122,7 +119,7 @@ testType2'
         );
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $this->connection->expects(self::once())
             ->method('fetchAssociative')

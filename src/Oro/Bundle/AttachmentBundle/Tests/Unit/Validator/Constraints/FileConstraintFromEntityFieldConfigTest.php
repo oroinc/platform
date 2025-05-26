@@ -3,14 +3,14 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\AttachmentBundle\Validator\Constraints\FileConstraintFromEntityFieldConfig;
+use PHPUnit\Framework\TestCase;
 
-class FileConstraintFromEntityFieldConfigTest extends \PHPUnit\Framework\TestCase
+class FileConstraintFromEntityFieldConfigTest extends TestCase
 {
-    private const SAMPLE_CLASS = 'SampleClass';
-    private const SAMPLE_FIELD = 'sampleField';
+    private const string SAMPLE_CLASS = 'SampleClass';
+    private const string SAMPLE_FIELD = 'sampleField';
 
-    /** @var FileConstraintFromEntityFieldConfig */
-    private $constraint;
+    private FileConstraintFromEntityFieldConfig $constraint;
 
     #[\Override]
     protected function setUp(): void

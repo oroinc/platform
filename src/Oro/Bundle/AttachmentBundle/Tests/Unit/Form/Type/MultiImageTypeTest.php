@@ -6,9 +6,10 @@ use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
 use Oro\Bundle\AttachmentBundle\Form\Type\ImageType;
 use Oro\Bundle\AttachmentBundle\Form\Type\MultiFileType;
 use Oro\Bundle\AttachmentBundle\Form\Type\MultiImageType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class MultiImageTypeTest extends \PHPUnit\Framework\TestCase
+class MultiImageTypeTest extends TestCase
 {
     private MultiFileType|MultiImageType $type;
 

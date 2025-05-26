@@ -5,9 +5,10 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\DependencyInjection;
 use Oro\Bundle\AttachmentBundle\DependencyInjection\OroAttachmentExtension;
 use Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration;
 use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class OroAttachmentExtensionTest extends \PHPUnit\Framework\TestCase
+class OroAttachmentExtensionTest extends TestCase
 {
     public function testLoadParameters(): void
     {

@@ -6,13 +6,13 @@ use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Provider\ImageFileNamesProvider;
 use Oro\Bundle\AttachmentBundle\Provider\ResizedImagePathProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ImageFileNamesProviderTest extends \PHPUnit\Framework\TestCase
+class ImageFileNamesProviderTest extends TestCase
 {
-    private FilterConfiguration|\PHPUnit\Framework\MockObject\MockObject $filterConfiguration;
-
-    private ResizedImagePathProviderInterface|\PHPUnit\Framework\MockObject\MockObject $imagePathProvider;
-
+    private FilterConfiguration&MockObject $filterConfiguration;
+    private ResizedImagePathProviderInterface&MockObject $imagePathProvider;
     private ImageFileNamesProvider $fileNamesProvider;
 
     #[\Override]

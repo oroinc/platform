@@ -30,7 +30,7 @@ class FileExtensionTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    private const FILE_ID = 42;
+    private const int FILE_ID = 42;
 
     private AttachmentManager|MockObject $attachmentManager;
     private PictureSourcesProviderInterface|MockObject $pictureSourcesProvider;

@@ -4,6 +4,7 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\DependencyInjection\Imagine\Fac
 
 use Liip\ImagineBundle\DependencyInjection\Factory\Resolver\ResolverFactoryInterface;
 use Oro\Bundle\AttachmentBundle\DependencyInjection\Imagine\Factory\GaufretteResolverFactory;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
@@ -11,10 +12,9 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class GaufretteResolverFactoryTest extends \PHPUnit\Framework\TestCase
+class GaufretteResolverFactoryTest extends TestCase
 {
-    /** @var GaufretteResolverFactory */
-    private $factory;
+    private GaufretteResolverFactory $factory;
 
     #[\Override]
     protected function setUp(): void
@@ -24,9 +24,7 @@ class GaufretteResolverFactoryTest extends \PHPUnit\Framework\TestCase
 
     private function processConfigTree(TreeBuilder $treeBuilder, array $configs): array
     {
-        $processor = new Processor();
-
-        return $processor->process($treeBuilder->buildTree(), $configs);
+        return (new Processor())->process($treeBuilder->buildTree(), $configs);
     }
 
     public function testShouldImplementResolverFactoryInterface(): void

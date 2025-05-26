@@ -9,14 +9,14 @@ use Oro\Bundle\AttachmentBundle\Model\FileModel;
 use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class ImageFileRemovalProcessorTest extends \PHPUnit\Framework\TestCase
+class ImageFileRemovalProcessorTest extends TestCase
 {
-    private FileRemovalManagerInterface|\PHPUnit\Framework\MockObject\MockObject $imageRemovalManager;
-
-    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
-
+    private FileRemovalManagerInterface&MockObject $imageRemovalManager;
+    private LoggerInterface&MockObject $logger;
     private ImageFileRemovalProcessor $processor;
 
     #[\Override]

@@ -10,14 +10,13 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AttachmentAssociationHelperTest extends \PHPUnit\Framework\TestCase
+class AttachmentAssociationHelperTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var AttachmentAssociationHelper */
-    private $attachmentAssociationHelper;
+    private ConfigManager&MockObject $configManager;
+    private AttachmentAssociationHelper $attachmentAssociationHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +26,7 @@ class AttachmentAssociationHelperTest extends \PHPUnit\Framework\TestCase
         $this->attachmentAssociationHelper = new AttachmentAssociationHelper($this->configManager);
     }
 
-    public function testIsAttachmentAssociationEnabledForNotConfigurableEntity()
+    public function testIsAttachmentAssociationEnabledForNotConfigurableEntity(): void
     {
         $entityClass = 'Test\Entity';
 
@@ -43,7 +42,7 @@ class AttachmentAssociationHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsAttachmentAssociationEnabledForDisabledAssociation()
+    public function testIsAttachmentAssociationEnabledForDisabledAssociation(): void
     {
         $entityClass = 'Test\Entity';
 
@@ -63,7 +62,7 @@ class AttachmentAssociationHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsAttachmentAssociationEnabledForEnabledAssociation()
+    public function testIsAttachmentAssociationEnabledForEnabledAssociation(): void
     {
         $entityClass = 'Test\Entity';
 
@@ -97,7 +96,7 @@ class AttachmentAssociationHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsAttachmentAssociationEnabledForEnabledButNotAccessibleAssociation()
+    public function testIsAttachmentAssociationEnabledForEnabledButNotAccessibleAssociation(): void
     {
         $entityClass = 'Test\Entity';
 
@@ -131,7 +130,7 @@ class AttachmentAssociationHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsAttachmentAssociationEnabledForEnabledButNotAccessibleAssociationButWithAccessibleFalse()
+    public function testIsAttachmentAssocEnabledForEnabledButNotAccessibleAssociationButWithAccessibleFalse(): void
     {
         $entityClass = 'Test\Entity';
 

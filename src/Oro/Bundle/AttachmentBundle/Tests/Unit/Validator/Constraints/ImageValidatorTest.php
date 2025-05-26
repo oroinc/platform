@@ -6,13 +6,13 @@ use Oro\Bundle\AttachmentBundle\Tools\MimeTypesConverter;
 use Oro\Bundle\AttachmentBundle\Validator\Constraints\Image;
 use Oro\Bundle\AttachmentBundle\Validator\Constraints\ImageValidator;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class ImageValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var File|\PHPUnit\Framework\MockObject\MockObject */
-    private $image;
+    private File&MockObject $image;
 
     #[\Override]
     protected function setUp(): void

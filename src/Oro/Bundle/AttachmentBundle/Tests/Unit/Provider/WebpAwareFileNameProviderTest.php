@@ -7,13 +7,13 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Provider\FileNameProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\WebpAwareFileNameProvider;
 use Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WebpAwareFileNameProviderTest extends \PHPUnit\Framework\TestCase
+class WebpAwareFileNameProviderTest extends TestCase
 {
-    private FileNameProviderInterface|\PHPUnit\Framework\MockObject\MockObject $innerFileNameProvider;
-
-    private WebpConfiguration|\PHPUnit\Framework\MockObject\MockObject $webpConfiguration;
-
+    private FileNameProviderInterface&MockObject $innerFileNameProvider;
+    private WebpConfiguration&MockObject $webpConfiguration;
     private WebpAwareFileNameProvider $provider;
 
     #[\Override]
@@ -29,8 +29,7 @@ class WebpAwareFileNameProviderTest extends \PHPUnit\Framework\TestCase
             $filterConfiguration
         );
 
-        $filterConfiguration
-            ->expects(self::any())
+        $filterConfiguration->expects(self::any())
             ->method('get')
             ->willReturnMap([['jpeg_filter', ['format' => 'jpeg']], ['empty_filter', []]]);
     }
@@ -39,8 +38,7 @@ class WebpAwareFileNameProviderTest extends \PHPUnit\Framework\TestCase
     {
         $file = new File();
         $filename = 'file.pdf';
-        $this->innerFileNameProvider
-            ->expects(self::once())
+        $this->innerFileNameProvider->expects(self::once())
             ->method('getFileName')
             ->with($file)
             ->willReturn($filename);
@@ -50,16 +48,14 @@ class WebpAwareFileNameProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFilteredImageNameNotAddsWebpWhenNotEnabledForAll(): void
     {
-        $this->webpConfiguration
-            ->expects(self::once())
+        $this->webpConfiguration->expects(self::once())
             ->method('isEnabledForAll')
             ->willReturn(false);
 
         $file = new File();
         $filename = 'sample.jpg';
         $filterName = 'empty_filter';
-        $this->innerFileNameProvider
-            ->expects(self::once())
+        $this->innerFileNameProvider->expects(self::once())
             ->method('getFilteredImageName')
             ->with($file, $filterName, '')
             ->willReturn($filename);
@@ -69,16 +65,14 @@ class WebpAwareFileNameProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFilteredImageNameNotAddsWebpWhenFormatAndEnabledForAll(): void
     {
-        $this->webpConfiguration
-            ->expects(self::never())
+        $this->webpConfiguration->expects(self::never())
             ->method('isEnabledForAll');
 
         $file = new File();
         $filename = 'sample.jpg';
         $format = 'sample_format';
         $filterName = 'empty_filter';
-        $this->innerFileNameProvider
-            ->expects(self::once())
+        $this->innerFileNameProvider->expects(self::once())
             ->method('getFilteredImageName')
             ->with($file, $filterName, $format)
             ->willReturn($filename);
@@ -88,16 +82,14 @@ class WebpAwareFileNameProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFilteredImageNameNotAddsWebpWhenNoFormatAndEnabledForAllButFilterHasFormat(): void
     {
-        $this->webpConfiguration
-            ->expects(self::once())
+        $this->webpConfiguration->expects(self::once())
             ->method('isEnabledForAll')
             ->willReturn(true);
 
         $file = new File();
         $filename = 'sample.jpg';
         $filterName = 'jpeg_filter';
-        $this->innerFileNameProvider
-            ->expects(self::once())
+        $this->innerFileNameProvider->expects(self::once())
             ->method('getFilteredImageName')
             ->with($file, $filterName, '')
             ->willReturn($filename);
@@ -107,16 +99,14 @@ class WebpAwareFileNameProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFilteredImageNameAddsWebpWhenNoFormatAndEnabledForAll(): void
     {
-        $this->webpConfiguration
-            ->expects(self::once())
+        $this->webpConfiguration->expects(self::once())
             ->method('isEnabledForAll')
             ->willReturn(true);
 
         $file = new File();
         $filename = 'sample.jpg';
         $filterName = 'empty_filter';
-        $this->innerFileNameProvider
-            ->expects(self::once())
+        $this->innerFileNameProvider->expects(self::once())
             ->method('getFilteredImageName')
             ->with($file, $filterName, 'webp')
             ->willReturn($filename);

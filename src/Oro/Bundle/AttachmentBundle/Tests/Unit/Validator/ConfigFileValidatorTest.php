@@ -8,18 +8,18 @@ use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
 use Oro\Bundle\AttachmentBundle\Validator\Constraints\ExternalFileMimeType;
 use Oro\Bundle\AttachmentBundle\Validator\Constraints\ExternalFileUrl;
 use Oro\Bundle\AttachmentBundle\Validator\Constraints\FileFieldCompatibility;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Symfony\Component\Validator\Constraints\File as SymfonyFileConstraint;
 use Symfony\Component\Validator\Constraints\Sequentially;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class ConfigFileValidatorTest extends \PHPUnit\Framework\TestCase
+class ConfigFileValidatorTest extends TestCase
 {
-    private ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject $validator;
-
-    private FileConstraintsProvider|\PHPUnit\Framework\MockObject\MockObject $fileConstraintsProvider;
-
+    private ValidatorInterface&MockObject $validator;
+    private FileConstraintsProvider&MockObject $fileConstraintsProvider;
     private ConfigFileValidator $configValidator;
 
     #[\Override]
@@ -42,23 +42,21 @@ class ConfigFileValidatorTest extends \PHPUnit\Framework\TestCase
     public function testValidateWhenSymfonyFileAndNoFieldName(): void
     {
         $dataClass = \stdClass::class;
-        $this->fileConstraintsProvider
-            ->expects(self::once())
+        $mimeTypes = ['sample/type1'];
+        $this->fileConstraintsProvider->expects(self::once())
             ->method('getAllowedMimeTypesForEntity')
             ->with($dataClass)
-            ->willReturn($mimeTypes = ['sample/type1']);
+            ->willReturn($mimeTypes);
 
         $maxFileSize = 100;
-        $this->fileConstraintsProvider
-            ->expects(self::once())
+        $this->fileConstraintsProvider->expects(self::once())
             ->method('getMaxSizeForEntity')
             ->with($dataClass)
             ->willReturn($maxFileSize);
 
         $symfonyFile = $this->createMock(SymfonyFile::class);
         $constraintViolationList = $this->createMock(ConstraintViolationList::class);
-        $this->validator
-            ->expects(self::once())
+        $this->validator->expects(self::once())
             ->method('validate')
             ->with(
                 $symfonyFile,
@@ -84,22 +82,20 @@ class ConfigFileValidatorTest extends \PHPUnit\Framework\TestCase
     public function testValidateWhenExternalFileAndNoFieldName(): void
     {
         $dataClass = \stdClass::class;
-        $this->fileConstraintsProvider
-            ->expects(self::once())
+        $mimeTypes = ['sample/type1'];
+        $this->fileConstraintsProvider->expects(self::once())
             ->method('getAllowedMimeTypesForEntity')
             ->with($dataClass)
-            ->willReturn($mimeTypes = ['sample/type1']);
+            ->willReturn($mimeTypes);
 
         $regexp = '/sample-regexp/';
-        $this->fileConstraintsProvider
-            ->expects(self::any())
+        $this->fileConstraintsProvider->expects(self::any())
             ->method('getExternalFileAllowedUrlsRegExp')
             ->willReturn($regexp);
 
         $externalFile = new ExternalFile('');
         $constraintViolationList = $this->createMock(ConstraintViolationList::class);
-        $this->validator
-            ->expects(self::once())
+        $this->validator->expects(self::once())
             ->method('validate')
             ->with(
                 $externalFile,
@@ -125,23 +121,21 @@ class ConfigFileValidatorTest extends \PHPUnit\Framework\TestCase
     public function testValidateWhenSymfonyFileAndHasFieldName(): void
     {
         $dataClass = \stdClass::class;
-        $this->fileConstraintsProvider
-            ->expects(self::once())
+        $mimeTypes = ['sample/type1'];
+        $this->fileConstraintsProvider->expects(self::once())
             ->method('getAllowedMimeTypesForEntityField')
             ->with($dataClass, $fieldName = 'sampleField')
-            ->willReturn($mimeTypes = ['sample/type1']);
+            ->willReturn($mimeTypes);
 
         $maxFileSize = 100;
-        $this->fileConstraintsProvider
-            ->expects(self::once())
+        $this->fileConstraintsProvider->expects(self::once())
             ->method('getMaxSizeForEntityField')
             ->with($dataClass, $fieldName)
             ->willReturn($maxFileSize);
 
         $symfonyFile = $this->createMock(SymfonyFile::class);
         $constraintViolationList = $this->createMock(ConstraintViolationList::class);
-        $this->validator
-            ->expects(self::once())
+        $this->validator->expects(self::once())
             ->method('validate')
             ->with(
                 $symfonyFile,
@@ -171,22 +165,20 @@ class ConfigFileValidatorTest extends \PHPUnit\Framework\TestCase
     public function testValidateWhenExternalFileAndHasFieldName(): void
     {
         $dataClass = \stdClass::class;
-        $this->fileConstraintsProvider
-            ->expects(self::once())
+        $mimeTypes = ['sample/type1'];
+        $this->fileConstraintsProvider->expects(self::once())
             ->method('getAllowedMimeTypesForEntityField')
             ->with($dataClass, $fieldName = 'sampleField')
-            ->willReturn($mimeTypes = ['sample/type1']);
+            ->willReturn($mimeTypes);
 
         $regexp = '/sample-regexp/';
-        $this->fileConstraintsProvider
-            ->expects(self::any())
+        $this->fileConstraintsProvider->expects(self::any())
             ->method('getExternalFileAllowedUrlsRegExp')
             ->willReturn($regexp);
 
         $externalFile = new ExternalFile('');
         $constraintViolationList = $this->createMock(ConstraintViolationList::class);
-        $this->validator
-            ->expects(self::once())
+        $this->validator->expects(self::once())
             ->method('validate')
             ->with(
                 $externalFile,
@@ -224,8 +216,7 @@ class ConfigFileValidatorTest extends \PHPUnit\Framework\TestCase
         );
 
         $constraintViolationList = new ConstraintViolationList();
-        $this->validator
-            ->expects(self::once())
+        $this->validator->expects(self::once())
             ->method('validate')
             ->with($url, $constraint)
             ->willReturn($constraintViolationList);
@@ -243,8 +234,7 @@ class ConfigFileValidatorTest extends \PHPUnit\Framework\TestCase
             )
         );
 
-        $this->validator
-            ->expects(self::never())
+        $this->validator->expects(self::never())
             ->method('validate');
 
         $this->configValidator->validate(new \stdClass(), $dataClass);

@@ -5,11 +5,11 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\ImportExport\EventListener;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\ImportExport\EventListener\FileHeadersListener;
 use Oro\Bundle\ImportExportBundle\Event\LoadEntityRulesAndBackendHeadersEvent;
+use PHPUnit\Framework\TestCase;
 
-class FileHeadersListenerTest extends \PHPUnit\Framework\TestCase
+class FileHeadersListenerTest extends TestCase
 {
-    /** @var FileHeadersListener */
-    private $listener;
+    private FileHeadersListener $listener;
 
     #[\Override]
     protected function setUp(): void

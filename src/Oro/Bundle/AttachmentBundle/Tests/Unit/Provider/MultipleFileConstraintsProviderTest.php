@@ -5,17 +5,16 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Provider;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\MultipleFileConstraintsProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class MultipleFileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
+class MultipleFileConstraintsProviderTest extends TestCase
 {
-    /** @var AttachmentEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $attachmentEntityConfigProvider;
-
-    /** @var MultipleFileConstraintsProvider */
-    private $provider;
+    private AttachmentEntityConfigProviderInterface&MockObject $attachmentEntityConfigProvider;
+    private MultipleFileConstraintsProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -27,20 +26,20 @@ class MultipleFileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetMaxNumberOfFiles()
+    public function testGetMaxNumberOfFiles(): void
     {
         self::assertEquals(0, $this->provider->getMaxNumberOfFiles());
     }
 
-    public function testGetMaxNumberOfFilesForEntity()
+    public function testGetMaxNumberOfFilesForEntity(): void
     {
-        $this->attachmentEntityConfigProvider
+        $entityClass = \stdClass::class;
+        $entityFieldConfig = $this->createMock(ConfigInterface::class);
+        $this->attachmentEntityConfigProvider->expects(self::once())
             ->method('getEntityConfig')
-            ->with($entityClass = \stdClass::class)
-            ->willReturn($entityFieldConfig = $this->createMock(ConfigInterface::class));
-
-        $entityFieldConfig
-            ->expects(self::once())
+            ->with($entityClass)
+            ->willReturn($entityFieldConfig);
+        $entityFieldConfig->expects(self::once())
             ->method('get')
             ->with('max_number_of_files')
             ->willReturn(10);
@@ -53,13 +52,14 @@ class MultipleFileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetMaxSizeForEntityField(): void
     {
-        $this->attachmentEntityConfigProvider
+        $entityClass = \stdClass::class;
+        $fieldName = 'sampleField';
+        $entityFieldConfig = $this->createMock(ConfigInterface::class);
+        $this->attachmentEntityConfigProvider->expects(self::once())
             ->method('getFieldConfig')
-            ->with($entityClass = \stdClass::class, $fieldName = 'sampleField')
-            ->willReturn($entityFieldConfig = $this->createMock(ConfigInterface::class));
-
-        $entityFieldConfig
-            ->expects(self::once())
+            ->with($entityClass, $fieldName)
+            ->willReturn($entityFieldConfig);
+        $entityFieldConfig->expects(self::once())
             ->method('get')
             ->with('max_number_of_files')
             ->willReturn(10);

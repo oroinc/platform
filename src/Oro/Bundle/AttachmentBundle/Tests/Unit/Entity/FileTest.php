@@ -6,9 +6,10 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 
-class FileTest extends \PHPUnit\Framework\TestCase
+class FileTest extends TestCase
 {
     use EntityTestCaseTrait;
 

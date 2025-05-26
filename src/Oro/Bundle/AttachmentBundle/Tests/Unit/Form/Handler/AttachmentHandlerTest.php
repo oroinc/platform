@@ -5,26 +5,19 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Form\Handler;
 use Doctrine\Persistence\ObjectManager;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Form\Handler\AttachmentHandler;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class AttachmentHandlerTest extends \PHPUnit\Framework\TestCase
+class AttachmentHandlerTest extends TestCase
 {
-    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $form;
-
-    /** @var Request */
-    private $request;
-
-    /** @var ObjectManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $om;
-
-    /** @var Attachment */
-    private $attachment;
-
-    /** @var AttachmentHandler */
-    private $handler;
+    private FormInterface&MockObject $form;
+    private Request $request;
+    private ObjectManager&MockObject $om;
+    private Attachment $attachment;
+    private AttachmentHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -39,7 +32,7 @@ class AttachmentHandlerTest extends \PHPUnit\Framework\TestCase
         $this->handler = new AttachmentHandler($requestStack, $this->om);
     }
 
-    public function testNotValidForm()
+    public function testNotValidForm(): void
     {
         $this->request->setMethod('POST');
 
@@ -59,7 +52,7 @@ class AttachmentHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->handler->process($this->form));
     }
 
-    public function testBadRequest()
+    public function testBadRequest(): void
     {
         $this->request->setMethod('GET');
 
@@ -73,7 +66,7 @@ class AttachmentHandlerTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($this->handler->process($this->form));
     }
 
-    public function testGoodRequest()
+    public function testGoodRequest(): void
     {
         $this->request->setMethod('POST');
 

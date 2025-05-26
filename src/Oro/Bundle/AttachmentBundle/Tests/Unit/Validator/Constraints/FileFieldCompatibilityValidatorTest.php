@@ -10,6 +10,7 @@ use Oro\Bundle\EntityBundle\Helper\FieldHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
@@ -17,14 +18,12 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class FileFieldCompatibilityValidatorTest extends ConstraintValidatorTestCase
 {
-    private const ENTITY_CLASS = \stdClass::class;
-    private const FIELD_NAME = 'sampleField';
-    private const SAMPLE_FIELD_LABEL = 'Sample Field Label';
+    private const string ENTITY_CLASS = \stdClass::class;
+    private const string FIELD_NAME = 'sampleField';
+    private const string SAMPLE_FIELD_LABEL = 'Sample Field Label';
 
-    private AttachmentEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject
-        $attachmentEntityConfigProvider;
-
-    private FieldHelper|\PHPUnit\Framework\MockObject\MockObject $fieldHelper;
+    private AttachmentEntityConfigProviderInterface&MockObject $attachmentEntityConfigProvider;
+    private FieldHelper&MockObject $fieldHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -32,8 +31,7 @@ class FileFieldCompatibilityValidatorTest extends ConstraintValidatorTestCase
         $this->attachmentEntityConfigProvider = $this->createMock(AttachmentEntityConfigProviderInterface::class);
 
         $this->fieldHelper = $this->createMock(FieldHelper::class);
-        $this->fieldHelper
-            ->expects(self::any())
+        $this->fieldHelper->expects(self::any())
             ->method('getRelations')
             ->with(self::ENTITY_CLASS)
             ->willReturn([self::FIELD_NAME => ['label' => self::SAMPLE_FIELD_LABEL]]);
@@ -65,8 +63,7 @@ class FileFieldCompatibilityValidatorTest extends ConstraintValidatorTestCase
             ['entityClass' => self::ENTITY_CLASS, 'fieldName' => self::FIELD_NAME]
         );
 
-        $this->attachmentEntityConfigProvider
-            ->expects(self::once())
+        $this->attachmentEntityConfigProvider->expects(self::once())
             ->method('getFieldConfig')
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->willReturn(null);
@@ -83,8 +80,7 @@ class FileFieldCompatibilityValidatorTest extends ConstraintValidatorTestCase
             ['entityClass' => self::ENTITY_CLASS, 'fieldName' => self::FIELD_NAME]
         );
 
-        $this->attachmentEntityConfigProvider
-            ->expects(self::once())
+        $this->attachmentEntityConfigProvider->expects(self::once())
             ->method('getFieldConfig')
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->willReturn(null);
@@ -105,8 +101,7 @@ class FileFieldCompatibilityValidatorTest extends ConstraintValidatorTestCase
             ['entityClass' => self::ENTITY_CLASS, 'fieldName' => self::FIELD_NAME]
         );
 
-        $this->attachmentEntityConfigProvider
-            ->expects(self::once())
+        $this->attachmentEntityConfigProvider->expects(self::once())
             ->method('getFieldConfig')
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->willReturn($this->createMock(ConfigInterface::class));
@@ -126,8 +121,7 @@ class FileFieldCompatibilityValidatorTest extends ConstraintValidatorTestCase
         );
 
         $fieldConfig = new Config($this->createMock(ConfigIdInterface::class), ['is_stored_externally' => true]);
-        $this->attachmentEntityConfigProvider
-            ->expects(self::once())
+        $this->attachmentEntityConfigProvider->expects(self::once())
             ->method('getFieldConfig')
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->willReturn($fieldConfig);
@@ -149,8 +143,7 @@ class FileFieldCompatibilityValidatorTest extends ConstraintValidatorTestCase
         );
 
         $fieldConfig = new Config($this->createMock(ConfigIdInterface::class), ['is_stored_externally' => false]);
-        $this->attachmentEntityConfigProvider
-            ->expects(self::any())
+        $this->attachmentEntityConfigProvider->expects(self::any())
             ->method('getFieldConfig')
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->willReturn($fieldConfig);
@@ -172,8 +165,7 @@ class FileFieldCompatibilityValidatorTest extends ConstraintValidatorTestCase
         );
 
         $fieldConfig = new Config($this->createMock(ConfigIdInterface::class), ['is_stored_externally' => false]);
-        $this->attachmentEntityConfigProvider
-            ->expects(self::once())
+        $this->attachmentEntityConfigProvider->expects(self::once())
             ->method('getFieldConfig')
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->willReturn($fieldConfig);
@@ -191,8 +183,7 @@ class FileFieldCompatibilityValidatorTest extends ConstraintValidatorTestCase
         );
 
         $fieldConfig = new Config($this->createMock(ConfigIdInterface::class), ['is_stored_externally' => true]);
-        $this->attachmentEntityConfigProvider
-            ->expects(self::once())
+        $this->attachmentEntityConfigProvider->expects(self::once())
             ->method('getFieldConfig')
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->willReturn($fieldConfig);

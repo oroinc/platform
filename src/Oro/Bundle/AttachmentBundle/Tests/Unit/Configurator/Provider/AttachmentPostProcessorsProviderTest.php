@@ -7,17 +7,14 @@ use Oro\Bundle\AttachmentBundle\Configurator\Provider\AttachmentPostProcessorsPr
 use Oro\Bundle\AttachmentBundle\DependencyInjection\Configuration;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AttachmentPostProcessorsProviderTest extends \PHPUnit\Framework\TestCase
+class AttachmentPostProcessorsProviderTest extends TestCase
 {
-    /** @var AttachmentPostProcessorsProvider */
-    private $attachmentPostProcessorsProvider;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
+    private AttachmentPostProcessorsProvider $attachmentPostProcessorsProvider;
+    private ConfigManager&MockObject $configManager;
+    private FeatureChecker&MockObject $featureChecker;
 
     #[\Override]
     protected function setUp(): void

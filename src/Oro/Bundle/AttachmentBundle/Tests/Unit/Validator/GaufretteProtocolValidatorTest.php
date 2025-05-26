@@ -4,11 +4,12 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Validator;
 
 use Oro\Bundle\AttachmentBundle\Validator\GaufretteProtocolValidator;
 use Oro\Bundle\AttachmentBundle\Validator\ProtocolValidatorInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class GaufretteProtocolValidatorTest extends \PHPUnit\Framework\TestCase
+class GaufretteProtocolValidatorTest extends TestCase
 {
-    /** @var ProtocolValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $innerValidator;
+    private ProtocolValidatorInterface&MockObject $innerValidator;
 
     #[\Override]
     protected function setUp(): void
@@ -16,7 +17,7 @@ class GaufretteProtocolValidatorTest extends \PHPUnit\Framework\TestCase
         $this->innerValidator = $this->createMock(ProtocolValidatorInterface::class);
     }
 
-    public function testIsSupportedProtocolForGaufretteProtocol()
+    public function testIsSupportedProtocolForGaufretteProtocol(): void
     {
         $protocol = 'gaufrette';
         $readonlyProtocol = 'gaufrette-readonly';
@@ -34,7 +35,7 @@ class GaufretteProtocolValidatorTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($validator->isSupportedProtocol($readonlyProtocol));
     }
 
-    public function testIsSupportedProtocolForGaufretteProtocolWhenItIsNotConfigured()
+    public function testIsSupportedProtocolForGaufretteProtocolWhenItIsNotConfigured(): void
     {
         $protocol = 'gaufrette';
 
@@ -47,7 +48,7 @@ class GaufretteProtocolValidatorTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($validator->isSupportedProtocol($protocol));
     }
 
-    public function testIsSupportedProtocolForProtocolSupportedByInnerValidator()
+    public function testIsSupportedProtocolForProtocolSupportedByInnerValidator(): void
     {
         $protocol = 'http';
 
@@ -60,7 +61,7 @@ class GaufretteProtocolValidatorTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($validator->isSupportedProtocol($protocol));
     }
 
-    public function testIsSupportedProtocolForProtocolNotSupportedByInnerValidator()
+    public function testIsSupportedProtocolForProtocolNotSupportedByInnerValidator(): void
     {
         $protocol = 'http';
 

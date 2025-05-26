@@ -7,19 +7,19 @@ use Oro\Bundle\AttachmentBundle\Form\DataTransformer\ExternalFileTransformer;
 use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
 use Oro\Bundle\AttachmentBundle\Tools\ExternalFileFactory;
 use Oro\Bundle\AttachmentBundle\Validator\ConfigFileValidator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 
-class ExternalFileTransformerTest extends \PHPUnit\Framework\TestCase
+class ExternalFileTransformerTest extends TestCase
 {
-    private const URL = 'http://example.org/image.png';
+    private const string URL = 'http://example.org/image.png';
 
-    private ConfigFileValidator|\PHPUnit\Framework\MockObject\MockObject $configFileValidator;
-
-    private ExternalFileFactory|\PHPUnit\Framework\MockObject\MockObject $externalFileFactory;
-
+    private ConfigFileValidator&MockObject $configFileValidator;
+    private ExternalFileFactory&MockObject $externalFileFactory;
     private ExternalFileTransformer $transformer;
 
     #[\Override]
@@ -58,15 +58,13 @@ class ExternalFileTransformerTest extends \PHPUnit\Framework\TestCase
 
     public function testReverseTransformReturnsExternalFileWhenNoViolations(): void
     {
-        $this->configFileValidator
-            ->expects(self::once())
+        $this->configFileValidator->expects(self::once())
             ->method('validateExternalFileUrl')
             ->with(self::URL)
             ->willReturn(new ConstraintViolationList());
 
         $externalFile = new ExternalFile(self::URL, 'image.png');
-        $this->externalFileFactory
-            ->expects(self::once())
+        $this->externalFileFactory->expects(self::once())
             ->method('createFromUrl')
             ->willReturn($externalFile);
 
@@ -83,14 +81,12 @@ class ExternalFileTransformerTest extends \PHPUnit\Framework\TestCase
             null,
             self::URL
         );
-        $this->configFileValidator
-            ->expects(self::once())
+        $this->configFileValidator->expects(self::once())
             ->method('validateExternalFileUrl')
             ->with(self::URL)
             ->willReturn(new ConstraintViolationList([$violation]));
 
-        $this->externalFileFactory
-            ->expects(self::never())
+        $this->externalFileFactory->expects(self::never())
             ->method('createFromUrl');
 
         $this->expectExceptionObject(
@@ -108,8 +104,7 @@ class ExternalFileTransformerTest extends \PHPUnit\Framework\TestCase
 
     public function testReverseTransformThrowsExceptionWhenExternalFileNotAccessible(): void
     {
-        $this->configFileValidator
-            ->expects(self::once())
+        $this->configFileValidator->expects(self::once())
             ->method('validateExternalFileUrl')
             ->with(self::URL)
             ->willReturn(new ConstraintViolationList());
@@ -120,8 +115,7 @@ class ExternalFileTransformerTest extends \PHPUnit\Framework\TestCase
             new \RuntimeException('sample error'),
             $this->createMock(ResponseInterface::class)
         );
-        $this->externalFileFactory
-            ->expects(self::once())
+        $this->externalFileFactory->expects(self::once())
             ->method('createFromUrl')
             ->with(self::URL)
             ->willThrowException($exception);
@@ -141,15 +135,13 @@ class ExternalFileTransformerTest extends \PHPUnit\Framework\TestCase
 
     public function testReverseTransformReturnsExternalFile(): void
     {
-        $this->configFileValidator
-            ->expects(self::once())
+        $this->configFileValidator->expects(self::once())
             ->method('validateExternalFileUrl')
             ->with(self::URL)
             ->willReturn(new ConstraintViolationList());
 
         $externalFile = new ExternalFile(self::URL, 'image.png');
-        $this->externalFileFactory
-            ->expects(self::once())
+        $this->externalFileFactory->expects(self::once())
             ->method('createFromUrl')
             ->with(self::URL)
             ->willReturn($externalFile);

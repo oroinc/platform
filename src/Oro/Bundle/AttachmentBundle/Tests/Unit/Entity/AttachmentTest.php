@@ -6,11 +6,11 @@ use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestUser;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use PHPUnit\Framework\TestCase;
 
-class AttachmentTest extends \PHPUnit\Framework\TestCase
+class AttachmentTest extends TestCase
 {
-    /** @var Attachment */
-    private $entity;
+    private Attachment $entity;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
         $this->entity = new Attachment();
     }
 
-    public function testComment()
+    public function testComment(): void
     {
         $this->assertNull($this->entity->getComment());
         $comment = 'test comment';
@@ -26,7 +26,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($comment, $this->entity->getComment());
     }
 
-    public function testCreatedAt()
+    public function testCreatedAt(): void
     {
         $this->assertNull($this->entity->getCreatedAt());
         $date = new \DateTime('now');
@@ -34,7 +34,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($date, $this->entity->getCreatedAt());
     }
 
-    public function testUpdatedAt()
+    public function testUpdatedAt(): void
     {
         $this->assertNull($this->entity->getUpdatedAt());
         $date = new \DateTime('now');
@@ -42,7 +42,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($date, $this->entity->getUpdatedAt());
     }
 
-    public function testFile()
+    public function testFile(): void
     {
         $this->assertNull($this->entity->getFile());
         $file = new File();
@@ -50,7 +50,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($file, $this->entity->getFile());
     }
 
-    public function testOwner()
+    public function testOwner(): void
     {
         $this->assertNull($this->entity->getOwner());
         $owner = new TestUser();
@@ -58,7 +58,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($owner, $this->entity->getOwner());
     }
 
-    public function testOrganization()
+    public function testOrganization(): void
     {
         $this->assertNull($this->entity->getOrganization());
         $organization = new Organization();
@@ -66,7 +66,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($organization, $this->entity->getOrganization());
     }
 
-    public function testPrePersists()
+    public function testPrePersists(): void
     {
         $testDate = new \DateTime('now', new \DateTimeZone('UTC'));
 
@@ -77,7 +77,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($testDate->format('Y-m-d'), $this->entity->getUpdatedAt()->format('Y-m-d'));
     }
 
-    public function testGetOwnerId()
+    public function testGetOwnerId(): void
     {
         $this->assertNull($this->entity->getId());
         $testOwner = new TestUser();
@@ -86,7 +86,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(1, $this->entity->getOwnerId());
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $this->assertEquals('', $this->entity->__toString());
 

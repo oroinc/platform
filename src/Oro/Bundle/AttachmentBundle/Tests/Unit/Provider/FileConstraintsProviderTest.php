@@ -9,20 +9,17 @@ use Oro\Bundle\AttachmentBundle\Provider\FileConstraintsProvider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager as SystemConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
+class FileConstraintsProviderTest extends TestCase
 {
-    /** @var SystemConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $systemConfigManager;
-
-    /** @var AttachmentEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $attachmentEntityConfigProvider;
-
-    /** @var FileConstraintsProvider */
-    private $provider;
+    private SystemConfigManager&MockObject $systemConfigManager;
+    private AttachmentEntityConfigProviderInterface&MockObject $attachmentEntityConfigProvider;
+    private FileConstraintsProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -142,9 +139,11 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAllowedMimeTypesForEntityWhenNoFieldConfig(): void
     {
+        $entityClass = \stdClass::class;
+
         $this->attachmentEntityConfigProvider->expects($this->any())
             ->method('getEntityConfig')
-            ->with($entityClass = \stdClass::class)
+            ->with($entityClass)
             ->willReturn(null);
 
         $this->systemConfigManager->expects($this->exactly(2))
@@ -162,11 +161,13 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAllowedMimeTypesForEntityWhenNoMimeTypes(): void
     {
+        $entityClass = \stdClass::class;
+
+        $entityConfig = $this->createMock(ConfigInterface::class);
         $this->attachmentEntityConfigProvider->expects($this->any())
             ->method('getEntityConfig')
-            ->with($entityClass = \stdClass::class)
-            ->willReturn($entityConfig = $this->createMock(ConfigInterface::class));
-
+            ->with($entityClass)
+            ->willReturn($entityConfig);
         $entityConfig->expects($this->once())
             ->method('get')
             ->with('mimetypes')
@@ -187,11 +188,13 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAllowedMimeTypesForEntity(): void
     {
+        $entityClass = \stdClass::class;
+
+        $entityConfig = $this->createMock(ConfigInterface::class);
         $this->attachmentEntityConfigProvider->expects($this->any())
             ->method('getEntityConfig')
-            ->with($entityClass = \stdClass::class)
-            ->willReturn($entityConfig = $this->createMock(ConfigInterface::class));
-
+            ->with($entityClass)
+            ->willReturn($entityConfig);
         $entityConfig->expects($this->once())
             ->method('get')
             ->with('mimetypes')
@@ -208,9 +211,12 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAllowedMimeTypesForEntityFieldWhenNoFieldConfig(): void
     {
+        $entityClass = \stdClass::class;
+        $fieldName = 'sampleField';
+
         $this->attachmentEntityConfigProvider->expects($this->once())
             ->method('getFieldConfig')
-            ->with($entityClass = \stdClass::class, $fieldName = 'sampleField')
+            ->with($entityClass, $fieldName)
             ->willReturn(null);
 
         $this->systemConfigManager->expects($this->once())
@@ -231,20 +237,22 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
         string $inputType,
         array $expectedResult
     ): void {
+        $entityClass = \stdClass::class;
+        $fieldName = 'sampleField';
+
+        $entityFieldConfig = $this->createMock(ConfigInterface::class);
+        $fieldConfigId = $this->createMock(FieldConfigId::class);
         $this->attachmentEntityConfigProvider->expects($this->once())
             ->method('getFieldConfig')
-            ->with($entityClass = \stdClass::class, $fieldName = 'sampleField')
-            ->willReturn($entityFieldConfig = $this->createMock(ConfigInterface::class));
-
+            ->with($entityClass, $fieldName)
+            ->willReturn($entityFieldConfig);
         $entityFieldConfig->expects($this->once())
             ->method('get')
             ->with('mimetypes')
             ->willReturn('');
-
         $entityFieldConfig->expects($this->once())
             ->method('getId')
-            ->willReturn($fieldConfigId = $this->createMock(FieldConfigId::class));
-
+            ->willReturn($fieldConfigId);
         $fieldConfigId->expects($this->once())
             ->method('getFieldType')
             ->willReturn($inputType);
@@ -282,20 +290,22 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAllowedMimeTypesForEntityFieldWhenNotImageAndNoMimeTypes(): void
     {
+        $entityClass = \stdClass::class;
+        $fieldName = 'sampleField';
+
+        $entityFieldConfig = $this->createMock(ConfigInterface::class);
+        $fieldConfigId = $this->createMock(FieldConfigId::class);
         $this->attachmentEntityConfigProvider->expects($this->once())
             ->method('getFieldConfig')
-            ->with($entityClass = \stdClass::class, $fieldName = 'sampleField')
-            ->willReturn($entityFieldConfig = $this->createMock(ConfigInterface::class));
-
+            ->with($entityClass, $fieldName)
+            ->willReturn($entityFieldConfig);
         $entityFieldConfig->expects($this->once())
             ->method('get')
             ->with('mimetypes')
             ->willReturn('');
-
         $entityFieldConfig->expects($this->once())
             ->method('getId')
-            ->willReturn($fieldConfigId = $this->createMock(FieldConfigId::class));
-
+            ->willReturn($fieldConfigId);
         $fieldConfigId->expects($this->once())
             ->method('getFieldType')
             ->willReturn('another_type');
@@ -313,16 +323,18 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetAllowedMimeTypesForEntityField(): void
     {
+        $entityClass = \stdClass::class;
+        $fieldName = 'sampleField';
+
+        $entityFieldConfig = $this->createMock(ConfigInterface::class);
         $this->attachmentEntityConfigProvider->expects($this->once())
             ->method('getFieldConfig')
-            ->with($entityClass = \stdClass::class, $fieldName = 'sampleField')
-            ->willReturn($entityFieldConfig = $this->createMock(ConfigInterface::class));
-
+            ->with($entityClass, $fieldName)
+            ->willReturn($entityFieldConfig);
         $entityFieldConfig->expects($this->once())
             ->method('get')
             ->with('mimetypes')
             ->willReturn('sample/type1,sample/type2');
-
         $entityFieldConfig->expects($this->never())
             ->method('getId');
 
@@ -358,9 +370,11 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetMaxSizeForEntityWhenNoEntityConfig(): void
     {
+        $entityClass = \stdClass::class;
+
         $this->attachmentEntityConfigProvider->expects($this->any())
             ->method('getEntityConfig')
-            ->with($entityClass = \stdClass::class)
+            ->with($entityClass)
             ->willReturn(null);
 
         $this->systemConfigManager->expects($this->once())
@@ -376,11 +390,13 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetMaxSizeForEntityWhenNoMaxSize(): void
     {
+        $entityClass = \stdClass::class;
+
+        $entityConfig = $this->createMock(ConfigInterface::class);
         $this->attachmentEntityConfigProvider->expects($this->any())
             ->method('getEntityConfig')
-            ->with($entityClass = \stdClass::class)
-            ->willReturn($entityConfig = $this->createMock(ConfigInterface::class));
-
+            ->with($entityClass)
+            ->willReturn($entityConfig);
         $entityConfig->expects($this->once())
             ->method('get')
             ->with('maxsize')
@@ -399,11 +415,13 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetMaxSizeForEntity(): void
     {
+        $entityClass = \stdClass::class;
+
+        $entityConfig = $this->createMock(ConfigInterface::class);
         $this->attachmentEntityConfigProvider->expects($this->any())
             ->method('getEntityConfig')
-            ->with($entityClass = \stdClass::class)
-            ->willReturn($entityConfig = $this->createMock(ConfigInterface::class));
-
+            ->with($entityClass)
+            ->willReturn($entityConfig);
         $entityConfig->expects($this->once())
             ->method('get')
             ->with('maxsize')
@@ -420,9 +438,12 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetMaxSizeForEntityFieldWhenNoFieldConfig(): void
     {
+        $entityClass = \stdClass::class;
+        $fieldName = 'sampleField';
+
         $this->attachmentEntityConfigProvider->expects($this->any())
             ->method('getFieldConfig')
-            ->with($entityClass = \stdClass::class, $fieldName = 'sampleField')
+            ->with($entityClass, $fieldName)
             ->willReturn(null);
 
         $this->systemConfigManager->expects($this->once())
@@ -438,11 +459,14 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetMaxSizeForEntityFieldWhenNoMaxSize(): void
     {
+        $entityClass = \stdClass::class;
+        $fieldName = 'sampleField';
+
+        $entityFieldConfig = $this->createMock(ConfigInterface::class);
         $this->attachmentEntityConfigProvider->expects($this->any())
             ->method('getFieldConfig')
-            ->with($entityClass = \stdClass::class, $fieldName = 'sampleField')
-            ->willReturn($entityFieldConfig = $this->createMock(ConfigInterface::class));
-
+            ->with($entityClass, $fieldName)
+            ->willReturn($entityFieldConfig);
         $entityFieldConfig->expects($this->once())
             ->method('get')
             ->with('maxsize')
@@ -461,11 +485,14 @@ class FileConstraintsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetMaxSizeForEntityField(): void
     {
+        $entityClass = \stdClass::class;
+        $fieldName = 'sampleField';
+
+        $entityFieldConfig = $this->createMock(ConfigInterface::class);
         $this->attachmentEntityConfigProvider->expects($this->any())
             ->method('getFieldConfig')
-            ->with($entityClass = \stdClass::class, $fieldName = 'sampleField')
-            ->willReturn($entityFieldConfig = $this->createMock(ConfigInterface::class));
-
+            ->with($entityClass, $fieldName)
+            ->willReturn($entityFieldConfig);
         $entityFieldConfig->expects($this->once())
             ->method('get')
             ->with('maxsize')

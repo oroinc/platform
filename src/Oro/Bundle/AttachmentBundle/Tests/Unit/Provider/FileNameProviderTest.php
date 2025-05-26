@@ -6,11 +6,12 @@ use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Provider\FileNameProvider;
 use Oro\Bundle\AttachmentBundle\Tools\FilenameExtensionHelper;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class FileNameProviderTest extends \PHPUnit\Framework\TestCase
+class FileNameProviderTest extends TestCase
 {
     private FileNameProvider $fileNameProvider;
 
@@ -18,8 +19,7 @@ class FileNameProviderTest extends \PHPUnit\Framework\TestCase
     protected function setUp(): void
     {
         $filterConfiguration = $this->createMock(FilterConfiguration::class);
-        $filterConfiguration
-            ->expects(self::any())
+        $filterConfiguration->expects(self::any())
             ->method('get')
             ->willReturnMap([['png_filter', ['format' => 'png']], ['empty_filter', []]]);
         $filenameExtensionHelper = new FilenameExtensionHelper(['image/svg']);

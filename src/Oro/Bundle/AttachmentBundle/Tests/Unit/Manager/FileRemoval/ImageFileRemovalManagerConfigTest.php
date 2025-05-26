@@ -4,10 +4,11 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Manager\FileRemoval;
 
 use Oro\Bundle\AttachmentBundle\Manager\FileRemoval\DirectoryExtractor;
 use Oro\Bundle\AttachmentBundle\Manager\FileRemoval\ImageFileRemovalManagerConfig;
+use PHPUnit\Framework\TestCase;
 
-class ImageFileRemovalManagerConfigTest extends \PHPUnit\Framework\TestCase
+class ImageFileRemovalManagerConfigTest extends TestCase
 {
-    public function testGetConfiguration()
+    public function testGetConfiguration(): void
     {
         $configuration = new ImageFileRemovalManagerConfig();
         self::assertEquals(

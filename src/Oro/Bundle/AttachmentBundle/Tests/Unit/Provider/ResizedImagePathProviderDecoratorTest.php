@@ -5,10 +5,12 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Provider;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Provider\ResizedImagePathProviderDecorator;
 use Oro\Bundle\AttachmentBundle\Provider\ResizedImagePathProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ResizedImagePathProviderDecoratorTest extends \PHPUnit\Framework\TestCase
+class ResizedImagePathProviderDecoratorTest extends TestCase
 {
-    private ResizedImagePathProviderInterface|\PHPUnit\Framework\MockObject\MockObject $innerResizedImagePathProvider;
+    private ResizedImagePathProviderInterface&MockObject $innerResizedImagePathProvider;
 
     #[\Override]
     protected function setUp(): void

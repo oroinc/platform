@@ -5,8 +5,9 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Tools;
 use Oro\Bundle\AttachmentBundle\DependencyInjection\Configuration;
 use Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use PHPUnit\Framework\TestCase;
 
-class WebpConfigurationTest extends \PHPUnit\Framework\TestCase
+class WebpConfigurationTest extends TestCase
 {
     /**
      * @dataProvider getIsEnabledIfSupportedDataProvider
@@ -119,8 +120,7 @@ class WebpConfigurationTest extends \PHPUnit\Framework\TestCase
     public function testGetWebpQuality(string|int|float|null $quality, int $expected): void
     {
         $configManager = $this->createMock(ConfigManager::class);
-        $configManager
-            ->expects(self::once())
+        $configManager->expects(self::once())
             ->method('get')
             ->with('oro_attachment.webp_quality')
             ->willReturn($quality);
