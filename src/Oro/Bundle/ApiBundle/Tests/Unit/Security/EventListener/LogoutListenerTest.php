@@ -4,22 +4,19 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Security\EventListener;
 
 use Oro\Bundle\ApiBundle\ApiDoc\RestDocUrlGeneratorInterface;
 use Oro\Bundle\ApiBundle\Security\EventListener\LogoutListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
 use Symfony\Component\Security\Http\HttpUtils;
 
-class LogoutListenerTest extends \PHPUnit\Framework\TestCase
+class LogoutListenerTest extends TestCase
 {
-    /** @var HttpUtils|\PHPUnit\Framework\MockObject\MockObject */
-    private $httpUtils;
-
-    /** @var RestDocUrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $restDocUrlGenerator;
-
-    /** @var LogoutListener */
-    private $listener;
+    private HttpUtils&MockObject $httpUtils;
+    private RestDocUrlGeneratorInterface&MockObject $restDocUrlGenerator;
+    private LogoutListener $listener;
 
     #[\Override]
     protected function setUp(): void

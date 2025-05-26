@@ -6,6 +6,8 @@ use Oro\Bundle\ApiBundle\Security\Http\Firewall\ContextListener;
 use Oro\Bundle\SecurityBundle\Authentication\Token\AnonymousToken;
 use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
 use Oro\Bundle\SecurityBundle\Request\CsrfProtectedRequestHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -17,20 +19,17 @@ use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Firewall\ContextListener as BaseContextListener;
 
-class ContextListenerTest extends \PHPUnit\Framework\TestCase
+class ContextListenerTest extends TestCase
 {
-    private const SESSION_NAME = 'TEST_SESSION_ID';
-    private const SESSION_ID = 'o595fqdg5214u4e4nfcs3uc923';
+    private const string SESSION_NAME = 'TEST_SESSION_ID';
+    private const string SESSION_ID = 'o595fqdg5214u4e4nfcs3uc923';
 
-    /** @var BaseContextListener|\PHPUnit\Framework\MockObject\MockObject */
-    private $innerListener;
+    private BaseContextListener&MockObject $innerListener;
 
     #[\Override]
     protected function setUp(): void
     {
-        $this->innerListener = $this->getMockBuilder(\stdClass::class)
-            ->addMethods(['__invoke'])
-            ->getMock();
+        $this->innerListener = $this->createMock(BaseContextListener::class);
     }
 
     private function getListener(
@@ -51,7 +50,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         return $listener;
     }
 
-    private function createMainRequestEvent($isXmlHttpRequest = true): RequestEvent
+    private function createMainRequestEvent(bool $isXmlHttpRequest = true): RequestEvent
     {
         $kernel = $this->createMock(HttpKernelInterface::class);
         $request = new Request([], [], ['_route' => 'foo']);
@@ -85,7 +84,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getToken')
             ->willReturn(null);
         $this->innerListener->expects(self::once())
-            ->method('__invoke')
+            ->method('authenticate')
             ->with($event);
         $csrfRequestManager->expects(self::once())
             ->method('isRequestTokenValid')
@@ -114,7 +113,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getToken')
             ->willReturn(new UsernamePasswordToken($this->createMock(UserInterface::class), 'test'));
         $this->innerListener->expects(self::never())
-            ->method('__invoke');
+            ->method('authenticate');
 
         $listener = $this->getListener($this->innerListener, $tokenStorage, $csrfRequestManager);
         $listener($event);
@@ -139,7 +138,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getToken')
             ->willReturn(null);
         $this->innerListener->expects(self::never())
-            ->method('__invoke');
+            ->method('authenticate');
 
         $listener = $this->getListener($this->innerListener, $tokenStorage, $csrfRequestManager);
         $listener($event);
@@ -163,7 +162,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getToken')
             ->willReturn(null);
         $this->innerListener->expects(self::never())
-            ->method('__invoke');
+            ->method('authenticate');
 
         $listener = $this->getListener($this->innerListener, $tokenStorage, $csrfRequestManager);
         $listener($event);
@@ -193,7 +192,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         $tokenStorage->setToken($anonymousToken);
 
         $this->innerListener->expects(self::once())
-            ->method('__invoke')
+            ->method('authenticate')
             ->with($event)
             ->willReturnCallback(static fn (RequestEvent $event) => $tokenStorage->setToken($sessionToken));
 
@@ -226,7 +225,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
         $tokenStorage->setToken($anonymousToken);
 
         $this->innerListener->expects(self::once())
-            ->method('__invoke')
+            ->method('authenticate')
             ->with($event)
             ->willReturnCallback(static fn (RequestEvent $event) => $tokenStorage->setToken(null));
 
@@ -259,7 +258,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getToken')
             ->willReturn($this->createMock(AnonymousToken::class));
         $this->innerListener->expects(self::never())
-            ->method('__invoke');
+            ->method('authenticate');
 
         $listener = $this->getListener($this->innerListener, $tokenStorage, $csrfRequestManager);
         $listener($event);
@@ -283,7 +282,7 @@ class ContextListenerTest extends \PHPUnit\Framework\TestCase
             ->method('getToken')
             ->willReturn($this->createMock(AnonymousToken::class));
         $this->innerListener->expects(self::never())
-            ->method('__invoke');
+            ->method('authenticate');
 
         $listener = $this->getListener($this->innerListener, $tokenStorage, $csrfRequestManager);
         $listener($event);

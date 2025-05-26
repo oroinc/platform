@@ -7,8 +7,7 @@ use Oro\Bundle\ApiBundle\Batch\Processor\Update\ClearFlushDataHandler;
 
 class ClearFlushDataHandlerTest extends BatchUpdateProcessorTestCase
 {
-    /** @var ClearFlushDataHandler */
-    private $processor;
+    private ClearFlushDataHandler $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -18,12 +17,12 @@ class ClearFlushDataHandlerTest extends BatchUpdateProcessorTestCase
         $this->processor = new ClearFlushDataHandler();
     }
 
-    public function testProcessWhenFlushDataHandlerIsNotSet()
+    public function testProcessWhenFlushDataHandlerIsNotSet(): void
     {
         $this->processor->process($this->context);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $flushDataHandler = $this->createMock(BatchFlushDataHandlerInterface::class);
         $flushDataHandler->expects(self::once())

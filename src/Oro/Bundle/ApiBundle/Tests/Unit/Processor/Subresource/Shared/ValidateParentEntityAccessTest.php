@@ -14,25 +14,16 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Bundle\ApiBundle\Util\QueryAclHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ValidateParentEntityAccessTest extends GetSubresourceProcessorOrmRelatedTestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
-
-    /** @var EntityIdHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityIdHelper;
-
-    /** @var QueryAclHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $queryAclHelper;
-
-    /** @var QueryHintResolverInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $queryHintResolver;
-
-    /** @var ValidateParentEntityAccess */
-    private $processor;
+    private EntityIdHelper&MockObject $entityIdHelper;
+    private QueryAclHelper&MockObject $queryAclHelper;
+    private QueryHintResolverInterface&MockObject $queryHintResolver;
+    private ValidateParentEntityAccess $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -52,7 +43,7 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorOrmRelatedTe
         );
     }
 
-    public function testProcessForSubresourceThatDoesNotAssociatedWithAnyFieldInParentEntityConfig()
+    public function testProcessForSubresourceThatDoesNotAssociatedWithAnyFieldInParentEntityConfig(): void
     {
         $parentConfig = new EntityDefinitionConfig();
         $parentMetadata = new EntityMetadata('Test\Entity');
@@ -68,7 +59,7 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorOrmRelatedTe
         $this->processor->process($this->context);
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessForNotManageableEntity(): void
     {
         $parentClass = 'Test\Class';
         $associationName = 'association';
@@ -86,7 +77,7 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorOrmRelatedTe
         $this->processor->process($this->context);
     }
 
-    public function testProcessForManageableEntity()
+    public function testProcessForManageableEntity(): void
     {
         $parentClass = 'Test\Class';
         $parentId = 123;
@@ -132,7 +123,7 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorOrmRelatedTe
         $this->processor->process($this->context);
     }
 
-    public function testProcessForManageableEntityWhenEntityNotFound()
+    public function testProcessForManageableEntityWhenEntityNotFound(): void
     {
         $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('The parent entity does not exist.');
@@ -197,7 +188,7 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorOrmRelatedTe
         $this->processor->process($this->context);
     }
 
-    public function testProcessForManageableEntityWhenNoAccessToEntity()
+    public function testProcessForManageableEntityWhenNoAccessToEntity(): void
     {
         $this->expectException(AccessDeniedException::class);
         $this->expectExceptionMessage('No access to the parent entity.');
@@ -262,7 +253,7 @@ class ValidateParentEntityAccessTest extends GetSubresourceProcessorOrmRelatedTe
         $this->processor->process($this->context);
     }
 
-    public function testProcessForResourceBasedOnManageableEntity()
+    public function testProcessForResourceBasedOnManageableEntity(): void
     {
         $parentClass = 'Test\Class';
         $parentResourceClass = 'Test\ParentResourceClass';

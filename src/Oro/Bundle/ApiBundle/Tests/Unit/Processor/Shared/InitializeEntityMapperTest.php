@@ -10,20 +10,14 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
 use Oro\Bundle\ApiBundle\Util\EntityMapper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class InitializeEntityMapperTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityInstantiator */
-    private $entityInstantiator;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderRegistry */
-    private $entityOverrideProviderRegistry;
-
-    /** @var InitializeEntityMapper */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EntityInstantiator&MockObject $entityInstantiator;
+    private EntityOverrideProviderRegistry&MockObject $entityOverrideProviderRegistry;
+    private InitializeEntityMapper $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -41,7 +35,7 @@ class InitializeEntityMapperTest extends FormProcessorTestCase
         );
     }
 
-    public function testProcessWhenEntityMapperIsAlreadySet()
+    public function testProcessWhenEntityMapperIsAlreadySet(): void
     {
         $entityMapper = $this->createMock(EntityMapper::class);
 
@@ -54,7 +48,7 @@ class InitializeEntityMapperTest extends FormProcessorTestCase
         self::assertSame($entityMapper, $this->context->getEntityMapper());
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessForNotManageableEntity(): void
     {
         $entityClass = Entity\User::class;
         $config = new EntityDefinitionConfig();
@@ -71,7 +65,7 @@ class InitializeEntityMapperTest extends FormProcessorTestCase
         self::assertNull($this->context->getEntityMapper());
     }
 
-    public function testProcessForManageableEntity()
+    public function testProcessForManageableEntity(): void
     {
         $entityClass = Entity\User::class;
         $config = new EntityDefinitionConfig();
@@ -88,7 +82,7 @@ class InitializeEntityMapperTest extends FormProcessorTestCase
         self::assertInstanceOf(EntityMapper::class, $this->context->getEntityMapper());
     }
 
-    public function testProcessForApiResourceBasedOnManageableEntity()
+    public function testProcessForApiResourceBasedOnManageableEntity(): void
     {
         $entityClass = Entity\UserProfile::class;
         $parentResourceClass = Entity\User::class;

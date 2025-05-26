@@ -14,7 +14,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class AllNotMemberOfComparisonExpressionTest extends OrmRelatedTestCase
 {
-    public function testWalkComparisonExpressionWhenAssociationIsNotJoined()
+    public function testWalkComparisonExpressionWhenAssociationIsNotJoined(): void
     {
         $expression = new AllMemberOfComparisonExpression(true);
         $expressionVisitor = new QueryExpressionVisitor(
@@ -67,7 +67,7 @@ class AllNotMemberOfComparisonExpressionTest extends OrmRelatedTestCase
         );
     }
 
-    public function testWalkComparisonExpressionForArrayValue()
+    public function testWalkComparisonExpressionForArrayValue(): void
     {
         $expression = new AllMemberOfComparisonExpression(true);
         $expressionVisitor = new QueryExpressionVisitor(
@@ -121,7 +121,7 @@ class AllNotMemberOfComparisonExpressionTest extends OrmRelatedTestCase
         );
     }
 
-    public function testWalkComparisonExpressionForScalarValue()
+    public function testWalkComparisonExpressionForScalarValue(): void
     {
         $expression = new AllMemberOfComparisonExpression(true);
         $expressionVisitor = new QueryExpressionVisitor(
@@ -175,7 +175,7 @@ class AllNotMemberOfComparisonExpressionTest extends OrmRelatedTestCase
         );
     }
 
-    public function testWalkComparisonExpressionWhenLastElementInPathIsField()
+    public function testWalkComparisonExpressionWhenLastElementInPathIsField(): void
     {
         $expression = new AllMemberOfComparisonExpression(true);
         $expressionVisitor = new QueryExpressionVisitor(
@@ -229,7 +229,7 @@ class AllNotMemberOfComparisonExpressionTest extends OrmRelatedTestCase
         );
     }
 
-    public function testWalkComparisonExpressionForCustomExpression()
+    public function testWalkComparisonExpressionForCustomExpression(): void
     {
         $expression = new AllMemberOfComparisonExpression(true);
         $expressionVisitor = new QueryExpressionVisitor(

@@ -6,14 +6,12 @@ use Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\SetTargetProcessor;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class SetTargetProcessorTest extends BatchUpdateItemProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorBagInterface */
-    private $processorBag;
-
-    /** @var SetTargetProcessor */
-    private $processor;
+    private ActionProcessorBagInterface&MockObject $processorBag;
+    private SetTargetProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +23,7 @@ class SetTargetProcessorTest extends BatchUpdateItemProcessorTestCase
         $this->processor = new SetTargetProcessor($this->processorBag);
     }
 
-    public function testProcessWhenTargetProcessorAlreadySet()
+    public function testProcessWhenTargetProcessorAlreadySet(): void
     {
         $targetProcessor = $this->createMock(ActionProcessorInterface::class);
 
@@ -38,7 +36,7 @@ class SetTargetProcessorTest extends BatchUpdateItemProcessorTestCase
         self::assertSame($targetProcessor, $this->context->getTargetProcessor());
     }
 
-    public function testProcessWhenTargetActionIsNotSet()
+    public function testProcessWhenTargetActionIsNotSet(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The target action is not defined.');
@@ -46,7 +44,7 @@ class SetTargetProcessorTest extends BatchUpdateItemProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessTargetActionIsSetAndTargetProcessorIsNotSet()
+    public function testProcessTargetActionIsSetAndTargetProcessorIsNotSet(): void
     {
         $targetProcessor = $this->createMock(ActionProcessorInterface::class);
 

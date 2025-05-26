@@ -9,21 +9,15 @@ use Oro\Bundle\ApiBundle\Processor\DeleteList\DeleteEntitiesByDeleteHandler;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerInterface;
 use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
 class DeleteEntitiesByDeleteHandlerTest extends DeleteListProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityDeleteHandlerRegistry */
-    private $deleteHandlerRegistry;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
-    private $logger;
-
-    /** @var DeleteEntitiesByDeleteHandler */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EntityDeleteHandlerRegistry&MockObject $deleteHandlerRegistry;
+    private LoggerInterface&MockObject $logger;
+    private DeleteEntitiesByDeleteHandler $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -41,7 +35,7 @@ class DeleteEntitiesByDeleteHandlerTest extends DeleteListProcessorTestCase
         );
     }
 
-    public function testProcessWithoutResult()
+    public function testProcessWithoutResult(): void
     {
         $this->deleteHandlerRegistry->expects(self::never())
             ->method('getHandler');
@@ -52,7 +46,7 @@ class DeleteEntitiesByDeleteHandlerTest extends DeleteListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessForNotManageableEntity(): void
     {
         $entity = new \stdClass();
         $entityClass = \get_class($entity);
@@ -78,7 +72,7 @@ class DeleteEntitiesByDeleteHandlerTest extends DeleteListProcessorTestCase
         self::assertEquals([$entity], $this->context->getResult());
     }
 
-    public function testProcessForNotArrayResult()
+    public function testProcessForNotArrayResult(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(
@@ -113,7 +107,7 @@ class DeleteEntitiesByDeleteHandlerTest extends DeleteListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $entity = new \stdClass();
         $entityClass = \get_class($entity);
@@ -161,7 +155,7 @@ class DeleteEntitiesByDeleteHandlerTest extends DeleteListProcessorTestCase
         self::assertFalse($this->context->hasResult());
     }
 
-    public function testProcessWithExceptionFromDeleteHandler()
+    public function testProcessWithExceptionFromDeleteHandler(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('test exception');
@@ -212,7 +206,7 @@ class DeleteEntitiesByDeleteHandlerTest extends DeleteListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithExceptionFromDeleteHandlerAndRollbackFailed()
+    public function testProcessWithExceptionFromDeleteHandlerAndRollbackFailed(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('test exception');
@@ -269,7 +263,7 @@ class DeleteEntitiesByDeleteHandlerTest extends DeleteListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForModelInheritedFromManageableEntity()
+    public function testProcessForModelInheritedFromManageableEntity(): void
     {
         $entity = new \stdClass();
         $entityClass = \get_class($entity);

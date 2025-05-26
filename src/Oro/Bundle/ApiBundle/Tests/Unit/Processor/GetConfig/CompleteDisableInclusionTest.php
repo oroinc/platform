@@ -7,8 +7,7 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDisableInclusion;
 
 class CompleteDisableInclusionTest extends ConfigProcessorTestCase
 {
-    /** @var CompleteDisableInclusion */
-    private $processor;
+    private CompleteDisableInclusion $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +17,7 @@ class CompleteDisableInclusionTest extends ConfigProcessorTestCase
         $this->processor = new CompleteDisableInclusion();
     }
 
-    public function testProcessForNotCompletedConfig()
+    public function testProcessForNotCompletedConfig(): void
     {
         $config = [
             'fields' => [
@@ -32,7 +31,7 @@ class CompleteDisableInclusionTest extends ConfigProcessorTestCase
         self::assertFalse($this->context->getResult()->hasDisableInclusion());
     }
 
-    public function testProcessWhenNoFields()
+    public function testProcessWhenNoFields(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -45,7 +44,7 @@ class CompleteDisableInclusionTest extends ConfigProcessorTestCase
         self::assertFalse($this->context->getResult()->hasDisableInclusion());
     }
 
-    public function testProcessWhenDisableInclusionIsAlreadySet()
+    public function testProcessWhenDisableInclusionIsAlreadySet(): void
     {
         $config = [
             'exclusion_policy'  => 'all',
@@ -69,7 +68,7 @@ class CompleteDisableInclusionTest extends ConfigProcessorTestCase
         self::assertTrue($this->context->getResult()->isInclusionEnabled());
     }
 
-    public function testProcessWhenEntityHasAssociations()
+    public function testProcessWhenEntityHasAssociations(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -92,7 +91,7 @@ class CompleteDisableInclusionTest extends ConfigProcessorTestCase
         self::assertTrue($this->context->getResult()->isInclusionEnabled());
     }
 
-    public function testProcessWhenEntityHasAssociationButItIsExcluded()
+    public function testProcessWhenEntityHasAssociationButItIsExcluded(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -116,7 +115,7 @@ class CompleteDisableInclusionTest extends ConfigProcessorTestCase
         self::assertFalse($this->context->getResult()->isInclusionEnabled());
     }
 
-    public function testProcessWhenEntityHasAssociationButItIsReturnedAsField()
+    public function testProcessWhenEntityHasAssociationButItIsReturnedAsField(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -139,7 +138,7 @@ class CompleteDisableInclusionTest extends ConfigProcessorTestCase
         self::assertFalse($this->context->getResult()->isInclusionEnabled());
     }
 
-    public function testProcessWhenEntityDoesNotHaveAssociations()
+    public function testProcessWhenEntityDoesNotHaveAssociations(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -157,7 +156,7 @@ class CompleteDisableInclusionTest extends ConfigProcessorTestCase
         self::assertFalse($this->context->getResult()->isInclusionEnabled());
     }
 
-    public function testProcessForMultiTargetEntity()
+    public function testProcessForMultiTargetEntity(): void
     {
         $config = [
             'exclusion_policy' => 'all',

@@ -6,21 +6,16 @@ use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
-class EntityOverrideProviderRegistryTest extends \PHPUnit\Framework\TestCase
+class EntityOverrideProviderRegistryTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderInterface */
-    private $defaultProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderInterface */
-    private $firstProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderInterface */
-    private $secondProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
-    private $container;
+    private EntityOverrideProviderInterface&MockObject $defaultProvider;
+    private EntityOverrideProviderInterface&MockObject $firstProvider;
+    private EntityOverrideProviderInterface&MockObject $secondProvider;
+    private ContainerInterface&MockObject $container;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +35,7 @@ class EntityOverrideProviderRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityOverrideProviderForUnsupportedRequestType()
+    public function testGetEntityOverrideProviderForUnsupportedRequestType(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot find an entity override provider for the request "rest,another".');
@@ -50,7 +45,7 @@ class EntityOverrideProviderRegistryTest extends \PHPUnit\Framework\TestCase
         $registry->getEntityOverrideProvider($requestType);
     }
 
-    public function testGetEntityOverrideProviderShouldReturnDefaultProviderForNotFirstAndSecondRequestType()
+    public function testGetEntityOverrideProviderShouldReturnDefaultProviderForNotFirstAndSecondRequestType(): void
     {
         $registry = $this->getRegistry(
             [
@@ -71,7 +66,7 @@ class EntityOverrideProviderRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->defaultProvider, $registry->getEntityOverrideProvider($requestType));
     }
 
-    public function testGetEntityOverrideProviderShouldReturnFirstProviderForFirstRequestType()
+    public function testGetEntityOverrideProviderShouldReturnFirstProviderForFirstRequestType(): void
     {
         $registry = $this->getRegistry(
             [
@@ -92,7 +87,7 @@ class EntityOverrideProviderRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->firstProvider, $registry->getEntityOverrideProvider($requestType));
     }
 
-    public function testGetEntityOverrideProviderShouldReturnSecondProviderForSecondRequestType()
+    public function testGetEntityOverrideProviderShouldReturnSecondProviderForSecondRequestType(): void
     {
         $registry = $this->getRegistry(
             [
@@ -113,7 +108,7 @@ class EntityOverrideProviderRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->secondProvider, $registry->getEntityOverrideProvider($requestType));
     }
 
-    public function testGetEntityOverrideProviderShouldReturnDefaultBagIfSpecificBagNotFound()
+    public function testGetEntityOverrideProviderShouldReturnDefaultBagIfSpecificBagNotFound(): void
     {
         $registry = $this->getRegistry(
             [

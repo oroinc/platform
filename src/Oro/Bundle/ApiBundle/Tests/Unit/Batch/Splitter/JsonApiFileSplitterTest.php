@@ -12,7 +12,7 @@ use Oro\Bundle\GaufretteBundle\FileManager;
  */
 class JsonApiFileSplitterTest extends FileSplitterTestCase
 {
-    public function testChunkSize()
+    public function testChunkSize(): void
     {
         $splitter = new JsonFileSplitter();
         self::assertSame(100, $splitter->getChunkSize());
@@ -20,7 +20,7 @@ class JsonApiFileSplitterTest extends FileSplitterTestCase
         self::assertSame(1000, $splitter->getChunkSize());
     }
 
-    public function testChunkSizePerSection()
+    public function testChunkSizePerSection(): void
     {
         $splitter = new JsonFileSplitter();
         self::assertSame([], $splitter->getChunkSizePerSection());
@@ -28,7 +28,7 @@ class JsonApiFileSplitterTest extends FileSplitterTestCase
         self::assertSame(['included' => 1000], $splitter->getChunkSizePerSection());
     }
 
-    public function testChunkFileNameTemplate()
+    public function testChunkFileNameTemplate(): void
     {
         $splitter = new JsonFileSplitter();
         self::assertNull($splitter->getChunkFileNameTemplate());
@@ -36,7 +36,7 @@ class JsonApiFileSplitterTest extends FileSplitterTestCase
         self::assertEquals('api_chunk_%s', $splitter->getChunkFileNameTemplate());
     }
 
-    public function testHeaderSectionName()
+    public function testHeaderSectionName(): void
     {
         $splitter = new JsonFileSplitter();
         self::assertNull($splitter->getHeaderSectionName());
@@ -44,7 +44,7 @@ class JsonApiFileSplitterTest extends FileSplitterTestCase
         self::assertEquals('jsonapi', $splitter->getHeaderSectionName());
     }
 
-    public function testSectionNamesToSplit()
+    public function testSectionNamesToSplit(): void
     {
         $splitter = new JsonFileSplitter();
         self::assertSame([], $splitter->getSectionNamesToSplit());
@@ -52,7 +52,7 @@ class JsonApiFileSplitterTest extends FileSplitterTestCase
         self::assertSame(['data', 'included'], $splitter->getSectionNamesToSplit());
     }
 
-    public function testSplitWithoutFile()
+    public function testSplitWithoutFile(): void
     {
         $fileName = 'notExistingFile';
         $expectedException = new \Exception('some error');
@@ -92,7 +92,7 @@ class JsonApiFileSplitterTest extends FileSplitterTestCase
     /**
      * @dataProvider streamTypeDataProvider
      */
-    public function testSplitToOneChunk(bool $withInMemoryBuffer)
+    public function testSplitToOneChunk(bool $withInMemoryBuffer): void
     {
         $inputJson = <<<JSON
 {"data":[
@@ -135,7 +135,7 @@ JSON;
     /**
      * @dataProvider streamTypeDataProvider
      */
-    public function testSplitToOneChunkPerSection(bool $withInMemoryBuffer)
+    public function testSplitToOneChunkPerSection(bool $withInMemoryBuffer): void
     {
         $inputJson = <<<JSON
 {"data":[
@@ -190,7 +190,7 @@ JSON;
     /**
      * @dataProvider streamTypeDataProvider
      */
-    public function testSplitWithSpecifiedSectionsToSplit(bool $withInMemoryBuffer)
+    public function testSplitWithSpecifiedSectionsToSplit(bool $withInMemoryBuffer): void
     {
         $inputJson = <<<JSON
 {
@@ -251,7 +251,7 @@ JSON;
     /**
      * @dataProvider streamTypeDataProvider
      */
-    public function testSplitWithSpecifiedSectionsToSplitAndWithHeaderSection(bool $withInMemoryBuffer)
+    public function testSplitWithSpecifiedSectionsToSplitAndWithHeaderSection(bool $withInMemoryBuffer): void
     {
         $inputJson = <<<JSON
 {
@@ -316,7 +316,7 @@ JSON;
     /**
      * @dataProvider streamTypeDataProvider
      */
-    public function testSplitToSeveralChunks(bool $withInMemoryBuffer)
+    public function testSplitToSeveralChunks(bool $withInMemoryBuffer): void
     {
         $inputJson = <<<JSON
 {"data":[
@@ -387,7 +387,7 @@ JSON;
     /**
      * @dataProvider streamTypeDataProvider
      */
-    public function testSplitToSeveralChunksAndWithHeaderSection(bool $withInMemoryBuffer)
+    public function testSplitToSeveralChunksAndWithHeaderSection(bool $withInMemoryBuffer): void
     {
         $inputJson = <<<JSON
 {"jsonapi": {"version": "1.0"},
@@ -461,7 +461,7 @@ JSON;
         $this->assertChunkContent($result[3], $resultFileContents[3]);
     }
 
-    public function testSplitToSeveralChunksWhenHeaderSectionIsNotFirstSectionInDocument()
+    public function testSplitToSeveralChunksWhenHeaderSectionIsNotFirstSectionInDocument(): void
     {
         $this->expectException(ParsingErrorFileSplitterException::class);
         $this->expectExceptionMessage(
@@ -496,7 +496,7 @@ JSON;
     /**
      * @dataProvider streamTypeDataProvider
      */
-    public function testSplitWithChunkFileNameTemplate(bool $withInMemoryBuffer)
+    public function testSplitWithChunkFileNameTemplate(bool $withInMemoryBuffer): void
     {
         $inputJson = <<<JSON
 {"data":[
@@ -548,7 +548,7 @@ JSON;
     /**
      * @dataProvider streamTypeDataProvider
      */
-    public function testSplitToSeveralChunkWithDifferentSections(bool $withInMemoryBuffer)
+    public function testSplitToSeveralChunkWithDifferentSections(bool $withInMemoryBuffer): void
     {
         $inputJson = <<<JSON
 {"data":[
@@ -612,7 +612,7 @@ JSON;
     /**
      * @dataProvider dataProviderWithExceptions
      */
-    public function testSplitWithException(string $inputJson, string $exceptionClass, string $exceptionMessage)
+    public function testSplitWithException(string $inputJson, string $exceptionClass, string $exceptionMessage): void
     {
         $splitter = new JsonFileSplitter();
         $this->splitWithException($splitter, $inputJson, $exceptionClass, $exceptionMessage);
@@ -661,7 +661,7 @@ JSON;
         ];
     }
 
-    public function testSplitWithDifferentTypesOfItems()
+    public function testSplitWithDifferentTypesOfItems(): void
     {
         $inputJson = <<<JSON
 {"data":[

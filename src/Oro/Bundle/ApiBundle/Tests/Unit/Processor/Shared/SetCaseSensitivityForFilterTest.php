@@ -7,17 +7,15 @@ use Oro\Bundle\ApiBundle\Filter\FilterInterface;
 use Oro\Bundle\ApiBundle\Processor\Shared\SetCaseSensitivityForFilter;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class SetCaseSensitivityForFilterTest extends GetListProcessorTestCase
 {
-    private const FILTER_NAME = 'someFilter';
-    private const SENSITIVITY_CONFIG_OPTION_NAME = 'sensitivity_config_option';
+    private const string FILTER_NAME = 'someFilter';
+    private const string SENSITIVITY_CONFIG_OPTION_NAME = 'sensitivity_config_option';
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var SetCaseSensitivityForFilter */
-    private $processor;
+    private ConfigManager&MockObject $configManager;
+    private SetCaseSensitivityForFilter $processor;
 
     #[\Override]
     protected function setUp(): void

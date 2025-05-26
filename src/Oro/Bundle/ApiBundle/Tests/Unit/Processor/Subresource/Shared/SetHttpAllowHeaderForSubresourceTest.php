@@ -9,17 +9,13 @@ use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
-    private $resourcesProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|SubresourcesProvider */
-    private $subresourcesProvider;
-
-    /** @var SetHttpAllowHeaderForSubresource */
-    private $processor;
+    private ResourcesProvider&MockObject $resourcesProvider;
+    private SubresourcesProvider&MockObject $subresourcesProvider;
+    private SetHttpAllowHeaderForSubresource $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +31,7 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
         );
     }
 
-    public function testProcessWhenResponseStatusCodeIsNot405()
+    public function testProcessWhenResponseStatusCodeIsNot405(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -53,7 +49,7 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
         self::assertFalse($this->context->getResponseHeaders()->has('Allow'));
     }
 
-    public function testProcessWhenAllowResponseHeaderAlreadySet()
+    public function testProcessWhenAllowResponseHeaderAlreadySet(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -72,7 +68,7 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
         self::assertEquals('GET', $this->context->getResponseHeaders()->get('Allow'));
     }
 
-    public function testProcessWhenAllActionsDisabled()
+    public function testProcessWhenAllActionsDisabled(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -102,7 +98,7 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
         self::assertFalse($this->context->getResponseHeaders()->has('Allow'));
     }
 
-    public function testProcessWhenAllActionsEnabled()
+    public function testProcessWhenAllActionsEnabled(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -128,7 +124,7 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
         self::assertEquals('OPTIONS, GET, PATCH, POST, DELETE', $this->context->getResponseHeaders()->get('Allow'));
     }
 
-    public function testProcessWhenOnlyGetSubresourceEnabled()
+    public function testProcessWhenOnlyGetSubresourceEnabled(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -156,7 +152,7 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
         self::assertEquals('OPTIONS, GET', $this->context->getResponseHeaders()->get('Allow'));
     }
 
-    public function testProcessWhenOnlyUpdateSubresourceEnabled()
+    public function testProcessWhenOnlyUpdateSubresourceEnabled(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -184,7 +180,7 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
         self::assertEquals('OPTIONS, PATCH', $this->context->getResponseHeaders()->get('Allow'));
     }
 
-    public function testProcessWhenEntityDoesNotHaveIdentifierFields()
+    public function testProcessWhenEntityDoesNotHaveIdentifierFields(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
 
@@ -211,7 +207,7 @@ class SetHttpAllowHeaderForSubresourceTest extends GetSubresourceProcessorTestCa
         self::assertEquals('OPTIONS, GET', $this->context->getResponseHeaders()->get('Allow'));
     }
 
-    public function testProcessWhenActionDisabledForParticularAssociation()
+    public function testProcessWhenActionDisabledForParticularAssociation(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);

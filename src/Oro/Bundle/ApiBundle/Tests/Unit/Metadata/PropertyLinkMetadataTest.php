@@ -5,10 +5,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Metadata;
 use Oro\Bundle\ApiBundle\Metadata\DataAccessorInterface;
 use Oro\Bundle\ApiBundle\Metadata\MetaAttributeMetadata;
 use Oro\Bundle\ApiBundle\Metadata\PropertyLinkMetadata;
+use PHPUnit\Framework\TestCase;
 
-class PropertyLinkMetadataTest extends \PHPUnit\Framework\TestCase
+class PropertyLinkMetadataTest extends TestCase
 {
-    public function testClone()
+    public function testClone(): void
     {
         $linkMetadata = new PropertyLinkMetadata('testField');
         $linkMetadata->addMetaProperty(new MetaAttributeMetadata('metaProperty1', 'string'));
@@ -18,7 +19,7 @@ class PropertyLinkMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($linkMetadata, $linkMetadataClone);
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $linkMetadata = new PropertyLinkMetadata('testField');
         $linkMetadata->addMetaProperty(new MetaAttributeMetadata('metaProperty1', 'string'));
@@ -36,7 +37,7 @@ class PropertyLinkMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testToArrayWithRequiredPropertiesOnly()
+    public function testToArrayWithRequiredPropertiesOnly(): void
     {
         $linkMetadata = new PropertyLinkMetadata('testField');
 
@@ -48,7 +49,7 @@ class PropertyLinkMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetHrefWhenPropertyDoesNotExist()
+    public function testGetHrefWhenPropertyDoesNotExist(): void
     {
         $linkMetadata = new PropertyLinkMetadata('testField');
 
@@ -61,7 +62,7 @@ class PropertyLinkMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertNull($linkMetadata->getHref($dataAccessor));
     }
 
-    public function testGetHrefWhenPropertyValueIsEmptyString()
+    public function testGetHrefWhenPropertyValueIsEmptyString(): void
     {
         $linkMetadata = new PropertyLinkMetadata('testField');
 
@@ -78,7 +79,7 @@ class PropertyLinkMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertNull($linkMetadata->getHref($dataAccessor));
     }
 
-    public function testGetHrefWhenPropertyValueIsNotEmpty()
+    public function testGetHrefWhenPropertyValueIsNotEmpty(): void
     {
         $linkMetadata = new PropertyLinkMetadata('testField');
 
@@ -95,7 +96,7 @@ class PropertyLinkMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('testUrl', $linkMetadata->getHref($dataAccessor));
     }
 
-    public function testMetaProperties()
+    public function testMetaProperties(): void
     {
         $linkMetadata = new PropertyLinkMetadata('testField');
         self::assertCount(0, $linkMetadata->getMetaProperties());

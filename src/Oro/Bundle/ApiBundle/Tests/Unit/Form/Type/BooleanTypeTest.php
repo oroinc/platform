@@ -10,7 +10,7 @@ class BooleanTypeTest extends ApiFormTypeTestCase
     /**
      * @dataProvider validValuesDataProvider
      */
-    public function testWithValidValue(string|int|bool $value, bool $expected)
+    public function testWithValidValue(string|int|bool $value, bool $expected): void
     {
         /**
          * @see \Oro\Bundle\ApiBundle\Processor\Shared\SubmitForm::prepareRequestData
@@ -44,7 +44,7 @@ class BooleanTypeTest extends ApiFormTypeTestCase
     /**
      * @dataProvider invalidValuesDataProvider
      */
-    public function testWithInvalidValue(?string $value)
+    public function testWithInvalidValue(?string $value): void
     {
         $form = $this->factory->create(BooleanType::class);
         $form->submit($value);

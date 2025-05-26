@@ -22,20 +22,16 @@ use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class NormalizeFilterValuesTest extends GetListProcessorTestCase
 {
-    /** @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject */
-    private $valueNormalizer;
-
-    /** @var EntityIdTransformerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityIdTransformerRegistry;
-
-    /** @var NormalizeFilterValues */
-    private $processor;
+    private ValueNormalizer&MockObject $valueNormalizer;
+    private EntityIdTransformerRegistry&MockObject $entityIdTransformerRegistry;
+    private NormalizeFilterValues $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -51,7 +47,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         );
     }
 
-    public function testProcessOnExistingQuery()
+    public function testProcessOnExistingQuery(): void
     {
         $this->context->setQuery(new \stdClass());
         $context = clone $this->context;
@@ -59,7 +55,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         self::assertEquals($context, $this->context);
     }
 
-    public function testProcessForNotStandaloneFilter()
+    public function testProcessForNotStandaloneFilter(): void
     {
         $filters = $this->context->getFilters();
         $filters->add('filter1', $this->createMock(FilterInterface::class));
@@ -76,7 +72,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessForSpecialHandlingFilter()
+    public function testProcessForSpecialHandlingFilter(): void
     {
         $filters = $this->context->getFilters();
         $filters->add('filter1', new FieldsFilter('string'));
@@ -93,7 +89,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessForFieldFilters()
+    public function testProcessForFieldFilters(): void
     {
         $filters = $this->context->getFilters();
         $idFilter = new ComparisonFilter('integer');
@@ -135,7 +131,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessForFieldFilterWhenNoFieldMetadata()
+    public function testProcessForFieldFilterWhenNoFieldMetadata(): void
     {
         $filters = $this->context->getFilters();
         $labelFilter = new StringComparisonFilter('string');
@@ -163,7 +159,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessForEmptyValueFieldFilter()
+    public function testProcessForEmptyValueFieldFilter(): void
     {
         $filters = $this->context->getFilters();
         $stringFilter = new ComparisonFilter('string');
@@ -186,7 +182,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessForSingleIdFilter()
+    public function testProcessForSingleIdFilter(): void
     {
         $filters = $this->context->getFilters();
         $idFilter = new ComparisonFilter('integer');
@@ -224,7 +220,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessForAssociationFilter()
+    public function testProcessForAssociationFilter(): void
     {
         $filters = $this->context->getFilters();
         $associationFilter = new ComparisonFilter('integer');
@@ -262,7 +258,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessForRenamedAssociationFilter()
+    public function testProcessForRenamedAssociationFilter(): void
     {
         $filters = $this->context->getFilters();
         $associationFilter = new ComparisonFilter('integer');
@@ -301,7 +297,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessForExistsAssociationFilter()
+    public function testProcessForExistsAssociationFilter(): void
     {
         $filters = $this->context->getFilters();
         $associationFilter = new ComparisonFilter('integer');
@@ -333,7 +329,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessForAssociationFilterWhenValueIsArray()
+    public function testProcessForAssociationFilterWhenValueIsArray(): void
     {
         $filters = $this->context->getFilters();
         $associationFilter = new ComparisonFilter('integer');
@@ -375,7 +371,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessForAssociationFilterWhenValueIsRange()
+    public function testProcessForAssociationFilterWhenValueIsRange(): void
     {
         $filters = $this->context->getFilters();
         $associationFilter = new ComparisonFilter('integer');
@@ -421,7 +417,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessForInvalidDataType()
+    public function testProcessForInvalidDataType(): void
     {
         $filters = $this->context->getFilters();
         $idFilter = new ComparisonFilter('integer');
@@ -452,7 +448,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessForNotSupportedFilter()
+    public function testProcessForNotSupportedFilter(): void
     {
         $filters = $this->context->getFilters();
         $idFilter = new ComparisonFilter('string');
@@ -479,7 +475,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessForAssociationFilterWhenNotResolvedIntegerId()
+    public function testProcessForAssociationFilterWhenNotResolvedIntegerId(): void
     {
         $filters = $this->context->getFilters();
         $associationFilter = new ComparisonFilter('integer');
@@ -527,7 +523,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         );
     }
 
-    public function testProcessForAssociationFilterWhenNotResolvedStringId()
+    public function testProcessForAssociationFilterWhenNotResolvedStringId(): void
     {
         $filters = $this->context->getFilters();
         $associationFilter = new ComparisonFilter('integer');
@@ -575,7 +571,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         );
     }
 
-    public function testProcessForAssociationFilterWhenNotResolvedCombinedId()
+    public function testProcessForAssociationFilterWhenNotResolvedCombinedId(): void
     {
         $filters = $this->context->getFilters();
         $associationFilter = new ComparisonFilter('integer');
@@ -627,7 +623,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         );
     }
 
-    public function testProcessForAssociationFilterWhenValueIsArrayWhenNotResolvedId()
+    public function testProcessForAssociationFilterWhenValueIsArrayWhenNotResolvedId(): void
     {
         $filters = $this->context->getFilters();
         $associationFilter = new ComparisonFilter('integer');
@@ -679,7 +675,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         );
     }
 
-    public function testProcessForAssociationFilterWhenValueIsRangeWhenNotResolvedFromId()
+    public function testProcessForAssociationFilterWhenValueIsRangeWhenNotResolvedFromId(): void
     {
         $filters = $this->context->getFilters();
         $associationFilter = new ComparisonFilter('integer');
@@ -735,7 +731,7 @@ class NormalizeFilterValuesTest extends GetListProcessorTestCase
         );
     }
 
-    public function testProcessForAssociationFilterWhenValueIsRangeWhenNotResolvedToId()
+    public function testProcessForAssociationFilterWhenValueIsRangeWhenNotResolvedToId(): void
     {
         $filters = $this->context->getFilters();
         $associationFilter = new ComparisonFilter('integer');

@@ -8,8 +8,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ValidateParentEntityExistsTest extends ChangeRelationshipProcessorTestCase
 {
-    /** @var ValidateParentEntityExists */
-    private $processor;
+    private ValidateParentEntityExists $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -19,13 +18,13 @@ class ValidateParentEntityExistsTest extends ChangeRelationshipProcessorTestCase
         $this->processor = new ValidateParentEntityExists();
     }
 
-    public function testProcessWhenParentEntityExists()
+    public function testProcessWhenParentEntityExists(): void
     {
         $this->context->setParentEntity(new \stdClass());
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenParentEntityDoesNotExist()
+    public function testProcessWhenParentEntityDoesNotExist(): void
     {
         $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('The parent entity does not exist.');

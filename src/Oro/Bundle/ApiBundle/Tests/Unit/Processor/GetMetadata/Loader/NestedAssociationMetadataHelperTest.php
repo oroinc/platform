@@ -11,20 +11,17 @@ use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\MetadataHelper;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\NestedAssociationMetadataHelper;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataFactory;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
+class NestedAssociationMetadataHelperTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataHelper */
-    private $metadataHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectMetadataFactory */
-    private $objectMetadataFactory;
-
-    /** @var NestedAssociationMetadataHelper */
-    private $nestedAssociationMetadataHelper;
+    private MetadataHelper&MockObject $metadataHelper;
+    private ObjectMetadataFactory&MockObject $objectMetadataFactory;
+    private NestedAssociationMetadataHelper $nestedAssociationMetadataHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +35,7 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddNestedAssociation()
+    public function testAddNestedAssociation(): void
     {
         $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
@@ -92,7 +89,7 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($targetEntityMetadata->isInheritedType());
     }
 
-    public function testAddNestedAssociationWhenDataTypeIsNotSetForIdField()
+    public function testAddNestedAssociationWhenDataTypeIsNotSetForIdField(): void
     {
         $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
@@ -144,7 +141,7 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($targetEntityMetadata->isInheritedType());
     }
 
-    public function testAddNestedAssociationWhenClassFieldDoesNotExist()
+    public function testAddNestedAssociationWhenClassFieldDoesNotExist(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
@@ -169,7 +166,7 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddNestedAssociationWhenClassFieldDoesNotHavePropertyPath()
+    public function testAddNestedAssociationWhenClassFieldDoesNotHavePropertyPath(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
@@ -194,7 +191,7 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddNestedAssociationWhenClassFieldIsAssociation()
+    public function testAddNestedAssociationWhenClassFieldIsAssociation(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
@@ -221,7 +218,7 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddNestedAssociationWhenIdFieldDoesNotExist()
+    public function testAddNestedAssociationWhenIdFieldDoesNotExist(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
@@ -247,7 +244,7 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddNestedAssociationWhenIdFieldDoesNotHavePropertyPath()
+    public function testAddNestedAssociationWhenIdFieldDoesNotHavePropertyPath(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
@@ -274,7 +271,7 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddNestedAssociationWhenIdFieldIsAssociation()
+    public function testAddNestedAssociationWhenIdFieldIsAssociation(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
@@ -303,7 +300,7 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSetTargetPropertyPathWhenFormPropertyPathEqualsToFieldName()
+    public function testSetTargetPropertyPathWhenFormPropertyPathEqualsToFieldName(): void
     {
         $fieldName = 'testField';
         $propertyMetadata = new FieldMetadata($fieldName);
@@ -324,7 +321,7 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($fieldName, $propertyMetadata->getPropertyPath());
     }
 
-    public function testSetTargetPropertyPathWhenFormPropertyPathIsNotEqualToFieldName()
+    public function testSetTargetPropertyPathWhenFormPropertyPathIsNotEqualToFieldName(): void
     {
         $fieldName = 'testField';
         $propertyMetadata = new FieldMetadata($fieldName);
@@ -346,7 +343,7 @@ class NestedAssociationMetadataHelperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($formPropertyPath, $propertyMetadata->getPropertyPath());
     }
 
-    public function testGetIdentifierFieldName()
+    public function testGetIdentifierFieldName(): void
     {
         self::assertEquals('id', $this->nestedAssociationMetadataHelper->getIdentifierFieldName());
     }

@@ -10,18 +10,14 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\AclProtectedEntityLoader;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class LoadEntityTest extends GetProcessorTestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var AclProtectedEntityLoader|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityLoader;
-
-    /** @var LoadEntity */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private AclProtectedEntityLoader&MockObject $entityLoader;
+    private LoadEntity $processor;
 
     #[\Override]
     protected function setUp(): void

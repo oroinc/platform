@@ -4,10 +4,11 @@ namespace Oro\Component\ChainProcessor\Tests\Unit;
 
 use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 use Oro\Component\ChainProcessor\SimpleProcessorRegistry;
+use PHPUnit\Framework\TestCase;
 
-class SimpleProcessorRegistryTest extends \PHPUnit\Framework\TestCase
+class SimpleProcessorRegistryTest extends TestCase
 {
-    public function testRegistry()
+    public function testRegistry(): void
     {
         $parentRegistry = $this->createMock(ProcessorRegistryInterface::class);
         $processor4Callback = function () {

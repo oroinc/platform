@@ -9,17 +9,14 @@ use Oro\Bundle\ApiBundle\Provider\SubresourcesProvider;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiSubresource;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
-    private $resourcesProvider;
+    private ResourcesProvider&MockObject $resourcesProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|SubresourcesProvider */
-    private $subresourcesProvider;
-
-    /** @var SetHttpAllowHeaderForRelationship */
-    private $processor;
+    private SubresourcesProvider&MockObject $subresourcesProvider;
+    private SetHttpAllowHeaderForRelationship $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +32,7 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
         );
     }
 
-    public function testProcessWhenResponseStatusCodeIsNot405()
+    public function testProcessWhenResponseStatusCodeIsNot405(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -53,7 +50,7 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
         self::assertFalse($this->context->getResponseHeaders()->has('Allow'));
     }
 
-    public function testProcessWhenAllowResponseHeaderAlreadySet()
+    public function testProcessWhenAllowResponseHeaderAlreadySet(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -72,7 +69,7 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
         self::assertEquals('GET', $this->context->getResponseHeaders()->get('Allow'));
     }
 
-    public function testProcessWhenAllActionsDisabled()
+    public function testProcessWhenAllActionsDisabled(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -102,7 +99,7 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
         self::assertFalse($this->context->getResponseHeaders()->has('Allow'));
     }
 
-    public function testProcessWhenAllActionsEnabled()
+    public function testProcessWhenAllActionsEnabled(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -128,7 +125,7 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
         self::assertEquals('OPTIONS, GET, PATCH, POST, DELETE', $this->context->getResponseHeaders()->get('Allow'));
     }
 
-    public function testProcessToOneAssociationWhenAtLeastOneAllowedHttpMethodExists()
+    public function testProcessToOneAssociationWhenAtLeastOneAllowedHttpMethodExists(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -156,7 +153,7 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
         self::assertEquals('OPTIONS, GET', $this->context->getResponseHeaders()->get('Allow'));
     }
 
-    public function testProcessToManyAssociationWhenAtLeastOneAllowedHttpMethodExists()
+    public function testProcessToManyAssociationWhenAtLeastOneAllowedHttpMethodExists(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -180,7 +177,7 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
         self::assertEquals('OPTIONS, GET, POST, DELETE', $this->context->getResponseHeaders()->get('Allow'));
     }
 
-    public function testProcessToOneAssociationWhenNoAllowedHttpMethods()
+    public function testProcessToOneAssociationWhenNoAllowedHttpMethods(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -210,7 +207,7 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
         self::assertFalse($this->context->getResponseHeaders()->has('Allow'));
     }
 
-    public function testProcessToManyAssociationWhenNoAllowedHttpMethods()
+    public function testProcessToManyAssociationWhenNoAllowedHttpMethods(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -240,7 +237,7 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
         self::assertFalse($this->context->getResponseHeaders()->has('Allow'));
     }
 
-    public function testProcessWhenEntityDoesNotHaveIdentifierFields()
+    public function testProcessWhenEntityDoesNotHaveIdentifierFields(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
 
@@ -263,7 +260,7 @@ class SetHttpAllowHeaderForRelationshipTest extends ChangeRelationshipProcessorT
         self::assertEquals('OPTIONS, GET, PATCH', $this->context->getResponseHeaders()->get('Allow'));
     }
 
-    public function testProcessWhenActionDisabledForParticularAssociation()
+    public function testProcessWhenActionDisabledForParticularAssociation(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);

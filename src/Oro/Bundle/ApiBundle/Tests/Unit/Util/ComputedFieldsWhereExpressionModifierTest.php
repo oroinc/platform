@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Util\ComputedFieldsWhereExpressionModifier;
 
 class ComputedFieldsWhereExpressionModifierTest extends OrmRelatedTestCase
 {
-    private const ENTITY_NAMESPACE = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\\';
+    private const string ENTITY_NAMESPACE = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\\';
 
     private function assertQuery(string $expectedDql, QueryBuilder $qb): void
     {

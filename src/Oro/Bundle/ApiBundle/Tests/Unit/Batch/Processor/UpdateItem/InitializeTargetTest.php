@@ -12,8 +12,7 @@ use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
 class InitializeTargetTest extends BatchUpdateItemProcessorTestCase
 {
-    /** @var InitializeTarget */
-    private $processor;
+    private InitializeTarget $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +29,7 @@ class InitializeTargetTest extends BatchUpdateItemProcessorTestCase
         );
     }
 
-    public function testProcessWhenNoTargetProcessor()
+    public function testProcessWhenNoTargetProcessor(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The target processor is not defined.');
@@ -38,7 +37,7 @@ class InitializeTargetTest extends BatchUpdateItemProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenNoTargetContext()
+    public function testProcessWhenNoTargetContext(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The target context is not defined.');
@@ -47,7 +46,7 @@ class InitializeTargetTest extends BatchUpdateItemProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenNoLastGroupInTargetContext()
+    public function testProcessWhenNoLastGroupInTargetContext(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The target last group is not defined.');
@@ -59,7 +58,7 @@ class InitializeTargetTest extends BatchUpdateItemProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenNoErrorsOccurredWhenProcessingTargetProcessor()
+    public function testProcessWhenNoErrorsOccurredWhenProcessingTargetProcessor(): void
     {
         $targetProcessor = $this->createMock(ActionProcessorInterface::class);
 
@@ -76,7 +75,7 @@ class InitializeTargetTest extends BatchUpdateItemProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWhenSomeErrorsOccurredWhenProcessingTargetProcessor()
+    public function testProcessWhenSomeErrorsOccurredWhenProcessingTargetProcessor(): void
     {
         $targetProcessor = $this->createMock(ActionProcessorInterface::class);
 

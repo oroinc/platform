@@ -25,6 +25,8 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -33,34 +35,17 @@ use Psr\Log\LoggerInterface;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class UpdateListProcessChunkMessageProcessorTest extends TestCase
 {
-    /** @var JobRunner|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobRunner;
-
-    /** @var JobManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobManager;
-
-    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileManager;
-
-    /** @var BatchUpdateHandler|\PHPUnit\Framework\MockObject\MockObject */
-    private $handler;
-
-    /** @var DataEncoderRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $dataEncoderRegistry;
-
-    /** @var UpdateListProcessingHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $processingHelper;
-
-    /** @var FileLockManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileLockManager;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var UpdateListProcessChunkMessageProcessor */
-    private $processor;
+    private JobRunner&MockObject $jobRunner;
+    private JobManagerInterface&MockObject $jobManager;
+    private FileManager&MockObject $fileManager;
+    private BatchUpdateHandler&MockObject $handler;
+    private DataEncoderRegistry&MockObject $dataEncoderRegistry;
+    private UpdateListProcessingHelper&MockObject $processingHelper;
+    private FileLockManager&MockObject $fileLockManager;
+    private LoggerInterface&MockObject $logger;
+    private UpdateListProcessChunkMessageProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -385,7 +370,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
         self::assertEquals($expectedJobData, $job->getData());
     }
 
-    public function testProcessSeveralItemsInChunk(): void
+    public function testProcessFewItemsInChunk(): void
     {
         $jobId = 456;
         $fileName = 'chunkFile';
@@ -457,7 +442,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
         self::assertEquals($expectedJobData, $job->getData());
     }
 
-    public function testProcessSeveralItemsInChunkAndHasItemsWithPermanentErrorsAndDataEncoderNotFound(): void
+    public function testProcessFewItemsInChunkAndHasItemsWithPermanentErrorsAndDataEncoderNotFound(): void
     {
         $jobId = 456;
         $requestType = ['testRequest'];
@@ -536,7 +521,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
         self::assertEquals($expectedJobData, $job->getData());
     }
 
-    public function testProcessSeveralItemsInChunkAndHasItemsWithPermanentErrorsAndCannotAcquireUpdateChunkCountLock()
+    public function testProcessFewItemsInChunkAndHasItemsWithPermanentErrorsAndCannotAcquireUpdateChunkCountLock(): void
     {
         $jobId = 456;
         $operationId = 123;
@@ -635,7 +620,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessSeveralItemsInChunkAndHasItemsWithPermanentErrorsAndFailedUpdateChunkCount(): void
+    public function testProcessFewItemsInChunkAndHasItemsWithPermanentErrorsAndFailedUpdateChunkCount(): void
     {
         $jobId = 456;
         $operationId = 123;
@@ -739,7 +724,7 @@ class UpdateListProcessChunkMessageProcessorTest extends \PHPUnit\Framework\Test
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessSeveralItemsInChunkAndHasItemsWithPermanentErrors(): void
+    public function testProcessFewItemsInChunkAndHasItemsWithPermanentErrors(): void
     {
         $jobId = 456;
         $operationId = 123;

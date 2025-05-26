@@ -13,26 +13,18 @@ use Oro\Bundle\ApiBundle\Batch\RetryHelper;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\GaufretteBundle\FileManager;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
 class SaveErrorsTest extends BatchUpdateProcessorTestCase
 {
-    private const ASYNC_OPERATION_ID = 123;
+    private const int ASYNC_OPERATION_ID = 123;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FileManager */
-    private $fileManager;
-
-    /** @var ChunkFile */
-    private $file;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ErrorManager */
-    private $errorManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
-    private $logger;
-
-    /** @var SaveErrors */
-    private $processor;
+    private FileManager&MockObject $fileManager;
+    private ChunkFile $file;
+    private ErrorManager&MockObject $errorManager;
+    private LoggerInterface&MockObject $logger;
+    private SaveErrors $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -75,7 +67,7 @@ class SaveErrorsTest extends BatchUpdateProcessorTestCase
         return $item;
     }
 
-    public function testProcessWhenNoErrorsInContext()
+    public function testProcessWhenNoErrorsInContext(): void
     {
         $this->errorManager->expects(self::never())
             ->method('writeErrors');
@@ -84,7 +76,7 @@ class SaveErrorsTest extends BatchUpdateProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenHasErrorsInContext()
+    public function testProcessWhenHasErrorsInContext(): void
     {
         $error = Error::createValidationError('error1', 'error 1')
             ->setCode('error1_code')
@@ -113,7 +105,7 @@ class SaveErrorsTest extends BatchUpdateProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWhenWriteErrorsFailed()
+    public function testProcessWhenWriteErrorsFailed(): void
     {
         $error = Error::createValidationError('error1', 'error 1')
             ->setCode('error1_code')
@@ -153,7 +145,7 @@ class SaveErrorsTest extends BatchUpdateProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWhenHasErrorsInBatchItemsContextButNoRawItemsAndProcessedItemStatuses()
+    public function testProcessWhenHasErrorsInBatchItemsContextButNoRawItemsAndProcessedItemStatuses(): void
     {
         $item1Index = 0;
         $item2Index = 1;
@@ -188,7 +180,7 @@ class SaveErrorsTest extends BatchUpdateProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWhenHasErrorsInBatchItemsContext()
+    public function testProcessWhenHasErrorsInBatchItemsContext(): void
     {
         $rawItems = [[], []];
         $processedItemStatuses = [
@@ -231,7 +223,7 @@ class SaveErrorsTest extends BatchUpdateProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWhenHasErrorsInBatchItemsContextButTheseBatchItemsWillBeProcessedOneMoreTime()
+    public function testProcessWhenHasErrorsInBatchItemsContextButTheseBatchItemsWillBeProcessedOneMoreTime(): void
     {
         $rawItems = [[], []];
         $processedItemStatuses = [

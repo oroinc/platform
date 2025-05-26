@@ -16,23 +16,16 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class UpdateListFinishMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class UpdateListFinishMessageProcessorTest extends TestCase
 {
-    /** @var UpdateListProcessingHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $processingHelper;
-
-    /** @var AsyncOperationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $operationManager;
-
-    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileManager;
-
-    /** @var IncludeMapManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $includeMapManager;
-
-    /** @var UpdateListFinishMessageProcessor */
-    private $processor;
+    private UpdateListProcessingHelper&MockObject $processingHelper;
+    private AsyncOperationManager&MockObject $operationManager;
+    private FileManager&MockObject $fileManager;
+    private IncludeMapManager&MockObject $includeMapManager;
+    private UpdateListFinishMessageProcessor $processor;
 
     #[\Override]
     protected function setUp(): void

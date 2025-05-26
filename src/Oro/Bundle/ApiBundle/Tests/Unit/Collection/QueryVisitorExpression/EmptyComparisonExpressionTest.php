@@ -13,7 +13,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class EmptyComparisonExpressionTest extends OrmRelatedTestCase
 {
-    public function testWalkComparisonExpressionForTrueValue()
+    public function testWalkComparisonExpressionForTrueValue(): void
     {
         $expression = new EmptyComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor(
@@ -56,7 +56,7 @@ class EmptyComparisonExpressionTest extends OrmRelatedTestCase
         self::assertEmpty($expressionVisitor->getParameters());
     }
 
-    public function testWalkComparisonExpressionForFalseValue()
+    public function testWalkComparisonExpressionForFalseValue(): void
     {
         $expression = new EmptyComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor(
@@ -99,7 +99,7 @@ class EmptyComparisonExpressionTest extends OrmRelatedTestCase
         self::assertEmpty($expressionVisitor->getParameters());
     }
 
-    public function testWalkComparisonExpressionWhenLastElementInPathIsField()
+    public function testWalkComparisonExpressionWhenLastElementInPathIsField(): void
     {
         $expression = new EmptyComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor(
@@ -142,7 +142,7 @@ class EmptyComparisonExpressionTest extends OrmRelatedTestCase
         self::assertEmpty($expressionVisitor->getParameters());
     }
 
-    public function testWalkComparisonExpressionForCustomExpression()
+    public function testWalkComparisonExpressionForCustomExpression(): void
     {
         $expression = new EmptyComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor(
@@ -184,7 +184,7 @@ class EmptyComparisonExpressionTest extends OrmRelatedTestCase
         self::assertEmpty($expressionVisitor->getParameters());
     }
 
-    public function testWalkComparisonExpressionForCustomExpressionWhenAssociationAlreadyJoined()
+    public function testWalkComparisonExpressionForCustomExpressionWhenAssociationAlreadyJoined(): void
     {
         $expression = new EmptyComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor(

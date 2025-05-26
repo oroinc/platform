@@ -9,17 +9,13 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\JsonApi\CompleteUpsertConfig;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig\ConfigProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class CompleteUpsertConfigTest extends ConfigProcessorTestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var EntityIdHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityIdHelper;
-
-    /** @var CompleteUpsertConfig */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EntityIdHelper&MockObject $entityIdHelper;
+    private CompleteUpsertConfig $processor;
 
     #[\Override]
     protected function setUp(): void

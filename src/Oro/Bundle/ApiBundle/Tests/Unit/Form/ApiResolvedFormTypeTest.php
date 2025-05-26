@@ -4,7 +4,8 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Form;
 
 use Oro\Bundle\ApiBundle\Form\ApiFormBuilder;
 use Oro\Bundle\ApiBundle\Form\ApiResolvedFormType;
-use Oro\Bundle\ApiBundle\Form\ApiResolvedFormTypeFactory;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -19,13 +20,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ApiResolvedFormTypeTest extends \PHPUnit\Framework\TestCase
+class ApiResolvedFormTypeTest extends TestCase
 {
-    /** @var ResolvedFormTypeInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $innerType;
-
-    /** @var ApiResolvedFormTypeFactory */
-    private $type;
+    private ResolvedFormTypeInterface&MockObject $innerType;
+    private ApiResolvedFormType $type;
 
     #[\Override]
     protected function setUp(): void

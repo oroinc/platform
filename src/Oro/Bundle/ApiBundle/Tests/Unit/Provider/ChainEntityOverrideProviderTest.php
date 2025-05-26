@@ -4,11 +4,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ApiBundle\Provider\ChainEntityOverrideProvider;
 use Oro\Bundle\ApiBundle\Provider\MutableEntityOverrideProvider;
+use PHPUnit\Framework\TestCase;
 
-class ChainEntityOverrideProviderTest extends \PHPUnit\Framework\TestCase
+class ChainEntityOverrideProviderTest extends TestCase
 {
-    /** @var ChainEntityOverrideProvider */
-    private $chainEntityOverrideProvider;
+    private ChainEntityOverrideProvider $chainEntityOverrideProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +25,7 @@ class ChainEntityOverrideProviderTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function testGetSubstituteEntityClassWhenSubstitutionExistsInFirstProvider()
+    public function testGetSubstituteEntityClassWhenSubstitutionExistsInFirstProvider(): void
     {
         self::assertEquals(
             'Test\Model1_1',
@@ -33,7 +33,7 @@ class ChainEntityOverrideProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetSubstituteEntityClassWhenSubstitutionExistsInBothProviders()
+    public function testGetSubstituteEntityClassWhenSubstitutionExistsInBothProviders(): void
     {
         self::assertEquals(
             'Test\Model2_1',
@@ -41,7 +41,7 @@ class ChainEntityOverrideProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetSubstituteEntityClassWhenSubstitutionExistsInSecondProvider()
+    public function testGetSubstituteEntityClassWhenSubstitutionExistsInSecondProvider(): void
     {
         self::assertEquals(
             'Test\Model3_2',
@@ -49,14 +49,14 @@ class ChainEntityOverrideProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetSubstituteEntityClassWhenSubstitutionDoesNotExist()
+    public function testGetSubstituteEntityClassWhenSubstitutionDoesNotExist(): void
     {
         self::assertNull(
             $this->chainEntityOverrideProvider->getSubstituteEntityClass('Test\Entity4')
         );
     }
 
-    public function testGetEntityClassWhenSubstitutionExistsInFirstProvider()
+    public function testGetEntityClassWhenSubstitutionExistsInFirstProvider(): void
     {
         self::assertEquals(
             'Test\Entity1',
@@ -64,7 +64,7 @@ class ChainEntityOverrideProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityClassWhenSubstitutionExistsInBothProviders()
+    public function testGetEntityClassWhenSubstitutionExistsInBothProviders(): void
     {
         self::assertEquals(
             'Test\Entity2',
@@ -72,7 +72,7 @@ class ChainEntityOverrideProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityClassWhenSubstitutionExistsInSecondProvider()
+    public function testGetEntityClassWhenSubstitutionExistsInSecondProvider(): void
     {
         self::assertEquals(
             'Test\Entity3',
@@ -80,7 +80,7 @@ class ChainEntityOverrideProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityClassWhenSubstitutionDoesNotExist()
+    public function testGetEntityClassWhenSubstitutionDoesNotExist(): void
     {
         self::assertNull(
             $this->chainEntityOverrideProvider->getEntityClass('Test\Model4')

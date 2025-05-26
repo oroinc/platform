@@ -4,13 +4,14 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Metadata;
 
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class MetaPropertyMetadataTest extends \PHPUnit\Framework\TestCase
+class MetaPropertyMetadataTest extends TestCase
 {
-    public function testClone()
+    public function testClone(): void
     {
         $propertyMetadata = new MetaPropertyMetadata('testName', 'testDataType', 'testPropertyPath');
 
@@ -19,7 +20,7 @@ class MetaPropertyMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($propertyMetadata, $propertyMetadataClone);
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $propertyMetadata = new MetaPropertyMetadata('testName', 'testDataType', 'testPropertyPath');
 
@@ -33,7 +34,7 @@ class MetaPropertyMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testToArrayWithRequiredPropertiesOnly()
+    public function testToArrayWithRequiredPropertiesOnly(): void
     {
         $propertyMetadata = new MetaPropertyMetadata();
         $propertyMetadata->setName('testName');
@@ -46,7 +47,7 @@ class MetaPropertyMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testToArrayInputOnlyProperty()
+    public function testToArrayInputOnlyProperty(): void
     {
         $propertyMetadata = new MetaPropertyMetadata();
         $propertyMetadata->setName('testName');
@@ -61,7 +62,7 @@ class MetaPropertyMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testToArrayOutputOnlyProperty()
+    public function testToArrayOutputOnlyProperty(): void
     {
         $propertyMetadata = new MetaPropertyMetadata();
         $propertyMetadata->setName('testName');
@@ -76,7 +77,7 @@ class MetaPropertyMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testToArrayHiddenProperty()
+    public function testToArrayHiddenProperty(): void
     {
         $propertyMetadata = new MetaPropertyMetadata();
         $propertyMetadata->setName('testName');
@@ -91,20 +92,20 @@ class MetaPropertyMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testNameInConstructor()
+    public function testNameInConstructor(): void
     {
         $propertyMetadata = new MetaPropertyMetadata('name');
         self::assertEquals('name', $propertyMetadata->getName());
     }
 
-    public function testNameAndDataTypeInConstructor()
+    public function testNameAndDataTypeInConstructor(): void
     {
         $propertyMetadata = new MetaPropertyMetadata('name', 'string');
         self::assertEquals('name', $propertyMetadata->getName());
         self::assertEquals('string', $propertyMetadata->getDataType());
     }
 
-    public function testNameAndDataTypeAndPropertyPathInConstructor()
+    public function testNameAndDataTypeAndPropertyPathInConstructor(): void
     {
         $propertyMetadata = new MetaPropertyMetadata('name', 'string', 'property');
         self::assertEquals('name', $propertyMetadata->getName());
@@ -112,7 +113,7 @@ class MetaPropertyMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('property', $propertyMetadata->getPropertyPath());
     }
 
-    public function testName()
+    public function testName(): void
     {
         $propertyMetadata = new MetaPropertyMetadata();
 
@@ -121,7 +122,7 @@ class MetaPropertyMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('name', $propertyMetadata->getName());
     }
 
-    public function testPropertyPath()
+    public function testPropertyPath(): void
     {
         $propertyMetadata = new MetaPropertyMetadata();
 
@@ -136,7 +137,7 @@ class MetaPropertyMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('name', $propertyMetadata->getPropertyPath());
     }
 
-    public function testDataType()
+    public function testDataType(): void
     {
         $propertyMetadata = new MetaPropertyMetadata();
 
@@ -145,7 +146,7 @@ class MetaPropertyMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('dataType', $propertyMetadata->getDataType());
     }
 
-    public function testDirection()
+    public function testDirection(): void
     {
         $propertyMetadata = new MetaPropertyMetadata();
 
@@ -168,7 +169,7 @@ class MetaPropertyMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($propertyMetadata->isOutput());
     }
 
-    public function testHidden()
+    public function testHidden(): void
     {
         $propertyMetadata = new MetaPropertyMetadata();
 
@@ -181,7 +182,7 @@ class MetaPropertyMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($propertyMetadata->isOutput());
     }
 
-    public function testResultName()
+    public function testResultName(): void
     {
         $propertyMetadata = new MetaPropertyMetadata();
 

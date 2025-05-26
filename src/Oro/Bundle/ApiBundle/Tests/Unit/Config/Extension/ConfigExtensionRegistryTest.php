@@ -6,23 +6,24 @@ use Oro\Bundle\ApiBundle\Config\Definition\ConfigurationSectionInterface;
 use Oro\Bundle\ApiBundle\Config\Definition\ConfigurationSettings;
 use Oro\Bundle\ApiBundle\Config\Extension\ConfigExtensionInterface;
 use Oro\Bundle\ApiBundle\Config\Extension\ConfigExtensionRegistry;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
-class ConfigExtensionRegistryTest extends \PHPUnit\Framework\TestCase
+class ConfigExtensionRegistryTest extends TestCase
 {
-    public function testDefaultConstructor()
+    public function testDefaultConstructor(): void
     {
         $configExtensionRegistry = new ConfigExtensionRegistry();
         self::assertSame(0, $configExtensionRegistry->getMaxNestingLevel());
     }
 
-    public function testConstructorWithMaxNestingLevel()
+    public function testConstructorWithMaxNestingLevel(): void
     {
         $configExtensionRegistry = new ConfigExtensionRegistry(1);
         self::assertSame(1, $configExtensionRegistry->getMaxNestingLevel());
     }
 
-    public function testExtensions()
+    public function testExtensions(): void
     {
         $configExtensionRegistry = new ConfigExtensionRegistry();
         self::assertSame([], $configExtensionRegistry->getExtensions());
@@ -32,7 +33,7 @@ class ConfigExtensionRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame([$extension], $configExtensionRegistry->getExtensions());
     }
 
-    public function testGetConfigurationSettings()
+    public function testGetConfigurationSettings(): void
     {
         $configExtensionRegistry = new ConfigExtensionRegistry();
         $extension = $this->createMock(ConfigExtensionInterface::class);
@@ -82,7 +83,7 @@ class ConfigExtensionRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($postProcessCallback, reset($postProcessCallbacks));
     }
 
-    public function testGetConfigSectionNames()
+    public function testGetConfigSectionNames(): void
     {
         $configExtensionRegistry = new ConfigExtensionRegistry();
         $extension1 = $this->createMock(ConfigExtensionInterface::class);

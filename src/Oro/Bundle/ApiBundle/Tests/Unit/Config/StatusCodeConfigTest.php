@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ApiBundle\Config\StatusCodeConfig;
+use PHPUnit\Framework\TestCase;
 
-class StatusCodeConfigTest extends \PHPUnit\Framework\TestCase
+class StatusCodeConfigTest extends TestCase
 {
-    public function testCustomAttribute()
+    public function testCustomAttribute(): void
     {
         $attrName = 'test';
 
@@ -34,7 +35,7 @@ class StatusCodeConfigTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $config->keys());
     }
 
-    public function testClone()
+    public function testClone(): void
     {
         $config = new StatusCodeConfig();
         self::assertEmpty($config->toArray());
@@ -50,7 +51,7 @@ class StatusCodeConfigTest extends \PHPUnit\Framework\TestCase
         self::assertNotSame($objValue, $configClone->get('test_object'));
     }
 
-    public function testExcluded()
+    public function testExcluded(): void
     {
         $config = new StatusCodeConfig();
         self::assertFalse($config->hasExcluded());
@@ -67,7 +68,7 @@ class StatusCodeConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testDescription()
+    public function testDescription(): void
     {
         $config = new StatusCodeConfig();
         self::assertFalse($config->hasDescription());

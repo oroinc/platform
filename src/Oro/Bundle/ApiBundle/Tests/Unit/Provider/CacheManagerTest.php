@@ -9,24 +9,19 @@ use Oro\Bundle\ApiBundle\Provider\ConfigCacheWarmer;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\EntityAliasResolverRegistry;
 use Oro\Bundle\ApiBundle\Provider\ResourcesCacheWarmer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class CacheManagerTest extends \PHPUnit\Framework\TestCase
+class CacheManagerTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigCacheWarmer */
-    private $configCacheWarmer;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityAliasResolverRegistry */
-    private $entityAliasResolverRegistry;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesCacheWarmer */
-    private $resourcesCacheWarmer;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
-    private $configProvider;
+    private ConfigCacheWarmer&MockObject $configCacheWarmer;
+    private EntityAliasResolverRegistry&MockObject $entityAliasResolverRegistry;
+    private ResourcesCacheWarmer&MockObject $resourcesCacheWarmer;
+    private ConfigProvider&MockObject $configProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -51,7 +46,7 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testClearCaches()
+    public function testClearCaches(): void
     {
         $cacheManager = $this->getCacheManager([], $this->createMock(ApiDocExtractor::class));
 
@@ -65,7 +60,7 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
         $cacheManager->clearCaches();
     }
 
-    public function testWarmUpCaches()
+    public function testWarmUpCaches(): void
     {
         $cacheManager = $this->getCacheManager([], $this->createMock(ApiDocExtractor::class));
 
@@ -79,7 +74,7 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
         $cacheManager->warmUpCaches();
     }
 
-    public function testWarmUpConfigCache()
+    public function testWarmUpConfigCache(): void
     {
         $cacheManager = $this->getCacheManager([], $this->createMock(ApiDocExtractor::class));
 
@@ -93,21 +88,21 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
         $cacheManager->warmUpConfigCache();
     }
 
-    public function testIsApiDocCacheEnabledForNonCachingApiDocExtractor()
+    public function testIsApiDocCacheEnabledForNonCachingApiDocExtractor(): void
     {
         $cacheManager = $this->getCacheManager([], $this->createMock(ApiDocExtractor::class));
 
         self::assertFalse($cacheManager->isApiDocCacheEnabled());
     }
 
-    public function testIsApiDocCacheEnabledForCachingApiDocExtractor()
+    public function testIsApiDocCacheEnabledForCachingApiDocExtractor(): void
     {
         $cacheManager = $this->getCacheManager([], $this->createMock(CachingApiDocExtractor::class));
 
         self::assertTrue($cacheManager->isApiDocCacheEnabled());
     }
 
-    public function testClearApiDocCacheForNonCachingApiDocExtractor()
+    public function testClearApiDocCacheForNonCachingApiDocExtractor(): void
     {
         $apiDocExtractor = $this->createMock(ApiDocExtractor::class);
         $cacheManager = $this->getCacheManager(['view1' => ['rest'], 'view2' => []], $apiDocExtractor);
@@ -115,7 +110,7 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
         $cacheManager->clearApiDocCache();
     }
 
-    public function testClearApiDocCacheForCachingApiDocExtractorAndViewIsNotSpecified()
+    public function testClearApiDocCacheForCachingApiDocExtractorAndViewIsNotSpecified(): void
     {
         $apiDocExtractor = $this->createMock(CachingApiDocExtractor::class);
         $cacheManager = $this->getCacheManager(['view1' => ['rest'], 'view2' => []], $apiDocExtractor);
@@ -127,7 +122,7 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
         $cacheManager->clearApiDocCache();
     }
 
-    public function testClearApiDocCacheForCachingApiDocExtractorAndViewIsSpecified()
+    public function testClearApiDocCacheForCachingApiDocExtractorAndViewIsSpecified(): void
     {
         $apiDocExtractor = $this->createMock(CachingApiDocExtractor::class);
         $cacheManager = $this->getCacheManager(['view1' => ['rest'], 'view2' => []], $apiDocExtractor);
@@ -139,7 +134,7 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
         $cacheManager->clearApiDocCache('view1');
     }
 
-    public function testWarmUpApiDocCacheForNonCachingApiDocExtractor()
+    public function testWarmUpApiDocCacheForNonCachingApiDocExtractor(): void
     {
         $apiDocExtractor = $this->createMock(ApiDocExtractor::class);
         $cacheManager = $this->getCacheManager(['view1' => ['rest'], 'view2' => []], $apiDocExtractor);
@@ -147,7 +142,7 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
         $cacheManager->warmUpApiDocCache();
     }
 
-    public function testWarmUpApiDocCacheForCachingApiDocExtractorAndViewIsNotSpecified()
+    public function testWarmUpApiDocCacheForCachingApiDocExtractorAndViewIsNotSpecified(): void
     {
         $apiDocExtractor = $this->createMock(CachingApiDocExtractor::class);
         $resettableService = $this->createMock(ResetInterface::class);
@@ -192,7 +187,7 @@ class CacheManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWarmUpApiDocCacheForCachingApiDocExtractorAndViewIsSpecified()
+    public function testWarmUpApiDocCacheForCachingApiDocExtractorAndViewIsSpecified(): void
     {
         $apiDocExtractor = $this->createMock(CachingApiDocExtractor::class);
         $resettableService = $this->createMock(ResetInterface::class);

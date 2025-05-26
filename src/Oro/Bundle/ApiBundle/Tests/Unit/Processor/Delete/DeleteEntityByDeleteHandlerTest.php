@@ -7,17 +7,14 @@ use Oro\Bundle\ApiBundle\Processor\Delete\DeleteEntityByDeleteHandler;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerInterface;
 use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class DeleteEntityByDeleteHandlerTest extends DeleteProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    private $doctrineHelper;
+    private DoctrineHelper&MockObject $doctrineHelper;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityDeleteHandlerRegistry */
-    private $deleteHandlerRegistry;
-
-    /** @var DeleteEntityByDeleteHandler */
-    private $processor;
+    private EntityDeleteHandlerRegistry&MockObject $deleteHandlerRegistry;
+    private DeleteEntityByDeleteHandler $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +30,7 @@ class DeleteEntityByDeleteHandlerTest extends DeleteProcessorTestCase
         );
     }
 
-    public function testProcessWithoutResult()
+    public function testProcessWithoutResult(): void
     {
         $this->deleteHandlerRegistry->expects(self::never())
             ->method('getHandler');
@@ -41,7 +38,7 @@ class DeleteEntityByDeleteHandlerTest extends DeleteProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessForNotManageableEntity(): void
     {
         $entity = new \stdClass();
         $entityClass = \get_class($entity);
@@ -62,7 +59,7 @@ class DeleteEntityByDeleteHandlerTest extends DeleteProcessorTestCase
         self::assertSame($entity, $this->context->getResult());
     }
 
-    public function testProcessForNotObjectResult()
+    public function testProcessForNotObjectResult(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The result property of the context should be an object, "string" given.');
@@ -90,7 +87,7 @@ class DeleteEntityByDeleteHandlerTest extends DeleteProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $entity = new \stdClass();
         $entityClass = \get_class($entity);
@@ -119,7 +116,7 @@ class DeleteEntityByDeleteHandlerTest extends DeleteProcessorTestCase
         self::assertFalse($this->context->hasResult());
     }
 
-    public function testProcessForModelInheritedFromManageableEntity()
+    public function testProcessForModelInheritedFromManageableEntity(): void
     {
         $entity = new \stdClass();
         $entityClass = \get_class($entity);

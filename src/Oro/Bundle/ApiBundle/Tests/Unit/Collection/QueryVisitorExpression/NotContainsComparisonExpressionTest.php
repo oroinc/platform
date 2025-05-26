@@ -9,8 +9,9 @@ use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ExpressionValue;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NotContainsComparisonExpression;
 use Oro\Bundle\ApiBundle\Tests\Unit\Stub\FieldDqlExpressionProviderStub;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use PHPUnit\Framework\TestCase;
 
-class NotContainsComparisonExpressionTest extends \PHPUnit\Framework\TestCase
+class NotContainsComparisonExpressionTest extends TestCase
 {
     public function testWalkComparisonExpression(): void
     {

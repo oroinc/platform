@@ -10,14 +10,15 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EntityHandlerTest extends \PHPUnit\Framework\TestCase
+class EntityHandlerTest extends TestCase
 {
-    /** @var ActionProcessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $customizationProcessor;
+    private ActionProcessorInterface&MockObject $customizationProcessor;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +33,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
         return $data;
     }
 
-    public function testWithoutPreviousHandler()
+    public function testWithoutPreviousHandler(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -67,7 +68,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
                     $config,
                     $configExtras,
                     $data
-                ) {
+                ): void {
                     self::assertEquals($version, $context->getVersion());
                     self::assertEquals($requestType, $context->getRequestType());
                     self::assertNull($context->getParentAction());
@@ -92,7 +93,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWithPreviousHandlerThatIsRedundant()
+    public function testWithPreviousHandlerThatIsRedundant(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -142,7 +143,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWithSeveralPreviousHandlersAndMiddleLevelPreviousHandlerIsRedundant()
+    public function testWithSeveralPreviousHandlersAndMiddleLevelPreviousHandlerIsRedundant(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -198,7 +199,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWithPreviousHandlerThatIsNotRedundantDueToVersion()
+    public function testWithPreviousHandlerThatIsNotRedundantDueToVersion(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -252,7 +253,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWithPreviousHandlerThatIsNotRedundantDueToRequestType()
+    public function testWithPreviousHandlerThatIsNotRedundantDueToRequestType(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -306,7 +307,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWithPreviousHandlerThatIsNotRedundantDueToEntityClass()
+    public function testWithPreviousHandlerThatIsNotRedundantDueToEntityClass(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -360,7 +361,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWithPreviousHandlerThatIsNotRedundantDueToHandlerType()
+    public function testWithPreviousHandlerThatIsNotRedundantDueToHandlerType(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -406,7 +407,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testForIdentifierOnly()
+    public function testForIdentifierOnly(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -442,7 +443,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
         $handler($data, $context);
     }
 
-    public function testForIdentifierOnlyWithCompositeIdentifier()
+    public function testForIdentifierOnlyWithCompositeIdentifier(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -479,7 +480,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
         $handler($data, $context);
     }
 
-    public function testForOneFieldThatIsNotIdentifier()
+    public function testForOneFieldThatIsNotIdentifier(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -515,7 +516,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
         $handler($data, $context);
     }
 
-    public function testForEntityWithoutIdentifier()
+    public function testForEntityWithoutIdentifier(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -550,7 +551,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
         $handler($data, $context);
     }
 
-    public function testForCollectionHandler()
+    public function testForCollectionHandler(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -610,7 +611,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWithCustomConfig()
+    public function testWithCustomConfig(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -675,7 +676,7 @@ class EntityHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWithParentAction()
+    public function testWithParentAction(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);

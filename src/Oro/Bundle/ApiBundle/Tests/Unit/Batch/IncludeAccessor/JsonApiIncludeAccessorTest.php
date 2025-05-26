@@ -4,11 +4,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\IncludeAccessor;
 
 use Oro\Bundle\ApiBundle\Batch\IncludeAccessor\JsonApiIncludeAccessor;
 use Oro\Bundle\ApiBundle\Batch\ItemKeyBuilder;
+use PHPUnit\Framework\TestCase;
 
-class JsonApiIncludeAccessorTest extends \PHPUnit\Framework\TestCase
+class JsonApiIncludeAccessorTest extends TestCase
 {
-    /** @var JsonApiIncludeAccessor */
-    private $includeAccessor;
+    private JsonApiIncludeAccessor $includeAccessor;
 
     #[\Override]
     protected function setUp(): void
@@ -16,14 +16,14 @@ class JsonApiIncludeAccessorTest extends \PHPUnit\Framework\TestCase
         $this->includeAccessor = new JsonApiIncludeAccessor(new ItemKeyBuilder());
     }
 
-    public function testGetPrimaryItemData()
+    public function testGetPrimaryItemData(): void
     {
         $itemData = ['type' => 'accounts', 'id' => '1'];
         $item = ['jsonapi' => ['version' => '1.0'], 'data' => $itemData];
         self::assertSame($itemData, $this->includeAccessor->getPrimaryItemData($item));
     }
 
-    public function testSetPrimaryItemData()
+    public function testSetPrimaryItemData(): void
     {
         $item = ['jsonapi' => ['version' => '1.0'], 'data' => ['type' => 'accounts', 'id' => 'old']];
         $this->includeAccessor->setPrimaryItemData($item, ['type' => 'accounts', 'id' => 'new']);
@@ -33,7 +33,7 @@ class JsonApiIncludeAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetItemIdentifier()
+    public function testGetItemIdentifier(): void
     {
         self::assertSame(
             ['accounts', '1'],
@@ -44,7 +44,7 @@ class JsonApiIncludeAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getItemIdentifierWithInvalidDataProvider
      */
-    public function testGetItemIdentifierWithInvalidData(array $item, string $expectedExceptionMessage)
+    public function testGetItemIdentifierWithInvalidData(array $item, string $expectedExceptionMessage): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
@@ -69,7 +69,7 @@ class JsonApiIncludeAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getRelationshipsProvider
      */
-    public function testGetRelationships(array $item, array $expectedResult)
+    public function testGetRelationships(array $item, array $expectedResult): void
     {
         self::assertSame($expectedResult, $this->includeAccessor->getRelationships($item));
     }
@@ -201,7 +201,7 @@ class JsonApiIncludeAccessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider updateRelationshipsProvider
      */
-    public function testUpdateRelationships(array $item, ?array $expectedResult = null)
+    public function testUpdateRelationships(array $item, ?array $expectedResult = null): void
     {
         if (null === $expectedResult) {
             $expectedResult = $item;
@@ -361,7 +361,7 @@ class JsonApiIncludeAccessorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testUpdateRelationshipsWhenNewIdsNotFound()
+    public function testUpdateRelationshipsWhenNewIdsNotFound(): void
     {
         $item = [
             'type'          => 'accounts',

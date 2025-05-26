@@ -6,8 +6,9 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use PHPUnit\Framework\TestCase;
 
-class UnhandledErrorProcessorTestCase extends \PHPUnit\Framework\TestCase
+class UnhandledErrorProcessorTestCase extends TestCase
 {
     protected const TEST_VERSION = '1.1';
     protected const TEST_REQUEST_TYPE = RequestType::REST;

@@ -7,8 +7,7 @@ use Oro\Bundle\ApiBundle\Batch\Processor\Update\UnlockIncludedData;
 
 class UnlockIncludedDataTest extends BatchUpdateProcessorTestCase
 {
-    /** @var UnlockIncludedData */
-    private $processor;
+    private UnlockIncludedData $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -18,12 +17,12 @@ class UnlockIncludedDataTest extends BatchUpdateProcessorTestCase
         $this->processor = new UnlockIncludedData();
     }
 
-    public function testProcessWithoutIncludedData()
+    public function testProcessWithoutIncludedData(): void
     {
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithIncludedData()
+    public function testProcessWithIncludedData(): void
     {
         $includedData = $this->createMock(IncludedData::class);
 

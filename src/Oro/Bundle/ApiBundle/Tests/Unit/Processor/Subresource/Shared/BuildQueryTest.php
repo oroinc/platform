@@ -21,7 +21,7 @@ class BuildQueryTest extends GetSubresourceProcessorOrmRelatedTestCase
         $this->processor = new BuildQuery($this->doctrineHelper);
     }
 
-    public function testProcessWhenQueryIsAlreadyBuilt()
+    public function testProcessWhenQueryIsAlreadyBuilt(): void
     {
         $qb = $this->createMock(QueryBuilder::class);
 
@@ -31,7 +31,7 @@ class BuildQueryTest extends GetSubresourceProcessorOrmRelatedTestCase
         self::assertSame($qb, $this->context->getQuery());
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessForNotManageableEntity(): void
     {
         $className = 'Test\Class';
 
@@ -46,7 +46,7 @@ class BuildQueryTest extends GetSubresourceProcessorOrmRelatedTestCase
         self::assertNull($this->context->getQuery());
     }
 
-    public function testProcessManageableEntity()
+    public function testProcessManageableEntity(): void
     {
         $className = Entity\User::class;
 
@@ -65,7 +65,7 @@ class BuildQueryTest extends GetSubresourceProcessorOrmRelatedTestCase
         );
     }
 
-    public function testProcessForResourceBasedOnManageableEntity()
+    public function testProcessForResourceBasedOnManageableEntity(): void
     {
         $entityClass = Entity\UserProfile::class;
         $parentResourceClass = Entity\User::class;
@@ -89,7 +89,7 @@ class BuildQueryTest extends GetSubresourceProcessorOrmRelatedTestCase
         );
     }
 
-    public function testProcessForResourceBasedOnNotManageableEntity()
+    public function testProcessForResourceBasedOnNotManageableEntity(): void
     {
         $entityClass = 'Test\Class';
         $parentResourceClass = 'Test\ParentClass';
@@ -105,7 +105,7 @@ class BuildQueryTest extends GetSubresourceProcessorOrmRelatedTestCase
         self::assertNull($this->context->getQuery());
     }
 
-    public function testProcessManageableEntityAndComputedAssociation()
+    public function testProcessManageableEntityAndComputedAssociation(): void
     {
         $className = Entity\User::class;
 
@@ -136,7 +136,7 @@ class BuildQueryTest extends GetSubresourceProcessorOrmRelatedTestCase
         self::assertNotSame($associationQuery, $query);
     }
 
-    public function testProcessManageableEntityAndComputedAssociationWithoutAssociationQuery()
+    public function testProcessManageableEntityAndComputedAssociationWithoutAssociationQuery(): void
     {
         $className = Entity\User::class;
 
@@ -154,7 +154,7 @@ class BuildQueryTest extends GetSubresourceProcessorOrmRelatedTestCase
         self::assertFalse($this->context->hasQuery());
     }
 
-    public function testProcessManageableEntityAndNotComputedAssociation()
+    public function testProcessManageableEntityAndNotComputedAssociation(): void
     {
         $className = Entity\User::class;
 

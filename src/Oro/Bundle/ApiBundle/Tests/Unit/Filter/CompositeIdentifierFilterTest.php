@@ -13,14 +13,13 @@ use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
+class CompositeIdentifierFilterTest extends TestCase
 {
-    /** @var EntityIdTransformerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityIdTransformerRegistry;
-
-    /** @var CompositeIdentifierFilter */
-    private $filter;
+    private EntityIdTransformerRegistry&MockObject $entityIdTransformerRegistry;
+    private CompositeIdentifierFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +31,7 @@ class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->setSupportedOperators([FilterOperator::EQ, FilterOperator::NEQ]);
     }
 
-    public function testApplyFilterForNullFilterValue()
+    public function testApplyFilterForNullFilterValue(): void
     {
         $requestType = new RequestType([RequestType::REST]);
         $metadata = new EntityMetadata('Test\Entity');
@@ -46,7 +45,7 @@ class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
         self::assertNull($criteria->getWhereExpression());
     }
 
-    public function testApplyFilterForNullIdentifier()
+    public function testApplyFilterForNullIdentifier(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The value must not be NULL.');
@@ -62,7 +61,7 @@ class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->apply($criteria, $filterValue);
     }
 
-    public function testApplyFilterForUnsupportedOperator()
+    public function testApplyFilterForUnsupportedOperator(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The operator ">" is not supported.');
@@ -78,7 +77,7 @@ class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->apply($criteria, $filterValue);
     }
 
-    public function testApplyFilterForEqualOperatorAndOneId()
+    public function testApplyFilterForEqualOperatorAndOneId(): void
     {
         $filterValue = new FilterValue('id', 'id1=1;renamedId2=2');
         $requestType = new RequestType([RequestType::REST]);
@@ -115,7 +114,7 @@ class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testApplyFilterForNotEqualOperatorAndOneId()
+    public function testApplyFilterForNotEqualOperatorAndOneId(): void
     {
         $filterValue = new FilterValue('id', 'id1=1;renamedId2=2', FilterOperator::NEQ);
         $requestType = new RequestType([RequestType::REST]);
@@ -152,7 +151,7 @@ class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testApplyFilterForEqualOperatorAndSeveralIds()
+    public function testApplyFilterForEqualOperatorAndSeveralIds(): void
     {
         $filterValue = new FilterValue('id', ['id1=1;renamedId2=2', 'id1=3;renamedId2=4']);
         $requestType = new RequestType([RequestType::REST]);
@@ -203,7 +202,7 @@ class CompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testApplyFilterForNotEqualOperatorAndSeveralIds()
+    public function testApplyFilterForNotEqualOperatorAndSeveralIds(): void
     {
         $filterValue = new FilterValue('id', ['id1=1;renamedId2=2', 'id1=3;renamedId2=4'], FilterOperator::NEQ);
         $requestType = new RequestType([RequestType::REST]);

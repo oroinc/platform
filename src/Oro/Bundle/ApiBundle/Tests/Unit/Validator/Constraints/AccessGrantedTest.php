@@ -3,9 +3,10 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\ApiBundle\Validator\Constraints\AccessGranted;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 
-class AccessGrantedTest extends \PHPUnit\Framework\TestCase
+class AccessGrantedTest extends TestCase
 {
     public function testGetDefaultPermission(): void
     {

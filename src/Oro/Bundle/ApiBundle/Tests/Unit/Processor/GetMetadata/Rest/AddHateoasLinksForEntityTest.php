@@ -13,15 +13,13 @@ use Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetMetadata\MetadataProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class AddHateoasLinksForEntityTest extends MetadataProcessorTestCase
 {
-    /** @var ResourcesProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $resourcesProvider;
-
-    /** @var AddHateoasLinksForEntity */
-    private $processor;
+    private ResourcesProvider&MockObject $resourcesProvider;
+    private AddHateoasLinksForEntity $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -41,13 +39,13 @@ class AddHateoasLinksForEntityTest extends MetadataProcessorTestCase
         );
     }
 
-    public function testProcessWhenNotEntityMetadataInResult()
+    public function testProcessWhenNotEntityMetadataInResult(): void
     {
         $this->processor->process($this->context);
         self::assertFalse($this->context->hasResult());
     }
 
-    public function testProcessWhenSelfLinkAlreadyExistsInEntityMetadata()
+    public function testProcessWhenSelfLinkAlreadyExistsInEntityMetadata(): void
     {
         $existingSelfLinkMetadata = new ExternalLinkMetadata('url');
         $entityMetadata = new EntityMetadata('Test\Entity');
@@ -63,7 +61,7 @@ class AddHateoasLinksForEntityTest extends MetadataProcessorTestCase
         self::assertSame($existingSelfLinkMetadata, $entityMetadata->getLink('self'));
     }
 
-    public function testProcessWhenSelfLinkDoesNotExistInEntityMetadata()
+    public function testProcessWhenSelfLinkDoesNotExistInEntityMetadata(): void
     {
         $entityMetadata = new EntityMetadata('Test\Entity');
 
@@ -88,7 +86,7 @@ class AddHateoasLinksForEntityTest extends MetadataProcessorTestCase
         );
     }
 
-    public function testProcessWhenSelfLinkDoesNotExistInEntityMetadataAndGetActionExcluded()
+    public function testProcessWhenSelfLinkDoesNotExistInEntityMetadataAndGetActionExcluded(): void
     {
         $entityMetadata = new EntityMetadata('Test\Entity');
 

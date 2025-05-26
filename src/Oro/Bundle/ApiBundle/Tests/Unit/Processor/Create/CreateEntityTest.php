@@ -10,20 +10,14 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class CreateEntityTest extends CreateProcessorTestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var EntityLoader|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityLoader;
-
-    /** @var EntityInstantiator|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityInstantiator;
-
-    /** @var CreateEntity */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EntityLoader&MockObject $entityLoader;
+    private EntityInstantiator&MockObject $entityInstantiator;
+    private CreateEntity $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -41,7 +35,7 @@ class CreateEntityTest extends CreateProcessorTestCase
         );
     }
 
-    public function testProcessWithoutEntityId()
+    public function testProcessWithoutEntityId(): void
     {
         $entityClass = Entity\Product::class;
         $entity = new $entityClass();
@@ -59,7 +53,7 @@ class CreateEntityTest extends CreateProcessorTestCase
         self::assertSame($entity, $this->context->getResult());
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessForNotManageableEntity(): void
     {
         $entityClass = Entity\Product::class;
         $entity = new $entityClass();
@@ -82,7 +76,7 @@ class CreateEntityTest extends CreateProcessorTestCase
         self::assertSame($entity, $this->context->getResult());
     }
 
-    public function testProcessForEntityWithIdGenerator()
+    public function testProcessForEntityWithIdGenerator(): void
     {
         $entityClass = Entity\Product::class;
         $entity = new $entityClass();
@@ -108,7 +102,7 @@ class CreateEntityTest extends CreateProcessorTestCase
         self::assertSame($entity, $this->context->getResult());
     }
 
-    public function testProcessForEntityWithoutIdGeneratorAndEntityDoesNotExist()
+    public function testProcessForEntityWithoutIdGeneratorAndEntityDoesNotExist(): void
     {
         $entityClass = Entity\Product::class;
         $entityId = 123;
@@ -139,7 +133,7 @@ class CreateEntityTest extends CreateProcessorTestCase
         self::assertSame($entity, $this->context->getResult());
     }
 
-    public function testProcessForEntityWithoutIdGeneratorAndEntityAlreadyExists()
+    public function testProcessForEntityWithoutIdGeneratorAndEntityAlreadyExists(): void
     {
         $entityClass = Entity\Product::class;
         $entityId = 123;
@@ -171,7 +165,7 @@ class CreateEntityTest extends CreateProcessorTestCase
         );
     }
 
-    public function testProcessWhenEntityIsAlreadyCreated()
+    public function testProcessWhenEntityIsAlreadyCreated(): void
     {
         $entityClass = Entity\Product::class;
         $entity = new $entityClass();
@@ -188,7 +182,7 @@ class CreateEntityTest extends CreateProcessorTestCase
         self::assertSame($entity, $this->context->getResult());
     }
 
-    public function testProcessForApiResourceBasedOnManageableEntity()
+    public function testProcessForApiResourceBasedOnManageableEntity(): void
     {
         $entityClass = Entity\UserProfile::class;
         $parentResourceClass = Entity\User::class;
@@ -218,7 +212,7 @@ class CreateEntityTest extends CreateProcessorTestCase
         self::assertSame($entity, $this->context->getResult());
     }
 
-    public function testProcessWhenDataClassIsSpecifiedForForm()
+    public function testProcessWhenDataClassIsSpecifiedForForm(): void
     {
         $entityClass = Entity\User::class;
         $formDataClass = Entity\Product::class;
@@ -249,7 +243,7 @@ class CreateEntityTest extends CreateProcessorTestCase
         self::assertSame($entity, $this->context->getResult());
     }
 
-    public function testProcessWhenDataClassIsSpecifiedForFormAndResultIsAlreadySet()
+    public function testProcessWhenDataClassIsSpecifiedForFormAndResultIsAlreadySet(): void
     {
         $entityClass = Entity\User::class;
         $formDataClass = Entity\Product::class;

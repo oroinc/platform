@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Security\Http\Firewall;
 
 use Oro\Bundle\ApiBundle\Security\Http\Firewall\ExceptionListener;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -16,9 +17,9 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 
-class ExceptionListenerTest extends \PHPUnit\Framework\TestCase
+class ExceptionListenerTest extends TestCase
 {
-    private const SESSION_NAME = 'TEST_SESSION_ID';
+    private const string SESSION_NAME = 'TEST_SESSION_ID';
 
     /**
      * @dataProvider getExceptionProvider

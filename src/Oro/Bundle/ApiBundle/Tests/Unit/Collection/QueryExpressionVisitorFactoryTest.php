@@ -8,10 +8,11 @@ use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ComparisonExpressionI
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\CompositeExpressionInterface;
 use Oro\Bundle\ApiBundle\Util\FieldDqlExpressionProviderInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use PHPUnit\Framework\TestCase;
 
-class QueryExpressionVisitorFactoryTest extends \PHPUnit\Framework\TestCase
+class QueryExpressionVisitorFactoryTest extends TestCase
 {
-    public function testCreateExpressionVisitor()
+    public function testCreateExpressionVisitor(): void
     {
         $compositeExpressions = ['AND' => $this->createMock(CompositeExpressionInterface::class)];
         $comparisonExpressions = ['=' => $this->createMock(ComparisonExpressionInterface::class)];

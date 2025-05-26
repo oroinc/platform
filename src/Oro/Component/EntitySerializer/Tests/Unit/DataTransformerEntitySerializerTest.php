@@ -34,7 +34,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
             [1 => \PDO::PARAM_INT]
         );
 
-        $this->container->expects($this->once())
+        $this->container->expects(self::once())
             ->method('get')
             ->with('data_transformer_service_id', ContainerInterface::NULL_ON_INVALID_REFERENCE)
             ->willReturn(null);
@@ -81,7 +81,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
             [1 => \PDO::PARAM_INT]
         );
 
-        $this->container->expects($this->once())
+        $this->container->expects(self::once())
             ->method('get')
             ->with('data_transformer_service_id', ContainerInterface::NULL_ON_INVALID_REFERENCE)
             ->willReturn(new \stdClass());
@@ -123,7 +123,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
 
         $context = ['key' => 'context value'];
         $transformer = $this->createMock(DataTransformerInterface::class);
-        $transformer->expects($this->once())
+        $transformer->expects(self::once())
             ->method('transform')
             ->with(
                 'group_name',
@@ -132,7 +132,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
             )
             ->willReturn('transformed_group_name');
 
-        $this->container->expects($this->once())
+        $this->container->expects(self::once())
             ->method('get')
             ->with('data_transformer_service_id', ContainerInterface::NULL_ON_INVALID_REFERENCE)
             ->willReturn($transformer);
@@ -184,12 +184,12 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
         );
 
         $transformer = $this->createMock(FormDataTransformerInterface::class);
-        $transformer->expects($this->once())
+        $transformer->expects(self::once())
             ->method('transform')
             ->with('group_name')
             ->willReturn('transformed_group_name');
 
-        $this->container->expects($this->once())
+        $this->container->expects(self::once())
             ->method('get')
             ->with('data_transformer_service_id', ContainerInterface::NULL_ON_INVALID_REFERENCE)
             ->willReturn($transformer);
@@ -289,7 +289,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
         );
 
         $transformer = $this->createMock(DataTransformerInterface::class);
-        $transformer->expects($this->once())
+        $transformer->expects(self::once())
             ->method('transform')
             ->with(
                 'group_name',
@@ -298,7 +298,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
             )
             ->willReturn('transformed_group_name');
 
-        $this->container->expects($this->once())
+        $this->container->expects(self::once())
             ->method('get')
             ->with('data_transformer_service_id', ContainerInterface::NULL_ON_INVALID_REFERENCE)
             ->willReturn($transformer);
@@ -354,7 +354,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
         );
 
         $transformer = $this->createMock(DataTransformerInterface::class);
-        $transformer->expects($this->once())
+        $transformer->expects(self::once())
             ->method('transform')
             ->with(
                 'user_name',
@@ -363,7 +363,7 @@ class DataTransformerEntitySerializerTest extends EntitySerializerTestCase
             )
             ->willReturn('transformed_user_name');
 
-        $this->container->expects($this->once())
+        $this->container->expects(self::once())
             ->method('get')
             ->with('data_transformer_service_id', ContainerInterface::NULL_ON_INVALID_REFERENCE)
             ->willReturn($transformer);

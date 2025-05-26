@@ -5,6 +5,8 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Security;
 use Oro\Bundle\ApiBundle\Security\FeatureDependAuthenticatorChecker;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SecurityBundle\Authentication\Authenticator\UsernamePasswordOrganizationAuthenticator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
@@ -12,13 +14,10 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerI
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 
-class FeatureDependAuthenticatorCheckerTest extends \PHPUnit\Framework\TestCase
+class FeatureDependAuthenticatorCheckerTest extends TestCase
 {
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /** @var FeatureDependAuthenticatorChecker */
-    private $checker;
+    private FeatureChecker&MockObject $featureChecker;
+    private FeatureDependAuthenticatorChecker $checker;
 
     #[\Override]
     protected function setUp(): void

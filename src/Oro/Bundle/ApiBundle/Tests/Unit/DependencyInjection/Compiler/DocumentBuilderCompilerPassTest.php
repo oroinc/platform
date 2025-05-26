@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\DocumentBuilderCompilerPass;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderFactory;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -11,12 +12,10 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class DocumentBuilderCompilerPassTest extends \PHPUnit\Framework\TestCase
+class DocumentBuilderCompilerPassTest extends TestCase
 {
     private DocumentBuilderCompilerPass $compiler;
-
     private ContainerBuilder $container;
-
     private Definition $factory;
 
     #[\Override]

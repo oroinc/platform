@@ -4,14 +4,12 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig;
 
 use Oro\Bundle\ApiBundle\Processor\GetConfig\MakeTimestampableFieldsReadOnly;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class MakeTimestampableFieldsReadOnlyTest extends ConfigProcessorTestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var MakeTimestampableFieldsReadOnly */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private MakeTimestampableFieldsReadOnly $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +23,7 @@ class MakeTimestampableFieldsReadOnlyTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForNotCompletedConfig()
+    public function testProcessForNotCompletedConfig(): void
     {
         $config = [
             'exclusion_policy' => 'none',
@@ -52,7 +50,7 @@ class MakeTimestampableFieldsReadOnlyTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessForNotManageableEntity(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -85,7 +83,7 @@ class MakeTimestampableFieldsReadOnlyTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -126,7 +124,7 @@ class MakeTimestampableFieldsReadOnlyTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForExcludedFields()
+    public function testProcessForExcludedFields(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -167,7 +165,7 @@ class MakeTimestampableFieldsReadOnlyTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWhenFieldsManuallyMarkedAsNotReadOnly()
+    public function testProcessWhenFieldsManuallyMarkedAsNotReadOnly(): void
     {
         $config = [
             'exclusion_policy' => 'all',

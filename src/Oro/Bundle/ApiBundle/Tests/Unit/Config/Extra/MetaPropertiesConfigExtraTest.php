@@ -3,14 +3,14 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config\Extra;
 
 use Oro\Bundle\ApiBundle\Config\Extra\MetaPropertiesConfigExtra;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class MetaPropertiesConfigExtraTest extends \PHPUnit\Framework\TestCase
+class MetaPropertiesConfigExtraTest extends TestCase
 {
-    /** @var MetaPropertiesConfigExtra */
-    private $extra;
+    private MetaPropertiesConfigExtra $extra;
 
     #[\Override]
     protected function setUp(): void
@@ -18,17 +18,17 @@ class MetaPropertiesConfigExtraTest extends \PHPUnit\Framework\TestCase
         $this->extra = new MetaPropertiesConfigExtra();
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         self::assertEquals(MetaPropertiesConfigExtra::NAME, $this->extra->getName());
     }
 
-    public function testIsPropagable()
+    public function testIsPropagable(): void
     {
         self::assertTrue($this->extra->isPropagable());
     }
 
-    public function testCacheKeyPart()
+    public function testCacheKeyPart(): void
     {
         $this->extra->addMetaProperty('prop1', 'string');
         $this->extra->addMetaProperty('prop2', 'string');
@@ -38,7 +38,7 @@ class MetaPropertiesConfigExtraTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCacheKeyPartWhenMetaPropertiesAreNotRequested()
+    public function testCacheKeyPartWhenMetaPropertiesAreNotRequested(): void
     {
         self::assertEquals(
             'meta_properties:',
@@ -46,13 +46,13 @@ class MetaPropertiesConfigExtraTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddMetaPropertyWithoutType()
+    public function testAddMetaPropertyWithoutType(): void
     {
         $this->extra->addMetaProperty('prop1', null);
         self::assertNull($this->extra->getTypeOfMetaProperty('prop1'));
     }
 
-    public function testAddMetaPropertyWithType()
+    public function testAddMetaPropertyWithType(): void
     {
         $this->extra->addMetaProperty('prop1', 'integer');
         self::assertEquals(
@@ -61,7 +61,7 @@ class MetaPropertiesConfigExtraTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetTypeOfUnknownMetaProperty()
+    public function testGetTypeOfUnknownMetaProperty(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "prop1" meta property does not exist.');
@@ -69,7 +69,7 @@ class MetaPropertiesConfigExtraTest extends \PHPUnit\Framework\TestCase
         $this->extra->getTypeOfMetaProperty('prop1');
     }
 
-    public function testSetTypeOfMetaProperty()
+    public function testSetTypeOfMetaProperty(): void
     {
         $this->extra->addMetaProperty('prop1', 'string');
         $this->extra->setTypeOfMetaProperty('prop1', 'integer');
@@ -79,7 +79,7 @@ class MetaPropertiesConfigExtraTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSetTypeOfUnknownMetaProperty()
+    public function testSetTypeOfUnknownMetaProperty(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "prop1" meta property does not exist.');
@@ -87,7 +87,7 @@ class MetaPropertiesConfigExtraTest extends \PHPUnit\Framework\TestCase
         $this->extra->setTypeOfMetaProperty('prop1', 'integer');
     }
 
-    public function testGetMetaPropertyNames()
+    public function testGetMetaPropertyNames(): void
     {
         $this->extra->addMetaProperty('prop1', 'string');
         $this->extra->addMetaProperty('prop2', 'integer');
@@ -97,14 +97,14 @@ class MetaPropertiesConfigExtraTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRemoveMetaProperty()
+    public function testRemoveMetaProperty(): void
     {
         $this->extra->addMetaProperty('prop1', 'string');
         $this->extra->removeMetaProperty('prop1');
         self::assertEquals([], $this->extra->getMetaPropertyNames());
     }
 
-    public function testRemoveUnknownMetaProperty()
+    public function testRemoveUnknownMetaProperty(): void
     {
         $this->extra->addMetaProperty('prop1', 'string');
         $this->extra->removeMetaProperty('unknownProp');

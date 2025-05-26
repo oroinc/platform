@@ -6,14 +6,13 @@ use Oro\Bundle\ApiBundle\Processor\CollectResources\CollectResourcesContext;
 use Oro\Bundle\ApiBundle\Processor\CollectResources\LoadDictionaries;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LoadDictionariesTest extends \PHPUnit\Framework\TestCase
+class LoadDictionariesTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ChainDictionaryValueListProvider */
-    private $dictionaryProvider;
-
-    /** @var LoadDictionaries */
-    private $processor;
+    private ChainDictionaryValueListProvider&MockObject $dictionaryProvider;
+    private LoadDictionaries $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class LoadDictionariesTest extends \PHPUnit\Framework\TestCase
         $this->processor = new LoadDictionaries($this->dictionaryProvider);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $context = new CollectResourcesContext();
 

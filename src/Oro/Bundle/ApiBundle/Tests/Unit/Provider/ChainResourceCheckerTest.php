@@ -6,14 +6,13 @@ use Oro\Bundle\ApiBundle\Provider\ChainResourceChecker;
 use Oro\Bundle\ApiBundle\Provider\ResourceCheckerInterface;
 use Oro\Bundle\ApiBundle\Provider\ResourceCheckerRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChainResourceCheckerTest extends \PHPUnit\Framework\TestCase
+class ChainResourceCheckerTest extends TestCase
 {
-    /** @var ResourceCheckerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $resourceCheckerRegistry;
-
-    /** @var ChainResourceChecker */
-    private $chainResourceChecker;
+    private ResourceCheckerRegistry&MockObject $resourceCheckerRegistry;
+    private ChainResourceChecker $chainResourceChecker;
 
     #[\Override]
     protected function setUp(): void

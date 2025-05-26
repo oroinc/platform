@@ -14,8 +14,7 @@ use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 
 class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
 {
-    /** @var BuildSingleItemQuery */
-    private $processor;
+    private BuildSingleItemQuery $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +27,7 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         );
     }
 
-    public function testProcessWhenDataAlreadyExist()
+    public function testProcessWhenDataAlreadyExist(): void
     {
         $this->context->setResult(new \stdClass());
         $this->processor->process($this->context);
@@ -36,7 +35,7 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         self::assertNull($this->context->getQuery());
     }
 
-    public function testProcessWhenQueryIsAlreadyBuilt()
+    public function testProcessWhenQueryIsAlreadyBuilt(): void
     {
         $qb = $this->createMock(QueryBuilder::class);
 
@@ -46,7 +45,7 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         self::assertSame($qb, $this->context->getQuery());
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessForNotManageableEntity(): void
     {
         $className = 'Test\Class';
 
@@ -59,7 +58,7 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         self::assertNull($this->context->getQuery());
     }
 
-    public function testProcessForManageableEntityWithSingleId()
+    public function testProcessForManageableEntityWithSingleId(): void
     {
         $entityClass = Entity\User::class;
         $entityId = 123;
@@ -86,7 +85,7 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         self::assertEquals($entityId, $parameter->getValue());
     }
 
-    public function testProcessForManageableEntityWithCompositeId()
+    public function testProcessForManageableEntityWithCompositeId(): void
     {
         $entityClass = Entity\CompositeKeyEntity::class;
         $entityId = ['id' => 123, 'title' => 'test'];
@@ -118,7 +117,7 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         self::assertEquals($entityId['title'], $titleParameter->getValue());
     }
 
-    public function testProcessForResourceBasedOnManageableEntity()
+    public function testProcessForResourceBasedOnManageableEntity(): void
     {
         $entityClass = Entity\UserProfile::class;
         $parentResourceClass = Entity\User::class;
@@ -150,7 +149,7 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
         self::assertEquals($entityId, $parameter->getValue());
     }
 
-    public function testProcessForResourceBasedOnNotManageableEntity()
+    public function testProcessForResourceBasedOnNotManageableEntity(): void
     {
         $entityClass = 'Test\Class';
         $parentResourceClass = 'Test\ParentClass';

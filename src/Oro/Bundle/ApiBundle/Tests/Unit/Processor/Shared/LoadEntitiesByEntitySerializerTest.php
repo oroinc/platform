@@ -13,14 +13,12 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelated
 use Oro\Component\ChainProcessor\ParameterBag;
 use Oro\Component\EntitySerializer\ConfigUtil;
 use Oro\Component\EntitySerializer\EntitySerializer;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class LoadEntitiesByEntitySerializerTest extends GetListProcessorOrmRelatedTestCase
 {
-    /** @var EntitySerializer|\PHPUnit\Framework\MockObject\MockObject */
-    private $serializer;
-
-    /** @var LoadEntitiesByEntitySerializer */
-    private $processor;
+    private EntitySerializer&MockObject $serializer;
+    private LoadEntitiesByEntitySerializer $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +30,7 @@ class LoadEntitiesByEntitySerializerTest extends GetListProcessorOrmRelatedTestC
         $this->processor = new LoadEntitiesByEntitySerializer($this->serializer);
     }
 
-    public function testProcessWithResult()
+    public function testProcessWithResult(): void
     {
         $resultEntity = new Product();
 
@@ -42,7 +40,7 @@ class LoadEntitiesByEntitySerializerTest extends GetListProcessorOrmRelatedTestC
         self::assertSame($resultEntity, $this->context->getResult());
     }
 
-    public function testProcessWithUnsupportedQuery()
+    public function testProcessWithUnsupportedQuery(): void
     {
         self::assertFalse($this->context->hasResult());
 
@@ -52,7 +50,7 @@ class LoadEntitiesByEntitySerializerTest extends GetListProcessorOrmRelatedTestC
         self::assertFalse($this->context->hasResult());
     }
 
-    public function testProcessWithoutConfig()
+    public function testProcessWithoutConfig(): void
     {
         $entityClass = Group::class;
 
@@ -69,7 +67,7 @@ class LoadEntitiesByEntitySerializerTest extends GetListProcessorOrmRelatedTestC
         self::assertFalse($this->context->hasResult());
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $entityClass = Group::class;
 
@@ -111,7 +109,7 @@ class LoadEntitiesByEntitySerializerTest extends GetListProcessorOrmRelatedTestC
         self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
-    public function testProcessWithEntityIds()
+    public function testProcessWithEntityIds(): void
     {
         $entityClass = Group::class;
 
@@ -153,7 +151,7 @@ class LoadEntitiesByEntitySerializerTest extends GetListProcessorOrmRelatedTestC
         self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
-    public function testProcessWithEntityIdsAndHasMore()
+    public function testProcessWithEntityIdsAndHasMore(): void
     {
         $entityClass = Group::class;
 
@@ -200,7 +198,7 @@ class LoadEntitiesByEntitySerializerTest extends GetListProcessorOrmRelatedTestC
         self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
-    public function testProcessWithEntityIdsAndForEntityWithCompositeIdentifier()
+    public function testProcessWithEntityIdsAndForEntityWithCompositeIdentifier(): void
     {
         $entityClass = Group::class;
 

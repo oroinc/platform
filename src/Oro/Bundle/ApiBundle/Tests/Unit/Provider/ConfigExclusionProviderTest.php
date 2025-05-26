@@ -7,8 +7,9 @@ use Oro\Bundle\ApiBundle\Provider\ConfigCache;
 use Oro\Bundle\ApiBundle\Provider\ConfigExclusionProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
+use PHPUnit\Framework\TestCase;
 
-class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
+class ConfigExclusionProviderTest extends TestCase
 {
     private ConfigExclusionProvider $provider;
 
@@ -167,7 +168,7 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider entityProvider
      */
-    public function testIsIgnoredEntity(string $className, bool $expected)
+    public function testIsIgnoredEntity(string $className, bool $expected): void
     {
         self::assertSame(
             $expected,
@@ -191,7 +192,7 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider fieldProvider
      */
-    public function testIsIgnoredField(string $className, string $fieldName, bool $expected)
+    public function testIsIgnoredField(string $className, string $fieldName, bool $expected): void
     {
         self::assertSame(
             $expected,
@@ -202,7 +203,7 @@ class ConfigExclusionProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider fieldProvider
      */
-    public function testIsIgnoredRelation(string $className, string $associationName, bool $expected)
+    public function testIsIgnoredRelation(string $className, string $associationName, bool $expected): void
     {
         self::assertSame(
             $expected,

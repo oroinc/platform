@@ -6,10 +6,11 @@ use Oro\Bundle\ApiBundle\Processor\MatchApplicableChecker;
 use Oro\Bundle\ApiBundle\Processor\ProcessorApplicableCheckerFactory;
 use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class ProcessorApplicableCheckerFactoryTest extends \PHPUnit\Framework\TestCase
+class ProcessorApplicableCheckerFactoryTest extends TestCase
 {
-    public function testCreateApplicableChecker()
+    public function testCreateApplicableChecker(): void
     {
         $factory = new ProcessorApplicableCheckerFactory();
         $chainApplicableChecker = $factory->createApplicableChecker();

@@ -7,17 +7,13 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\LoadParentResourceMetadata;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class LoadParentResourceMetadataTest extends MetadataProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
-    private $metadataProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var LoadParentResourceMetadata */
-    private $processor;
+    private MetadataProvider&MockObject $metadataProvider;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private LoadParentResourceMetadata $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +29,7 @@ class LoadParentResourceMetadataTest extends MetadataProcessorTestCase
         );
     }
 
-    public function testProcessForAlreadyLoadedMetadata()
+    public function testProcessForAlreadyLoadedMetadata(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
 
@@ -48,7 +44,7 @@ class LoadParentResourceMetadataTest extends MetadataProcessorTestCase
         self::assertSame($metadata, $this->context->getResult());
     }
 
-    public function testProcessWhenResourceIsNotBasedOnAnotherResource()
+    public function testProcessWhenResourceIsNotBasedOnAnotherResource(): void
     {
         $entityClass = 'Test\Entity';
         $config = new EntityDefinitionConfig();
@@ -65,7 +61,7 @@ class LoadParentResourceMetadataTest extends MetadataProcessorTestCase
         self::assertFalse($this->context->hasResult());
     }
 
-    public function testProcessWhenResourceIsBasedOnAnotherResource()
+    public function testProcessWhenResourceIsBasedOnAnotherResource(): void
     {
         $entityClass = 'Test\Entity';
         $parentEntityClass = 'Test\ParentEntity';
@@ -105,7 +101,7 @@ class LoadParentResourceMetadataTest extends MetadataProcessorTestCase
         self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
-    public function testProcessWhenResourceIsBasedOnAnotherResourceButEntityIsManageable()
+    public function testProcessWhenResourceIsBasedOnAnotherResourceButEntityIsManageable(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(

@@ -8,19 +8,15 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ValidateParentEntityTypeAccessTest extends GetSubresourceProcessorTestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var AclGroupProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclGroupProvider;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private AclGroupProviderInterface&MockObject $aclGroupProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -33,9 +29,7 @@ class ValidateParentEntityTypeAccessTest extends GetSubresourceProcessorTestCase
 
         $this->doctrineHelper->expects(self::any())
             ->method('getManageableEntityClass')
-            ->willReturnCallback(function ($className) {
-                return $className;
-            });
+            ->willReturnArgument(0);
     }
 
     private function getProcessor(bool $forcePermissionUsage = false): ValidateParentEntityTypeAccess

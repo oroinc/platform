@@ -8,14 +8,13 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Provider\EnumOptionEntityClassProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EnumOptionEntityClassProviderTest extends \PHPUnit\Framework\TestCase
+class EnumOptionEntityClassProviderTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var EnumOptionEntityClassProvider */
-    private $provider;
+    private ConfigManager&MockObject $configManager;
+    private EnumOptionEntityClassProvider $provider;
 
     #[\Override]
     protected function setUp(): void

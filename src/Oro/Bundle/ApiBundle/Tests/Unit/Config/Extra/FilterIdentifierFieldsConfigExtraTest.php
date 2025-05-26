@@ -3,11 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config\Extra;
 
 use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
+use PHPUnit\Framework\TestCase;
 
-class FilterIdentifierFieldsConfigExtraTest extends \PHPUnit\Framework\TestCase
+class FilterIdentifierFieldsConfigExtraTest extends TestCase
 {
-    /** @var FilterIdentifierFieldsConfigExtra */
-    private $extra;
+    private FilterIdentifierFieldsConfigExtra $extra;
 
     #[\Override]
     protected function setUp(): void
@@ -15,17 +15,17 @@ class FilterIdentifierFieldsConfigExtraTest extends \PHPUnit\Framework\TestCase
         $this->extra = new FilterIdentifierFieldsConfigExtra();
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         self::assertEquals(FilterIdentifierFieldsConfigExtra::NAME, $this->extra->getName());
     }
 
-    public function testIsPropagable()
+    public function testIsPropagable(): void
     {
         self::assertFalse($this->extra->isPropagable());
     }
 
-    public function testCacheKeyPart()
+    public function testCacheKeyPart(): void
     {
         self::assertEquals(FilterIdentifierFieldsConfigExtra::NAME, $this->extra->getCacheKeyPart());
     }

@@ -5,14 +5,16 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class IncludedEntityCollectionTest extends \PHPUnit\Framework\TestCase
+class IncludedEntityCollectionTest extends TestCase
 {
-    private IncludedEntityData $entityData;
+    private IncludedEntityData&MockObject $entityData;
     private IncludedEntityCollection $collection;
 
     #[\Override]

@@ -14,14 +14,13 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AssociationCompositeIdentifierFilterTest extends \PHPUnit\Framework\TestCase
+class AssociationCompositeIdentifierFilterTest extends TestCase
 {
-    /** @var EntityIdTransformerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $idTransformerRegistry;
-
-    /** @var AssociationCompositeIdentifierFilter */
-    private $filter;
+    private EntityIdTransformerRegistry&MockObject $idTransformerRegistry;
+    private AssociationCompositeIdentifierFilter $filter;
 
     #[\Override]
     protected function setUp(): void

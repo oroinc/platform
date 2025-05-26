@@ -20,6 +20,8 @@ use Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityMapper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Guess\TypeGuess;
@@ -29,16 +31,13 @@ use Symfony\Component\Form\Guess\TypeGuess;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
+class MetadataTypeGuesserTest extends TestCase
 {
-    private const TEST_CLASS = 'Test\Entity';
-    private const TEST_PROPERTY = 'testField';
+    private const string TEST_CLASS = 'Test\Entity';
+    private const string TEST_PROPERTY = 'testField';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var MetadataTypeGuesser */
-    private $typeGuesser;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private MetadataTypeGuesser $typeGuesser;
 
     #[\Override]
     protected function setUp(): void
@@ -114,36 +113,36 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         return $associationMetadata;
     }
 
-    public function testShouldGetPreviouslySetMetadataAccessor()
+    public function testShouldGetPreviouslySetMetadataAccessor(): void
     {
         $metadataAccessor = $this->createMock(MetadataAccessorInterface::class);
         $this->typeGuesser->setMetadataAccessor($metadataAccessor);
         self::assertSame($metadataAccessor, $this->typeGuesser->getMetadataAccessor());
     }
 
-    public function testShouldGetPreviouslySetConfigAccessor()
+    public function testShouldGetPreviouslySetConfigAccessor(): void
     {
         $configAccessor = $this->createMock(ConfigAccessorInterface::class);
         $this->typeGuesser->setConfigAccessor($configAccessor);
         self::assertSame($configAccessor, $this->typeGuesser->getConfigAccessor());
     }
 
-    public function testGuessRequired()
+    public function testGuessRequired(): void
     {
         self::assertNull($this->typeGuesser->guessRequired(self::TEST_CLASS, self::TEST_PROPERTY));
     }
 
-    public function testGuessMaxLength()
+    public function testGuessMaxLength(): void
     {
         self::assertNull($this->typeGuesser->guessMaxLength(self::TEST_CLASS, self::TEST_PROPERTY));
     }
 
-    public function testGuessPattern()
+    public function testGuessPattern(): void
     {
         self::assertNull($this->typeGuesser->guessPattern(self::TEST_CLASS, self::TEST_PROPERTY));
     }
 
-    public function testGuessTypeWithoutMetadataAccessor()
+    public function testGuessTypeWithoutMetadataAccessor(): void
     {
         self::assertEquals(
             new TypeGuess(TextType::class, [], TypeGuess::LOW_CONFIDENCE),
@@ -151,7 +150,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeWithoutMetadata()
+    public function testGuessTypeWithoutMetadata(): void
     {
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor(null));
         self::assertEquals(
@@ -160,7 +159,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForUndefinedField()
+    public function testGuessTypeForUndefinedField(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
 
@@ -171,7 +170,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForFormTypeWithoutOptions()
+    public function testGuessTypeForFormTypeWithoutOptions(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $metadata->addField($this->createFieldMetadata(self::TEST_PROPERTY, 'integer'));
@@ -183,7 +182,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForFormTypeWithOptions()
+    public function testGuessTypeForFormTypeWithOptions(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $metadata->addField($this->createFieldMetadata(self::TEST_PROPERTY, 'datetime'));
@@ -199,7 +198,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForNotMappedFieldType()
+    public function testGuessTypeForNotMappedFieldType(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $metadata->addField($this->createFieldMetadata(self::TEST_PROPERTY, 'string'));
@@ -211,7 +210,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForArrayField()
+    public function testGuessTypeForArrayField(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $metadata->addField($this->createFieldMetadata(self::TEST_PROPERTY, 'array'));
@@ -223,7 +222,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForTypedArrayField()
+    public function testGuessTypeForTypedArrayField(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $metadata->addField($this->createFieldMetadata(self::TEST_PROPERTY, 'currency[]'));
@@ -235,7 +234,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForToOneAssociation()
+    public function testGuessTypeForToOneAssociation(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $associationMetadata = $this->createAssociationMetadata(
@@ -261,7 +260,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForToOneAssociationWithIncludedEntities()
+    public function testGuessTypeForToOneAssociationWithIncludedEntities(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $associationMetadata = $this->createAssociationMetadata(
@@ -289,7 +288,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForToManyAssociation()
+    public function testGuessTypeForToManyAssociation(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $associationMetadata = $this->createAssociationMetadata(
@@ -315,7 +314,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForToManyAssociationWithIncludedEntities()
+    public function testGuessTypeForToManyAssociationWithIncludedEntities(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $associationMetadata = $this->createAssociationMetadata(
@@ -345,7 +344,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForArrayAssociationWithoutTargetMetadata()
+    public function testGuessTypeForArrayAssociationWithoutTargetMetadata(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $associationMetadata = $this->createAssociationMetadata(
@@ -366,7 +365,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForArrayAssociationWithoutTargetConfig()
+    public function testGuessTypeForArrayAssociationWithoutTargetConfig(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $associationMetadata = $this->createAssociationMetadata(
@@ -386,7 +385,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForToOneArrayAssociation()
+    public function testGuessTypeForToOneArrayAssociation(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $associationMetadata = $this->createAssociationMetadata(
@@ -423,7 +422,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForToOneArrayAssociationWithCustomFormOptions()
+    public function testGuessTypeForToOneArrayAssociationWithCustomFormOptions(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $associationMetadata = $this->createAssociationMetadata(
@@ -465,7 +464,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForToManyArrayAssociationForNotManageableEntity()
+    public function testGuessTypeForToManyArrayAssociationForNotManageableEntity(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $associationMetadata = $this->createAssociationMetadata(
@@ -507,7 +506,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForToManyArrayAssociationForManageableEntity()
+    public function testGuessTypeForToManyArrayAssociationForManageableEntity(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $associationMetadata = $this->createAssociationMetadata(
@@ -549,7 +548,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForToManyArrayAssociationWithCustomFormOptions()
+    public function testGuessTypeForToManyArrayAssociationWithCustomFormOptions(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $associationMetadata = $this->createAssociationMetadata(
@@ -600,7 +599,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForCollapsedArrayAssociationWithoutTargetMetadata()
+    public function testGuessTypeForCollapsedArrayAssociationWithoutTargetMetadata(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $associationMetadata = $this->createAssociationMetadata(
@@ -623,7 +622,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForCollapsedArrayAssociationWithoutTargetConfig()
+    public function testGuessTypeForCollapsedArrayAssociationWithoutTargetConfig(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $associationMetadata = $this->createAssociationMetadata(
@@ -645,7 +644,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForCollapsedArrayAssociationWithoutChildFieldsAndAssociations()
+    public function testGuessTypeForCollapsedArrayAssociationWithoutChildFieldsAndAssociations(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $associationMetadata = $this->createAssociationMetadata(
@@ -671,7 +670,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForCollapsedToOneArrayAssociation()
+    public function testGuessTypeForCollapsedToOneArrayAssociation(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $associationMetadata = $this->createAssociationMetadata(
@@ -711,7 +710,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForCollapsedToOneArrayAssociationWithCustomFormOptions()
+    public function testGuessTypeForCollapsedToOneArrayAssociationWithCustomFormOptions(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $associationMetadata = $this->createAssociationMetadata(
@@ -756,7 +755,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForCollapsedToManyArrayAssociationForNotManageableEntity()
+    public function testGuessTypeForCollapsedToManyArrayAssociationForNotManageableEntity(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $associationMetadata = $this->createAssociationMetadata(
@@ -801,7 +800,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForCollapsedToManyArrayAssociationForManageableEntity()
+    public function testGuessTypeForCollapsedToManyArrayAssociationForManageableEntity(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $associationMetadata = $this->createAssociationMetadata(
@@ -846,7 +845,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForCollapsedToManyArrayAssociationWithCustomFormOptions()
+    public function testGuessTypeForCollapsedToManyArrayAssociationWithCustomFormOptions(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $associationMetadata = $this->createAssociationMetadata(
@@ -900,7 +899,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForCollapsedArrayAssociationWhenChildPropertyIsAssociation()
+    public function testGuessTypeForCollapsedArrayAssociationWhenChildPropertyIsAssociation(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $associationMetadata = $this->createAssociationMetadata(
@@ -947,7 +946,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForAssociationContainsNestedObject()
+    public function testGuessTypeForAssociationContainsNestedObject(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $associationMetadata = $this->createAssociationMetadata(
@@ -985,7 +984,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForAssociationContainsNestedObjectWithoutDataClassInFormOptions()
+    public function testGuessTypeForAssociationContainsNestedObjectWithoutDataClassInFormOptions(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $associationMetadata = $this->createAssociationMetadata(
@@ -1018,7 +1017,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY);
     }
 
-    public function testGuessTypeForAssociationContainsNestedObjectWithoutDataClassInFormOptionsButWithInheritData()
+    public function testGuessTypeForAssociationContainsNestedObjWithoutDataClassInFormOptionsButWithInheritData(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $associationMetadata = $this->createAssociationMetadata(
@@ -1057,7 +1056,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForAssociationContainsNestedObjectWithInheritDataAndNotMapped()
+    public function testGuessTypeForAssociationContainsNestedObjectWithInheritDataAndNotMapped(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $associationMetadata = $this->createAssociationMetadata(
@@ -1097,7 +1096,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForAssociationContainsNestedObjectWithNotInheritDataAndNotMapped()
+    public function testGuessTypeForAssociationContainsNestedObjectWithNotInheritDataAndNotMapped(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $associationMetadata = $this->createAssociationMetadata(
@@ -1136,7 +1135,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGuessTypeForAssociationContainsNestedObjectWithoutFormOptions()
+    public function testGuessTypeForAssociationContainsNestedObjectWithoutFormOptions(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $associationMetadata = $this->createAssociationMetadata(
@@ -1168,7 +1167,7 @@ class MetadataTypeGuesserTest extends \PHPUnit\Framework\TestCase
         $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY);
     }
 
-    public function testGuessTypeForNestedAssociation()
+    public function testGuessTypeForNestedAssociation(): void
     {
         $metadata = new EntityMetadata(self::TEST_CLASS);
         $associationMetadata = $this->createAssociationMetadata(

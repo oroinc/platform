@@ -7,8 +7,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AssertHasResultTest extends GetProcessorTestCase
 {
-    /** @var AssertHasResult */
-    private $processor;
+    private AssertHasResult $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -18,13 +17,13 @@ class AssertHasResultTest extends GetProcessorTestCase
         $this->processor = new AssertHasResult();
     }
 
-    public function testProcessOnExpectedResult()
+    public function testProcessOnExpectedResult(): void
     {
         $this->context->setResult(['key' => 'value']);
         $this->processor->process($this->context);
     }
 
-    public function testProcessOnEmptyResult()
+    public function testProcessOnEmptyResult(): void
     {
         $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('Unsupported request.');
@@ -32,7 +31,7 @@ class AssertHasResultTest extends GetProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessOnNullResult()
+    public function testProcessOnNullResult(): void
     {
         $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('An entity with the requested identifier does not exist.');

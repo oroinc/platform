@@ -4,10 +4,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ChunkSizeProviderCompilerPass;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-class ChunkSizeProviderCompilerPassTest extends \PHPUnit\Framework\TestCase
+class ChunkSizeProviderCompilerPassTest extends TestCase
 {
     public function testProcess(): void
     {

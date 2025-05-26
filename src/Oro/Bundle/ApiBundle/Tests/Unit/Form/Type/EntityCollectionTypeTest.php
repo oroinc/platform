@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Form\ApiFormTypeTestCase;
 
 class EntityCollectionTypeTest extends ApiFormTypeTestCase
 {
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $type = new EntityCollectionType();
         self::assertEquals(CollectionType::class, $type->getParent());

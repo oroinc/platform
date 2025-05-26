@@ -4,12 +4,12 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc\AnnotationHandler;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\ApiBundle\ApiDoc\AnnotationHandler\AddApiDocViewAnnotationHandler;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Route;
 
-class AddApiDocViewAnnotationHandlerTest extends \PHPUnit\Framework\TestCase
+class AddApiDocViewAnnotationHandlerTest extends TestCase
 {
-    /** @var AddApiDocViewAnnotationHandler */
-    private $handler;
+    private AddApiDocViewAnnotationHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +20,7 @@ class AddApiDocViewAnnotationHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider handleProvider
      */
-    public function testHandle(array $existingViews, array $expectedViews)
+    public function testHandle(array $existingViews, array $expectedViews): void
     {
         $annotation = new ApiDoc(['views' => $existingViews]);
         $route = new Route('test');

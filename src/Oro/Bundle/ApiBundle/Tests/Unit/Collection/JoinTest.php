@@ -3,13 +3,14 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection;
 
 use Oro\Bundle\ApiBundle\Collection\Join;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class JoinTest extends \PHPUnit\Framework\TestCase
+class JoinTest extends TestCase
 {
-    public function testConstructorWithAllParameters()
+    public function testConstructorWithAllParameters(): void
     {
         $join = new Join(
             Join::INNER_JOIN,
@@ -30,7 +31,7 @@ class JoinTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider conditionTypeNormalizationDataProvider
      */
-    public function testConditionTypeNormalization(string $conditionType, ?string $condition)
+    public function testConditionTypeNormalization(string $conditionType, ?string $condition): void
     {
         $join = new Join(Join::LEFT_JOIN, 'Test\Entity', $conditionType, $condition);
         self::assertNull($join->getConditionType());
@@ -51,7 +52,7 @@ class JoinTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider conditionNormalizationDataProvider
      */
-    public function testConditionNormalization(?string $condition)
+    public function testConditionNormalization(?string $condition): void
     {
         $join = new Join(Join::LEFT_JOIN, 'Test\Entity', Join::WITH, $condition);
         self::assertNull($join->getCondition());
@@ -68,7 +69,7 @@ class JoinTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider indexByNormalizationDataProvider
      */
-    public function testIndexByNormalization(?string $indexBy)
+    public function testIndexByNormalization(?string $indexBy): void
     {
         $join = new Join(Join::LEFT_JOIN, 'Test\Entity', Join::WITH, 'condition', $indexBy);
         self::assertNull($join->getIndexBy());
@@ -82,7 +83,7 @@ class JoinTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testSetJoin()
+    public function testSetJoin(): void
     {
         $join = new Join(Join::LEFT_JOIN, 'Test\Entity');
 
@@ -90,7 +91,7 @@ class JoinTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('Test\Entity1', $join->getJoin());
     }
 
-    public function testSetJoinType()
+    public function testSetJoinType(): void
     {
         $join = new Join(Join::LEFT_JOIN, 'Test\Entity');
 
@@ -98,7 +99,7 @@ class JoinTest extends \PHPUnit\Framework\TestCase
         self::assertSame(Join::INNER_JOIN, $join->getJoinType());
     }
 
-    public function testSetCondition()
+    public function testSetCondition(): void
     {
         $join = new Join(Join::LEFT_JOIN, 'Test\Entity');
 
@@ -106,7 +107,7 @@ class JoinTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('test condition', $join->getCondition());
     }
 
-    public function testSetAlias()
+    public function testSetAlias(): void
     {
         $join = new Join(Join::LEFT_JOIN, 'Test\Entity');
 
@@ -117,7 +118,7 @@ class JoinTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider equalsDataProvider
      */
-    public function testEquals(Join $join1, Join $join2, bool $expectedResult)
+    public function testEquals(Join $join1, Join $join2, bool $expectedResult): void
     {
         self::assertSame($expectedResult, $join1->equals($join2));
         self::assertSame($expectedResult, $join2->equals($join1));

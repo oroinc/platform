@@ -22,32 +22,23 @@ use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Route;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
+class RestDocHandlerTest extends TestCase
 {
-    private const ROUTE_GROUP = 'test_route_group';
+    private const string ROUTE_GROUP = 'test_route_group';
 
-    /** @var RestDocViewDetector|\PHPUnit\Framework\MockObject\MockObject */
-    private $docViewDetector;
-
-    /** @var RestDocContextProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $contextProvider;
-
-    /** @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject */
-    private $valueNormalizer;
-
-    /** @var RestDocIdentifierHandler|\PHPUnit\Framework\MockObject\MockObject */
-    private $identifierHandler;
-
-    /** @var RestDocFiltersHandler|\PHPUnit\Framework\MockObject\MockObject */
-    private $filtersHandler;
-
-    /** @var RestDocHandler */
-    private $handler;
+    private RestDocViewDetector&MockObject $docViewDetector;
+    private RestDocContextProvider&MockObject $contextProvider;
+    private ValueNormalizer&MockObject $valueNormalizer;
+    private RestDocIdentifierHandler&MockObject $identifierHandler;
+    private RestDocFiltersHandler&MockObject $filtersHandler;
+    private RestDocHandler $handler;
 
     #[\Override]
     protected function setUp(): void
@@ -100,7 +91,7 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-    public function testHandleForRouteWithoutGroupOption()
+    public function testHandleForRouteWithoutGroupOption(): void
     {
         $annotation = new ApiDoc([]);
         $route = new Route('/test_route');
@@ -110,7 +101,7 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $this->convertAnnotationToArray($annotation));
     }
 
-    public function testHandleForRouteWithUnsupportedGroupOption()
+    public function testHandleForRouteWithUnsupportedGroupOption(): void
     {
         $annotation = new ApiDoc([]);
         $route = new Route('/test_route', [], [], ['group' => 'another']);
@@ -120,7 +111,7 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $this->convertAnnotationToArray($annotation));
     }
 
-    public function testHandleForEmptyRequestType()
+    public function testHandleForEmptyRequestType(): void
     {
         $annotation = new ApiDoc([]);
         $route = new Route('/test_route', [], [], ['group' => self::ROUTE_GROUP]);
@@ -134,7 +125,7 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $this->convertAnnotationToArray($annotation));
     }
 
-    public function testHandleForRouteWithoutActionAttribute()
+    public function testHandleForRouteWithoutActionAttribute(): void
     {
         $annotation = new ApiDoc([]);
         $route = new Route('/test_route', [], [], ['group' => self::ROUTE_GROUP]);
@@ -148,7 +139,7 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $this->convertAnnotationToArray($annotation));
     }
 
-    public function testHandleForRouteWithoutEntityAttribute()
+    public function testHandleForRouteWithoutEntityAttribute(): void
     {
         $annotation = new ApiDoc([]);
         $route = new Route('/test_route', ['_action' => ApiAction::GET], [], ['group' => self::ROUTE_GROUP]);
@@ -162,7 +153,7 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $this->convertAnnotationToArray($annotation));
     }
 
-    public function testHandleForResourceWithoutConfig()
+    public function testHandleForResourceWithoutConfig(): void
     {
         $annotation = new ApiDoc([]);
         $requestType = new RequestType([RequestType::REST]);
@@ -203,7 +194,7 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHandleForResourceWithoutMetadata()
+    public function testHandleForResourceWithoutMetadata(): void
     {
         $annotation = new ApiDoc([]);
         $requestType = new RequestType([RequestType::REST]);
@@ -247,7 +238,7 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHandleForPrimaryResourceWithEmptyConfig()
+    public function testHandleForPrimaryResourceWithEmptyConfig(): void
     {
         $annotation = new ApiDoc([]);
         $requestType = new RequestType([RequestType::REST]);
@@ -316,7 +307,7 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHandleForPrimaryResourceWithIdentifier()
+    public function testHandleForPrimaryResourceWithIdentifier(): void
     {
         $annotation = new ApiDoc([]);
         $requestType = new RequestType([RequestType::REST]);
@@ -403,7 +394,7 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHandleForPrimaryResourceWithoutIdentifier()
+    public function testHandleForPrimaryResourceWithoutIdentifier(): void
     {
         $annotation = new ApiDoc([]);
         $requestType = new RequestType([RequestType::REST]);
@@ -486,7 +477,7 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testHandleForPrimaryResourceWithInputData()
+    public function testHandleForPrimaryResourceWithInputData(): void
     {
         $annotation = new ApiDoc([]);
         $requestType = new RequestType([RequestType::REST]);
@@ -595,7 +586,7 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHandleForPrimaryResourceWithInputDataAndWithoutOutputData()
+    public function testHandleForPrimaryResourceWithInputDataAndWithoutOutputData(): void
     {
         $annotation = new ApiDoc([]);
         $requestType = new RequestType([RequestType::REST]);
@@ -679,7 +670,7 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testHandleForSubresource()
+    public function testHandleForSubresource(): void
     {
         $annotation = new ApiDoc([]);
         $requestType = new RequestType([RequestType::REST]);
@@ -784,7 +775,7 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testHandleForUpdateListAction()
+    public function testHandleForUpdateListAction(): void
     {
         $annotation = new ApiDoc([]);
         $requestType = new RequestType([RequestType::REST]);
@@ -868,7 +859,7 @@ class RestDocHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHandleForOptionsAction()
+    public function testHandleForOptionsAction(): void
     {
         $annotation = new ApiDoc([]);
         $requestType = new RequestType([RequestType::REST]);

@@ -12,20 +12,17 @@ use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityLoader;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EntityLoaderTest extends \PHPUnit\Framework\TestCase
+class EntityLoaderTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
-
-    /** @var QueryHintResolverInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $queryHintResolver;
-
-    /** @var EntityLoader */
-    private $entityLoader;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private QueryHintResolverInterface&MockObject $queryHintResolver;
+    private EntityLoader $entityLoader;
 
     #[\Override]
     protected function setUp(): void

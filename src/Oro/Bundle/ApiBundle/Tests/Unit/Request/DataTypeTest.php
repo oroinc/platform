@@ -3,16 +3,17 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
 use Oro\Bundle\ApiBundle\Request\DataType;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class DataTypeTest extends \PHPUnit\Framework\TestCase
+class DataTypeTest extends TestCase
 {
     /**
      * @dataProvider arrayProvider
      */
-    public function testIsArray(?string $dataType, bool $expected)
+    public function testIsArray(?string $dataType, bool $expected): void
     {
         self::assertSame($expected, DataType::isArray($dataType));
     }
@@ -39,7 +40,7 @@ class DataTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider nestedObjectProvider
      */
-    public function testIsNestedObject(?string $dataType, bool $expected)
+    public function testIsNestedObject(?string $dataType, bool $expected): void
     {
         self::assertSame($expected, DataType::isNestedObject($dataType));
     }
@@ -58,7 +59,7 @@ class DataTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider nestedAssociationProvider
      */
-    public function testIsNestedAssociation(?string $dataType, bool $expected)
+    public function testIsNestedAssociation(?string $dataType, bool $expected): void
     {
         self::assertSame($expected, DataType::isNestedAssociation($dataType));
     }
@@ -76,7 +77,7 @@ class DataTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider associationAsFieldProvider
      */
-    public function testIsAssociationAsField(?string $dataType, bool $expected)
+    public function testIsAssociationAsField(?string $dataType, bool $expected): void
     {
         self::assertSame($expected, DataType::isAssociationAsField($dataType));
     }
@@ -103,7 +104,7 @@ class DataTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider extendedAssociationProvider
      */
-    public function testIsExtendedAssociation(?string $dataType, bool $expected)
+    public function testIsExtendedAssociation(?string $dataType, bool $expected): void
     {
         self::assertSame($expected, DataType::isExtendedAssociation($dataType));
     }
@@ -126,7 +127,7 @@ class DataTypeTest extends \PHPUnit\Framework\TestCase
         string $dataType,
         string $expectedAssociationType,
         ?string $expectedAssociationKind
-    ) {
+    ): void {
         [$associationType, $associationKind] = DataType::parseExtendedAssociation($dataType);
         self::assertSame($expectedAssociationType, $associationType);
         self::assertSame($expectedAssociationKind, $associationKind);
@@ -143,7 +144,7 @@ class DataTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidExtendedAssociationProvider
      */
-    public function testParseInvalidExtendedAssociation(string $dataType)
+    public function testParseInvalidExtendedAssociation(string $dataType): void
     {
         $this->expectException(\InvalidArgumentException::class);
         DataType::parseExtendedAssociation($dataType);

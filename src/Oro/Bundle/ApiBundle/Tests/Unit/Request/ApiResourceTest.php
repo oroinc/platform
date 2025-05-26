@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
 use Oro\Bundle\ApiBundle\Request\ApiResource;
+use PHPUnit\Framework\TestCase;
 
-class ApiResourceTest extends \PHPUnit\Framework\TestCase
+class ApiResourceTest extends TestCase
 {
-    public function testGetEntityClass()
+    public function testGetEntityClass(): void
     {
         $className = 'Test\Class';
 
@@ -14,7 +15,7 @@ class ApiResourceTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($className, $resource->getEntityClass());
     }
 
-    public function testExcludedActions()
+    public function testExcludedActions(): void
     {
         $resource = new ApiResource('Test\Class');
         self::assertEquals([], $resource->getExcludedActions());

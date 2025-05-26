@@ -12,17 +12,14 @@ use Oro\Bundle\ApiBundle\Filter\PageNumberFilter;
 use Oro\Bundle\ApiBundle\Filter\PageSizeFilter;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FilterHelperTest extends \PHPUnit\Framework\TestCase
+class FilterHelperTest extends TestCase
 {
-    /** @var FilterCollection */
-    private $filterCollection;
-
-    /** @var FilterValueAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $filterValueAccessor;
-
-    /** @var FilterHelper */
-    private $filterHelper;
+    private FilterCollection $filterCollection;
+    private FilterValueAccessorInterface&MockObject $filterValueAccessor;
+    private FilterHelper $filterHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +30,7 @@ class FilterHelperTest extends \PHPUnit\Framework\TestCase
         $this->filterHelper = new FilterHelper($this->filterCollection, $this->filterValueAccessor);
     }
 
-    public function testEmptyFilters()
+    public function testEmptyFilters(): void
     {
         self::assertNull($this->filterHelper->getFilterValue('test'));
         self::assertNull($this->filterHelper->getPageNumber());
@@ -42,7 +39,7 @@ class FilterHelperTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->filterHelper->getBooleanFilterValue('test'));
     }
 
-    public function testWithoutFilterValuesAndWithoutDefaultValues()
+    public function testWithoutFilterValuesAndWithoutDefaultValues(): void
     {
         $this->filterCollection->add(
             'page[number]',
@@ -74,7 +71,7 @@ class FilterHelperTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->filterHelper->getBooleanFilterValue('test'));
     }
 
-    public function testWithoutFilterValues()
+    public function testWithoutFilterValues(): void
     {
         $this->filterCollection->add(
             'page[number]',
@@ -106,7 +103,7 @@ class FilterHelperTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->filterHelper->getBooleanFilterValue('test'));
     }
 
-    public function testWithFilterValues()
+    public function testWithFilterValues(): void
     {
         $this->filterCollection->add(
             'page[number]',
@@ -146,7 +143,7 @@ class FilterHelperTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->filterHelper->getBooleanFilterValue('test'));
     }
 
-    public function testBooleanWithEqOperator()
+    public function testBooleanWithEqOperator(): void
     {
         $testFilter = new ComparisonFilter(DataType::BOOLEAN, 'test filter');
         $testFilter->setField('test');
@@ -167,7 +164,7 @@ class FilterHelperTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->filterHelper->getBooleanFilterValue('test'));
     }
 
-    public function testBooleanWithNeqOperator()
+    public function testBooleanWithNeqOperator(): void
     {
         $testFilter = new ComparisonFilter(DataType::BOOLEAN, 'test filter');
         $testFilter->setField('test');

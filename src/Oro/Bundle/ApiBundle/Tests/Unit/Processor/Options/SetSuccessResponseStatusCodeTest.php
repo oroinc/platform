@@ -8,8 +8,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SetSuccessResponseStatusCodeTest extends OptionsProcessorTestCase
 {
-    /** @var SetSuccessResponseStatusCode */
-    private $processor;
+    private SetSuccessResponseStatusCode $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -19,27 +18,27 @@ class SetSuccessResponseStatusCodeTest extends OptionsProcessorTestCase
         $this->processor = new SetSuccessResponseStatusCode();
     }
 
-    public function testProcessWhenNoResultAndNoErrorsAndNoResponseStatusCode()
+    public function testProcessWhenNoResultAndNoErrorsAndNoResponseStatusCode(): void
     {
         $this->processor->process($this->context);
         self::assertSame(Response::HTTP_OK, $this->context->getResponseStatusCode());
     }
 
-    public function testProcessWhenResultIsSet()
+    public function testProcessWhenResultIsSet(): void
     {
         $this->context->setResult([]);
         $this->processor->process($this->context);
         self::assertNull($this->context->getResponseStatusCode());
     }
 
-    public function testProcessWhenHasErrors()
+    public function testProcessWhenHasErrors(): void
     {
         $this->context->addError(Error::create('test'));
         $this->processor->process($this->context);
         self::assertNull($this->context->getResponseStatusCode());
     }
 
-    public function testProcessWhenResponseStatusCodeIsSet()
+    public function testProcessWhenResponseStatusCodeIsSet(): void
     {
         $existingStatusCode = 400;
         $this->context->setResponseStatusCode($existingStatusCode);

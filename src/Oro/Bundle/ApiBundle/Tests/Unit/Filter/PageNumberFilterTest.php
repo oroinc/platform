@@ -7,10 +7,11 @@ use Oro\Bundle\ApiBundle\Exception\InvalidFilterValueException;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\PageNumberFilter;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use PHPUnit\Framework\TestCase;
 
-class PageNumberFilterTest extends \PHPUnit\Framework\TestCase
+class PageNumberFilterTest extends TestCase
 {
-    public function testApplyWithoutFilter()
+    public function testApplyWithoutFilter(): void
     {
         $filter = new PageNumberFilter(DataType::UNSIGNED_INTEGER);
         $criteria = new Criteria();
@@ -20,7 +21,7 @@ class PageNumberFilterTest extends \PHPUnit\Framework\TestCase
         self::assertNull($criteria->getFirstResult());
     }
 
-    public function testApplyWithFilter()
+    public function testApplyWithFilter(): void
     {
         $pageSize = 10;
         $pageNum = 2;
@@ -40,7 +41,7 @@ class PageNumberFilterTest extends \PHPUnit\Framework\TestCase
         self::assertSame($expectedOffset, $criteria->getFirstResult());
     }
 
-    public function testApplyWithFilterAndNullValue()
+    public function testApplyWithFilterAndNullValue(): void
     {
         $filter = new PageNumberFilter(DataType::UNSIGNED_INTEGER);
         $filterValue = new FilterValue('path', null, null);
@@ -51,7 +52,7 @@ class PageNumberFilterTest extends \PHPUnit\Framework\TestCase
         self::assertNull($criteria->getFirstResult());
     }
 
-    public function testApplyWithFilterAndValueLessThan1()
+    public function testApplyWithFilterAndValueLessThan1(): void
     {
         $this->expectException(InvalidFilterValueException::class);
         $this->expectExceptionMessage('The value should be greater than or equals to 1.');

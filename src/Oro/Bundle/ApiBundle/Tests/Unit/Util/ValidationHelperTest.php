@@ -3,19 +3,18 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 
 use Oro\Bundle\ApiBundle\Util\ValidationHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Mapping\ClassMetadataInterface;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\PropertyMetadataInterface;
 
-class ValidationHelperTest extends \PHPUnit\Framework\TestCase
+class ValidationHelperTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataFactoryInterface */
-    private $metadataFactory;
-
-    /** @var ValidationHelper */
-    private $validationHelper;
+    private MetadataFactoryInterface&MockObject $metadataFactory;
+    private ValidationHelper $validationHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +24,7 @@ class ValidationHelperTest extends \PHPUnit\Framework\TestCase
         $this->validationHelper = new ValidationHelper($this->metadataFactory);
     }
 
-    public function testGetValidationMetadataForClassWhenNoMetadata()
+    public function testGetValidationMetadataForClassWhenNoMetadata(): void
     {
         $className = 'Test\Class';
 
@@ -39,7 +38,7 @@ class ValidationHelperTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->validationHelper->getValidationMetadataForClass($className));
     }
 
-    public function testGetValidationMetadataForClassWhenMetadataExists()
+    public function testGetValidationMetadataForClassWhenMetadataExists(): void
     {
         $className = 'Test\Class';
         $classMetadata = $this->createMock(ClassMetadataInterface::class);
@@ -59,7 +58,7 @@ class ValidationHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetValidationMetadataForPropertyWhenNoClassMetadata()
+    public function testGetValidationMetadataForPropertyWhenNoClassMetadata(): void
     {
         $className = 'Test\Class';
         $propertyName = 'test';
@@ -77,7 +76,7 @@ class ValidationHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetValidationMetadataForProperty()
+    public function testGetValidationMetadataForProperty(): void
     {
         $className = 'Test\Class';
         $propertyName = 'test';
@@ -102,7 +101,7 @@ class ValidationHelperTest extends \PHPUnit\Framework\TestCase
         self::assertSame($propertyMetadata, $result[0]);
     }
 
-    public function testHasValidationConstraintForClassWhenNoExpectedConstraint()
+    public function testHasValidationConstraintForClassWhenNoExpectedConstraint(): void
     {
         $className = 'Test\Class';
         $group = 'Test';
@@ -130,7 +129,7 @@ class ValidationHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHasValidationConstraintForClassWhenExpectedConstraintExists()
+    public function testHasValidationConstraintForClassWhenExpectedConstraintExists(): void
     {
         $className = 'Test\Class';
         $group = 'Test';
@@ -158,7 +157,7 @@ class ValidationHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHasValidationConstraintForPropertyWhenNoExpectedConstraint()
+    public function testHasValidationConstraintForPropertyWhenNoExpectedConstraint(): void
     {
         $className = 'Test\Class';
         $propertyName = 'test';
@@ -193,7 +192,7 @@ class ValidationHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHasValidationConstraintForPropertyWhenExpectedConstraintExists()
+    public function testHasValidationConstraintForPropertyWhenExpectedConstraintExists(): void
     {
         $className = 'Test\Class';
         $propertyName = 'test';

@@ -8,14 +8,13 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ContextParentMetadataAccessorTest extends \PHPUnit\Framework\TestCase
+class ContextParentMetadataAccessorTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|SubresourceContext */
-    private $context;
-
-    /** @var ContextParentMetadataAccessor */
-    private $metadataAccessor;
+    private SubresourceContext&MockObject $context;
+    private ContextParentMetadataAccessor $metadataAccessor;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +24,7 @@ class ContextParentMetadataAccessorTest extends \PHPUnit\Framework\TestCase
         $this->metadataAccessor = new ContextParentMetadataAccessor($this->context);
     }
 
-    public function testGetMetadataForContextParentClass()
+    public function testGetMetadataForContextParentClass(): void
     {
         $className = User::class;
         $metadata = new EntityMetadata('Test\Entity');
@@ -40,7 +39,7 @@ class ContextParentMetadataAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertSame($metadata, $this->metadataAccessor->getMetadata($className));
     }
 
-    public function testGetMetadataForContextParentClassForCaseWhenParentApiResourceIsBasedOnManageableEntity()
+    public function testGetMetadataForContextParentClassForCaseWhenParentApiResourceIsBasedOnManageableEntity(): void
     {
         $className = User::class;
         $metadata = new EntityMetadata('Test\Entity');
@@ -55,7 +54,7 @@ class ContextParentMetadataAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertSame($metadata, $this->metadataAccessor->getMetadata($className));
     }
 
-    public function testGetMetadataForNotContextParentClass()
+    public function testGetMetadataForNotContextParentClass(): void
     {
         $this->context->expects(self::once())
             ->method('getParentClassName')

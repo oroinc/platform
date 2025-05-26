@@ -17,20 +17,16 @@ use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeSubresourceProcessorTestCase;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class NormalizeRequestDataTest extends ChangeSubresourceProcessorTestCase
 {
-    /** @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject */
-    private $valueNormalizer;
-
-    /** @var EntityIdTransformerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityIdTransformer;
-
-    /** @var NormalizeRequestData */
-    private $processor;
+    private ValueNormalizer&MockObject $valueNormalizer;
+    private EntityIdTransformerInterface&MockObject $entityIdTransformer;
+    private NormalizeRequestData $processor;
 
     #[\Override]
     protected function setUp(): void

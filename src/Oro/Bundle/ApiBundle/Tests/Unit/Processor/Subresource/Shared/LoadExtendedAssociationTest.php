@@ -12,17 +12,15 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorOrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Component\EntitySerializer\EntitySerializer;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntitySerializer */
-    private $entitySerializer;
-
-    /** @var LoadExtendedAssociation */
-    private $processor;
+    private EntitySerializer&MockObject $entitySerializer;
+    private LoadExtendedAssociation $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -39,7 +37,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         );
     }
 
-    public function testProcessWhenResultAlreadyExists()
+    public function testProcessWhenResultAlreadyExists(): void
     {
         $result = ['test'];
 
@@ -50,7 +48,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         self::assertCount(0, $this->context->getSkippedGroups());
     }
 
-    public function testProcessWhenAssociationConfigDoesNotExist()
+    public function testProcessWhenAssociationConfigDoesNotExist(): void
     {
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
@@ -63,7 +61,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         self::assertCount(0, $this->context->getSkippedGroups());
     }
 
-    public function testProcessForNotExtendedAssociation()
+    public function testProcessForNotExtendedAssociation(): void
     {
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
@@ -77,7 +75,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         self::assertCount(0, $this->context->getSkippedGroups());
     }
 
-    public function testProcessForInvalidTypeOfExtendedAssociation()
+    public function testProcessForInvalidTypeOfExtendedAssociation(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Unsupported type of extended association: invalidType.');
@@ -91,7 +89,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         $this->processor->process($this->context);
     }
 
-    public function testProcessForExtendedAssociation()
+    public function testProcessForExtendedAssociation(): void
     {
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
@@ -135,7 +133,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
-    public function testProcessForEmptyResultOfManyToOneExtendedAssociation()
+    public function testProcessForEmptyResultOfManyToOneExtendedAssociation(): void
     {
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
@@ -176,7 +174,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
-    public function testProcessForEmptyResultOfManyToManyExtendedAssociation()
+    public function testProcessForEmptyResultOfManyToManyExtendedAssociation(): void
     {
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
@@ -217,7 +215,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
-    public function testProcessForEmptyResultOfMultipleManyToOneExtendedAssociation()
+    public function testProcessForEmptyResultOfMultipleManyToOneExtendedAssociation(): void
     {
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
@@ -258,7 +256,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
-    public function testProcessForManyToOneExtendedAssociationWhenParentEntityWasNotFound()
+    public function testProcessForManyToOneExtendedAssociationWhenParentEntityWasNotFound(): void
     {
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
@@ -297,7 +295,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
-    public function testProcessForManyToManyExtendedAssociationWhenParentEntityWasNotFound()
+    public function testProcessForManyToManyExtendedAssociationWhenParentEntityWasNotFound(): void
     {
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();
@@ -336,7 +334,7 @@ class LoadExtendedAssociationTest extends GetSubresourceProcessorOrmRelatedTestC
         self::assertEquals([ApiActionGroup::NORMALIZE_DATA], $this->context->getSkippedGroups());
     }
 
-    public function testProcessForMultipleManyToOneExtendedAssociationWhenParentEntityWasNotFound()
+    public function testProcessForMultipleManyToOneExtendedAssociationWhenParentEntityWasNotFound(): void
     {
         $associationName = 'testAssociation';
         $parentConfig = new EntityDefinitionConfig();

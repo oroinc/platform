@@ -17,23 +17,18 @@ use Oro\Bundle\ApiBundle\Provider\ExtendedAssociationProvider;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
+class ExtendedAssociationFilterTest extends TestCase
 {
-    /** @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject */
-    private $valueNormalizer;
-
-    /** @var ExtendedAssociationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $extendedAssociationProvider;
-
-    /** @var EntityOverrideProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityOverrideProvider;
-
-    /** @var ExtendedAssociationFilter */
-    private $filter;
+    private ValueNormalizer&MockObject $valueNormalizer;
+    private ExtendedAssociationProvider&MockObject $extendedAssociationProvider;
+    private EntityOverrideProviderInterface&MockObject $entityOverrideProvider;
+    private ExtendedAssociationFilter $filter;
 
     #[\Override]
     protected function setUp(): void
@@ -53,12 +48,12 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->setEntityOverrideProviderRegistry($entityOverrideProviderRegistry);
     }
 
-    public function testGetFilterValueName()
+    public function testGetFilterValueName(): void
     {
         self::assertEquals('type', $this->filter->getFilterValueName());
     }
 
-    public function testSearchFilterKey()
+    public function testSearchFilterKey(): void
     {
         $filterValues = [
             'filter[name]'            => new FilterValue('name', 'test'),
@@ -74,7 +69,7 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSearchFilterKeyWhenAssociationTargetWasNotSpecified()
+    public function testSearchFilterKeyWhenAssociationTargetWasNotSpecified(): void
     {
         $this->expectException(InvalidFilterValueKeyException::class);
         $this->expectExceptionMessage('The target type of an association is not specified.');
@@ -88,7 +83,7 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->searchFilterKeys($filterValues);
     }
 
-    public function testSearchFilterKeyWhenAssociationTargetIsEmpty()
+    public function testSearchFilterKeyWhenAssociationTargetIsEmpty(): void
     {
         $this->expectException(InvalidFilterValueKeyException::class);
         $this->expectExceptionMessage('The target type of an association is not specified.');
@@ -102,7 +97,7 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->searchFilterKeys($filterValues);
     }
 
-    public function testSearchFilterKeyWhenAssociationTargetPlaceholderWasNotReplacedWithAssociationType()
+    public function testSearchFilterKeyWhenAssociationTargetPlaceholderWasNotReplacedWithAssociationType(): void
     {
         $this->expectException(InvalidFilterValueKeyException::class);
         $this->expectExceptionMessage('Replace "type" placeholder with the target type of an association.');
@@ -116,7 +111,7 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->searchFilterKeys($filterValues);
     }
 
-    public function testApplyFilter()
+    public function testApplyFilter(): void
     {
         $filterValue = new FilterValue('target.users', '123');
         $requestType = new RequestType([RequestType::REST]);
@@ -154,7 +149,7 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testApplyFilterWhenAssociationTargetIsOverridden()
+    public function testApplyFilterWhenAssociationTargetIsOverridden(): void
     {
         $filterValue = new FilterValue('target.users', '123');
         $requestType = new RequestType([RequestType::REST]);
@@ -196,7 +191,7 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testApplyFilterWhenAssociationTargetIsNotSupported()
+    public function testApplyFilterWhenAssociationTargetIsNotSupported(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('An association with "users" is not supported.');
@@ -232,7 +227,7 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->apply($criteria, $filterValue);
     }
 
-    public function testApplyFilterWhenAllTargetsAreNotAccessibleViaApi()
+    public function testApplyFilterWhenAllTargetsAreNotAccessibleViaApi(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('An association with "users" is not supported.');
@@ -263,7 +258,7 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
         $this->filter->apply($criteria, $filterValue);
     }
 
-    public function testApplyFilterWithManyToManyAssociation()
+    public function testApplyFilterWithManyToManyAssociation(): void
     {
         $filterValue = new FilterValue('target.users', '123');
         $requestType = new RequestType([RequestType::REST]);
@@ -301,7 +296,7 @@ class ExtendedAssociationFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testApplyFilterWithManyToManyAssociationAndNotOperator()
+    public function testApplyFilterWithManyToManyAssociationAndNotOperator(): void
     {
         $filterValue = new FilterValue('target.users', '123', FilterOperator::NEQ);
         $requestType = new RequestType([RequestType::REST]);

@@ -3,11 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ApiBundle\Provider\MutableEntityOverrideProvider;
+use PHPUnit\Framework\TestCase;
 
-class MutableEntityOverrideProviderTest extends \PHPUnit\Framework\TestCase
+class MutableEntityOverrideProviderTest extends TestCase
 {
-    /** @var MutableEntityOverrideProvider */
-    private $entityOverrideProvider;
+    private MutableEntityOverrideProvider $entityOverrideProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -15,7 +15,7 @@ class MutableEntityOverrideProviderTest extends \PHPUnit\Framework\TestCase
         $this->entityOverrideProvider = new MutableEntityOverrideProvider(['Test\Entity1' => 'Test\Entity2']);
     }
 
-    public function testGetSubstituteEntityClassWhenSubstitutionExists()
+    public function testGetSubstituteEntityClassWhenSubstitutionExists(): void
     {
         self::assertEquals(
             'Test\Entity2',
@@ -23,14 +23,14 @@ class MutableEntityOverrideProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetSubstituteEntityClassWhenSubstitutionDoesNotExist()
+    public function testGetSubstituteEntityClassWhenSubstitutionDoesNotExist(): void
     {
         self::assertNull(
             $this->entityOverrideProvider->getSubstituteEntityClass('Test\Entity2')
         );
     }
 
-    public function testGetEntityClassWhenSubstitutionExists()
+    public function testGetEntityClassWhenSubstitutionExists(): void
     {
         self::assertEquals(
             'Test\Entity1',
@@ -38,14 +38,14 @@ class MutableEntityOverrideProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityClassWhenSubstitutionDoesNotExist()
+    public function testGetEntityClassWhenSubstitutionDoesNotExist(): void
     {
         self::assertNull(
             $this->entityOverrideProvider->getEntityClass('Test\Entity1')
         );
     }
 
-    public function testAddSubstitution()
+    public function testAddSubstitution(): void
     {
         $this->entityOverrideProvider->addSubstitution('Test\Entity3', 'Test\Entity4');
         self::assertEquals(

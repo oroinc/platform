@@ -3,11 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc\Parser;
 
 use Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocAnnotationParser;
+use PHPUnit\Framework\TestCase;
 
-class ApiDocAnnotationParserTest extends \PHPUnit\Framework\TestCase
+class ApiDocAnnotationParserTest extends TestCase
 {
-    /** @var ApiDocAnnotationParser */
-    private $parser;
+    private ApiDocAnnotationParser $parser;
 
     #[\Override]
     protected function setUp(): void
@@ -15,14 +15,14 @@ class ApiDocAnnotationParserTest extends \PHPUnit\Framework\TestCase
         $this->parser = new ApiDocAnnotationParser();
     }
 
-    public function testSupportsWithoutFields()
+    public function testSupportsWithoutFields(): void
     {
         $item = [];
 
         self::assertFalse($this->parser->supports($item));
     }
 
-    public function testSupportsWithUnexpectedTypeOfFields()
+    public function testSupportsWithUnexpectedTypeOfFields(): void
     {
         $item = [
             'fields' => 'a string'
@@ -31,7 +31,7 @@ class ApiDocAnnotationParserTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->parser->supports($item));
     }
 
-    public function testSupportsWithFieldsAsArray()
+    public function testSupportsWithFieldsAsArray(): void
     {
         $item = [
             'fields' => []
@@ -40,7 +40,7 @@ class ApiDocAnnotationParserTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->parser->supports($item));
     }
 
-    public function testParseFieldWithProperties()
+    public function testParseFieldWithProperties(): void
     {
         $item = [
             'fields' => [
@@ -56,7 +56,7 @@ class ApiDocAnnotationParserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testParseFieldWithoutRequiredProperty()
+    public function testParseFieldWithoutRequiredProperty(): void
     {
         $item = [
             'fields' => [
@@ -72,7 +72,7 @@ class ApiDocAnnotationParserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testParseFieldWithRequiredProperty()
+    public function testParseFieldWithRequiredProperty(): void
     {
         $item = [
             'fields' => [

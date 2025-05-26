@@ -5,10 +5,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc\Parser;
 use Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Config\FileLocator;
 use Symfony\Component\Yaml\Yaml;
 
-class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
+class MarkdownApiDocParserTest extends TestCase
 {
     private function loadDocument(): MarkdownApiDocParser
     {
@@ -56,7 +57,7 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expected, $actualValue);
     }
 
-    public function testRegisterDocumentationResourceForUnsupportedFile()
+    public function testRegisterDocumentationResourceForUnsupportedFile(): void
     {
         $fileLocator = $this->createMock(FileLocator::class);
         $fileLocator->expects(self::never())
@@ -68,7 +69,7 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testParse()
+    public function testParse(): void
     {
         $apiDocParser = $this->loadDocument();
 
@@ -77,7 +78,7 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
         $this->assertLoadedData($expected, $apiDocParser);
     }
 
-    public function testInheritDoc()
+    public function testInheritDoc(): void
     {
         $apiDocParser = $this->loadDocument();
         $apiDocParser->registerDocumentationResource('@OroApiBundle/Tests/Unit/ApiDoc/Parser/Fixtures/inheritdoc.md');
@@ -87,7 +88,7 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
         $this->assertLoadedData($expected, $apiDocParser);
     }
 
-    public function testReplaceDescriptions()
+    public function testReplaceDescriptions(): void
     {
         $apiDocParser = $this->loadDocument();
         $apiDocParser->registerDocumentationResource('@OroApiBundle/Tests/Unit/ApiDoc/Parser/Fixtures/replace.md');
@@ -100,7 +101,7 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getActionDocumentationProvider
      */
-    public function testGetActionDocumentation(?string $expected, string $className, string $actionName)
+    public function testGetActionDocumentation(?string $expected, string $className, string $actionName): void
     {
         $apiDocParser = $this->loadDocument();
 
@@ -149,7 +150,7 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
         string $className,
         string $fieldName,
         ?string $actionName = null
-    ) {
+    ): void {
         $apiDocParser = $this->loadDocument();
 
         self::assertSame(
@@ -231,7 +232,7 @@ class MarkdownApiDocParserTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getFilterDocumentationProvider
      */
-    public function testGetFilterDocumentation(?string $expected, string $className, string $filterName)
+    public function testGetFilterDocumentation(?string $expected, string $className, string $filterName): void
     {
         $apiDocParser = $this->loadDocument();
 

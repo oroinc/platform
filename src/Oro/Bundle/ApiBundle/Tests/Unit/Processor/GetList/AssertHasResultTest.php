@@ -7,8 +7,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AssertHasResultTest extends GetListProcessorTestCase
 {
-    /** @var AssertHasResult */
-    private $processor;
+    private AssertHasResult $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -18,13 +17,13 @@ class AssertHasResultTest extends GetListProcessorTestCase
         $this->processor = new AssertHasResult();
     }
 
-    public function testProcessOnExpectedResult()
+    public function testProcessOnExpectedResult(): void
     {
         $this->context->setResult([['key' => 'value']]);
         $this->processor->process($this->context);
     }
 
-    public function testProcessOnExistingResult()
+    public function testProcessOnExistingResult(): void
     {
         $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('Getting a list of entities failed.');
@@ -33,7 +32,7 @@ class AssertHasResultTest extends GetListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessOnEmptyQuery()
+    public function testProcessOnEmptyQuery(): void
     {
         $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('Unsupported request.');
@@ -41,7 +40,7 @@ class AssertHasResultTest extends GetListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessOnWrongQuery()
+    public function testProcessOnWrongQuery(): void
     {
         $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('Unsupported query type: stdClass.');

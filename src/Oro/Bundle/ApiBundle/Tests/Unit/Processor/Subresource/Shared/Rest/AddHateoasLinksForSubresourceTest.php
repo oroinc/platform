@@ -14,19 +14,15 @@ use Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class AddHateoasLinksForSubresourceTest extends GetSubresourceProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|UrlGeneratorInterface */
-    private $urlGenerator;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|SubresourcesProvider */
-    private $subresourcesProvider;
-
-    /** @var AddHateoasLinksForSubresource */
-    private $processor;
+    private UrlGeneratorInterface&MockObject $urlGenerator;
+    private SubresourcesProvider&MockObject $subresourcesProvider;
+    private AddHateoasLinksForSubresource $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -48,7 +44,7 @@ class AddHateoasLinksForSubresourceTest extends GetSubresourceProcessorTestCase
         );
     }
 
-    public function testProcessWhenNoDocumentBuilder()
+    public function testProcessWhenNoDocumentBuilder(): void
     {
         $this->subresourcesProvider->expects(self::never())
             ->method('getSubresource');
@@ -61,7 +57,7 @@ class AddHateoasLinksForSubresourceTest extends GetSubresourceProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForNotSuccessResponse()
+    public function testProcessForNotSuccessResponse(): void
     {
         $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
 
@@ -84,7 +80,7 @@ class AddHateoasLinksForSubresourceTest extends GetSubresourceProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenNoSubresource()
+    public function testProcessWhenNoSubresource(): void
     {
         $parentClassName = 'Test\Entity';
         $associationName = 'testAssociation';
@@ -116,7 +112,7 @@ class AddHateoasLinksForSubresourceTest extends GetSubresourceProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForExcludedSubresource()
+    public function testProcessForExcludedSubresource(): void
     {
         $parentClassName = 'Test\Entity';
         $associationName = 'testAssociation';
@@ -151,7 +147,7 @@ class AddHateoasLinksForSubresourceTest extends GetSubresourceProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForSuccessResponse()
+    public function testProcessForSuccessResponse(): void
     {
         $parentClassName = 'Test\Entity';
         $parentEntityId = '_123';

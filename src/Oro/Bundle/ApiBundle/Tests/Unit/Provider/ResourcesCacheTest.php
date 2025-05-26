@@ -6,22 +6,19 @@ use Oro\Bundle\ApiBundle\Provider\ResourcesCache;
 use Oro\Bundle\ApiBundle\Provider\ResourcesCacheAccessor;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
+class ResourcesCacheTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|CacheItemPoolInterface */
-    private $cache;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|CacheItemInterface */
-    private $cacheItem;
-
-    /** @var ResourcesCache */
-    private $resourcesCache;
+    private CacheItemPoolInterface&MockObject $cache;
+    private CacheItemInterface&MockObject $cacheItem;
+    private ResourcesCache $resourcesCache;
 
     #[\Override]
     protected function setUp(): void
@@ -34,7 +31,7 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAccessibleResourcesNoCache()
+    public function testGetAccessibleResourcesNoCache(): void
     {
         $this->cache->expects(self::once())
             ->method('getItem')
@@ -49,7 +46,7 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAccessibleResources()
+    public function testGetAccessibleResources(): void
     {
         $cachedData = [null, ['Test\Entity1' => 0, 'Test\Entity2' => 1, 'Test\Entity3' => 3]];
 
@@ -70,7 +67,7 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetExcludedActionsNoCache()
+    public function testGetExcludedActionsNoCache(): void
     {
         $this->cache->expects(self::once())
             ->method('getItem')
@@ -85,7 +82,7 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetExcludedActions()
+    public function testGetExcludedActions(): void
     {
         $cachedData = [null, ['Test\Entity1' => ['delete']]];
 
@@ -106,7 +103,7 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetResourcesNoCache()
+    public function testGetResourcesNoCache(): void
     {
         $this->cache->expects(self::once())
             ->method('getItem')
@@ -121,7 +118,7 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetResources()
+    public function testGetResources(): void
     {
         $cachedData = [null, ['Test\Entity1' => [[]], 'Test\Entity2' => [['create']]]];
 
@@ -145,7 +142,7 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetResourcesWithoutIdentifierNoCache()
+    public function testGetResourcesWithoutIdentifierNoCache(): void
     {
         $this->cache->expects(self::once())
             ->method('getItem')
@@ -160,7 +157,7 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetResourcesWithoutIdentifier()
+    public function testGetResourcesWithoutIdentifier(): void
     {
         $cachedData = [null, ['Test\Entity1', 'Test\Entity2']];
 
@@ -181,7 +178,7 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSave()
+    public function testSave(): void
     {
         $resource1 = new ApiResource('Test\Entity1');
         $resource2 = new ApiResource('Test\Entity2');
@@ -232,7 +229,7 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSaveResourcesWithoutIdentifier()
+    public function testSaveResourcesWithoutIdentifier(): void
     {
         $this->cache->expects(self::once())
             ->method('getItem')
@@ -252,7 +249,7 @@ class ResourcesCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $this->cache->expects(self::once())
             ->method('clear');

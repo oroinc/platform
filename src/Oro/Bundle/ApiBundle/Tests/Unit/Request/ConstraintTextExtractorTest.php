@@ -6,14 +6,14 @@ use Oro\Bundle\ApiBundle\Form\NamedValidationConstraint;
 use Oro\Bundle\ApiBundle\Request\ConstraintTextExtractor;
 use Oro\Bundle\ApiBundle\Validator\Constraints\HasAdderAndRemover;
 use Oro\Bundle\SecurityBundle\Validator\Constraints\FieldAccessGranted;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Blank;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class ConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
+class ConstraintTextExtractorTest extends TestCase
 {
-    /** @var ConstraintTextExtractor */
-    private $constraintTextExtractor;
+    private ConstraintTextExtractor $constraintTextExtractor;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +24,7 @@ class ConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getConstraintStatusCodeDataProvider
      */
-    public function testGetConstraintStatusCode(Constraint $constraint, int $expectedStatusCode)
+    public function testGetConstraintStatusCode(Constraint $constraint, int $expectedStatusCode): void
     {
         self::assertEquals(
             $expectedStatusCode,
@@ -43,7 +43,7 @@ class ConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetConstraintCode()
+    public function testGetConstraintCode(): void
     {
         self::assertNull($this->constraintTextExtractor->getConstraintCode(new Blank()));
     }
@@ -51,7 +51,7 @@ class ConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getConstraintTypeDataProvider
      */
-    public function testConstraintType(Constraint $constraint, string $expectedType)
+    public function testConstraintType(Constraint $constraint, string $expectedType): void
     {
         self::assertEquals(
             $expectedType,

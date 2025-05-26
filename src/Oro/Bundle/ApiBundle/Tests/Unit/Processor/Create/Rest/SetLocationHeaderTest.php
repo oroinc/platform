@@ -13,23 +13,17 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class SetLocationHeaderTest extends FormProcessorTestCase
 {
-    private const ITEM_ROUTE_NAME = 'item_route';
+    private const string ITEM_ROUTE_NAME = 'item_route';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|UrlGeneratorInterface */
-    private $urlGenerator;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
-    private $valueNormalizer;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerInterface */
-    private $entityIdTransformer;
-
-    /** @var SetLocationHeader */
-    private $processor;
+    private UrlGeneratorInterface&MockObject $urlGenerator;
+    private ValueNormalizer&MockObject $valueNormalizer;
+    private EntityIdTransformerInterface&MockObject $entityIdTransformer;
+    private SetLocationHeader $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -63,7 +57,7 @@ class SetLocationHeaderTest extends FormProcessorTestCase
         );
     }
 
-    public function testProcessWhenHeaderAlreadyExist()
+    public function testProcessWhenHeaderAlreadyExist(): void
     {
         $existingLocation = 'existing location';
 
@@ -77,14 +71,14 @@ class SetLocationHeaderTest extends FormProcessorTestCase
         );
     }
 
-    public function testProcessWhenNoId()
+    public function testProcessWhenNoId(): void
     {
         $this->processor->process($this->context);
 
         self::assertFalse($this->context->getResponseHeaders()->has(SetLocationHeader::RESPONSE_HEADER_NAME));
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $location = 'test location';
         $entityClass = 'Test\Entity';

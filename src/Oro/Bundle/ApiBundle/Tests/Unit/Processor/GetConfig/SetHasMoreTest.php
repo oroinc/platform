@@ -7,8 +7,7 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\SetHasMore;
 
 class SetHasMoreTest extends ConfigProcessorTestCase
 {
-    /** @var SetHasMore */
-    private $processor;
+    private SetHasMore $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +17,7 @@ class SetHasMoreTest extends ConfigProcessorTestCase
         $this->processor = new SetHasMore();
     }
 
-    public function testProcessForNotCompletedConfig()
+    public function testProcessForNotCompletedConfig(): void
     {
         $config = [
             'fields' => [
@@ -41,7 +40,7 @@ class SetHasMoreTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForCompletedConfig()
+    public function testProcessForCompletedConfig(): void
     {
         $config = [
             'exclusion_policy' => 'all',

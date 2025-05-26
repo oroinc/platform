@@ -6,13 +6,14 @@ use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
+class GroupRangeApplicableCheckerTest extends TestCase
 {
-    public function testGroupRangeApplicableCheckerWithoutFirstAndLastGroups()
+    public function testGroupRangeApplicableCheckerWithoutFirstAndLastGroups(): void
     {
         $context = new Context();
         $context->setAction('action1');
@@ -40,7 +41,7 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGroupRangeApplicableCheckerWithUnknownFirstGroup()
+    public function testGroupRangeApplicableCheckerWithUnknownFirstGroup(): void
     {
         $context = new Context();
         $context->setAction('action1');
@@ -69,7 +70,7 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGroupRangeApplicableCheckerWithUnknownLastGroup()
+    public function testGroupRangeApplicableCheckerWithUnknownLastGroup(): void
     {
         $context = new Context();
         $context->setAction('action1');
@@ -98,7 +99,7 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGroupRangeApplicableCheckerWithFirstAndLastGroups()
+    public function testGroupRangeApplicableCheckerWithFirstAndLastGroups(): void
     {
         $context = new Context();
         $context->setAction('action1');
@@ -141,7 +142,7 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGroupRangeApplicableCheckerWithFirstGroupOnly()
+    public function testGroupRangeApplicableCheckerWithFirstGroupOnly(): void
     {
         $context = new Context();
         $context->setAction('action1');
@@ -184,7 +185,7 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGroupRangeApplicableCheckerWithLastGroupOnly()
+    public function testGroupRangeApplicableCheckerWithLastGroupOnly(): void
     {
         $context = new Context();
         $context->setAction('action1');
@@ -227,7 +228,7 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFirstGroupEqualsLastGroup()
+    public function testFirstGroupEqualsLastGroup(): void
     {
         $context = new Context();
         $context->setAction('action1');
@@ -257,7 +258,7 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFirstGroupEqualsLastGroupWithoutUngroupedProcessors()
+    public function testFirstGroupEqualsLastGroupWithoutUngroupedProcessors(): void
     {
         $context = new Context();
         $context->setAction('action1');
@@ -281,7 +282,7 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFirstGroupEqualsLastGroupWithoutProcessorsInThisGroup()
+    public function testFirstGroupEqualsLastGroupWithoutProcessorsInThisGroup(): void
     {
         $context = new Context();
         $context->setAction('action1');
@@ -304,7 +305,7 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFirstGroupAndLastGroupWithoutProcessorsInFirstGroup()
+    public function testFirstGroupAndLastGroupWithoutProcessorsInFirstGroup(): void
     {
         $context = new Context();
         $context->setAction('action1');
@@ -327,7 +328,7 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFirstGroupAndLastGroupWithoutProcessorsInLastGroup()
+    public function testFirstGroupAndLastGroupWithoutProcessorsInLastGroup(): void
     {
         $context = new Context();
         $context->setAction('action1');
@@ -350,28 +351,19 @@ class GroupRangeApplicableCheckerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    /**
-     * @return ProcessorRegistryInterface
-     */
-    protected function getProcessorRegistry()
+    private function getProcessorRegistry(): ProcessorRegistryInterface
     {
         $processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
-        $processorRegistry->expects($this->any())
+        $processorRegistry->expects(self::any())
             ->method('getProcessor')
-            ->willReturnCallback(
-                function ($processorId) {
-                    return new ProcessorMock($processorId);
-                }
-            );
+            ->willReturnCallback(function ($processorId) {
+                return new ProcessorMock($processorId);
+            });
 
         return $processorRegistry;
     }
 
-    /**
-     * @param string[]  $expectedProcessorIds
-     * @param \Iterator $processors
-     */
-    protected static function assertProcessors(array $expectedProcessorIds, \Iterator $processors)
+    private static function assertProcessors(array $expectedProcessorIds, \Iterator $processors): void
     {
         $processorIds = [];
         /** @var ProcessorMock $processor */

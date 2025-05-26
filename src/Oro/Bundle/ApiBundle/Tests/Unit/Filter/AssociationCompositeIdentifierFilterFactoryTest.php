@@ -6,14 +6,13 @@ use Oro\Bundle\ApiBundle\Filter\AssociationCompositeIdentifierFilter;
 use Oro\Bundle\ApiBundle\Filter\AssociationCompositeIdentifierFilterFactory;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AssociationCompositeIdentifierFilterFactoryTest extends \PHPUnit\Framework\TestCase
+class AssociationCompositeIdentifierFilterFactoryTest extends TestCase
 {
-    /** @var EntityIdTransformerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $idTransformerRegistry;
-
-    /** @var AssociationCompositeIdentifierFilterFactory */
-    private $factory;
+    private EntityIdTransformerRegistry&MockObject $idTransformerRegistry;
+    private AssociationCompositeIdentifierFilterFactory $factory;
 
     #[\Override]
     protected function setUp(): void

@@ -9,14 +9,12 @@ use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Processor\Shared\PersistIncludedEntities;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class PersistIncludedEntitiesTest extends FormProcessorTestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var PersistIncludedEntities */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private PersistIncludedEntities $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -28,18 +26,18 @@ class PersistIncludedEntitiesTest extends FormProcessorTestCase
         $this->processor = new PersistIncludedEntities($this->doctrineHelper);
     }
 
-    public function testProcessWhenIncludedEntitiesCollectionDoesNotExist()
+    public function testProcessWhenIncludedEntitiesCollectionDoesNotExist(): void
     {
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenIncludedEntitiesCollectionIsEmpty()
+    public function testProcessWhenIncludedEntitiesCollectionIsEmpty(): void
     {
         $this->context->setIncludedEntities(new IncludedEntityCollection());
         $this->processor->process($this->context);
     }
 
-    public function testProcessForNewIncludedObject()
+    public function testProcessForNewIncludedObject(): void
     {
         $object = new \stdClass();
         $objectClass = 'Test\Class';
@@ -62,7 +60,7 @@ class PersistIncludedEntitiesTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForExistingIncludedObject()
+    public function testProcessForExistingIncludedObject(): void
     {
         $object = new \stdClass();
         $objectClass = 'Test\Class';
@@ -83,7 +81,7 @@ class PersistIncludedEntitiesTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForNewIncludedEntity()
+    public function testProcessForNewIncludedEntity(): void
     {
         $entity = new \stdClass();
         $entityClass = 'Test\Class';
@@ -110,7 +108,7 @@ class PersistIncludedEntitiesTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForExistingIncludedEntity()
+    public function testProcessForExistingIncludedEntity(): void
     {
         $entity = new \stdClass();
         $entityClass = 'Test\Class';
@@ -131,7 +129,7 @@ class PersistIncludedEntitiesTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithAdditionalEntitiesToPersist()
+    public function testProcessWithAdditionalEntitiesToPersist(): void
     {
         $entity1 = new \stdClass();
         $entity2 = new \stdClass();
@@ -167,7 +165,7 @@ class PersistIncludedEntitiesTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithAdditionalEntitiesToRemove()
+    public function testProcessWithAdditionalEntitiesToRemove(): void
     {
         $entity1 = new \stdClass();
         $entity2 = new \stdClass();

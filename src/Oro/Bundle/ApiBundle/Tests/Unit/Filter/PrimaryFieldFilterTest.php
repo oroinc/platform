@@ -8,10 +8,11 @@ use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\PrimaryFieldFilter;
+use PHPUnit\Framework\TestCase;
 
-class PrimaryFieldFilterTest extends \PHPUnit\Framework\TestCase
+class PrimaryFieldFilterTest extends TestCase
 {
-    public function testFieldIsNotSpecified()
+    public function testFieldIsNotSpecified(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The Field must not be empty.');
@@ -20,7 +21,7 @@ class PrimaryFieldFilterTest extends \PHPUnit\Framework\TestCase
         $filter->apply(new Criteria(), new FilterValue('path', 'value', FilterOperator::EQ));
     }
 
-    public function testDataFieldIsNotSpecified()
+    public function testDataFieldIsNotSpecified(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The DataField must not be empty.');
@@ -30,7 +31,7 @@ class PrimaryFieldFilterTest extends \PHPUnit\Framework\TestCase
         $filter->apply(new Criteria(), new FilterValue('path', 'value', FilterOperator::EQ));
     }
 
-    public function testOptions()
+    public function testOptions(): void
     {
         $filter = new PrimaryFieldFilter('string');
         $filter->setDataField('dataField');
@@ -40,7 +41,7 @@ class PrimaryFieldFilterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('primaryFlagField', $filter->getPrimaryFlagField());
     }
 
-    public function testApplyNullValue()
+    public function testApplyNullValue(): void
     {
         $filter = new PrimaryFieldFilter('string');
         $filter->setField('association');
@@ -52,7 +53,7 @@ class PrimaryFieldFilterTest extends \PHPUnit\Framework\TestCase
         self::assertNull($criteria->getWhereExpression());
     }
 
-    public function testApplyWithDefaultPrimaryFlagField()
+    public function testApplyWithDefaultPrimaryFlagField(): void
     {
         $filter = new PrimaryFieldFilter('string');
         $filter->setField('association');
@@ -73,7 +74,7 @@ class PrimaryFieldFilterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testApplyWithCustomPrimaryFlagField()
+    public function testApplyWithCustomPrimaryFlagField(): void
     {
         $filter = new PrimaryFieldFilter('string');
         $filter->setField('association');

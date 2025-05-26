@@ -3,13 +3,14 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Extension;
 
 use Oro\Bundle\ApiBundle\Form\Extension\ValidationExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Validator\EventListener\ValidationListener;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class ValidationExtensionTest extends \PHPUnit\Framework\TestCase
+class ValidationExtensionTest extends TestCase
 {
     private ValidationExtension $extension;
 

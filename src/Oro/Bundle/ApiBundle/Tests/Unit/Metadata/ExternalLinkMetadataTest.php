@@ -6,10 +6,11 @@ use Oro\Bundle\ApiBundle\Exception\LinkHrefResolvingFailedException;
 use Oro\Bundle\ApiBundle\Metadata\DataAccessorInterface;
 use Oro\Bundle\ApiBundle\Metadata\ExternalLinkMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaAttributeMetadata;
+use PHPUnit\Framework\TestCase;
 
-class ExternalLinkMetadataTest extends \PHPUnit\Framework\TestCase
+class ExternalLinkMetadataTest extends TestCase
 {
-    public function testClone()
+    public function testClone(): void
     {
         $linkMetadata = new ExternalLinkMetadata(
             'urlTemplate',
@@ -23,7 +24,7 @@ class ExternalLinkMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($linkMetadata, $linkMetadataClone);
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $linkMetadata = new ExternalLinkMetadata(
             'testUrlTemplate',
@@ -47,7 +48,7 @@ class ExternalLinkMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testToArrayWithRequiredPropertiesOnly()
+    public function testToArrayWithRequiredPropertiesOnly(): void
     {
         $linkMetadata = new ExternalLinkMetadata('testUrlTemplate');
 
@@ -59,7 +60,7 @@ class ExternalLinkMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetHrefWithoutUrlParams()
+    public function testGetHrefWithoutUrlParams(): void
     {
         $urlTemplate = 'http://test.com/api/{version}/{resource}?filter={filter}';
         $linkMetadata = new ExternalLinkMetadata($urlTemplate);
@@ -74,7 +75,7 @@ class ExternalLinkMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetHrefWhenAllUrlParamsAreResolved()
+    public function testGetHrefWhenAllUrlParamsAreResolved(): void
     {
         $linkMetadata = new ExternalLinkMetadata(
             'http://test.com/api/{version}/{resource}?filter={filter}',
@@ -84,7 +85,7 @@ class ExternalLinkMetadataTest extends \PHPUnit\Framework\TestCase
         $dataAccessor = $this->createMock(DataAccessorInterface::class);
         $dataAccessor->expects(self::exactly(2))
             ->method('tryGetValue')
-            ->willReturnCallback(function ($propertyPath, &$value) {
+            ->willReturnCallback(function ($propertyPath, &$value): bool {
                 $hasValue = false;
                 if (DataAccessorInterface::ENTITY_TYPE === $propertyPath) {
                     $value = 'entity';
@@ -103,7 +104,7 @@ class ExternalLinkMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetHrefWhenOnlyPartOfUrlParamsAreResolvedButThereAreDefaultValuesInDefaultParams()
+    public function testGetHrefWhenOnlyPartOfUrlParamsAreResolvedButThereAreDefaultValuesInDefaultParams(): void
     {
         $linkMetadata = new ExternalLinkMetadata(
             'http://test.com/api/{version}/{resource}?filter={filter}',
@@ -114,7 +115,7 @@ class ExternalLinkMetadataTest extends \PHPUnit\Framework\TestCase
         $dataAccessor = $this->createMock(DataAccessorInterface::class);
         $dataAccessor->expects(self::exactly(2))
             ->method('tryGetValue')
-            ->willReturnCallback(function ($propertyPath, &$value) {
+            ->willReturnCallback(function ($propertyPath, &$value): bool {
                 $hasValue = false;
                 if (DataAccessorInterface::ENTITY_TYPE === $propertyPath) {
                     $value = 'entity';
@@ -130,7 +131,7 @@ class ExternalLinkMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetHrefWhenOnlyPartOfUrlParamsAreResolved()
+    public function testGetHrefWhenOnlyPartOfUrlParamsAreResolved(): void
     {
         $this->expectException(LinkHrefResolvingFailedException::class);
         $this->expectExceptionMessage('Cannot build URL for a link. Missing Parameters: filter,version.');
@@ -143,7 +144,7 @@ class ExternalLinkMetadataTest extends \PHPUnit\Framework\TestCase
         $dataAccessor = $this->createMock(DataAccessorInterface::class);
         $dataAccessor->expects(self::exactly(3))
             ->method('tryGetValue')
-            ->willReturnCallback(function ($propertyPath, &$value) {
+            ->willReturnCallback(function ($propertyPath, &$value): bool {
                 $hasValue = false;
                 if (DataAccessorInterface::ENTITY_TYPE === $propertyPath) {
                     $value = 'entity';
@@ -156,7 +157,7 @@ class ExternalLinkMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertNull($linkMetadata->getHref($dataAccessor));
     }
 
-    public function testMetaProperties()
+    public function testMetaProperties(): void
     {
         $linkMetadata = new ExternalLinkMetadata('urlTemplate');
         self::assertCount(0, $linkMetadata->getMetaProperties());

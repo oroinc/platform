@@ -4,8 +4,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CollectResources;
 
 use Oro\Bundle\ApiBundle\Processor\CollectResources\CollectResourcesContext;
 use Oro\Bundle\ApiBundle\Request\ApiResourceCollection;
+use PHPUnit\Framework\TestCase;
 
-class CollectResourcesContextTest extends \PHPUnit\Framework\TestCase
+class CollectResourcesContextTest extends TestCase
 {
     private CollectResourcesContext $context;
 
@@ -15,12 +16,12 @@ class CollectResourcesContextTest extends \PHPUnit\Framework\TestCase
         $this->context = new CollectResourcesContext();
     }
 
-    public function testResultShouldBeInitialized()
+    public function testResultShouldBeInitialized(): void
     {
         self::assertInstanceOf(ApiResourceCollection::class, $this->context->getResult());
     }
 
-    public function testAccessibleResources()
+    public function testAccessibleResources(): void
     {
         self::assertEquals([], $this->context->getAccessibleResources());
 
@@ -28,7 +29,7 @@ class CollectResourcesContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['Test\Class'], $this->context->getAccessibleResources());
     }
 
-    public function testAccessibleAsAssociationResources()
+    public function testAccessibleAsAssociationResources(): void
     {
         self::assertEquals([], $this->context->getAccessibleAsAssociationResources());
 

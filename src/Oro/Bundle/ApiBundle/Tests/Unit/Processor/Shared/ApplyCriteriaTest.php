@@ -8,14 +8,12 @@ use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Processor\Shared\ApplyCriteria;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\CriteriaConnector;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class ApplyCriteriaTest extends GetListProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|CriteriaConnector */
-    private $criteriaConnector;
-
-    /** @var ApplyCriteria */
-    private $processor;
+    private CriteriaConnector&MockObject $criteriaConnector;
+    private ApplyCriteria $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +25,7 @@ class ApplyCriteriaTest extends GetListProcessorTestCase
         $this->processor = new ApplyCriteria($this->criteriaConnector);
     }
 
-    public function testProcessWhenQueryDoesNotExist()
+    public function testProcessWhenQueryDoesNotExist(): void
     {
         $this->criteriaConnector->expects(self::never())
             ->method('applyCriteria');
@@ -36,7 +34,7 @@ class ApplyCriteriaTest extends GetListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenCriteriaObjectDoesNotExist()
+    public function testProcessWhenCriteriaObjectDoesNotExist(): void
     {
         $this->criteriaConnector->expects(self::never())
             ->method('applyCriteria');
@@ -45,7 +43,7 @@ class ApplyCriteriaTest extends GetListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithCriteria()
+    public function testProcessWithCriteria(): void
     {
         $query = $this->createMock(QueryBuilder::class);
         $criteria = $this->createMock(Criteria::class);
@@ -61,7 +59,7 @@ class ApplyCriteriaTest extends GetListProcessorTestCase
         self::assertNull($this->context->getCriteria());
     }
 
-    public function testProcessWithCommonCriteria()
+    public function testProcessWithCommonCriteria(): void
     {
         $query = $this->createMock(QueryBuilder::class);
         $criteria = $this->createMock(CommonCriteria::class);

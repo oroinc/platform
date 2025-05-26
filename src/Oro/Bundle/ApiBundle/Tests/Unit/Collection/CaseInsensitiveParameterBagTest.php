@@ -3,11 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection;
 
 use Oro\Bundle\ApiBundle\Collection\CaseInsensitiveParameterBag;
+use PHPUnit\Framework\TestCase;
 
-class CaseInsensitiveParameterBagTest extends \PHPUnit\Framework\TestCase
+class CaseInsensitiveParameterBagTest extends TestCase
 {
-    /** @var CaseInsensitiveParameterBag */
-    private $caseInsensitiveParameterBag;
+    private CaseInsensitiveParameterBag $caseInsensitiveParameterBag;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class CaseInsensitiveParameterBagTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider actionsDataProvider
      */
-    public function testActions(string $key, string $value)
+    public function testActions(string $key, string $value): void
     {
         $this->caseInsensitiveParameterBag->set($key, $value);
         $this->caseInsensitiveParameterBag->set(strtoupper($key), $value);

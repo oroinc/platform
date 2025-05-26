@@ -25,7 +25,7 @@ class CollectionTypeTest extends ApiFormTypeTestCase
         ];
     }
 
-    public function testShouldUseAdder()
+    public function testShouldUseAdder(): void
     {
         $entity = $this->getMockBuilder(User::class)
             ->onlyMethods(['addGroup', 'removeGroup'])
@@ -64,7 +64,7 @@ class CollectionTypeTest extends ApiFormTypeTestCase
         self::assertTrue($form->isSynchronized());
     }
 
-    public function testShouldUseRemover()
+    public function testShouldUseRemover(): void
     {
         $entity = $this->getMockBuilder(User::class)
             ->onlyMethods(['addGroup', 'removeGroup'])
@@ -105,7 +105,7 @@ class CollectionTypeTest extends ApiFormTypeTestCase
         self::assertTrue($form->isSynchronized());
     }
 
-    public function testShouldUpdateExistingEntity()
+    public function testShouldUpdateExistingEntity(): void
     {
         $entity = $this->getMockBuilder(User::class)
             ->onlyMethods(['addGroup', 'removeGroup'])
@@ -143,7 +143,7 @@ class CollectionTypeTest extends ApiFormTypeTestCase
         self::assertEquals('group2', $group1->getName());
     }
 
-    public function testShouldUseRemoverWhenRemoveAllItems()
+    public function testShouldUseRemoverWhenRemoveAllItems(): void
     {
         $entity = $this->getMockBuilder(User::class)
             ->onlyMethods(['addGroup', 'removeGroup'])
@@ -180,7 +180,7 @@ class CollectionTypeTest extends ApiFormTypeTestCase
         self::assertTrue($form->isSynchronized());
     }
 
-    public function testShouldValidateEntryEntity()
+    public function testShouldValidateEntryEntity(): void
     {
         $entity = $this->getMockBuilder(User::class)
             ->onlyMethods(['addGroup', 'removeGroup'])
@@ -220,7 +220,7 @@ class CollectionTypeTest extends ApiFormTypeTestCase
         self::assertCount(1, $form->get('groups')->get(0)->getErrors());
     }
 
-    public function testWithInvalidValue()
+    public function testWithInvalidValue(): void
     {
         $form = $this->factory->create(
             CollectionType::class,

@@ -10,14 +10,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class RenamedNameContainerType extends AbstractType
 {
     #[\Override]
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
             ->add('renamedName', TextType::class, array_merge(['property_path' => 'name'], $options['name_options']));
     }
 
     #[\Override]
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(['name_options' => []]);
     }

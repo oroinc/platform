@@ -7,8 +7,9 @@ use Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\BatchUpdateItemContext;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
+use PHPUnit\Framework\TestCase;
 
-class BatchUpdateItemContextTest extends \PHPUnit\Framework\TestCase
+class BatchUpdateItemContextTest extends TestCase
 {
     private BatchUpdateItemContext $context;
 
@@ -18,7 +19,7 @@ class BatchUpdateItemContextTest extends \PHPUnit\Framework\TestCase
         $this->context = new BatchUpdateItemContext();
     }
 
-    public function testClassName()
+    public function testClassName(): void
     {
         self::assertNull($this->context->getClassName());
 
@@ -36,7 +37,7 @@ class BatchUpdateItemContextTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->context->has('class'));
     }
 
-    public function testId()
+    public function testId(): void
     {
         self::assertNull($this->context->getId());
 
@@ -48,7 +49,7 @@ class BatchUpdateItemContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getId());
     }
 
-    public function testSummary()
+    public function testSummary(): void
     {
         self::assertNull($this->context->getSummary());
 
@@ -60,7 +61,7 @@ class BatchUpdateItemContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getSummary());
     }
 
-    public function testSupportedEntityClasses()
+    public function testSupportedEntityClasses(): void
     {
         self::assertSame([], $this->context->getSupportedEntityClasses());
 
@@ -68,7 +69,7 @@ class BatchUpdateItemContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame(['Test\Class'], $this->context->getSupportedEntityClasses());
     }
 
-    public function testRequestData()
+    public function testRequestData(): void
     {
         self::assertNull($this->context->getRequestData());
 
@@ -79,7 +80,7 @@ class BatchUpdateItemContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getRequestData());
     }
 
-    public function testTargetAction()
+    public function testTargetAction(): void
     {
         self::assertNull($this->context->getTargetAction());
 
@@ -97,7 +98,7 @@ class BatchUpdateItemContextTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->context->has('targetAction'));
     }
 
-    public function testTargetProcessor()
+    public function testTargetProcessor(): void
     {
         self::assertNull($this->context->getTargetProcessor());
 
@@ -109,7 +110,7 @@ class BatchUpdateItemContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getTargetProcessor());
     }
 
-    public function testTargetContext()
+    public function testTargetContext(): void
     {
         self::assertNull($this->context->getTargetContext());
 
@@ -121,7 +122,7 @@ class BatchUpdateItemContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getTargetContext());
     }
 
-    public function testSharedData()
+    public function testSharedData(): void
     {
         $sharedData = $this->createMock(ParameterBagInterface::class);
 

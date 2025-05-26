@@ -7,16 +7,14 @@ use Oro\Bundle\ApiBundle\Model\EntityHolderInterface;
 use Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityObjectAccess;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class ValidateEntityObjectAccessTest extends GetProcessorTestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var ValidateEntityObjectAccess */
-    private $processor;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private ValidateEntityObjectAccess $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -49,7 +47,7 @@ class ValidateEntityObjectAccessTest extends GetProcessorTestCase
             ->with('VIEW', self::identicalTo($entity))
             ->willReturn(true);
 
-        $this->context->setClassName(get_class($entity));
+        $this->context->setClassName($entity::class);
         $this->context->setConfig($config);
         $this->context->setResult($entity);
         $this->processor->process($this->context);
@@ -68,7 +66,7 @@ class ValidateEntityObjectAccessTest extends GetProcessorTestCase
             ->with('VIEW', self::identicalTo($entity))
             ->willReturn(false);
 
-        $this->context->setClassName(get_class($entity));
+        $this->context->setClassName($entity::class);
         $this->context->setConfig($config);
         $this->context->setResult($entity);
         $this->processor->process($this->context);
@@ -85,7 +83,7 @@ class ValidateEntityObjectAccessTest extends GetProcessorTestCase
             ->with('test_acl_resource', self::identicalTo($entity))
             ->willReturn(true);
 
-        $this->context->setClassName(get_class($entity));
+        $this->context->setClassName($entity::class);
         $this->context->setConfig($config);
         $this->context->setResult($entity);
         $this->processor->process($this->context);
@@ -103,7 +101,7 @@ class ValidateEntityObjectAccessTest extends GetProcessorTestCase
             ->with('test_acl_resource', self::identicalTo($entity))
             ->willReturn(false);
 
-        $this->context->setClassName(get_class($entity));
+        $this->context->setClassName($entity::class);
         $this->context->setConfig($config);
         $this->context->setResult($entity);
         $this->processor->process($this->context);
@@ -118,7 +116,7 @@ class ValidateEntityObjectAccessTest extends GetProcessorTestCase
         $this->authorizationChecker->expects(self::never())
             ->method('isGranted');
 
-        $this->context->setClassName(get_class($entity));
+        $this->context->setClassName($entity::class);
         $this->context->setConfig($config);
         $this->context->setResult($entity);
         $this->processor->process($this->context);
@@ -138,7 +136,7 @@ class ValidateEntityObjectAccessTest extends GetProcessorTestCase
             ->with('VIEW', self::identicalTo($entity))
             ->willReturn(true);
 
-        $this->context->setClassName(get_class($entity));
+        $this->context->setClassName($entity::class);
         $this->context->setConfig($config);
         $this->context->setResult($model);
         $this->processor->process($this->context);
@@ -161,7 +159,7 @@ class ValidateEntityObjectAccessTest extends GetProcessorTestCase
             ->with('VIEW', self::identicalTo($entity))
             ->willReturn(false);
 
-        $this->context->setClassName(get_class($entity));
+        $this->context->setClassName($entity::class);
         $this->context->setConfig($config);
         $this->context->setResult($model);
         $this->processor->process($this->context);

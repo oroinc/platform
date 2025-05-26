@@ -6,14 +6,12 @@ use Oro\Bundle\ApiBundle\Exception\ActionNotAllowedException;
 use Oro\Bundle\ApiBundle\Processor\Shared\ValidateActionAvailability;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class ValidateActionAvailabilityTest extends GetListProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
-    private $resourcesProvider;
-
-    /** @var ValidateActionAvailability */
-    private $processor;
+    private ResourcesProvider&MockObject $resourcesProvider;
+    private ValidateActionAvailability $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +23,7 @@ class ValidateActionAvailabilityTest extends GetListProcessorTestCase
         $this->processor = new ValidateActionAvailability($this->resourcesProvider);
     }
 
-    public function testProcessForPrimaryEntityWhenActionIsExcluded()
+    public function testProcessForPrimaryEntityWhenActionIsExcluded(): void
     {
         $this->expectException(ActionNotAllowedException::class);
         $this->expectExceptionMessage('The action is not allowed.');
@@ -42,7 +40,7 @@ class ValidateActionAvailabilityTest extends GetListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForIncludedEntityWhenActionIsExcluded()
+    public function testProcessForIncludedEntityWhenActionIsExcluded(): void
     {
         $this->expectException(ActionNotAllowedException::class);
         $this->expectExceptionMessage('The "action1" action is not allowed.');
@@ -59,7 +57,7 @@ class ValidateActionAvailabilityTest extends GetListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenActionIsNotExcluded()
+    public function testProcessWhenActionIsNotExcluded(): void
     {
         $entityClass = 'Test\Class';
 

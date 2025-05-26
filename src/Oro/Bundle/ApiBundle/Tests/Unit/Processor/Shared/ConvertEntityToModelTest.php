@@ -10,8 +10,7 @@ use Oro\Bundle\ApiBundle\Util\EntityMapper;
 
 class ConvertEntityToModelTest extends FormProcessorTestCase
 {
-    /** @var ConvertEntityToModel */
-    private $processor;
+    private ConvertEntityToModel $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class ConvertEntityToModelTest extends FormProcessorTestCase
         $this->processor = new ConvertEntityToModel();
     }
 
-    public function testProcessWhenNoEntity()
+    public function testProcessWhenNoEntity(): void
     {
         $entityClass = Entity\User::class;
         $config = new EntityDefinitionConfig();
@@ -38,7 +37,7 @@ class ConvertEntityToModelTest extends FormProcessorTestCase
         self::assertFalse($this->context->hasResult());
     }
 
-    public function testProcessWhenNoEntityMapper()
+    public function testProcessWhenNoEntityMapper(): void
     {
         $entityClass = Entity\User::class;
         $entity = new \stdClass();
@@ -52,7 +51,7 @@ class ConvertEntityToModelTest extends FormProcessorTestCase
         self::assertSame($entity, $this->context->getResult());
     }
 
-    public function testProcessWhenEntityShouldBeConvertedToModel()
+    public function testProcessWhenEntityShouldBeConvertedToModel(): void
     {
         $entityClass = Entity\User::class;
         $entity = new \stdClass();

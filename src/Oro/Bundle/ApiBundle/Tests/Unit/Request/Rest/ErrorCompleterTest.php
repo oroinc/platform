@@ -11,24 +11,19 @@ use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractorInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Rest\ErrorCompleter;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
+class ErrorCompleterTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ExceptionTextExtractorInterface */
-    private $exceptionTextExtractor;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
-    private $valueNormalizer;
-
-    /** @var RequestType */
-    private $requestType;
-
-    /** @var ErrorCompleter */
-    private $errorCompleter;
+    private ExceptionTextExtractorInterface&MockObject $exceptionTextExtractor;
+    private ValueNormalizer&MockObject $valueNormalizer;
+    private RequestType $requestType;
+    private ErrorCompleter $errorCompleter;
 
     #[\Override]
     protected function setUp(): void
@@ -44,7 +39,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCompleteErrorWhenErrorTitleHasSubstitution()
+    public function testCompleteErrorWhenErrorTitleHasSubstitution(): void
     {
         $error = new Error();
         $error->setStatusCode(400);
@@ -60,7 +55,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorWithoutInnerException()
+    public function testCompleteErrorWithoutInnerException(): void
     {
         $error = new Error();
         $expectedError = new Error();
@@ -69,7 +64,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorWithInnerExceptionAndAlreadyCompletedProperties()
+    public function testCompleteErrorWithInnerExceptionAndAlreadyCompletedProperties(): void
     {
         $exception = new \Exception('some exception');
 
@@ -91,7 +86,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorWithInnerExceptionAndExceptionTextExtractorReturnsNothing()
+    public function testCompleteErrorWithInnerExceptionAndExceptionTextExtractorReturnsNothing(): void
     {
         $exception = new \Exception('some exception');
 
@@ -105,7 +100,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorWithInnerException()
+    public function testCompleteErrorWithInnerException(): void
     {
         $exception = new \Exception('some exception');
 
@@ -140,7 +135,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorTitleByStatusCode()
+    public function testCompleteErrorTitleByStatusCode(): void
     {
         $error = new Error();
         $error->setStatusCode(400);
@@ -153,7 +148,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorTitleByUnknownStatusCode()
+    public function testCompleteErrorTitleByUnknownStatusCode(): void
     {
         $error = new Error();
         $error->setStatusCode(1000);
@@ -165,7 +160,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorWithMetaPropertyWithNullValue()
+    public function testCompleteErrorWithMetaPropertyWithNullValue(): void
     {
         $error = new Error();
         $error->setDetail('test detail');
@@ -191,7 +186,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         bool $isArrayAllowed,
         mixed $value,
         mixed $normalizedValue
-    ) {
+    ): void {
         $error = new Error();
         $error->setDetail('test detail');
         $error->addMetaProperty('meta1', new ErrorMetaProperty($value, $dataType));
@@ -219,7 +214,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testFixIncludedEntityPath()
+    public function testFixIncludedEntityPath(): void
     {
         $error = new Error();
         $error->setSource(ErrorSource::createByPropertyPath('association1.field1'));

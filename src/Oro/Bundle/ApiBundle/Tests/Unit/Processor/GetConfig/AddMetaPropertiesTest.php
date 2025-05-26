@@ -7,8 +7,7 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\AddMetaProperties;
 
 class AddMetaPropertiesTest extends ConfigProcessorTestCase
 {
-    /** @var AddMetaProperties */
-    private $processor;
+    private AddMetaProperties $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +17,7 @@ class AddMetaPropertiesTest extends ConfigProcessorTestCase
         $this->processor = new AddMetaProperties();
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $config = [
             'fields' => [

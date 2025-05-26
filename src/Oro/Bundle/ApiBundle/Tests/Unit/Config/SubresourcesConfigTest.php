@@ -4,16 +4,17 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ApiBundle\Config\SubresourceConfig;
 use Oro\Bundle\ApiBundle\Config\SubresourcesConfig;
+use PHPUnit\Framework\TestCase;
 
-class SubresourcesConfigTest extends \PHPUnit\Framework\TestCase
+class SubresourcesConfigTest extends TestCase
 {
-    public function testIsEmpty()
+    public function testIsEmpty(): void
     {
         $config = new SubresourcesConfig();
         self::assertTrue($config->isEmpty());
     }
 
-    public function testGetAddRemove()
+    public function testGetAddRemove(): void
     {
         $subresourceConfig = new SubresourceConfig();
         $config = new SubresourcesConfig();
@@ -35,7 +36,7 @@ class SubresourcesConfigTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($config->isEmpty());
     }
 
-    public function testToArrayAndClone()
+    public function testToArrayAndClone(): void
     {
         $config = new SubresourcesConfig();
         $subresourceConfig = new SubresourceConfig();

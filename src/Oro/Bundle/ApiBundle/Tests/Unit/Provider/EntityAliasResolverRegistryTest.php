@@ -6,21 +6,16 @@ use Oro\Bundle\ApiBundle\Provider\EntityAliasResolverRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
-class EntityAliasResolverRegistryTest extends \PHPUnit\Framework\TestCase
+class EntityAliasResolverRegistryTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityAliasResolver */
-    private $defaultResolver;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityAliasResolver */
-    private $firstResolver;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityAliasResolver */
-    private $secondResolver;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
-    private $container;
+    private EntityAliasResolver&MockObject $defaultResolver;
+    private EntityAliasResolver&MockObject $firstResolver;
+    private EntityAliasResolver&MockObject $secondResolver;
+    private ContainerInterface&MockObject $container;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +35,7 @@ class EntityAliasResolverRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityAliasResolverForUnsupportedRequestType()
+    public function testGetEntityAliasResolverForUnsupportedRequestType(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot find an entity alias resolver for the request "rest,another".');
@@ -50,7 +45,7 @@ class EntityAliasResolverRegistryTest extends \PHPUnit\Framework\TestCase
         $registry->getEntityAliasResolver($requestType);
     }
 
-    public function testGetEntityAliasResolverShouldReturnDefaultResolverForNotFirstAndSecondRequestType()
+    public function testGetEntityAliasResolverShouldReturnDefaultResolverForNotFirstAndSecondRequestType(): void
     {
         $registry = $this->getRegistry(
             [
@@ -71,7 +66,7 @@ class EntityAliasResolverRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->defaultResolver, $registry->getEntityAliasResolver($requestType));
     }
 
-    public function testGetEntityAliasResolverShouldReturnFirstResolverForFirstRequestType()
+    public function testGetEntityAliasResolverShouldReturnFirstResolverForFirstRequestType(): void
     {
         $registry = $this->getRegistry(
             [
@@ -92,7 +87,7 @@ class EntityAliasResolverRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->firstResolver, $registry->getEntityAliasResolver($requestType));
     }
 
-    public function testGetEntityAliasResolverShouldReturnSecondResolverForSecondRequestType()
+    public function testGetEntityAliasResolverShouldReturnSecondResolverForSecondRequestType(): void
     {
         $registry = $this->getRegistry(
             [
@@ -113,7 +108,7 @@ class EntityAliasResolverRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->secondResolver, $registry->getEntityAliasResolver($requestType));
     }
 
-    public function testGetEntityAliasResolverShouldReturnDefaultResolverIfSpecificResolverNotFound()
+    public function testGetEntityAliasResolverShouldReturnDefaultResolverIfSpecificResolverNotFound(): void
     {
         $registry = $this->getRegistry(
             [
@@ -133,7 +128,7 @@ class EntityAliasResolverRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->defaultResolver, $registry->getEntityAliasResolver($requestType));
     }
 
-    public function testWarmUpCache()
+    public function testWarmUpCache(): void
     {
         $registry = $this->getRegistry(
             [
@@ -161,7 +156,7 @@ class EntityAliasResolverRegistryTest extends \PHPUnit\Framework\TestCase
         $registry->warmUpCache();
     }
 
-    public function testClearCache()
+    public function testClearCache(): void
     {
         $registry = $this->getRegistry(
             [

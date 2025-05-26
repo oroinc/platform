@@ -7,17 +7,16 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Metadata\TargetMetadataProvider;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilder\ObjectAccessorInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class TargetMetadataProviderTest extends \PHPUnit\Framework\TestCase
+class TargetMetadataProviderTest extends TestCase
 {
-    /** @var ObjectAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $objectAccessor;
-
-    /** @var TargetMetadataProvider */
-    private $targetMetadataProvider;
+    private ObjectAccessorInterface&MockObject $objectAccessor;
+    private TargetMetadataProvider $targetMetadataProvider;
 
     #[\Override]
     protected function setUp(): void

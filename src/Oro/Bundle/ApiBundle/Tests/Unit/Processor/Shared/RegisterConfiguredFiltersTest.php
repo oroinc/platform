@@ -19,6 +19,7 @@ use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Filter\RequestAwareFilterStub;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -26,11 +27,8 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelated
  */
 class RegisterConfiguredFiltersTest extends GetListProcessorOrmRelatedTestCase
 {
-    /** @var FilterFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $filterFactory;
-
-    /** @var RegisterConfiguredFilters */
-    private $processor;
+    private FilterFactoryInterface&MockObject $filterFactory;
+    private RegisterConfiguredFilters $processor;
 
     #[\Override]
     protected function setUp(): void

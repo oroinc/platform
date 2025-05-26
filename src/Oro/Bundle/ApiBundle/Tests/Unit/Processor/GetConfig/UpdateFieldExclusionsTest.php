@@ -7,8 +7,7 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\UpdateFieldExclusions;
 
 class UpdateFieldExclusionsTest extends ConfigProcessorTestCase
 {
-    /** @var UpdateFieldExclusions */
-    private $processor;
+    private UpdateFieldExclusions $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +17,7 @@ class UpdateFieldExclusionsTest extends ConfigProcessorTestCase
         $this->processor = new UpdateFieldExclusions();
     }
 
-    public function testProcessWhenNoExplicitlyConfiguredFieldNames()
+    public function testProcessWhenNoExplicitlyConfiguredFieldNames(): void
     {
         $definition = new EntityDefinitionConfig();
         $definition->setExcludeAll();
@@ -36,7 +35,7 @@ class UpdateFieldExclusionsTest extends ConfigProcessorTestCase
         self::assertFalse($definition->getField('field3')->isExcluded());
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $definition = new EntityDefinitionConfig();
         $definition->setExcludeAll();

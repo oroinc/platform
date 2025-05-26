@@ -10,14 +10,12 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\ChangeSubresource\CompleteErrors;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeSubresourceProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class CompleteErrorsTest extends ChangeSubresourceProcessorTestCase
 {
-    /** @var ErrorCompleterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $errorCompleter;
-
-    /** @var CompleteErrors */
-    private $processor;
+    private ErrorCompleterInterface&MockObject $errorCompleter;
+    private CompleteErrors $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +33,7 @@ class CompleteErrorsTest extends ChangeSubresourceProcessorTestCase
         $this->processor = new CompleteErrors($errorCompleterRegistry);
     }
 
-    public function testProcessWithoutErrors()
+    public function testProcessWithoutErrors(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
 
@@ -46,7 +44,7 @@ class CompleteErrorsTest extends ChangeSubresourceProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
 
@@ -76,7 +74,7 @@ class CompleteErrorsTest extends ChangeSubresourceProcessorTestCase
         self::assertEquals([$expectedError], $this->context->getErrors());
     }
 
-    public function testProcessWhenNoParentEntityClass()
+    public function testProcessWhenNoParentEntityClass(): void
     {
         $error = Error::createByException(new \Exception('some exception'));
 
@@ -99,7 +97,7 @@ class CompleteErrorsTest extends ChangeSubresourceProcessorTestCase
         self::assertEquals([$expectedError], $this->context->getErrors());
     }
 
-    public function testProcessWhenParentEntityTypeWasNotConvertedToEntityClass()
+    public function testProcessWhenParentEntityTypeWasNotConvertedToEntityClass(): void
     {
         $error = Error::createByException(new \Exception('some exception'));
 
@@ -122,7 +120,7 @@ class CompleteErrorsTest extends ChangeSubresourceProcessorTestCase
         self::assertEquals([$expectedError], $this->context->getErrors());
     }
 
-    public function testProcessWhenNoEntityClass()
+    public function testProcessWhenNoEntityClass(): void
     {
         $error = Error::createByException(new \Exception('some exception'));
 
@@ -145,7 +143,7 @@ class CompleteErrorsTest extends ChangeSubresourceProcessorTestCase
         self::assertEquals([$expectedError], $this->context->getErrors());
     }
 
-    public function testProcessWhenEntityTypeWasNotConvertedToEntityClass()
+    public function testProcessWhenEntityTypeWasNotConvertedToEntityClass(): void
     {
         $error = Error::createByException(new \Exception('some exception'));
 
@@ -168,7 +166,7 @@ class CompleteErrorsTest extends ChangeSubresourceProcessorTestCase
         self::assertEquals([$expectedError], $this->context->getErrors());
     }
 
-    public function testProcessWhenLoadConfigFailed()
+    public function testProcessWhenLoadConfigFailed(): void
     {
         $error = Error::createByException(new \Exception('some exception'));
 
@@ -194,7 +192,7 @@ class CompleteErrorsTest extends ChangeSubresourceProcessorTestCase
         self::assertEquals([$expectedError], $this->context->getErrors());
     }
 
-    public function testProcessWhenLoadMetadataFailed()
+    public function testProcessWhenLoadMetadataFailed(): void
     {
         $error = Error::createByException(new \Exception('some exception'));
 
@@ -221,7 +219,7 @@ class CompleteErrorsTest extends ChangeSubresourceProcessorTestCase
         self::assertEquals([$expectedError], $this->context->getErrors());
     }
 
-    public function testRemoveDuplicates()
+    public function testRemoveDuplicates(): void
     {
         $this->context->addError(
             Error::create('title1', 'detail1')

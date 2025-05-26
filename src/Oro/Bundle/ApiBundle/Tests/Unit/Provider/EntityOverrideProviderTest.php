@@ -4,11 +4,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ApiBundle\Provider\ConfigCache;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProvider;
+use PHPUnit\Framework\TestCase;
 
-class EntityOverrideProviderTest extends \PHPUnit\Framework\TestCase
+class EntityOverrideProviderTest extends TestCase
 {
-    /** @var EntityOverrideProvider */
-    private $entityOverrideProvider;
+    private EntityOverrideProvider $entityOverrideProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +23,7 @@ class EntityOverrideProviderTest extends \PHPUnit\Framework\TestCase
         $this->entityOverrideProvider = new EntityOverrideProvider($configCache);
     }
 
-    public function testGetSubstituteEntityClass()
+    public function testGetSubstituteEntityClass(): void
     {
         self::assertEquals(
             'Test\Entity2',
@@ -36,7 +36,7 @@ class EntityOverrideProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetSubstituteEntityClassWhenSubstitutionDoesNotExist()
+    public function testGetSubstituteEntityClassWhenSubstitutionDoesNotExist(): void
     {
         self::assertNull(
             $this->entityOverrideProvider->getSubstituteEntityClass('Test\Entity3')
@@ -47,7 +47,7 @@ class EntityOverrideProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityClass()
+    public function testGetEntityClass(): void
     {
         self::assertEquals(
             'Test\Entity1',
@@ -60,7 +60,7 @@ class EntityOverrideProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityClassWhenSubstitutionDoesNotExist()
+    public function testGetEntityClassWhenSubstitutionDoesNotExist(): void
     {
         self::assertNull(
             $this->entityOverrideProvider->getEntityClass('Test\Entity3')

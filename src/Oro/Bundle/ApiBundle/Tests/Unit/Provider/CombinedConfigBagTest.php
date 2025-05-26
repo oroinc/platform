@@ -6,20 +6,17 @@ use Oro\Bundle\ApiBundle\Config\EntityConfigMerger;
 use Oro\Bundle\ApiBundle\Provider\CombinedConfigBag;
 use Oro\Bundle\ApiBundle\Provider\ConfigBag;
 use Oro\Bundle\ApiBundle\Provider\ConfigBagInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CombinedConfigBagTest extends \PHPUnit\Framework\TestCase
+class CombinedConfigBagTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigBagInterface */
-    private $configBag1;
+    private ConfigBagInterface&MockObject $configBag1;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigBagInterface */
-    private $configBag2;
+    private ConfigBagInterface&MockObject $configBag2;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityConfigMerger */
-    private $entityConfigMerger;
-
-    /** @var CombinedConfigBag */
-    private $combinedConfigBag;
+    private EntityConfigMerger&MockObject $entityConfigMerger;
+    private CombinedConfigBag $combinedConfigBag;
 
     #[\Override]
     protected function setUp(): void
@@ -34,7 +31,7 @@ class CombinedConfigBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetClassNames()
+    public function testGetClassNames(): void
     {
         $version = '1.2';
 
@@ -53,7 +50,7 @@ class CombinedConfigBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testNoConfig()
+    public function testNoConfig(): void
     {
         $className = 'Test\Class1';
         $version = '1.2';
@@ -78,7 +75,7 @@ class CombinedConfigBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnlyFirstBagHasConfig()
+    public function testOnlyFirstBagHasConfig(): void
     {
         $className = 'Test\Class1';
         $version = '1.2';
@@ -106,7 +103,7 @@ class CombinedConfigBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnlySecondBagHasConfig()
+    public function testOnlySecondBagHasConfig(): void
     {
         $className = 'Test\Class1';
         $version = '1.2';
@@ -134,7 +131,7 @@ class CombinedConfigBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAllBagsHaveConfigs()
+    public function testAllBagsHaveConfigs(): void
     {
         $className = 'Test\Class1';
         $version = '1.2';
@@ -164,7 +161,7 @@ class CombinedConfigBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $className = 'Test\Class1';
         $version = '1.2';

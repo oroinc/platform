@@ -10,14 +10,12 @@ use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Update\UpdateProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class ValidateRequestDataTest extends UpdateProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
-    private $valueNormalizer;
-
-    /** @var ValidateRequestData */
-    private $processor;
+    private ValueNormalizer&MockObject $valueNormalizer;
+    private ValidateRequestData $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +27,7 @@ class ValidateRequestDataTest extends UpdateProcessorTestCase
         $this->processor = new ValidateRequestData($this->valueNormalizer);
     }
 
-    public function testProcessWhenRequestDataAlreadyValidated()
+    public function testProcessWhenRequestDataAlreadyValidated(): void
     {
         $this->context->setRequestData([]);
         $this->context->setProcessed(ValidateRequestData::OPERATION_NAME);
@@ -37,7 +35,7 @@ class ValidateRequestDataTest extends UpdateProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWithValidRequestDataForResourceWithoutIdentifier()
+    public function testProcessWithValidRequestDataForResourceWithoutIdentifier(): void
     {
         $requestData = [
             'meta' => ['foo' => 'bar']
@@ -53,7 +51,7 @@ class ValidateRequestDataTest extends UpdateProcessorTestCase
         self::assertTrue($this->context->isProcessed(ValidateRequestData::OPERATION_NAME));
     }
 
-    public function testProcessWithInvalidRequestDataForResourceWithoutIdentifier()
+    public function testProcessWithInvalidRequestDataForResourceWithoutIdentifier(): void
     {
         $requestData = [
             'meta' => null
@@ -77,7 +75,7 @@ class ValidateRequestDataTest extends UpdateProcessorTestCase
         self::assertTrue($this->context->isProcessed(ValidateRequestData::OPERATION_NAME));
     }
 
-    public function testProcessWithValidRequestData()
+    public function testProcessWithValidRequestData(): void
     {
         $requestData = [
             'data' => ['id' => '1', 'type' => 'products', 'attributes' => ['foo' => 'bar']]
@@ -101,7 +99,7 @@ class ValidateRequestDataTest extends UpdateProcessorTestCase
         self::assertTrue($this->context->isProcessed(ValidateRequestData::OPERATION_NAME));
     }
 
-    public function testProcessWithInvalidRequestData()
+    public function testProcessWithInvalidRequestData(): void
     {
         $requestData = [
             'data' => ['type' => 'test', 'id' => '1', 'attributes' => ['foo' => 'bar']]

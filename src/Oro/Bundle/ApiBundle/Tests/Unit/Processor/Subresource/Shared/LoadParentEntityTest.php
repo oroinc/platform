@@ -8,18 +8,14 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\LoadParentEntity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\AclProtectedEntityLoader;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class LoadParentEntityTest extends ChangeRelationshipProcessorTestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var AclProtectedEntityLoader|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityLoader;
-
-    /** @var LoadParentEntity */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private AclProtectedEntityLoader&MockObject $entityLoader;
+    private LoadParentEntity $processor;
 
     #[\Override]
     protected function setUp(): void

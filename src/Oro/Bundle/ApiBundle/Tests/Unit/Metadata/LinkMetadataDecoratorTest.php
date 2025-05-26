@@ -6,14 +6,13 @@ use Oro\Bundle\ApiBundle\Metadata\DataAccessorInterface;
 use Oro\Bundle\ApiBundle\Metadata\LinkMetadataDecorator;
 use Oro\Bundle\ApiBundle\Metadata\LinkMetadataInterface;
 use Oro\Bundle\ApiBundle\Metadata\MetaAttributeMetadata;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LinkMetadataDecoratorTest extends \PHPUnit\Framework\TestCase
+class LinkMetadataDecoratorTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LinkMetadataInterface */
-    private $linkMetadata;
-
-    /** @var LinkMetadataDecorator */
-    private $decorator;
+    private LinkMetadataInterface&MockObject $linkMetadata;
+    private LinkMetadataDecorator $decorator;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +21,7 @@ class LinkMetadataDecoratorTest extends \PHPUnit\Framework\TestCase
         $this->decorator = new LinkMetadataDecoratorStub($this->linkMetadata);
     }
 
-    public function testClone()
+    public function testClone(): void
     {
         $decoratorClone = clone $this->decorator;
 
@@ -30,7 +29,7 @@ class LinkMetadataDecoratorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($this->decorator->toArray(), $decoratorClone->toArray());
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $linkData = ['key' => 'value'];
         $this->linkMetadata->expects(self::once())
@@ -43,7 +42,7 @@ class LinkMetadataDecoratorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($linkData, $result);
     }
 
-    public function testGetHref()
+    public function testGetHref(): void
     {
         $href = 'http://test.com/api/resource';
         $dataAccessor = $this->createMock(DataAccessorInterface::class);
@@ -55,7 +54,7 @@ class LinkMetadataDecoratorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($href, $this->decorator->getHref($dataAccessor));
     }
 
-    public function testMetaProperties()
+    public function testMetaProperties(): void
     {
         $metaProperties = ['test' => new MetaAttributeMetadata('test')];
         $this->linkMetadata->expects(self::once())
@@ -65,7 +64,7 @@ class LinkMetadataDecoratorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($metaProperties, $this->decorator->getMetaProperties());
     }
 
-    public function testHasMetaProperty()
+    public function testHasMetaProperty(): void
     {
         $result = true;
         $metaPropertyName = 'test';
@@ -77,7 +76,7 @@ class LinkMetadataDecoratorTest extends \PHPUnit\Framework\TestCase
         self::assertSame($result, $this->decorator->hasMetaProperty($metaPropertyName));
     }
 
-    public function testGetMetaProperty()
+    public function testGetMetaProperty(): void
     {
         $metaProperty = new MetaAttributeMetadata('test');
         $metaPropertyName = 'test';
@@ -89,7 +88,7 @@ class LinkMetadataDecoratorTest extends \PHPUnit\Framework\TestCase
         self::assertSame($metaProperty, $this->decorator->getMetaProperty($metaPropertyName));
     }
 
-    public function testAddMetaProperty()
+    public function testAddMetaProperty(): void
     {
         $metaProperty = new MetaAttributeMetadata('test');
         $this->linkMetadata->expects(self::once())
@@ -100,7 +99,7 @@ class LinkMetadataDecoratorTest extends \PHPUnit\Framework\TestCase
         self::assertSame($metaProperty, $this->decorator->addMetaProperty($metaProperty));
     }
 
-    public function testRemoveMetaProperty()
+    public function testRemoveMetaProperty(): void
     {
         $metaPropertyName = 'test';
         $this->linkMetadata->expects(self::once())

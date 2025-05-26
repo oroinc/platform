@@ -6,6 +6,8 @@ use Oro\Bundle\ApiBundle\Security\FeatureDependedFirewallMap;
 use Oro\Bundle\ApiBundle\Security\Http\Firewall\FeatureAccessListener;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\SecurityBundle\Csrf\CsrfRequestManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
@@ -20,16 +22,11 @@ use Symfony\Component\Security\Http\Firewall\LogoutListener;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
+class FeatureDependedFirewallMapTest extends TestCase
 {
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /** @var FeatureAccessListener|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureAccessListener;
+    private ContainerInterface&MockObject $container;
+    private FeatureChecker&MockObject $featureChecker;
+    private FeatureAccessListener&MockObject $featureAccessListener;
 
     #[\Override]
     protected function setUp(): void
@@ -51,7 +48,7 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
     }
 
     private function setFirewallContextExpectations(
-        FirewallContext|\PHPUnit\Framework\MockObject\MockObject $context,
+        FirewallContext&MockObject $context,
         string $firewallName,
         iterable $listeners,
         object $exceptionListener,
@@ -71,7 +68,7 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
             ->willReturn($logoutListener);
     }
 
-    public function testGetListenersWithoutContext()
+    public function testGetListenersWithoutContext(): void
     {
         $request = Request::create('http://localhost');
 
@@ -83,7 +80,7 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
         self::assertNull($logoutListener);
     }
 
-    public function testGetListenersForEmptyFeatureDependedFirewalls()
+    public function testGetListenersForEmptyFeatureDependedFirewalls(): void
     {
         $request = Request::create('http://localhost');
         $context = $this->createMock(FirewallContext::class);
@@ -120,7 +117,7 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
         self::assertSame($logoutListener, $actualLogoutListener);
     }
 
-    public function testGetListenersForNotApiFirewall()
+    public function testGetListenersForNotApiFirewall(): void
     {
         $request = Request::create('http://localhost');
         $context = $this->createMock(FirewallContext::class);
@@ -159,7 +156,7 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
         self::assertSame($logoutListener, $actualLogoutListener);
     }
 
-    public function testGetListenersForApiFirewallAndEnabledApiFeature()
+    public function testGetListenersForApiFirewallAndEnabledApiFeature(): void
     {
         $request = Request::create('http://localhost');
         $context = $this->createMock(FirewallContext::class);
@@ -201,7 +198,7 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
         self::assertSame($logoutListener, $actualLogoutListener);
     }
 
-    public function testGetListenersForApiFirewallAndDisabledApiFeature()
+    public function testGetListenersForApiFirewallAndDisabledApiFeature(): void
     {
         $request = Request::create('http://localhost');
         $context = $this->createMock(FirewallContext::class);
@@ -246,7 +243,7 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
         self::assertSame($logoutListener, $actualLogoutListener);
     }
 
-    public function testGetListenersForApiFirewallAndDisabledApiFeatureAndNoListeners()
+    public function testGetListenersForApiFirewallAndDisabledApiFeatureAndNoListeners(): void
     {
         $request = Request::create('http://localhost');
         $context = $this->createMock(FirewallContext::class);
@@ -288,7 +285,7 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
         self::assertSame($logoutListener, $actualLogoutListener);
     }
 
-    public function testGetListenersForApiFirewallAndDisabledApiFeatureAndHasApiFirewallListeners()
+    public function testGetListenersForApiFirewallAndDisabledApiFeatureAndHasApiFirewallListeners(): void
     {
         $request = Request::create('http://localhost');
         $context = $this->createMock(FirewallContext::class);
@@ -333,7 +330,7 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
         self::assertSame($logoutListener, $actualLogoutListener);
     }
 
-    public function testGetListenersForApiFirewallAndDisabledApiFeatureAndNoListenersAndHasApiFirewallListeners()
+    public function testGetListenersForApiFirewallAndDisabledApiFeatureAndNoListenersAndHasApiFirewallListeners(): void
     {
         $request = Request::create('http://localhost');
         $context = $this->createMock(FirewallContext::class);
@@ -375,7 +372,7 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
         self::assertSame($logoutListener, $actualLogoutListener);
     }
 
-    public function testGetListenersForApiFirewallAndDisabledApiFeatureAndNoListenersInGenerator()
+    public function testGetListenersForApiFirewallAndDisabledApiFeatureAndNoListenersInGenerator(): void
     {
         $request = Request::create('http://localhost');
         $context = $this->createMock(FirewallContext::class);
@@ -390,7 +387,7 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
         ];
 
         $listeners = new RewindableGenerator(
-            function () {
+            function (): void {
             },
             0
         );
@@ -421,7 +418,7 @@ class FeatureDependedFirewallMapTest extends \PHPUnit\Framework\TestCase
         self::assertSame($logoutListener, $actualLogoutListener);
     }
 
-    public function testGetListenersForApiFirewallAndDisabledApiFeatureAndHasListenersInGenerator()
+    public function testGetListenersForApiFirewallAndDisabledApiFeatureAndHasListenersInGenerator(): void
     {
         $request = Request::create('http://localhost');
         $context = $this->createMock(FirewallContext::class);

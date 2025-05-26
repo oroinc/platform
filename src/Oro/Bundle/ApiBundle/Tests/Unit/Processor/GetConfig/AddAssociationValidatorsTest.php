@@ -13,17 +13,13 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Validator\Constraints\AccessGranted;
 use Oro\Bundle\ApiBundle\Validator\Constraints\All;
 use Oro\Bundle\ApiBundle\Validator\Constraints\HasAdderAndRemover;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class AddAssociationValidatorsTest extends ConfigProcessorTestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var AssociationAccessExclusionProviderRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $associationAccessExclusionProviderRegistry;
-
-    /** @var AddAssociationValidators */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private AssociationAccessExclusionProviderRegistry&MockObject $associationAccessExclusionProviderRegistry;
+    private AddAssociationValidators $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +36,7 @@ class AddAssociationValidatorsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessForNotManageableEntity(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -104,7 +100,7 @@ class AddAssociationValidatorsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessToManyAssociationForNotManageableEntityWhenConstraintAlreadyExists()
+    public function testProcessToManyAssociationForNotManageableEntityWhenConstraintAlreadyExists(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -147,7 +143,7 @@ class AddAssociationValidatorsTest extends ConfigProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessForManageableEntity()
+    public function testProcessForManageableEntity(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -249,7 +245,7 @@ class AddAssociationValidatorsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForByReferenceCollectionValuedAssociationOfNotManageableEntity()
+    public function testProcessForByReferenceCollectionValuedAssociationOfNotManageableEntity(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -283,7 +279,7 @@ class AddAssociationValidatorsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForByReferenceCollectionValuedAssociationOfManageableEntity()
+    public function testProcessForByReferenceCollectionValuedAssociationOfManageableEntity(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -339,7 +335,7 @@ class AddAssociationValidatorsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForComputedCollectionValuedAssociationOfNotManageableEntity()
+    public function testProcessForComputedCollectionValuedAssociationOfNotManageableEntity(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -370,7 +366,7 @@ class AddAssociationValidatorsTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForComputedCollectionValuedAssociationOfManageableEntity()
+    public function testProcessForComputedCollectionValuedAssociationOfManageableEntity(): void
     {
         $config = [
             'exclusion_policy' => 'all',

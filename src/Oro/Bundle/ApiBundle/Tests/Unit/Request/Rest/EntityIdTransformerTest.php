@@ -6,14 +6,15 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Request\Rest\EntityIdTransformer;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
+class EntityIdTransformerTest extends TestCase
 {
-    /** @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject */
-    private $valueNormalizer;
+    private ValueNormalizer&MockObject $valueNormalizer;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +27,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         return new EntityIdTransformer($this->valueNormalizer, ['rest'], $alwaysString);
     }
 
-    public function testTransformForEnumEntity()
+    public function testTransformForEnumEntity(): void
     {
         $result = $this->getTransformer()->transform(
             'test_enum.option1',
@@ -38,7 +39,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider transformProvider
      */
-    public function testTransform(int|array $id, int|string $expectedResult)
+    public function testTransform(int|array $id, int|string $expectedResult): void
     {
         $result = $this->getTransformer()->transform($id, new EntityMetadata('Test\Entity'));
         self::assertSame($expectedResult, $result);
@@ -47,7 +48,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider transformProvider
      */
-    public function testTransformWithAlwaysString(int|array $id, int|string $expectedResult)
+    public function testTransformWithAlwaysString(int|array $id, int|string $expectedResult): void
     {
         $result = $this->getTransformer(true)->transform($id, new EntityMetadata('Test\Entity'));
         self::assertSame((string)$expectedResult, $result);
@@ -62,7 +63,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testReverseTransformForEnumEntity()
+    public function testReverseTransformForEnumEntity(): void
     {
         $result = $this->getTransformer()->reverseTransform(
             'option1',
@@ -71,7 +72,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         self::assertSame('test_enum.option1', $result);
     }
 
-    public function testReverseTransformForEnumEntityWithHint()
+    public function testReverseTransformForEnumEntityWithHint(): void
     {
         $metadata = new EntityMetadata('Extend\Entity\EV_Test_Enum1');
         $metadata->setHints([['name' => 'HINT_ENUM_OPTION', 'value' => 'test_enum2']]);
@@ -79,7 +80,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         self::assertSame('test_enum2.option1', $result);
     }
 
-    public function testReverseTransformForSingleIdentifier()
+    public function testReverseTransformForSingleIdentifier(): void
     {
         $entityClass = 'Test\Class';
         $value = '123';
@@ -97,7 +98,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         self::assertSame(123, $result);
     }
 
-    public function testReverseTransformForSingleIdentifierWhenFieldDataTypeIsString()
+    public function testReverseTransformForSingleIdentifierWhenFieldDataTypeIsString(): void
     {
         $entityClass = 'Test\Class';
         $value = 123;
@@ -113,7 +114,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         self::assertSame('123', $result);
     }
 
-    public function testReverseTransformForCompositeIdentifier()
+    public function testReverseTransformForCompositeIdentifier(): void
     {
         $entityClass = 'Test\Class';
         $value = 'id1=123;id2=456';
@@ -135,7 +136,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testReverseTransformForCompositeIdentifierWhenFieldsDataTypeIsString()
+    public function testReverseTransformForCompositeIdentifierWhenFieldsDataTypeIsString(): void
     {
         $entityClass = 'Test\Class';
         $value = 'id1=123;id2=456';
@@ -155,7 +156,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testReverseTransformForCompositeIdentifierContainsEncodedChars()
+    public function testReverseTransformForCompositeIdentifierContainsEncodedChars(): void
     {
         $entityClass = 'Test\Class';
         $value = http_build_query(['id1' => 'key 1', 'id2' => 'key&1\'1'], '', ';');
@@ -175,7 +176,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testReverseTransformForCompositeIdentifierWithInvalidField()
+    public function testReverseTransformForCompositeIdentifierWithInvalidField(): void
     {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage(
@@ -199,7 +200,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         $this->getTransformer()->reverseTransform($value, $metadata);
     }
 
-    public function testReverseTransformForCompositeIdentifierWhenItDoesNotContainAllIdentifierFields()
+    public function testReverseTransformForCompositeIdentifierWhenItDoesNotContainAllIdentifierFields(): void
     {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage(
@@ -223,7 +224,7 @@ class EntityIdTransformerTest extends \PHPUnit\Framework\TestCase
         $this->getTransformer()->reverseTransform($value, $metadata);
     }
 
-    public function testReverseTransformForCompositeIdentifierThatDoesNotHaveFieldValue()
+    public function testReverseTransformForCompositeIdentifierThatDoesNotHaveFieldValue(): void
     {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage(

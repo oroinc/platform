@@ -11,19 +11,18 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
+class EntityFieldFilteringHelperTest extends TestCase
 {
-    private const TEST_CLASS_NAME = 'Test\Entity';
+    private const string TEST_CLASS_NAME = 'Test\Entity';
 
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var EntityFieldFilteringHelper */
-    private $helper;
+    private ConfigManager&MockObject $configManager;
+    private EntityFieldFilteringHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -49,7 +48,7 @@ class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFilterEntityFieldsForUnspecifiedExclusionPolicy()
+    public function testFilterEntityFieldsForUnspecifiedExclusionPolicy(): void
     {
         $this->configManager->expects(self::never())
             ->method('hasConfig');
@@ -67,7 +66,7 @@ class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['field1', 'field2', 'field3'], $filteredFieldNames);
     }
 
-    public function testFilterEntityFieldsForNoneExclusionPolicy()
+    public function testFilterEntityFieldsForNoneExclusionPolicy(): void
     {
         $this->configManager->expects(self::never())
             ->method('hasConfig');
@@ -85,7 +84,7 @@ class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['field1', 'field2', 'field3'], $filteredFieldNames);
     }
 
-    public function testFilterEntityFieldsForAllExclusionPolicy()
+    public function testFilterEntityFieldsForAllExclusionPolicy(): void
     {
         $this->configManager->expects(self::never())
             ->method('hasConfig');
@@ -103,7 +102,7 @@ class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['field1'], $filteredFieldNames);
     }
 
-    public function testFilterEntityFieldsForCustomFieldsExclusionPolicyForFieldsOfNonConfigurableEntity()
+    public function testFilterEntityFieldsForCustomFieldsExclusionPolicyForFieldsOfNonConfigurableEntity(): void
     {
         $this->configManager->expects(self::once())
             ->method('hasConfig')
@@ -123,7 +122,7 @@ class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['field1', 'field2', 'field3'], $filteredFieldNames);
     }
 
-    public function testFilterEntityFieldsForCustomFieldsExclusionPolicyForFieldsOfCustomEntity()
+    public function testFilterEntityFieldsForCustomFieldsExclusionPolicyForFieldsOfCustomEntity(): void
     {
         $this->configManager->expects(self::once())
             ->method('hasConfig')
@@ -147,7 +146,7 @@ class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['field1', 'field2', 'field3'], $filteredFieldNames);
     }
 
-    public function testFilterEntityFieldsForCustomFieldsExclusionPolicyForFieldsOfExtendSystemEntity()
+    public function testFilterEntityFieldsForCustomFieldsExclusionPolicyForFieldsOfExtendSystemEntity(): void
     {
         $this->configManager->expects(self::exactly(3))
             ->method('hasConfig')
@@ -188,7 +187,7 @@ class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['field1', 'field2'], $filteredFieldNames);
     }
 
-    public function testIsExtendSystemEntityForNonConfigurableEntity()
+    public function testIsExtendSystemEntityForNonConfigurableEntity(): void
     {
         $this->configManager->expects(self::once())
             ->method('hasConfig')
@@ -202,7 +201,7 @@ class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->helper->isExtendSystemEntity(self::TEST_CLASS_NAME));
     }
 
-    public function testIsExtendSystemEntityForNonExtendedEntity()
+    public function testIsExtendSystemEntityForNonExtendedEntity(): void
     {
         $this->configManager->expects(self::once())
             ->method('hasConfig')
@@ -220,7 +219,7 @@ class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->helper->isExtendSystemEntity(self::TEST_CLASS_NAME));
     }
 
-    public function testIsExtendSystemEntityForSystemOwnedExtendedEntity()
+    public function testIsExtendSystemEntityForSystemOwnedExtendedEntity(): void
     {
         $this->configManager->expects(self::once())
             ->method('hasConfig')
@@ -238,7 +237,7 @@ class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->helper->isExtendSystemEntity(self::TEST_CLASS_NAME));
     }
 
-    public function testIsExtendSystemEntityForCustomOwnedExtendedEntity()
+    public function testIsExtendSystemEntityForCustomOwnedExtendedEntity(): void
     {
         $this->configManager->expects(self::once())
             ->method('hasConfig')
@@ -256,7 +255,7 @@ class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->helper->isExtendSystemEntity(self::TEST_CLASS_NAME));
     }
 
-    public function testIsCustomFieldForNonConfigurableEntity()
+    public function testIsCustomFieldForNonConfigurableEntity(): void
     {
         $this->configManager->expects(self::once())
             ->method('hasConfig')
@@ -270,7 +269,7 @@ class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->helper->isCustomField(self::TEST_CLASS_NAME, 'field1'));
     }
 
-    public function testIsCustomFieldForNotExtendedField()
+    public function testIsCustomFieldForNotExtendedField(): void
     {
         $this->configManager->expects(self::once())
             ->method('hasConfig')
@@ -288,7 +287,7 @@ class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->helper->isCustomField(self::TEST_CLASS_NAME, 'field1'));
     }
 
-    public function testIsCustomFieldForSystemOwnedExtendedField()
+    public function testIsCustomFieldForSystemOwnedExtendedField(): void
     {
         $this->configManager->expects(self::once())
             ->method('hasConfig')
@@ -306,7 +305,7 @@ class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->helper->isCustomField(self::TEST_CLASS_NAME, 'field1'));
     }
 
-    public function testIsCustomFieldForCustomOwnedExtendedField()
+    public function testIsCustomFieldForCustomOwnedExtendedField(): void
     {
         $this->configManager->expects(self::once())
             ->method('hasConfig')
@@ -324,7 +323,7 @@ class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->helper->isCustomField(self::TEST_CLASS_NAME, 'field1'));
     }
 
-    public function testIsCustomAssociationForNonConfigurableEntity()
+    public function testIsCustomAssociationForNonConfigurableEntity(): void
     {
         $this->configManager->expects(self::once())
             ->method('hasConfig')
@@ -338,7 +337,7 @@ class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->helper->isCustomAssociation(self::TEST_CLASS_NAME, 'association1'));
     }
 
-    public function testIsCustomAssociationForNotExtendedAssociation()
+    public function testIsCustomAssociationForNotExtendedAssociation(): void
     {
         $this->configManager->expects(self::once())
             ->method('hasConfig')
@@ -356,7 +355,7 @@ class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->helper->isCustomAssociation(self::TEST_CLASS_NAME, 'association1'));
     }
 
-    public function testIsCustomAssociationForSystemOwnedExtendedAssociation()
+    public function testIsCustomAssociationForSystemOwnedExtendedAssociation(): void
     {
         $this->configManager->expects(self::once())
             ->method('hasConfig')
@@ -374,7 +373,7 @@ class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->helper->isCustomAssociation(self::TEST_CLASS_NAME, 'association1'));
     }
 
-    public function testIsCustomAssociationForCustomOwnedExtendedAssociation()
+    public function testIsCustomAssociationForCustomOwnedExtendedAssociation(): void
     {
         $this->configManager->expects(self::once())
             ->method('hasConfig')
@@ -392,7 +391,7 @@ class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->helper->isCustomAssociation(self::TEST_CLASS_NAME, 'association1'));
     }
 
-    public function testIsCustomAssociationForDefaultAssociationAndNonConfigurableEntity()
+    public function testIsCustomAssociationForDefaultAssociationAndNonConfigurableEntity(): void
     {
         $this->configManager->expects(self::exactly(2))
             ->method('hasConfig')
@@ -412,7 +411,7 @@ class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
         ));
     }
 
-    public function testIsCustomAssociationForNotExtendedDefaultAssociation()
+    public function testIsCustomAssociationForNotExtendedDefaultAssociation(): void
     {
         $this->configManager->expects(self::exactly(2))
             ->method('hasConfig')
@@ -440,7 +439,7 @@ class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
         ));
     }
 
-    public function testIsCustomAssociationForSystemOwnedExtendedDefaultAssociation()
+    public function testIsCustomAssociationForSystemOwnedExtendedDefaultAssociation(): void
     {
         $this->configManager->expects(self::exactly(2))
             ->method('hasConfig')
@@ -471,7 +470,7 @@ class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
         ));
     }
 
-    public function testIsCustomAssociationForCustomOwnedExtendedDefaultAssociation()
+    public function testIsCustomAssociationForCustomOwnedExtendedDefaultAssociation(): void
     {
         $this->configManager->expects(self::once())
             ->method('hasConfig')
@@ -495,7 +494,7 @@ class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
         ));
     }
 
-    public function testIsCustomAssociationForSystemOwnedExtendedDefaultAssociationButCustomOwnedAssociation()
+    public function testIsCustomAssociationForSystemOwnedExtendedDefaultAssociationButCustomOwnedAssociation(): void
     {
         $this->configManager->expects(self::exactly(2))
             ->method('hasConfig')
@@ -526,7 +525,7 @@ class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
         ));
     }
 
-    public function testIsCustomAssociationForNotExtendedDefaultAssociationAndSystemOwnedAssociation()
+    public function testIsCustomAssociationForNotExtendedDefaultAssociationAndSystemOwnedAssociation(): void
     {
         $this->configManager->expects(self::exactly(2))
             ->method('hasConfig')
@@ -554,7 +553,7 @@ class EntityFieldFilteringHelperTest extends \PHPUnit\Framework\TestCase
         ));
     }
 
-    public function testIsCustomAssociationForNotExtendedDefaultAssociationAndCustomOwnedAssociation()
+    public function testIsCustomAssociationForNotExtendedDefaultAssociationAndCustomOwnedAssociation(): void
     {
         $this->configManager->expects(self::exactly(2))
             ->method('hasConfig')

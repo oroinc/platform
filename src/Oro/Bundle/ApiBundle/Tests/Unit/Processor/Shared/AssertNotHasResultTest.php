@@ -8,8 +8,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 
 class AssertNotHasResultTest extends GetProcessorTestCase
 {
-    /** @var AssertNotHasResult */
-    private $processor;
+    private AssertNotHasResult $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -19,12 +18,12 @@ class AssertNotHasResultTest extends GetProcessorTestCase
         $this->processor = new AssertNotHasResult();
     }
 
-    public function testProcessWhenNoResult()
+    public function testProcessWhenNoResult(): void
     {
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenHasResult()
+    public function testProcessWhenHasResult(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The result should not exist.');

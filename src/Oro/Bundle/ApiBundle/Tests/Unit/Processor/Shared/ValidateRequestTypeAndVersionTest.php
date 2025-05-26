@@ -9,8 +9,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
 class ValidateRequestTypeAndVersionTest extends GetListProcessorTestCase
 {
-    /** @var ValidateRequestTypeAndVersion */
-    private $processor;
+    private ValidateRequestTypeAndVersion $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -20,12 +19,12 @@ class ValidateRequestTypeAndVersionTest extends GetListProcessorTestCase
         $this->processor = new ValidateRequestTypeAndVersion();
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenNoRequestType()
+    public function testProcessWhenNoRequestType(): void
     {
         $this->context->getRequestType()->clear();
         $this->processor->process($this->context);
@@ -41,14 +40,14 @@ class ValidateRequestTypeAndVersionTest extends GetListProcessorTestCase
         );
     }
 
-    public function testProcessWhenVersionIsNotSet()
+    public function testProcessWhenVersionIsNotSet(): void
     {
         $this->context->remove(ApiContext::VERSION);
         $this->processor->process($this->context);
         self::assertEquals('latest', $this->context->getVersion());
     }
 
-    public function testProcessWhenVersionIsSet()
+    public function testProcessWhenVersionIsSet(): void
     {
         $version = '2.1';
         $this->context->setVersion($version);
@@ -56,7 +55,7 @@ class ValidateRequestTypeAndVersionTest extends GetListProcessorTestCase
         self::assertSame($version, $this->context->getVersion());
     }
 
-    public function testProcessWhenVersionHasMeaninglessPrefix()
+    public function testProcessWhenVersionHasMeaninglessPrefix(): void
     {
         $this->context->setVersion('v1.2');
         $this->processor->process($this->context);

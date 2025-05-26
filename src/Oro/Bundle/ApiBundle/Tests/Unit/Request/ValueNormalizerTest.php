@@ -18,6 +18,7 @@ use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
 use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Tests ValueNormalizer and normalization processors for all supported simple types
@@ -25,7 +26,7 @@ use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
+class ValueNormalizerTest extends TestCase
 {
     private const STRING_REQUIREMENT = Processor\NormalizeString::REQUIREMENT;
     private const INTEGER_REQUIREMENT = Processor\NormalizeInteger::REQUIREMENT;
@@ -179,7 +180,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getRequirementProvider
      */
-    public function testGetRequirement(string $expectedValue, string $dataType, array $requestType)
+    public function testGetRequirement(string $expectedValue, string $dataType, array $requestType): void
     {
         $result = $this->valueNormalizer->getRequirement($dataType, new RequestType($requestType));
         self::assertSame($expectedValue, $result);
@@ -325,7 +326,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getRangeRequirementProvider
      */
-    public function testGetRangeRequirement(string $expectedValue, string $dataType, array $requestType)
+    public function testGetRangeRequirement(string $expectedValue, string $dataType, array $requestType): void
     {
         $result = $this->valueNormalizer->getRequirement($dataType, new RequestType($requestType), false, true);
         self::assertSame($expectedValue, $result);
@@ -438,7 +439,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getArrayRangeRequirementProvider
      */
-    public function testGetArrayRangeRequirement(string $expectedValue, string $dataType, array $requestType)
+    public function testGetArrayRangeRequirement(string $expectedValue, string $dataType, array $requestType): void
     {
         $result = $this->valueNormalizer->getRequirement($dataType, new RequestType($requestType), true, true);
         self::assertSame($expectedValue, $result);
@@ -557,7 +558,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
         string $dataType,
         array $requestType,
         bool $isArrayAllowed = false
-    ) {
+    ): void {
         $result = $this->valueNormalizer->normalizeValue(
             $value,
             $dataType,
@@ -1295,7 +1296,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider normalizeRangeValueProvider
      */
-    public function testNormalizeRangeValue(Range $expectedValue, Range|string $value, string $dataType)
+    public function testNormalizeRangeValue(Range $expectedValue, Range|string $value, string $dataType): void
     {
         $result = $this->valueNormalizer->normalizeValue(
             $value,
@@ -1475,7 +1476,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
         string $value,
         string $dataType,
         array $requestType
-    ) {
+    ): void {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
         $this->valueNormalizer->normalizeValue($value, $dataType, new RequestType($requestType), true);
@@ -1931,7 +1932,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
         string $value,
         string $dataType,
         array $requestType
-    ) {
+    ): void {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
         $this->valueNormalizer->normalizeValue($value, $dataType, new RequestType($requestType), true, true);
@@ -2324,7 +2325,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testGetRequirementCache()
+    public function testGetRequirementCache(): void
     {
         $processor = $this->getMockBuilder(NormalizeValueProcessor::class)
             ->setConstructorArgs([$this->createMock(ProcessorBagInterface::class), 'normalize_value'])
@@ -2355,7 +2356,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals((string)$requestType2, $valueNormalizer->getRequirement(DataType::INTEGER, $requestType2));
     }
 
-    public function testNormalizeValueCache()
+    public function testNormalizeValueCache(): void
     {
         $processor = $this->getMockBuilder(NormalizeValueProcessor::class)
             ->setConstructorArgs([$this->createMock(ProcessorBagInterface::class), 'normalize_value'])

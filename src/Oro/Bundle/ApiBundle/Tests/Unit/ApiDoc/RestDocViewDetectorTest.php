@@ -6,16 +6,17 @@ use Oro\Bundle\ApiBundle\ApiDoc\RequestTypeProviderInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
 use Oro\Bundle\ApiBundle\ApiDoc\RestRequestTypeProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class RestDocViewDetectorTest extends \PHPUnit\Framework\TestCase
+class RestDocViewDetectorTest extends TestCase
 {
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
+    private RequestStack&MockObject $requestStack;
 
     #[\Override]
     protected function setUp(): void

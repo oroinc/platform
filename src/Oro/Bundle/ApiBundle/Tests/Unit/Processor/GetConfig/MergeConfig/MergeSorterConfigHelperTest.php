@@ -3,11 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig\MergeConfig;
 
 use Oro\Bundle\ApiBundle\Processor\GetConfig\MergeConfig\MergeSorterConfigHelper;
+use PHPUnit\Framework\TestCase;
 
-class MergeSorterConfigHelperTest extends \PHPUnit\Framework\TestCase
+class MergeSorterConfigHelperTest extends TestCase
 {
-    /** @var MergeSorterConfigHelper */
-    private $mergeSorterConfigHelper;
+    private MergeSorterConfigHelper $mergeSorterConfigHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -15,7 +15,7 @@ class MergeSorterConfigHelperTest extends \PHPUnit\Framework\TestCase
         $this->mergeSorterConfigHelper = new MergeSorterConfigHelper();
     }
 
-    public function testMergeEmptySorterConfig()
+    public function testMergeEmptySorterConfig(): void
     {
         $config = [];
         $sorterConfig = [];
@@ -28,7 +28,7 @@ class MergeSorterConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMergeSorterConfigWithExclusionPolicyEqualsToAll()
+    public function testMergeSorterConfigWithExclusionPolicyEqualsToAll(): void
     {
         $config = [
             'sorters' => [
@@ -72,7 +72,7 @@ class MergeSorterConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMergeSorterConfigWithoutExclusionPolicy()
+    public function testMergeSorterConfigWithoutExclusionPolicy(): void
     {
         $config = [
             'sorters' => [
@@ -117,7 +117,7 @@ class MergeSorterConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMergeSorterConfigWhenConfigDoesNotHaveFieldsSection()
+    public function testMergeSorterConfigWhenConfigDoesNotHaveFieldsSection(): void
     {
         $config = [
             'sorters' => [

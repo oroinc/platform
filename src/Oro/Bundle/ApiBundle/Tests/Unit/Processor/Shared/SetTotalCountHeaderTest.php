@@ -14,20 +14,16 @@ use Oro\Component\DoctrineUtils\ORM\ResultSetMappingUtil;
 use Oro\Component\DoctrineUtils\ORM\SqlQuery;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 use Oro\Component\EntitySerializer\QueryResolver;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|CountQueryBuilderOptimizer */
-    private $countQueryBuilderOptimizer;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|QueryResolver */
-    private $queryResolver;
-
-    /** @var SetTotalCountHeader */
-    private $processor;
+    private CountQueryBuilderOptimizer&MockObject $countQueryBuilderOptimizer;
+    private QueryResolver&MockObject $queryResolver;
+    private SetTotalCountHeader $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -40,14 +36,14 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         $this->processor = new SetTotalCountHeader($this->countQueryBuilderOptimizer, $this->queryResolver);
     }
 
-    public function testProcessWithoutRequestHeader()
+    public function testProcessWithoutRequestHeader(): void
     {
         $this->processor->process($this->context);
 
         self::assertFalse($this->context->getResponseHeaders()->has('X-Include-Total-Count'));
     }
 
-    public function testProcessOnExistingHeader()
+    public function testProcessOnExistingHeader(): void
     {
         $testCount = 135;
 
@@ -60,7 +56,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    public function testProcessWithTotalCallback()
+    public function testProcessWithTotalCallback(): void
     {
         $testCount = 135;
 
@@ -78,7 +74,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    public function testProcessWithWrongTotalCallbackResult()
+    public function testProcessWithWrongTotalCallbackResult(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Expected integer as result of "totalCount" callback, "string" given.');
@@ -92,7 +88,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessOrmQueryBuilder()
+    public function testProcessOrmQueryBuilder(): void
     {
         $config = new EntityDefinitionConfig();
         $totalCount = 123;
@@ -131,7 +127,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
     /**
      * @dataProvider computedFieldDataProvider
      */
-    public function testProcessOrmQueryBuilderWithComputedFields(string $computedFieldExpr)
+    public function testProcessOrmQueryBuilderWithComputedFields(string $computedFieldExpr): void
     {
         $config = new EntityDefinitionConfig();
         $totalCount = 123;
@@ -180,7 +176,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         ];
     }
 
-    public function testProcessOrmQuery()
+    public function testProcessOrmQuery(): void
     {
         $config = new EntityDefinitionConfig();
         $totalCount = 123;
@@ -209,7 +205,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    public function testProcessSqlQueryBuilder()
+    public function testProcessSqlQueryBuilder(): void
     {
         $config = new EntityDefinitionConfig();
         $totalCount = 123;
@@ -249,7 +245,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    public function testProcessSqlQuery()
+    public function testProcessSqlQuery(): void
     {
         $config = new EntityDefinitionConfig();
         $totalCount = 123;
@@ -289,7 +285,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    public function testProcessOnWrongQuery()
+    public function testProcessOnWrongQuery(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(
@@ -304,7 +300,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         $this->processor->process($this->context);
     }
 
-    public function testArrayData()
+    public function testArrayData(): void
     {
         $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
         $this->context->setResult([['id' => 1], ['id' => 2]]);
@@ -317,7 +313,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    public function testObjectData()
+    public function testObjectData(): void
     {
         $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
         $this->context->setResult(new \stdClass());
@@ -329,7 +325,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    public function testNoData()
+    public function testNoData(): void
     {
         $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
         $this->context->setConfig(new EntityDefinitionConfig());
@@ -340,7 +336,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    public function testPagingDisabled()
+    public function testPagingDisabled(): void
     {
         $config = new EntityDefinitionConfig();
         $config->setPageSize(-1);
@@ -360,7 +356,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    public function testPagingDisabledObjectData()
+    public function testPagingDisabledObjectData(): void
     {
         $config = new EntityDefinitionConfig();
         $config->setPageSize(-1);
@@ -379,7 +375,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    public function testPagingDisabledNoData()
+    public function testPagingDisabledNoData(): void
     {
         $config = new EntityDefinitionConfig();
         $config->setPageSize(-1);
@@ -397,7 +393,7 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    public function testPagingDisabledForDeleteList()
+    public function testPagingDisabledForDeleteList(): void
     {
         $config = new EntityDefinitionConfig();
         $config->setPageSize(-1);

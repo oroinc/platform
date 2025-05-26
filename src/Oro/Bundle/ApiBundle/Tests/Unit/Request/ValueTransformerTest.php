@@ -8,17 +8,14 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueTransformer;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\EntitySerializer\DataTransformerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ValueTransformerTest extends \PHPUnit\Framework\TestCase
+class ValueTransformerTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DataTransformerRegistry */
-    private $dataTransformerRegistry;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DataTransformerInterface */
-    private $dataTransformer;
-
-    /** @var ValueTransformer */
-    private $valueTransformer;
+    private DataTransformerRegistry&MockObject $dataTransformerRegistry;
+    private DataTransformerInterface&MockObject $dataTransformer;
+    private ValueTransformer $valueTransformer;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +29,7 @@ class ValueTransformerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testTransformValueWhenNotRequestTypeInContext()
+    public function testTransformValueWhenNotRequestTypeInContext(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The transformation context must have "requestType" attribute.');
@@ -49,7 +46,7 @@ class ValueTransformerTest extends \PHPUnit\Framework\TestCase
         $this->valueTransformer->transformValue($value, $dataType, $context);
     }
 
-    public function testTransformValueWhenDataTransformerNotFound()
+    public function testTransformValueWhenDataTransformerNotFound(): void
     {
         $value = 'value';
         $dataType = 'test_data_type';
@@ -70,7 +67,7 @@ class ValueTransformerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testTransformValueWhenDataTransformerFound()
+    public function testTransformValueWhenDataTransformerFound(): void
     {
         $value = 'value';
         $dataType = 'test_data_type';
@@ -100,7 +97,7 @@ class ValueTransformerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testTransformFieldValue()
+    public function testTransformFieldValue(): void
     {
         $fieldValue = 'value';
         $fieldConfig = ['config_key' => 'config_value'];

@@ -21,8 +21,7 @@ use Symfony\Component\Form\Forms;
  */
 class EntityTypeTest extends OrmRelatedTestCase
 {
-    /** @var FormFactoryInterface */
-    private $factory;
+    private FormFactoryInterface $factory;
 
     #[\Override]
     protected function setUp(): void
@@ -49,7 +48,7 @@ class EntityTypeTest extends OrmRelatedTestCase
     /**
      * @dataProvider validSingleEmptyValuesDataProvider
      */
-    public function testSingleWithValidEmptyValue(array|string|null $value)
+    public function testSingleWithValidEmptyValue(array|string|null $value): void
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setIsCollection(false);
@@ -77,7 +76,7 @@ class EntityTypeTest extends OrmRelatedTestCase
     /**
      * @dataProvider validMultipleEmptyValuesDataProvider
      */
-    public function testMultipleWithValidEmptyValue(array|string|null $value, ArrayCollection $expected)
+    public function testMultipleWithValidEmptyValue(array|string|null $value, ArrayCollection $expected): void
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setIsCollection(true);
@@ -102,7 +101,7 @@ class EntityTypeTest extends OrmRelatedTestCase
         ];
     }
 
-    public function testSingleWithValidValue()
+    public function testSingleWithValidValue(): void
     {
         $value = ['class' => Group::class, 'id' => 123];
         $entity = new Group();
@@ -135,7 +134,7 @@ class EntityTypeTest extends OrmRelatedTestCase
         self::assertTrue($form->isSynchronized());
     }
 
-    public function testMultipleWithValidValue()
+    public function testMultipleWithValidValue(): void
     {
         $value = ['class' => Group::class, 'id' => 123];
         $entity = new Group();
@@ -168,7 +167,7 @@ class EntityTypeTest extends OrmRelatedTestCase
         self::assertTrue($form->isSynchronized());
     }
 
-    public function testSingleWithInvalidValue()
+    public function testSingleWithInvalidValue(): void
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setIsCollection(false);
@@ -183,7 +182,7 @@ class EntityTypeTest extends OrmRelatedTestCase
         self::assertFalse($form->isSynchronized());
     }
 
-    public function testMultipleWithInvalidValue()
+    public function testMultipleWithInvalidValue(): void
     {
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setIsCollection(true);
@@ -198,7 +197,7 @@ class EntityTypeTest extends OrmRelatedTestCase
         self::assertFalse($form->isSynchronized());
     }
 
-    public function testSingleWithNotAcceptableValue()
+    public function testSingleWithNotAcceptableValue(): void
     {
         $value = ['class' => 'Test\Entity', 'id' => 123];
 
@@ -215,7 +214,7 @@ class EntityTypeTest extends OrmRelatedTestCase
         self::assertFalse($form->isSynchronized());
     }
 
-    public function testMultipleWithNotAcceptableValue()
+    public function testMultipleWithNotAcceptableValue(): void
     {
         $value = ['class' => 'Test\Entity', 'id' => 123];
 
@@ -232,7 +231,7 @@ class EntityTypeTest extends OrmRelatedTestCase
         self::assertFalse($form->isSynchronized());
     }
 
-    public function testSingleWithValidValueFromIncludedEntities()
+    public function testSingleWithValidValueFromIncludedEntities(): void
     {
         $value = ['class' => Group::class, 'id' => 123];
         $entity = new Group();
@@ -255,7 +254,7 @@ class EntityTypeTest extends OrmRelatedTestCase
         self::assertTrue($form->isSynchronized());
     }
 
-    public function testMultipleWithValidValueFromIncludedEntities()
+    public function testMultipleWithValidValueFromIncludedEntities(): void
     {
         $value = ['class' => Group::class, 'id' => 123];
         $entity = new Group();

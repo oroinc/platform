@@ -8,19 +8,17 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\NormalizeFilters;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class NormalizeFiltersTest extends ConfigProcessorTestCase
 {
-    private const IDENTIFIER_FILTER_NAME = 'id';
+    private const string IDENTIFIER_FILTER_NAME = 'id';
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var NormalizeFilters */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private NormalizeFilters $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +30,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
         $this->processor = new NormalizeFilters($this->doctrineHelper);
     }
 
-    public function testRemoveExcludedFilters()
+    public function testRemoveExcludedFilters(): void
     {
         $filters = [
             'exclusion_policy' => 'all',
@@ -67,7 +65,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
     /**
      * @dataProvider processNotManageableEntityProvider
      */
-    public function testProcessForNotManageableEntity(array $definition, array $filters, array $expectedFilters)
+    public function testProcessForNotManageableEntity(array $definition, array $filters, array $expectedFilters): void
     {
         $this->doctrineHelper->expects(self::any())
             ->method('isManageableEntityClass')
@@ -274,7 +272,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
     /**
      * @dataProvider processManageableEntityProvider
      */
-    public function testProcessForManageableEntity(array $definition, array $filters, array $expectedFilters)
+    public function testProcessForManageableEntity(array $definition, array $filters, array $expectedFilters): void
     {
         $rootMetadata = $this->getClassMetadataMock();
         $toOne1Metadata = $this->getClassMetadataMock();
@@ -437,7 +435,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
         ];
     }
 
-    public function testFiltersByRenamedField()
+    public function testFiltersByRenamedField(): void
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -517,7 +515,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testCompleteCompositeIdFiltersForEntityWithSingleIdentifier()
+    public function testCompleteCompositeIdFiltersForEntityWithSingleIdentifier(): void
     {
         $definition = new EntityDefinitionConfig();
         $definition->setIdentifierFieldNames(['id']);
@@ -527,7 +525,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testCompleteCompositeIdFiltersWhenIdFilterAlreadyExists()
+    public function testCompleteCompositeIdFiltersWhenIdFilterAlreadyExists(): void
     {
         $definition = new EntityDefinitionConfig();
         $definition->setIdentifierFieldNames(['id1', 'id2']);
@@ -542,7 +540,7 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
         self::assertEquals('custom_filter', $filters->getField(self::IDENTIFIER_FILTER_NAME)->getType());
     }
 
-    public function testCompleteCompositeIdFiltersWhenIdFilterDoesNotExist()
+    public function testCompleteCompositeIdFiltersWhenIdFilterDoesNotExist(): void
     {
         $definition = new EntityDefinitionConfig();
         $definition->setIdentifierFieldNames(['id1', 'id2']);

@@ -4,10 +4,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ApiBundle\Config\FilterFieldConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
+use PHPUnit\Framework\TestCase;
 
-class FiltersConfigTest extends \PHPUnit\Framework\TestCase
+class FiltersConfigTest extends TestCase
 {
-    public function testCustomAttribute()
+    public function testCustomAttribute(): void
     {
         $attrName = 'test';
 
@@ -39,7 +40,7 @@ class FiltersConfigTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $config->keys());
     }
 
-    public function testExclusionPolicy()
+    public function testExclusionPolicy(): void
     {
         $config = new FiltersConfig();
         self::assertFalse($config->hasExclusionPolicy());
@@ -84,7 +85,7 @@ class FiltersConfigTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($config->isEmpty());
     }
 
-    public function testFields()
+    public function testFields(): void
     {
         $config = new FiltersConfig();
         self::assertFalse($config->hasFields());
@@ -106,7 +107,7 @@ class FiltersConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testFindField()
+    public function testFindField(): void
     {
         $config = new FiltersConfig();
 
@@ -147,7 +148,7 @@ class FiltersConfigTest extends \PHPUnit\Framework\TestCase
         self::assertSame($swapField1, $config->findField('realSwapField', true));
     }
 
-    public function testGetOrAddField()
+    public function testGetOrAddField(): void
     {
         $config = new FiltersConfig();
 
@@ -158,7 +159,7 @@ class FiltersConfigTest extends \PHPUnit\Framework\TestCase
         self::assertSame($field, $field1);
     }
 
-    public function testAddField()
+    public function testAddField(): void
     {
         $config = new FiltersConfig();
 

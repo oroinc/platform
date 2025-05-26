@@ -16,6 +16,8 @@ use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 use Oro\Component\Testing\Logger\BufferingLogger;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -27,18 +29,13 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
+class NormalizeResultActionProcessorTest extends TestCase
 {
-    private const TEST_ACTION = 'test';
+    private const string TEST_ACTION = 'test';
 
-    /** @var ProcessorRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $processorRegistry;
-
-    /** @var ProcessorBagConfigBuilder */
-    private $processorBagConfigBuilder;
-
-    /** @var NormalizeResultActionProcessor */
-    private $processor;
+    private ProcessorRegistryInterface&MockObject $processorRegistry;
+    private ProcessorBagConfigBuilder $processorBagConfigBuilder;
+    private NormalizeResultActionProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -77,7 +74,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @param array $processors [processorId => groupName, ...]
      *
-     * @return ProcessorInterface[]|\PHPUnit\Framework\MockObject\MockObject[]
+     * @return ProcessorInterface[]&MockObject[]
      */
     private function addProcessors(array $processors): array
     {
@@ -109,13 +106,13 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testWhenNoProcessors()
+    public function testWhenNoProcessors(): void
     {
         $context = $this->getContext();
         $this->processor->process($context);
     }
 
-    public function testWhenNoExceptionsAndErrors()
+    public function testWhenNoExceptionsAndErrors(): void
     {
         $context = $this->getContext();
 
@@ -137,7 +134,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionOccurs(bool $withLogger)
+    public function testWhenExceptionOccurs(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -194,7 +191,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionOccursAndSoftErrorsHandlingEnabled(bool $withLogger)
+    public function testWhenExceptionOccursAndSoftErrorsHandlingEnabled(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -251,7 +248,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccurs(bool $withLogger)
+    public function testWhenErrorOccurs(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -308,7 +305,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursInLastProcessor(bool $withLogger)
+    public function testWhenErrorOccursInLastProcessor(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -363,7 +360,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursAndSoftErrorsHandlingEnabled(bool $withLogger)
+    public function testWhenErrorOccursAndSoftErrorsHandlingEnabled(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -420,7 +417,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursInLastProcessorAndSoftErrorsHandlingEnabled(bool $withLogger)
+    public function testWhenErrorOccursInLastProcessorAndSoftErrorsHandlingEnabled(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -475,7 +472,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionOccursAndNormalizeResultGroupIsDisabled(bool $withLogger)
+    public function testWhenExceptionOccursAndNormalizeResultGroupIsDisabled(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -533,8 +530,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionOccursAndNormalizeResultGroupIsDisabledAndSoftErrHandlingEnabled(bool $withLogger)
-    {
+    public function testWhenExceptionOccursAndNormalizeResultGroupIsDisabledAndSoftErrHandlingEnabled(
+        bool $withLogger
+    ): void {
         $logger = null;
         if ($withLogger) {
             $logger = $this->setLogger();
@@ -592,7 +590,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursAndNormalizeResultGroupIsDisabled(bool $withLogger)
+    public function testWhenErrorOccursAndNormalizeResultGroupIsDisabled(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -665,8 +663,9 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursAndNormalizeResultGroupIsDisabledAndSoftErrorsHandlingEnabled(bool $withLogger)
-    {
+    public function testWhenErrorOccursAndNormalizeResultGroupIsDisabledAndSoftErrorsHandlingEnabled(
+        bool $withLogger
+    ): void {
         $logger = null;
         if ($withLogger) {
             $logger = $this->setLogger();
@@ -724,7 +723,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionOccursInNormalizeResultGroup(bool $withLogger)
+    public function testWhenExceptionOccursInNormalizeResultGroup(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -778,7 +777,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionOccursInNormalizeResultGroupAndSoftErrorsHandlingEnabled(bool $withLogger)
+    public function testWhenExceptionOccursInNormalizeResultGroupAndSoftErrorsHandlingEnabled(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -833,7 +832,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenAuthenticationExceptionOccursInNormalizeResultGroup(bool $withLogger)
+    public function testWhenAuthenticationExceptionOccursInNormalizeResultGroup(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -888,7 +887,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionAndThenAuthExceptionOccursInNormalizeResultGroup(bool $withLogger)
+    public function testWhenExceptionAndThenAuthExceptionOccursInNormalizeResultGroup(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -944,7 +943,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenAuthenticationExceptionOccursInNormalizeResultGroupAndSoftErr(bool $withLogger)
+    public function testWhenAuthenticationExceptionOccursInNormalizeResultGroupAndSoftErr(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -991,7 +990,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionAndThenAuthExceptionOccursInNormalizeResultGroupAndSoftErr(bool $withLogger)
+    public function testWhenExceptionAndThenAuthExceptionOccursInNormalizeResultGroupAndSoftErr(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -1025,12 +1024,29 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         $errorException = $errors[0]->getInnerException();
         self::assertInstanceOf(get_class($exception), $errorException);
         self::assertEquals($exception->getMessage(), $errorException->getMessage());
+        if (null !== $logger) {
+            self::assertEquals(
+                [
+                    [
+                        'error',
+                        'An exception occurred in "processor1" processor.',
+                        [
+                            'exception'   => $exception,
+                            'action'      => self::TEST_ACTION,
+                            'requestType' => 'rest,json_api',
+                            'version'     => '1.2'
+                        ]
+                    ]
+                ],
+                $logger->cleanLogs()
+            );
+        }
     }
 
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursInNormalizeResultGroup(bool $withLogger)
+    public function testWhenErrorOccursInNormalizeResultGroup(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -1071,7 +1087,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursInNormalizeResultGroupAndSoftErrorsHandlingEnabled(bool $withLogger)
+    public function testWhenErrorOccursInNormalizeResultGroupAndSoftErrorsHandlingEnabled(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -1113,7 +1129,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenInternalPhpErrorOccurs(bool $withLogger)
+    public function testWhenInternalPhpErrorOccurs(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -1173,7 +1189,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider safeExceptionProvider
      */
-    public function testWhenSafeExceptionOccurs(\Exception $exception)
+    public function testWhenSafeExceptionOccurs(\Exception $exception): void
     {
         $logger = $this->setLogger();
 
@@ -1234,7 +1250,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider httpInternalServerErrorExceptionProvider
      */
-    public function testWhenHttpInternalServerErrorExceptionOccurs(HttpException $exception)
+    public function testWhenHttpInternalServerErrorExceptionOccurs(HttpException $exception): void
     {
         $logger = $this->setLogger();
 
@@ -1292,7 +1308,7 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider errorForLogConversionProvider
      */
-    public function testErrorForLogConversion(Error $error, array $loggedError)
+    public function testErrorForLogConversion(Error $error, array $loggedError): void
     {
         $logger = $this->setLogger();
         $context = $this->getContext();
@@ -1311,23 +1327,21 @@ class NormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($context);
 
         self::assertEquals([$error], $context->getErrors());
-        if (null !== $logger) {
-            self::assertEquals(
+        self::assertEquals(
+            [
                 [
+                    'info',
+                    'Error(s) occurred in "processor1" processor.',
                     [
-                        'info',
-                        'Error(s) occurred in "processor1" processor.',
-                        [
-                            'errors'      => [$loggedError],
-                            'action'      => self::TEST_ACTION,
-                            'requestType' => 'rest,json_api',
-                            'version'     => '1.2'
-                        ]
+                        'errors'      => [$loggedError],
+                        'action'      => self::TEST_ACTION,
+                        'requestType' => 'rest,json_api',
+                        'version'     => '1.2'
                     ]
-                ],
-                $logger->cleanLogs()
-            );
-        }
+                ]
+            ],
+            $logger->cleanLogs()
+        );
     }
 
     public function errorForLogConversionProvider(): array

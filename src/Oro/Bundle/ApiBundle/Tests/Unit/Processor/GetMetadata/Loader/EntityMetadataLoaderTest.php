@@ -16,6 +16,7 @@ use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataFactory;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -24,26 +25,13 @@ use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
  */
 class EntityMetadataLoaderTest extends LoaderTestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var MetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $metadataFactory;
-
-    /** @var ObjectMetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $objectMetadataFactory;
-
-    /** @var EntityMetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityMetadataFactory;
-
-    /** @var EntityNestedObjectMetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $nestedObjectMetadataFactory;
-
-    /** @var EntityNestedAssociationMetadataFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $nestedAssociationMetadataFactory;
-
-    /** @var EntityMetadataLoader */
-    private $entityMetadataLoader;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private MetadataFactory&MockObject $metadataFactory;
+    private ObjectMetadataFactory&MockObject $objectMetadataFactory;
+    private EntityMetadataFactory&MockObject $entityMetadataFactory;
+    private EntityNestedObjectMetadataFactory&MockObject $nestedObjectMetadataFactory;
+    private EntityNestedAssociationMetadataFactory&MockObject $nestedAssociationMetadataFactory;
+    private EntityMetadataLoader $entityMetadataLoader;
 
     #[\Override]
     protected function setUp(): void
@@ -66,11 +54,10 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         );
     }
 
-    public function testForIdentifierField()
+    public function testForIdentifierField(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $fieldName = 'testField';
@@ -110,18 +97,17 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
         self::assertEquals([$fieldName], $entityMetadata->getIdentifierFieldNames());
     }
 
-    public function testForRenamedIdentifierField()
+    public function testForRenamedIdentifierField(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $fieldName = 'testField';
@@ -163,17 +149,16 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
         self::assertEquals([$fieldName], $entityMetadata->getIdentifierFieldNames());
     }
 
-    public function testForConfiguredIdentifierField()
+    public function testForConfiguredIdentifierField(): void
     {
         $entityClass = 'Test\Class';
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $config = new EntityDefinitionConfig();
@@ -225,17 +210,16 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
         self::assertEquals(['field1'], $entityMetadata->getIdentifierFieldNames());
     }
 
-    public function testForConfiguredIdentifierFieldShouldSetHasIdentifierGeneratorToFalse()
+    public function testForConfiguredIdentifierFieldShouldSetHasIdentifierGeneratorToFalse(): void
     {
         $entityClass = 'Test\Class';
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $config = new EntityDefinitionConfig();
@@ -287,7 +271,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
@@ -295,10 +279,9 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         self::assertFalse($entityMetadata->hasIdentifierGenerator());
     }
 
-    public function testForConfiguredIdentifierFieldEqualsToEntityIdentifierFieldShouldKeepHasIdentifierGeneratorAsIs()
+    public function testForConfiguredIdFieldEqualsToEntityIdentifierFieldShouldKeepHasIdentifierGeneratorAsIs(): void
     {
         $entityClass = 'Test\Class';
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $config = new EntityDefinitionConfig();
@@ -350,7 +333,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
@@ -358,11 +341,10 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         self::assertTrue($entityMetadata->hasIdentifierGenerator());
     }
 
-    public function testForExcludedField()
+    public function testForExcludedField(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $fieldName = 'testField';
@@ -395,17 +377,16 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForExcludedFieldWhenExcludedPropertiesShouldNotBeIgnored()
+    public function testForExcludedFieldWhenExcludedPropertiesShouldNotBeIgnored(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = true;
         $targetAction = 'testAction';
 
         $fieldName = 'testField';
@@ -445,17 +426,16 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            true,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForIgnoredField()
+    public function testForIgnoredField(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $fieldName = 'testField';
@@ -488,17 +468,16 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForField()
+    public function testForField(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $fieldName = 'testField';
@@ -537,17 +516,16 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForRenamedField()
+    public function testForRenamedField(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $fieldName = 'testField';
@@ -588,17 +566,16 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForUnknownField()
+    public function testForUnknownField(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $config->addField('unknownField');
@@ -629,17 +606,16 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForMetaProperty()
+    public function testForMetaProperty(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $fieldName = 'testField';
@@ -679,17 +655,16 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForExcludedMetaProperty()
+    public function testForExcludedMetaProperty(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $fieldName = 'testField';
@@ -723,17 +698,16 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForRenamedMetaProperty()
+    public function testForRenamedMetaProperty(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $fieldName = 'testField';
@@ -775,17 +749,16 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForUnknownMetaProperty()
+    public function testForUnknownMetaProperty(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $field = $config->addField('unknownField');
@@ -817,17 +790,16 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForAssociation()
+    public function testForAssociation(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $associationName = 'testAssociation';
@@ -866,17 +838,16 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForExcludedAssociation()
+    public function testForExcludedAssociation(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $associationName = 'testAssociation';
@@ -909,17 +880,16 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForRenamedAssociation()
+    public function testForRenamedAssociation(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $associationName = 'testAssociation';
@@ -960,17 +930,16 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForUnknownAssociation()
+    public function testForUnknownAssociation(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $config->addField('unknownAssociation');
@@ -1001,17 +970,16 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForAssociationDoesNotExistInEntityAndConfiguredByTargetClassAndTargetType()
+    public function testForAssociationDoesNotExistInEntityAndConfiguredByTargetClassAndTargetType(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $associationName = 'testAssociation';
@@ -1053,17 +1021,16 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForAssociationThatIsFieldInEntityAndConfiguredByTargetClassAndTargetType()
+    public function testForAssociationThatIsFieldInEntityAndConfiguredByTargetClassAndTargetType(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $associationName = 'testAssociation';
@@ -1107,17 +1074,16 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForAdditionalPropertyWithoutDataType()
+    public function testForAdditionalPropertyWithoutDataType(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $fieldName = 'testField';
@@ -1157,17 +1123,16 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForExcludedAdditionalProperty()
+    public function testForExcludedAdditionalProperty(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $fieldName = 'testField';
@@ -1209,17 +1174,16 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForExcludedAdditionalPropertyWhenExcludedPropertiesShouldNotBeIgnored()
+    public function testForExcludedAdditionalPropertyWhenExcludedPropertiesShouldNotBeIgnored(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = true;
         $targetAction = 'testAction';
 
         $fieldName = 'testField';
@@ -1260,17 +1224,16 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            true,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForAdditionalMetaProperty()
+    public function testForAdditionalMetaProperty(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $fieldName = 'testField';
@@ -1310,17 +1273,16 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForAdditionalFieldProperty()
+    public function testForAdditionalFieldProperty(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $fieldName = 'testField';
@@ -1360,17 +1322,16 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForAdditionalAssociationProperty()
+    public function testForAdditionalAssociationProperty(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $associationName = 'testAssociation';
@@ -1412,17 +1373,16 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForAdditionalNestedObjectProperty()
+    public function testForAdditionalNestedObjectProperty(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $fieldName = 'testField';
@@ -1458,24 +1418,23 @@ class EntityMetadataLoaderTest extends LoaderTestCase
                 $entityClass,
                 $fieldName,
                 self::identicalTo($field),
-                $withExcludedProperties,
+                false,
                 $targetAction
             );
 
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForAdditionalNestedAssociationProperty()
+    public function testForAdditionalNestedAssociationProperty(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $fieldName = 'testField';
@@ -1510,24 +1469,23 @@ class EntityMetadataLoaderTest extends LoaderTestCase
                 $entityClass,
                 $fieldName,
                 self::identicalTo($field),
-                $withExcludedProperties,
+                false,
                 $targetAction
             );
 
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
     }
 
-    public function testForFieldWithConfiguredDirection()
+    public function testForFieldWithConfiguredDirection(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $fieldName = 'testField';
@@ -1569,7 +1527,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
@@ -1577,11 +1535,10 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         self::assertTrue($fieldMetadata->isOutput());
     }
 
-    public function testForMetaPropertyWithConfiguredDirection()
+    public function testForMetaPropertyWithConfiguredDirection(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $fieldName = 'testField';
@@ -1624,7 +1581,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
@@ -1632,11 +1589,10 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         self::assertTrue($propertyMetadata->isOutput());
     }
 
-    public function testForAssociationWithConfiguredDirection()
+    public function testForAssociationWithConfiguredDirection(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $associationName = 'testAssociation';
@@ -1678,7 +1634,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
@@ -1686,11 +1642,10 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         self::assertTrue($associationMetadata->isOutput());
     }
 
-    public function testForFieldDoesNotExistInEntityAndConfiguredDirection()
+    public function testForFieldDoesNotExistInEntityAndConfiguredDirection(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $fieldName = 'testField';
@@ -1733,7 +1688,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
@@ -1741,11 +1696,10 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         self::assertTrue($fieldMetadata->isOutput());
     }
 
-    public function testForMetaPropertyDoesNotExistInEntityAndConfiguredDirection()
+    public function testForMetaPropertyDoesNotExistInEntityAndConfiguredDirection(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $fieldName = 'testField';
@@ -1788,7 +1742,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
@@ -1796,11 +1750,10 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         self::assertTrue($propertyMetadata->isOutput());
     }
 
-    public function testForAssociationDoesNotExistInEntityAndConfiguredDirection()
+    public function testForAssociationDoesNotExistInEntityAndConfiguredDirection(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $associationName = 'testAssociation';
@@ -1845,7 +1798,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
@@ -1853,11 +1806,10 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         self::assertTrue($associationMetadata->isOutput());
     }
 
-    public function testForNestedObjectPropertyWithConfiguredDirection()
+    public function testForNestedObjectPropertyWithConfiguredDirection(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $fieldName = 'testField';
@@ -1895,7 +1847,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
                 $entityClass,
                 $fieldName,
                 self::identicalTo($field),
-                $withExcludedProperties,
+                false,
                 $targetAction
             )
             ->willReturn($associationMetadata);
@@ -1903,7 +1855,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
@@ -1911,11 +1863,10 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         self::assertTrue($associationMetadata->isOutput());
     }
 
-    public function testForNestedAssociationPropertyWithConfiguredDirection()
+    public function testForNestedAssociationPropertyWithConfiguredDirection(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $fieldName = 'testField';
@@ -1952,7 +1903,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
                 $entityClass,
                 $fieldName,
                 self::identicalTo($field),
-                $withExcludedProperties,
+                false,
                 $targetAction
             )
             ->willReturn($associationMetadata);
@@ -1960,7 +1911,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);
@@ -1968,12 +1919,11 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         self::assertTrue($associationMetadata->isOutput());
     }
 
-    public function testForEntityWithHints()
+    public function testForEntityWithHints(): void
     {
         $entityClass = 'Test\Class';
         $config = new EntityDefinitionConfig();
         $config->addHint('HINT_TEST');
-        $withExcludedProperties = false;
         $targetAction = 'testAction';
 
         $fieldName = 'testField';
@@ -2013,7 +1963,7 @@ class EntityMetadataLoaderTest extends LoaderTestCase
         $result = $this->entityMetadataLoader->loadEntityMetadata(
             $entityClass,
             $config,
-            $withExcludedProperties,
+            false,
             $targetAction
         );
         self::assertSame($entityMetadata, $result);

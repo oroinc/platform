@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Provider\CombinedConfigBag;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 use Oro\Component\Config\CumulativeResourceManager;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -23,7 +24,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
+class OroApiExtensionTest extends TestCase
 {
     #[\Override]
     protected function setUp(): void
@@ -107,7 +108,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
      * @dataProvider environmentDataProvider
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testLoadApiConfiguration(bool $devMode)
+    public function testLoadApiConfiguration(bool $devMode): void
     {
         $container = $this->getContainer($devMode);
         $container->set('oro_api.config_extension_registry', $this->getConfigExtensionRegistry());
@@ -268,8 +269,9 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
      * @dataProvider environmentDataProvider
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testLoadApiConfigurationWithSeveralTypesOfConfigFilesInAdditionalToDefaultConfigFile(bool $devMode)
-    {
+    public function testLoadApiConfigurationWithSeveralTypesOfConfigFilesInAdditionalToDefaultConfigFile(
+        bool $devMode
+    ): void {
         $container = $this->getContainer($devMode);
         $container->set('oro_api.config_extension_registry', $this->getConfigExtensionRegistry());
 
@@ -592,7 +594,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
      * @dataProvider environmentDataProvider
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testLoadApiConfigurationShouldBeSortedByRequestType(bool $devMode)
+    public function testLoadApiConfigurationShouldBeSortedByRequestType(bool $devMode): void
     {
         $container = $this->getContainer($devMode);
         $container->set('oro_api.config_extension_registry', $this->getConfigExtensionRegistry());
@@ -918,7 +920,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
      * @dataProvider environmentDataProvider
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testLoadApiConfigurationForConfigWithSeveralConfigFiles(bool $devMode)
+    public function testLoadApiConfigurationForConfigWithSeveralConfigFiles(bool $devMode): void
     {
         $container = $this->getContainer($devMode);
         $container->set('oro_api.config_extension_registry', $this->getConfigExtensionRegistry());
@@ -1252,7 +1254,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoadApiConfigurationShouldThrowExceptionIfExistSeveralConfigurationsWithSameRequestType()
+    public function testLoadApiConfigurationShouldThrowExceptionIfExistSeveralConfigurationsWithSameRequestType(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
@@ -1279,7 +1281,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->load([$config], $container);
     }
 
-    public function testLoadApiConfigurationShouldThrowExceptionIfExistConfigurationsWithSameRequestTypeAsDefaultOne()
+    public function testLoadApiConfigShouldThrowExceptionIfExistConfigurationsWithSameRequestTypeAsDefaultOne(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
@@ -1306,7 +1308,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->load([$config], $container);
     }
 
-    public function testLoadFilterDisallowDataTypes()
+    public function testLoadFilterDisallowDataTypes(): void
     {
         $container = $this->getContainer();
 
@@ -1336,7 +1338,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testRegisterDefaultConfigParameters()
+    public function testRegisterDefaultConfigParameters(): void
     {
         $container = $this->getContainer();
 
@@ -1364,7 +1366,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $container->getDefinition('oro_api.cache_manager')->getArgument(0));
     }
 
-    public function testRegisterConfigParameters()
+    public function testRegisterConfigParameters(): void
     {
         $container = $this->getContainer();
 
@@ -1430,7 +1432,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testZeroMaxEntitiesLimit()
+    public function testZeroMaxEntitiesLimit(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
@@ -1441,7 +1443,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->load([['max_entities' => 0]], $this->getContainer());
     }
 
-    public function testConfigurationForEmptyCors()
+    public function testConfigurationForEmptyCors(): void
     {
         $container = $this->getContainer();
 
@@ -1458,7 +1460,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $corsSettingsDef->getArgument(4));
     }
 
-    public function testConfigurationForCors()
+    public function testConfigurationForCors(): void
     {
         $container = $this->getContainer();
 
@@ -1501,7 +1503,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testConfigurationForApiDocViews()
+    public function testConfigurationForApiDocViews(): void
     {
         $container = $this->getContainer();
 
@@ -1621,7 +1623,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConfigurationForDefaultApiDocCache()
+    public function testConfigurationForDefaultApiDocCache(): void
     {
         $container = $this->getContainer();
 
@@ -1638,7 +1640,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConfigurationForApiDocCache()
+    public function testConfigurationForApiDocCache(): void
     {
         $container = $this->getContainer();
 
@@ -1670,7 +1672,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConfigurationForDefaultFeatureDependedFirewalls()
+    public function testConfigurationForDefaultFeatureDependedFirewalls(): void
     {
         $container = $this->getContainer();
 
@@ -1681,7 +1683,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $apiConfig['api_firewalls']);
     }
 
-    public function testConfigurationForFeatureDependedFirewalls()
+    public function testConfigurationForFeatureDependedFirewalls(): void
     {
         $container = $this->getContainer();
 
@@ -1750,7 +1752,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testDefaultBatchApiConfiguration()
+    public function testDefaultBatchApiConfiguration(): void
     {
         $container = $this->getContainer();
 
@@ -1782,7 +1784,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testBatchApiConfiguration()
+    public function testBatchApiConfiguration(): void
     {
         $container = $this->getContainer();
 
@@ -1901,7 +1903,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testBatchApiConfigurationWithNotIntegerValueForEntityChunkSize()
+    public function testBatchApiConfigurationWithNotIntegerValueForEntityChunkSize(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(
@@ -1925,7 +1927,7 @@ class OroApiExtensionTest extends \PHPUnit\Framework\TestCase
         $extension->load($configs, $container);
     }
 
-    public function testBatchApiConfigurationWithNotIntegerValueForIncludedEntityChunkSize()
+    public function testBatchApiConfigurationWithNotIntegerValueForIncludedEntityChunkSize(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage(

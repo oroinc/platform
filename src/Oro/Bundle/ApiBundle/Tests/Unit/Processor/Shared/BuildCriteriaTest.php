@@ -19,8 +19,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelated
 
 class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
 {
-    /** @var BuildCriteria */
-    private $processor;
+    private BuildCriteria $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -39,7 +38,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
         return $filter;
     }
 
-    public function testProcessWhenQueryIsAlreadyBuilt()
+    public function testProcessWhenQueryIsAlreadyBuilt(): void
     {
         $qb = $this->createMock(QueryBuilder::class);
 
@@ -49,14 +48,14 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
         self::assertSame($qb, $this->context->getQuery());
     }
 
-    public function testProcessWhenCriteriaObjectDoesNotExist()
+    public function testProcessWhenCriteriaObjectDoesNotExist(): void
     {
         $this->processor->process($this->context);
 
         self::assertFalse($this->context->hasQuery());
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $this->context->getFilterValues()->set(
             'filter[label]',
@@ -86,7 +85,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    public function testProcessShouldApplyFiltersInCorrectOrder()
+    public function testProcessShouldApplyFiltersInCorrectOrder(): void
     {
         $this->context->getFilterValues()->set(
             'filter[label]',
@@ -116,7 +115,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    public function testProcessForUnknownFilter()
+    public function testProcessForUnknownFilter(): void
     {
         $this->context->getFilterValues()->set(
             'filter[name]',
@@ -131,7 +130,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    public function testProcessWhenApplyFilterFailed()
+    public function testProcessWhenApplyFilterFailed(): void
     {
         $this->context->getFilterValues()->set(
             'filter[name]',
@@ -162,7 +161,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    public function testProcessWhenApplyPredefinedFilterFailed()
+    public function testProcessWhenApplyPredefinedFilterFailed(): void
     {
         $this->context->getFilterValues()->set(
             'someFilter',
@@ -191,7 +190,7 @@ class BuildCriteriaTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    public function testProcessFilterWithDefaultValue()
+    public function testProcessFilterWithDefaultValue(): void
     {
         $filter = new PageSizeFilter(DataType::INTEGER);
         $filter->setDefaultValue(5);

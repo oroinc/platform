@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Rest\RestDocumentBuilder;
 use Oro\Bundle\ApiBundle\Tests\Unit\Request\DocumentBuilderTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -20,11 +21,8 @@ use Psr\Log\LoggerInterface;
  */
 class RestDocumentBuilderTest extends DocumentBuilderTestCase
 {
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var RestDocumentBuilder */
-    private $documentBuilder;
+    private LoggerInterface&MockObject $logger;
+    private RestDocumentBuilder $documentBuilder;
 
     #[\Override]
     protected function setUp(): void
@@ -39,7 +37,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testSetDataObjectWithoutMetadata()
+    public function testSetDataObjectWithoutMetadata(): void
     {
         $object = [
             'id' => 123,
@@ -56,7 +54,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testSetDataObjectWithoutMetadataAndWithObjectType()
+    public function testSetDataObjectWithoutMetadataAndWithObjectType(): void
     {
         $object = [
             'id' => 123,
@@ -75,7 +73,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testSetDataCollectionWithoutMetadata()
+    public function testSetDataCollectionWithoutMetadata(): void
     {
         $object = [
             'id' => 123,
@@ -94,7 +92,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testSetDataCollectionWithoutMetadataAndWithObjectType()
+    public function testSetDataCollectionWithoutMetadataAndWithObjectType(): void
     {
         $object = [
             'id' => 123,
@@ -115,7 +113,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testSetDataCollectionOfScalarsWithoutMetadata()
+    public function testSetDataCollectionOfScalarsWithoutMetadata(): void
     {
         $this->documentBuilder->setDataCollection(['val1', null, 'val3'], $this->requestType, null);
         self::assertEquals(
@@ -124,7 +122,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testSetDataObjectWithMetadata()
+    public function testSetDataObjectWithMetadata(): void
     {
         $object = [
             'id' => 123,
@@ -179,7 +177,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testSetDataCollectionWithMetadata()
+    public function testSetDataCollectionWithMetadata(): void
     {
         $object = [
             'id' => 123,
@@ -236,7 +234,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testSetDataObjectWithLinks()
+    public function testSetDataObjectWithLinks(): void
     {
         $object = [
             'code' => 123,
@@ -284,7 +282,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testSetDataCollectionWithLinks()
+    public function testSetDataCollectionWithLinks(): void
     {
         $object = [
             'code' => 123,
@@ -334,7 +332,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testSetDataCollectionOfScalarsWithMetadata()
+    public function testSetDataCollectionOfScalarsWithMetadata(): void
     {
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
         $metadata->addField($this->createFieldMetadata('id'));
@@ -347,7 +345,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testAssociationWithInheritance()
+    public function testAssociationWithInheritance(): void
     {
         $object = [
             'id' => 123,
@@ -390,7 +388,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testAssociationWithInheritanceAndSomeInheritedEntitiesDoNotHaveAlias()
+    public function testAssociationWithInheritanceAndSomeInheritedEntitiesDoNotHaveAlias(): void
     {
         $object = [
             'id' => 123,
@@ -433,7 +431,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testMissingAssociationsAsFields()
+    public function testMissingAssociationsAsFields(): void
     {
         $object = [
             'id' => 123
@@ -461,7 +459,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @dataProvider toOneAssociationAsFieldProvider
      */
-    public function testToOneAssociationAsField(array|int|null $value, array|int|null $expected)
+    public function testToOneAssociationAsField(array|int|null $value, array|int|null $expected): void
     {
         $object = [
             'id' => 123,
@@ -509,7 +507,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @dataProvider toManyAssociationAsFieldProvider
      */
-    public function testToManyAssociationAsField(?array $value, array $expected)
+    public function testToManyAssociationAsField(?array $value, array $expected): void
     {
         $object = [
             'id' => 123,
@@ -561,7 +559,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @dataProvider toOneAssociationAsFieldForIdFieldsOnlyProvider
      */
-    public function testToOneAssociationAsFieldForIdFieldsOnly(array|int|null $value, array|int|null $expected)
+    public function testToOneAssociationAsFieldForIdFieldsOnly(array|int|null $value, array|int|null $expected): void
     {
         $object = [
             'id' => 123,
@@ -598,7 +596,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @dataProvider toManyAssociationAsFieldForIdFieldsOnlyProvider
      */
-    public function testToManyAssociationAsFieldForIdFieldsOnly(?array $value, array $expected)
+    public function testToManyAssociationAsFieldForIdFieldsOnly(?array $value, array $expected): void
     {
         $object = [
             'id' => 123,
@@ -642,7 +640,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @dataProvider toOneCollapsedAssociationAsFieldProvider
      */
-    public function testToOneCollapsedAssociationAsField(array|string|null $value, ?string $expected)
+    public function testToOneCollapsedAssociationAsField(array|string|null $value, ?string $expected): void
     {
         $object = [
             'id' => 123,
@@ -688,7 +686,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
     /**
      * @dataProvider toManyCollapsedAssociationAsFieldProvider
      */
-    public function testToManyCollapsedAssociationAsField(?array $value, array $expected)
+    public function testToManyCollapsedAssociationAsField(?array $value, array $expected): void
     {
         $object = [
             'id' => 123,
@@ -735,7 +733,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         ];
     }
 
-    public function testNestedAssociationAsArrayAttribute()
+    public function testNestedAssociationAsArrayAttribute(): void
     {
         $object = [
             'id' => 1,
@@ -807,7 +805,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testNestedObject()
+    public function testNestedObject(): void
     {
         $object = [
             'id' => 1,
@@ -837,7 +835,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testSetErrorObject()
+    public function testSetErrorObject(): void
     {
         $error = new Error();
         $error->setStatusCode(500);
@@ -858,7 +856,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testSetErrorObjectForErrorWithMetaProperty()
+    public function testSetErrorObjectForErrorWithMetaProperty(): void
     {
         $error = new Error();
         $error->setStatusCode(500);
@@ -883,7 +881,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testSetErrorCollection()
+    public function testSetErrorCollection(): void
     {
         $error1 = new Error();
         $error1->setStatusCode(500);
@@ -917,7 +915,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testMetaPropertyWithResultName()
+    public function testMetaPropertyWithResultName(): void
     {
         $object = [
             'id' => 123,
@@ -939,7 +937,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testMetaPropertyThatNotMappedToAnyField()
+    public function testMetaPropertyThatNotMappedToAnyField(): void
     {
         $object = [
             'id' => 123,
@@ -960,7 +958,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testSetDataObjectForEntityWithoutIdentifier()
+    public function testSetDataObjectForEntityWithoutIdentifier(): void
     {
         $object = [
             'name' => 'Name',
@@ -990,7 +988,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testInputOnlyMetaProperty()
+    public function testInputOnlyMetaProperty(): void
     {
         $object = [
             'id' => 123,
@@ -1011,7 +1009,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testInputOnlyField()
+    public function testInputOnlyField(): void
     {
         $object = [
             'id' => 123,
@@ -1032,7 +1030,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testInputOnlyAssociation()
+    public function testInputOnlyAssociation(): void
     {
         $object = [
             'id' => 123,
@@ -1053,7 +1051,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testInputOnlyMetaPropertyForEntityWithoutIdentifier()
+    public function testInputOnlyMetaPropertyForEntityWithoutIdentifier(): void
     {
         $object = [
             'meta1' => 'Meta1'
@@ -1070,7 +1068,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testInputOnlyFieldForEntityWithoutIdentifier()
+    public function testInputOnlyFieldForEntityWithoutIdentifier(): void
     {
         $object = [
             'field1' => 'value1'
@@ -1087,7 +1085,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testInputOnlyAssociationForEntityWithoutIdentifier()
+    public function testInputOnlyAssociationForEntityWithoutIdentifier(): void
     {
         $object = [
             'association1' => 456
@@ -1104,7 +1102,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testAddLinksToCollectionValuedResult()
+    public function testAddLinksToCollectionValuedResult(): void
     {
         $object = [
             'id' => 1,
@@ -1157,7 +1155,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testAddLinksToSingleValuedResult()
+    public function testAddLinksToSingleValuedResult(): void
     {
         $object = [
             'id' => 1,
@@ -1208,7 +1206,7 @@ class RestDocumentBuilderTest extends DocumentBuilderTestCase
         );
     }
 
-    public function testMetadataForCollectionValuedResult()
+    public function testMetadataForCollectionValuedResult(): void
     {
         $object = [
             'id' => 1,

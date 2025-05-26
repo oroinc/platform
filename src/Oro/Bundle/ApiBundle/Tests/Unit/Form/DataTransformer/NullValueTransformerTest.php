@@ -3,15 +3,14 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\ApiBundle\Form\DataTransformer\NullValueTransformer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\DataTransformerInterface;
 
-class NullValueTransformerTest extends \PHPUnit\Framework\TestCase
+class NullValueTransformerTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DataTransformerInterface */
-    private $innerTransformer;
-
-    /** @var NullValueTransformer */
-    private $nullValueTransformer;
+    private DataTransformerInterface&MockObject $innerTransformer;
+    private NullValueTransformer $nullValueTransformer;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class NullValueTransformerTest extends \PHPUnit\Framework\TestCase
         $this->nullValueTransformer = new NullValueTransformer($this->innerTransformer);
     }
 
-    public function testInnerTransformerGetterAndSetter()
+    public function testInnerTransformerGetterAndSetter(): void
     {
         self::assertSame($this->innerTransformer, $this->nullValueTransformer->getInnerTransformer());
 
@@ -30,7 +29,7 @@ class NullValueTransformerTest extends \PHPUnit\Framework\TestCase
         self::assertSame($anotherInnerTransformer, $this->nullValueTransformer->getInnerTransformer());
     }
 
-    public function testTransformForNull()
+    public function testTransformForNull(): void
     {
         $this->innerTransformer->expects(self::never())
             ->method('transform');
@@ -38,7 +37,7 @@ class NullValueTransformerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->nullValueTransformer->transform(null));
     }
 
-    public function testTransformForNotNull()
+    public function testTransformForNotNull(): void
     {
         $value = 'test';
         $transformedValue = 'transformed';
@@ -51,7 +50,7 @@ class NullValueTransformerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($transformedValue, $this->nullValueTransformer->transform($value));
     }
 
-    public function testReverseTransformForNull()
+    public function testReverseTransformForNull(): void
     {
         $transformedValue = 'transformed';
 
@@ -63,7 +62,7 @@ class NullValueTransformerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($transformedValue, $this->nullValueTransformer->reverseTransform(null));
     }
 
-    public function testReverseTransformForEmptyString()
+    public function testReverseTransformForEmptyString(): void
     {
         $transformedValue = 'transformed';
 
@@ -75,7 +74,7 @@ class NullValueTransformerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($transformedValue, $this->nullValueTransformer->reverseTransform(''));
     }
 
-    public function testReverseTransformWhenInnerTransformerReturnsNullAndInputValueIsEmptyString()
+    public function testReverseTransformWhenInnerTransformerReturnsNullAndInputValueIsEmptyString(): void
     {
         $this->innerTransformer->expects(self::once())
             ->method('reverseTransform')
@@ -85,7 +84,7 @@ class NullValueTransformerTest extends \PHPUnit\Framework\TestCase
         self::assertSame('', $this->nullValueTransformer->reverseTransform(''));
     }
 
-    public function testReverseTransformWhenInnerTransformerReturnsNullButInputValueIsNotEmptyString()
+    public function testReverseTransformWhenInnerTransformerReturnsNullButInputValueIsNotEmptyString(): void
     {
         $value = 'test';
 
@@ -97,7 +96,7 @@ class NullValueTransformerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->nullValueTransformer->reverseTransform($value));
     }
 
-    public function testReverseTransformForNotNullAndNotEmptyString()
+    public function testReverseTransformForNotNullAndNotEmptyString(): void
     {
         $value = 'test';
         $transformedValue = 'transformed';

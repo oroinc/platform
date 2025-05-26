@@ -6,11 +6,11 @@ use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\PageSizeFilter;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
+use PHPUnit\Framework\TestCase;
 
-class FilterCollectionTest extends \PHPUnit\Framework\TestCase
+class FilterCollectionTest extends TestCase
 {
-    /** @var FilterCollection */
-    private $filterCollection;
+    private FilterCollection $filterCollection;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class FilterCollectionTest extends \PHPUnit\Framework\TestCase
         $this->filterCollection = new FilterCollection();
     }
 
-    public function testActions()
+    public function testActions(): void
     {
         self::assertCount(0, $this->filterCollection);
         self::assertTrue($this->filterCollection->isEmpty());
@@ -70,7 +70,7 @@ class FilterCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->filterCollection->offsetExists('[filter][sort]'));
     }
 
-    public function testDefaultGroup()
+    public function testDefaultGroup(): void
     {
         self::assertNull($this->filterCollection->getDefaultGroupName());
 

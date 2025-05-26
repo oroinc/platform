@@ -4,17 +4,15 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig;
 
 use Oro\Bundle\ApiBundle\Processor\GetConfig\SetMaxRelatedEntities;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var SetMaxRelatedEntities */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private SetMaxRelatedEntities $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +26,7 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForEmptyConfig()
+    public function testProcessForEmptyConfig(): void
     {
         $config = [];
 
@@ -42,7 +40,7 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
         $this->assertConfig([], $configObject);
     }
 
-    public function testProcessForNotCompletedConfig()
+    public function testProcessForNotCompletedConfig(): void
     {
         $config = [
             'fields' => [
@@ -67,7 +65,7 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWithoutLimit()
+    public function testProcessWithoutLimit(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -101,7 +99,7 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForNotManageableEntityWithoutTargetOptions()
+    public function testProcessForNotManageableEntityWithoutTargetOptions(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -139,7 +137,7 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessForNotManageableEntity(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -221,7 +219,7 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForNotManageableEntityWithParentToOneAndChildToMany()
+    public function testProcessForNotManageableEntityWithParentToOneAndChildToMany(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -285,7 +283,7 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForNotManageableEntityWhenToMayAssociationShouldBeRepresentedAsField()
+    public function testProcessForNotManageableEntityWhenToMayAssociationShouldBeRepresentedAsField(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -332,7 +330,7 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForManageableEntityWhenToMayAssociationShouldBeRepresentedAsField()
+    public function testProcessForManageableEntityWhenToMayAssociationShouldBeRepresentedAsField(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -399,7 +397,7 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessForManageableEntityWithToManyAssociations()
+    public function testProcessForManageableEntityWithToManyAssociations(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -504,7 +502,7 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForManageableEntityWithParentToOneAndChildToMany()
+    public function testProcessForManageableEntityWithParentToOneAndChildToMany(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -598,7 +596,7 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessForManageableEntityAndAssociationsWithPropertyPath()
+    public function testProcessForManageableEntityAndAssociationsWithPropertyPath(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -694,7 +692,7 @@ class SetMaxRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForManageableEntityAndAssociationsWithPropertyPathToChildEntity()
+    public function testProcessForManageableEntityAndAssociationsWithPropertyPathToChildEntity(): void
     {
         $config = [
             'exclusion_policy' => 'all',

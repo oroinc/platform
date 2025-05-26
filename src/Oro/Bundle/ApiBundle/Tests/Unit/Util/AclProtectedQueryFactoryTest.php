@@ -13,17 +13,13 @@ use Oro\Bundle\ApiBundle\Util\QueryModifierRegistry;
 use Oro\Component\EntitySerializer\DoctrineHelper;
 use Oro\Component\EntitySerializer\EntityConfig;
 use Oro\Component\EntitySerializer\QueryResolver;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class AclProtectedQueryFactoryTest extends OrmRelatedTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|QueryResolver */
-    private $queryResolver;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|QueryModifierRegistry */
-    private $queryModifier;
-
-    /** @var AclProtectedQueryFactory */
-    private $queryFactory;
+    private QueryResolver&MockObject $queryResolver;
+    private QueryModifierRegistry&MockObject $queryModifier;
+    private AclProtectedQueryFactory $queryFactory;
 
     #[\Override]
     protected function setUp(): void

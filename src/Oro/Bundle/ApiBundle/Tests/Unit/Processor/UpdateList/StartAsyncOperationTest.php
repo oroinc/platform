@@ -10,17 +10,13 @@ use Oro\Bundle\MessageQueueBundle\Client\BufferedMessageProducer;
 use Oro\Component\MessageQueue\Client\Message;
 use Oro\Component\MessageQueue\Client\MessagePriority;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class StartAsyncOperationTest extends UpdateListProcessorTestCase
 {
-    /** @var MessageProducerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $producer;
-
-    /** @var ChunkSizeProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $chunkSizeProvider;
-
-    /** @var SyncProcessingLimitProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $syncProcessingLimitProvider;
+    private MessageProducerInterface&MockObject $producer;
+    private ChunkSizeProvider&MockObject $chunkSizeProvider;
+    private SyncProcessingLimitProvider&MockObject $syncProcessingLimitProvider;
 
     #[\Override]
     protected function setUp(): void

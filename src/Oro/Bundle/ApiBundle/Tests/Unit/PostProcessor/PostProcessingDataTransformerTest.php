@@ -4,10 +4,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\PostProcessor;
 
 use Oro\Bundle\ApiBundle\PostProcessor\PostProcessingDataTransformer;
 use Oro\Bundle\ApiBundle\PostProcessor\PostProcessorInterface;
+use PHPUnit\Framework\TestCase;
 
-class PostProcessingDataTransformerTest extends \PHPUnit\Framework\TestCase
+class PostProcessingDataTransformerTest extends TestCase
 {
-    public function testTransform()
+    public function testTransform(): void
     {
         $postProcessor = $this->createMock(PostProcessorInterface::class);
         $postProcessorOptions = ['key' => 'value'];

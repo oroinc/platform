@@ -16,21 +16,15 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorOrmRelatedTestCase
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Component\ChainProcessor\ParameterBag;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class LoadEntityByDataLoaderTest extends GetProcessorOrmRelatedTestCase
 {
-    /** @var DataLoaderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $dataLoader;
-
-    /** @var EntityClassResolver|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityClassResolver;
-
-    /** @var QueryHintResolverInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $queryHintResolver;
-
-    /** @var LoadEntityByDataLoader */
-    private $processor;
+    private DataLoaderInterface&MockObject $dataLoader;
+    private EntityClassResolver&MockObject $entityClassResolver;
+    private QueryHintResolverInterface&MockObject $queryHintResolver;
+    private LoadEntityByDataLoader $processor;
 
     #[\Override]
     protected function setUp(): void

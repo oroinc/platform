@@ -15,7 +15,7 @@ class HasAdderAndRemoverValidatorTest extends ConstraintValidatorTestCase
         return new HasAdderAndRemoverValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(
             null,
@@ -25,7 +25,7 @@ class HasAdderAndRemoverValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testHasAdderAndRemover()
+    public function testHasAdderAndRemover(): void
     {
         $constraint = new HasAdderAndRemover([
             'class'    => Entity\User::class,
@@ -37,7 +37,7 @@ class HasAdderAndRemoverValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testNoAdderAndRemover()
+    public function testNoAdderAndRemover(): void
     {
         $constraint = new HasAdderAndRemover([
             'class'    => Entity\EntityWithoutGettersAndSetters::class,
@@ -55,7 +55,7 @@ class HasAdderAndRemoverValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testNoAdderAndRemoverButSeveralPairsPossible()
+    public function testNoAdderAndRemoverButSeveralPairsPossible(): void
     {
         $constraint = new HasAdderAndRemover([
             'class'    => Entity\EntityWithoutGettersAndSetters::class,

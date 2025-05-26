@@ -12,8 +12,7 @@ use Oro\Bundle\ApiBundle\Util\EntityMapper;
 
 class ConvertModelToEntityTest extends BatchUpdateProcessorTestCase
 {
-    /** @var ConvertModelToEntity */
-    private $processor;
+    private ConvertModelToEntity $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -23,12 +22,12 @@ class ConvertModelToEntityTest extends BatchUpdateProcessorTestCase
         $this->processor = new ConvertModelToEntity();
     }
 
-    public function testProcessWhenNoBatchItems()
+    public function testProcessWhenNoBatchItems(): void
     {
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenHasErrors()
+    public function testProcessWhenHasErrors(): void
     {
         $item = $this->createMock(BatchUpdateItem::class);
         $itemContext = $this->createMock(BatchUpdateItemContext::class);
@@ -45,7 +44,7 @@ class ConvertModelToEntityTest extends BatchUpdateProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenNoTargetContext()
+    public function testProcessWhenNoTargetContext(): void
     {
         $item = $this->createMock(BatchUpdateItem::class);
         $itemContext = $this->createMock(BatchUpdateItemContext::class);
@@ -63,7 +62,7 @@ class ConvertModelToEntityTest extends BatchUpdateProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenNoModel()
+    public function testProcessWhenNoModel(): void
     {
         $item = $this->createMock(BatchUpdateItem::class);
         $itemContext = $this->createMock(BatchUpdateItemContext::class);
@@ -93,7 +92,7 @@ class ConvertModelToEntityTest extends BatchUpdateProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenNoEntityMapper()
+    public function testProcessWhenNoEntityMapper(): void
     {
         $item = $this->createMock(BatchUpdateItem::class);
         $itemContext = $this->createMock(BatchUpdateItemContext::class);
@@ -124,7 +123,7 @@ class ConvertModelToEntityTest extends BatchUpdateProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenModelShouldBeConvertedToEntity()
+    public function testProcessWhenModelShouldBeConvertedToEntity(): void
     {
         $entityClass = Entity\User::class;
         $model = new \stdClass();
@@ -168,7 +167,7 @@ class ConvertModelToEntityTest extends BatchUpdateProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenModelShouldBeConvertedToEntityForApiResourceBasedOnManageableEntity()
+    public function testProcessWhenModelShouldBeConvertedToEntityForApiResourceBasedOnManageableEntity(): void
     {
         $entityClass = Entity\UserProfile::class;
         $parentResourceClass = Entity\User::class;

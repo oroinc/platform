@@ -17,10 +17,9 @@ use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class SetDefaultPagingTest extends GetListProcessorTestCase
 {
-    private const DEFAULT_PAGE_SIZE = 10;
+    private const int DEFAULT_PAGE_SIZE = 10;
 
-    /** @var SetDefaultPaging */
-    private $processor;
+    private SetDefaultPaging $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -45,7 +44,7 @@ class SetDefaultPagingTest extends GetListProcessorTestCase
         );
     }
 
-    public function testProcessWhenQueryIsAlreadyExist()
+    public function testProcessWhenQueryIsAlreadyExist(): void
     {
         $qb = $this->createMock(QueryBuilder::class);
 
@@ -55,7 +54,7 @@ class SetDefaultPagingTest extends GetListProcessorTestCase
         self::assertSame($qb, $this->context->getQuery());
     }
 
-    public function testProcessWithDefaultPaging()
+    public function testProcessWithDefaultPaging(): void
     {
         $this->context->getRequestType()->add(RequestType::JSON_API);
         $this->context->setConfig(new EntityDefinitionConfig());
@@ -76,7 +75,7 @@ class SetDefaultPagingTest extends GetListProcessorTestCase
         self::assertEquals(['page[size]', 'page[number]'], array_keys($filters->all()));
     }
 
-    public function testProcessWhenPagingFiltersAlreadyExist()
+    public function testProcessWhenPagingFiltersAlreadyExist(): void
     {
         $customDefaultPageSize = 5;
         $this->context->getFilters()->add(
@@ -109,7 +108,7 @@ class SetDefaultPagingTest extends GetListProcessorTestCase
         self::assertEquals(['page[size]', 'page[number]'], array_keys($filters->all()));
     }
 
-    public function testProcessWhenPageSizeExistsInConfig()
+    public function testProcessWhenPageSizeExistsInConfig(): void
     {
         $config = new EntityDefinitionConfig();
         $config->setPageSize(123);
@@ -133,7 +132,7 @@ class SetDefaultPagingTest extends GetListProcessorTestCase
         self::assertEquals(['page[size]', 'page[number]'], array_keys($filters->all()));
     }
 
-    public function testProcessWhenPagingIsDisabled()
+    public function testProcessWhenPagingIsDisabled(): void
     {
         $config = new EntityDefinitionConfig();
         $config->setPageSize(-1);

@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
+use PHPUnit\Framework\TestCase;
 
-class FilterValueTest extends \PHPUnit\Framework\TestCase
+class FilterValueTest extends TestCase
 {
-    public function testPath()
+    public function testPath(): void
     {
         $filterValue = new FilterValue('path', 'value', 'operator');
 
@@ -15,7 +16,7 @@ class FilterValueTest extends \PHPUnit\Framework\TestCase
         self::assertSame('path2', $filterValue->getPath());
     }
 
-    public function testValue()
+    public function testValue(): void
     {
         $filterValue = new FilterValue('path', 'value', 'operator');
 
@@ -28,7 +29,7 @@ class FilterValueTest extends \PHPUnit\Framework\TestCase
         self::assertSame(['value1', 'value2'], $filterValue->getValue());
     }
 
-    public function testOperator()
+    public function testOperator(): void
     {
         $filterValue = new FilterValue('path', 'value', 'operator');
 
@@ -37,14 +38,14 @@ class FilterValueTest extends \PHPUnit\Framework\TestCase
         self::assertSame('operator2', $filterValue->getOperator());
     }
 
-    public function testDefaultOperator()
+    public function testDefaultOperator(): void
     {
         $filterValue = new FilterValue('path', 'value');
 
         self::assertNull($filterValue->getOperator());
     }
 
-    public function testFilterValueCreatedWithSourceKeyAndValue()
+    public function testFilterValueCreatedWithSourceKeyAndValue(): void
     {
         $filterValue = FilterValue::createFromSource('src_key', 'path', 'value', 'operator');
 
@@ -55,7 +56,7 @@ class FilterValueTest extends \PHPUnit\Framework\TestCase
         self::assertSame('operator', $filterValue->getOperator());
     }
 
-    public function testFilterValueCreatedWithoutSourceKeyAndValue()
+    public function testFilterValueCreatedWithoutSourceKeyAndValue(): void
     {
         $filterValue = new FilterValue('path', 'value', 'operator');
 

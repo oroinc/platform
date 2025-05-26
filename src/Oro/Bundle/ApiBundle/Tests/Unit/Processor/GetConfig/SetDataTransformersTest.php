@@ -10,21 +10,15 @@ use Oro\Bundle\ApiBundle\PostProcessor\PostProcessorRegistry;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\SetDataTransformers;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\EntitySerializer\DataTransformerInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\DataTransformerInterface as FormDataTransformerInterface;
 
 class SetDataTransformersTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DataTransformerRegistry */
-    private $dataTransformerRegistry;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|PostProcessorRegistry */
-    private $postProcessorRegistry;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var SetDataTransformers */
-    private $processor;
+    private DataTransformerRegistry&MockObject $dataTransformerRegistry;
+    private PostProcessorRegistry&MockObject $postProcessorRegistry;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private SetDataTransformers $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -42,7 +36,7 @@ class SetDataTransformersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForEmptyConfig()
+    public function testProcessForEmptyConfig(): void
     {
         $config = [];
 
@@ -57,7 +51,7 @@ class SetDataTransformersTest extends ConfigProcessorTestCase
         $this->assertConfig([], $configObject);
     }
 
-    public function testProcessForNotCompletedConfig()
+    public function testProcessForNotCompletedConfig(): void
     {
         $config = [
             'fields' => [
@@ -83,7 +77,7 @@ class SetDataTransformersTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessForNotManageableEntity(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -149,7 +143,7 @@ class SetDataTransformersTest extends ConfigProcessorTestCase
         $this->assertConfig($expectedConfig, $configObject);
     }
 
-    public function testProcessForManageableEntity()
+    public function testProcessForManageableEntity(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -235,7 +229,7 @@ class SetDataTransformersTest extends ConfigProcessorTestCase
         $this->assertConfig($expectedConfig, $configObject);
     }
 
-    public function testProcessForNotManageableEntityWithAssociation()
+    public function testProcessForNotManageableEntityWithAssociation(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -293,7 +287,7 @@ class SetDataTransformersTest extends ConfigProcessorTestCase
         $this->assertConfig($expectedConfig, $configObject);
     }
 
-    public function testProcessForManageableEntityWithAssociation()
+    public function testProcessForManageableEntityWithAssociation(): void
     {
         $config = [
             'exclusion_policy' => 'all',

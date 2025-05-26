@@ -7,8 +7,7 @@ use Oro\Bundle\ApiBundle\Batch\Processor\Update\ClearBatchItems;
 
 class ClearBatchItemsTest extends BatchUpdateProcessorTestCase
 {
-    /** @var ClearBatchItems */
-    private $processor;
+    private ClearBatchItems $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +17,7 @@ class ClearBatchItemsTest extends BatchUpdateProcessorTestCase
         $this->processor = new ClearBatchItems();
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $this->context->setBatchItems([$this->createMock(BatchUpdateItem::class)]);
         $this->processor->process($this->context);

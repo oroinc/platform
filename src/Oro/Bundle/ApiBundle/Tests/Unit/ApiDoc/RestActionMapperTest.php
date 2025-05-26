@@ -5,17 +5,17 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc;
 use Oro\Bundle\ApiBundle\ApiDoc\RestActionMapper;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\Rest\RestRoutes;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
-class RestActionMapperTest extends \PHPUnit\Framework\TestCase
+class RestActionMapperTest extends TestCase
 {
-    private const ITEM_ROUTE = 'item_route';
-    private const LIST_ROUTE = 'list_route';
-    private const SUBRESOURCE_ROUTE = 'subresource_route';
-    private const RELATIONSHIP_ROUTE = 'relationship_route';
+    private const string ITEM_ROUTE = 'item_route';
+    private const string LIST_ROUTE = 'list_route';
+    private const string SUBRESOURCE_ROUTE = 'subresource_route';
+    private const string RELATIONSHIP_ROUTE = 'relationship_route';
 
-    /** @var RestActionMapper */
-    private $actionMapper;
+    private RestActionMapper $actionMapper;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +32,7 @@ class RestActionMapperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getActionsDataProvider
      */
-    public function testGetActions(string $templateRouteName, array $expectedActions)
+    public function testGetActions(string $templateRouteName, array $expectedActions): void
     {
         self::assertEquals($expectedActions, $this->actionMapper->getActions($templateRouteName));
     }
@@ -82,12 +82,12 @@ class RestActionMapperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetActionsForUnknownRoute()
+    public function testGetActionsForUnknownRoute(): void
     {
         self::assertSame([], $this->actionMapper->getActions('unknown'));
     }
 
-    public function testGetActionsForResourcesWithoutIdentifier()
+    public function testGetActionsForResourcesWithoutIdentifier(): void
     {
         self::assertEquals(
             [
@@ -104,7 +104,7 @@ class RestActionMapperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getMethodDataProvider
      */
-    public function testGetMethod(string $action, string $expectedMethod)
+    public function testGetMethod(string $action, string $expectedMethod): void
     {
         self::assertEquals($expectedMethod, $this->actionMapper->getMethod($action));
     }
@@ -131,7 +131,7 @@ class RestActionMapperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetMethodForUnknownAction()
+    public function testGetMethodForUnknownAction(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Unsupported API action "unknown".');

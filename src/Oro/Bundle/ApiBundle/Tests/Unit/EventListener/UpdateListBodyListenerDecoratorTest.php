@@ -5,25 +5,20 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\EventListener;
 use Oro\Bundle\ApiBundle\EventListener\BodyListenerInterface;
 use Oro\Bundle\ApiBundle\EventListener\UpdateListBodyListenerDecorator;
 use Oro\Bundle\ApiBundle\Request\Rest\RestRoutes;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
-class UpdateListBodyListenerDecoratorTest extends \PHPUnit\Framework\TestCase
+class UpdateListBodyListenerDecoratorTest extends TestCase
 {
-    private const LIST_ROUTE_NAME = 'list_route';
+    private const string LIST_ROUTE_NAME = 'list_route';
 
-    /** @var Request */
-    private $request;
-
-    /** @var RequestEvent */
-    private $event;
-
-    /** @var BodyListenerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $bodyListener;
-
-    /** @var UpdateListBodyListenerDecorator */
-    private $decorator;
+    private Request $request;
+    private RequestEvent $event;
+    private BodyListenerInterface&MockObject $bodyListener;
+    private UpdateListBodyListenerDecorator $decorator;
 
     #[\Override]
     protected function setUp(): void

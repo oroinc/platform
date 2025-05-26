@@ -4,11 +4,12 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\NormalizeValue;
 
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeValueContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class NormalizeValueContextTest extends \PHPUnit\Framework\TestCase
+class NormalizeValueContextTest extends TestCase
 {
     private NormalizeValueContext $context;
 

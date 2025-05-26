@@ -47,7 +47,7 @@ class CompoundObjectTypeTest extends ApiFormTypeTestCase
         );
     }
 
-    public function testSubmitWhenNoApiContext()
+    public function testSubmitWhenNoApiContext(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('name'));
@@ -71,7 +71,7 @@ class CompoundObjectTypeTest extends ApiFormTypeTestCase
         self::assertEquals('testName', $data->getName());
     }
 
-    public function testBuildFormForField()
+    public function testBuildFormForField(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('name'));
@@ -102,7 +102,7 @@ class CompoundObjectTypeTest extends ApiFormTypeTestCase
         self::assertEquals('testName', $data->getName());
     }
 
-    public function testBuildFormForRenamedField()
+    public function testBuildFormForRenamedField(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('renamedName'))
@@ -134,7 +134,7 @@ class CompoundObjectTypeTest extends ApiFormTypeTestCase
         self::assertEquals('testName', $data->getName());
     }
 
-    public function testBuildFormForReadOnlyField()
+    public function testBuildFormForReadOnlyField(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('name'));
@@ -166,7 +166,7 @@ class CompoundObjectTypeTest extends ApiFormTypeTestCase
         self::assertNull($data->getName());
     }
 
-    public function testBuildFormForFieldWithFormType()
+    public function testBuildFormForFieldWithFormType(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('id'));
@@ -197,7 +197,7 @@ class CompoundObjectTypeTest extends ApiFormTypeTestCase
         self::assertSame(123, $data->getId());
     }
 
-    public function testBuildFormForFieldWithFormOptions()
+    public function testBuildFormForFieldWithFormOptions(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('renamedName'));
@@ -228,7 +228,7 @@ class CompoundObjectTypeTest extends ApiFormTypeTestCase
         self::assertEquals('testName', $data->getName());
     }
 
-    public function testBuildFormForIgnoredField()
+    public function testBuildFormForIgnoredField(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('name'))
@@ -260,7 +260,7 @@ class CompoundObjectTypeTest extends ApiFormTypeTestCase
         self::assertNull($data->getName());
     }
 
-    public function testBuildFormForFieldIgnoredOnlyForGetActions()
+    public function testBuildFormForFieldIgnoredOnlyForGetActions(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('name'));
@@ -292,7 +292,7 @@ class CompoundObjectTypeTest extends ApiFormTypeTestCase
         self::assertEquals('testName', $data->getName());
     }
 
-    public function testBuildFormForAssociation()
+    public function testBuildFormForAssociation(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addAssociation(new AssociationMetadata('owner'));
@@ -323,7 +323,7 @@ class CompoundObjectTypeTest extends ApiFormTypeTestCase
         self::assertNull($data->getOwner());
     }
 
-    public function testBuildFormForAssociationAsField()
+    public function testBuildFormForAssociationAsField(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addAssociation(new AssociationMetadata('owner'))->setDataType('object');
@@ -357,7 +357,7 @@ class CompoundObjectTypeTest extends ApiFormTypeTestCase
         self::assertSame('testName', $data->getOwner()->getName());
     }
 
-    public function testCreateNestedObject()
+    public function testCreateNestedObject(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
@@ -395,7 +395,7 @@ class CompoundObjectTypeTest extends ApiFormTypeTestCase
         self::assertSame('testPriceValue', $data->getPrice()->getValue());
     }
 
-    public function testCreateNestedObjectWhenValueIsNotSubmitted()
+    public function testCreateNestedObjectWhenValueIsNotSubmitted(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
@@ -433,7 +433,7 @@ class CompoundObjectTypeTest extends ApiFormTypeTestCase
         self::assertNull($data->getPrice()->getValue());
     }
 
-    public function testCreateNestedObjectWhenSubmittedDataIsEmpty()
+    public function testCreateNestedObjectWhenSubmittedDataIsEmpty(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
@@ -471,7 +471,7 @@ class CompoundObjectTypeTest extends ApiFormTypeTestCase
         self::assertNull($data->getPrice()->getValue());
     }
 
-    public function testCreateNestedObjectWhenSubmittedValueIsNull()
+    public function testCreateNestedObjectWhenSubmittedValueIsNull(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
@@ -509,7 +509,7 @@ class CompoundObjectTypeTest extends ApiFormTypeTestCase
         self::assertNull($data->getPrice()->getValue());
     }
 
-    public function testCreateNestedObjectWhenSubmittedValueIsNullAndRequiredOptionIsFalse()
+    public function testCreateNestedObjectWhenSubmittedValueIsNullAndRequiredOptionIsFalse(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
@@ -548,7 +548,7 @@ class CompoundObjectTypeTest extends ApiFormTypeTestCase
         self::assertNull($data->getNullablePrice());
     }
 
-    public function testCreateNestedObjectWhenSubmittedValueIsEmptyArray()
+    public function testCreateNestedObjectWhenSubmittedValueIsEmptyArray(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
@@ -586,7 +586,7 @@ class CompoundObjectTypeTest extends ApiFormTypeTestCase
         self::assertNull($data->getPrice()->getValue());
     }
 
-    public function testUpdateNestedObject()
+    public function testUpdateNestedObject(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
@@ -626,7 +626,7 @@ class CompoundObjectTypeTest extends ApiFormTypeTestCase
         self::assertSame('oldPriceCurrency', $data->getPrice()->getCurrency());
     }
 
-    public function testUpdateNestedObjectWhenValueIsNotSubmitted()
+    public function testUpdateNestedObjectWhenValueIsNotSubmitted(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
@@ -665,7 +665,7 @@ class CompoundObjectTypeTest extends ApiFormTypeTestCase
         self::assertSame('oldPriceCurrency', $data->getPrice()->getCurrency());
     }
 
-    public function testUpdateNestedObjectWhenSubmittedValueIsNull()
+    public function testUpdateNestedObjectWhenSubmittedValueIsNull(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
@@ -705,7 +705,7 @@ class CompoundObjectTypeTest extends ApiFormTypeTestCase
         self::assertNull($data->getPrice()->getCurrency());
     }
 
-    public function testUpdateNestedObjectWhenSubmittedValueIsEmptyArray()
+    public function testUpdateNestedObjectWhenSubmittedValueIsEmptyArray(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));

@@ -4,9 +4,10 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ApiBundle\Provider\ResourceCheckerConfigProvider;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
-class ResourceCheckerConfigProviderTest extends \PHPUnit\Framework\TestCase
+class ResourceCheckerConfigProviderTest extends TestCase
 {
     use TempDirExtension;
 

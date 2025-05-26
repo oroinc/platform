@@ -47,7 +47,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         return $metadata;
     }
 
-    public function testTransform()
+    public function testTransform(): void
     {
         $metadata = $this->getAssociationMetadata([Group::class]);
         $transformer = $this->getEntityToIdTransformer($metadata);
@@ -57,7 +57,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
     /**
      * @dataProvider reverseTransformForEmptyValueDataProvider
      */
-    public function testReverseTransformForEmptyValue(array|string|null $value)
+    public function testReverseTransformForEmptyValue(array|string|null $value): void
     {
         $metadata = $this->getAssociationMetadata([Group::class]);
         $transformer = $this->getEntityToIdTransformer($metadata);
@@ -76,7 +76,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
     /**
      * @dataProvider reverseTransformDataProvider
      */
-    public function testReverseTransform(array $value)
+    public function testReverseTransform(array $value): void
     {
         $metadata = $this->getAssociationMetadata([Group::class]);
         $transformer = $this->getEntityToIdTransformer($metadata);
@@ -110,7 +110,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         ];
     }
 
-    public function testReverseTransformForModelInheritedFromManageableEntity()
+    public function testReverseTransformForModelInheritedFromManageableEntity(): void
     {
         $this->notManageableClassNames = [UserProfile::class];
 
@@ -141,7 +141,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         self::assertEquals($value['id'], $transformResult->getId());
     }
 
-    public function testReverseTransformWhenEntityDoesNotFoundInIncludedEntity()
+    public function testReverseTransformWhenEntityDoesNotFoundInIncludedEntity(): void
     {
         $metadata = $this->getAssociationMetadata([Group::class]);
         $includedEntities = new IncludedEntityCollection();
@@ -168,7 +168,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         self::assertEquals($entity, $transformer->reverseTransform($value));
     }
 
-    public function testReverseTransformWhenEntityFoundInIncludedEntity()
+    public function testReverseTransformWhenEntityFoundInIncludedEntity(): void
     {
         $metadata = $this->getAssociationMetadata([Group::class]);
         $includedEntities = new IncludedEntityCollection();
@@ -184,7 +184,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         self::assertEquals($entity, $transformer->reverseTransform($value));
     }
 
-    public function testReverseTransformWhenEntityIsPrimaryEntity()
+    public function testReverseTransformWhenEntityIsPrimaryEntity(): void
     {
         $metadata = $this->getAssociationMetadata([Group::class]);
         $includedEntities = new IncludedEntityCollection();
@@ -201,7 +201,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         self::assertEquals($entity, $transformer->reverseTransform($value));
     }
 
-    public function testReverseTransformWhenEntityNotFound()
+    public function testReverseTransformWhenEntityNotFound(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage(
@@ -224,7 +224,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         $transformer->reverseTransform($value);
     }
 
-    public function testReverseTransformWhenEntityWithCompositeKeyNotFound()
+    public function testReverseTransformWhenEntityWithCompositeKeyNotFound(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage(sprintf(
@@ -253,7 +253,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         $transformer->reverseTransform($value);
     }
 
-    public function testReverseTransformWhenInvalidValueType()
+    public function testReverseTransformWhenInvalidValueType(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('Expected an array.');
@@ -263,7 +263,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         $transformer->reverseTransform(123);
     }
 
-    public function testReverseTransformWhenValueDoesNotHaveClass()
+    public function testReverseTransformWhenValueDoesNotHaveClass(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('Expected an array with "class" element.');
@@ -273,7 +273,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         $transformer->reverseTransform(['id' => 123]);
     }
 
-    public function testReverseTransformWhenValueDoesNotHaveId()
+    public function testReverseTransformWhenValueDoesNotHaveId(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('Expected an array with "id" element.');
@@ -283,7 +283,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         $transformer->reverseTransform(['class' => Group::class]);
     }
 
-    public function testReverseTransformWhenAnyEntityTypeShouldBeRejected()
+    public function testReverseTransformWhenAnyEntityTypeShouldBeRejected(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('There are no acceptable classes.');
@@ -294,7 +294,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         $transformer->reverseTransform(['class' => Group::class, 'id' => ['primary' => 1]]);
     }
 
-    public function testReverseTransformForNotAcceptableEntity()
+    public function testReverseTransformForNotAcceptableEntity(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage(sprintf(
@@ -310,7 +310,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         $transformer->reverseTransform(['class' => User::class, 'id' => 123]);
     }
 
-    public function testReverseTransformForNotManageableEntity()
+    public function testReverseTransformForNotManageableEntity(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage(
@@ -324,7 +324,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         $transformer->reverseTransform(['class' => Group::class, 'id' => 123]);
     }
 
-    public function testReverseTransformWhenAnyEntityTypeIsAcceptable()
+    public function testReverseTransformWhenAnyEntityTypeIsAcceptable(): void
     {
         $metadata = $this->getAssociationMetadata([]);
         $transformer = $this->getEntityToIdTransformer($metadata);
@@ -350,7 +350,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
         self::assertEquals($entity, $transformer->reverseTransform($value));
     }
 
-    public function testReverseTransformWhenDoctrineIsNotAbleToLoadEntity()
+    public function testReverseTransformWhenDoctrineIsNotAbleToLoadEntity(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage(sprintf(
@@ -369,7 +369,7 @@ class EntityToIdTransformerTest extends OrmRelatedTestCase
     /**
      * @dataProvider reverseTransformWhenIdIsNotAcceptableDataProvider
      */
-    public function testReverseTransformWhenIdIsNotAcceptable(mixed $id)
+    public function testReverseTransformWhenIdIsNotAcceptable(mixed $id): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage(

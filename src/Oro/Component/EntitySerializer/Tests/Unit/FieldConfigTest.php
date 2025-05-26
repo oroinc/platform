@@ -4,8 +4,9 @@ namespace Oro\Component\EntitySerializer\Tests\Unit;
 
 use Oro\Component\EntitySerializer\EntityConfig;
 use Oro\Component\EntitySerializer\FieldConfig;
+use PHPUnit\Framework\TestCase;
 
-class FieldConfigTest extends \PHPUnit\Framework\TestCase
+class FieldConfigTest extends TestCase
 {
     public function testCustomAttribute(): void
     {
@@ -34,7 +35,7 @@ class FieldConfigTest extends \PHPUnit\Framework\TestCase
     public function testToArray(): void
     {
         $fieldConfig = new FieldConfig();
-        $this->assertEquals([], $fieldConfig->toArray());
+        self::assertEquals([], $fieldConfig->toArray());
 
         $fieldConfig->setExcluded();
 
@@ -42,7 +43,7 @@ class FieldConfigTest extends \PHPUnit\Framework\TestCase
         $targetEntity->setExcludeAll();
         $fieldConfig->setTargetEntity($targetEntity);
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 'exclude'          => true,
                 'exclusion_policy' => 'all'
@@ -54,104 +55,104 @@ class FieldConfigTest extends \PHPUnit\Framework\TestCase
     public function testIsEmpty(): void
     {
         $fieldConfig = new FieldConfig();
-        $this->assertTrue($fieldConfig->isEmpty());
+        self::assertTrue($fieldConfig->isEmpty());
 
         $fieldConfig->setExcluded();
-        $this->assertFalse($fieldConfig->isEmpty());
+        self::assertFalse($fieldConfig->isEmpty());
 
         $fieldConfig->setExcluded(false);
-        $this->assertFalse($fieldConfig->isEmpty());
+        self::assertFalse($fieldConfig->isEmpty());
 
         $fieldConfig->setExcluded(null);
-        $this->assertTrue($fieldConfig->isEmpty());
+        self::assertTrue($fieldConfig->isEmpty());
 
         $targetEntity = new EntityConfig();
         $fieldConfig->setTargetEntity($targetEntity);
-        $this->assertTrue($fieldConfig->isEmpty());
+        self::assertTrue($fieldConfig->isEmpty());
 
         $targetEntity->setExcludeAll();
-        $this->assertFalse($fieldConfig->isEmpty());
+        self::assertFalse($fieldConfig->isEmpty());
 
         $fieldConfig->setTargetEntity(null);
-        $this->assertTrue($fieldConfig->isEmpty());
+        self::assertTrue($fieldConfig->isEmpty());
     }
 
     public function testTargetEntity(): void
     {
         $fieldConfig = new FieldConfig();
-        $this->assertNull($fieldConfig->getTargetEntity());
+        self::assertNull($fieldConfig->getTargetEntity());
 
         $targetEntity = new EntityConfig();
-        $this->assertSame($targetEntity, $fieldConfig->setTargetEntity($targetEntity));
-        $this->assertSame($targetEntity, $fieldConfig->getTargetEntity());
+        self::assertSame($targetEntity, $fieldConfig->setTargetEntity($targetEntity));
+        self::assertSame($targetEntity, $fieldConfig->getTargetEntity());
     }
 
     public function testExcluded(): void
     {
         $fieldConfig = new FieldConfig();
-        $this->assertFalse($fieldConfig->isExcluded());
+        self::assertFalse($fieldConfig->isExcluded());
 
         $fieldConfig->setExcluded();
-        $this->assertTrue($fieldConfig->isExcluded());
-        $this->assertEquals(['exclude' => true], $fieldConfig->toArray());
+        self::assertTrue($fieldConfig->isExcluded());
+        self::assertEquals(['exclude' => true], $fieldConfig->toArray());
 
         $fieldConfig->setExcluded(false);
-        $this->assertFalse($fieldConfig->isExcluded());
-        $this->assertEquals([], $fieldConfig->toArray());
+        self::assertFalse($fieldConfig->isExcluded());
+        self::assertEquals([], $fieldConfig->toArray());
     }
 
     public function testCollapsed(): void
     {
         $fieldConfig = new FieldConfig();
-        $this->assertFalse($fieldConfig->isCollapsed());
+        self::assertFalse($fieldConfig->isCollapsed());
 
         $fieldConfig->setCollapsed();
-        $this->assertTrue($fieldConfig->isCollapsed());
-        $this->assertEquals(['collapse' => true], $fieldConfig->toArray());
+        self::assertTrue($fieldConfig->isCollapsed());
+        self::assertEquals(['collapse' => true], $fieldConfig->toArray());
 
         $fieldConfig->setCollapsed(false);
-        $this->assertFalse($fieldConfig->isCollapsed());
-        $this->assertEquals([], $fieldConfig->toArray());
+        self::assertFalse($fieldConfig->isCollapsed());
+        self::assertEquals([], $fieldConfig->toArray());
     }
 
     public function testPropertyPath(): void
     {
         $fieldConfig = new FieldConfig();
-        $this->assertNull($fieldConfig->getPropertyPath());
-        $this->assertEquals('default', $fieldConfig->getPropertyPath('default'));
+        self::assertNull($fieldConfig->getPropertyPath());
+        self::assertEquals('default', $fieldConfig->getPropertyPath('default'));
 
         $fieldConfig->setPropertyPath('test');
-        $this->assertEquals('test', $fieldConfig->getPropertyPath());
-        $this->assertEquals('test', $fieldConfig->getPropertyPath('default'));
-        $this->assertEquals(['property_path' => 'test'], $fieldConfig->toArray());
+        self::assertEquals('test', $fieldConfig->getPropertyPath());
+        self::assertEquals('test', $fieldConfig->getPropertyPath('default'));
+        self::assertEquals(['property_path' => 'test'], $fieldConfig->toArray());
 
         $fieldConfig->setPropertyPath();
-        $this->assertNull($fieldConfig->getPropertyPath());
-        $this->assertEquals('default', $fieldConfig->getPropertyPath('default'));
-        $this->assertEquals([], $fieldConfig->toArray());
+        self::assertNull($fieldConfig->getPropertyPath());
+        self::assertEquals('default', $fieldConfig->getPropertyPath('default'));
+        self::assertEquals([], $fieldConfig->toArray());
     }
 
     public function testDataTransformers(): void
     {
         $fieldConfig = new FieldConfig();
-        $this->assertEquals([], $fieldConfig->getDataTransformers());
+        self::assertEquals([], $fieldConfig->getDataTransformers());
 
         $fieldConfig->addDataTransformer('data_transformer_service_id');
-        $this->assertEquals(
+        self::assertEquals(
             ['data_transformer_service_id'],
             $fieldConfig->getDataTransformers()
         );
-        $this->assertEquals(
+        self::assertEquals(
             ['data_transformer' => ['data_transformer_service_id']],
             $fieldConfig->toArray()
         );
 
         $fieldConfig->addDataTransformer('another_data_transformer_service_id');
-        $this->assertEquals(
+        self::assertEquals(
             ['data_transformer_service_id', 'another_data_transformer_service_id'],
             $fieldConfig->getDataTransformers()
         );
-        $this->assertEquals(
+        self::assertEquals(
             ['data_transformer' => ['data_transformer_service_id', 'another_data_transformer_service_id']],
             $fieldConfig->toArray()
         );

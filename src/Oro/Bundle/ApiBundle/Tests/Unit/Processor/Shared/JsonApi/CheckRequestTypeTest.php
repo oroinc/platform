@@ -13,8 +13,7 @@ use Symfony\Component\HttpKernel\Exception\UnsupportedMediaTypeHttpException;
  */
 class CheckRequestTypeTest extends GetListProcessorTestCase
 {
-    /** @var CheckRequestType */
-    private $processor;
+    private CheckRequestType $processor;
 
     #[\Override]
     protected function setUp(): void

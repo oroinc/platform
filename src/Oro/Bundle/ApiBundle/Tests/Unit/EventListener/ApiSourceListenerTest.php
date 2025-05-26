@@ -10,14 +10,13 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Event\PostFlushConfigEvent;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\FeatureToggleBundle\Event\FeaturesChange;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ApiSourceListenerTest extends \PHPUnit\Framework\TestCase
+class ApiSourceListenerTest extends TestCase
 {
-    /** @var CacheManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $cacheManager;
-
-    /** @var ApiSourceListener */
-    private $listener;
+    private CacheManager&MockObject $cacheManager;
+    private ApiSourceListener $listener;
 
     #[\Override]
     protected function setUp(): void

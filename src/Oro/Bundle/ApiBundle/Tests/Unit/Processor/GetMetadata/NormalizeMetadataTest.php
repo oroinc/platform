@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -20,17 +21,10 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
  */
 class NormalizeMetadataTest extends MetadataProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
-    private $metadataProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderInterface */
-    private $entityOverrideProvider;
-
-    /** @var NormalizeMetadata */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private MetadataProvider&MockObject $metadataProvider;
+    private EntityOverrideProviderInterface&MockObject $entityOverrideProvider;
+    private NormalizeMetadata $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -96,12 +90,12 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         return $associationMetadata;
     }
 
-    public function testProcessWithoutMetadata()
+    public function testProcessWithoutMetadata(): void
     {
         $this->processor->process($this->context);
     }
 
-    public function testProcessNormalizationWithoutLinkedProperties()
+    public function testProcessNormalizationWithoutLinkedProperties(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -163,7 +157,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
-    public function testProcessWhenExcludedPropertiesShouldNotBeRemoved()
+    public function testProcessWhenExcludedPropertiesShouldNotBeRemoved(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -196,7 +190,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
-    public function testProcessLinkedPropertiesForFieldWithoutPropertyPath()
+    public function testProcessLinkedPropertiesForFieldWithoutPropertyPath(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -224,7 +218,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
-    public function testProcessLinkedPropertiesForRenamedField()
+    public function testProcessLinkedPropertiesForRenamedField(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -254,7 +248,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
-    public function testProcessLinkedPropertiesWhenItIsAlreadyProcessed()
+    public function testProcessLinkedPropertiesWhenItIsAlreadyProcessed(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -288,7 +282,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
-    public function testProcessLinkedPropertiesForNotManageableEntity()
+    public function testProcessLinkedPropertiesForNotManageableEntity(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -325,7 +319,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessLinkedPropertiesForAssociationWithPropertyPathAndHasConfigForTargetField()
+    public function testProcessLinkedPropertiesForAssociationWithPropertyPathAndHasConfigForTargetField(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -424,7 +418,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
-    public function testProcessLinkedPropertiesForAssociationWithPropertyPathAndWithoutConfigForTargetField()
+    public function testProcessLinkedPropertiesForAssociationWithPropertyPathAndWithoutConfigForTargetField(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -472,7 +466,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
-    public function testProcessLinkedPropertiesWithPropertyPathButWhenIntermediateFieldIsNotAssociation()
+    public function testProcessLinkedPropertiesWithPropertyPathButWhenIntermediateFieldIsNotAssociation(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -507,7 +501,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessRenamedLinkedPropertyWhenItIsField()
+    public function testProcessRenamedLinkedPropertyWhenItIsField(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -578,7 +572,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessRenamedLinkedPropertyWhenItIsAssociation()
+    public function testProcessRenamedLinkedPropertyWhenItIsAssociation(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -694,7 +688,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessCollapsedArrayAssociationLinkedProperty()
+    public function testProcessCollapsedArrayAssociationLinkedProperty(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -811,7 +805,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         self::assertEquals($expectedMetadata, $this->context->getResult());
     }
 
-    public function testNormalizeAcceptableTargetClassNames()
+    public function testNormalizeAcceptableTargetClassNames(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -901,7 +895,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         );
     }
 
-    public function testNormalizeExpandedNestedAssociation()
+    public function testNormalizeExpandedNestedAssociation(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -982,7 +976,7 @@ class NormalizeMetadataTest extends MetadataProcessorTestCase
         self::assertEquals($association1Metadata, $metadata->getAssociation('association1'));
     }
 
-    public function testNormalizeExpandedNestedAssociationWithRenamedFields()
+    public function testNormalizeExpandedNestedAssociationWithRenamedFields(): void
     {
         $config = [
             'exclusion_policy' => 'all',

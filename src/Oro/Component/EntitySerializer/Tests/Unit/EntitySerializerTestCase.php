@@ -21,21 +21,15 @@ use Oro\Component\EntitySerializer\QueryFactory;
 use Oro\Component\EntitySerializer\QueryResolver;
 use Oro\Component\EntitySerializer\SerializationHelper;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class EntitySerializerTestCase extends OrmTestCase
 {
-    /** @var EntityManagerInterface */
-    protected $em;
-
-    /** @var EntityFieldFilterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $entityFieldFilter;
-
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    protected $container;
-
-    /** @var EntitySerializer */
-    protected $serializer;
+    protected EntityManagerInterface $em;
+    protected EntityFieldFilterInterface&MockObject $entityFieldFilter;
+    protected ContainerInterface&MockObject $container;
+    protected EntitySerializer $serializer;
 
     #[\Override]
     protected function setUp(): void
@@ -44,17 +38,17 @@ abstract class EntitySerializerTestCase extends OrmTestCase
         $this->em->getConfiguration()->setMetadataDriverImpl(new AttributeDriver([]));
 
         $doctrine = $this->createMock(ManagerRegistry::class);
-        $doctrine->expects($this->any())
+        $doctrine->expects(self::any())
             ->method('getManagerForClass')
             ->willReturn($this->em);
 
         $this->entityFieldFilter = $this->createMock(EntityFieldFilterInterface::class);
-        $this->entityFieldFilter->expects($this->any())
+        $this->entityFieldFilter->expects(self::any())
             ->method('isApplicableField')
             ->willReturn(true);
 
         $queryHintResolver = $this->createMock(QueryHintResolverInterface::class);
-        $queryHintResolver->expects($this->any())
+        $queryHintResolver->expects(self::any())
             ->method('resolveHints')
             ->willReturnCallback(function (Query $query, array $hints = []) {
                 if (!empty($hints)) {
@@ -88,12 +82,12 @@ abstract class EntitySerializerTestCase extends OrmTestCase
     {
         $this->sortByKeyRecursive($expected);
         $this->sortByKeyRecursive($actual);
-        $this->assertSame($expected, $actual, $message);
+        self::assertSame($expected, $actual, $message);
     }
 
     protected function assertDqlEquals(string $expected, string $actual, string $message = ''): void
     {
-        $this->assertEquals($expected, $actual, $message);
+        self::assertEquals($expected, $actual, $message);
     }
 
     protected function sortByKeyRecursive(array &$array): void

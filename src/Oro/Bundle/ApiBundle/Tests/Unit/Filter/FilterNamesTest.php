@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 
 use Oro\Bundle\ApiBundle\Filter\FilterNames;
+use PHPUnit\Framework\TestCase;
 
-class FilterNamesTest extends \PHPUnit\Framework\TestCase
+class FilterNamesTest extends TestCase
 {
-    public function testAllNames()
+    public function testAllNames(): void
     {
         $filterNames = new FilterNames(
             'sort',
@@ -27,7 +28,7 @@ class FilterNamesTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('include', $filterNames->getIncludeFilterName());
     }
 
-    public function testOptionalNames()
+    public function testOptionalNames(): void
     {
         $filterNames = new FilterNames(
             'sort',

@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class CollectionEntryType extends AbstractType
 {
     #[\Override]
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add(
             'name',

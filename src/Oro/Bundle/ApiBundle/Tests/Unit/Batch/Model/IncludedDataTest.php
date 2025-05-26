@@ -7,17 +7,14 @@ use Oro\Bundle\ApiBundle\Batch\IncludeAccessor\IncludeAccessorInterface;
 use Oro\Bundle\ApiBundle\Batch\IncludeAccessor\JsonApiIncludeAccessor;
 use Oro\Bundle\ApiBundle\Batch\ItemKeyBuilder;
 use Oro\Bundle\ApiBundle\Batch\Model\IncludedData;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class IncludedDataTest extends \PHPUnit\Framework\TestCase
+class IncludedDataTest extends TestCase
 {
-    /** @var ItemKeyBuilder */
-    private $itemKeyBuilder;
-
-    /** @var IncludeAccessorInterface */
-    private $includeAccessor;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FileLockManager */
-    private $fileLockManager;
+    private ItemKeyBuilder $itemKeyBuilder;
+    private IncludeAccessorInterface $includeAccessor;
+    private FileLockManager&MockObject $fileLockManager;
 
     #[\Override]
     protected function setUp(): void
@@ -39,7 +36,7 @@ class IncludedDataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetIncludeAccessor()
+    public function testGetIncludeAccessor(): void
     {
         $items = [
             [['type' => 'accounts', 'id' => '1'], 10, 'included']
@@ -48,7 +45,7 @@ class IncludedDataTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->includeAccessor, $includedData->getIncludeAccessor());
     }
 
-    public function testGetIncludedItem()
+    public function testGetIncludedItem(): void
     {
         $items = [
             'accounts|1' => [['type' => 'accounts', 'id' => '1'], 10, 'included'],
@@ -61,7 +58,7 @@ class IncludedDataTest extends \PHPUnit\Framework\TestCase
         self::assertNull($includedData->getIncludedItem(999));
     }
 
-    public function testGetIncludedItemIndex()
+    public function testGetIncludedItemIndex(): void
     {
         $items = [
             'accounts|1' => [['type' => 'accounts', 'id' => '1'], 10, 'included'],
@@ -73,7 +70,7 @@ class IncludedDataTest extends \PHPUnit\Framework\TestCase
         self::assertNull($includedData->getIncludedItemIndex('accounts', '2'));
     }
 
-    public function testGetIncludedItemSectionName()
+    public function testGetIncludedItemSectionName(): void
     {
         $items = [
             'accounts|1' => [['type' => 'accounts', 'id' => '1'], 10, 'included'],
@@ -85,7 +82,7 @@ class IncludedDataTest extends \PHPUnit\Framework\TestCase
         self::assertNull($includedData->getIncludedItemSectionName('accounts', '2'));
     }
 
-    public function testGetAllSectionNames()
+    public function testGetAllSectionNames(): void
     {
         $items = [
             'accounts|1' => [['type' => 'accounts', 'id' => '1'], 10, 'included'],
@@ -95,7 +92,7 @@ class IncludedDataTest extends \PHPUnit\Framework\TestCase
         self::assertSame(['included'], $includedData->getAllSectionNames());
     }
 
-    public function testHasProcessedIncludedItemsWhenProcessedIncludedItemsExist()
+    public function testHasProcessedIncludedItemsWhenProcessedIncludedItemsExist(): void
     {
         $items = [
             'accounts|1' => [['type' => 'accounts', 'id' => '1'], 10, 'included']
@@ -107,7 +104,7 @@ class IncludedDataTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($includedData->hasProcessedIncludedItems());
     }
 
-    public function testHasProcessedIncludedItemsWhenProcessedIncludedItemsDoNotExist()
+    public function testHasProcessedIncludedItemsWhenProcessedIncludedItemsDoNotExist(): void
     {
         $items = [
             'accounts|1' => [['type' => 'accounts', 'id' => '1'], 10, 'included']
@@ -117,7 +114,7 @@ class IncludedDataTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($includedData->hasProcessedIncludedItems());
     }
 
-    public function testGetProcessedIncludedItemId()
+    public function testGetProcessedIncludedItemId(): void
     {
         $items = [
             'accounts|1' => [['type' => 'accounts', 'id' => '1'], 10, 'included'],
@@ -136,7 +133,7 @@ class IncludedDataTest extends \PHPUnit\Framework\TestCase
         self::assertNull($includedData->getProcessedIncludedItemId('accounts', '3'));
     }
 
-    public function testUnlock()
+    public function testUnlock(): void
     {
         $this->fileLockManager->expects(self::exactly(2))
             ->method('releaseLock')
@@ -151,7 +148,7 @@ class IncludedDataTest extends \PHPUnit\Framework\TestCase
         $includedData->unlock();
     }
 
-    public function testUnlockWhenIncludeIndexWasNotLocked()
+    public function testUnlockWhenIncludeIndexWasNotLocked(): void
     {
         $this->fileLockManager->expects(self::never())
             ->method('releaseLock');

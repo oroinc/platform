@@ -10,8 +10,7 @@ use Oro\Bundle\ApiBundle\Util\EntityMapper;
 
 class ConvertParentModelToEntityTest extends ChangeRelationshipProcessorTestCase
 {
-    /** @var ConvertParentModelToEntity */
-    private $processor;
+    private ConvertParentModelToEntity $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class ConvertParentModelToEntityTest extends ChangeRelationshipProcessorTestCase
         $this->processor = new ConvertParentModelToEntity();
     }
 
-    public function testProcessWhenNoModel()
+    public function testProcessWhenNoModel(): void
     {
         $entityClass = Entity\User::class;
         $config = new EntityDefinitionConfig();
@@ -38,7 +37,7 @@ class ConvertParentModelToEntityTest extends ChangeRelationshipProcessorTestCase
         self::assertFalse($this->context->hasParentEntity());
     }
 
-    public function testProcessWhenNoEntityMapper()
+    public function testProcessWhenNoEntityMapper(): void
     {
         $entityClass = Entity\User::class;
         $model = new \stdClass();
@@ -52,7 +51,7 @@ class ConvertParentModelToEntityTest extends ChangeRelationshipProcessorTestCase
         self::assertSame($model, $this->context->getParentEntity());
     }
 
-    public function testProcessWhenModelShouldBeConvertedToEntity()
+    public function testProcessWhenModelShouldBeConvertedToEntity(): void
     {
         $entityClass = Entity\User::class;
         $model = new \stdClass();
@@ -74,7 +73,7 @@ class ConvertParentModelToEntityTest extends ChangeRelationshipProcessorTestCase
         self::assertSame($entity, $this->context->getParentEntity());
     }
 
-    public function testProcessWhenModelShouldBeConvertedToEntityForApiResourceBasedOnManageableEntity()
+    public function testProcessWhenModelShouldBeConvertedToEntityForApiResourceBasedOnManageableEntity(): void
     {
         $entityClass = Entity\UserProfile::class;
         $parentResourceClass = Entity\User::class;

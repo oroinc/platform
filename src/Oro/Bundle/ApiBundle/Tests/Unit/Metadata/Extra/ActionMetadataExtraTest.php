@@ -4,8 +4,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Metadata\Extra;
 
 use Oro\Bundle\ApiBundle\Metadata\Extra\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
+use PHPUnit\Framework\TestCase;
 
-class ActionMetadataExtraTest extends \PHPUnit\Framework\TestCase
+class ActionMetadataExtraTest extends TestCase
 {
     public function testGetName(): void
     {

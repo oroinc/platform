@@ -7,14 +7,13 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityClassToEntityTypeTransformerTest extends \PHPUnit\Framework\TestCase
+class EntityClassToEntityTypeTransformerTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
-    private $valueNormalizer;
-
-    /** @var EntityClassToEntityTypeTransformer */
-    private $transformer;
+    private ValueNormalizer&MockObject $valueNormalizer;
+    private EntityClassToEntityTypeTransformer $transformer;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +26,7 @@ class EntityClassToEntityTypeTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider emptyValueProvider
      */
-    public function testTransformEmptyValue(?string $value)
+    public function testTransformEmptyValue(?string $value): void
     {
         $this->valueNormalizer->expects(self::never())
             ->method('normalizeValue');
@@ -46,7 +45,7 @@ class EntityClassToEntityTypeTransformerTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testTransform()
+    public function testTransform(): void
     {
         $value = 'Test\Class1';
         $expectedValue = 'class1';

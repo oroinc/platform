@@ -19,7 +19,7 @@ class SetCorsMaxAgeTest extends OptionsProcessorTestCase
         );
     }
 
-    public function testMaxAgeIsAlreadySet()
+    public function testMaxAgeIsAlreadySet(): void
     {
         $processor = new SetCorsMaxAge($this->getCorsSettings(123));
         $this->context->getResponseHeaders()->set('Access-Control-Max-Age', 234);
@@ -29,7 +29,7 @@ class SetCorsMaxAgeTest extends OptionsProcessorTestCase
         self::assertSame(234, $this->context->getResponseHeaders()->get('Access-Control-Max-Age'));
     }
 
-    public function testPreflightCacheIsDisabledForPreflightRequest()
+    public function testPreflightCacheIsDisabledForPreflightRequest(): void
     {
         $processor = new SetCorsMaxAge($this->getCorsSettings(0));
         $this->context->getRequestHeaders()->set('Access-Control-Request-Method', 'POST');
@@ -38,7 +38,7 @@ class SetCorsMaxAgeTest extends OptionsProcessorTestCase
         self::assertFalse($this->context->getResponseHeaders()->has('Access-Control-Max-Age'));
     }
 
-    public function testPreflightCacheIsEnabledForPreflightRequest()
+    public function testPreflightCacheIsEnabledForPreflightRequest(): void
     {
         $processor = new SetCorsMaxAge($this->getCorsSettings(123));
         $this->context->getRequestHeaders()->set('Access-Control-Request-Method', 'POST');
@@ -47,7 +47,7 @@ class SetCorsMaxAgeTest extends OptionsProcessorTestCase
         self::assertSame(123, $this->context->getResponseHeaders()->get('Access-Control-Max-Age'));
     }
 
-    public function testPreflightCacheIsEnabledForNotPreflightRequest()
+    public function testPreflightCacheIsEnabledForNotPreflightRequest(): void
     {
         $processor = new SetCorsMaxAge($this->getCorsSettings(123));
         $processor->process($this->context);

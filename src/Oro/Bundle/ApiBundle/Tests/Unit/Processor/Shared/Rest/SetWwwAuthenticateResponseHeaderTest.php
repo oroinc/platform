@@ -9,8 +9,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class SetWwwAuthenticateResponseHeaderTest extends UnhandledErrorProcessorTestCase
 {
-    /** @var SetWwwAuthenticateResponseHeader */
-    private $processor;
+    private SetWwwAuthenticateResponseHeader $processor;
 
     #[\Override]
     protected function setUp(): void

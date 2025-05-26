@@ -8,8 +8,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcesso
 
 class ValidateParentEntityIdExistsTest extends GetSubresourceProcessorTestCase
 {
-    /** @var ValidateParentEntityIdExists */
-    private $processor;
+    private ValidateParentEntityIdExists $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +18,7 @@ class ValidateParentEntityIdExistsTest extends GetSubresourceProcessorTestCase
         $this->processor = new ValidateParentEntityIdExists();
     }
 
-    public function testProcessWhenParentEntityIdExists()
+    public function testProcessWhenParentEntityIdExists(): void
     {
         $this->context->setParentId(123);
         $this->processor->process($this->context);
@@ -27,7 +26,7 @@ class ValidateParentEntityIdExistsTest extends GetSubresourceProcessorTestCase
         self::assertCount(0, $this->context->getErrors());
     }
 
-    public function testProcessWhenParentEntityIdDoesNotExist()
+    public function testProcessWhenParentEntityIdDoesNotExist(): void
     {
         $this->processor->process($this->context);
 

@@ -9,8 +9,7 @@ use Symfony\Component\Form\FormInterface;
 
 class BuildFormTest extends FormProcessorTestCase
 {
-    /** @var BuildForm */
-    private $processor;
+    private BuildForm $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +18,7 @@ class BuildFormTest extends FormProcessorTestCase
         $this->processor = new BuildForm();
     }
 
-    public function testProcessWhenFormAlreadyExists()
+    public function testProcessWhenFormAlreadyExists(): void
     {
         $form = $this->createMock(FormInterface::class);
 
@@ -28,13 +27,13 @@ class BuildFormTest extends FormProcessorTestCase
         self::assertSame($form, $this->context->getForm());
     }
 
-    public function testProcessWhenFormBuilderDoesNotExists()
+    public function testProcessWhenFormBuilderDoesNotExists(): void
     {
         $this->processor->process($this->context);
         self::assertFalse($this->context->hasForm());
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $formBuilder = $this->createMock(FormBuilderInterface::class);
         $form = $this->createMock(FormInterface::class);

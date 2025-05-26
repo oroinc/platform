@@ -3,12 +3,13 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection;
 
 use Oro\Bundle\ApiBundle\Collection\KeyObjectCollection;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
+class KeyObjectCollectionTest extends TestCase
 {
     private KeyObjectCollection $collection;
 
@@ -18,19 +19,19 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
         $this->collection = new KeyObjectCollection();
     }
 
-    public function testShouldAddObjectWithoutData()
+    public function testShouldAddObjectWithoutData(): void
     {
         $this->collection->add(new \stdClass(), 'key');
         $this->expectNotToPerformAssertions();
     }
 
-    public function testShouldAddObjectWithData()
+    public function testShouldAddObjectWithData(): void
     {
         $this->collection->add(new \stdClass(), 'key', 'data');
         $this->expectNotToPerformAssertions();
     }
 
-    public function testShouldAddThrowExceptionForNullKey()
+    public function testShouldAddThrowExceptionForNullKey(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected $key argument of type "scalar", "null" given.');
@@ -38,7 +39,7 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
         $this->collection->add(new \stdClass(), null);
     }
 
-    public function testShouldAddThrowExceptionIfKeyIsObject()
+    public function testShouldAddThrowExceptionIfKeyIsObject(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected $key argument of type "scalar", "stdClass" given.');
@@ -46,7 +47,7 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
         $this->collection->add(new \stdClass(), new \stdClass());
     }
 
-    public function testShouldAddThrowExceptionIfKeyIsArray()
+    public function testShouldAddThrowExceptionIfKeyIsArray(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected $key argument of type "scalar", "array" given.');
@@ -57,7 +58,7 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider blankKeyProvider
      */
-    public function testShouldAddThrowExceptionForBlankKey(string $key)
+    public function testShouldAddThrowExceptionForBlankKey(string $key): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The $key argument should not be a blank string.');
@@ -76,7 +77,7 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validKeysProvider
      */
-    public function testShouldAddWithNotStringKey(mixed $key)
+    public function testShouldAddWithNotStringKey(mixed $key): void
     {
         $this->collection->add(new \stdClass(), $key);
         $this->expectNotToPerformAssertions();
@@ -91,12 +92,12 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testShouldGetReturnNullForUnknownObject()
+    public function testShouldGetReturnNullForUnknownObject(): void
     {
         self::assertNull($this->collection->get('key'));
     }
 
-    public function testShouldGetAddedObject()
+    public function testShouldGetAddedObject(): void
     {
         $object = new \stdClass();
         $key = 'key';
@@ -104,12 +105,12 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertSame($object, $this->collection->get($key));
     }
 
-    public function testShouldGetKeyReturnNullForUnknownObject()
+    public function testShouldGetKeyReturnNullForUnknownObject(): void
     {
         self::assertNull($this->collection->getKey(new \stdClass()));
     }
 
-    public function testShouldGetKeyForAddedObject()
+    public function testShouldGetKeyForAddedObject(): void
     {
         $object = new \stdClass();
         $key = 'key';
@@ -117,12 +118,12 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertSame($key, $this->collection->getKey($object));
     }
 
-    public function testShouldGetDataReturnNullForUnknownObject()
+    public function testShouldGetDataReturnNullForUnknownObject(): void
     {
         self::assertNull($this->collection->getData(new \stdClass()));
     }
 
-    public function testShouldGetDataForAddedObject()
+    public function testShouldGetDataForAddedObject(): void
     {
         $object = new \stdClass();
         $key = 'key';
@@ -131,12 +132,12 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertSame($data, $this->collection->getData($object));
     }
 
-    public function testShouldContainsKeyReturnFalseForUnknownObject()
+    public function testShouldContainsKeyReturnFalseForUnknownObject(): void
     {
         self::assertFalse($this->collection->containsKey('key'));
     }
 
-    public function testShouldContainsKeyReturnTrueForAddedObject()
+    public function testShouldContainsKeyReturnTrueForAddedObject(): void
     {
         $object = new \stdClass();
         $key = 'key';
@@ -144,12 +145,12 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->collection->containsKey($key));
     }
 
-    public function testShouldContainsReturnFalseForUnknownObject()
+    public function testShouldContainsReturnFalseForUnknownObject(): void
     {
         self::assertFalse($this->collection->contains(new \stdClass()));
     }
 
-    public function testShouldContainsReturnTrueForAddedObject()
+    public function testShouldContainsReturnTrueForAddedObject(): void
     {
         $object = new \stdClass();
         $key = 'key';
@@ -157,12 +158,12 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->collection->contains($object));
     }
 
-    public function testShouldGetAllReturnEmptyArrayForEmptyCollection()
+    public function testShouldGetAllReturnEmptyArrayForEmptyCollection(): void
     {
         self::assertSame([], $this->collection->getAll());
     }
 
-    public function testShouldGetAllReturnAllObjects()
+    public function testShouldGetAllReturnAllObjects(): void
     {
         $object1 = new \stdClass();
         $object2 = new \stdClass();
@@ -173,7 +174,7 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertSame([$key1 => $object1, $key2 => $object2], $this->collection->getAll());
     }
 
-    public function testShouldBeIterable()
+    public function testShouldBeIterable(): void
     {
         $object = new \stdClass();
         $key = 'key';
@@ -184,7 +185,7 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testShouldClearAllData()
+    public function testShouldClearAllData(): void
     {
         $object = new \stdClass();
         $this->collection->add($object, 'key', 'data');
@@ -194,40 +195,40 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->collection->getData($object));
     }
 
-    public function testShouldIsEmptyReturnTrueForEmptyCollection()
+    public function testShouldIsEmptyReturnTrueForEmptyCollection(): void
     {
         self::assertTrue($this->collection->isEmpty());
     }
 
-    public function testShouldIsEmptyReturnFalseForEmptyCollection()
+    public function testShouldIsEmptyReturnFalseForEmptyCollection(): void
     {
         $this->collection->add(new \stdClass(), 'key', 'data');
         self::assertFalse($this->collection->isEmpty());
     }
 
-    public function testShouldCountReturnZeroForEmptyCollection()
+    public function testShouldCountReturnZeroForEmptyCollection(): void
     {
         self::assertSame(0, $this->collection->count());
     }
 
-    public function testShouldCountReturnTheNumberOfObjectsInCollection()
+    public function testShouldCountReturnTheNumberOfObjectsInCollection(): void
     {
         $this->collection->add(new \stdClass(), 'key', 'data');
         self::assertSame(1, $this->collection->count());
     }
 
-    public function testShouldBeCountable()
+    public function testShouldBeCountable(): void
     {
         self::assertCount(0, $this->collection);
     }
 
-    public function testShouldRemoveNotThrowExceptionForUnknownObject()
+    public function testShouldRemoveNotThrowExceptionForUnknownObject(): void
     {
         $this->collection->remove(new \stdClass());
         $this->expectNotToPerformAssertions();
     }
 
-    public function testShouldRemoveObject()
+    public function testShouldRemoveObject(): void
     {
         $object = new \stdClass();
         $this->collection->add($object, 'key', 'data');
@@ -237,13 +238,13 @@ class KeyObjectCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->collection->getData($object));
     }
 
-    public function testShouldRemoveKeyNotThrowExceptionForUnknownKey()
+    public function testShouldRemoveKeyNotThrowExceptionForUnknownKey(): void
     {
         $this->collection->removeKey('key');
         $this->expectNotToPerformAssertions();
     }
 
-    public function testShouldRemoveObjectByKey()
+    public function testShouldRemoveObjectByKey(): void
     {
         $object = new \stdClass();
         $this->collection->add($object, 'key', 'data');

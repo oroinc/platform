@@ -11,14 +11,13 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ConfigProviderTest extends \PHPUnit\Framework\TestCase
+class ConfigProviderTest extends TestCase
 {
-    /** @var ActionProcessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $processor;
-
-    /** @var ConfigProvider */
-    private $configProvider;
+    private ActionProcessorInterface&MockObject $processor;
+    private ConfigProvider $configProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +27,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         $this->configProvider = new ConfigProvider($this->processor);
     }
 
-    public function testShouldThrowExceptionIfClassNameIsEmpty()
+    public function testShouldThrowExceptionIfClassNameIsEmpty(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$className must not be empty.');
@@ -36,7 +35,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         $this->configProvider->getConfig('', '1.2', new RequestType([]));
     }
 
-    public function testShouldBuildConfigAndCacheConfigAndSetConfigKeyForNotIdentifierFieldsOnlyConfig()
+    public function testShouldBuildConfigAndCacheConfigAndSetConfigKeyForNotIdentifierFieldsOnlyConfig(): void
     {
         $className = 'Test\Class';
         $version = '1.2';
@@ -96,7 +95,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($result, $anotherResult);
     }
 
-    public function testShouldBuildConfigButNotCacheConfigAndNotSetConfigKeyForNotIdentifierFieldsOnlyConfig()
+    public function testShouldBuildConfigButNotCacheConfigAndNotSetConfigKeyForNotIdentifierFieldsOnlyConfig(): void
     {
         $className = 'Test\Class';
         $version = '1.2';
@@ -157,7 +156,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($result, $anotherResult);
     }
 
-    public function testShouldBuildConfigAndCacheConfigAndSetConfigKeyForIdentifierFieldsOnlyConfig()
+    public function testShouldBuildConfigAndCacheConfigAndSetConfigKeyForIdentifierFieldsOnlyConfig(): void
     {
         $className = 'Test\Class';
         $version = '1.2';
@@ -232,7 +231,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($result, $anotherResult);
     }
 
-    public function testShouldBePossibleToClearInternalCache()
+    public function testShouldBePossibleToClearInternalCache(): void
     {
         $className = 'Test\Class';
         $version = '1.2';
@@ -253,7 +252,7 @@ class ConfigProviderTest extends \PHPUnit\Framework\TestCase
         $this->configProvider->getConfig($className, $version, $requestType, $extras);
     }
 
-    public function testShouldThrowExceptionIfCircularDependencyDetected()
+    public function testShouldThrowExceptionIfCircularDependencyDetected(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(

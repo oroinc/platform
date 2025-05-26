@@ -19,7 +19,7 @@ class SetCacheControlTest extends OptionsProcessorTestCase
         );
     }
 
-    public function testPreflightCacheIsEnabled()
+    public function testPreflightCacheIsEnabled(): void
     {
         $processor = new SetCacheControl($this->getCorsSettings(123));
         $processor->process($this->context);
@@ -31,7 +31,7 @@ class SetCacheControlTest extends OptionsProcessorTestCase
         self::assertEquals('Origin', $this->context->getResponseHeaders()->get('Vary'));
     }
 
-    public function testPreflightCacheIsDisabled()
+    public function testPreflightCacheIsDisabled(): void
     {
         $processor = new SetCacheControl($this->getCorsSettings(0));
         $processor->process($this->context);
@@ -40,7 +40,7 @@ class SetCacheControlTest extends OptionsProcessorTestCase
         self::assertFalse($this->context->getResponseHeaders()->has('Vary'));
     }
 
-    public function testPreflightCacheIsEnabledAndCacheControlHeaderIsAlreadySet()
+    public function testPreflightCacheIsEnabledAndCacheControlHeaderIsAlreadySet(): void
     {
         $processor = new SetCacheControl($this->getCorsSettings(123));
         $this->context->getResponseHeaders()->set('Cache-Control', 'no-cache');

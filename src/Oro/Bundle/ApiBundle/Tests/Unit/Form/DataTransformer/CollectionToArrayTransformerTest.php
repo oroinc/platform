@@ -4,12 +4,13 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DataTransformer;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\CollectionToArrayTransformer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\DataTransformerInterface;
 
-class CollectionToArrayTransformerTest extends \PHPUnit\Framework\TestCase
+class CollectionToArrayTransformerTest extends TestCase
 {
-    /** @var DataTransformerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $elementTransformer;
+    private DataTransformerInterface&MockObject $elementTransformer;
 
     #[\Override]
     protected function setUp(): void
@@ -17,7 +18,7 @@ class CollectionToArrayTransformerTest extends \PHPUnit\Framework\TestCase
         $this->elementTransformer = $this->createMock(DataTransformerInterface::class);
     }
 
-    public function testTransform()
+    public function testTransform(): void
     {
         $transformer = new CollectionToArrayTransformer($this->elementTransformer);
         self::assertNull($transformer->transform(new ArrayCollection()));
@@ -26,7 +27,7 @@ class CollectionToArrayTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider reverseTransformDataProvider
      */
-    public function testReverseTransform(array|string|null $value, ArrayCollection $expected)
+    public function testReverseTransform(array|string|null $value, ArrayCollection $expected): void
     {
         $this->elementTransformer->expects(self::any())
             ->method('reverseTransform')
@@ -41,8 +42,10 @@ class CollectionToArrayTransformerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider reverseTransformDataProvider
      */
-    public function testReverseTransformWhenUseCollectionFalse(array|string|null $value, ArrayCollection $expected)
-    {
+    public function testReverseTransformWhenUseCollectionFalse(
+        array|string|null $value,
+        ArrayCollection $expected
+    ): void {
         $this->elementTransformer->expects(self::any())
             ->method('reverseTransform')
             ->willReturnCallback(function ($element) {

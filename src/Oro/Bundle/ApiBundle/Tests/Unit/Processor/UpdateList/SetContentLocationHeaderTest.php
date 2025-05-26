@@ -10,21 +10,17 @@ use Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 class SetContentLocationHeaderTest extends UpdateListProcessorTestCase
 {
-    private const ITEM_ROUTE_NAME = 'item_route';
+    private const string ITEM_ROUTE_NAME = 'item_route';
 
-    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
-
-    /** @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject */
-    private $valueNormalizer;
-
-    /** @var SetContentLocationHeader */
-    private $processor;
+    private RouterInterface&MockObject $router;
+    private ValueNormalizer&MockObject $valueNormalizer;
+    private SetContentLocationHeader $processor;
 
     #[\Override]
     protected function setUp(): void

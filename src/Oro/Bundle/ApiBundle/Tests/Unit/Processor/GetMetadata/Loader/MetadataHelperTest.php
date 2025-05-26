@@ -7,11 +7,11 @@ use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\MetadataHelper;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
+use PHPUnit\Framework\TestCase;
 
-class MetadataHelperTest extends \PHPUnit\Framework\TestCase
+class MetadataHelperTest extends TestCase
 {
-    /** @var MetadataHelper */
-    private $metadataHelper;
+    private MetadataHelper $metadataHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
         $this->metadataHelper = new MetadataHelper();
     }
 
-    public function testAssertDataTypeForNotEmptyDataType()
+    public function testAssertDataTypeForNotEmptyDataType(): void
     {
         $dataType = 'string';
         self::assertEquals(
@@ -31,7 +31,7 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider emptyDataTypeDataProvider
      */
-    public function testAssertDataTypeForEmptyDataType(?string $dataType)
+    public function testAssertDataTypeForEmptyDataType(?string $dataType): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
@@ -53,8 +53,11 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getFormPropertyPathProvider
      */
-    public function testGetFormPropertyPath(?string $expectedPropertyPath, ?array $formOptions, string $targetAction)
-    {
+    public function testGetFormPropertyPath(
+        ?string $expectedPropertyPath,
+        ?array $formOptions,
+        string $targetAction
+    ): void {
         $field = new EntityDefinitionFieldConfig();
         $field->setFormOptions($formOptions);
 
@@ -105,7 +108,7 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testShouldNotSetPropertyPathIfItEqualsToConfigPropertyPath()
+    public function testShouldNotSetPropertyPathIfItEqualsToConfigPropertyPath(): void
     {
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -120,7 +123,7 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($fieldName, $propertyMetadata->getPropertyPath());
     }
 
-    public function testShouldNotSetPropertyPathIfFormPropertyPathEqualsToConfigPropertyPath()
+    public function testShouldNotSetPropertyPathIfFormPropertyPathEqualsToConfigPropertyPath(): void
     {
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -136,7 +139,7 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($fieldName, $propertyMetadata->getPropertyPath());
     }
 
-    public function testShouldSetFormPropertyPathForCreateAction()
+    public function testShouldSetFormPropertyPathForCreateAction(): void
     {
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -152,7 +155,7 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('propertyPath', $propertyMetadata->getPropertyPath());
     }
 
-    public function testShouldSetFormPropertyPathForUpdateAction()
+    public function testShouldSetFormPropertyPathForUpdateAction(): void
     {
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();
@@ -168,7 +171,7 @@ class MetadataHelperTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('propertyPath', $propertyMetadata->getPropertyPath());
     }
 
-    public function testShouldNotSetFormPropertyPathForGetAction()
+    public function testShouldNotSetFormPropertyPathForGetAction(): void
     {
         $fieldName = 'testField';
         $field = new EntityDefinitionFieldConfig();

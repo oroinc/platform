@@ -16,7 +16,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class NeqOrEmptyComparisonExpressionTest extends OrmRelatedTestCase
 {
-    public function testWalkComparisonExpressionForNullValue()
+    public function testWalkComparisonExpressionForNullValue(): void
     {
         $this->expectException(QueryException::class);
         $this->expectExceptionMessage('The value for "e.test" must not be NULL.');
@@ -42,7 +42,7 @@ class NeqOrEmptyComparisonExpressionTest extends OrmRelatedTestCase
         );
     }
 
-    public function testWalkComparisonExpression()
+    public function testWalkComparisonExpression(): void
     {
         $expression = new NeqOrEmptyComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor(
@@ -88,7 +88,7 @@ class NeqOrEmptyComparisonExpressionTest extends OrmRelatedTestCase
         );
     }
 
-    public function testWalkComparisonExpressionForRangeValue()
+    public function testWalkComparisonExpressionForRangeValue(): void
     {
         $expression = new NeqOrEmptyComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor(
@@ -140,7 +140,7 @@ class NeqOrEmptyComparisonExpressionTest extends OrmRelatedTestCase
         );
     }
 
-    public function testWalkComparisonExpressionWhenLastElementInPathIsField()
+    public function testWalkComparisonExpressionWhenLastElementInPathIsField(): void
     {
         $expression = new NeqOrEmptyComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor(
@@ -186,7 +186,7 @@ class NeqOrEmptyComparisonExpressionTest extends OrmRelatedTestCase
         );
     }
 
-    public function testWalkComparisonExpressionForRangeValueWhenLastElementInPathIsField()
+    public function testWalkComparisonExpressionForRangeValueWhenLastElementInPathIsField(): void
     {
         $expression = new NeqOrEmptyComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor(
@@ -238,7 +238,7 @@ class NeqOrEmptyComparisonExpressionTest extends OrmRelatedTestCase
         );
     }
 
-    public function testWalkComparisonExpressionForCustomExpression()
+    public function testWalkComparisonExpressionForCustomExpression(): void
     {
         $expression = new NeqOrEmptyComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor(
@@ -283,7 +283,7 @@ class NeqOrEmptyComparisonExpressionTest extends OrmRelatedTestCase
         );
     }
 
-    public function testWalkComparisonExpressionForCustomExpressionWhenAssociationAlreadyJoined()
+    public function testWalkComparisonExpressionForCustomExpressionWhenAssociationAlreadyJoined(): void
     {
         $expression = new NeqOrEmptyComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor(

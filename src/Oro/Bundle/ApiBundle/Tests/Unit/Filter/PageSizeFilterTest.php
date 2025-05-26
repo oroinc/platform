@@ -7,10 +7,11 @@ use Oro\Bundle\ApiBundle\Exception\InvalidFilterValueException;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\PageSizeFilter;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use PHPUnit\Framework\TestCase;
 
-class PageSizeFilterTest extends \PHPUnit\Framework\TestCase
+class PageSizeFilterTest extends TestCase
 {
-    public function testApplyWithoutFilter()
+    public function testApplyWithoutFilter(): void
     {
         $filter = new PageSizeFilter(DataType::INTEGER);
         $criteria = new Criteria();
@@ -20,7 +21,7 @@ class PageSizeFilterTest extends \PHPUnit\Framework\TestCase
         self::assertNull($criteria->getMaxResults());
     }
 
-    public function testApplyWithFilter()
+    public function testApplyWithFilter(): void
     {
         $filter = new PageSizeFilter(DataType::INTEGER);
         $filterValue = new FilterValue('path', 10, null);
@@ -31,7 +32,7 @@ class PageSizeFilterTest extends \PHPUnit\Framework\TestCase
         self::assertSame(10, $criteria->getMaxResults());
     }
 
-    public function testApplyWithFilterAndNullValue()
+    public function testApplyWithFilterAndNullValue(): void
     {
         $filter = new PageSizeFilter(DataType::INTEGER);
         $filterValue = new FilterValue('path', null, null);
@@ -42,7 +43,7 @@ class PageSizeFilterTest extends \PHPUnit\Framework\TestCase
         self::assertNull($criteria->getFirstResult());
     }
 
-    public function testApplyWithFilterAndValueEqualsToZero()
+    public function testApplyWithFilterAndValueEqualsToZero(): void
     {
         $filter = new PageSizeFilter(DataType::INTEGER);
         $filterValue = new FilterValue('path', 0, null);
@@ -53,7 +54,7 @@ class PageSizeFilterTest extends \PHPUnit\Framework\TestCase
         self::assertSame(0, $criteria->getMaxResults());
     }
 
-    public function testApplyWithFilterAndValueEqualsToMinusOne()
+    public function testApplyWithFilterAndValueEqualsToMinusOne(): void
     {
         $filter = new PageSizeFilter(DataType::INTEGER);
         $filterValue = new FilterValue('path', -1, null);
@@ -64,7 +65,7 @@ class PageSizeFilterTest extends \PHPUnit\Framework\TestCase
         self::assertSame(-1, $criteria->getMaxResults());
     }
 
-    public function testApplyWithFilterAndValueLessThanMinusOne()
+    public function testApplyWithFilterAndValueLessThanMinusOne(): void
     {
         $this->expectException(InvalidFilterValueException::class);
         $this->expectExceptionMessage('The value should be greater than or equals to -1.');

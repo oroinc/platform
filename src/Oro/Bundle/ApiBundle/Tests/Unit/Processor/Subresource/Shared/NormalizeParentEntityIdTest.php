@@ -9,14 +9,12 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\NormalizeParentEntityId;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class NormalizeParentEntityIdTest extends GetSubresourceProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdTransformerInterface */
-    private $entityIdTransformer;
-
-    /** @var NormalizeParentEntityId */
-    private $processor;
+    private EntityIdTransformerInterface&MockObject $entityIdTransformer;
+    private NormalizeParentEntityId $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +31,7 @@ class NormalizeParentEntityIdTest extends GetSubresourceProcessorTestCase
         $this->processor = new NormalizeParentEntityId($entityIdTransformerRegistry);
     }
 
-    public function testProcessWhenParentIdAlreadyNormalized()
+    public function testProcessWhenParentIdAlreadyNormalized(): void
     {
         $this->context->setParentClassName('Test\Class');
         $this->context->setParentId(123);
@@ -44,7 +42,7 @@ class NormalizeParentEntityIdTest extends GetSubresourceProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testConvertStringParentIdToConcreteDataType()
+    public function testConvertStringParentIdToConcreteDataType(): void
     {
         $this->context->setParentClassName('Test\Class');
         $this->context->setParentId('123');
@@ -61,7 +59,7 @@ class NormalizeParentEntityIdTest extends GetSubresourceProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessForInvalidParentId()
+    public function testProcessForInvalidParentId(): void
     {
         $this->context->setParentClassName('Test\Class');
         $this->context->setParentId('123');
@@ -85,7 +83,7 @@ class NormalizeParentEntityIdTest extends GetSubresourceProcessorTestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testProcessForNotResolvedParentId()
+    public function testProcessForNotResolvedParentId(): void
     {
         $this->context->setParentClassName('Test\Class');
         $this->context->setParentId('test');

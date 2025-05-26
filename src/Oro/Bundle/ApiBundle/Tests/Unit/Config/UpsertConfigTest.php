@@ -3,8 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ApiBundle\Config\UpsertConfig;
+use PHPUnit\Framework\TestCase;
 
-class UpsertConfigTest extends \PHPUnit\Framework\TestCase
+class UpsertConfigTest extends TestCase
 {
     public function testInitialState(): void
     {

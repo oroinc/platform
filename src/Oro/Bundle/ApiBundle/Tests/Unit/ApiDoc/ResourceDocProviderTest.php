@@ -4,11 +4,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc;
 
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocProvider;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
+use PHPUnit\Framework\TestCase;
 
-class ResourceDocProviderTest extends \PHPUnit\Framework\TestCase
+class ResourceDocProviderTest extends TestCase
 {
-    /** @var ResourceDocProvider */
-    private $resourceDocProvider;
+    private ResourceDocProvider $resourceDocProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class ResourceDocProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getResourceDescriptionProvider
      */
-    public function testGetResourceDescription(string $action, string $entityDescription, ?string $expected)
+    public function testGetResourceDescription(string $action, string $entityDescription, ?string $expected): void
     {
         self::assertSame(
             $expected,
@@ -50,7 +50,7 @@ class ResourceDocProviderTest extends \PHPUnit\Framework\TestCase
         string $entitySingularName,
         string $entityPluralName,
         ?string $expected
-    ) {
+    ): void {
         self::assertSame(
             $expected,
             $this->resourceDocProvider->getResourceDocumentation($action, $entitySingularName, $entityPluralName)
@@ -182,7 +182,7 @@ class ResourceDocProviderTest extends \PHPUnit\Framework\TestCase
         string $associationDescription,
         bool $isCollection,
         ?string $expected
-    ) {
+    ): void {
         self::assertSame(
             $expected,
             $this->resourceDocProvider->getSubresourceDescription($action, $associationDescription, $isCollection)
@@ -222,7 +222,7 @@ class ResourceDocProviderTest extends \PHPUnit\Framework\TestCase
         string $associationDescription,
         bool $isCollection,
         ?string $expected
-    ) {
+    ): void {
         self::assertSame(
             $expected,
             $this->resourceDocProvider->getSubresourceDocumentation($action, $associationDescription, $isCollection)

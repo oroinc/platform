@@ -30,6 +30,7 @@ use Oro\Component\EntitySerializer\DataTransformer;
 use Oro\Component\EntitySerializer\SerializationHelper;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -40,14 +41,9 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  */
 class ByConfigObjectNormalizerTest extends OrmTestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var AssociationAccessExclusionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $associationAccessExclusionProvider;
-
-    /** @var ObjectNormalizer */
-    private $objectNormalizer;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private AssociationAccessExclusionProviderInterface&MockObject $associationAccessExclusionProvider;
+    private ObjectNormalizer $objectNormalizer;
 
     #[\Override]
     protected function setUp(): void
@@ -143,7 +139,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         return $loaderFactory->getLoader(ConfigUtil::DEFINITION)->load($config);
     }
 
-    public function testNormalizeSimpleObject()
+    public function testNormalizeSimpleObject(): void
     {
         $object = new Entity\Group();
         $object->setId(123);
@@ -173,7 +169,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         );
     }
 
-    public function testNormalizeSimpleObjectWithRenaming()
+    public function testNormalizeSimpleObjectWithRenaming(): void
     {
         $object = new Entity\Group();
         $object->setId(123);
@@ -205,7 +201,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         );
     }
 
-    public function testNormalizeSimpleObjectWithDataTransformers()
+    public function testNormalizeSimpleObjectWithDataTransformers(): void
     {
         $object = new Entity\Group();
         $object->setId(123);
@@ -241,7 +237,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         );
     }
 
-    public function testNormalizeSimpleObjectWithPostSerialize()
+    public function testNormalizeSimpleObjectWithPostSerialize(): void
     {
         $object = new Entity\Group();
         $object->setId(123);
@@ -286,7 +282,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         );
     }
 
-    public function testNormalizeObjectWithToOneRelations()
+    public function testNormalizeObjectWithToOneRelations(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -347,7 +343,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         );
     }
 
-    public function testNormalizeObjectWithNullToOneRelations()
+    public function testNormalizeObjectWithNullToOneRelations(): void
     {
         $product = new Entity\Product();
         $product->setId(123);
@@ -395,7 +391,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         );
     }
 
-    public function testNormalizeObjectWithToManyRelation()
+    public function testNormalizeObjectWithToManyRelation(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -444,7 +440,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         );
     }
 
-    public function testNormalizeObjectWithArrayToManyRelation()
+    public function testNormalizeObjectWithArrayToManyRelation(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -495,7 +491,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         );
     }
 
-    public function testNormalizeObjectWithNullToManyRelation()
+    public function testNormalizeObjectWithNullToManyRelation(): void
     {
         $product = new Entity\Product();
         $product->setId(123);
@@ -552,7 +548,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         );
     }
 
-    public function testNormalizeObjectWithToOneRelationsAndDataTransformers()
+    public function testNormalizeObjectWithToOneRelationsAndDataTransformers(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -622,7 +618,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         );
     }
 
-    public function testNormalizeObjectWithCollapsedNullTableInheritanceRelations()
+    public function testNormalizeObjectWithCollapsedNullTableInheritanceRelations(): void
     {
         $product = new Entity\Product();
         $product->setId(123);
@@ -685,7 +681,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         );
     }
 
-    public function testNormalizeObjectWithCollapsedTableInheritanceRelations()
+    public function testNormalizeObjectWithCollapsedTableInheritanceRelations(): void
     {
         $product = new Entity\Product();
         $product->setId(123);
@@ -764,7 +760,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         );
     }
 
-    public function testNormalizeObjectWithNullTableInheritanceRelations()
+    public function testNormalizeObjectWithNullTableInheritanceRelations(): void
     {
         $product = new Entity\Product();
         $product->setId(123);
@@ -825,7 +821,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         );
     }
 
-    public function testNormalizeObjectWithTableInheritanceRelations()
+    public function testNormalizeObjectWithTableInheritanceRelations(): void
     {
         $product = new Entity\Product();
         $product->setId(123);
@@ -902,7 +898,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         );
     }
 
-    public function testNormalizeShouldNotChangeOriginalConfig()
+    public function testNormalizeShouldNotChangeOriginalConfig(): void
     {
         $object = new Entity\Group();
         $object->setId(123);
@@ -930,7 +926,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         self::assertEquals($srcConfig, $configObject->toArray());
     }
 
-    public function testNormalizeWithIgnoredField()
+    public function testNormalizeWithIgnoredField(): void
     {
         $object = new Entity\Group();
         $object->setId(123);
@@ -961,7 +957,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         );
     }
 
-    public function testNormalizeWithDependsOnNotConfiguredField()
+    public function testNormalizeWithDependsOnNotConfiguredField(): void
     {
         $object = new Entity\Group();
         $object->setId(123);
@@ -992,7 +988,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         );
     }
 
-    public function testNormalizeWithDependsOnExcludedField()
+    public function testNormalizeWithDependsOnExcludedField(): void
     {
         $object = new Entity\Group();
         $object->setId(123);
@@ -1025,7 +1021,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         );
     }
 
-    public function testNormalizeWithComputedField()
+    public function testNormalizeWithComputedField(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1065,7 +1061,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         );
     }
 
-    public function testNormalizeWithComputedFieldAndSkipPostSerializationForPrimaryObjects()
+    public function testNormalizeWithComputedFieldAndSkipPostSerializationForPrimaryObjects(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1110,7 +1106,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         );
     }
 
-    public function testNormalizeWithDependsOnComputedField()
+    public function testNormalizeWithDependsOnComputedField(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1161,7 +1157,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         );
     }
 
-    public function testNormalizeWithDependsOnRenamedComputedField()
+    public function testNormalizeWithDependsOnRenamedComputedField(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1216,7 +1212,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         );
     }
 
-    public function testNormalizeObjectWhenRelationRepresentedByEntityIdentifierClass()
+    public function testNormalizeObjectWhenRelationRepresentedByEntityIdentifierClass(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1262,7 +1258,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         );
     }
 
-    public function testNormalizeObjectForInvalidExclusionPolicyInRelationConfig()
+    public function testNormalizeObjectForInvalidExclusionPolicyInRelationConfig(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(sprintf(
@@ -1292,7 +1288,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         $this->normalizeObject($product, $this->createConfigObject($config));
     }
 
-    public function testNormalizeObjectWhenNoViewAccessToSameEntities()
+    public function testNormalizeObjectWhenNoViewAccessToSameEntities(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -1369,7 +1365,7 @@ class ByConfigObjectNormalizerTest extends OrmTestCase
         );
     }
 
-    public function testNormalizeObjectWhenIgnoreViewAccessToSameEntities()
+    public function testNormalizeObjectWhenIgnoreViewAccessToSameEntities(): void
     {
         $config = [
             'exclusion_policy' => 'all',

@@ -6,10 +6,11 @@ use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateItemStatus;
 use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateResponse;
 use Oro\Bundle\ApiBundle\Batch\Model\BatchAffectedEntities;
 use Oro\Bundle\ApiBundle\Batch\Model\BatchSummary;
+use PHPUnit\Framework\TestCase;
 
-class BatchUpdateResponseTest extends \PHPUnit\Framework\TestCase
+class BatchUpdateResponseTest extends TestCase
 {
-    public function testResponse()
+    public function testResponse(): void
     {
         $data = [['key' => 'val']];
         $processedItemStatuses = [BatchUpdateItemStatus::NO_ERRORS];
@@ -26,7 +27,7 @@ class BatchUpdateResponseTest extends \PHPUnit\Framework\TestCase
         self::assertNull($response->getRetryReason());
     }
 
-    public function testResponseWithUnexpectedErrors()
+    public function testResponseWithUnexpectedErrors(): void
     {
         $data = [['key' => 'val']];
         $processedItemStatuses = [BatchUpdateItemStatus::NO_ERRORS];
@@ -43,7 +44,7 @@ class BatchUpdateResponseTest extends \PHPUnit\Framework\TestCase
         self::assertNull($response->getRetryReason());
     }
 
-    public function testResponseWithRetryAgain()
+    public function testResponseWithRetryAgain(): void
     {
         $data = [['key' => 'val']];
         $processedItemStatuses = [BatchUpdateItemStatus::NO_ERRORS];

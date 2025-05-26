@@ -6,14 +6,12 @@ use Oro\Bundle\ApiBundle\Batch\Model\ChunkFile;
 use Oro\Bundle\ApiBundle\Batch\Processor\Update\JsonApi\LoadDataFromFile;
 use Oro\Bundle\ApiBundle\Tests\Unit\Batch\Processor\Update\BatchUpdateProcessorTestCase;
 use Oro\Bundle\GaufretteBundle\FileManager;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class LoadDataFromFileTest extends BatchUpdateProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FileManager */
-    private $fileManager;
-
-    /** @var LoadDataFromFile */
-    private $processor;
+    private FileManager&MockObject $fileManager;
+    private LoadDataFromFile $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -23,13 +21,13 @@ class LoadDataFromFileTest extends BatchUpdateProcessorTestCase
         $this->processor = new LoadDataFromFile();
     }
 
-    public function testProcessWhenDataAlreadyLoaded()
+    public function testProcessWhenDataAlreadyLoaded(): void
     {
         $this->context->setResult('test');
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenDataFileContainsJsonApiHeader()
+    public function testProcessWhenDataFileContainsJsonApiHeader(): void
     {
         $fileName = 'test_file.json';
 
@@ -62,7 +60,7 @@ class LoadDataFromFileTest extends BatchUpdateProcessorTestCase
         );
     }
 
-    public function testProcessWhenDataFileDoesNotContainJsonApiHeader()
+    public function testProcessWhenDataFileDoesNotContainJsonApiHeader(): void
     {
         $fileName = 'test_file.json';
 

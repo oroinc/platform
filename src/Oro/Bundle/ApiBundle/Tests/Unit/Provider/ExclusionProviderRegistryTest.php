@@ -6,21 +6,16 @@ use Oro\Bundle\ApiBundle\Provider\ExclusionProviderRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
-class ExclusionProviderRegistryTest extends \PHPUnit\Framework\TestCase
+class ExclusionProviderRegistryTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ExclusionProviderInterface */
-    private $defaultExclusionProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ExclusionProviderInterface */
-    private $firstExclusionProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ExclusionProviderInterface */
-    private $secondExclusionProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
-    private $container;
+    private ExclusionProviderInterface&MockObject $defaultExclusionProvider;
+    private ExclusionProviderInterface&MockObject $firstExclusionProvider;
+    private ExclusionProviderInterface&MockObject $secondExclusionProvider;
+    private ContainerInterface&MockObject $container;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +35,7 @@ class ExclusionProviderRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetExclusionProviderForUnsupportedRequestType()
+    public function testGetExclusionProviderForUnsupportedRequestType(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot find an exclusion provider for the request "rest,another".');
@@ -50,7 +45,7 @@ class ExclusionProviderRegistryTest extends \PHPUnit\Framework\TestCase
         $registry->getExclusionProvider($requestType);
     }
 
-    public function testGetExclusionProviderShouldReturnDefaultProviderForNotFirstAndSecondRequestType()
+    public function testGetExclusionProviderShouldReturnDefaultProviderForNotFirstAndSecondRequestType(): void
     {
         $registry = $this->getRegistry(
             [
@@ -71,7 +66,7 @@ class ExclusionProviderRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->defaultExclusionProvider, $registry->getExclusionProvider($requestType));
     }
 
-    public function testGetExclusionProviderShouldReturnFirstProviderForFirstRequestType()
+    public function testGetExclusionProviderShouldReturnFirstProviderForFirstRequestType(): void
     {
         $registry = $this->getRegistry(
             [
@@ -92,7 +87,7 @@ class ExclusionProviderRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->firstExclusionProvider, $registry->getExclusionProvider($requestType));
     }
 
-    public function testGetExclusionProviderShouldReturnSecondProviderForSecondRequestType()
+    public function testGetExclusionProviderShouldReturnSecondProviderForSecondRequestType(): void
     {
         $registry = $this->getRegistry(
             [
@@ -113,7 +108,7 @@ class ExclusionProviderRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->secondExclusionProvider, $registry->getExclusionProvider($requestType));
     }
 
-    public function testGetExclusionProviderShouldReturnDefaultBagIfSpecificBagNotFound()
+    public function testGetExclusionProviderShouldReturnDefaultBagIfSpecificBagNotFound(): void
     {
         $registry = $this->getRegistry(
             [

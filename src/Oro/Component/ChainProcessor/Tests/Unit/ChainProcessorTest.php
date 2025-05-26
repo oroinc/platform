@@ -9,10 +9,11 @@ use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
+use PHPUnit\Framework\TestCase;
 
-class ChainProcessorTest extends \PHPUnit\Framework\TestCase
+class ChainProcessorTest extends TestCase
 {
-    public function testExecuteProcessors()
+    public function testExecuteProcessors(): void
     {
         $processor1 = $this->createMock(ProcessorInterface::class);
         $processor2 = $this->createMock(ProcessorInterface::class);
@@ -41,7 +42,7 @@ class ChainProcessorTest extends \PHPUnit\Framework\TestCase
         $chainProcessor->process($context);
     }
 
-    public function testExecuteProcessorsFailure()
+    public function testExecuteProcessorsFailure(): void
     {
         $processor1 = $this->createMock(ProcessorInterface::class);
         $processor2 = $this->createMock(ProcessorInterface::class);

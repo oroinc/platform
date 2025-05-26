@@ -16,16 +16,14 @@ use Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class AddPaginationLinksForSubresourceTest extends GetSubresourceProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|UrlGeneratorInterface */
-    private $urlGenerator;
-
-    /** @var AddPaginationLinksForSubresource */
-    private $processor;
+    private UrlGeneratorInterface&MockObject $urlGenerator;
+    private AddPaginationLinksForSubresource $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -55,7 +53,7 @@ class AddPaginationLinksForSubresourceTest extends GetSubresourceProcessorTestCa
         );
     }
 
-    public function testProcessWhenNoDocumentBuilder()
+    public function testProcessWhenNoDocumentBuilder(): void
     {
         $this->context->setParentClassName('Test\Entity');
         $this->context->setParentId(123);
@@ -65,7 +63,7 @@ class AddPaginationLinksForSubresourceTest extends GetSubresourceProcessorTestCa
         $this->processor->process($this->context);
     }
 
-    public function testProcessForNotSuccessResponse()
+    public function testProcessForNotSuccessResponse(): void
     {
         $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
 
@@ -85,7 +83,7 @@ class AddPaginationLinksForSubresourceTest extends GetSubresourceProcessorTestCa
         $this->processor->process($this->context);
     }
 
-    public function testProcessForSuccessResponse()
+    public function testProcessForSuccessResponse(): void
     {
         $parentClassName = 'Test\Entity';
         $parentEntityId = '_123';

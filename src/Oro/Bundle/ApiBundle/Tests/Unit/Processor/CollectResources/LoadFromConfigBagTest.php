@@ -8,14 +8,13 @@ use Oro\Bundle\ApiBundle\Provider\ConfigBagInterface;
 use Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\Version;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
+class LoadFromConfigBagTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigBagInterface */
-    private $configBag;
-
-    /** @var LoadFromConfigBag */
-    private $processor;
+    private ConfigBagInterface&MockObject $configBag;
+    private LoadFromConfigBag $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +29,7 @@ class LoadFromConfigBagTest extends \PHPUnit\Framework\TestCase
         $this->processor = new LoadFromConfigBag($configBagRegistry);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $context = new CollectResourcesContext();
         $context->setVersion(Version::LATEST);

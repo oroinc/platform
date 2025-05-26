@@ -3,11 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig\MergeConfig;
 
 use Oro\Bundle\ApiBundle\Processor\GetConfig\MergeConfig\MergeFilterConfigHelper;
+use PHPUnit\Framework\TestCase;
 
-class MergeFilterConfigHelperTest extends \PHPUnit\Framework\TestCase
+class MergeFilterConfigHelperTest extends TestCase
 {
-    /** @var MergeFilterConfigHelper */
-    private $mergeFilterConfigHelper;
+    private MergeFilterConfigHelper $mergeFilterConfigHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -15,7 +15,7 @@ class MergeFilterConfigHelperTest extends \PHPUnit\Framework\TestCase
         $this->mergeFilterConfigHelper = new MergeFilterConfigHelper();
     }
 
-    public function testMergeEmptyFilterConfig()
+    public function testMergeEmptyFilterConfig(): void
     {
         $config = [];
         $filterConfig = [];
@@ -28,7 +28,7 @@ class MergeFilterConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMergeFilterConfigWithExclusionPolicyEqualsToAll()
+    public function testMergeFilterConfigWithExclusionPolicyEqualsToAll(): void
     {
         $config = [
             'filters' => [
@@ -72,7 +72,7 @@ class MergeFilterConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMergeFilterConfigWithoutExclusionPolicy()
+    public function testMergeFilterConfigWithoutExclusionPolicy(): void
     {
         $config = [
             'filters' => [
@@ -139,7 +139,7 @@ class MergeFilterConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMergeFilterConfigWhenConfigDoesNotHaveFieldsSection()
+    public function testMergeFilterConfigWhenConfigDoesNotHaveFieldsSection(): void
     {
         $config = [
             'filters' => [

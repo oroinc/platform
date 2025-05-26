@@ -4,11 +4,12 @@ namespace Oro\Component\ChainProcessor\Tests\Unit;
 
 use Oro\Component\ChainProcessor\LazyProcessorBagConfigProvider;
 use Oro\Component\ChainProcessor\ProcessorBagActionConfigProvider;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
-class LazyProcessorBagConfigProviderTest extends \PHPUnit\Framework\TestCase
+class LazyProcessorBagConfigProviderTest extends TestCase
 {
-    public function testProcessorBagConfigProvider()
+    public function testProcessorBagConfigProvider(): void
     {
         $groups = ['action1' => ['group1']];
         $processors = [

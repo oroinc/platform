@@ -5,14 +5,13 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc;
 use Oro\Bundle\ApiBundle\ApiDoc\PredefinedIdDocumentationProvider;
 use Oro\Bundle\ApiBundle\Request\EntityIdResolverRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class PredefinedIdDocumentationProviderTest extends \PHPUnit\Framework\TestCase
+class PredefinedIdDocumentationProviderTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityIdResolverRegistry */
-    private $entityIdResolverRegistry;
-
-    /** @var PredefinedIdDocumentationProvider */
-    private $provider;
+    private EntityIdResolverRegistry&MockObject $entityIdResolverRegistry;
+    private PredefinedIdDocumentationProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +21,7 @@ class PredefinedIdDocumentationProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new PredefinedIdDocumentationProvider($this->entityIdResolverRegistry);
     }
 
-    public function testGetDocumentationWhenNoPredefinedIds()
+    public function testGetDocumentationWhenNoPredefinedIds(): void
     {
         $requestType = new RequestType(['test']);
 
@@ -36,7 +35,7 @@ class PredefinedIdDocumentationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDocumentationWhenPredefinedIdsExist()
+    public function testGetDocumentationWhenPredefinedIdsExist(): void
     {
         $requestType = new RequestType(['test']);
 

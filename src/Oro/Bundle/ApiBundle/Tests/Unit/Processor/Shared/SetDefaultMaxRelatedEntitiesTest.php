@@ -8,10 +8,9 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
 class SetDefaultMaxRelatedEntitiesTest extends GetListProcessorTestCase
 {
-    private const MAX_RELATED_ENTITIES_LIMIT = 100;
+    private const int MAX_RELATED_ENTITIES_LIMIT = 100;
 
-    /** @var SetDefaultMaxRelatedEntities */
-    private $processor;
+    private SetDefaultMaxRelatedEntities $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class SetDefaultMaxRelatedEntitiesTest extends GetListProcessorTestCase
         $this->processor = new SetDefaultMaxRelatedEntities(self::MAX_RELATED_ENTITIES_LIMIT);
     }
 
-    public function testProcessWhenMaxRelatedEntitiesConfigExtraAlreadyExistsInContext()
+    public function testProcessWhenMaxRelatedEntitiesConfigExtraAlreadyExistsInContext(): void
     {
         $customMaxRelatedEntitiesLimit = 123;
         $existingExtra = new MaxRelatedEntitiesConfigExtra($customMaxRelatedEntitiesLimit);
@@ -35,7 +34,7 @@ class SetDefaultMaxRelatedEntitiesTest extends GetListProcessorTestCase
         self::assertSame($customMaxRelatedEntitiesLimit, $extra->getMaxRelatedEntities());
     }
 
-    public function testProcessWhenMaxRelatedEntitiesConfigExtraDoesNotExistInContext()
+    public function testProcessWhenMaxRelatedEntitiesConfigExtraDoesNotExistInContext(): void
     {
         $this->processor->process($this->context);
 

@@ -10,20 +10,19 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
 use Oro\Component\Config\Tests\Unit\Fixtures\ResourceStub;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ConfigCacheTest extends \PHPUnit\Framework\TestCase
+class ConfigCacheTest extends TestCase
 {
     use TempDirExtension;
 
-    /** @var string */
-    private $configKey;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigCacheFactory */
-    private $configCacheFactory;
+    private string $configKey;
+    private ConfigCacheFactory&MockObject $configCacheFactory;
 
     #[\Override]
     protected function setUp(): void
@@ -41,7 +40,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetConfig()
+    public function testGetConfig(): void
     {
         $configFile = 'api_test.yml';
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
@@ -79,7 +78,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedConfig, $configCache->getConfig($configFile));
     }
 
-    public function testGetConfigWhenCacheIsFresh()
+    public function testGetConfigWhenCacheIsFresh(): void
     {
         $configFile = 'api_test.yml';
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
@@ -115,7 +114,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedConfig, $configCache->getConfig($configFile));
     }
 
-    public function testGetConfigWhenCacheDataIsInvalid()
+    public function testGetConfigWhenCacheDataIsInvalid(): void
     {
         $configFile = 'api_test.yml';
         $cachePath = __DIR__ . '/Fixtures/api_test_invalid.php';
@@ -143,7 +142,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $configCache->getConfig($configFile);
     }
 
-    public function testGetConfigWhenCacheDoesNotHaveConfigForGivenConfigFile()
+    public function testGetConfigWhenCacheDoesNotHaveConfigForGivenConfigFile(): void
     {
         $configFile = 'api_test1.yml';
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
@@ -171,7 +170,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $configCache->getConfig($configFile);
     }
 
-    public function testGetAliases()
+    public function testGetAliases(): void
     {
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedAliases = [
@@ -203,7 +202,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedAliases, $configCache->getAliases());
     }
 
-    public function testGetAliasesWhenCacheIsFresh()
+    public function testGetAliasesWhenCacheIsFresh(): void
     {
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedAliases = [
@@ -233,7 +232,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedAliases, $configCache->getAliases());
     }
 
-    public function testGetAliasesWhenCacheDataIsInvalid()
+    public function testGetAliasesWhenCacheDataIsInvalid(): void
     {
         $cachePath = __DIR__ . '/Fixtures/api_test_invalid.php';
 
@@ -260,7 +259,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $configCache->getAliases();
     }
 
-    public function testGetExcludedEntities()
+    public function testGetExcludedEntities(): void
     {
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedExcludedEntities = [
@@ -289,7 +288,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedExcludedEntities, $configCache->getExcludedEntities());
     }
 
-    public function testGetExcludedEntitiesWhenCacheIsFresh()
+    public function testGetExcludedEntitiesWhenCacheIsFresh(): void
     {
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedExcludedEntities = [
@@ -316,7 +315,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedExcludedEntities, $configCache->getExcludedEntities());
     }
 
-    public function testGetExcludedEntitiesWhenCacheDataIsInvalid()
+    public function testGetExcludedEntitiesWhenCacheDataIsInvalid(): void
     {
         $cachePath = __DIR__ . '/Fixtures/api_test_invalid.php';
 
@@ -343,7 +342,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $configCache->getExcludedEntities();
     }
 
-    public function testGetSubstitutions()
+    public function testGetSubstitutions(): void
     {
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedSubstitutions = [
@@ -373,7 +372,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedSubstitutions, $configCache->getSubstitutions());
     }
 
-    public function testGetSubstitutionsWhenCacheIsFresh()
+    public function testGetSubstitutionsWhenCacheIsFresh(): void
     {
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedSubstitutions = [
@@ -401,7 +400,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedSubstitutions, $configCache->getSubstitutions());
     }
 
-    public function testGetSubstitutionsWhenCacheDataIsInvalid()
+    public function testGetSubstitutionsWhenCacheDataIsInvalid(): void
     {
         $cachePath = __DIR__ . '/Fixtures/api_test_invalid.php';
 
@@ -428,7 +427,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $configCache->getSubstitutions();
     }
 
-    public function testGetExclusions()
+    public function testGetExclusions(): void
     {
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedExclusions = [
@@ -460,7 +459,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedExclusions, $configCache->getExclusions());
     }
 
-    public function testGetExclusionsWhenCacheIsFresh()
+    public function testGetExclusionsWhenCacheIsFresh(): void
     {
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedExclusions = [
@@ -490,7 +489,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedExclusions, $configCache->getExclusions());
     }
 
-    public function testGetExclusionsWhenCacheDataIsInvalid()
+    public function testGetExclusionsWhenCacheDataIsInvalid(): void
     {
         $cachePath = __DIR__ . '/Fixtures/api_test_invalid.php';
 
@@ -517,7 +516,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $configCache->getExclusions();
     }
 
-    public function testGetInclusions()
+    public function testGetInclusions(): void
     {
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedInclusions = [
@@ -549,7 +548,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedInclusions, $configCache->getInclusions());
     }
 
-    public function testGetInclusionsWhenCacheIsFresh()
+    public function testGetInclusionsWhenCacheIsFresh(): void
     {
         $cachePath = __DIR__ . '/Fixtures/api_test.php';
         $expectedInclusions = [
@@ -579,7 +578,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedInclusions, $configCache->getInclusions());
     }
 
-    public function testGetInclusionsWhenCacheDataIsInvalid()
+    public function testGetInclusionsWhenCacheDataIsInvalid(): void
     {
         $cachePath = __DIR__ . '/Fixtures/api_test_invalid.php';
 
@@ -606,7 +605,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         $configCache->getInclusions();
     }
 
-    public function testIsCacheFreshForNullTimestamp()
+    public function testIsCacheFreshForNullTimestamp(): void
     {
         $this->configCacheFactory->expects(self::never())
             ->method('getCache');
@@ -616,7 +615,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($configCache->isCacheFresh(null));
     }
 
-    public function testIsCacheFreshWhenNoCachedData()
+    public function testIsCacheFreshWhenNoCachedData(): void
     {
         $cacheFile = $this->getTempFile('ApiConfigCache');
 
@@ -631,7 +630,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($configCache->isCacheFresh($timestamp));
     }
 
-    public function testIsCacheFreshWhenCachedDataExist()
+    public function testIsCacheFreshWhenCachedDataExist(): void
     {
         $cacheFile = $this->getTempFile('ApiConfigCache');
 
@@ -650,7 +649,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($configCache->isCacheFresh($cacheTimestamp - 1));
     }
 
-    public function testIsCacheFreshWhenCachedDataExistForDevelopmentModeWhenCacheIsFresh()
+    public function testIsCacheFreshWhenCachedDataExistForDevelopmentModeWhenCacheIsFresh(): void
     {
         $cacheFile = $this->getTempFile('ApiConfigCache');
 
@@ -671,7 +670,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($configCache->isCacheFresh($cacheTimestamp - 1));
     }
 
-    public function testIsCacheFreshWhenCachedDataExistForDevelopmentModeWhenCacheIsDirty()
+    public function testIsCacheFreshWhenCachedDataExistForDevelopmentModeWhenCacheIsDirty(): void
     {
         $cacheFile = $this->getTempFile('ApiConfigCache');
 
@@ -693,7 +692,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($configCache->isCacheFresh($cacheTimestamp - 1));
     }
 
-    public function testGetCacheTimestampWhenNoCachedData()
+    public function testGetCacheTimestampWhenNoCachedData(): void
     {
         $cacheFile = $this->getTempFile('ApiConfigCache');
 
@@ -707,7 +706,7 @@ class ConfigCacheTest extends \PHPUnit\Framework\TestCase
         self::assertNull($configCache->getCacheTimestamp());
     }
 
-    public function testGetCacheTimestampWhenCachedDataExist()
+    public function testGetCacheTimestampWhenCachedDataExist(): void
     {
         $cacheFile = $this->getTempFile('ApiConfigCache');
 

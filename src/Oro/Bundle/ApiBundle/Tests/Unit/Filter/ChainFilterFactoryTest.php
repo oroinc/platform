@@ -5,10 +5,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 use Oro\Bundle\ApiBundle\Filter\ChainFilterFactory;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
+use PHPUnit\Framework\TestCase;
 
-class ChainFilterFactoryTest extends \PHPUnit\Framework\TestCase
+class ChainFilterFactoryTest extends TestCase
 {
-    public function testChainFactory()
+    public function testChainFactory(): void
     {
         $childFactory1 = $this->createMock(FilterFactoryInterface::class);
         $childFactory2 = $this->createMock(FilterFactoryInterface::class);

@@ -4,16 +4,17 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ApiBundle\Config\ActionConfig;
 use Oro\Bundle\ApiBundle\Config\SubresourceConfig;
+use PHPUnit\Framework\TestCase;
 
-class SubresourceConfigTest extends \PHPUnit\Framework\TestCase
+class SubresourceConfigTest extends TestCase
 {
-    public function testIsEmpty()
+    public function testIsEmpty(): void
     {
         $config = new SubresourceConfig();
         self::assertTrue($config->isEmpty());
     }
 
-    public function testClone()
+    public function testClone(): void
     {
         $config = new SubresourceConfig();
         self::assertTrue($config->isEmpty());
@@ -30,7 +31,7 @@ class SubresourceConfigTest extends \PHPUnit\Framework\TestCase
         self::assertNotSame($objValue, $configClone->get('test_object'));
     }
 
-    public function testExcluded()
+    public function testExcluded(): void
     {
         $config = new SubresourceConfig();
         self::assertFalse($config->hasExcluded());
@@ -47,7 +48,7 @@ class SubresourceConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['exclude' => false], $config->toArray());
     }
 
-    public function testTargetClass()
+    public function testTargetClass(): void
     {
         $config = new SubresourceConfig();
         self::assertNull($config->getTargetClass());
@@ -61,7 +62,7 @@ class SubresourceConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testTargetType()
+    public function testTargetType(): void
     {
         $config = new SubresourceConfig();
         self::assertFalse($config->hasTargetType());
@@ -87,7 +88,7 @@ class SubresourceConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testActions()
+    public function testActions(): void
     {
         $actionConfig = new ActionConfig();
 
@@ -110,7 +111,7 @@ class SubresourceConfigTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($config->isEmpty());
     }
 
-    public function testExtraAttribute()
+    public function testExtraAttribute(): void
     {
         $attrName = 'test';
 

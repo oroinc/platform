@@ -8,8 +8,7 @@ use Symfony\Component\Form\FormInterface;
 
 class SubmitFormTest extends FormProcessorTestCase
 {
-    /** @var SubmitForm */
-    private $processor;
+    private SubmitForm $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +18,7 @@ class SubmitFormTest extends FormProcessorTestCase
         $this->processor = new SubmitForm();
     }
 
-    public function testProcessWithoutForm()
+    public function testProcessWithoutForm(): void
     {
         $entity = new \stdClass();
 
@@ -27,7 +26,7 @@ class SubmitFormTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForAlreadySubmittedForm()
+    public function testProcessForAlreadySubmittedForm(): void
     {
         $form = $this->createMock(FormInterface::class);
 
@@ -41,7 +40,7 @@ class SubmitFormTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $requestData = [
             'field1' => 123,

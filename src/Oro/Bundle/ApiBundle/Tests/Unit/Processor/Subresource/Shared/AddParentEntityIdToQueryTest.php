@@ -29,13 +29,13 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessWhenQueryDoesNotExist()
+    public function testProcessWhenQueryDoesNotExist(): void
     {
         $this->processor->process($this->context);
         self::assertNull($this->context->getQuery());
     }
 
-    public function testProcessForUnsupportedQuery()
+    public function testProcessForUnsupportedQuery(): void
     {
         $query = new \stdClass();
 
@@ -44,7 +44,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         self::assertSame($query, $this->context->getQuery());
     }
 
-    public function testProcessForQueryWithSeveralRootAliases()
+    public function testProcessForQueryWithSeveralRootAliases(): void
     {
         $query = $this->doctrineHelper
             ->getEntityManagerForClass(Entity\Product::class)
@@ -65,7 +65,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForSubresourceThatDoesNotAssociatedWithAnyFieldInParentEntityConfig()
+    public function testProcessForSubresourceThatDoesNotAssociatedWithAnyFieldInParentEntityConfig(): void
     {
         $associationName = 'association';
 
@@ -95,7 +95,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         self::assertCount(0, $this->context->getQuery()->getParameters());
     }
 
-    public function testProcessForComputedAssociationWhenQueryForItIsPreparedByAnotherProcessor()
+    public function testProcessForComputedAssociationWhenQueryForItIsPreparedByAnotherProcessor(): void
     {
         $associationName = 'owner';
         $parentId = 123;
@@ -135,7 +135,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForComputedAssociationWhenQueryForItIsNotPreparedByAnotherProcessor()
+    public function testProcessForComputedAssociationWhenQueryForItIsNotPreparedByAnotherProcessor(): void
     {
         $associationName = 'owner';
         $parentId = 123;
@@ -175,7 +175,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForComputedAssociationAndCompositeParentIdWhenQueryForItIsPreparedByAnotherProcessor()
+    public function testProcessForComputedAssocAndCompositeParentIdWhenQueryForItIsPreparedByAnotherProcessor(): void
     {
         $associationName = 'owner';
         $parentId = ['id' => 123, 'title' => 'test'];
@@ -224,7 +224,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForComputedAssociationAndCompositeParentIdWhenQueryForItIsNotPreparedByAnotherProcessor()
+    public function testProcessForComputedAssocAndCompositeParentIdWhenQueryForItIsNotPreparedByAnotherProcessor(): void
     {
         $associationName = 'owner';
         $parentId = ['id' => 123, 'title' => 'test'];
@@ -270,7 +270,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForSubresourceWhenQueryForItIsPreparedByAnotherProcessor()
+    public function testProcessForSubresourceWhenQueryForItIsPreparedByAnotherProcessor(): void
     {
         $associationName = 'owner';
         $parentId = 123;
@@ -310,7 +310,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForToManyBidirectionalAssociation()
+    public function testProcessForToManyBidirectionalAssociation(): void
     {
         $associationName = 'products';
         $parentId = 123;
@@ -347,7 +347,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForToManyUnidirectionalAssociation()
+    public function testProcessForToManyUnidirectionalAssociation(): void
     {
         $associationName = 'users';
         $parentId = 123;
@@ -385,7 +385,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForToManyRenamedBidirectionalAssociation()
+    public function testProcessForToManyRenamedBidirectionalAssociation(): void
     {
         $associationName = 'renamedProducts';
         $parentId = 123;
@@ -422,7 +422,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForToManyRenamedUnidirectionalAssociation()
+    public function testProcessForToManyRenamedUnidirectionalAssociation(): void
     {
         $associationName = 'renamedUsers';
         $parentId = 123;
@@ -460,7 +460,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForToOneBidirectionalAssociation()
+    public function testProcessForToOneBidirectionalAssociation(): void
     {
         $associationName = 'owner';
         $parentId = 123;
@@ -496,7 +496,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForToOneUnidirectionalAssociation()
+    public function testProcessForToOneUnidirectionalAssociation(): void
     {
         $associationName = 'user';
         $parentId = 123;
@@ -533,7 +533,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForToOneRenamedBidirectionalAssociation()
+    public function testProcessForToOneRenamedBidirectionalAssociation(): void
     {
         $associationName = 'renamedOwner';
         $parentId = 123;
@@ -569,7 +569,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForToOneRenamedUnidirectionalAssociation()
+    public function testProcessForToOneRenamedUnidirectionalAssociation(): void
     {
         $associationName = 'renamedUser';
         $parentId = 123;
@@ -606,7 +606,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForToOneInverseSideBidirectionalAssociation()
+    public function testProcessForToOneInverseSideBidirectionalAssociation(): void
     {
         $associationName = 'origin';
         $parentId = 123;
@@ -642,7 +642,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForToOneRenamedInverseSideBidirectionalAssociation()
+    public function testProcessForToOneRenamedInverseSideBidirectionalAssociation(): void
     {
         $associationName = 'renamedOrigin';
         $parentId = 123;
@@ -678,7 +678,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForRenamedParentIdentifierField()
+    public function testProcessForRenamedParentIdentifierField(): void
     {
         $associationName = 'owner';
         $parentId = 123;
@@ -714,7 +714,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForCompositeParentIdentifier()
+    public function testProcessForCompositeParentIdentifier(): void
     {
         $associationName = 'children';
         $parentId = ['id' => 123, 'title' => 'test'];
@@ -757,7 +757,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForRenamedCompositeParentIdentifier()
+    public function testProcessForRenamedCompositeParentIdentifier(): void
     {
         $associationName = 'children';
         $parentId = ['renamedId' => 123, 'renamedTitle' => 'test'];
@@ -800,7 +800,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForAssociationWithDeepPropertyPath()
+    public function testProcessForAssociationWithDeepPropertyPath(): void
     {
         $associationName = 'category';
         $parentId = 123;
@@ -842,7 +842,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForApiResourceBasedOnManageableEntity()
+    public function testProcessForApiResourceBasedOnManageableEntity(): void
     {
         $this->notManageableClassNames[] = Entity\UserProfile::class;
 

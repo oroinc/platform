@@ -3,13 +3,14 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ApiBundle\Config\FilterFieldConfig;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class FilterFieldConfigTest extends \PHPUnit\Framework\TestCase
+class FilterFieldConfigTest extends TestCase
 {
-    public function testCustomAttribute()
+    public function testCustomAttribute(): void
     {
         $attrName = 'test';
 
@@ -37,7 +38,7 @@ class FilterFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $config->keys());
     }
 
-    public function testClone()
+    public function testClone(): void
     {
         $config = new FilterFieldConfig();
         self::assertEmpty($config->toArray());
@@ -53,7 +54,7 @@ class FilterFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertNotSame($objValue, $configClone->get('test_object'));
     }
 
-    public function testExcluded()
+    public function testExcluded(): void
     {
         $config = new FilterFieldConfig();
         self::assertFalse($config->hasExcluded());
@@ -70,7 +71,7 @@ class FilterFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testPropertyPath()
+    public function testPropertyPath(): void
     {
         $config = new FilterFieldConfig();
         self::assertFalse($config->hasPropertyPath());
@@ -96,7 +97,7 @@ class FilterFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testIsCollection()
+    public function testIsCollection(): void
     {
         $config = new FilterFieldConfig();
         self::assertFalse($config->hasCollection());
@@ -113,7 +114,7 @@ class FilterFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testDescription()
+    public function testDescription(): void
     {
         $config = new FilterFieldConfig();
         self::assertFalse($config->hasDescription());
@@ -136,7 +137,7 @@ class FilterFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testDataType()
+    public function testDataType(): void
     {
         $config = new FilterFieldConfig();
         self::assertFalse($config->hasDataType());
@@ -151,7 +152,7 @@ class FilterFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertNull($config->getDataType());
     }
 
-    public function testArrayAllowed()
+    public function testArrayAllowed(): void
     {
         $config = new FilterFieldConfig();
         self::assertFalse($config->hasArrayAllowed());
@@ -168,7 +169,7 @@ class FilterFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testRangeAllowed()
+    public function testRangeAllowed(): void
     {
         $config = new FilterFieldConfig();
         self::assertFalse($config->hasRangeAllowed());
@@ -185,7 +186,7 @@ class FilterFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testType()
+    public function testType(): void
     {
         $config = new FilterFieldConfig();
         self::assertFalse($config->hasType());
@@ -202,7 +203,7 @@ class FilterFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testOptions()
+    public function testOptions(): void
     {
         $config = new FilterFieldConfig();
         self::assertNull($config->getOptions());
@@ -216,7 +217,7 @@ class FilterFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testOperators()
+    public function testOperators(): void
     {
         $config = new FilterFieldConfig();
         self::assertNull($config->getOperators());

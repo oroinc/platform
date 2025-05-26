@@ -6,13 +6,14 @@ use Oro\Bundle\ApiBundle\Provider\ConfigCacheFactory;
 use Oro\Bundle\ApiBundle\Provider\ConfigCacheFile;
 use Oro\Bundle\ApiBundle\Provider\ConfigCacheWarmer;
 use Oro\Component\Config\Cache\ConfigCacheStateInterface;
+use PHPUnit\Framework\TestCase;
 
-class ConfigCacheFactoryTest extends \PHPUnit\Framework\TestCase
+class ConfigCacheFactoryTest extends TestCase
 {
     /**
      * @dataProvider getCacheProvider
      */
-    public function testGetCache(bool $debug)
+    public function testGetCache(bool $debug): void
     {
         $configKey = 'test';
         $cacheDir = __DIR__ . '/Fixtures';
@@ -33,7 +34,7 @@ class ConfigCacheFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetCacheWithDependencies()
+    public function testGetCacheWithDependencies(): void
     {
         $configKey = 'test';
         $cacheDir = __DIR__ . '/Fixtures';

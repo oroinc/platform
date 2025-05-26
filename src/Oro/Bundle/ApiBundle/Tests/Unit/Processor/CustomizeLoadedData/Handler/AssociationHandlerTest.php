@@ -10,14 +10,15 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
+class AssociationHandlerTest extends TestCase
 {
-    /** @var ActionProcessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $customizationProcessor;
+    private ActionProcessorInterface&MockObject $customizationProcessor;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +33,7 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         return $data;
     }
 
-    public function testWithoutPreviousHandler()
+    public function testWithoutPreviousHandler(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -100,7 +101,7 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWithPreviousHandlerThatIsRedundant()
+    public function testWithPreviousHandlerThatIsRedundant(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -156,7 +157,7 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWithSeveralPreviousHandlersAndMiddleLevelPreviousHandlerIsRedundant()
+    public function testWithSeveralPreviousHandlersAndMiddleLevelPreviousHandlerIsRedundant(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -218,7 +219,7 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWithPreviousHandlerThatIsNotRedundantDueToVersion()
+    public function testWithPreviousHandlerThatIsNotRedundantDueToVersion(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -278,7 +279,7 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWithPreviousHandlerThatIsNotRedundantDueToRequestType()
+    public function testWithPreviousHandlerThatIsNotRedundantDueToRequestType(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -338,7 +339,7 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWithPreviousHandlerThatIsNotRedundantDueToRootEntityClass()
+    public function testWithPreviousHandlerThatIsNotRedundantDueToRootEntityClass(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -398,7 +399,7 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWithPreviousHandlerThatIsNotRedundantDueToPropertyPath()
+    public function testWithPreviousHandlerThatIsNotRedundantDueToPropertyPath(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -458,7 +459,7 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWithPreviousHandlerThatIsNotRedundantDueToEntityClass()
+    public function testWithPreviousHandlerThatIsNotRedundantDueToEntityClass(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -518,7 +519,7 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWithPreviousHandlerThatIsNotRedundantDueToHandlerType()
+    public function testWithPreviousHandlerThatIsNotRedundantDueToHandlerType(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -568,7 +569,7 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConfigForKnownField()
+    public function testConfigForKnownField(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -611,7 +612,7 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         $handler($data, $context);
     }
 
-    public function testConfigForUnknownField()
+    public function testConfigForUnknownField(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -653,7 +654,7 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         $handler($data, $context);
     }
 
-    public function testConfigForExcludedField()
+    public function testConfigForExcludedField(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -697,7 +698,7 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         $handler($data, $context);
     }
 
-    public function testConfigForNestedAssociationField()
+    public function testConfigForNestedAssociationField(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -741,7 +742,7 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         $handler($data, $context);
     }
 
-    public function testForCollectionHandler()
+    public function testForCollectionHandler(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -809,7 +810,7 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWithCustomConfig()
+    public function testWithCustomConfig(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);
@@ -883,7 +884,7 @@ class AssociationHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testWithParentAction()
+    public function testWithParentAction(): void
     {
         $version = '1.2';
         $requestType = new RequestType(['test']);

@@ -6,10 +6,11 @@ use Oro\Bundle\ApiBundle\Processor\CollectResources\CollectResourcesContext;
 use Oro\Bundle\ApiBundle\Processor\CollectResources\ForceExcludeUpdateListAction;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
+use PHPUnit\Framework\TestCase;
 
-class ForceExcludeUpdateListActionTest extends \PHPUnit\Framework\TestCase
+class ForceExcludeUpdateListActionTest extends TestCase
 {
-    public function testProcessOnEmptyExcludedActions()
+    public function testProcessOnEmptyExcludedActions(): void
     {
         $resource = new ApiResource('Test\Entity1');
         $context = new CollectResourcesContext();
@@ -24,7 +25,7 @@ class ForceExcludeUpdateListActionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWithExcludedUpdateListAction()
+    public function testProcessWithExcludedUpdateListAction(): void
     {
         $resource = new ApiResource('Test\Entity1');
         $resource->addExcludedAction(ApiAction::UPDATE_LIST);
@@ -40,7 +41,7 @@ class ForceExcludeUpdateListActionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWithExcludedGetActionAndManuallyEnabledUpdateListAction()
+    public function testProcessWithExcludedGetActionAndManuallyEnabledUpdateListAction(): void
     {
         $resource = new ApiResource('Test\Entity1');
         $resource->addExcludedAction(ApiAction::GET);

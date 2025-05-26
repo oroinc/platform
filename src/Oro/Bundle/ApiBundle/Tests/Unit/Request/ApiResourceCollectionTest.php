@@ -4,10 +4,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiResourceCollection;
+use PHPUnit\Framework\TestCase;
 
-class ApiResourceCollectionTest extends \PHPUnit\Framework\TestCase
+class ApiResourceCollectionTest extends TestCase
 {
-    public function testAddAndCountableAndIterator()
+    public function testAddAndCountableAndIterator(): void
     {
         $resource1 = new ApiResource('Test\Class1');
         $resource2 = new ApiResource('Test\Class2');
@@ -28,7 +29,7 @@ class ApiResourceCollectionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddAlreadyExisting()
+    public function testAddAlreadyExisting(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('A resource for "Test\Class1" already exists.');
@@ -38,7 +39,7 @@ class ApiResourceCollectionTest extends \PHPUnit\Framework\TestCase
         $collection->add(new ApiResource('Test\Class1'));
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         $resource1 = new ApiResource('Test\Class1');
         $resource2 = new ApiResource('Test\Class2');
@@ -63,7 +64,7 @@ class ApiResourceCollectionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHas()
+    public function testHas(): void
     {
         $collection = new ApiResourceCollection();
         $collection->add(new ApiResource('Test\Class1'));
@@ -74,7 +75,7 @@ class ApiResourceCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($collection->has('Test\Class3'));
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $resource1 = new ApiResource('Test\Class1');
         $resource2 = new ApiResource('Test\Class2');
@@ -88,7 +89,7 @@ class ApiResourceCollectionTest extends \PHPUnit\Framework\TestCase
         self::assertNull($collection->get('Test\Class3'));
     }
 
-    public function testIsEmptyAndClear()
+    public function testIsEmptyAndClear(): void
     {
         $collection = new ApiResourceCollection();
         self::assertTrue($collection->isEmpty());

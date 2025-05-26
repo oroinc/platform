@@ -13,23 +13,17 @@ use Oro\Bundle\ApiBundle\Provider\ExtendedAssociationProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class CustomAssociationCompleterTest extends CompleteDefinitionHelperTestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var ExtendedAssociationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $extendedAssociationProvider;
-
-    /** @var CustomAssociationCompleter */
-    private $customAssociationCompleter;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private ConfigProvider&MockObject $configProvider;
+    private ExtendedAssociationProvider&MockObject $extendedAssociationProvider;
+    private CustomAssociationCompleter $customAssociationCompleter;
 
     #[\Override]
     protected function setUp(): void
@@ -61,7 +55,7 @@ class CustomAssociationCompleterTest extends CompleteDefinitionHelperTestCase
         return $target1EntityMetadata;
     }
 
-    public function testCompleteToOneExtendedAssociationWithoutAssociationKind()
+    public function testCompleteToOneExtendedAssociationWithoutAssociationKind(): void
     {
         $dataType = 'association:manyToOne';
         $associationName = 'association1';
@@ -120,7 +114,7 @@ class CustomAssociationCompleterTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    public function testCompleteToManyExtendedAssociationWithAssociationKind()
+    public function testCompleteToManyExtendedAssociationWithAssociationKind(): void
     {
         $dataType = 'association:manyToMany:kind';
         $associationName = 'association1';
@@ -179,7 +173,7 @@ class CustomAssociationCompleterTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    public function testCompleteMultipleManyToOneExtendedAssociation()
+    public function testCompleteMultipleManyToOneExtendedAssociation(): void
     {
         $dataType = 'association:multipleManyToOne';
         $associationName = 'association1';
@@ -238,7 +232,7 @@ class CustomAssociationCompleterTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    public function testCompleteExtendedAssociationWithCustomTargetClass()
+    public function testCompleteExtendedAssociationWithCustomTargetClass(): void
     {
         $dataType = 'association:manyToOne';
         $associationName = 'association1';
@@ -300,7 +294,7 @@ class CustomAssociationCompleterTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    public function testCompleteExtendedAssociationWithCustomTargetType()
+    public function testCompleteExtendedAssociationWithCustomTargetType(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The "target_type" option cannot be configured for "Test\Class::association1".');
@@ -329,7 +323,7 @@ class CustomAssociationCompleterTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    public function testCompleteExtendedAssociationWithCustomDependsOn()
+    public function testCompleteExtendedAssociationWithCustomDependsOn(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The "depends_on" option cannot be configured for "Test\Class::association1".');
@@ -358,7 +352,7 @@ class CustomAssociationCompleterTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    public function testCompleteExtendedAssociationWhenTargetsHaveNotStringIdentifier()
+    public function testCompleteExtendedAssociationWhenTargetsHaveNotStringIdentifier(): void
     {
         $dataType = 'association:manyToOne';
         $associationName = 'association1';
@@ -424,7 +418,7 @@ class CustomAssociationCompleterTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    public function testCompleteExtendedAssociationWhenTargetsHaveDifferentTypesOfIdentifier()
+    public function testCompleteExtendedAssociationWhenTargetsHaveDifferentTypesOfIdentifier(): void
     {
         $dataType = 'association:manyToOne';
         $associationName = 'association1';
@@ -490,7 +484,7 @@ class CustomAssociationCompleterTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    public function testCompleteExtendedAssociationWhenOneOfTargetHasCompositeIdentifier()
+    public function testCompleteExtendedAssociationWhenOneOfTargetHasCompositeIdentifier(): void
     {
         $dataType = 'association:manyToOne';
         $associationName = 'association1';
@@ -563,7 +557,7 @@ class CustomAssociationCompleterTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    public function testCompleteExtendedAssociationWithEmptyTargets()
+    public function testCompleteExtendedAssociationWithEmptyTargets(): void
     {
         $dataType = 'association:manyToOne';
         $associationName = 'association1';
@@ -624,7 +618,7 @@ class CustomAssociationCompleterTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    public function testCompleteEnumAssociation()
+    public function testCompleteEnumAssociation(): void
     {
         $dataType = 'enum';
         $associationName = 'enumAssociation';
@@ -703,7 +697,7 @@ class CustomAssociationCompleterTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    public function testCompleteMultiEnumAssociation()
+    public function testCompleteMultiEnumAssociation(): void
     {
         $dataType = 'multiEnum';
         $associationName = 'multiEnumAssociation';

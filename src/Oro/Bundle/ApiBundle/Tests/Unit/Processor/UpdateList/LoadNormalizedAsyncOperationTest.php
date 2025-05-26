@@ -13,17 +13,13 @@ use Oro\Bundle\ApiBundle\Processor\UpdateList\UpdateListContext;
 use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Component\ChainProcessor\ParameterBag;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class LoadNormalizedAsyncOperationTest extends UpdateListProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorBagInterface */
-    private $processorBag;
-
-    /** @var ParameterBag */
-    private $sharedData;
-
-    /** @var LoadNormalizedAsyncOperation */
-    private $processor;
+    private ActionProcessorBagInterface&MockObject $processorBag;
+    private ParameterBag $sharedData;
+    private LoadNormalizedAsyncOperation $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -39,7 +35,7 @@ class LoadNormalizedAsyncOperationTest extends UpdateListProcessorTestCase
         $this->processor = new LoadNormalizedAsyncOperation($this->processorBag);
     }
 
-    public function testProcessWhenContextAlreadyContainsResult()
+    public function testProcessWhenContextAlreadyContainsResult(): void
     {
         $result = ['key' => 'value'];
 
@@ -52,7 +48,7 @@ class LoadNormalizedAsyncOperationTest extends UpdateListProcessorTestCase
         self::assertEquals($result, $this->context->getResult());
     }
 
-    public function testProcessWhenGetActionSuccess()
+    public function testProcessWhenGetActionSuccess(): void
     {
         $getResult = ['key' => 'value'];
         $getConfig = new EntityDefinitionConfig();
@@ -125,7 +121,7 @@ class LoadNormalizedAsyncOperationTest extends UpdateListProcessorTestCase
         self::assertEquals($expectedContext, $this->context);
     }
 
-    public function testProcessWhenGetActionHasErrors()
+    public function testProcessWhenGetActionHasErrors(): void
     {
         $getError = Error::create('test error');
 

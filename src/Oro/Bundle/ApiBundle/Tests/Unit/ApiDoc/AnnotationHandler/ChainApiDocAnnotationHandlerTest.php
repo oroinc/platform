@@ -5,11 +5,12 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc\AnnotationHandler;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\ApiBundle\ApiDoc\AnnotationHandler\ApiDocAnnotationHandlerInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\AnnotationHandler\ChainApiDocAnnotationHandler;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Route;
 
-class ChainApiDocAnnotationHandlerTest extends \PHPUnit\Framework\TestCase
+class ChainApiDocAnnotationHandlerTest extends TestCase
 {
-    public function testEmptyChainHandler()
+    public function testEmptyChainHandler(): void
     {
         $annotation = $this->createMock(ApiDoc::class);
         $route = $this->createMock(Route::class);
@@ -18,7 +19,7 @@ class ChainApiDocAnnotationHandlerTest extends \PHPUnit\Framework\TestCase
         $chainHandler->handle($annotation, $route);
     }
 
-    public function testChainHandler()
+    public function testChainHandler(): void
     {
         $annotation = $this->createMock(ApiDoc::class);
         $route = $this->createMock(Route::class);

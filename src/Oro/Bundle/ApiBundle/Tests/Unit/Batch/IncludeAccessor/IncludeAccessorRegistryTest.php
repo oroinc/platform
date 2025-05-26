@@ -7,11 +7,12 @@ use Oro\Bundle\ApiBundle\Batch\IncludeAccessor\IncludeAccessorRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
-class IncludeAccessorRegistryTest extends \PHPUnit\Framework\TestCase
+class IncludeAccessorRegistryTest extends TestCase
 {
-    public function testEmptyAccessors()
+    public function testEmptyAccessors(): void
     {
         $registry = new IncludeAccessorRegistry(
             [],
@@ -22,7 +23,7 @@ class IncludeAccessorRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertNull($registry->getAccessor(new RequestType(['rest'])));
     }
 
-    public function testAccessorFound()
+    public function testAccessorFound(): void
     {
         $accessor1 = $this->createMock(IncludeAccessorInterface::class);
         $accessor2 = $this->createMock(IncludeAccessorInterface::class);
@@ -44,7 +45,7 @@ class IncludeAccessorRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($accessor2, $registry->getAccessor(new RequestType(['second'])));
     }
 
-    public function testAccessorNotFound()
+    public function testAccessorNotFound(): void
     {
         $accessor1 = $this->createMock(IncludeAccessorInterface::class);
         $accessor2 = $this->createMock(IncludeAccessorInterface::class);

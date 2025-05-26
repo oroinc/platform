@@ -6,24 +6,22 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\JsonApi\RelationshipRequestDataValidator;
+use PHPUnit\Framework\TestCase;
 
-class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
+class RelationshipRequestDataValidatorTest extends TestCase
 {
-    /** @var RelationshipRequestDataValidator */
-    private $validator;
+    private RelationshipRequestDataValidator $validator;
 
     #[\Override]
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->validator = new RelationshipRequestDataValidator();
     }
 
     /**
      * @dataProvider validResourceIdentifierObjectProvider
      */
-    public function testValidResourceIdentifierObject(array $requestData)
+    public function testValidResourceIdentifierObject(array $requestData): void
     {
         $errors = $this->validator->validateResourceIdentifierObject($requestData);
 
@@ -63,7 +61,7 @@ class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validResourceIdentifierObjectCollectionProvider
      */
-    public function testValidResourceIdentifierObjectCollection(array $requestData)
+    public function testValidResourceIdentifierObjectCollection(array $requestData): void
     {
         $errors = $this->validator->validateResourceIdentifierObjectCollection($requestData);
 
@@ -103,7 +101,7 @@ class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidResourceIdentifierObjectProvider
      */
-    public function testInvalidResourceIdentifierObject(array $requestData, array $expectedErrors)
+    public function testInvalidResourceIdentifierObject(array $requestData, array $expectedErrors): void
     {
         $errors = $this->validator->validateResourceIdentifierObject($requestData);
 
@@ -228,7 +226,7 @@ class RelationshipRequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidResourceIdentifierObjectCollectionProvider
      */
-    public function testInvalidResourceIdentifierObjectCollection(array $requestData, array $expectedErrors)
+    public function testInvalidResourceIdentifierObjectCollection(array $requestData, array $expectedErrors): void
     {
         $errors = $this->validator->validateResourceIdentifierObjectCollection($requestData);
 

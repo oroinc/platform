@@ -21,7 +21,7 @@ class ExtractEntityIdTest extends FormProcessorTestCase
         $this->processor = new ExtractEntityId();
     }
 
-    public function testProcessWhenEntityIdAlreadyExistsInContext()
+    public function testProcessWhenEntityIdAlreadyExistsInContext(): void
     {
         $entityId = 123;
         $requestData = [
@@ -38,7 +38,7 @@ class ExtractEntityIdTest extends FormProcessorTestCase
         self::assertNull($this->context->getRequestId());
     }
 
-    public function testProcessWhenEntityIdDoesNotExistInContext()
+    public function testProcessWhenEntityIdDoesNotExistInContext(): void
     {
         $requestData = [
             'data' => [
@@ -53,7 +53,7 @@ class ExtractEntityIdTest extends FormProcessorTestCase
         self::assertEquals($this->context->getId(), $this->context->getRequestId());
     }
 
-    public function testProcessForEmptyRequestData()
+    public function testProcessForEmptyRequestData(): void
     {
         $requestData = [];
 
@@ -64,7 +64,7 @@ class ExtractEntityIdTest extends FormProcessorTestCase
         self::assertNull($this->context->getRequestId());
     }
 
-    public function testProcessForEmptyRequestDataWithoutEntityIdButEntityHasIdGenerator()
+    public function testProcessForEmptyRequestDataWithoutEntityIdButEntityHasIdGenerator(): void
     {
         $requestData = [
             'data' => []
@@ -81,7 +81,7 @@ class ExtractEntityIdTest extends FormProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessForEmptyRequestDataWithoutEntityIdAndEntityDoesNotHaveIdGenerator()
+    public function testProcessForEmptyRequestDataWithoutEntityIdAndEntityDoesNotHaveIdGenerator(): void
     {
         $requestData = [
             'data' => []

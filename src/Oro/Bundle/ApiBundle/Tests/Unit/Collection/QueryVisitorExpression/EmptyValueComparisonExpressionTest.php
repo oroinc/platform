@@ -10,8 +10,9 @@ use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\EmptyValueComparisonExpression;
 use Oro\Bundle\ApiBundle\Tests\Unit\Stub\FieldDqlExpressionProviderStub;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use PHPUnit\Framework\TestCase;
 
-class EmptyValueComparisonExpressionTest extends \PHPUnit\Framework\TestCase
+class EmptyValueComparisonExpressionTest extends TestCase
 {
     private function getExpressionVisitor(): QueryExpressionVisitor
     {

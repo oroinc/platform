@@ -15,8 +15,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
  */
 class EntityMetadataFactoryTest extends OrmRelatedTestCase
 {
-    /** @var EntityMetadataFactory */
-    private $metadataFactory;
+    private EntityMetadataFactory $metadataFactory;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +25,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         $this->metadataFactory = new EntityMetadataFactory($this->doctrineHelper);
     }
 
-    public function testCreateEntityMetadata()
+    public function testCreateEntityMetadata(): void
     {
         $expectedMetadata = new EntityMetadata(Entity\Product::class);
         $expectedMetadata->setIdentifierFieldNames(['id']);
@@ -40,7 +39,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         self::assertEquals($expectedMetadata, $metadata);
     }
 
-    public function testCreateEntityMetadataForEntityWithCompositeIdentifier()
+    public function testCreateEntityMetadataForEntityWithCompositeIdentifier(): void
     {
         $expectedMetadata = new EntityMetadata(Entity\CompositeKeyEntity::class);
         $expectedMetadata->setIdentifierFieldNames(['id', 'title']);
@@ -54,7 +53,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         self::assertEquals($expectedMetadata, $metadata);
     }
 
-    public function testCreateMetaPropertyMetadata()
+    public function testCreateMetaPropertyMetadata(): void
     {
         $expectedMetadata = new MetaPropertyMetadata('name', 'string');
 
@@ -66,7 +65,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         self::assertEquals($expectedMetadata, $metadata);
     }
 
-    public function testCreateMetaPropertyMetadataByPropertyPath()
+    public function testCreateMetaPropertyMetadataByPropertyPath(): void
     {
         $expectedMetadata = new MetaPropertyMetadata('id', 'integer');
 
@@ -78,7 +77,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         self::assertEquals($expectedMetadata, $metadata);
     }
 
-    public function testCreateMetaPropertyMetadataWhenDataTypeIsSpecified()
+    public function testCreateMetaPropertyMetadataWhenDataTypeIsSpecified(): void
     {
         $expectedMetadata = new MetaPropertyMetadata('name', 'integer');
 
@@ -91,7 +90,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         self::assertEquals($expectedMetadata, $metadata);
     }
 
-    public function testCreateMetaPropertyMetadataForNotManageableField()
+    public function testCreateMetaPropertyMetadataForNotManageableField(): void
     {
         $expectedMetadata = new MetaPropertyMetadata('unmanageableField');
 
@@ -103,7 +102,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         self::assertEquals($expectedMetadata, $metadata);
     }
 
-    public function testCreateFieldMetadataForIdentifier()
+    public function testCreateFieldMetadataForIdentifier(): void
     {
         $expectedMetadata = new FieldMetadata();
         $expectedMetadata->setName('id');
@@ -118,7 +117,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         self::assertEquals($expectedMetadata, $metadata);
     }
 
-    public function testCreateFieldMetadata()
+    public function testCreateFieldMetadata(): void
     {
         $expectedMetadata = new FieldMetadata();
         $expectedMetadata->setName('name');
@@ -134,7 +133,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         self::assertEquals($expectedMetadata, $metadata);
     }
 
-    public function testCreateFieldMetadataByPropertyPath()
+    public function testCreateFieldMetadataByPropertyPath(): void
     {
         $expectedMetadata = new FieldMetadata();
         $expectedMetadata->setName('label');
@@ -150,7 +149,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         self::assertEquals($expectedMetadata, $metadata);
     }
 
-    public function testCreateFieldMetadataWhenDataTypeIsSpecified()
+    public function testCreateFieldMetadataWhenDataTypeIsSpecified(): void
     {
         $expectedMetadata = new FieldMetadata();
         $expectedMetadata->setName('name');
@@ -167,7 +166,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         self::assertEquals($expectedMetadata, $metadata);
     }
 
-    public function testCreateFieldMetadataForNullable()
+    public function testCreateFieldMetadataForNullable(): void
     {
         $expectedMetadata = new FieldMetadata();
         $expectedMetadata->setName('updatedAt');
@@ -182,7 +181,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         self::assertEquals($expectedMetadata, $metadata);
     }
 
-    public function testCreateFieldMetadataForNonManageableField()
+    public function testCreateFieldMetadataForNonManageableField(): void
     {
         $expectedMetadata = new FieldMetadata();
         $expectedMetadata->setName('another');
@@ -198,7 +197,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         self::assertEquals($expectedMetadata, $metadata);
     }
 
-    public function testCreateFieldMetadataForNonManageableFieldWhenFieldTypeIsNotSpecified()
+    public function testCreateFieldMetadataForNonManageableFieldWhenFieldTypeIsNotSpecified(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf(
@@ -212,7 +211,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         );
     }
 
-    public function testCreateAssociationMetadataForManyToOne()
+    public function testCreateAssociationMetadataForManyToOne(): void
     {
         $expectedMetadata = new AssociationMetadata();
         $expectedMetadata->setName('category');
@@ -231,7 +230,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         self::assertEquals($expectedMetadata, $metadata);
     }
 
-    public function testCreateAssociationMetadataForManyToOneByPropertyPath()
+    public function testCreateAssociationMetadataForManyToOneByPropertyPath(): void
     {
         $expectedMetadata = new AssociationMetadata();
         $expectedMetadata->setName('category');
@@ -250,7 +249,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         self::assertEquals($expectedMetadata, $metadata);
     }
 
-    public function testCreateAssociationMetadataForNotNullableManyToOne()
+    public function testCreateAssociationMetadataForNotNullableManyToOne(): void
     {
         $expectedMetadata = new AssociationMetadata();
         $expectedMetadata->setName('category');
@@ -269,7 +268,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         self::assertEquals($expectedMetadata, $metadata);
     }
 
-    public function testCreateAssociationMetadataForManyToMany()
+    public function testCreateAssociationMetadataForManyToMany(): void
     {
         $expectedMetadata = new AssociationMetadata();
         $expectedMetadata->setName('users');
@@ -288,7 +287,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         self::assertEquals($expectedMetadata, $metadata);
     }
 
-    public function testCreateAssociationMetadataForManyToManyByPropertyPath()
+    public function testCreateAssociationMetadataForManyToManyByPropertyPath(): void
     {
         $expectedMetadata = new AssociationMetadata();
         $expectedMetadata->setName('groups');
@@ -307,7 +306,7 @@ class EntityMetadataFactoryTest extends OrmRelatedTestCase
         self::assertEquals($expectedMetadata, $metadata);
     }
 
-    public function testCreateAssociationMetadataWithDataType()
+    public function testCreateAssociationMetadataWithDataType(): void
     {
         $expectedMetadata = new AssociationMetadata();
         $expectedMetadata->setName('category');
