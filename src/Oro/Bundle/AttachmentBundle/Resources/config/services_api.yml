@@ -60,3 +60,4 @@ services:
             - '@security.authorization_checker'
         tags:
             - { name: oro.api.processor, action: get, group: data_security_check, class: Oro\Bundle\AttachmentBundle\Entity\File, priority: 10 }
+            - { name: oro.api.processor, action: get, group: security_check, class: Oro\Bundle\AttachmentBundle\Entity\File, priority: 255 }
