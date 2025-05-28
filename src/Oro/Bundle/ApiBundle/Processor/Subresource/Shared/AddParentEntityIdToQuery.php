@@ -61,7 +61,7 @@ class AddParentEntityIdToQuery implements ProcessorInterface
         }
 
         if (ConfigUtil::IGNORE_PROPERTY_PATH === $associationName
-            || $this->isEnumerableType($context->getParentConfig(), $associationName)
+            || $this->isEnumerableType($context->getParentConfig(), $context->getAssociationName())
         ) {
             $this->entityIdHelper->applyEntityIdentifierRestriction(
                 $query,
