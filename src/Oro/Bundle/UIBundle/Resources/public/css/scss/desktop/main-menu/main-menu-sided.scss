@@ -181,7 +181,7 @@
 
             color: $menu-item-first-level-text-color;
 
-            word-break: break-word;
+            overflow-wrap: break-word;
 
             .menu-icon {
                 display: block;

@@ -41,7 +41,7 @@
         .app-header {
             &.sticky-out-of-viewport {
                 ~ * .oro-datagrid {
-                    --app-header-height: 0px;
+                    --app-header-height: 0;
                 }
             }
         }

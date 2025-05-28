@@ -138,16 +138,6 @@
         border: none;
     }
 
-    input[type='text'],
-    input[type='email'],
-    input[type='password'],
-    select {
-        // stylelint-disable-next-line selector-no-vendor-prefix
-        &:-ms-input-placeholder {
-            color: $primary-600;
-        }
-    }
-
     .organization-selector-arrow {
         position: relative;
         top: 8px;

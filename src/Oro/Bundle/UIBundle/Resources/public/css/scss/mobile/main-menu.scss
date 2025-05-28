@@ -37,9 +37,6 @@
         margin-bottom: 0;
         margin-left: 0;
 
-        /* iOS 11 */
-        margin-left: constant(safe-area-inset-left);
-
         /* iOS 11.2+ */
         margin-left: env(safe-area-inset-left);
         width: $main-menu-mobile-width;

@@ -6,7 +6,6 @@
     width: auto;
 
     -webkit-overflow-scrolling: touch;
-    overflow-scrolling: touch;
     touch-action: auto;
 }
 
@@ -19,7 +18,7 @@
         &-header {
             &::before {
                 content: '';
-                height: var(--app-header-height, 0px);
+                height: var(--app-header-height, 0);
                 transition: height 500ms;
                 display: block;
                 pointer-events: none;

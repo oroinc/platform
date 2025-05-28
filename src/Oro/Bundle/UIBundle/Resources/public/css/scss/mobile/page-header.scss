@@ -88,7 +88,7 @@
         font-size: $base-font-size--xl;
         font-weight: font-weight('light');
         display: inline;
-        word-break: break-word;
+        overflow-wrap: break-word;
     }
 
     &__icon {

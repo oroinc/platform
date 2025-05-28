@@ -55,9 +55,6 @@ $secondary-font: get-font-name('secondary'), 'times new roman', serif !default;
 $code-font: get-font-name('code'), 'courier', monospace !default;
 $base-font-masked: get-font-name('only-bullets'), 'helvetica', arial, sans-serif !default;
 
-// include in assets
-$icon-font: 'FontAwesome';
-
 // Fonts sizes
 $root-font-size: 14px !default;
 $base-font-size: 14px !default;

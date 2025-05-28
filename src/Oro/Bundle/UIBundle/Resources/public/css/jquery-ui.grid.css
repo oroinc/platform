@@ -238,15 +238,15 @@
     overflow: visible;
 }
 .ui-datepicker.ui-widget-content a {
-    color: #222222;
+    color: #222;
 }
 .ui-datepicker .ui-widget-header {
-    background: #cccccc url('~bundles/oroui/images/ui-bg_highlight-soft_75_cccccc_1x100.png') 50% 50% repeat-x;
-    color: #222222;
+    background: #ccc url('~bundles/oroui/images/ui-bg_highlight-soft_75_cccccc_1x100.png') 50% 50% repeat-x;
+    color: #222;
     font-weight: bold;
 }
 .ui-datepicker .ui-widget-header a {
-    color: #222222;
+    color: #222;
 }
 
 /* Interaction states
