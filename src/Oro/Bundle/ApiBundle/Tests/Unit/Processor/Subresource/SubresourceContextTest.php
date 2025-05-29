@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Config\Extra\HateoasConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\Extra\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\Extra\HateoasMetadataExtra;
+use Oro\Bundle\ApiBundle\Metadata\TargetMetadataAccessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
@@ -17,6 +18,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestMetadataExtra;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Component\Testing\ReflectionUtil;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -482,6 +484,12 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($metadata, $this->context->getParentMetadata()); // load metadata
         self::assertTrue($this->context->hasParentMetadata());
 
+        // test that metadata is initialized
+        self::assertInstanceOf(
+            TargetMetadataAccessorInterface::class,
+            ReflectionUtil::getPropertyValue($metadata, 'targetMetadataAccessor')
+        );
+
         self::assertEquals($config, $this->context->getParentConfig());
 
         // test that metadata are loaded only once
@@ -539,6 +547,12 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
 
         self::assertSame($metadata, $this->context->getParentMetadata()); // load metadata
         self::assertTrue($this->context->hasParentMetadata());
+
+        // test that metadata is initialized
+        self::assertInstanceOf(
+            TargetMetadataAccessorInterface::class,
+            ReflectionUtil::getPropertyValue($metadata, 'targetMetadataAccessor')
+        );
 
         self::assertEquals($config, $this->context->getParentConfig());
 

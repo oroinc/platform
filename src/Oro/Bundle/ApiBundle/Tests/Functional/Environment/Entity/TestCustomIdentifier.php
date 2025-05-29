@@ -13,10 +13,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Table(name: 'test_api_custom_id')]
 class TestCustomIdentifier implements TestFrameworkEntityInterface
 {
-    #[ORM\Column(name: 'id', type: Types::INTEGER)]
+    #[ORM\Column(name: 'autoincrement_key', type: Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    public ?int $id = null;
+    public ?int $autoincrementKey = null;
 
     #[ORM\Column(name: '`key`', type: Types::STRING, unique: true, nullable: false)]
     public ?string $key = null;
@@ -26,7 +26,7 @@ class TestCustomIdentifier implements TestFrameworkEntityInterface
     public ?string $name = null;
 
     #[ORM\ManyToOne(targetEntity: TestCustomIdentifier::class)]
-    #[ORM\JoinColumn(name: 'parent_id', referencedColumnName: 'id')]
+    #[ORM\JoinColumn(name: 'parent_autoincrement_key', referencedColumnName: 'autoincrement_key')]
     protected ?TestCustomIdentifier $parent = null;
 
     /**
@@ -34,8 +34,8 @@ class TestCustomIdentifier implements TestFrameworkEntityInterface
      */
     #[ORM\ManyToMany(targetEntity: TestCustomIdentifier::class)]
     #[ORM\JoinTable(name: 'test_api_custom_id_children')]
-    #[ORM\JoinColumn(name: 'parent_id', referencedColumnName: 'id')]
-    #[ORM\InverseJoinColumn(name: 'child_id', referencedColumnName: 'id')]
+    #[ORM\JoinColumn(name: 'parent_autoincrement_key', referencedColumnName: 'autoincrement_key')]
+    #[ORM\InverseJoinColumn(name: 'child_autoincrement_key', referencedColumnName: 'autoincrement_key')]
     protected ?Collection $children = null;
 
     public function __construct()

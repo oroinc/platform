@@ -49,8 +49,9 @@ abstract class AbstractEntityAssociationTransformer extends AbstractAssociationT
                 'oro.api.form.not_manageable_entity'
             );
         }
+        $entityMetadata = $this->metadata->getTargetMetadata($entityClass);
         try {
-            $entity = $this->entityLoader->findEntity($entityClass, $entityId, $this->metadata->getTargetMetadata());
+            $entity = $this->entityLoader->findEntity($entityClass, $entityId, $entityMetadata);
         } catch (ORMException $e) {
             throw new TransformationFailedException(
                 sprintf(

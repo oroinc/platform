@@ -269,7 +269,7 @@ api:
             identifier_description: 'The unique identifier of a resource. It is a key.'
             fields:
                 databaseId:
-                    property_path: id
+                    property_path: autoincrementKey
             filters:
                 fields:
                     key:

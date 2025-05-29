@@ -106,13 +106,20 @@ class TokenSerializer implements TokenSerializerInterface
 
     private function createToken(int $organizationId, int $userId, string $userClass, array $roles): TokenInterface
     {
-        $organization = $this->doctrine->getRepository(Organization::class)->find($organizationId);
+        /** @var Organization|null $organization */
+        $organization = $this->loadEntity(Organization::class, $organizationId);
+        if (null === $organization) {
+            throw new InvalidTokenUserOrganizationException(
+                'An error occurred while creating a token: organization not found.'
+            );
+        }
 
-        /** @var AbstractUser $user */
-        $user = $this->doctrine->getRepository($userClass)->find($userId);
-
-        if (null === $organization || null === $user) {
-            throw new InvalidTokenUserOrganizationException('An error occurred while creating a token.');
+        /** @var AbstractUser|null $user */
+        $user = $this->loadEntity($userClass, $userId);
+        if (null === $user) {
+            throw new InvalidTokenUserOrganizationException(
+                'An error occurred while creating a token: user not found.'
+            );
         }
 
         $roleObjects = [];
@@ -124,5 +131,16 @@ class TokenSerializer implements TokenSerializerInterface
         }
 
         return new ImpersonationToken($user, $organization, $roleObjects);
+    }
+
+    private function loadEntity(string $entityClass, mixed $entityId): ?object
+    {
+        $em = $this->doctrine->getManagerForClass($entityClass);
+        $entity = $em->find($entityClass, $entityId);
+        if (null !== $entity) {
+            $em->refresh($entity);
+        }
+
+        return $entity;
     }
 }

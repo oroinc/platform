@@ -69,8 +69,12 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
     private function isExpandRequested(CustomizeLoadedDataContext $context): bool
     {
         $associationPath = $context->getPropertyPath();
-        if (!$associationPath && $this->getSubresourceAssociationName($context)) {
-            return true;
+        if (!$associationPath) {
+            /** @var EntityDefinitionConfigExtra|null $entityConfigExtra */
+            $entityConfigExtra = $context->getConfigExtra(EntityDefinitionConfigExtra::NAME);
+            if (ApiAction::GET_SUBRESOURCE === $entityConfigExtra?->getAction()) {
+                return true;
+            }
         }
 
         /** @var ExpandRelatedEntitiesConfigExtra|null $expandConfigExtra */
@@ -92,17 +96,6 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
         return $propertyPath . ConfigUtil::PATH_DELIMITER;
     }
 
-    private function getSubresourceAssociationName(CustomizeLoadedDataContext $context): ?string
-    {
-        /** @var EntityDefinitionConfigExtra|null $entityConfigExtra */
-        $entityConfigExtra = $context->getConfigExtra(EntityDefinitionConfigExtra::NAME);
-        if (null === $entityConfigExtra || $entityConfigExtra->getAction() !== ApiAction::GET_SUBRESOURCE) {
-            return null;
-        }
-
-        return $entityConfigExtra->getAssociationName();
-    }
-
     private function getAssociationName(string $associationPath): string
     {
         $lastDelimiter = strrpos($associationPath, ConfigUtil::PATH_DELIMITER);
@@ -114,24 +107,25 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
     }
 
     /**
-     * @return EntityDefinitionFieldConfig[] [association name => EntityDefinitionFieldConfig, ...]
+     * @return array [association name => [is collection, id only], ...]
      */
     private function getAssociationsToExpand(
         EntityDefinitionConfig $config,
         CustomizeLoadedDataContext $context
     ): array {
         if (!$context->getPropertyPath()) {
-            $subresourceAssociationName = $this->getSubresourceAssociationName($context);
-            if ($subresourceAssociationName) {
-                $associationConfig = $config->getField($subresourceAssociationName);
-                if (null !== $associationConfig) {
-                    $dataType = $associationConfig->getDataType();
-                    if (DataType::isExtendedAssociation($dataType) || DataType::isNestedAssociation($dataType)) {
-                        return [$subresourceAssociationName => $associationConfig];
-                    }
-                    $targetClass = AssociationConfigUtil::getAssociationTargetClass($associationConfig, $config);
-                    if ($targetClass && is_a($targetClass, EntityIdentifier::class, true)) {
-                        return [$subresourceAssociationName => $associationConfig];
+            /** @var EntityDefinitionConfigExtra|null $entityConfigExtra */
+            $entityConfigExtra = $context->getConfigExtra(EntityDefinitionConfigExtra::NAME);
+            if (null !== $entityConfigExtra) {
+                $targetAction = $entityConfigExtra->getAction();
+                if (ApiAction::GET_RELATIONSHIP === $targetAction || ApiAction::GET_SUBRESOURCE === $targetAction) {
+                    $associationName = $entityConfigExtra->getAssociationName();
+                    $associationConfig = $config->getField($associationName);
+                    if (null !== $associationConfig) {
+                        $idOnly = $this->checkSpecialCaseAssociation($config, $associationConfig, $targetAction);
+                        if (null !== $idOnly) {
+                            return [$associationName => [$associationConfig->isCollectionValuedAssociation(), $idOnly]];
+                        }
                     }
                 }
             }
@@ -140,9 +134,29 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
         return $this->collectAssociationsToExpand($config, $context);
     }
 
+    private function checkSpecialCaseAssociation(
+        EntityDefinitionConfig $config,
+        EntityDefinitionFieldConfig $associationConfig,
+        string $targetAction
+    ): ?bool {
+        $dataType = $associationConfig->getDataType();
+        if (DataType::isNestedAssociation($dataType)) {
+            return ApiAction::GET_RELATIONSHIP === $targetAction;
+        }
+        if (ApiAction::GET_SUBRESOURCE === $targetAction && DataType::isExtendedAssociation($dataType)) {
+            return false;
+        }
+
+        $targetClass = AssociationConfigUtil::getAssociationTargetClass($associationConfig, $config);
+        if ($targetClass && is_a($targetClass, EntityIdentifier::class, true)) {
+            return ApiAction::GET_RELATIONSHIP === $targetAction;
+        }
+
+        return null;
+    }
+
     /**
-     * @return EntityDefinitionFieldConfig[] [association name => EntityDefinitionFieldConfig, ...]
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @return array [association name => [is collection, id only], ...]
      */
     private function collectAssociationsToExpand(
         EntityDefinitionConfig $config,
@@ -151,32 +165,27 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
         $result = [];
         /** @var ExpandRelatedEntitiesConfigExtra|null $expandConfigExtra */
         $expandConfigExtra = $context->getConfigExtra(ExpandRelatedEntitiesConfigExtra::NAME);
-        if (null !== $expandConfigExtra) {
-            $pathPrefix = $this->getPathPrefix($context);
-            $fields = $config->getFields();
-            foreach ($fields as $fieldName => $field) {
-                if ($field->isExcluded()) {
-                    continue;
-                }
-                $targetClass = AssociationConfigUtil::getAssociationTargetClass($field, $config);
-                if (!$targetClass || !is_a($targetClass, EntityIdentifier::class, true)) {
-                    continue;
-                }
-                if ($field->isCollectionValuedAssociation()
-                    && !DataType::isExtendedAssociation($field->getDataType())
-                ) {
-                    continue;
-                }
-                $fieldPath = $fieldName;
-                if ($pathPrefix) {
-                    $fieldPath = $pathPrefix . $fieldPath;
-                }
-                if (!$expandConfigExtra->isExpandRequested($fieldPath)) {
-                    continue;
-                }
-
-                $result[$fieldName] = $field;
+        $pathPrefix = $this->getPathPrefix($context);
+        $fields = $config->getFields();
+        foreach ($fields as $fieldName => $field) {
+            if ($field->isExcluded()) {
+                continue;
             }
+            if ($field->isCollectionValuedAssociation() && !DataType::isExtendedAssociation($field->getDataType())) {
+                continue;
+            }
+            $targetClass = AssociationConfigUtil::getAssociationTargetClass($field, $config);
+            if (!$targetClass || !is_a($targetClass, EntityIdentifier::class, true)) {
+                continue;
+            }
+            $fieldPath = $fieldName;
+            if ($pathPrefix) {
+                $fieldPath = $pathPrefix . $fieldPath;
+            }
+            $result[$fieldName] = [
+                $field->isCollectionValuedAssociation(),
+                null === $expandConfigExtra || !$expandConfigExtra->isExpandRequested($fieldPath)
+            ];
         }
 
         return $result;
@@ -196,9 +205,9 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
     }
 
     /**
-     * @param array                         $data
-     * @param string                        $entityIdFieldName
-     * @param EntityDefinitionFieldConfig[] $associations [association name => EntityDefinitionFieldConfig, ...]
+     * @param array  $data
+     * @param string $entityIdFieldName
+     * @param array  $associations [association name => [is collection, id only], ...]
      *
      * @return array [association name => [entity class => [entity id, ...], ...], ...]
      */
@@ -206,7 +215,7 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
     {
         $allIds = [];
         foreach ($data as $item) {
-            foreach ($associations as $associationName => $associationConfig) {
+            foreach ($associations as $associationName => [$isCollection]) {
                 if (!isset($item[$associationName])) {
                     continue;
                 }
@@ -214,7 +223,7 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
                 if (!$associationData) {
                     continue;
                 }
-                if ($associationConfig->isCollectionValuedAssociation()) {
+                if ($isCollection) {
                     foreach ($associationData as $dataItem) {
                         $entityClass = $dataItem[ConfigUtil::CLASS_NAME];
                         $allIds[$associationName][$entityClass][] = $dataItem[$entityIdFieldName];
@@ -259,13 +268,14 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
     }
 
     /**
-     * @param array                         $data
-     * @param string                        $entityIdFieldName
-     * @param CustomizeLoadedDataContext    $context
-     * @param EntityDefinitionFieldConfig[] $associations [association name => EntityDefinitionFieldConfig, ...]
+     * @param array                      $data
+     * @param string                     $entityIdFieldName
+     * @param CustomizeLoadedDataContext $context
+     * @param array                      $associations [association name => [is collection, id only], ...]
      *
      * @return array|null
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     private function loadExpandedEntitiesForAssociations(
         array $data,
@@ -282,9 +292,17 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
             return null;
         }
 
-        $expandedData = $this->loadExpandedEntityDataByIds($ids, $entityIdFieldName, $context);
+        $isCollectionFlags = [];
+        $idOnlyFlags = [];
+        foreach ($associations as $associationName => [$isCollection, $idOnly]) {
+            $isCollectionFlags[$associationName] = $isCollection;
+            if ($idOnly) {
+                $idOnlyFlags[$associationName] = true;
+            }
+        }
+        $expandedData = $this->loadExpandedEntityDataByIds($ids, $entityIdFieldName, $context, $idOnlyFlags);
         foreach ($data as $key => $item) {
-            foreach ($associations as $associationName => $associationConfig) {
+            foreach ($isCollectionFlags as $associationName => $isCollection) {
                 if (!isset($item[$associationName])) {
                     continue;
                 }
@@ -292,19 +310,12 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
                 if (!$associationData) {
                     continue;
                 }
-                if (!$associationConfig->isCollectionValuedAssociation()) {
-                    $entityClass = $associationData[ConfigUtil::CLASS_NAME];
-                    $entityId = $associationData[$entityIdFieldName];
-                    if (isset($expandedData[$associationName][$entityClass][$entityId])) {
-                        $data[$key][$associationName] = $expandedData[$associationName][$entityClass][$entityId];
-                    }
-                } elseif (isset($expandedData[$associationName])) {
-                    $data[$key][$associationName] = $this->processCollection(
-                        $associationData,
-                        $entityIdFieldName,
-                        $expandedData[$associationName]
-                    );
+                if (!isset($expandedData[$associationName])) {
+                    continue;
                 }
+                $data[$key][$associationName] = $isCollection
+                    ? $this->processCollection($associationData, $entityIdFieldName, $expandedData[$associationName])
+                    : $this->processItem($associationData, $entityIdFieldName, $expandedData[$associationName]);
             }
         }
 
@@ -315,27 +326,34 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
      * @param array                      $ids [association name => [entity class => [entity id, ...], ...], ...]
      * @param string                     $entityIdFieldName
      * @param CustomizeLoadedDataContext $context
+     * @param array                      $idOnlyFlags [association name => id only, ...]
      *
      * @return array|null [association name => [entity class => [entity id => entity data, ...], ...], ...]
      */
     private function loadExpandedEntityDataByIds(
         array $ids,
         string $entityIdFieldName,
-        CustomizeLoadedDataContext $context
+        CustomizeLoadedDataContext $context,
+        array $idOnlyFlags = []
     ): ?array {
         $result = [];
         $pathPrefix = $this->getPathPrefix($context);
         foreach ($ids as $associationName => $associationIds) {
-            $associationPath = $pathPrefix
-                ? $pathPrefix . $associationName
-                : $associationName;
+            $associationPath = null;
+            if ($associationName) {
+                $associationPath = $pathPrefix
+                    ? $pathPrefix . $associationName
+                    : $associationName;
+            }
+            $idOnly = $idOnlyFlags[$associationName] ?? false;
             foreach ($associationIds as $entityClass => $entityIds) {
-                $expandedEntityData = $this->dataLoader->loadExpandedEntityData(
+                $expandedEntityData = $this->loadExpandedEntityData(
                     $entityClass,
                     $entityIds,
                     $entityIdFieldName,
                     $context,
-                    $associationPath ?: null
+                    $associationPath,
+                    $idOnly
                 );
                 if ($expandedEntityData) {
                     $result[$associationName][$entityClass] = $expandedEntityData;
@@ -346,12 +364,39 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
         return $result;
     }
 
+    private function loadExpandedEntityData(
+        string $entityClass,
+        array $entityIds,
+        string $entityIdFieldName,
+        CustomizeLoadedDataContext $context,
+        ?string $associationPath,
+        bool $idOnly
+    ): ?array {
+        if ($idOnly) {
+            return $this->dataLoader->loadExpandedEntityDataIdOnly(
+                $entityClass,
+                $entityIds,
+                $entityIdFieldName,
+                $context,
+                $associationPath
+            );
+        }
+
+        return $this->dataLoader->loadExpandedEntityData(
+            $entityClass,
+            $entityIds,
+            $entityIdFieldName,
+            $context,
+            $associationPath
+        );
+    }
+
     /**
      * @param array  $associationData
      * @param string $entityIdFieldName
      * @param array  $expandedEntities [entity class => [entity id => entity data, ...], ...]
      *
-     * @return array
+     * @return array [item key => [name => value, ...], ...]
      */
     private function processCollection(
         array $associationData,
@@ -360,12 +405,35 @@ class ExpandMultiTargetAssociations implements ProcessorInterface
     ): array {
         $result = [];
         foreach ($associationData as $key => $item) {
-            $entityClass = $item[ConfigUtil::CLASS_NAME];
-            $entityId = $item[$entityIdFieldName];
-            if (isset($expandedEntities[$entityClass][$entityId])) {
-                $item = $expandedEntities[$entityClass][$entityId];
+            $result[$key] = $this->processItem($item, $entityIdFieldName, $expandedEntities);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array  $associationData
+     * @param string $entityIdFieldName
+     * @param array  $expandedEntities [entity class => [entity id => entity data, ...], ...]
+     *
+     * @return array [name => value, ...]
+     */
+    private function processItem(
+        array $associationData,
+        string $entityIdFieldName,
+        array $expandedEntities
+    ): array {
+        $entityClass = $associationData[ConfigUtil::CLASS_NAME];
+        $entityId = $associationData[$entityIdFieldName];
+        if (!isset($expandedEntities[$entityClass][$entityId])) {
+            return $associationData;
+        }
+
+        $result = $expandedEntities[$entityClass][$entityId];
+        foreach ($associationData as $key => $val) {
+            if ($key !== ConfigUtil::CLASS_NAME && $key !== $entityIdFieldName && !\array_key_exists($key, $result)) {
+                $result[$key] = $val;
             }
-            $result[$key] = $item;
         }
 
         return $result;
