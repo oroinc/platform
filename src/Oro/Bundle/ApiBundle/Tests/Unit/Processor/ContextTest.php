@@ -16,6 +16,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\Extra\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\Extra\HateoasMetadataExtra;
+use Oro\Bundle\ApiBundle\Metadata\TargetMetadataAccessorInterface;
 use Oro\Bundle\ApiBundle\Model\NotResolvedIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
@@ -24,6 +25,7 @@ use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
+use Oro\Component\Testing\ReflectionUtil;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -947,6 +949,12 @@ class ContextTest extends TestCase
         self::assertSame($metadata, $this->context->getMetadata()); // load metadata
         self::assertTrue($this->context->hasMetadata());
 
+        // test that metadata is initialized
+        self::assertInstanceOf(
+            TargetMetadataAccessorInterface::class,
+            ReflectionUtil::getPropertyValue($metadata, 'targetMetadataAccessor')
+        );
+
         self::assertEquals($config, $this->context->getConfig());
 
         // test that metadata are loaded only once
@@ -999,6 +1007,12 @@ class ContextTest extends TestCase
 
         self::assertSame($metadata, $this->context->getMetadata()); // load metadata
         self::assertTrue($this->context->hasMetadata());
+
+        // test that metadata is initialized
+        self::assertInstanceOf(
+            TargetMetadataAccessorInterface::class,
+            ReflectionUtil::getPropertyValue($metadata, 'targetMetadataAccessor')
+        );
 
         self::assertEquals($config, $this->context->getConfig());
 

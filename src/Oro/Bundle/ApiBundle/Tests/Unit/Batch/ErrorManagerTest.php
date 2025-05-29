@@ -274,7 +274,7 @@ class ErrorManagerTest extends TestCase
         array $data
     ): void {
         foreach ($data as &$testFile) {
-            $testFile = rtrim(file_get_contents(__DIR__ . '/Fixtures/error_manager/' . $testFile), "\n\n");
+            $testFile = rtrim(file_get_contents(__DIR__ . '/Fixtures/error_manager/' . $testFile), "\n\r");
         }
         unset($testFile);
 

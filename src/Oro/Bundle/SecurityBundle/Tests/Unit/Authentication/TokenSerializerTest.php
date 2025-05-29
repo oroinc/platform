@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Authentication;
 
-use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\ImpersonationToken;
@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 class TokenSerializerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
+    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
     private $doctrine;
 
     /** @var TokenSerializer */
@@ -33,9 +33,9 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
     public function testSerializeForUnsupportedToken()
     {
         $this->expectException(InvalidTokenSerializationException::class);
-        $token = $this->createMock(TokenInterface::class);
+        $this->expectExceptionMessage('An error occurred during token serialization.');
 
-        $this->tokenSerializer->serialize($token);
+        $this->tokenSerializer->serialize($this->createMock(TokenInterface::class));
     }
 
     public function testSerializeForTokenWithoutUser()
@@ -45,6 +45,8 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
         $token = new OrganizationToken($organization);
 
         $this->expectException(InvalidTokenSerializationException::class);
+        $this->expectExceptionMessage('An error occurred during token serialization.');
+
         $this->tokenSerializer->serialize($token);
     }
 
@@ -96,22 +98,19 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
         $user->addUserRole($role2);
         $user->addUserRole($role3);
 
-        $organizationRepo = $this->createMock(EntityRepository::class);
-        $userRepo = $this->createMock(EntityRepository::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $this->doctrine->expects(self::exactly(2))
-            ->method('getRepository')
+            ->method('getManagerForClass')
             ->willReturnMap([
-                [Organization::class, null, $organizationRepo],
-                [User::class, null, $userRepo],
+                [Organization::class, $em],
+                [User::class, $em]
             ]);
-        $organizationRepo->expects(self::once())
+        $em->expects(self::exactly(2))
             ->method('find')
-            ->with(1)
-            ->willReturn($organization);
-        $userRepo->expects(self::once())
-            ->method('find')
-            ->with(123)
-            ->willReturn($user);
+            ->willReturnMap([
+                [Organization::class, 1, $organization],
+                [User::class, 123, $user]
+            ]);
 
         /** @var ImpersonationToken $token */
         $token = $this->tokenSerializer->deserialize(
@@ -133,6 +132,8 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
     public function testDeserializeUnsupportedToken(?string $value)
     {
         $this->expectException(InvalidTokenSerializationException::class);
+        $this->expectExceptionMessage('An error occurred while deserializing the token.');
+
         $this->tokenSerializer->deserialize($value);
     }
 
@@ -157,24 +158,23 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
         $organization = new Organization();
         $organization->setId(1);
 
-        $organizationRepo = $this->createMock(EntityRepository::class);
-        $userRepo = $this->createMock(EntityRepository::class);
+        $em = $this->createMock(EntityManagerInterface::class);
         $this->doctrine->expects(self::exactly(2))
-            ->method('getRepository')
+            ->method('getManagerForClass')
             ->willReturnMap([
-                [Organization::class, null, $organizationRepo],
-                [User::class, null, $userRepo],
+                [Organization::class, $em],
+                [User::class, $em]
             ]);
-        $organizationRepo->expects(self::once())
+        $em->expects(self::exactly(2))
             ->method('find')
-            ->with(1)
-            ->willReturn($organization);
-        $userRepo->expects(self::once())
-            ->method('find')
-            ->with(123)
-            ->willReturn(null);
+            ->willReturnMap([
+                [Organization::class, 1, $organization],
+                [User::class, 123, null]
+            ]);
 
         $this->expectException(InvalidTokenUserOrganizationException::class);
+        $this->expectExceptionMessage('An error occurred while creating a token: user not found.');
+
         $value = 'organizationId=1;userId=123;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_1,ROLE_2';
         $this->tokenSerializer->deserialize($value);
     }
@@ -184,24 +184,19 @@ class TokenSerializerTest extends \PHPUnit\Framework\TestCase
         $user = new User();
         $user->setId(123);
 
-        $organizationRepo = $this->createMock(EntityRepository::class);
-        $userRepo = $this->createMock(EntityRepository::class);
-        $this->doctrine->expects(self::exactly(2))
-            ->method('getRepository')
-            ->willReturnMap([
-                [Organization::class, null, $organizationRepo],
-                [User::class, null, $userRepo],
-            ]);
-        $organizationRepo->expects(self::once())
+        $em = $this->createMock(EntityManagerInterface::class);
+        $this->doctrine->expects(self::once())
+            ->method('getManagerForClass')
+            ->with(Organization::class)
+            ->willReturn($em);
+        $em->expects(self::once())
             ->method('find')
-            ->with(1)
+            ->with(Organization::class, 1)
             ->willReturn(null);
-        $userRepo->expects(self::once())
-            ->method('find')
-            ->with(123)
-            ->willReturn($user);
 
         $this->expectException(InvalidTokenUserOrganizationException::class);
+        $this->expectExceptionMessage('An error occurred while creating a token: organization not found.');
+
         $value = 'organizationId=1;userId=123;userClass=Oro\Bundle\UserBundle\Entity\User;roles=ROLE_1,ROLE_2';
         $this->tokenSerializer->deserialize($value);
     }
