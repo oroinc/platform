@@ -200,6 +200,7 @@ class EntitySerializer
             $this->doctrineHelper->getRootEntityClass($qb),
             $entityConfig,
             $context,
+            $context['use_id_as_key'] ?? false,
             $skipPostSerializationForPrimaryEntities
         );
         if ($hasMore) {
@@ -223,6 +224,7 @@ class EntitySerializer
             $entityClass,
             $entityConfig,
             $context,
+            $context['use_id_as_key'] ?? false,
             $skipPostSerializationForPrimaryEntities
         );
 

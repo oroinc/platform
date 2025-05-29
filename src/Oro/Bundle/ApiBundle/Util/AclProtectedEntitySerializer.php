@@ -24,7 +24,7 @@ class AclProtectedEntitySerializer extends EntitySerializer
     ): array {
         $this->setContext($context);
         try {
-            return parent::serialize($qb, $config, $context);
+            return parent::serialize($qb, $config, $context, $skipPostSerializationForPrimaryEntities);
         } finally {
             $this->resetContext();
         }
@@ -40,7 +40,13 @@ class AclProtectedEntitySerializer extends EntitySerializer
     ): array {
         $this->setContext($context);
         try {
-            return parent::serializeEntities($entities, $entityClass, $config, $context);
+            return parent::serializeEntities(
+                $entities,
+                $entityClass,
+                $config,
+                $context,
+                $skipPostSerializationForPrimaryEntities
+            );
         } finally {
             $this->resetContext();
         }

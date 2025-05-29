@@ -176,7 +176,11 @@ class TestEntitiesMigration implements
         $table->addIndex(['parent_id']);
         $table->addIndex(['linked_id']);
         $table->addForeignKeyConstraint($table, ['parent_id'], ['id']);
-        $table->addForeignKeyConstraint($schema->getTable('test_api_custom_id'), ['linked_id'], ['id']);
+        $table->addForeignKeyConstraint(
+            $schema->getTable('test_api_custom_id'),
+            ['linked_id'],
+            ['autoincrement_key']
+        );
 
         $tableLinks = $schema->createTable('test_api_nested_objects_links');
         $tableLinks->addColumn('owner_id', 'integer');
@@ -185,7 +189,11 @@ class TestEntitiesMigration implements
         $tableLinks->addIndex(['owner_id']);
         $tableLinks->addIndex(['link_id']);
         $tableLinks->addForeignKeyConstraint($table, ['owner_id'], ['id']);
-        $tableLinks->addForeignKeyConstraint($schema->getTable('test_api_custom_id'), ['link_id'], ['id']);
+        $tableLinks->addForeignKeyConstraint(
+            $schema->getTable('test_api_custom_id'),
+            ['link_id'],
+            ['autoincrement_key']
+        );
     }
 
     /**
@@ -247,14 +255,14 @@ class TestEntitiesMigration implements
         }
 
         $table1 = $schema->createTable('test_api_custom_id');
-        $table1->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table1->addColumn('autoincrement_key', 'integer', ['autoincrement' => true]);
         $table1->addColumn('key', 'string', ['notnull' => true, 'length' => 255]);
         $table1->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
-        $table1->addColumn('parent_id', 'integer', ['notnull' => false]);
+        $table1->addColumn('parent_autoincrement_key', 'integer', ['notnull' => false]);
         $table1->addUniqueIndex(['key']);
-        $table1->setPrimaryKey(['id']);
-        $table1->addIndex(['parent_id']);
-        $table1->addForeignKeyConstraint($table1, ['parent_id'], ['id']);
+        $table1->setPrimaryKey(['autoincrement_key']);
+        $table1->addIndex(['parent_autoincrement_key']);
+        $table1->addForeignKeyConstraint($table1, ['parent_autoincrement_key'], ['autoincrement_key']);
 
         $table2 = $schema->createTable('test_api_custom_composite_id');
         $table2->addColumn('id', 'integer', ['autoincrement' => true]);
@@ -286,13 +294,13 @@ class TestEntitiesMigration implements
         );
 
         $table1Children = $schema->createTable('test_api_custom_id_children');
-        $table1Children->addColumn('parent_id', 'integer');
-        $table1Children->addColumn('child_id', 'integer');
-        $table1Children->setPrimaryKey(['parent_id', 'child_id']);
-        $table1Children->addIndex(['parent_id']);
-        $table1Children->addIndex(['child_id']);
-        $table1Children->addForeignKeyConstraint($table1, ['parent_id'], ['id']);
-        $table1Children->addForeignKeyConstraint($table1, ['child_id'], ['id']);
+        $table1Children->addColumn('parent_autoincrement_key', 'integer');
+        $table1Children->addColumn('child_autoincrement_key', 'integer');
+        $table1Children->setPrimaryKey(['parent_autoincrement_key', 'child_autoincrement_key']);
+        $table1Children->addIndex(['parent_autoincrement_key']);
+        $table1Children->addIndex(['child_autoincrement_key']);
+        $table1Children->addForeignKeyConstraint($table1, ['parent_autoincrement_key'], ['autoincrement_key']);
+        $table1Children->addForeignKeyConstraint($table1, ['child_autoincrement_key'], ['autoincrement_key']);
 
         $table2Children = $schema->createTable('test_api_custom_composite_id_c');
         $table2Children->addColumn('parent_id', 'integer');

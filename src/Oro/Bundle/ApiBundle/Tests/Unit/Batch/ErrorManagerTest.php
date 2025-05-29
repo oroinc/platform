@@ -279,7 +279,7 @@ class ErrorManagerTest extends \PHPUnit\Framework\TestCase
         array $data
     ) {
         foreach ($data as &$testFile) {
-            $testFile = rtrim(file_get_contents(__DIR__ . '/Fixtures/error_manager/' . $testFile), "\n\n");
+            $testFile = rtrim(file_get_contents(__DIR__ . '/Fixtures/error_manager/' . $testFile), "\n\r");
         }
         unset($testFile);
 

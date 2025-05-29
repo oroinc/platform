@@ -62,11 +62,11 @@ class TestEntityForNestedObjects implements TestFrameworkEntityInterface
     #[ORM\ManyToMany(targetEntity: TestCustomIdentifier::class, cascade: ['all'])]
     #[ORM\JoinTable(name: 'test_api_nested_objects_links')]
     #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id')]
-    #[ORM\InverseJoinColumn(name: 'link_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'link_id', referencedColumnName: 'autoincrement_key')]
     protected ?Collection $links = null;
 
     #[ORM\ManyToOne(targetEntity: TestCustomIdentifier::class)]
-    #[ORM\JoinColumn(name: 'linked_id', referencedColumnName: 'id')]
+    #[ORM\JoinColumn(name: 'linked_id', referencedColumnName: 'autoincrement_key')]
     protected ?TestCustomIdentifier $linked = null;
 
     public function __construct()

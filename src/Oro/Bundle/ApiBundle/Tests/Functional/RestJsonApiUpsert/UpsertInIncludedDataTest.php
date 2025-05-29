@@ -96,7 +96,10 @@ class UpsertInIncludedDataTest extends RestJsonApiTestCase
 
         $createdEntity = $this->getEntityWithCustomIdentifier('new item');
         self::assertSame('New Item', $createdEntity->name);
-        self::assertSame($this->getReference('test_custom_id1')->id, $createdEntity->getParent()->id);
+        self::assertSame(
+            $this->getReference('test_custom_id1')->autoincrementKey,
+            $createdEntity->getParent()->autoincrementKey
+        );
         self::assertSame('Updated Item 1', $createdEntity->getParent()->name);
     }
 
@@ -333,7 +336,10 @@ class UpsertInIncludedDataTest extends RestJsonApiTestCase
 
         $createdEntity = $this->getEntityWithCustomIdentifier('new item');
         self::assertSame('New Item', $createdEntity->name);
-        self::assertSame($this->getReference('test_custom_id1')->id, $createdEntity->getParent()->id);
+        self::assertSame(
+            $this->getReference('test_custom_id1')->autoincrementKey,
+            $createdEntity->getParent()->autoincrementKey
+        );
         self::assertSame('Updated Item 1', $createdEntity->getParent()->name);
     }
 
