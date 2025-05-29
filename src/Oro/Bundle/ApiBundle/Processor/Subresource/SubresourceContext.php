@@ -14,6 +14,7 @@ use Oro\Bundle\ApiBundle\Metadata\Extra\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\Extra\HateoasMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraCollection;
 use Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraInterface;
+use Oro\Bundle\ApiBundle\Metadata\TargetMetadataAccessor;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -445,14 +446,37 @@ class SubresourceContext extends Context
         if ($parentEntityClass) {
             $parentConfig = $this->getParentConfig();
             if (null !== $parentConfig) {
-                $this->parentMetadata = $this->metadataProvider->getMetadata(
+                $parentMetadata = $this->metadataProvider->getMetadata(
                     $parentEntityClass,
                     $this->getVersion(),
                     $this->getRequestType(),
                     $parentConfig,
                     $this->getParentMetadataExtras()
                 );
+                if (null !== $parentMetadata) {
+                    $this->initializeParentMetadata($parentMetadata);
+                }
+                $this->parentMetadata = $parentMetadata;
             }
         }
+    }
+
+    protected function initializeParentMetadata(
+        EntityMetadata $parentMetadata,
+        ?string $path = null,
+        ?TargetMetadataAccessor $targetMetadataAccessor = null
+    ): void {
+        if (null === $targetMetadataAccessor) {
+            $targetMetadataAccessor = new TargetMetadataAccessor(
+                $this->getVersion(),
+                $this->getRequestType(),
+                $this->metadataProvider,
+                $this->getParentMetadataExtras(),
+                $this->configProvider,
+                $this->getParentConfigExtras()
+            );
+        }
+
+        $this->setTargetMetadataAccessor($parentMetadata, $targetMetadataAccessor, $path);
     }
 }

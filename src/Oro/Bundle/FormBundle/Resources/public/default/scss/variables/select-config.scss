@@ -14,11 +14,6 @@ $select-padding: 11px $base-ui-element-icon-size 11px $select-padding-start !def
 
 $select-placeholder-color: $base-ui-element-placeholder-color !default;
 
-$select-firefox-height: null !default;
-$select-firefox-line-height: null !default;
-$select-firefox-inner-offset-top: null !default;
-$select-firefox-inner-offset-bottom: null !default;
-
 $select-border: $base-ui-element-border !default;
 $select-border-radius: $base-ui-element-border-radius !default;
 $select-background-color: $base-ui-element-bg-color !default;
@@ -68,7 +63,7 @@ $select-disabled-color: $base-ui-element-color-disabled-state !default;
 
 // Plain select
 
-$select-plain-arrow-position: right 0px center !default;
+$select-plain-arrow-position: right 0 center !default;
 $select-plain-font-size: $base-font-size--s !default;
 $select-plain-font-weight: font-weight('semi-bold') !default;
 $select-plain-line-height: 1.7 !default;

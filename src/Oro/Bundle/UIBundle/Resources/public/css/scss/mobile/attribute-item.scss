@@ -11,7 +11,7 @@
 
     &__description {
         margin-left: $attribute-item-description-offset-start;
-        word-break: $attribute-item-description-word-break;
+        overflow-wrap: $attribute-item-description-overflow-wrap;
     }
 
     &--mobile-full {

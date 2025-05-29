@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
+use Doctrine\ORM\Query\Expr\Join;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
@@ -10,9 +11,11 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorOrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTestCase
 {
@@ -874,6 +877,96 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
             . ' INNER JOIN Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User parent_entity1'
             . ' WITH parent_entity1.category = e'
             . ' WHERE parent_entity1.id = :parent_entity_id',
+            $this->context->getQuery()->getDQL()
+        );
+        self::assertEquals(
+            $parentId,
+            $this->context->getQuery()->getParameter('parent_entity_id')->getValue()
+        );
+    }
+
+    public function testProcessForEnumAssociation()
+    {
+        $associationName = 'enum';
+        $parentId = 123;
+
+        $parentConfig = new EntityDefinitionConfig();
+        $parentConfig->setIdentifierFieldNames(['id']);
+        $parentConfig->addField('id');
+        $parentConfig->addField($associationName)
+            ->createAndSetTargetEntity()
+            ->addHint('HINT_ENUM_OPTION', true);
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
+        $parentMetadata->addField(new FieldMetadata('id'));
+
+        $query = $this->doctrineHelper
+            ->getEntityRepositoryForClass(EnumOption::class)
+            ->createQueryBuilder('r')
+            ->innerJoin(Entity\Product::class, 'e', Join::WITH, 'JSON_EXTRACT(e.serialized_data, \'enum\') = r.id');
+
+        $this->context->setParentClassName(Entity\Product::class);
+        $this->context->setParentId($parentId);
+        $this->context->setAssociationName($associationName);
+        $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
+        $this->context->setQuery($query);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            'SELECT r'
+            . ' FROM Oro\Bundle\EntityExtendBundle\Entity\EnumOption r'
+            . ' INNER JOIN Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product e'
+            . ' WITH JSON_EXTRACT(e.serialized_data, \'enum\') = r.id'
+            . ' WHERE e.id = :parent_entity_id',
+            $this->context->getQuery()->getDQL()
+        );
+        self::assertEquals(
+            $parentId,
+            $this->context->getQuery()->getParameter('parent_entity_id')->getValue()
+        );
+    }
+
+    public function testProcessForRenamedEnumAssociation()
+    {
+        $associationName = 'enum';
+        $parentId = 123;
+
+        $parentConfig = new EntityDefinitionConfig();
+        $parentConfig->setIdentifierFieldNames(['id']);
+        $parentConfig->addField('id');
+        $associationFieldConfig = $parentConfig->addField($associationName);
+        $associationFieldConfig->setPropertyPath('enum_field');
+        $associationFieldConfig->createAndSetTargetEntity()
+            ->addHint('HINT_ENUM_OPTION', true);
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
+        $parentMetadata->addField(new FieldMetadata('id'));
+
+        $query = $this->doctrineHelper
+            ->getEntityRepositoryForClass(EnumOption::class)
+            ->createQueryBuilder('r')
+            ->innerJoin(
+                Entity\Product::class,
+                'e',
+                Join::WITH,
+                'JSON_EXTRACT(e.serialized_data, \'enum_field\') = r.id'
+            );
+
+        $this->context->setParentClassName(Entity\Product::class);
+        $this->context->setParentId($parentId);
+        $this->context->setAssociationName($associationName);
+        $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
+        $this->context->setQuery($query);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            'SELECT r'
+            . ' FROM Oro\Bundle\EntityExtendBundle\Entity\EnumOption r'
+            . ' INNER JOIN Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product e'
+            . ' WITH JSON_EXTRACT(e.serialized_data, \'enum_field\') = r.id'
+            . ' WHERE e.id = :parent_entity_id',
             $this->context->getQuery()->getDQL()
         );
         self::assertEquals(

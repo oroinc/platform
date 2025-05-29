@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Metadata;
 
 use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\TargetConfigExtraBuilder;
 use Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
@@ -57,15 +58,11 @@ class TargetMetadataAccessor implements TargetMetadataAccessorInterface
     #[\Override]
     public function getTargetMetadata(string $targetClassName, ?string $associationPath): ?EntityMetadata
     {
-        if (!$this->isExpandRequested($associationPath)) {
-            return null;
-        }
-
         $config = $this->configProvider->getConfig(
             $targetClassName,
             $this->version,
             $this->requestType,
-            $this->buildConfigExtras($associationPath)
+            $this->buildConfigExtras($associationPath, !$this->isExpandRequested($associationPath))
         );
         if (!$config->hasDefinition()) {
             return null;
@@ -107,20 +104,30 @@ class TargetMetadataAccessor implements TargetMetadataAccessorInterface
     }
 
     /**
-     * @param string|null $associationPath
-     *
      * @return ConfigExtraInterface[]
      */
-    private function buildConfigExtras(?string $associationPath): array
+    private function buildConfigExtras(?string $associationPath, bool $idOnly): array
     {
-        $cacheKey = $associationPath ?? '';
+        $cacheKey = ($associationPath ?? '') . ($idOnly ? '|idOnly' : '');
         if (!isset($this->processedConfigExtras[$cacheKey])) {
-            $this->processedConfigExtras[$cacheKey] = TargetConfigExtraBuilder::buildConfigExtras(
-                $this->configExtras,
-                $associationPath
-            );
+            $configExtras = TargetConfigExtraBuilder::buildConfigExtras($this->configExtras, $associationPath);
+            if ($idOnly && !$this->hasFilterIdentifierFieldsConfigExtra($configExtras)) {
+                $configExtras[] = new FilterIdentifierFieldsConfigExtra();
+            }
+            $this->processedConfigExtras[$cacheKey] = $configExtras;
         }
 
         return $this->processedConfigExtras[$cacheKey];
+    }
+
+    private function hasFilterIdentifierFieldsConfigExtra(array $configExtras): bool
+    {
+        foreach ($configExtras as $extra) {
+            if ($extra instanceof FilterIdentifierFieldsConfigExtra) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

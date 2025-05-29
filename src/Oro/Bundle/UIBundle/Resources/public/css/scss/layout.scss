@@ -35,7 +35,7 @@ body {
             &:not(.extra-list):not(.list-inline) {
                 margin: 0 0 $content-padding-medium $content-padding;
 
-                word-break: break-word;
+                overflow-wrap: break-word;
             }
         }
 

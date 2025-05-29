@@ -45,7 +45,7 @@
         background-color: $select2-container-multi-search-choice-bg-color;
         cursor: default;
         user-select: none;
-        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
 
     .select2-chosen {

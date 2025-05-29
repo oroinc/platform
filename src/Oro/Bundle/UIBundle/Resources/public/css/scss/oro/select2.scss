@@ -216,7 +216,7 @@
                 max-width: calc(100% - (#{$select2-search-choice-offset * 2}));
 
                 > div {
-                    @include text-line-truncate(auto, 100%);
+                    @include text-line-truncate(100%, 100%);
 
                     background: $select2-search-choice-background;
                     padding:

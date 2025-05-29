@@ -777,6 +777,14 @@ class Context extends NormalizeResultContext implements ContextInterface
             );
         }
 
+        $this->setTargetMetadataAccessor($metadata, $targetMetadataAccessor, $path);
+    }
+
+    protected function setTargetMetadataAccessor(
+        EntityMetadata $metadata,
+        ?TargetMetadataAccessor $targetMetadataAccessor,
+        ?string $path = null
+    ): void {
         $metadata->setTargetMetadataAccessor($targetMetadataAccessor);
 
         $associations = $metadata->getAssociations();

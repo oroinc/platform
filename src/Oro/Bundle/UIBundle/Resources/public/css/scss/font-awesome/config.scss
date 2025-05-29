@@ -1,7 +1,7 @@
 /* @theme: admin.oro; */
 
 $fa-font-path: '~@oroinc/font-awesome/fonts';
-$fa-font-family: 'FontAwesome';
+$fa-font-family: 'FontAwesome', serif;
 
 @import '~@oroinc/font-awesome/scss/variables';
 @import 'icons-css-vars';

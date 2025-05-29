@@ -183,12 +183,8 @@ class EntitySerializer
         $this->fieldFilter = $filter;
     }
 
-    public function serialize(
-        QueryBuilder $qb,
-        EntityConfig|array $config,
-        array $context = [],
-        bool $skipPostSerializationForPrimaryEntities = false
-    ): array {
+    public function serialize(QueryBuilder $qb, EntityConfig|array $config, array $context = []): array
+    {
         $entityConfig = $this->normalizeConfig($config);
 
         $this->queryModifier->updateQuery($qb, $entityConfig);
@@ -200,7 +196,8 @@ class EntitySerializer
             $this->doctrineHelper->getRootEntityClass($qb),
             $entityConfig,
             $context,
-            $skipPostSerializationForPrimaryEntities
+            $context['use_id_as_key'] ?? false,
+            $context['skip_post_serialization_for_primary_entities'] ?? false
         );
         if ($hasMore) {
             $data[ConfigUtil::INFO_RECORD_KEY] = [ConfigUtil::HAS_MORE => true];
@@ -213,8 +210,7 @@ class EntitySerializer
         array $entities,
         string $entityClass,
         EntityConfig|array $config,
-        array $context = [],
-        bool $skipPostSerializationForPrimaryEntities = false
+        array $context = []
     ): array {
         $entityConfig = $this->normalizeConfig($config);
 
@@ -223,7 +219,8 @@ class EntitySerializer
             $entityClass,
             $entityConfig,
             $context,
-            $skipPostSerializationForPrimaryEntities
+            $context['use_id_as_key'] ?? false,
+            $context['skip_post_serialization_for_primary_entities'] ?? false
         );
 
         return $this->dataNormalizer->normalizeData($data, $entityConfig);
