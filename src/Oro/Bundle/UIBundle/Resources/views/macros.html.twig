@@ -1387,15 +1387,11 @@
         {% if title is empty %}
             {% set title = text %}
         {% endif %}
-        {% if class is empty %}
-            {% set class = '' %}
-        {% endif %}
         {% if url is not empty %}
-            <a href="{{ url|escape('html_attr') }}" title="{{ title|escape('html_attr') }}" class="{{ class }}"
-            {% if (not oro_is_url_local(url)) %} target="_blank"{% endif %}
-            {% for name,value in attributes|default({}) %}
-                {{ name }}="{{ value }}"
-            {% endfor %}
+            <a href="{{ url|escape('html_attr') }}" title="{{ title|escape('html_attr') }}"
+            {%- if class is not empty %} class="{{ class }}"{% endif -%}
+            {%- if (not oro_is_url_local(url)) %} target="_blank"{% endif -%}
+            {%- for name, value in attributes|default({}) %} {{ name }}="{{ value }}"{% endfor -%}
             >{{ text }}</a>
         {% endif %}
     {% endapply %}
@@ -1494,8 +1490,8 @@
 {% endmacro %}
 
 {%- macro entityViewLink(entity, label, route, permission) -%}
+    {% apply spaceless %}
     {% import _self as UIMacro %}
-
     {% if entity %}
         {% if route and is_granted(permission|default('VIEW'), entity) and feature_resource_enabled(route, 'routes') %}
             {{ UIMacro.renderUrl(path(route, {'id': entity.id}), label) }}
@@ -1505,6 +1501,7 @@
     {% else %}
         {{ 'oro.ui.empty'|trans }}
     {% endif %}
+    {% endapply %}
 {%- endmacro -%}
 
 {%- macro entityViewLinks(entities, labelProperty, route, permission) -%}
