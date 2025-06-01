@@ -40,6 +40,30 @@ class MaintenanceLockUnlockCommandTest extends WebTestCase
         $this->assertResponseCode(200);
     }
 
+    public function testMaintenanceLockWhenAlreadyEnabled(): void
+    {
+        $this->doExecuteCommand(MaintenanceLockCommand::getDefaultName());
+        
+        $commandTester = $this->doExecuteCommand(MaintenanceLockCommand::getDefaultName());
+        
+        $this->assertOutputContains($commandTester, 'Maintenance mode is already enabled.');
+        $this->assertSuccessReturnCode($commandTester);
+        $this->assertResponseCode(503);
+        
+        $this->doExecuteCommand(MaintenanceUnlockCommand::getDefaultName());
+    }
+
+    public function testMaintenanceUnlockWhenAlreadyDisabled(): void
+    {
+        $this->doExecuteCommand(MaintenanceUnlockCommand::getDefaultName());
+        
+        $commandTester = $this->doExecuteCommand(MaintenanceUnlockCommand::getDefaultName());
+        
+        $this->assertOutputContains($commandTester, 'Maintenance mode is already disabled.');
+        $this->assertSuccessReturnCode($commandTester);
+        $this->assertResponseCode(200);
+    }
+
     private function assertResponseCode(int $code): void
     {
         $this->client->request('GET', $this->getUrl('oro_user_security_login'));
