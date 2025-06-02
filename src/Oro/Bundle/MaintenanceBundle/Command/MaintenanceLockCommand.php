@@ -73,6 +73,11 @@ HELP
             }
         }
 
+        if ($driver->isExists()) {
+            $io->note('Maintenance mode is already enabled.');
+            return Command::SUCCESS;
+        }
+
         if ($driver->lock() === true) {
             $this->dispatcher->dispatch(new MaintenanceEvent(), MaintenanceEvent::MAINTENANCE_ON);
             $io->success('Maintenance mode is turned on.');
