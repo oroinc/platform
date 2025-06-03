@@ -2,24 +2,22 @@
 
 namespace Oro\Bundle\ApiBundle\Filter;
 
-use Oro\Bundle\ApiBundle\Provider\EntityAliasResolverRegistry;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 
 /**
  * Creates a new instance of NestedAssociationFilter.
  */
 class NestedAssociationFilterFactory
 {
-    private EntityAliasResolverRegistry $entityAliasResolverRegistry;
-
-    public function __construct(EntityAliasResolverRegistry $entityAliasResolverRegistry)
-    {
-        $this->entityAliasResolverRegistry = $entityAliasResolverRegistry;
+    public function __construct(
+        private readonly ValueNormalizer $valueNormalizer
+    ) {
     }
 
     public function createFilter(string $dataType): NestedAssociationFilter
     {
         $filter = new NestedAssociationFilter($dataType);
-        $filter->setEntityAliasResolverRegistry($this->entityAliasResolverRegistry);
+        $filter->setValueNormalizer($this->valueNormalizer);
 
         return $filter;
     }

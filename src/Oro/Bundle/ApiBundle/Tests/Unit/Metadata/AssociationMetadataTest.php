@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\ExternalLinkMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaAttributeMetadata;
+use Oro\Bundle\ApiBundle\Metadata\TargetMetadataAccessorInterface;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use PHPUnit\Framework\TestCase;
 
@@ -15,15 +16,6 @@ use PHPUnit\Framework\TestCase;
  */
 class AssociationMetadataTest extends TestCase
 {
-    private EntityMetadata $entityMetadata;
-
-    #[\Override]
-    protected function setUp(): void
-    {
-        $this->entityMetadata = new EntityMetadata('entityClassName');
-        $this->entityMetadata->setInheritedType(true);
-    }
-
     public function testClone(): void
     {
         $associationMetadata = new AssociationMetadata();
@@ -62,6 +54,9 @@ class AssociationMetadataTest extends TestCase
 
     public function testToArray(): void
     {
+        $entityMetadata = new EntityMetadata('Test\Class');
+        $entityMetadata->setInheritedType(true);
+
         $associationMetadata = new AssociationMetadata();
         $associationMetadata->setName('testName');
         $associationMetadata->setPropertyPath('testPropertyPath');
@@ -73,7 +68,7 @@ class AssociationMetadataTest extends TestCase
         $associationMetadata->setIsCollection(true);
         $associationMetadata->setIsNullable(true);
         $associationMetadata->setCollapsed(true);
-        $associationMetadata->setTargetMetadata($this->entityMetadata);
+        $associationMetadata->setTargetMetadata($entityMetadata);
         $associationMetadata->addMetaProperty(new MetaAttributeMetadata('metaProperty1', 'string'));
         $associationMetadata->addRelationshipMetaProperty(new MetaAttributeMetadata('metaProperty2', 'string'));
         $associationMetadata->addLink('link1', new ExternalLinkMetadata('url1'));
@@ -92,7 +87,7 @@ class AssociationMetadataTest extends TestCase
                 'base_target_class'            => 'baseTargetClassName',
                 'acceptable_target_classes'    => ['targetClassName1', 'targetClassName2'],
                 'target_metadata'              => [
-                    'class'     => 'entityClassName',
+                    'class'     => 'Test\Class',
                     'inherited' => true
                 ],
                 'meta_properties'              => [
@@ -408,13 +403,154 @@ class AssociationMetadataTest extends TestCase
         self::assertTrue($associationMetadata->isCollapsed());
     }
 
-    public function testTargetMetadata(): void
+    public function testSetTargetMetadataFullMode(): void
     {
+        $targetMetadataAccessor = $this->createMock(TargetMetadataAccessorInterface::class);
+        $targetMetadataAccessor->expects(self::once())
+            ->method('setFullMode')
+            ->with(true);
+
+        $targetMetadata = $this->createMock(EntityMetadata::class);
+        $targetMetadata->expects(self::once())
+            ->method('setEntityMetadataFullMode')
+            ->with(true);
+
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setTargetMetadataAccessor($targetMetadataAccessor);
+        $associationMetadata->setTargetMetadata($targetMetadata);
+
+        $associationMetadata->setTargetMetadataFullMode(true);
+    }
+
+    public function testSetTargetMetadataFullModeWhenTargetMetadataAccessorIsNotSet(): void
+    {
+        $targetMetadata = $this->createMock(EntityMetadata::class);
+        $targetMetadata->expects(self::once())
+            ->method('setEntityMetadataFullMode')
+            ->with(true);
+
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setTargetMetadata($targetMetadata);
+
+        $associationMetadata->setTargetMetadataFullMode(true);
+    }
+
+    public function testSetTargetMetadataFullModeWhenNoTargetMetadata(): void
+    {
+        $targetMetadataAccessor = $this->createMock(TargetMetadataAccessorInterface::class);
+        $targetMetadataAccessor->expects(self::once())
+            ->method('setFullMode')
+            ->with(true);
+
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setTargetMetadataAccessor($targetMetadataAccessor);
+
+        $associationMetadata->setTargetMetadataFullMode(true);
+    }
+
+    public function testTargetMetadataWithClassName(): void
+    {
+        $anotherEntityMetadata = new EntityMetadata('Test\AnotherClass');
+
+        $targetMetadataAccessor = $this->createMock(TargetMetadataAccessorInterface::class);
+        $targetMetadataAccessor->expects(self::once())
+            ->method('getTargetMetadata')
+            ->with('Test\AnotherClass')
+            ->willReturn($anotherEntityMetadata);
+
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setTargetMetadataAccessor($targetMetadataAccessor);
+        $associationMetadata->setAssociationPath('association');
+
+        $entityMetadata = new EntityMetadata('Test\Class');
+        $associationMetadata->setTargetMetadata($entityMetadata);
+        self::assertEquals($anotherEntityMetadata, $associationMetadata->getTargetMetadata('Test\AnotherClass'));
+    }
+
+    public function testTargetMetadataWithClassNameAndWhenClassNameEqualToCurrentTargetClassName(): void
+    {
+        $targetEntityMetadata = new EntityMetadata('Test\Class');
+
+        $targetMetadataAccessor = $this->createMock(TargetMetadataAccessorInterface::class);
+        $targetMetadataAccessor->expects(self::never())
+            ->method('getTargetMetadata');
+
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setTargetMetadataAccessor($targetMetadataAccessor);
+        $associationMetadata->setTargetClassName('Test\Class');
+        $associationMetadata->setAssociationPath('association');
+        $associationMetadata->setTargetMetadata($targetEntityMetadata);
+
+        self::assertEquals($targetEntityMetadata, $associationMetadata->getTargetMetadata('Test\Class'));
+    }
+
+    public function testTargetMetadataWithClassNameAndWhenClassNameEqualsToTargetClassNameButFullModeIsSet(): void
+    {
+        $fullEntityMetadata = new EntityMetadata('Test\Class');
+
+        $targetMetadataAccessor = $this->createMock(TargetMetadataAccessorInterface::class);
+        $targetMetadataAccessor->expects(self::once())
+            ->method('isFullMode')
+            ->willReturn(true);
+        $targetMetadataAccessor->expects(self::once())
+            ->method('getTargetMetadata')
+            ->with('Test\Class')
+            ->willReturn($fullEntityMetadata);
+
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setTargetMetadataAccessor($targetMetadataAccessor);
+        $associationMetadata->setTargetClassName('Test\Class');
+        $associationMetadata->setAssociationPath('association');
+
+        $entityMetadata = new EntityMetadata('Test\Class');
+        $associationMetadata->setTargetMetadata($entityMetadata);
+        self::assertEquals($fullEntityMetadata, $associationMetadata->getTargetMetadata('Test\Class'));
+    }
+
+    public function testTargetMetadataWithoutTargetClassName(): void
+    {
+        $targetMetadataAccessor = $this->createMock(TargetMetadataAccessorInterface::class);
+        $targetMetadataAccessor->expects(self::never())
+            ->method('getTargetMetadata');
+
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setTargetMetadataAccessor($targetMetadataAccessor);
+        $associationMetadata->setAssociationPath('association');
+
+        $entityMetadata = new EntityMetadata('Test\Class');
+        $associationMetadata->setTargetMetadata($entityMetadata);
+        self::assertEquals($entityMetadata, $associationMetadata->getTargetMetadata());
+    }
+
+    public function testTargetMetadataWhenNoAssociationPath(): void
+    {
+        $targetMetadataAccessor = $this->createMock(TargetMetadataAccessorInterface::class);
+        $targetMetadataAccessor->expects(self::never())
+            ->method('getTargetMetadata');
+
         $associationMetadata = new AssociationMetadata();
 
+        $entityMetadata = new EntityMetadata('Test\Class');
+        $associationMetadata->setTargetMetadata($entityMetadata);
+        self::assertEquals($entityMetadata, $associationMetadata->getTargetMetadata());
+    }
+
+    public function testTargetMetadataWhenTargetMetadataAccessorIsNotSet(): void
+    {
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setAssociationPath('association');
+
+        $entityMetadata = new EntityMetadata('Test\Class');
+        $associationMetadata->setTargetMetadata($entityMetadata);
+        self::assertEquals($entityMetadata, $associationMetadata->getTargetMetadata());
+    }
+
+    public function testTargetMetadataWhenTargetMetadataAccessorIsNotSetAndNoTargetMetadata(): void
+    {
+        $associationMetadata = new AssociationMetadata();
+        $associationMetadata->setAssociationPath('association');
+
         self::assertNull($associationMetadata->getTargetMetadata());
-        $associationMetadata->setTargetMetadata($this->entityMetadata);
-        self::assertEquals($this->entityMetadata, $associationMetadata->getTargetMetadata());
     }
 
     public function testLinks(): void
