@@ -265,20 +265,24 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware
         $userRoleForm = $this->getRoleViewFormElement();
         $permissionNames = $table->getColumn(0);
         $permissionsArray = $userRoleForm->getPermissionsByNames($permissionNames);
-        foreach ($table->getRows() as $row) {
-            $entityName = array_shift($row);
+        $this->seePermissions($table, $permissionsArray);
+    }
 
-            foreach ($row as $cell) {
-                [$role, $value] = explode(':', $cell);
-                self::assertNotEmpty($permissionsArray[$entityName][$role]);
-                $expected = $permissionsArray[$entityName][$role];
-                self::assertEquals(
-                    $expected,
-                    $value,
-                    "Failed asserting that permission $expected equals $value for $entityName"
-                );
-            }
-        }
+    /**
+     * Asserts that provided permissions allowed on role view page
+     *
+     * Example: Then the role has following active permissions:
+     *            | Language    | View:Business Unit | Create:User          | Edit:User | Assign:User | Translate:User |
+     *            | Task        | View:Division      | Create:Business Unit | Edit:User | Delete:User | Assign:User |
+     *
+     * @Then /^the customer user role has following active permissions:$/
+     */
+    public function iSeeFollowingCustomerUserPermissions(TableNode $table)
+    {
+        $customerUserRoleForm = $this->getCustomerRoleViewFormElement();
+        $permissionNames = $table->getColumn(0);
+        $permissionsArray = $customerUserRoleForm->getCustomerUserPermissionsByNames($permissionNames);
+        $this->seePermissions($table, $permissionsArray);
     }
 
     /**
@@ -576,6 +580,14 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware
     }
 
     /**
+     * @return UserRoleViewForm
+     */
+    protected function getCustomerRoleViewFormElement()
+    {
+        return $this->elementFactory->createElement('CustomerUserRoleView');
+    }
+
+    /**
      * @return UserRoleForm
      */
     protected function getRoleEditFormElement()
@@ -586,5 +598,25 @@ class ACLContext extends OroFeatureContext implements OroPageObjectAware
     private function getInflector(): Inflector
     {
         return $this->inflector ?: ($this->inflector = (new InflectorFactory())->build());
+    }
+
+    private function seePermissions(TableNode $table, array $permissionsArray): void
+    {
+        foreach ($table->getRows() as $row) {
+            $entityName = array_shift($row);
+
+            foreach ($row as $cell) {
+                if (str_contains($cell, ':')) {
+                    [$role, $value] = explode(':', $cell);
+                    self::assertNotEmpty($permissionsArray[$entityName][$role]);
+                    $expected = $permissionsArray[$entityName][$role];
+                    self::assertEquals(
+                        $expected,
+                        $value,
+                        "Failed asserting that permission $expected equals $value for $entityName"
+                    );
+                }
+            }
+        }
     }
 }
