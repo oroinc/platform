@@ -154,6 +154,91 @@ class AclPrivilegeRepository
     }
 
     /**
+     * Gets all privileges associated with the given security identity.
+     *
+     * @param SID $sid
+     * @param null $aclGroup
+     * @param bool $checkACLSupport
+     * @return ArrayCollection|AclPrivilege[]
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    public function getSupportedAclPrivileges(SID $sid, $aclGroup = null, bool $checkACLSupport = false)
+    {
+        $privileges = new ArrayCollection();
+        foreach ($this->manager->getAllExtensions() as $extension) {
+            $extensionKey = $extension->getExtensionKey();
+            // fill a list of object identities;
+            // the root object identity is added to the top of the list (for performance reasons)
+            /** @var ClassSecurityMetadata[] $classes */
+            $classes = [];
+            /** @var OID[] $oids */
+            $oids = [];
+            $extensionClasses = $extension->getClasses();
+            foreach ($extensionClasses as $class) {
+                $className = $class->getClassName();
+                $oid = new OID($extensionKey, $className);
+
+                if ($checkACLSupport && !$extension->supports($oid->getType(), $oid->getIdentifier())) {
+                    continue;
+                }
+
+                $oids[] = $oid;
+                $classes[$className] = $class;
+            }
+
+            $rootOid = $this->manager->getRootOid($extensionKey);
+            array_unshift($oids, $rootOid);
+
+            // load ACLs for all object identities
+            $acls = $this->findAcls($sid, $oids);
+
+            // find ACL for the root object identity
+            $rootAcl = $this->findAclByOid($acls, $rootOid);
+            foreach ($oids as $oid) {
+                if ($oid->getType() === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
+                    continue;
+                }
+
+                $class = $classes[$oid->getType()];
+                $name = $class->getLabel();
+                if (!$name) {
+                    $name = substr($class->getClassName(), strpos($class->getClassName(), '\\'));
+                } elseif ($name instanceof Label) {
+                    $name = $name->trans($this->translator);
+                }
+                $description = $class->getDescription();
+                if ($description instanceof Label) {
+                    $description = $description->trans($this->translator);
+                }
+
+                $privilege = new AclPrivilege();
+                $privilege
+                    ->setIdentity(new AclPrivilegeIdentity(
+                        ObjectIdentityHelper::encodeIdentityString($oid->getIdentifier(), $oid->getType()),
+                        $name
+                    ))
+                    ->setExtensionKey($extensionKey)
+                    ->setDescription($description)
+                    ->setGroup($class->getGroup())
+                    ->setCategory($class->getCategory());
+
+                $this->addPermissions($sid, $privilege, $oid, $acls, $extension, $rootAcl, $aclGroup);
+
+                // add fields in case if class metadata has not empty fields array
+                if ($class->getFields()) {
+                    $privilege->setFields($this->getFieldsPrivileges($sid, $class, $extension));
+                }
+                $privileges->add($privilege);
+            }
+        }
+
+        $this->sortPrivileges($privileges);
+
+        return $privileges;
+    }
+
+    /**
      * Associates privileges with the given security identity.
      *
      * @param SID                            $sid
