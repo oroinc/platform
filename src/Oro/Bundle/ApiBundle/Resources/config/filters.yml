@@ -229,3 +229,10 @@ services:
             - true
         tags:
           - { name: oro.api.query.comparison_expression, operator: 'NESTED_TREE_WITH_ROOT' }
+
+    oro_api.query.comparison_expression.entity:
+        class: Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\EntityComparisonExpression
+        arguments:
+            - '@doctrine'
+        tags:
+            - { name: oro.api.query.comparison_expression, operator: 'ENTITY' }
