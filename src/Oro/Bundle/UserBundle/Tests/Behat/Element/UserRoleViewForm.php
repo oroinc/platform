@@ -58,4 +58,36 @@ class UserRoleViewForm extends Form
 
         return $permissionArray;
     }
+
+    /**
+     * Fetch permissions to array from role view page form
+     *
+     * @param array $permissionNames
+     * @return array
+     */
+    public function getCustomerUserPermissionsByNames(array $permissionNames)
+    {
+        $permissionArray = [];
+
+        foreach ($permissionNames as $name) {
+            $permission = $this->find(
+                'xpath',
+                sprintf(
+                    '//div[contains(@class, "entity-permission-container")'.
+                    ' and descendant::div[@class="entity-name" and text()="%s"]]',
+                    $name
+                )
+            );
+            $items = $permission->findAll('xpath', '//li[contains(@class,"action-permissions__item")]');
+
+            foreach ($items as $item) {
+                [$action, $value] = explode('-', str_replace([' - ', ' -', '- '], '-', $item->getText()));
+                if ($action && $value) {
+                    $permissionArray[$name][$action] = $value;
+                }
+            }
+        }
+
+        return $permissionArray;
+    }
 }
