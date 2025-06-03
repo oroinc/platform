@@ -11,6 +11,8 @@ use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 /**
  * @dbIsolationPerTest
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
 class NestedAssociationTest extends RestJsonApiTestCase
 {
@@ -20,9 +22,14 @@ class NestedAssociationTest extends RestJsonApiTestCase
         $this->loadFixtures([LoadNestedAssociationData::class]);
     }
 
-    public function testGetList()
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testGetList(): void
     {
         $entityType = $this->getEntityType(TestEntity::class);
+        $relatedEntityType = $this->getEntityType(TestRelatedEntity::class);
+        $relatedEntityWithCustomIdType = $this->getEntityType(TestRelatedEntityWithCustomId::class);
 
         $response = $this->cget(['entity' => $entityType]);
         $this->assertResponseContains(
@@ -32,15 +39,12 @@ class NestedAssociationTest extends RestJsonApiTestCase
                         'type' => $entityType,
                         'id' => '<toString(@test_entity_1->id)>',
                         'attributes' => [
-                            'name' => [
-                                'firstName' => null,
-                                'lastName' => 'Entity 1'
-                            ]
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 1']
                         ],
                         'relationships' => [
                             'relatedEntity' => [
                                 'data' => [
-                                    'type' => $this->getEntityType(TestRelatedEntity::class),
+                                    'type' => $relatedEntityType,
                                     'id' => '<toString(@test_related_entity_1->id)>'
                                 ]
                             ]
@@ -50,16 +54,150 @@ class NestedAssociationTest extends RestJsonApiTestCase
                         'type' => $entityType,
                         'id' => '<toString(@test_entity_2->id)>',
                         'attributes' => [
-                            'name' => [
-                                'firstName' => null,
-                                'lastName' => 'Entity 2'
-                            ]
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 2']
                         ],
                         'relationships' => [
                             'relatedEntity' => [
                                 'data' => [
-                                    'type' => $this->getEntityType(TestRelatedEntityWithCustomId::class),
+                                    'type' => $relatedEntityWithCustomIdType,
                                     'id' => '<toString(@test_related_entity_with_custom_id_1->key)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_3->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 3']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityType,
+                                    'id' => '<toString(@test_related_entity_2->id)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_4->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 4']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => '<toString(@test_related_entity_with_custom_id_2->key)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_5->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 5']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityType,
+                                    'id' => '<toString(@test_related_entity_3->id)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_6->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 6']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => '<toString(@test_related_entity_with_custom_id_3->key)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_7->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 7']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => null
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testGetListWithEqFilterByRelatedEntity(): void
+    {
+        $entityType = $this->getEntityType(TestEntity::class);
+        $relatedEntityType = $this->getEntityType(TestRelatedEntity::class);
+        $relatedEntityId = $this->getReference('test_related_entity_1')->id;
+
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['filter[relatedEntity][' . $relatedEntityType . ']' => $relatedEntityId]
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_1->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 1']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => ['type' => $relatedEntityType, 'id' => (string)$relatedEntityId]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testGetListWithEqFilterByRelatedEntityWithCustomId(): void
+    {
+        $entityType = $this->getEntityType(TestEntity::class);
+        $relatedEntityWithCustomIdType = $this->getEntityType(TestRelatedEntityWithCustomId::class);
+        $relatedEntityWithCustomIdKey = $this->getReference('test_related_entity_with_custom_id_1')->key;
+
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['filter[relatedEntity][' . $relatedEntityWithCustomIdType . ']' => $relatedEntityWithCustomIdKey]
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_2->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 2']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => (string)$relatedEntityWithCustomIdKey
                                 ]
                             ]
                         ]
@@ -70,7 +208,1183 @@ class NestedAssociationTest extends RestJsonApiTestCase
         );
     }
 
-    public function testGet()
+    public function testGetListWithEqFilterByRelatedEntityBySeveralIds(): void
+    {
+        $entityType = $this->getEntityType(TestEntity::class);
+        $relatedEntityType = $this->getEntityType(TestRelatedEntity::class);
+        $relatedEntity1Id = $this->getReference('test_related_entity_1')->id;
+        $relatedEntity2Id = $this->getReference('test_related_entity_2')->id;
+
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['filter[relatedEntity][' . $relatedEntityType . ']' => $relatedEntity1Id . ',' . $relatedEntity2Id]
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_1->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 1']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => ['type' => $relatedEntityType, 'id' => (string)$relatedEntity1Id]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_3->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 3']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => ['type' => $relatedEntityType, 'id' => (string)$relatedEntity2Id]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testGetListWithEqFilterByRelatedEntityWithCustomIdBySeveralIds(): void
+    {
+        $entityType = $this->getEntityType(TestEntity::class);
+        $relatedEntityWithCustomIdType = $this->getEntityType(TestRelatedEntityWithCustomId::class);
+        $relatedEntityWithCustomId1Key = $this->getReference('test_related_entity_with_custom_id_1')->key;
+        $relatedEntityWithCustomId2Key = $this->getReference('test_related_entity_with_custom_id_2')->key;
+
+        $response = $this->cget(
+            ['entity' => $entityType],
+            [
+                'filter[relatedEntity][' . $relatedEntityWithCustomIdType . ']' =>
+                    $relatedEntityWithCustomId1Key . ',' . $relatedEntityWithCustomId2Key
+            ]
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_2->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 2']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => (string)$relatedEntityWithCustomId1Key
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_4->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 4']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => (string)$relatedEntityWithCustomId2Key
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testGetListWithNeqFilterByRelatedEntity(): void
+    {
+        $entityType = $this->getEntityType(TestEntity::class);
+        $relatedEntityType = $this->getEntityType(TestRelatedEntity::class);
+        $relatedEntityWithCustomIdType = $this->getEntityType(TestRelatedEntityWithCustomId::class);
+        $relatedEntityId = $this->getReference('test_related_entity_1')->id;
+
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['filter[relatedEntity][' . $relatedEntityType . '][neq]' => $relatedEntityId]
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_2->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 2']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => '<toString(@test_related_entity_with_custom_id_1->key)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_3->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 3']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityType,
+                                    'id' => '<toString(@test_related_entity_2->id)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_4->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 4']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => '<toString(@test_related_entity_with_custom_id_2->key)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_5->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 5']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityType,
+                                    'id' => '<toString(@test_related_entity_3->id)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_6->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 6']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => '<toString(@test_related_entity_with_custom_id_3->key)>'
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testGetListWithNeqFilterByRelatedEntityWithCustomId(): void
+    {
+        $entityType = $this->getEntityType(TestEntity::class);
+        $relatedEntityType = $this->getEntityType(TestRelatedEntity::class);
+        $relatedEntityWithCustomIdType = $this->getEntityType(TestRelatedEntityWithCustomId::class);
+        $relatedEntityWithCustomIdKey = $this->getReference('test_related_entity_with_custom_id_1')->key;
+
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['filter[relatedEntity][' . $relatedEntityWithCustomIdType . '][neq]' => $relatedEntityWithCustomIdKey]
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_1->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 1']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityType,
+                                    'id' => '<toString(@test_related_entity_1->id)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_3->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 3']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityType,
+                                    'id' => '<toString(@test_related_entity_2->id)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_4->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 4']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => '<toString(@test_related_entity_with_custom_id_2->key)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_5->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 5']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityType,
+                                    'id' => '<toString(@test_related_entity_3->id)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_6->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 6']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => '<toString(@test_related_entity_with_custom_id_3->key)>'
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testGetListWithNeqFilterByRelatedEntityBySeveralIds(): void
+    {
+        $entityType = $this->getEntityType(TestEntity::class);
+        $relatedEntityType = $this->getEntityType(TestRelatedEntity::class);
+        $relatedEntityWithCustomIdType = $this->getEntityType(TestRelatedEntityWithCustomId::class);
+        $relatedEntity1Id = $this->getReference('test_related_entity_1')->id;
+        $relatedEntity2Id = $this->getReference('test_related_entity_2')->id;
+
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['filter[relatedEntity][' . $relatedEntityType . '][neq]' => $relatedEntity1Id . ',' . $relatedEntity2Id]
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_2->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 2']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => '<toString(@test_related_entity_with_custom_id_1->key)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_4->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 4']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => '<toString(@test_related_entity_with_custom_id_2->key)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_5->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 5']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityType,
+                                    'id' => '<toString(@test_related_entity_3->id)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_6->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 6']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => '<toString(@test_related_entity_with_custom_id_3->key)>'
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testGetListWithNeqFilterByRelatedEntityWithCustomIdBySeveralIds(): void
+    {
+        $entityType = $this->getEntityType(TestEntity::class);
+        $relatedEntityType = $this->getEntityType(TestRelatedEntity::class);
+        $relatedEntityWithCustomIdType = $this->getEntityType(TestRelatedEntityWithCustomId::class);
+        $relatedEntityWithCustomId1Key = $this->getReference('test_related_entity_with_custom_id_1')->key;
+        $relatedEntityWithCustomId2Key = $this->getReference('test_related_entity_with_custom_id_2')->key;
+
+        $response = $this->cget(
+            ['entity' => $entityType],
+            [
+                'filter[relatedEntity][' . $relatedEntityWithCustomIdType . '][neq]' =>
+                    $relatedEntityWithCustomId1Key . ',' . $relatedEntityWithCustomId2Key
+            ]
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_1->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 1']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityType,
+                                    'id' => '<toString(@test_related_entity_1->id)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_3->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 3']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityType,
+                                    'id' => '<toString(@test_related_entity_2->id)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_5->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 5']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityType,
+                                    'id' => '<toString(@test_related_entity_3->id)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_6->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 6']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => '<toString(@test_related_entity_with_custom_id_3->key)>'
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testGetListWithExistsFilterByRelatedEntity(): void
+    {
+        $entityType = $this->getEntityType(TestEntity::class);
+        $relatedEntityType = $this->getEntityType(TestRelatedEntity::class);
+
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['filter[relatedEntity][' . $relatedEntityType . '][exists]' => 'yes']
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_1->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 1']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityType,
+                                    'id' => '<toString(@test_related_entity_1->id)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_3->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 3']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityType,
+                                    'id' => '<toString(@test_related_entity_2->id)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_5->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 5']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityType,
+                                    'id' => '<toString(@test_related_entity_3->id)>'
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testGetListWithExistsFilterByRelatedEntityWithCustomId(): void
+    {
+        $entityType = $this->getEntityType(TestEntity::class);
+        $relatedEntityWithCustomIdType = $this->getEntityType(TestRelatedEntityWithCustomId::class);
+
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['filter[relatedEntity][' . $relatedEntityWithCustomIdType . '][exists]' => 'yes']
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_2->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 2']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => '<toString(@test_related_entity_with_custom_id_1->key)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_4->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 4']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => '<toString(@test_related_entity_with_custom_id_2->key)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_6->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 6']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => '<toString(@test_related_entity_with_custom_id_3->key)>'
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testGetListWithNotExistsFilterByRelatedEntity(): void
+    {
+        $entityType = $this->getEntityType(TestEntity::class);
+        $relatedEntityType = $this->getEntityType(TestRelatedEntity::class);
+        $relatedEntityWithCustomIdType = $this->getEntityType(TestRelatedEntityWithCustomId::class);
+
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['filter[relatedEntity][' . $relatedEntityType . '][exists]' => 'no']
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_2->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 2']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => '<toString(@test_related_entity_with_custom_id_1->key)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_4->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 4']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => '<toString(@test_related_entity_with_custom_id_2->key)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_6->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 6']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => '<toString(@test_related_entity_with_custom_id_3->key)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_7->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 7']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => null
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testGetListWithNotExistsFilterByRelatedEntityWithCustomId(): void
+    {
+        $entityType = $this->getEntityType(TestEntity::class);
+        $relatedEntityType = $this->getEntityType(TestRelatedEntity::class);
+        $relatedEntityWithCustomIdType = $this->getEntityType(TestRelatedEntityWithCustomId::class);
+
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['filter[relatedEntity][' . $relatedEntityWithCustomIdType . '][exists]' => 'no']
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_1->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 1']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityType,
+                                    'id' => '<toString(@test_related_entity_1->id)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_3->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 3']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityType,
+                                    'id' => '<toString(@test_related_entity_2->id)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_5->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 5']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityType,
+                                    'id' => '<toString(@test_related_entity_3->id)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_7->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 7']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => null
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testGetListWithNeqOrNullFilterByRelatedEntity(): void
+    {
+        $entityType = $this->getEntityType(TestEntity::class);
+        $relatedEntityType = $this->getEntityType(TestRelatedEntity::class);
+        $relatedEntityWithCustomIdType = $this->getEntityType(TestRelatedEntityWithCustomId::class);
+        $relatedEntityId = $this->getReference('test_related_entity_1')->id;
+
+        $response = $this->cget(
+            ['entity' => $entityType],
+            ['filter[relatedEntity][' . $relatedEntityType . '][neq_or_null]' => $relatedEntityId]
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_2->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 2']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => '<toString(@test_related_entity_with_custom_id_1->key)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_3->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 3']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityType,
+                                    'id' => '<toString(@test_related_entity_2->id)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_4->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 4']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => '<toString(@test_related_entity_with_custom_id_2->key)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_5->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 5']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityType,
+                                    'id' => '<toString(@test_related_entity_3->id)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_6->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 6']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => '<toString(@test_related_entity_with_custom_id_3->key)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_7->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 7']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => null
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testGetListWithNeqOrNullFilterByRelatedEntityWithCustomId(): void
+    {
+        $entityType = $this->getEntityType(TestEntity::class);
+        $relatedEntityType = $this->getEntityType(TestRelatedEntity::class);
+        $relatedEntityWithCustomIdType = $this->getEntityType(TestRelatedEntityWithCustomId::class);
+        $relatedEntityWithCustomIdKey = $this->getReference('test_related_entity_with_custom_id_1')->key;
+
+        $response = $this->cget(
+            ['entity' => $entityType],
+            [
+                'filter[relatedEntity][' . $relatedEntityWithCustomIdType . '][neq_or_null]' =>
+                    $relatedEntityWithCustomIdKey
+            ]
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_1->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 1']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityType,
+                                    'id' => '<toString(@test_related_entity_1->id)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_3->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 3']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityType,
+                                    'id' => '<toString(@test_related_entity_2->id)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_4->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 4']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => '<toString(@test_related_entity_with_custom_id_2->key)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_5->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 5']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityType,
+                                    'id' => '<toString(@test_related_entity_3->id)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_6->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 6']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => '<toString(@test_related_entity_with_custom_id_3->key)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_7->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 7']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => null
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testGetListWithNeqOrNullFilterByRelatedEntityBySeveralIds(): void
+    {
+        $entityType = $this->getEntityType(TestEntity::class);
+        $relatedEntityType = $this->getEntityType(TestRelatedEntity::class);
+        $relatedEntityWithCustomIdType = $this->getEntityType(TestRelatedEntityWithCustomId::class);
+        $relatedEntity1Id = $this->getReference('test_related_entity_1')->id;
+        $relatedEntity2Id = $this->getReference('test_related_entity_2')->id;
+
+        $response = $this->cget(
+            ['entity' => $entityType],
+            [
+                'filter[relatedEntity][' . $relatedEntityType . '][neq_or_null]' =>
+                    $relatedEntity1Id . ',' . $relatedEntity2Id
+            ]
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_2->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 2']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => '<toString(@test_related_entity_with_custom_id_1->key)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_4->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 4']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => '<toString(@test_related_entity_with_custom_id_2->key)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_5->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 5']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityType,
+                                    'id' => '<toString(@test_related_entity_3->id)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_6->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 6']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => '<toString(@test_related_entity_with_custom_id_3->key)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_7->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 7']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => null
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testGetListWithNeqOrNullFilterByRelatedEntityWithCustomIdBySeveralIds(): void
+    {
+        $entityType = $this->getEntityType(TestEntity::class);
+        $relatedEntityType = $this->getEntityType(TestRelatedEntity::class);
+        $relatedEntityWithCustomIdType = $this->getEntityType(TestRelatedEntityWithCustomId::class);
+        $relatedEntityWithCustomId1Key = $this->getReference('test_related_entity_with_custom_id_1')->key;
+        $relatedEntityWithCustomId2Key = $this->getReference('test_related_entity_with_custom_id_2')->key;
+
+        $response = $this->cget(
+            ['entity' => $entityType],
+            [
+                'filter[relatedEntity][' . $relatedEntityWithCustomIdType . '][neq_or_null]' =>
+                    $relatedEntityWithCustomId1Key . ',' . $relatedEntityWithCustomId2Key
+            ]
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_1->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 1']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityType,
+                                    'id' => '<toString(@test_related_entity_1->id)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_3->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 3']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityType,
+                                    'id' => '<toString(@test_related_entity_2->id)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_5->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 5']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityType,
+                                    'id' => '<toString(@test_related_entity_3->id)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_6->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 6']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => [
+                                    'type' => $relatedEntityWithCustomIdType,
+                                    'id' => '<toString(@test_related_entity_with_custom_id_3->key)>'
+                                ]
+                            ]
+                        ]
+                    ],
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_7->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 7']
+                        ],
+                        'relationships' => [
+                            'relatedEntity' => [
+                                'data' => null
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testGetListFilteredByRelatedEntityWhenRelatedEntityIsNotRequested(): void
+    {
+        $entityType = $this->getEntityType(TestEntity::class);
+        $relatedEntityType = $this->getEntityType(TestRelatedEntity::class);
+        $relatedEntityId = $this->getReference('test_related_entity_1')->id;
+
+        $response = $this->cget(
+            ['entity' => $entityType],
+            [
+                'fields[' . $entityType . ']' => 'name',
+                'filter[relatedEntity][' . $relatedEntityType . ']' => $relatedEntityId
+            ]
+        );
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    [
+                        'type' => $entityType,
+                        'id' => '<toString(@test_entity_1->id)>',
+                        'attributes' => [
+                            'name' => ['firstName' => null, 'lastName' => 'Entity 1']
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+        $responseData = self::jsonToArray($response->getContent());
+        self::assertArrayNotHasKey('relationships', $responseData['data'][0]);
+    }
+
+    public function testGet(): void
     {
         /** @var TestEntity $entity */
         $entity = $this->getReference('test_entity_1');
@@ -84,10 +1398,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
                     'type' => $entityType,
                     'id' => (string)$entity->getId(),
                     'attributes' => [
-                        'name' => [
-                            'firstName' => null,
-                            'lastName' => 'Entity 1'
-                        ]
+                        'name' => ['firstName' => null, 'lastName' => 'Entity 1']
                     ],
                     'relationships' => [
                         'relatedEntity' => [
@@ -107,7 +1418,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
         self::assertArrayNotHasKey('relatedId', $attributes);
     }
 
-    public function testGetForRelatedEntityWithCustomId()
+    public function testGetForRelatedEntityWithCustomId(): void
     {
         /** @var TestEntity $entity */
         $entity = $this->getReference('test_entity_2');
@@ -121,10 +1432,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
                     'type' => $entityType,
                     'id' => (string)$entity->getId(),
                     'attributes' => [
-                        'name' => [
-                            'firstName' => null,
-                            'lastName' => 'Entity 2'
-                        ]
+                        'name' => ['firstName' => null, 'lastName' => 'Entity 2']
                     ],
                     'relationships' => [
                         'relatedEntity' => [
@@ -144,7 +1452,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
         self::assertArrayNotHasKey('relatedId', $attributes);
     }
 
-    public function testGetWithTitleMetaProperty()
+    public function testGetWithTitleMetaProperty(): void
     {
         /** @var TestEntity $entity */
         $entity = $this->getReference('test_entity_1');
@@ -164,10 +1472,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
                         'title' => 'Entity 1 ' . TestRelatedEntity::class
                     ],
                     'attributes' => [
-                        'name' => [
-                            'firstName' => null,
-                            'lastName' => 'Entity 1'
-                        ]
+                        'name' => ['firstName' => null, 'lastName' => 'Entity 1']
                     ],
                     'relationships' => [
                         'relatedEntity' => [
@@ -187,7 +1492,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
         self::assertArrayNotHasKey('relatedId', $attributes);
     }
 
-    public function testGetWithTitleMetaPropertyForRelatedEntityWithCustomId()
+    public function testGetWithTitleMetaPropertyForRelatedEntityWithCustomId(): void
     {
         /** @var TestEntity $entity */
         $entity = $this->getReference('test_entity_2');
@@ -207,10 +1512,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
                         'title' => 'Entity 2 ' . TestRelatedEntityWithCustomId::class
                     ],
                     'attributes' => [
-                        'name' => [
-                            'firstName' => null,
-                            'lastName' => 'Entity 2'
-                        ]
+                        'name' => ['firstName' => null, 'lastName' => 'Entity 2']
                     ],
                     'relationships' => [
                         'relatedEntity' => [
@@ -230,7 +1532,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
         self::assertArrayNotHasKey('relatedId', $attributes);
     }
 
-    public function testGetWithIncludeFilter()
+    public function testGetWithIncludeFilter(): void
     {
         /** @var TestEntity $entity */
         $entity = $this->getReference('test_entity_1');
@@ -247,10 +1549,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
                     'type' => $entityType,
                     'id' => (string)$entity->getId(),
                     'attributes' => [
-                        'name' => [
-                            'firstName' => null,
-                            'lastName' => 'Entity 1'
-                        ]
+                        'name' => ['firstName' => null, 'lastName' => 'Entity 1']
                     ],
                     'relationships' => [
                         'relatedEntity' => [
@@ -282,7 +1581,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
         }
     }
 
-    public function testGetWithIncludeFilterForRelatedEntityWithCustomId()
+    public function testGetWithIncludeFilterForRelatedEntityWithCustomId(): void
     {
         /** @var TestEntity $entity */
         $entity = $this->getReference('test_entity_2');
@@ -299,10 +1598,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
                     'type' => $entityType,
                     'id' => (string)$entity->getId(),
                     'attributes' => [
-                        'name' => [
-                            'firstName' => null,
-                            'lastName' => 'Entity 2'
-                        ]
+                        'name' => ['firstName' => null, 'lastName' => 'Entity 2']
                     ],
                     'relationships' => [
                         'relatedEntity' => [
@@ -334,7 +1630,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
         }
     }
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $entityType = $this->getEntityType(TestEntity::class);
 
@@ -382,7 +1678,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
         self::assertSame($relatedEntity1->id, $entity->getRelatedId());
     }
 
-    public function testCreateForRelatedEntityWithCustomId()
+    public function testCreateForRelatedEntityWithCustomId(): void
     {
         $entityType = $this->getEntityType(TestEntity::class);
 
@@ -430,7 +1726,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
         self::assertSame($relatedEntity1->autoincrementKey, $entity->getRelatedId());
     }
 
-    public function testCreateWithoutNestedAssociationData()
+    public function testCreateWithoutNestedAssociationData(): void
     {
         $entityType = $this->getEntityType(TestEntity::class);
 
@@ -455,7 +1751,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
         self::assertNull($entity->getRelatedId());
     }
 
-    public function testCreateWithoutNestedAssociationDataForRelatedEntityWithCustomId()
+    public function testCreateWithoutNestedAssociationDataForRelatedEntityWithCustomId(): void
     {
         $entityType = $this->getEntityType(TestEntity::class);
 
@@ -480,7 +1776,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
         self::assertNull($entity->getRelatedId());
     }
 
-    public function testUpdate()
+    public function testUpdate(): void
     {
         /** @var TestEntity $entity */
         $entity = $this->getReference('test_entity_1');
@@ -524,7 +1820,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
         self::assertSame($relatedEntity2->id, $entity->getRelatedId());
     }
 
-    public function testUpdateForRelatedEntityWithCustomId()
+    public function testUpdateForRelatedEntityWithCustomId(): void
     {
         /** @var TestEntity $entity */
         $entity = $this->getReference('test_entity_2');
@@ -568,7 +1864,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
         self::assertSame($relatedEntity2->autoincrementKey, $entity->getRelatedId());
     }
 
-    public function testUpdateToNull()
+    public function testUpdateToNull(): void
     {
         /** @var TestEntity $entity */
         $entity = $this->getReference('test_entity_1');
@@ -601,7 +1897,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
         self::assertNull($entity->getRelatedId());
     }
 
-    public function testUpdateToNullForRelatedEntityWithCustomId()
+    public function testUpdateToNullForRelatedEntityWithCustomId(): void
     {
         /** @var TestEntity $entity */
         $entity = $this->getReference('test_entity_2');
@@ -634,7 +1930,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
         self::assertNull($entity->getRelatedId());
     }
 
-    public function testGetSubresource()
+    public function testGetSubresource(): void
     {
         /** @var TestEntity $entity */
         $entity = $this->getReference('test_entity_1');
@@ -666,7 +1962,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
         self::assertArrayNotHasKey('meta', $responseContent['data']);
     }
 
-    public function testGetSubresourceForRelatedEntityWithCustomId()
+    public function testGetSubresourceForRelatedEntityWithCustomId(): void
     {
         /** @var TestEntity $entity */
         $entity = $this->getReference('test_entity_2');
@@ -698,7 +1994,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
         self::assertArrayNotHasKey('meta', $responseContent['data']);
     }
 
-    public function testGetSubresourceWithTitle()
+    public function testGetSubresourceWithTitle(): void
     {
         /** @var TestEntity $entity */
         $entity = $this->getReference('test_entity_1');
@@ -729,7 +2025,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
         );
     }
 
-    public function testGetSubresourceWithTitleForRelatedEntityWithCustomId()
+    public function testGetSubresourceWithTitleForRelatedEntityWithCustomId(): void
     {
         /** @var TestEntity $entity */
         $entity = $this->getReference('test_entity_2');
@@ -760,7 +2056,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
         );
     }
 
-    public function testGetRelationship()
+    public function testGetRelationship(): void
     {
         /** @var TestEntity $entity */
         $entity = $this->getReference('test_entity_1');
@@ -791,7 +2087,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
         self::assertArrayNotHasKey('relationships', $responseContent['data']);
     }
 
-    public function testGetRelationshipForRelatedEntityWithCustomId()
+    public function testGetRelationshipForRelatedEntityWithCustomId(): void
     {
         /** @var TestEntity $entity */
         $entity = $this->getReference('test_entity_2');
@@ -822,7 +2118,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
         self::assertArrayNotHasKey('relationships', $responseContent['data']);
     }
 
-    public function testUpdateRelationship()
+    public function testUpdateRelationship(): void
     {
         /** @var TestEntity $entity */
         $entity = $this->getReference('test_entity_1');
@@ -848,7 +2144,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
         self::assertSame($relatedEntity2->id, $entity->getRelatedId());
     }
 
-    public function testUpdateRelationshipForRelatedEntityWithCustomId()
+    public function testUpdateRelationshipForRelatedEntityWithCustomId(): void
     {
         /** @var TestEntity $entity */
         $entity = $this->getReference('test_entity_2');
@@ -874,7 +2170,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
         self::assertSame($relatedEntity2->autoincrementKey, $entity->getRelatedId());
     }
 
-    public function testUpdateRelationshipToNull()
+    public function testUpdateRelationshipToNull(): void
     {
         /** @var TestEntity $entity */
         $entity = $this->getReference('test_entity_1');
@@ -892,7 +2188,7 @@ class NestedAssociationTest extends RestJsonApiTestCase
         self::assertNull($entity->getRelatedId());
     }
 
-    public function testUpdateRelationshipToNullForRelatedEntityWithCustomId()
+    public function testUpdateRelationshipToNullForRelatedEntityWithCustomId(): void
     {
         /** @var TestEntity $entity */
         $entity = $this->getReference('test_entity_2');

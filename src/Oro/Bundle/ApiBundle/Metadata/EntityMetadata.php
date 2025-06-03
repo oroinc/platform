@@ -183,12 +183,34 @@ class EntityMetadata implements ToArrayInterface, EntityIdMetadataInterface
     }
 
     /**
+     * Sets a flag that manages whether the full metadata should be returned
+     * by the {@see getEntityMetadata()} method.
+     */
+    public function setEntityMetadataFullMode(bool $full): void
+    {
+        if ($this->targetMetadataAccessor instanceof FullModeAwareTargetMetadataAccessorInterface) {
+            $this->targetMetadataAccessor->setFullMode($full);
+        }
+        foreach ($this->associations as $association) {
+            $association->setTargetMetadataFullMode($full);
+        }
+    }
+
+    /**
      * Gets metadata for the given entity class.
      */
     public function getEntityMetadata(string $className): ?EntityMetadata
     {
-        if (null === $this->targetMetadataAccessor || $className === $this->className) {
-            return null;
+        if (null === $this->targetMetadataAccessor
+            || (
+                $className === $this->className
+                && !(
+                    $this->targetMetadataAccessor instanceof FullModeAwareTargetMetadataAccessorInterface
+                    && $this->targetMetadataAccessor->isFullMode()
+                )
+            )
+        ) {
+            return $this;
         }
 
         return $this->targetMetadataAccessor->getTargetMetadata($className, null);

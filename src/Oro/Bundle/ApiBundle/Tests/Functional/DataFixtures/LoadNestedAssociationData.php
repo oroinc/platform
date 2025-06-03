@@ -26,20 +26,64 @@ class LoadNestedAssociationData extends AbstractFixture
         }
         $manager->flush();
 
-        $entity1 = new TestEntity();
-        $entity1->setLastName('Entity 1');
-        $entity1->setRelatedClass(TestRelatedEntity::class);
-        $entity1->setRelatedId($this->getReference('test_related_entity_1')->id);
-        $this->addReference('test_entity_1', $entity1);
-        $manager->persist($entity1);
-
-        $entity2 = new TestEntity();
-        $entity2->setLastName('Entity 2');
-        $entity2->setRelatedClass(TestRelatedEntityWithCustomId::class);
-        $entity2->setRelatedId($this->getReference('test_related_entity_with_custom_id_1')->autoincrementKey);
-        $this->addReference('test_entity_2', $entity2);
-        $manager->persist($entity2);
+        $this->addReference('test_entity_1', $this->createEntity(
+            $manager,
+            'Entity 1',
+            TestRelatedEntity::class,
+            $this->getReference('test_related_entity_1')->id
+        ));
+        $this->addReference('test_entity_2', $this->createEntity(
+            $manager,
+            'Entity 2',
+            TestRelatedEntityWithCustomId::class,
+            $this->getReference('test_related_entity_with_custom_id_1')->autoincrementKey
+        ));
+        $this->addReference('test_entity_3', $this->createEntity(
+            $manager,
+            'Entity 3',
+            TestRelatedEntity::class,
+            $this->getReference('test_related_entity_2')->id
+        ));
+        $this->addReference('test_entity_4', $this->createEntity(
+            $manager,
+            'Entity 4',
+            TestRelatedEntityWithCustomId::class,
+            $this->getReference('test_related_entity_with_custom_id_2')->autoincrementKey
+        ));
+        $this->addReference('test_entity_5', $this->createEntity(
+            $manager,
+            'Entity 5',
+            TestRelatedEntity::class,
+            $this->getReference('test_related_entity_3')->id
+        ));
+        $this->addReference('test_entity_6', $this->createEntity(
+            $manager,
+            'Entity 6',
+            TestRelatedEntityWithCustomId::class,
+            $this->getReference('test_related_entity_with_custom_id_3')->autoincrementKey
+        ));
+        $this->addReference('test_entity_7', $this->createEntity(
+            $manager,
+            'Entity 7',
+            null,
+            null
+        ));
 
         $manager->flush();
+    }
+
+    private function createEntity(
+        ObjectManager $manager,
+        string $name,
+        ?string $relatedClass,
+        ?int $relatedId
+    ): TestEntity {
+        $entity = new TestEntity();
+        $entity->setLastName($name);
+        $entity->setRelatedClass($relatedClass);
+        $entity->setRelatedId($relatedId);
+        $manager->persist($entity);
+
+        return $entity;
     }
 }
