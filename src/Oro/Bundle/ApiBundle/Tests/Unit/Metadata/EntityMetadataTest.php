@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\ExternalLinkMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
+use Oro\Bundle\ApiBundle\Metadata\TargetMetadataAccessorInterface;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use PHPUnit\Framework\TestCase;
@@ -15,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class EntityMetadataTest extends TestCase
 {
@@ -165,6 +167,105 @@ class EntityMetadataTest extends TestCase
 
         $entityMetadata->setHasIdentifierGenerator(false);
         self::assertFalse($entityMetadata->hasIdentifierGenerator());
+    }
+
+    public function testSetEntityMetadataFullMode(): void
+    {
+        $targetMetadataAccessor = $this->createMock(TargetMetadataAccessorInterface::class);
+        $targetMetadataAccessor->expects(self::once())
+            ->method('setFullMode')
+            ->with(true);
+
+        $associationMetadata = $this->createMock(AssociationMetadata::class);
+        $associationMetadata->expects(self::once())
+            ->method('setTargetMetadataFullMode')
+            ->with(true);
+
+        $entityMetadata = new EntityMetadata('Test\Class');
+        $entityMetadata->setTargetMetadataAccessor($targetMetadataAccessor);
+        $entityMetadata->addAssociation($associationMetadata);
+
+        $entityMetadata->setEntityMetadataFullMode(true);
+    }
+
+    public function testSetEntityMetadataFullModeWhenTargetMetadataAccessorIsNotSet(): void
+    {
+        $associationMetadata = $this->createMock(AssociationMetadata::class);
+        $associationMetadata->expects(self::once())
+            ->method('setTargetMetadataFullMode')
+            ->with(true);
+
+        $entityMetadata = new EntityMetadata('Test\Class');
+        $entityMetadata->addAssociation($associationMetadata);
+
+        $entityMetadata->setEntityMetadataFullMode(true);
+    }
+
+    public function testGetEntityMetadata(): void
+    {
+        $anotherEntityMetadata = new EntityMetadata('Test\AnotherClass');
+
+        $targetMetadataAccessor = $this->createMock(TargetMetadataAccessorInterface::class);
+        $targetMetadataAccessor->expects(self::once())
+            ->method('getTargetMetadata')
+            ->with('Test\AnotherClass', self::isNull())
+            ->willReturn($anotherEntityMetadata);
+
+        $entityMetadata = new EntityMetadata('Test\Class');
+        $entityMetadata->setTargetMetadataAccessor($targetMetadataAccessor);
+
+        self::assertSame($anotherEntityMetadata, $entityMetadata->getEntityMetadata('Test\AnotherClass'));
+    }
+
+    public function testGetEntityMetadataWhenEntityMetadataNotFound(): void
+    {
+        $targetMetadataAccessor = $this->createMock(TargetMetadataAccessorInterface::class);
+        $targetMetadataAccessor->expects(self::once())
+            ->method('getTargetMetadata')
+            ->with('Test\AnotherClass', self::isNull())
+            ->willReturn(null);
+
+        $entityMetadata = new EntityMetadata('Test\Class');
+        $entityMetadata->setTargetMetadataAccessor($targetMetadataAccessor);
+
+        self::assertNull($entityMetadata->getEntityMetadata('Test\AnotherClass'));
+    }
+
+    public function testGetEntityMetadataWhenClassNameEqualToCurrentMetadataClassName(): void
+    {
+        $targetMetadataAccessor = $this->createMock(TargetMetadataAccessorInterface::class);
+        $targetMetadataAccessor->expects(self::never())
+            ->method('getTargetMetadata');
+
+        $entityMetadata = new EntityMetadata('Test\Class');
+        $entityMetadata->setTargetMetadataAccessor($targetMetadataAccessor);
+
+        self::assertSame($entityMetadata, $entityMetadata->getEntityMetadata('Test\Class'));
+    }
+
+    public function testGetEntityMetadataWhenClassNameEqualsToCurrentMetadataClassNameButFullModeIsSet(): void
+    {
+        $fullEntityMetadata = new EntityMetadata('Test\Class');
+
+        $targetMetadataAccessor = $this->createMock(TargetMetadataAccessorInterface::class);
+        $targetMetadataAccessor->expects(self::once())
+            ->method('isFullMode')
+            ->willReturn(true);
+        $targetMetadataAccessor->expects(self::once())
+            ->method('getTargetMetadata')
+            ->with('Test\Class', self::isNull())
+            ->willReturn($fullEntityMetadata);
+
+        $entityMetadata = new EntityMetadata('Test\Class');
+        $entityMetadata->setTargetMetadataAccessor($targetMetadataAccessor);
+
+        self::assertSame($fullEntityMetadata, $entityMetadata->getEntityMetadata('Test\Class'));
+    }
+
+    public function testGetEntityMetadataWhenTargetMetadataAccessorIsNotSet(): void
+    {
+        $entityMetadata = new EntityMetadata('Test\Class');
+        self::assertSame($entityMetadata, $entityMetadata->getEntityMetadata('Test\AnotherClass'));
     }
 
     public function testGetPropertyPath(): void

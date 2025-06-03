@@ -604,6 +604,88 @@ class QueryExpressionVisitorTest extends OrmRelatedTestCase
         );
     }
 
+    public function testCreateQueryWithoutRootQuery(): void
+    {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('No query is set before invoking createQuery().');
+
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            $this->fieldDqlExpressionProvider,
+            new EntityClassResolver($this->doctrine)
+        );
+
+        $expressionVisitor->createQuery(Entity\User::class);
+    }
+
+    public function testCreateQueryWithoutJoinMap(): void
+    {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('No join map is set before invoking createQuery().');
+
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            $this->fieldDqlExpressionProvider,
+            new EntityClassResolver($this->doctrine)
+        );
+
+        $expressionVisitor->setQuery(new QueryBuilder($this->em));
+        $expressionVisitor->createQuery(Entity\User::class);
+    }
+
+    public function testCreateQueryWithoutAliases(): void
+    {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('No aliases are set before invoking createQuery().');
+
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            $this->fieldDqlExpressionProvider,
+            new EntityClassResolver($this->doctrine)
+        );
+
+        $expressionVisitor->setQuery(new QueryBuilder($this->em));
+        $expressionVisitor->setQueryJoinMap([]);
+        $expressionVisitor->createQuery(Entity\User::class);
+    }
+
+    public function testCreateQuery(): void
+    {
+        $expressionVisitor = new QueryExpressionVisitor(
+            [],
+            [],
+            $this->fieldDqlExpressionProvider,
+            new EntityClassResolver($this->doctrine)
+        );
+
+        $qb = new QueryBuilder($this->em);
+        $qb
+            ->select('e')
+            ->from(Entity\User::class, 'e')
+            ->leftJoin('e.groups', 'groups');
+
+        $expressionVisitor->setQuery($qb);
+        $expressionVisitor->setQueryJoinMap(['groups' => 'groups']);
+        $expressionVisitor->setQueryAliases(['e', 'groups']);
+        $query = $expressionVisitor->createQuery(Entity\User::class);
+
+        $expectedSubquery = 'SELECT e_subquery1'
+            . ' FROM Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User e_subquery1';
+        self::assertEquals($expectedSubquery, $query->getDQL());
+
+        // test that the query has valid SQL
+        $expectedSql = 'SELECT u0_.id AS id_0, u0_.name AS name_1,'
+            . ' u0_.category_name AS category_name_2, u0_.owner_id AS owner_id_3'
+            . ' FROM user_table u0_'
+            . ' LEFT JOIN user_to_group_table u2_ ON u0_.id = u2_.user_id'
+            . ' LEFT JOIN group_table g1_ ON g1_.id = u2_.user_group_id'
+            . ' WHERE EXISTS (SELECT u3_.id FROM user_table u3_)';
+        self::assertEquals($expectedSql, $this->buildExistsSql($qb, $query));
+    }
+
     public function testCreateSubqueryWithoutQuery(): void
     {
         $this->expectException(QueryException::class);

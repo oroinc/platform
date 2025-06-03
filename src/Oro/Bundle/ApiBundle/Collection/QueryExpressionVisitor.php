@@ -197,6 +197,24 @@ class QueryExpressionVisitor extends ExpressionVisitor
     }
 
     /**
+     * Builds a query for the given entity class.
+     */
+    public function createQuery(string $entityClass): QueryBuilder
+    {
+        if (null === $this->query) {
+            throw new QueryException('No query is set before invoking createQuery().');
+        }
+        if (null === $this->queryJoinMap) {
+            throw new QueryException('No join map is set before invoking createQuery().');
+        }
+        if (!isset($this->queryAliases[0])) {
+            throw new QueryException('No aliases are set before invoking createQuery().');
+        }
+
+        return $this->createQueryBuilder($entityClass, $this->generateSubqueryAlias($this->getRootAlias()));
+    }
+
+    /**
      * Builds a subquery for the given to-many association.
      * The returned subquery is joined to an association corresponds the specified field.
      * The type of root entity of the returned subquery is always equal to a target entity

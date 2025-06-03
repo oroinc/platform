@@ -165,6 +165,12 @@ api:
                             property_path: relatedId
                 linkedField:
                     property_path: linked.key
+            filters:
+                fields:
+                    relatedEntity:
+                        data_type: string
+                        type: nestedAssociation
+                        allow_array: true
         Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
             filters:
                 fields:

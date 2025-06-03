@@ -18,6 +18,10 @@ The current file describes significant changes in the code that may affect the u
 
 ### Removed
 
+#### ApiBundle
+* Removed `fieldName` option for the `nestedAssociation` filter, use the existing `field` option instead.
+* Fixed injection of API metadata into filters that implement both `Oro\Bundle\ApiBundle\Filter\MetadataAwareFilterInterface` and `Oro\Bundle\ApiBundle\Filter\FieldAwareFilterInterface` interfaces. From now the parent entity metadata is injected instead of injection the association metadata. So, if a filter implements `Oro\Bundle\ApiBundle\Filter\MetadataAwareFilterInterface` interface the parent entity metadata is injected independ on `Oro\Bundle\ApiBundle\Filter\FieldAwareFilterInterface` interface.
+
 #### LayoutBundle
 * Removed `oro_layout.provider.svg_icons_support` service, now it should be used `getThemeOption` method from `oro_layout.theme_manager` service.
 

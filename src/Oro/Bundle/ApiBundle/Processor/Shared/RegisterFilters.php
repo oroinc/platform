@@ -51,7 +51,7 @@ abstract class RegisterFilters implements ProcessorInterface
         $filter = $this->filterFactory->createFilter($filterType, $filterOptions);
         if (null !== $filter) {
             $this->initializeFilterOptions($filter, $filterConfig);
-            if ($filter instanceof FieldAwareFilterInterface) {
+            if ($filter instanceof FieldAwareFilterInterface && null === $filter->getField()) {
                 $filter->setField($propertyPath);
             }
             if ($filterConfig->isCollection()) {
@@ -85,9 +85,6 @@ abstract class RegisterFilters implements ProcessorInterface
                         $context->getClassName(),
                         $propertyPath
                     ));
-                }
-                if ($filter instanceof FieldAwareFilterInterface && $metadata->hasAssociation($filter->getField())) {
-                    $metadata = $metadata->getAssociation($filter->getField())?->getTargetMetadata() ?? $metadata;
                 }
                 $filter->setMetadata($metadata);
             }

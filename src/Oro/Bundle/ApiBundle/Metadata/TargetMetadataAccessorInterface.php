@@ -18,4 +18,14 @@ interface TargetMetadataAccessorInterface
      * @return EntityMetadata|null
      */
     public function getTargetMetadata(string $targetClassName, ?string $associationPath): ?EntityMetadata;
+
+    /**
+     * Indicates whether a full mode is enabled.
+     */
+    public function isFullMode(): bool;
+
+    /**
+     * Setad a flag that indicates whether a full mode is enabled.
+     */
+    public function setFullMode(bool $full = true): void;
 }

@@ -5,27 +5,19 @@ namespace Oro\Bundle\ApiBundle\Filter;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Provider\EntityAliasResolverRegistry;
+use Oro\Bundle\ApiBundle\Exception\InvalidFilterOperatorException;
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * A filter that can be used to filter data by a nested association.
  */
-class NestedAssociationFilter extends AssociationFilter implements ConfigAwareFilterInterface
+class NestedAssociationFilter extends AssociationFilter implements
+    ConfigAwareFilterInterface,
+    MetadataAwareFilterInterface
 {
-    private EntityAliasResolverRegistry $entityAliasResolverRegistry;
-
-    private string $fieldName;
     private EntityDefinitionConfig $config;
-
-    public function setEntityAliasResolverRegistry(EntityAliasResolverRegistry $entityAliasResolverRegistry): void
-    {
-        $this->entityAliasResolverRegistry = $entityAliasResolverRegistry;
-    }
-
-    public function setFieldName(string $fieldName): void
-    {
-        $this->fieldName = $fieldName;
-    }
+    private EntityMetadata $metadata;
 
     #[\Override]
     public function setConfig(EntityDefinitionConfig $config): void
@@ -34,9 +26,9 @@ class NestedAssociationFilter extends AssociationFilter implements ConfigAwareFi
     }
 
     #[\Override]
-    public function getField(): ?string
+    public function setMetadata(EntityMetadata $metadata): void
     {
-        return $this->fieldName;
+        $this->metadata = $metadata;
     }
 
     #[\Override]
@@ -44,20 +36,60 @@ class NestedAssociationFilter extends AssociationFilter implements ConfigAwareFi
     {
         $this->assertFilterValuePath($field, $path);
 
-        $entityAliasResolver = $this->entityAliasResolverRegistry
-            ->getEntityAliasResolver($this->getRequestType());
-        $className = $entityAliasResolver->getClassByPluralAlias(substr($path, \strlen($field) + 1));
+        $entityClass = $this->getEntityClass(substr($path, \strlen($field) + 1));
 
-        $targetEntity = $this->config->getField($field)->getTargetEntity();
-        $expr = Criteria::expr()->andX(
-            $this->buildEqualToExpression($targetEntity->getField('__class__')->getPropertyPath(), $className),
-            parent::doBuildExpression($targetEntity->getField('id')->getPropertyPath(), $path, $operator, $value)
-        );
+        $targetConfig = $this->config->getField($field)->getTargetEntity();
+        $entityClassFieldName = $targetConfig->getField(ConfigUtil::CLASS_NAME)->getPropertyPath();
+        $entityIdFieldName = $targetConfig->getField('id')->getPropertyPath();
 
-        if (FilterOperator::NEQ === $operator) {
-            $expr = $this->buildNotExpression($expr);
+        if (FilterOperator::EXISTS === $operator) {
+            $expr = $this->buildEqualToExpression($entityClassFieldName, $entityClass);
+            if (!$value) {
+                $expr = Criteria::expr()->orX(
+                    $this->buildNotExpression($expr),
+                    $this->buildEqualToExpression($entityIdFieldName, null)
+                );
+            }
+
+            return $expr;
         }
 
-        return $expr;
+        if (FilterOperator::EQ === $operator
+            || FilterOperator::NEQ === $operator
+            || FilterOperator::NEQ_OR_NULL === $operator
+        ) {
+            $expr = Criteria::expr()->andX(
+                $this->buildEqualToExpression($entityClassFieldName, $entityClass),
+                $this->buildComparisonExpression($entityIdFieldName, 'ENTITY', [
+                    $entityClass,
+                    $this->buildEqualToExpression($this->getTargetIdFieldName($entityClass, $field), $value)
+                ])
+            );
+            if (FilterOperator::NEQ === $operator) {
+                $expr = $this->buildNotExpression($expr);
+            } elseif (FilterOperator::NEQ_OR_NULL === $operator) {
+                $expr = Criteria::expr()->orX(
+                    $this->buildNotExpression($expr),
+                    $this->buildEqualToExpression($entityIdFieldName, null)
+                );
+            }
+
+            return $expr;
+        }
+
+        throw new InvalidFilterOperatorException($operator);
+    }
+
+    private function getTargetIdFieldName(string $entityClass, string $field): string
+    {
+        $associationMetadata = $this->metadata->getAssociation($field);
+        if (null === $associationMetadata) {
+            $associationMetadata = $this->metadata->getEntityMetadata($this->metadata->getClassName())
+                ->getAssociation($field);
+        }
+        $targetMetadata = $associationMetadata->getTargetMetadata($entityClass);
+        $targetIdFieldNames = $targetMetadata->getIdentifierFieldNames();
+
+        return $targetMetadata->getProperty(reset($targetIdFieldNames))->getPropertyPath();
     }
 }

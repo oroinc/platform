@@ -1358,6 +1358,21 @@ services:
             - { name: oro.api.processor, action: get_subresource, group: normalize_result, collection: true, priority: 100 }
             - { name: oro.api.processor, action: get_relationship, group: normalize_result, collection: true, priority: 100 }
 
+    oro_api.disable_full_metadata_mode:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\DisableFullMetadataMode
+        tags:
+            - { name: oro.api.processor, action: get, group: normalize_result, priority: 10 }
+            - { name: oro.api.processor, action: get_list, group: normalize_result, priority: 10 }
+            - { name: oro.api.processor, action: delete, group: normalize_result, priority: 10 }
+            - { name: oro.api.processor, action: delete_list, group: normalize_result, priority: 10 }
+            - { name: oro.api.processor, action: create, group: normalize_result, priority: 10 }
+            - { name: oro.api.processor, action: update, group: normalize_result, priority: 10 }
+            - { name: oro.api.processor, action: update_list, group: normalize_result, priority: 10 }
+            - { name: oro.api.processor, action: get_subresource, group: normalize_result, priority: 10 }
+            - { name: oro.api.processor, action: delete_subresource, group: normalize_result, priority: 10 }
+            - { name: oro.api.processor, action: add_subresource, group: normalize_result, priority: 10 }
+            - { name: oro.api.processor, action: update_subresource, group: normalize_result, priority: 10 }
+
     oro_api.complete_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\CompleteErrors
         arguments:
