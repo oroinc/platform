@@ -20,6 +20,10 @@ trusted_data:
                 parentAlias: true
                 parentJoinAlias: true
                 associationName: true
+        Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\EntityComparisonExpressionVisitor:
+            walkComparison:
+                field: true
+                placeholder: true
         Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer:
             tryGetValueByAssociationQuery:
                 fieldName: true
