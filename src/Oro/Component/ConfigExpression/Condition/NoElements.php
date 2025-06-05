@@ -73,6 +73,10 @@ class NoElements extends AbstractCondition implements ContextAccessorAwareInterf
     {
         $value = $this->resolveValue($context, $this->value, false);
 
-        return count($value) === 0;
+        if (is_countable($value)) {
+            return count($value) === 0;
+        }
+
+        return false;
     }
 }
