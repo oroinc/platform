@@ -1,0 +1,9 @@
+<% let oroui = _.macros('oroui') %>
+<button type="button" class="<%- cssConfig.footerResetBtn %>" <% if (!enabledReset) { %>disabled="disabled" <% } %>data-role="reset">
+    <% if (resetButtonIcon) { %>
+        <%= oroui.renderIcon({
+            name: resetButtonIcon
+        }) %>
+    <% } %>
+    <%- resetButtonLabel %>
+</button>

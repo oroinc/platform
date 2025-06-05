@@ -1,0 +1,27 @@
+<% let oroui = _.macros('oroui') %>
+<% var dropdownId = _.uniqueId('multiselect-dropdown-'); %>
+<div class="<%- cssConfig.dropdown %>">
+    <button class="<%- cssConfig.dropdownToggleBtn %>"
+        id="<%- dropdownId %>"
+        type="button"
+        data-toggle="dropdown"
+        data-prevent-close-on-menu-click="true"
+        aria-expanded="false"
+    >
+        <% if (dropdownToggleIcon) { %>
+            <%= oroui.renderIcon({
+                name: dropdownToggleIcon
+            }) %>
+        <% } %>
+        <%- dropdownToggleLabel %>
+    </button>
+
+    <div class="<%- cssConfig.dropdownMenu %>"
+        aria-labelledby="<%- dropdownId %>"
+        data-role="content"
+    >
+        <% if (dropdownMenuLabel) { %>
+            <h5 class="<%- cssConfig.dropdownMenuLabel %>"><%- dropdownMenuLabel %></h5>
+        <% } %>
+    </div>
+</div>
