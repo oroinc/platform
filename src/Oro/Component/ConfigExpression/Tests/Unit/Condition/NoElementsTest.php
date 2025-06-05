@@ -49,6 +49,16 @@ class NoElementsTest extends \PHPUnit\Framework\TestCase
                 'options'        => [new PropertyPath('foo')],
                 'context'        => ['foo' => new ArrayCollection()],
                 'expectedResult' => true
+            ],
+            'not countable' => [
+                'options'        => [new PropertyPath('foo')],
+                'context'        => ['foo' => 'not_countable'],
+                'expectedResult' => false
+            ],
+            'null' => [
+                'options'        => [new PropertyPath('foo')],
+                'context'        => ['foo' => null],
+                'expectedResult' => false
             ]
         ];
     }
