@@ -100,6 +100,9 @@ class MigrateEnumFieldConfigQuery extends RemoveOutdatedEnumFieldQuery
         if (isset($data['extend']['schema']['doctrine'][$this->entityClass]['fields'][$enumSnapshotField])) {
             unset($data['extend']['schema']['doctrine'][$this->entityClass]['fields'][$enumSnapshotField]);
         }
+        if (isset($data['extend']['schema']['addremove'][$this->enumField])) {
+            unset($data['extend']['schema']['addremove'][$this->enumField]);
+        }
         $data['extend']['schema']['serialized_property'][$this->enumField] = [];
 
         $data = $this->connection->convertToDatabaseValue($data, Types::ARRAY);
