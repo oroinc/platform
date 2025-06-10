@@ -381,14 +381,16 @@ Example:
 
 ## Versioned migration Enum changes:
 
+- To avoid breaking versioned migrations, it is advisable to use the appropriate methods when creating enums for the old binding.
+
 *Before:*
 
 ```php
     $queries->addPostQuery(
-        new OutdatedInsertEnumValuesQuery(
+        new InsertEnumValuesQuery(
             $this->extendExtension,
             'cu_auth_status', 
-            [new OutdatedEnumDataValue(CustomerUserAuthStatus::STATUS_EXPIRED, 'Expired', 3)]
+            [new EnumDataValue(CustomerUserAuthStatus::STATUS_EXPIRED, 'Expired', 3)]
         )
      );
 ```
@@ -397,12 +399,12 @@ Example:
 namespace Oro\Bundle\CalendarBundle\Migrations\Schema\v1_0;
 
 class OroCalendarBundle implements Migration, ExtendExtensionAwareInterface
- {
-     use ExtendExtensionAwareTrait;
+{
+    use ExtendExtensionAwareTrait;
  
-     public function up(Schema $schema, QueryBag $queries)
-     {
-         $table = $schema->getTable('oro_calendar_event_attendee');
+    public function up(Schema $schema, QueryBag $queries)
+    {
+        $table = $schema->getTable('oro_calendar_event_attendee');
         $this->extendExtension->addEnumField(
             $schema,
             $table,
@@ -433,7 +435,7 @@ class OroCalendarBundle implements Migration, ExtendExtensionAwareInterface
 namespace Oro\Bundle\CalendarBundle\Migrations\Schema\v1_0;
 
 class OroCalendarBundle implements Migration, OutdatedExtendExtensionAwareInterface
- {
+{
      use OutdatedExtendExtensionAwareTrait;
  
     public function up(Schema $schema, QueryBag $queries)
@@ -447,10 +449,48 @@ class OroCalendarBundle implements Migration, OutdatedExtendExtensionAwareInterf
             false,
             false,
             [
-                'extend' => ['owner' => ExtendScope::OWNER_CUSTOM]
+                'extend' => ['owner' => ExtendScope::OWNER_CUSTOM],
+                'enum' => [
+                    'immutable_codes' => ExtendHelper::mapToEnumOptionIds('opportunity_type', ['new',]),
+                ]
             ]
          );
      }
+```
+
+## Migration `immutable_codes` options:
+
+*Before:*
+
+```php
+$options = new OroOptions();
+    $options->set('enum', 'immutable_codes', [
+        CustomerUserAuthStatus::STATUS_EXPIRED
+    ]
+);
+```
+
+*After:*
+
+```php
+$enumOptionIds = [
+   ExtendHelper::buildEnumOptionId('cu_auth_status', CustomerUserAuthStatus::STATUS_EXPIRED)
+];
+$customerUserTable->addExtendColumnOption('auth_status', 'enum', 'immutable_codes', $enumOptionIds);
+```
+
+## Versioned schema migration (enum table name generation changes):
+
+*Before:*
+
+```php
+$this->extendExtension->getNameGenerator()->generateEnumTableName('opportunity_status')
+```
+
+*After:*
+
+```php
+OutdatedExtendExtension::generateEnumTableName('opportunity_status')
 ```
 
 ## Migration data fixture:
@@ -458,12 +498,14 @@ class OroCalendarBundle implements Migration, OutdatedExtendExtensionAwareInterf
 *Before:*
 
 ```php
-   $queries->addPostQuery(new OutdatedInsertEnumValuesQuery($this->outdatedExtendExtension, 'cu_auth_status', [
-            new OutdatedEnumDataValue(CustomerUserAuthStatus::STATUS_EXPIRED, 'Expired', 3)
-        ]));
+$queries->addPostQuery(new InsertEnumValuesQuery($this->extendExtension, 'cu_auth_status', [
+    new EnumDataValue(CustomerUserAuthStatus::STATUS_EXPIRED, 'Expired', 3)
+]));
 ```
 
 *After:*
+
+- All migration data that generates new enum options relies on language data. To ensure that this fixture executes correctly after adding a language, it is advisable to establish a dependency on it.
 
 ```php
 class LoadLeadStatusOptionData extends AbstractEnumFixture
@@ -485,6 +527,21 @@ class LoadLeadStatusOptionData extends AbstractEnumFixture
     protected function getEnumCode(): string
     {
         return 'lead_status';
+    }
+}
+
+```
+- If the fixtures for data migration create enum options and do not extend from `AbstractEnumFixture`, add a dependency on `LoadLanguageData`. [[f]](#upgrade-toolkit-coverage)
+
+```php
+class LoadLeadStatusOptionData extends AbstractFixture implements DependentFixtureInterface
+{
+    // fixture data migration methods ...
+    
+    #[\Override]
+    public function getDependencies(): array // this dependency is required if your fixture is not extend `AbstractEnumFixture`
+    {
+        return [LoadLanguageData::class];
     }
 }
 
@@ -515,41 +572,111 @@ class LoadLeadStatusOptionData extends AbstractEnumFixture
 - Query by enum fields
 
 ```php
- $qb = $this->doctrine->getRepository(CustomerUser::class)
-            ->createQueryBuilder('u')
-            ->select('COUNT(u.id)')
-            ->andWhere('IDENTITY(u.auth_status) <> :authStatus')
+$qb = $this->doctrine->getRepository(CustomerUser::class)
+      ->createQueryBuilder('u')
+      ->select('COUNT(u.id)')
+      ->andWhere('IDENTITY(u.auth_status) <> :authStatus')
 ```
 
 *After:*
 
 ```php
- $qb = $this->doctrine->getRepository(CustomerUser::class)
-            ->createQueryBuilder('u')
-            ->select('COUNT(u.id)')
-            ->andWhere("JSON_EXTRACT(u.serialized_data, 'auth_status') <> :authStatus")
+$qb = $this->doctrine->getRepository(CustomerUser::class)
+      ->createQueryBuilder('u')
+      ->select('COUNT(u.id)')
+      ->andWhere("JSON_EXTRACT(u.serialized_data, 'auth_status') <> :authStatus")
 ```
 
-## Query to Enum Option Repository:
+- Multi-enum Join
+
+```php
+->addLeftJoin(
+    $path,
+    EnumOption::class,
+    Join::WITH,
+    QueryBuilderUtil::sprintf(
+        "JSONB_ARRAY_CONTAINS_JSON(%s.serialized_data, '%s', CONCAT('\"', %s.id, '\"')) = true",
+        $parentAlias,
+        $fieldName,
+        $alias
+    )
+)
+```
+
+- Multi-enum Query
+
+```php
+->andWhere(
+    QueryBuilderUtil::sprintf(
+        "JSONB_ARRAY_CONTAINS_JSON(e.serialized_data, '%s', '\"%s\"') = true",
+        $fieldName,
+        $optionId
+    )
+)
+```
+
+## Query to Enum Option Repository: [[p]](#upgrade-toolkit-coverage)
+
+- Class ```Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumValueRepository``` was removed. 
+Use ```Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumOptionRepository``` instead.
+
+- Use ```Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumOptionRepository::createEnumOption``` 
+instead of ```Oro\Bundle\EntityExtendBundle\Entity\Repository\EnumOptionRepository::createEnumValue```
 
 *Before:*
 
 ```php
-   $statusEnum = $this->doctrine
-        ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::STATUS_ENUM_CODE))
-        ->find(Attendee::STATUS_NONE);
+$statusEnum = $this->doctrine
+    ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::STATUS_ENUM_CODE))
+    ->find(Attendee::STATUS_NONE);
 ```
 
 *After:*
 
 ```php
-    $statusEnum = $this->doctrine
-         ->getRepository(EnumOption::class)
-         ->find(ExtendHelper::buildEnumOptionId(Attendee::STATUS_ENUM_CODE, Attendee::STATUS_NONE)
-    );
+$statusEnum = $this->doctrine
+     ->getRepository(EnumOption::class)
+     ->find(ExtendHelper::buildEnumOptionId(Attendee::STATUS_ENUM_CODE, Attendee::STATUS_NONE)
+);
 ```
 
-## Comparison of enum option:
+- Use ```->findBy(...)``` instead of ```->findAll()``` while querying to Enum Option Repository
+
+*Before:*
+
+```php
+    $internalStatuses = $this->doctrine
+        ->getRepository(ExtendHelper::buildEnumValueClassName(Order::INTERNAL_STATUS_CODE))
+        ->findAll();
+```
+
+*After:*
+
+```php
+    $internalStatuses = $this->doctrine
+        ->getRepository(EnumOption::class)
+        ->findBy(['enumCode' => Order::INTERNAL_STATUS_CODE]);
+```
+
+- Avoid usage of the name value as a search criteria argument for ```->findBy(...)``` and ```->findOneBy(...)``` method calls
+
+*Before:*
+
+```php
+    $internalStatus = $this->doctrine
+        ->getRepository(ExtendHelper::buildEnumValueClassName(Order::INTERNAL_STATUS_CODE))
+        ->findOneBy(['name' => $name]);
+```
+
+*After:*
+
+```php
+    $internalStatus = $this->doctrine
+        ->getRepository(EnumOption::class)
+        ->findOneBy(['id' => ExtendHelper::buildEnumOptionId(Order::INTERNAL_STATUS_CODE, $name)]);
+```
+
+## Comparison of enum option: [[f]](#upgrade-toolkit-coverage)
 
 *Before:*
 
@@ -570,6 +697,15 @@ class LoadLeadStatusOptionData extends AbstractEnumFixture
 ```php
   if (!$originalValue instanceof EnumOptionInterface) {}
 ```
+
+## Getting of enum options:
+
+- Class ```Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider``` was removed. 
+Use ```Oro\Bundle\EntityExtendBundle\Provider\EnumOptionsProvider``` instead. [[f]](#upgrade-toolkit-coverage)
+- Use ```Oro\Bundle\EntityExtendBundle\Provider\EnumOptionsProvider::getEnumValueByCode()``` method
+instead of ```Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider::getEnumValueByCode()``` [[f]](#upgrade-toolkit-coverage)
+- Service was renamed from ```oro_entity_extend.enum_value_provider``` to ```oro_entity_extend.enum_options_provider``` [[p]](#upgrade-toolkit-coverage) 
+
 
 ### Expression Language changes:
 
@@ -715,6 +851,65 @@ quote_creating_definition:
       - '@neq':  [$status.internalId, 'lost']
       - '@neq':  [$status.internalId, 'won']
       - '@type': [$customer.target, 'Oro\Bundle\CustomerBundle\Entity\Customer']
+```
+
+*Before:*
+
+```yaml
+partner_level:
+  options:
+    enum_code: partner_level
+    excluded_values:
+      - gold
+
+```
+*After:*
+
+```yaml
+partner_level:
+  options:
+    enum_code: partner_level
+    excluded_values:
+      - 'partner_level.gold'
+```
+
+### Workflow definition configuration changes: [[f]](#upgrade-toolkit-coverage)
+
+*Before:*
+
+```yaml
+actions:
+    - '@request_enum_entity':
+        enum_code: lead_status
+        identifier: 'new'
+
+```
+*After:*
+
+```yaml
+actions:
+  - '@request_enum_entity':
+      enum_code: lead_status
+      identifier: 'lead_status.new'
+```
+
+### Processes definition configuration changes: [[f]](#upgrade-toolkit-coverage)
+
+*Before:*
+
+```yaml
+    - '@find_entity':
+        attribute: $.status
+        class: Extend\Entity\EV_Task_Status
+        identifier: 'open'
+```
+*After:*
+
+```yaml
+    - '@find_entity':
+        attribute: $.status
+        class: Oro\Bundle\EntityExtendBundle\Entity\EnumOption
+        identifier: 'task_status.open'
 ```
 
 ### Checking the set of changes of enum field
