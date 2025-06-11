@@ -10,6 +10,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Tests\Functional\Environment\TestEntityNameResolverClassesProviderInterface;
 use Oro\Bundle\EntityBundle\Tests\Functional\Environment\TestEntityNameResolverDataLoaderInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
@@ -104,6 +105,11 @@ class EntityNameResolverTest extends WebTestCase
         $entityNameResolver = $this->getEntityNameResolver();
         $entityDataLoader = $this->getEntityDataLoader();
         $doctrine = $this->getDoctrine();
+
+        /** @var ConfigManager $configManager */
+        $configManager = $this->getContainer()->get('oro_entity_config.config_manager');
+        $configManager->clear();
+
         $entityClasses = $this->getEntityClassesProvider()->getEntityClasses();
         ksort($entityClasses);
         foreach ($entityClasses as $entityClass => $reasons) {
