@@ -107,6 +107,11 @@ class EntityNameResolverTest extends WebTestCase
         $entityNameResolver = $this->getEntityNameResolver();
         $entityDataLoader = $this->getEntityDataLoader();
         $doctrine = $this->getDoctrine();
+
+        /** @var ConfigManager $configManager */
+        $configManager = $this->getContainer()->get('oro_entity_config.config_manager');
+        $configManager->clear();
+
         $entityClasses = $this->getEntityClassesProvider()->getEntityClasses();
         ksort($entityClasses);
         foreach ($entityClasses as $entityClass => $reasons) {
