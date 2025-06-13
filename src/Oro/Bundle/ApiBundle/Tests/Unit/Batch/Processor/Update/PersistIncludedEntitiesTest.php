@@ -12,14 +12,15 @@ use Oro\Bundle\ApiBundle\Collection\IncludedEntityCollection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class PersistIncludedEntitiesTest extends BatchUpdateProcessorTestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var PersistIncludedEntities */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private PersistIncludedEntities $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -31,12 +32,23 @@ class PersistIncludedEntitiesTest extends BatchUpdateProcessorTestCase
         $this->processor = new PersistIncludedEntities($this->doctrineHelper);
     }
 
-    public function testProcessWhenNoBatchItems()
+    public function testProcessWhenNoBatchItems(): void
     {
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenHasErrors()
+    public function testProcessWhenFlushDataShouldBeSkipped(): void
+    {
+        $item = $this->createMock(BatchUpdateItem::class);
+        $item->expects(self::never())
+            ->method(self::anything());
+
+        $this->context->setSkipFlushData(true);
+        $this->context->setBatchItems([$item]);
+        $this->processor->process($this->context);
+    }
+
+    public function testProcessWhenHasErrors(): void
     {
         $item = $this->createMock(BatchUpdateItem::class);
         $itemContext = $this->createMock(BatchUpdateItemContext::class);
@@ -53,7 +65,7 @@ class PersistIncludedEntitiesTest extends BatchUpdateProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenNoTargetContext()
+    public function testProcessWhenNoTargetContext(): void
     {
         $item = $this->createMock(BatchUpdateItem::class);
         $itemContext = $this->createMock(BatchUpdateItemContext::class);
@@ -68,7 +80,7 @@ class PersistIncludedEntitiesTest extends BatchUpdateProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenIncludedEntitiesCollectionDoesNotExist()
+    public function testProcessWhenIncludedEntitiesCollectionDoesNotExist(): void
     {
         $item = $this->createMock(BatchUpdateItem::class);
         $itemContext = $this->createMock(BatchUpdateItemContext::class);
@@ -93,7 +105,7 @@ class PersistIncludedEntitiesTest extends BatchUpdateProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenIncludedEntitiesCollectionIsEmpty()
+    public function testProcessWhenIncludedEntitiesCollectionIsEmpty(): void
     {
         $item = $this->createMock(BatchUpdateItem::class);
         $itemContext = $this->createMock(BatchUpdateItemContext::class);
@@ -118,7 +130,7 @@ class PersistIncludedEntitiesTest extends BatchUpdateProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForNewIncludedObject()
+    public function testProcessForNewIncludedObject(): void
     {
         $object = new \stdClass();
         $objectClass = 'Test\Class';
@@ -157,7 +169,7 @@ class PersistIncludedEntitiesTest extends BatchUpdateProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForExistingIncludedObject()
+    public function testProcessForExistingIncludedObject(): void
     {
         $object = new \stdClass();
         $objectClass = 'Test\Class';
@@ -194,7 +206,7 @@ class PersistIncludedEntitiesTest extends BatchUpdateProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForNewIncludedEntity()
+    public function testProcessForNewIncludedEntity(): void
     {
         $entity = new \stdClass();
         $entityClass = 'Test\Class';
@@ -237,7 +249,7 @@ class PersistIncludedEntitiesTest extends BatchUpdateProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithAdditionalEntitiesToPersist()
+    public function testProcessWithAdditionalEntitiesToPersist(): void
     {
         $entity1 = new \stdClass();
         $entity2 = new \stdClass();
@@ -292,7 +304,7 @@ class PersistIncludedEntitiesTest extends BatchUpdateProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithAdditionalEntitiesToRemove()
+    public function testProcessWithAdditionalEntitiesToRemove(): void
     {
         $entity1 = new \stdClass();
         $entity2 = new \stdClass();

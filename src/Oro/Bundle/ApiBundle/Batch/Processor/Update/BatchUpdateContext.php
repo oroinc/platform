@@ -35,6 +35,7 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
     private ?array $processedItemStatuses = null;
     private ?BatchFlushDataHandlerInterface $flushDataHandler = null;
     private ?ParameterBagInterface $sharedData = null;
+    private bool $skipFlushData = false;
 
     #[\Override]
     protected function initialize(): void
@@ -298,5 +299,21 @@ class BatchUpdateContext extends ByStepNormalizeResultContext
     public function setSharedData(ParameterBagInterface $sharedData): void
     {
         $this->sharedData = $sharedData;
+    }
+
+    /**
+     * Indicates whether this batch operation should not flush data into a storage, e.g. the database.
+     */
+    public function isSkipFlushData(): bool
+    {
+        return $this->skipFlushData;
+    }
+
+    /**
+     * Sets a value indicates whether this batch operation should not flush data into a storage, e.g. the database.
+     */
+    public function setSkipFlushData(bool $skipFlushData): void
+    {
+        $this->skipFlushData = $skipFlushData;
     }
 }

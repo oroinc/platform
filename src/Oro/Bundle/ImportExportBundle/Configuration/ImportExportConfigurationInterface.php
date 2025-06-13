@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ImportExportBundle\Configuration;
 
+/**
+ * Represents Import/Export configuration.
+ */
 interface ImportExportConfigurationInterface
 {
     public function getRouteOptions(): array;

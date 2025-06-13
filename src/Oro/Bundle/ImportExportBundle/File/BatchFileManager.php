@@ -8,8 +8,7 @@ use Oro\Bundle\ImportExportBundle\Reader\AbstractFileReader;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
 
 /**
- * Splits import file in batches.
- * Merges files into summary file.
+ * Provides a functionality to split a file into chunks and merge files into a summary file.
  */
 class BatchFileManager
 {
@@ -64,59 +63,92 @@ class BatchFileManager
     }
 
     /**
-     * This method split file on chunk, and return file name array.
-     *
-     * @param string $pathFile
-     * @return array
+     * Splits a file into chunks and returns the chunk file names.
      */
     public function splitFile($pathFile)
     {
-        if (! ($this->writer && $this->reader)) {
+        if (null === $this->writer || null === $this->reader) {
             throw new InvalidConfigurationException('Reader and Writer must be configured.');
         }
 
-        $context = new Context(array_merge(
+        $readerContext = new Context(array_merge(
             [Context::OPTION_FILE_PATH => $pathFile],
             $this->configurationOptions
         ));
-        $this->reader->initializeByContext($context);
+        $this->reader->initializeByContext($readerContext);
 
-        $batchSize = $context->getOption(Context::OPTION_BATCH_SIZE) ?: $this->sizeOfBatch;
-
-        $data = [];
-        $i = 0;
-        $header = null;
-        $files = [];
         $extension = pathinfo($pathFile, PATHINFO_EXTENSION);
-        while ($row = $this->reader->read($context)) {
-            $header = $header ?: $this->reader->getHeader();
-            $data[] = $row;
-            if (++$i == $batchSize) {
-                $files[] = $this->writeBatch($data, $header, $extension);
-                $data = [];
-                $i = 0;
-            }
-        }
+        $batchSize = $readerContext->getOption(Context::OPTION_BATCH_SIZE) ?: $this->sizeOfBatch;
 
-        if ($i) {
-            $files[] = $this->writeBatch($data, $header, $extension);
+        $files = [];
+        $header = null;
+        $items = [];
+        try {
+            while ($item = $this->reader->read($readerContext)) {
+                $header = $header ?: $this->reader->getHeader();
+                $items[] = $item;
+                if (\count($items) === $batchSize) {
+                    $files[] = $this->writeBatch($items, $header, $extension);
+                    $items = [];
+                }
+            }
+            if (\count($items) > 0) {
+                $files[] = $this->writeBatch($items, $header, $extension);
+            }
+        } finally {
+            $this->reader->close();
         }
 
         return $files;
     }
 
     /**
-     * @param array $data
-     * @param array|null $header
-     * @param string $extension
-     *
-     * @return string
+     * Merges files into a summary file.
      */
-    private function writeBatch(array $data, $header, $extension)
+    public function mergeFiles(array $files, $summaryFile)
+    {
+        if (null === $this->writer || null === $this->reader) {
+            throw new InvalidConfigurationException('Reader and Writer must be configured.');
+        }
+
+        $writerContext = null;
+        try {
+            foreach ($files as $file) {
+                $readerContext = new Context([Context::OPTION_FILE_PATH => $file]);
+                $this->reader->initializeByContext($readerContext);
+                try {
+                    $items = [];
+                    while ($item = $this->reader->read($readerContext)) {
+                        if (null === $writerContext) {
+                            $writerContext = new Context([
+                                Context::OPTION_FILE_PATH => $summaryFile,
+                                Context::OPTION_HEADER => $this->reader->getHeader(),
+                                Context::OPTION_FIRST_LINE_IS_HEADER => true
+                            ]);
+                            $this->writer->setImportExportContext($writerContext);
+                        }
+                        $items[] = $item;
+                        if (\count($items) === $this->sizeOfBatch) {
+                            $this->writer->write($items);
+                            $items = [];
+                        }
+                    }
+                    if (\count($items) > 0) {
+                        $this->writer->write($items);
+                    }
+                } finally {
+                    $this->reader->close();
+                }
+            }
+        } finally {
+            $this->writer->close();
+        }
+    }
+
+    private function writeBatch(array $items, ?array $header, string $extension): string
     {
         $batchFileName = FileManager::generateUniqueFileName($extension);
         $batchFilePath = FileManager::generateTmpFilePath($batchFileName);
-
         $writerContext = new Context(array_merge(
             [
                 Context::OPTION_FILE_PATH => $batchFilePath,
@@ -125,58 +157,17 @@ class BatchFileManager
             $this->configurationOptions
         ));
         $this->writer->setImportExportContext($writerContext);
-        $this->writer->write($data);
-        $this->writer->close();
-
-        $this->fileManager->writeFileToStorage($batchFilePath, $batchFileName);
-        @unlink($batchFilePath);
+        try {
+            try {
+                $this->writer->write($items);
+            } finally {
+                $this->writer->close();
+            }
+            $this->fileManager->writeFileToStorage($batchFilePath, $batchFileName);
+        } finally {
+            @unlink($batchFilePath);
+        }
 
         return $batchFileName;
-    }
-
-    /**
-     * @param array $files
-     * @param string $summaryFile
-     * @return string
-     */
-    public function mergeFiles(array $files, $summaryFile)
-    {
-        if (! ($this->writer && $this->reader)) {
-            throw new InvalidConfigurationException('Reader and Writer must be configured.');
-        }
-        $contextWriter = null;
-        foreach ($files as $file) {
-            $contextReader = new Context(['filePath' => $file]);
-            $this->reader->initializeByContext($contextReader);
-
-            $items = [];
-            $i = 0;
-            while ($item = $this->reader->read($contextReader)) {
-                if (! $contextWriter) {
-                    $contextWriter = new Context(
-                        [
-                            'filePath' => $summaryFile,
-                            'header' => $this->reader->getHeader(),
-                            'firstLineIsHeader' => true,
-                        ]
-                    );
-                    $this->writer->setImportExportContext($contextWriter);
-                }
-                $items[] = $item;
-
-                if (++$i === $this->sizeOfBatch) {
-                    $this->writer->write($items);
-                    $i = 0;
-                    $items = [];
-                }
-            }
-
-            if (count($items) > 0) {
-                $this->writer->write($items);
-            }
-        }
-        $this->writer->close();
-
-        return $summaryFile;
     }
 }

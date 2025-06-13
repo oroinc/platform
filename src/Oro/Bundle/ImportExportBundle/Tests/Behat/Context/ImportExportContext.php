@@ -121,6 +121,20 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
         $this->downloadTemplateFile($entity, $processorName);
     }
 
+    //@codingStandardsIgnoreStart
+    /**
+     * Download data template from entity grid page with custom processor and job name
+     *
+     * @When /^(?:|I )download Data Template file with processor "(?P<processorName>([\w\s\.]+))" and job "(?P<jobName>([\w\s\.]+))"$/
+     */
+    //@codingStandardsIgnoreEnd
+    public function iDownloadDataTemplateFileWithProcessorAndJob(
+        string $processorName,
+        string $jobName
+    ): void {
+        $this->downloadTemplateFileByProcessorAndJob($processorName, [], $jobName);
+    }
+
     /**
      * Download data template from entity grid page
      *
@@ -164,23 +178,26 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
         $this->downloadTemplateFileByProcessor($processor);
     }
 
-    /**
-     * @param string $processor
-     * @param array $options
-     */
-    public function downloadTemplateFileByProcessor($processor, $options = [])
-    {
+    public function downloadTemplateFileByProcessorAndJob(
+        string $processor,
+        array $options = [],
+        string $jobName = '',
+    ): void {
         $this->openImportModalAndReturnImportSubmitButton();
 
         $exportButton = $this->createElement('ActiveExportTemplateButton');
         self::assertTrue($exportButton->isIsset(), "Export template link was not found");
 
+        $parameters = [
+            'processorAlias' => $processor,
+            'options' => $options
+        ];
+        if ($jobName) {
+            $parameters['exportTemplateJob'] = $jobName;
+        }
         $url = $this->locatePath($this->getAppContainer()->get('router')->generate(
             'oro_importexport_export_template',
-            [
-                'processorAlias' => $processor,
-                'options' => $options
-            ]
+            $parameters
         ));
 
         $this->template = $this->getTempFilePath('import_template_');
@@ -196,6 +213,15 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
         self::assertEquals(200, $response->getStatusCode());
 
         $this->oroMainContext->closeUiDialog();
+    }
+
+    /**
+     * @param string $processor
+     * @param array $options
+     */
+    public function downloadTemplateFileByProcessor($processor, $options = [])
+    {
+        $this->downloadTemplateFileByProcessorAndJob($processor, $options);
     }
 
     /**
@@ -451,6 +477,19 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
     }
 
     /**
+     * Assert that given column is present in the downloaded JSON template
+     * Example: When I download Data Template file
+     *          And I see "name" field in JSON template
+     *
+     * @Then /^(?:|I )see "(?P<field>([\w\s.+\/]+))" field in JSON template$/
+     */
+    public function iSeeFieldInJsonTemplate(string $field): void
+    {
+        $data = json_decode(implode('', file($this->template)), true);
+        self::assertArrayHasKey($field, $data[0]);
+    }
+
+    /**
      * Assert that given columns are present in the downloaded csv template
      * Example: When I download Data Template file
      *          And I see the following columns in the downloaded csv template:
@@ -486,6 +525,20 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
         foreach ($rows as $i => $row) {
             self::assertEquals($row, $csv[0][$i] ?? '');
         }
+    }
+
+    /**
+     * @Given /^(?:|I )import "(?P<fileName>.*)" import file/
+     */
+    public function iImportCustomFile(string $fileName): void
+    {
+        $importSubmitButton = $this->openImportModalAndReturnImportSubmitButton();
+
+        $importFile = $this->createElement('Import Choose File');
+        $importFile->setValue($fileName);
+
+        $importSubmitButton->press();
+        $this->getDriver()->waitForAjax(240000); // wait max 4 minutes
     }
 
     /**
@@ -981,7 +1034,7 @@ class ImportExportContext extends OroFeatureContext implements OroPageObjectAwar
             mkdir($path);
         }
 
-        return tempnam($path, $prefix) . '.csv';
+        return tempnam($path, $prefix) . '.txt';
     }
 
     private function closeFlashMessages()

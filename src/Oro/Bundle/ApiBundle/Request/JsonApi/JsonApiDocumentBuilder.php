@@ -33,13 +33,14 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     public const META_UPSERT = 'upsert';
     public const META_VALIDATE = 'validate';
 
-    private const ERROR_STATUS = 'status';
-    private const ERROR_CODE = 'code';
-    private const ERROR_TITLE = 'title';
-    private const ERROR_DETAIL = 'detail';
-    private const ERROR_SOURCE = 'source';
-    private const ERROR_POINTER = 'pointer';
-    private const ERROR_PARAMETER = 'parameter';
+    public const ERROR_ID = 'id';
+    public const ERROR_STATUS = 'status';
+    public const ERROR_CODE = 'code';
+    public const ERROR_TITLE = 'title';
+    public const ERROR_DETAIL = 'detail';
+    public const ERROR_SOURCE = 'source';
+    public const ERROR_POINTER = 'pointer';
+    public const ERROR_PARAMETER = 'parameter';
 
     #[\Override]
     public function getDocument(): array

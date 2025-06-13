@@ -5,33 +5,39 @@ namespace Oro\Bundle\ImportExportBundle\Configuration;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
- * Import/Export configuration holder
+ * Import/Export configuration holder.
  */
 class ImportExportConfiguration extends ParameterBag implements ImportExportConfigurationInterface
 {
-    const FIELD_ROUTE_OPTIONS = 'routeOptions';
-    const FIELD_ENTITY_CLASS = 'entityClass';
-    const FIELD_FILE_PREFIX = 'filePrefix';
+    public const FIELD_ROUTE_OPTIONS = 'routeOptions';
+    public const FIELD_ENTITY_CLASS = 'entityClass';
+    public const FIELD_FILE_PREFIX = 'filePrefix';
 
-    const FIELD_EXPORT_JOB_NAME = 'exportJobName';
-    const FIELD_EXPORT_PROCESSOR_ALIAS = 'exportProcessorAlias';
-    const FIELD_EXPORT_BUTTON_LABEL = 'exportButtonLabel';
-    const FIELD_EXPORT_POPUP_TITLE = 'exportPopupTitle';
+    public const FIELD_FEATURE_NAME = 'featureName';
 
-    const FIELD_EXPORT_TEMPLATE_JOB_NAME = 'exportTemplateJobName';
-    const FIELD_EXPORT_TEMPLATE_PROCESSOR_ALIAS = 'exportTemplateProcessorAlias';
-    const FIELD_EXPORT_TEMPLATE_BUTTON_LABEL = 'exportTemplateButtonLabel';
+    public const FIELD_EXPORT_JOB_NAME = 'exportJobName';
+    public const FIELD_EXPORT_PROCESSOR_ALIAS = 'exportProcessorAlias';
+    public const FIELD_EXPORT_BUTTON_LABEL = 'exportButtonLabel';
+    public const FIELD_EXPORT_POPUP_TITLE = 'exportPopupTitle';
 
-    const FIELD_IMPORT_JOB_NAME = 'importJobName';
-    const FIELD_IMPORT_PROCESSOR_ALIAS = 'importProcessorAlias';
+    public const FIELD_EXPORT_TEMPLATE_JOB_NAME = 'exportTemplateJobName';
+    public const FIELD_EXPORT_TEMPLATE_PROCESSOR_ALIAS = 'exportTemplateProcessorAlias';
+    public const FIELD_EXPORT_TEMPLATE_BUTTON_LABEL = 'exportTemplateButtonLabel';
 
-    const FIELD_IMPORT_ENTITY_LABEL = 'importEntityLabel';
-    const FIELD_IMPORT_STRATEGY_TOOLTIP = 'importStrategyTooltip';
-    const FIELD_IMPORT_PROCESSORS_TO_CONFIRMATION_MESSAGE = 'importProcessorToConfirmationMessages';
-    const FIELD_IMPORT_VALIDATION_JOB_NAME = 'importValidationJobName';
-    const FIELD_IMPORT_VALIDATION_BUTTON_LABEL = 'importValidationButtonLabel';
-    const FIELD_IMPORT_ADDITIONAL_NOTICES = 'importAdditionalNotices';
-    const FIELD_IMPORT_PROCESSOR_TOPIC_NAME = 'importProcessorTopicName';
+    public const FIELD_IMPORT_JOB_NAME = 'importJobName';
+    public const FIELD_IMPORT_PROCESSOR_ALIAS = 'importProcessorAlias';
+
+    public const FIELD_IMPORT_ENTITY_LABEL = 'importEntityLabel';
+    public const FIELD_IMPORT_STRATEGY_TOOLTIP = 'importStrategyTooltip';
+    public const FIELD_IMPORT_PROCESSORS_TO_CONFIRMATION_MESSAGE = 'importProcessorToConfirmationMessages';
+    public const FIELD_IMPORT_VALIDATION_JOB_NAME = 'importValidationJobName';
+    public const FIELD_IMPORT_VALIDATION_BUTTON_LABEL = 'importValidationButtonLabel';
+    public const FIELD_IMPORT_ADDITIONAL_NOTICES = 'importAdditionalNotices';
+    public const FIELD_IMPORT_PROCESSOR_TOPIC_NAME = 'importProcessorTopicName';
+
+    public const FIELD_IMPORT_COLUMNS_NOTICE = 'importColumnsNotice';
+    public const FIELD_IMPORT_FORM_FILE_ACCEPT_ATTRIBUTE = 'fileAcceptAttribute';
+    public const FIELD_IMPORT_FORM_FILE_MIME_TYPES = 'fileMimeTypes';
 
     #[\Override]
     public function getRouteOptions(): array
@@ -138,5 +144,25 @@ class ImportExportConfiguration extends ParameterBag implements ImportExportConf
     public function getImportProcessorTopicName(): ?string
     {
         return $this->get(self::FIELD_IMPORT_PROCESSOR_TOPIC_NAME);
+    }
+
+    public function getImportColumnsNotice(): ?string
+    {
+        return $this->get(self::FIELD_IMPORT_COLUMNS_NOTICE);
+    }
+
+    public function getImportFileAcceptAttribute(): ?string
+    {
+        return $this->get(self::FIELD_IMPORT_FORM_FILE_ACCEPT_ATTRIBUTE);
+    }
+
+    public function getImportFileMimeTypes(): ?array
+    {
+        return $this->get(self::FIELD_IMPORT_FORM_FILE_MIME_TYPES);
+    }
+
+    public function getFeatureName(): ?string
+    {
+        return $this->get(self::FIELD_FEATURE_NAME);
     }
 }

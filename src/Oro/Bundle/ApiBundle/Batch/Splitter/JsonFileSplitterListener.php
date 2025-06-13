@@ -180,7 +180,6 @@ class JsonFileSplitterListener implements ListenerInterface
         $this->level++;
         $this->objectKeys[$this->level] = $this->key ?: null;
         $this->key = null;
-
         $this->stack[] = [];
     }
 

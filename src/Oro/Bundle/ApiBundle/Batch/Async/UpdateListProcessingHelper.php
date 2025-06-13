@@ -25,21 +25,12 @@ use Psr\Log\LoggerInterface;
  */
 class UpdateListProcessingHelper
 {
-    private FileManager $fileManager;
-    private FileNameProvider $fileNameProvider;
-    private MessageProducerInterface $producer;
-    private LoggerInterface $logger;
-
     public function __construct(
-        FileManager $fileManager,
-        FileNameProvider $fileNameProvider,
-        MessageProducerInterface $producer,
-        LoggerInterface $logger
+        private readonly FileManager $fileManager,
+        private readonly FileNameProvider $fileNameProvider,
+        private readonly MessageProducerInterface $producer,
+        private readonly LoggerInterface $logger
     ) {
-        $this->fileManager = $fileManager;
-        $this->fileNameProvider = $fileNameProvider;
-        $this->producer = $producer;
-        $this->logger = $logger;
     }
 
     public function getCommonBody(array $parentBody): array

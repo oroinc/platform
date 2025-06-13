@@ -25,6 +25,18 @@ connector:
                         processor: oro_importexport.processor.export_template_delegate
                         writer:    oro_importexport.writer.csv
                     parameters: ~
+        entity_export_template_to_json:
+            title: "Entity Template Export to JSON"
+            type: export_template
+            steps:
+                export_template:
+                    title:     export_template
+                    class:     Oro\Bundle\BatchBundle\Step\ItemStep
+                    services:
+                        reader:    oro_importexport.reader.template_fixture
+                        processor: oro_importexport.processor.export_template_delegate
+                        writer:    oro_importexport.writer.json_pretty
+                    parameters: ~
         entity_import_validation_from_csv:
             title: "Entity Import Validation from CSV"
             type: import_validation

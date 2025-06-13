@@ -8,204 +8,273 @@ use Oro\Bundle\ImportExportBundle\File\BatchFileManager;
 use Oro\Bundle\ImportExportBundle\File\FileManager;
 use Oro\Bundle\ImportExportBundle\Reader\AbstractFileReader;
 use Oro\Bundle\ImportExportBundle\Writer\FileStreamWriter;
+use PHPUnit\Framework\TestCase;
 
-class BatchFileManagerTest extends \PHPUnit\Framework\TestCase
+class BatchFileManagerTest extends TestCase
 {
-    public function testShouldSplitFile()
+    public function testSplitFileWhenReaderAndWriterAreNotSet(): void
     {
-        $reader = $this->createMock(AbstractFileReader::class);
-        $reader->expects($this->once())
-            ->method('initializeByContext')
-            ->with(new Context([
-                Context::OPTION_FILE_PATH => 'test.csv',
-                Context::OPTION_DELIMITER => ';',
-                Context::OPTION_ENCLOSURE => '|',
-            ]));
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Reader and Writer must be configured.');
+        $batchFileManager = new BatchFileManager($this->createMock(FileManager::class), 1);
+        $batchFileManager->splitFile('test.csv');
+    }
 
-        $reader->expects($this->exactly(3))
+    public function testSplitFileWhenReaderIsNotSet(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Reader and Writer must be configured.');
+        $batchFileManager = new BatchFileManager($this->createMock(FileManager::class), 1);
+        $batchFileManager->setWriter($this->createMock(FileStreamWriter::class));
+        $batchFileManager->splitFile('test.csv');
+    }
+
+    public function testSplitFileWhenWriterIsNotSet(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Reader and Writer must be configured.');
+        $batchFileManager = new BatchFileManager($this->createMock(FileManager::class), 1);
+        $batchFileManager->setReader($this->createMock(AbstractFileReader::class));
+        $batchFileManager->splitFile('test.csv');
+    }
+
+    public function testSplitFile(): void
+    {
+        $readerContext = new Context([
+            Context::OPTION_FILE_PATH => 'test.csv',
+            Context::OPTION_DELIMITER => ';',
+            Context::OPTION_ENCLOSURE => '|'
+        ]);
+        $reader = $this->createMock(AbstractFileReader::class);
+        $reader->expects(self::once())
+            ->method('initializeByContext')
+            ->with($readerContext);
+        $reader->expects(self::exactly(3))
             ->method('read')
-            ->with(new Context([
-                Context::OPTION_FILE_PATH => 'test.csv',
-                Context::OPTION_DELIMITER => ';',
-                Context::OPTION_ENCLOSURE => '|',
-            ]))
-            ->willReturnOnConsecutiveCalls([1, 2], [3, 4], false);
-        $reader->expects($this->once())
+            ->with($readerContext)
+            ->willReturnOnConsecutiveCalls(
+                [1, 2],
+                [3, 4],
+                false
+            );
+        $reader->expects(self::once())
             ->method('getHeader')
             ->willReturn(['a', 'b']);
+        $reader->expects(self::once())
+            ->method('close');
 
-        $fileManagerMock = $this->createMock(FileManager::class);
         $writer = $this->createMock(FileStreamWriter::class);
-        $writer->expects($this->exactly(2))
+        $writer->expects(self::exactly(2))
             ->method('setImportExportContext');
-
-        $writer->expects($this->exactly(2))
+        $writer->expects(self::exactly(2))
             ->method('write')
             ->withConsecutive(
                 [[[1, 2]]],
                 [[[3, 4]]]
             );
-        $batchFileManager = new BatchFileManager($fileManagerMock, 1);
+
+        $fileManager = $this->createMock(FileManager::class);
+        $fileManager->expects(self::exactly(2))
+            ->method('writeFileToStorage');
+
+        $batchFileManager = new BatchFileManager($fileManager, 1);
         $batchFileManager->setReader($reader);
         $batchFileManager->setWriter($writer);
         $batchFileManager->setConfigurationOptions([
             Context::OPTION_DELIMITER => ';',
-            Context::OPTION_ENCLOSURE => '|',
+            Context::OPTION_ENCLOSURE => '|'
         ]);
-        $this->assertCount(2, $batchFileManager->splitFile('test.csv'));
+        self::assertCount(2, $batchFileManager->splitFile('test.csv'));
     }
 
-    public function testShouldSplitFileWithCustomBatchSize(): void
+    public function testSplitFileWithCustomBatchSize(): void
     {
-        $context = new Context([
+        $readerContext = new Context([
             Context::OPTION_FILE_PATH => 'test.csv',
             Context::OPTION_DELIMITER => ';',
             Context::OPTION_ENCLOSURE => '|',
-            Context::OPTION_BATCH_SIZE => 3,
+            Context::OPTION_BATCH_SIZE => 3
         ]);
-
         $reader = $this->createMock(AbstractFileReader::class);
-        $reader->expects($this->once())
+        $reader->expects(self::once())
             ->method('initializeByContext')
-            ->with($context);
-        $reader->expects($this->exactly(6))
+            ->with($readerContext);
+        $reader->expects(self::exactly(6))
             ->method('read')
-            ->with($context)
-            ->willReturnOnConsecutiveCalls([1, 2], [3, 4], [5, 6], [7, 8], [9, 10], false);
-        $reader->expects($this->once())
+            ->with($readerContext)
+            ->willReturnOnConsecutiveCalls(
+                [1, 2],
+                [3, 4],
+                [5, 6],
+                [7, 8],
+                [9, 10],
+                false
+            );
+        $reader->expects(self::once())
             ->method('getHeader')
             ->willReturn(['a', 'b']);
-
-        $fileManagerMock = $this->createMock(FileManager::class);
+        $reader->expects(self::once())
+            ->method('close');
 
         $writer = $this->createMock(FileStreamWriter::class);
-        $writer->expects($this->exactly(2))
+        $writer->expects(self::exactly(2))
             ->method('setImportExportContext');
-
-        $writer->expects($this->exactly(2))
+        $writer->expects(self::exactly(2))
             ->method('write')
             ->withConsecutive(
                 [[[1, 2], [3, 4], [5, 6]]],
                 [[[7, 8], [9, 10]]]
             );
-        $batchFileManager = new BatchFileManager($fileManagerMock, 1);
+
+        $fileManager = $this->createMock(FileManager::class);
+        $fileManager->expects(self::exactly(2))
+            ->method('writeFileToStorage');
+
+        $batchFileManager = new BatchFileManager($fileManager, 1);
         $batchFileManager->setReader($reader);
         $batchFileManager->setWriter($writer);
         $batchFileManager->setConfigurationOptions([
             Context::OPTION_DELIMITER => ';',
             Context::OPTION_ENCLOSURE => '|',
-            Context::OPTION_BATCH_SIZE => 3,
+            Context::OPTION_BATCH_SIZE => 3
         ]);
-        $this->assertCount(2, $batchFileManager->splitFile('test.csv'));
+        self::assertCount(2, $batchFileManager->splitFile('test.csv'));
     }
 
-    public function testShouldThrowErrorDuringSplitFile()
+    public function testMergeFilesWhenReaderAndWriterAreNotSet(): void
     {
-        $fileManagerMock = $this->createMock(FileManager::class);
-        $batchFileManager = new BatchFileManager($fileManagerMock, 1);
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Reader and Writer must be configured.');
-        $batchFileManager->splitFile('test.csv');
+        $batchFileManager = new BatchFileManager($this->createMock(FileManager::class), 1);
+        $batchFileManager->mergeFiles(['test1', 'test2'], 'result');
     }
 
-    public function testShouldThrowErrorDuringMergeFiles()
+    public function testMergeFilesWhenReaderIsNotSet(): void
     {
-        $fileManagerMock = $this->createMock(FileManager::class);
-        $batchFileManager = new BatchFileManager($fileManagerMock, 1);
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Reader and Writer must be configured.');
-        $batchFileManager->splitFile('test.csv');
+        $batchFileManager = new BatchFileManager($this->createMock(FileManager::class), 1);
+        $batchFileManager->setWriter($this->createMock(FileStreamWriter::class));
+        $batchFileManager->mergeFiles(['test1', 'test2'], 'result');
     }
 
-    public function testShouldMergeFiles()
+    public function testMergeFilesWhenWriterIsNotSet(): void
     {
-        $fileManagerMock = $this->createMock(FileManager::class);
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Reader and Writer must be configured.');
+        $batchFileManager = new BatchFileManager($this->createMock(FileManager::class), 1);
+        $batchFileManager->setReader($this->createMock(AbstractFileReader::class));
+        $batchFileManager->mergeFiles(['test1', 'test2'], 'result');
+    }
 
+    public function testMergeFiles(): void
+    {
         $reader = $this->createMock(AbstractFileReader::class);
-        $reader->expects($this->exactly(2))
+        $reader->expects(self::exactly(2))
             ->method('initializeByContext')
             ->withConsecutive(
-                [new Context(['filePath' => 'test1'])],
-                [new Context(['filePath' => 'test2'])]
+                [new Context([Context::OPTION_FILE_PATH => 'test1'])],
+                [new Context([Context::OPTION_FILE_PATH => 'test2'])]
             );
-        $reader->expects($this->exactly(5))
+        $reader->expects(self::exactly(5))
             ->method('read')
             ->withConsecutive(
-                [new Context(['filePath' => 'test1'])],
-                [new Context(['filePath' => 'test1'])],
-                [new Context(['filePath' => 'test1'])],
-                [new Context(['filePath' => 'test2'])],
-                [new Context(['filePath' => 'test2'])]
+                [new Context([Context::OPTION_FILE_PATH => 'test1'])],
+                [new Context([Context::OPTION_FILE_PATH => 'test1'])],
+                [new Context([Context::OPTION_FILE_PATH => 'test1'])],
+                [new Context([Context::OPTION_FILE_PATH => 'test2'])],
+                [new Context([Context::OPTION_FILE_PATH => 'test2'])]
             )
-            ->willReturnOnConsecutiveCalls(1, 2, false, 3, false);
-        $reader->expects($this->once())
+            ->willReturnOnConsecutiveCalls(
+                1,
+                2,
+                false,
+                3,
+                false
+            );
+        $reader->expects(self::once())
             ->method('getHeader')
             ->willReturn(['a', 'b']);
+        $reader->expects(self::exactly(2))
+            ->method('close');
 
         $writer = $this->createMock(FileStreamWriter::class);
-        $writer->expects($this->once())
+        $writer->expects(self::once())
             ->method('setImportExportContext')
-            ->with(new Context(['filePath' => 'result', 'header' => ['a', 'b'], 'firstLineIsHeader' => true]));
-        $writer->expects($this->exactly(2))
+            ->with(new Context([
+                Context::OPTION_FILE_PATH => 'result',
+                Context::OPTION_HEADER => ['a', 'b'],
+                Context::OPTION_FIRST_LINE_IS_HEADER => true
+            ]));
+        $writer->expects(self::exactly(2))
             ->method('write')
             ->withConsecutive(
                 [[1, 2]],
                 [[3]]
             );
-        $writer->expects($this->once())
+        $writer->expects(self::once())
             ->method('close');
 
-        $batchFileManager = new BatchFileManager($fileManagerMock, 10);
+        $batchFileManager = new BatchFileManager($this->createMock(FileManager::class), 10);
         $batchFileManager->setReader($reader);
         $batchFileManager->setWriter($writer);
-
-        $this->assertEquals('result', $batchFileManager->mergeFiles(['test1', 'test2'], 'result'));
+        $batchFileManager->mergeFiles(['test1', 'test2'], 'result');
     }
 
-    public function testShouldMergeFilesWhenBatchSizeIsExceeded()
+    public function testMergeFilesWhenBatchSizeIsExceeded(): void
     {
-        $fileManagerMock = $this->createMock(FileManager::class);
-
         $reader = $this->createMock(AbstractFileReader::class);
-        $reader->expects($this->exactly(2))
+        $reader->expects(self::exactly(2))
             ->method('initializeByContext')
             ->withConsecutive(
-                [new Context(['filePath' => 'test1'])],
-                [new Context(['filePath' => 'test2'])]
+                [new Context([Context::OPTION_FILE_PATH => 'test1'])],
+                [new Context([Context::OPTION_FILE_PATH => 'test2'])]
             );
-        $reader->expects($this->exactly(6))
+        $reader->expects(self::exactly(6))
             ->method('read')
             ->withConsecutive(
-                [new Context(['filePath' => 'test1'])],
-                [new Context(['filePath' => 'test1'])],
-                [new Context(['filePath' => 'test1'])],
-                [new Context(['filePath' => 'test1'])],
-                [new Context(['filePath' => 'test2'])],
-                [new Context(['filePath' => 'test2'])]
+                [new Context([Context::OPTION_FILE_PATH => 'test1'])],
+                [new Context([Context::OPTION_FILE_PATH => 'test1'])],
+                [new Context([Context::OPTION_FILE_PATH => 'test1'])],
+                [new Context([Context::OPTION_FILE_PATH => 'test1'])],
+                [new Context([Context::OPTION_FILE_PATH => 'test2'])],
+                [new Context([Context::OPTION_FILE_PATH => 'test2'])]
             )
-            ->willReturnOnConsecutiveCalls(1, 2, 3, false, 4, false);
-        $reader->expects($this->once())
+            ->willReturnOnConsecutiveCalls(
+                1,
+                2,
+                3,
+                false,
+                4,
+                false
+            );
+        $reader->expects(self::once())
             ->method('getHeader')
             ->willReturn(['a', 'b']);
+        $reader->expects(self::exactly(2))
+            ->method('close');
 
         $writer = $this->createMock(FileStreamWriter::class);
-        $writer->expects($this->once())
+        $writer->expects(self::once())
             ->method('setImportExportContext')
-            ->with(new Context(['filePath' => 'result', 'header' => ['a', 'b'], 'firstLineIsHeader' => true]));
-        $writer->expects($this->exactly(3))
+            ->with(new Context([
+                Context::OPTION_FILE_PATH => 'result',
+                Context::OPTION_HEADER => ['a', 'b'],
+                Context::OPTION_FIRST_LINE_IS_HEADER => true
+            ]));
+        $writer->expects(self::exactly(3))
             ->method('write')
             ->withConsecutive(
                 [[1, 2]],
                 [[3]],
                 [[4]]
             );
-        $writer->expects($this->once())
+        $writer->expects(self::once())
             ->method('close');
 
-        $batchFileManager = new BatchFileManager($fileManagerMock, 2);
+        $batchFileManager = new BatchFileManager($this->createMock(FileManager::class), 2);
         $batchFileManager->setReader($reader);
         $batchFileManager->setWriter($writer);
-
-        $this->assertEquals('result', $batchFileManager->mergeFiles(['test1', 'test2'], 'result'));
+        $batchFileManager->mergeFiles(['test1', 'test2'], 'result');
     }
 }

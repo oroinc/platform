@@ -12,6 +12,7 @@ use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 use Oro\Component\MessageQueue\Client\MessageProducerInterface;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -19,7 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
 /**
- * Imports data from a CSV file.
+ * Imports data from a file.
  */
 class ImportCommand extends Command
 {
@@ -53,15 +54,15 @@ class ImportCommand extends Command
     protected function configure()
     {
         $this
-            ->addArgument('file', InputArgument::REQUIRED, 'CSV file name')
+            ->addArgument('file', InputArgument::REQUIRED, 'File name')
             ->addOption('jobName', null, InputOption::VALUE_REQUIRED, 'Import job name')
             ->addOption('processor', null, InputOption::VALUE_REQUIRED, 'Import processor name')
             ->addOption('validation', null, InputOption::VALUE_NONE, 'Only validate data instead of import')
             ->addOption('email', null, InputOption::VALUE_REQUIRED, 'Email to send the import log to')
-            ->setDescription('Imports data from a CSV file.')
+            ->setDescription('Imports data from a file.')
             ->setHelp(
                 <<<'HELP'
-The <info>%command.name%</info> command imports data from a CSV file.
+The <info>%command.name%</info> command imports data from a file.
 This command only schedules the job by adding a message to the message queue, so ensure
 that the message consumer processes (<info>oro:message-queue:consume</info>) are running
 for data to be imported.
@@ -94,104 +95,94 @@ HELP
     #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        if (! is_file($sourceFile = $input->getArgument('file'))) {
-            throw new \InvalidArgumentException(sprintf('File not found: %s', $sourceFile));
+        $sourceFile = $input->getArgument('file');
+        if (!is_file($sourceFile)) {
+            throw new RuntimeException(sprintf('File not found: %s', $sourceFile));
         }
 
-        $email = $input->getOption('email');
-
-        if ($email === null) {
-            throw new \InvalidArgumentException('The --email option is required.');
-        }
-
-        $importOwner = $this->userManger->findUserByEmail((string) $email);
-        if (!$importOwner instanceof User) {
-            throw new \InvalidArgumentException(sprintf('Invalid email. There is no user with %s email!', $email));
-        }
+        $userId = $this->handleEmail($input);
+        $processorType = $input->getOption('validation')
+            ? ProcessorRegistry::TYPE_IMPORT_VALIDATION
+            : ProcessorRegistry::TYPE_IMPORT;
+        $processorAlias = $this->handleProcessorName($input, $output, $processorType);
+        $jobName = $this->handleJobName($input, $output, $processorType);
 
         $originFileName = basename($sourceFile);
         $fileName = FileManager::generateUniqueFileName(pathinfo($sourceFile, PATHINFO_EXTENSION));
         $this->fileManager->writeFileToStorage($sourceFile, $fileName);
-
-        $processor = $input->getOption('validation') ?
-            ProcessorRegistry::TYPE_IMPORT_VALIDATION :
-            ProcessorRegistry::TYPE_IMPORT;
-
-        $processorAlias = $this->handleProcessorName(
-            $input,
-            $output,
-            $processor
-        );
-
-        $jobName = $this->handleJobName($input, $output, $processor);
 
         $this->messageProducer->send(
             PreImportTopic::getName(),
             [
                 'fileName' => $fileName,
                 'originFileName' => $originFileName,
-                'userId' => $importOwner->getId(),
+                'userId' => $userId,
                 'jobName' =>  $jobName,
                 'processorAlias' => $processorAlias,
-                'process' => $processor,
+                'process' => $processorType
             ]
         );
 
-        if ($email) {
-            $output->writeln('Scheduled successfully. The result will be sent to the email');
-        } else {
-            $output->writeln('Scheduled successfully.');
-        }
+        $output->writeln('Scheduled successfully. The result will be sent to the email');
 
         return Command::SUCCESS;
     }
 
-    /**
-     * @throws \InvalidArgumentException
-     */
-    private function handleProcessorName(
-        InputInterface $input,
-        OutputInterface $output,
-        string $type = ProcessorRegistry::TYPE_IMPORT
-    ): string {
-        $label = ucwords(str_replace('-', ' ', 'processor'));
-
-        if ($input->getOption('processor') &&
-            $this->processorRegistry->hasProcessor($type, $input->getOption('processor'))
-        ) {
-            return $input->getOption('processor');
+    private function handleProcessorName(InputInterface $input, OutputInterface $output, string $processorType): string
+    {
+        $processor = $input->getOption('processor');
+        if ($processor && $this->processorRegistry->hasProcessor($processorType, $processor)) {
+            return $processor;
         }
 
-        $processors = $this->processorRegistry->getProcessorsByType($type);
-
+        $processors = $this->processorRegistry->getProcessorsByType($processorType);
         if (!$processors) {
-            throw new \InvalidArgumentException('No configured processors');
+            throw new RuntimeException('No configured processors');
         }
 
         $processorNames = array_keys($processors);
         if (!$input->getOption('no-interaction')) {
-            $question = new ChoiceQuestion(sprintf('<question>Choose %s: </question>', $label), $processorNames);
-            return $this->getHelper('question')->ask($input, $output, $question);
+            return $this->getHelper('question')->ask(
+                $input,
+                $output,
+                new ChoiceQuestion('<question>Choose Processor: </question>', $processorNames)
+            );
         }
 
-        throw new \InvalidArgumentException(sprintf('Missing %s', $label));
+        throw new RuntimeException('Missing "processor" option.');
     }
 
-    private function handleJobName(
-        InputInterface $input,
-        OutputInterface $output,
-        string $type = ProcessorRegistry::TYPE_IMPORT
-    ): string {
+    private function handleJobName(InputInterface $input, OutputInterface $output, string $processorType): string
+    {
         $jobName = $input->getOption('jobName');
-        $jobNames = array_keys($this->connectorRegistry->getJobs($type)['oro_importexport']);
-        if ($jobName && in_array($jobName, $jobNames)) {
+        $jobNames = array_keys($this->connectorRegistry->getJobs($processorType)['oro_importexport']);
+        if ($jobName && \in_array($jobName, $jobNames, true)) {
             return $jobName;
         }
+
         if (!$input->getOption('no-interaction')) {
-            $question = new ChoiceQuestion('<question>Choose Job: </question>', $jobNames);
-            return $this->getHelper('question')->ask($input, $output, $question);
+            return $this->getHelper('question')->ask(
+                $input,
+                $output,
+                new ChoiceQuestion('<question>Choose Job: </question>', $jobNames)
+            );
         }
 
-        throw new \InvalidArgumentException('Missing "jobName" option.');
+        throw new RuntimeException('Missing "jobName" option.');
+    }
+
+    private function handleEmail(InputInterface $input): ?int
+    {
+        $email = $input->getOption('email');
+        if (null === $email) {
+            throw new RuntimeException('The --email option is required.');
+        }
+
+        $importOwner = $this->userManger->findUserByEmail((string)$email);
+        if (!$importOwner instanceof User) {
+            throw new RuntimeException(sprintf('Invalid email. There is no user with %s email!', $email));
+        }
+
+        return $importOwner->getId();
     }
 }

@@ -229,7 +229,7 @@ class Configuration implements ConfigurationInterface
                             ->prototype('array')
                                 ->beforeNormalization()
                                     ->always(function ($value) {
-                                        if (\is_string($value) || $value === null) {
+                                        if (null === $value || \is_string($value)) {
                                             $value = [['value' => $value, 'actions' => []]];
                                         }
 

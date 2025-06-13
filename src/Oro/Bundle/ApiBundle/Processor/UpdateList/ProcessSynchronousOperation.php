@@ -37,33 +37,16 @@ class ProcessSynchronousOperation implements ProcessorInterface
 
     private const CHUNK_LIMIT_EXCEEDED_ERROR_MESSAGE = 'The limit for the maximum number of chunks exceeded';
 
-    private DoctrineHelper $doctrineHelper;
-    private int $waitTimeout;
-    private ErrorManager $errorManager;
-    private FileManager $fileManager;
-    private SyncProcessingLimitProvider $syncProcessingLimitProvider;
-    private MessageProducerInterface $producer;
-    private ActionProcessorBagInterface $processorBag;
-    private FilterNamesRegistry $filterNamesRegistry;
-
     public function __construct(
-        DoctrineHelper $doctrineHelper,
-        int $waitTimeout,
-        ErrorManager $errorManager,
-        FileManager $fileManager,
-        SyncProcessingLimitProvider $syncProcessingLimitProvider,
-        MessageProducerInterface $producer,
-        ActionProcessorBagInterface $processorBag,
-        FilterNamesRegistry $filterNamesRegistry
+        private readonly DoctrineHelper $doctrineHelper,
+        private readonly int $waitTimeout,
+        private readonly ErrorManager $errorManager,
+        private readonly FileManager $fileManager,
+        private readonly SyncProcessingLimitProvider $syncProcessingLimitProvider,
+        private readonly MessageProducerInterface $producer,
+        private readonly ActionProcessorBagInterface $processorBag,
+        private readonly FilterNamesRegistry $filterNamesRegistry
     ) {
-        $this->doctrineHelper = $doctrineHelper;
-        $this->waitTimeout = $waitTimeout;
-        $this->errorManager = $errorManager;
-        $this->fileManager = $fileManager;
-        $this->syncProcessingLimitProvider = $syncProcessingLimitProvider;
-        $this->producer = $producer;
-        $this->processorBag = $processorBag;
-        $this->filterNamesRegistry = $filterNamesRegistry;
     }
 
     #[\Override]

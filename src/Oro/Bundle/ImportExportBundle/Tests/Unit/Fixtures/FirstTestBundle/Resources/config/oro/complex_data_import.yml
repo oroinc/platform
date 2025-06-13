@@ -1,0 +1,32 @@
+test_entity:
+    target_type: orders
+    fields:
+        name:
+            target_path: attributes.name
+        external:
+            target_path: attributes.external
+            value: true
+        user:
+            target_path: relationships.user.data
+            ref: user
+        lineItems:
+            target_path: relationships.lineItems.data
+            ref: line_items
+
+user:
+    target_type: users
+    entity: Entity\User
+    lookup_field: email
+    ignore_not_found: true
+
+line_items:
+    target_type: orderlineitems
+    collection: true
+    fields:
+        value:
+            target_path: attributes.value
+        productSku:
+            target_path: attributes.productSku
+        product:
+            target_path: relationships.product.data
+            source: productSku

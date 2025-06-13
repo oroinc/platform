@@ -9,7 +9,11 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * The form type for import data widget.
+ */
 class ImportType extends AbstractType
 {
     const NAME = 'oro_importexport_import';
@@ -27,11 +31,18 @@ class ImportType extends AbstractType
     #[\Override]
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('file', FileType::class);
+        $fileFieldOptions = [];
+        if ($options['fileAcceptAttribute']) {
+            $fileFieldOptions['attr'] = ['accept' => $options['fileAcceptAttribute']];
+        }
+        $fileFieldOptions['constraints'] = [
+            new Assert\File(mimeTypes: $options['fileMimeTypes'] ?? ['text/plain', 'text/csv'])
+        ];
+        $builder->add('file', FileType::class, $fileFieldOptions);
 
         $processorChoices = $this->getImportProcessorsChoices($options['entityName']);
-        $processorNames = array_values($processorChoices);
 
+        $processorNames = array_values($processorChoices);
         $builder->add(
             'processorAlias',
             ChoiceType::class,
@@ -74,15 +85,16 @@ class ImportType extends AbstractType
     #[\Override]
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(
-            [
-                'data_class' =>  ImportData::class,
-                'processorAliasOptions' => [],
-            ]
-        );
+        $resolver->setDefaults([
+            'data_class' =>  ImportData::class,
+            'processorAliasOptions' => [],
+            'fileMimeTypes' => null,
+            'fileAcceptAttribute' => null
+        ]);
         $resolver->setRequired(['entityName']);
-
         $resolver->setAllowedTypes('entityName', 'string');
+        $resolver->setAllowedTypes('fileMimeTypes', ['array', 'null']);
+        $resolver->setAllowedTypes('fileAcceptAttribute', ['string', 'null']);
         $resolver->setAllowedTypes('processorAliasOptions', 'array');
     }
 
