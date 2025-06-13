@@ -27,6 +27,10 @@ class PersistIncludedEntities implements ProcessorInterface
     {
         /** @var BatchUpdateContext $context */
 
+        if ($context->isSkipFlushData()) {
+            return;
+        }
+
         $items = $context->getBatchItems();
         if (!$items) {
             return;

@@ -225,4 +225,15 @@ class BatchUpdateContextTest extends TestCase
         $this->context->setSharedData($sharedData);
         self::assertSame($sharedData, $this->context->getSharedData());
     }
+
+    public function testSkipFlushData(): void
+    {
+        self::assertFalse($this->context->isSkipFlushData());
+
+        $this->context->setSkipFlushData(true);
+        self::assertTrue($this->context->isSkipFlushData());
+
+        $this->context->setSkipFlushData(false);
+        self::assertFalse($this->context->isSkipFlushData());
+    }
 }

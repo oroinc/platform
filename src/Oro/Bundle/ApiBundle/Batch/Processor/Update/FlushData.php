@@ -53,12 +53,17 @@ class FlushData implements ProcessorInterface
             $itemsToProcess = $this->getItemsToProcess($items, $processedItemStatuses);
             if ($itemsToProcess) {
                 try {
-                    $entityClass = $this->getEntityClass($items);
-                    if ($entityClass) {
-                        $flushHandler = $this->getFlushDataHandler($entityClass);
-                        $context->setFlushDataHandler($flushHandler);
-                        $flushResult = $this->flushItems($itemsToProcess, $flushHandler, $context);
-                    } else {
+                    $flushResult = self::NO_ERRORS;
+                    if (!$context->isSkipFlushData()) {
+                        $entityClass = $this->getEntityClass($items);
+                        if ($entityClass) {
+                            $flushHandler = $this->getFlushDataHandler($entityClass);
+                            $context->setFlushDataHandler($flushHandler);
+                            $flushResult = $this->flushItems($itemsToProcess, $flushHandler, $context);
+                        } else {
+                            $flushResult = self::HAS_ERRORS;
+                        }
+                    } elseif ($this->hasItemsWithErrors($items)) {
                         $flushResult = self::HAS_ERRORS;
                     }
                     foreach ($itemsToProcess as $item) {

@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ImportExportBundle\Configuration;
 
+/**
+ * Represents Import/Export configuration.
+ */
 interface ImportExportConfigurationInterface
 {
     public function getRouteOptions(): array;
@@ -82,4 +85,18 @@ interface ImportExportConfigurationInterface
      * @return string[]
      */
     public function getImportAdditionalNotices(): array;
+
+    public function getImportColumnsNotice(): ?string;
+
+    /**
+     * Returns the "assert" attribute that should be added to the file input HTML control.
+     */
+    public function getImportFileAcceptAttribute(): ?string;
+
+    /**
+     * Returns MIME types that are allowed for uploaded files.
+     */
+    public function getImportFileMimeTypes(): ?array;
+
+    public function getFeatureName(): ?string;
 }

@@ -94,10 +94,10 @@ class JsonPartialFileParser extends Parser
         $lineNumber = &$privatePropertyAccessor('lineNumber');
         $charNumber = &$privatePropertyAccessor('charNumber');
         $stopParsing = &$privatePropertyAccessor('stopParsing');
-        $stream = $this->getPrivateProperty('stream');
-        $bufferSize = $this->getPrivateProperty('bufferSize');
-        $lineEnding = $this->getPrivateProperty('lineEnding');
-        $listener = $this->getPrivateProperty('listener');
+        $stream = $privatePropertyAccessor('stream');
+        $bufferSize = $privatePropertyAccessor('bufferSize');
+        $lineEnding = $privatePropertyAccessor('lineEnding');
+        $listener = $privatePropertyAccessor('listener');
 
         if (null === $lineNumber) {
             $lineNumber = 1;
@@ -112,7 +112,12 @@ class JsonPartialFileParser extends Parser
         $eof = false;
         while (!feof($stream) && !$eof) {
             $startPos = ftell($stream);
+            // set the underlying streams chunk size, so it delivers according to the request from stream_get_line
+            stream_set_chunk_size($stream, $bufferSize);
             $line = stream_get_line($stream, $bufferSize, $lineEnding);
+            if (false === $line) {
+                $line = '';
+            }
             $endPos = ftell($stream);
             $ended = (bool)($endPos - \strlen($line) - $startPos);
             // if we're still at the same place after stream_get_line, we're done

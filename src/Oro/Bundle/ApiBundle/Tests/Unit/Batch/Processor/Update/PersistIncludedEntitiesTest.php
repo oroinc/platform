@@ -14,6 +14,9 @@ use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use PHPUnit\Framework\MockObject\MockObject;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class PersistIncludedEntitiesTest extends BatchUpdateProcessorTestCase
 {
     private DoctrineHelper&MockObject $doctrineHelper;
@@ -31,6 +34,17 @@ class PersistIncludedEntitiesTest extends BatchUpdateProcessorTestCase
 
     public function testProcessWhenNoBatchItems(): void
     {
+        $this->processor->process($this->context);
+    }
+
+    public function testProcessWhenFlushDataShouldBeSkipped(): void
+    {
+        $item = $this->createMock(BatchUpdateItem::class);
+        $item->expects(self::never())
+            ->method(self::anything());
+
+        $this->context->setSkipFlushData(true);
+        $this->context->setBatchItems([$item]);
         $this->processor->process($this->context);
     }
 

@@ -2,28 +2,41 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Form\Model;
 
-use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Bundle\ImportExportBundle\Form\Model\ImportData;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class ImportDataTest extends \PHPUnit\Framework\TestCase
+class ImportDataTest extends TestCase
 {
-    /**
-     * @dataProvider propertiesDataProvider
-     */
-    public function testSettersAndGetters(string $property, mixed $value)
+    public function testEmpty(): void
     {
-        $obj = new ImportData();
+        $data = new ImportData();
 
-        $accessor = PropertyAccess::createPropertyAccessor();
-        $accessor->setValue($obj, $property, $value);
-        $this->assertEquals($value, $accessor->getValue($obj, $property));
+        self::assertNull($data->getFile());
+        self::assertNull($data->getProcessorAlias());
     }
 
-    public function propertiesDataProvider(): array
+    public function testFileSetterAndGetter(): void
     {
-        return [
-            ['file', 'test'],
-            ['processorAlias', 'test']
-        ];
+        $data = new ImportData();
+
+        $file = $this->createMock(UploadedFile::class);
+        $data->setFile($file);
+        self::assertSame($file, $data->getFile());
+
+        $data->setFile(null);
+        self::assertNull($data->getFile());
+    }
+
+    public function testProcessorAliasSetterAndGetter(): void
+    {
+        $data = new ImportData();
+
+        $processorAlias = 'test';
+        $data->setProcessorAlias($processorAlias);
+        self::assertSame($processorAlias, $data->getProcessorAlias());
+
+        $data->setProcessorAlias(null);
+        self::assertNull($data->getProcessorAlias());
     }
 }

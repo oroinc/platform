@@ -35,3 +35,15 @@ services:
         arguments:
             - '@oro_importexport.template_fixture.manager'
             - '@oro_entity.helper.field_helper'
+
+    oro_importexport.complex_data_entity_loader:
+        class: Oro\Bundle\ImportExportBundle\Converter\ComplexData\DataAccessor\ComplexDataConvertationEntityLoader
+        arguments:
+            - '@doctrine'
+            - '@oro_security.token_accessor'
+            - '@oro_security.owner.ownership_metadata_provider'
+
+    oro_importexport.complex_data_value_transformer.json_api:
+        class: Oro\Bundle\ImportExportBundle\Converter\ComplexData\ValueTransformer\JsonApiComplexDataValueTransformer
+        arguments:
+            - '@oro_api.value_transformer'
