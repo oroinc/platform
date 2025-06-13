@@ -6,52 +6,32 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * ImportData value object
- *
+ * Represents a model for {@see \Oro\Bundle\ImportExportBundle\Form\Type\ImportType}.
  */
 class ImportData
 {
-    /**
-     * @var UploadedFile
-     */
-    #[Assert\File(mimeTypes: ['text/plain', 'text/csv'])]
     #[Assert\NotBlank]
-    protected $file;
+    private ?UploadedFile $file = null;
 
-    /**
-     * @var string
-     */
     #[Assert\NotBlank]
-    protected $processorAlias;
+    private ?string $processorAlias = null;
 
-    /**
-     * @param UploadedFile $file
-     */
-    public function setFile($file)
+    public function setFile(?UploadedFile $file): void
     {
         $this->file = $file;
     }
 
-    /**
-     * @return UploadedFile
-     */
-    public function getFile()
+    public function getFile(): ?UploadedFile
     {
         return $this->file;
     }
 
-    /**
-     * @param string $processorAlias
-     */
-    public function setProcessorAlias($processorAlias)
+    public function setProcessorAlias(?string $processorAlias): void
     {
         $this->processorAlias = $processorAlias;
     }
 
-    /**
-     * @return string
-     */
-    public function getProcessorAlias()
+    public function getProcessorAlias(): ?string
     {
         return $this->processorAlias;
     }

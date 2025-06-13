@@ -7,16 +7,22 @@ services:
             - ['setImportHelper', ['@oro_importexport.strategy.import.helper']]
 
     oro_importexport.reader.csv:
-        class: 'Oro\Bundle\ImportExportBundle\Reader\CsvFileReader'
+        class: Oro\Bundle\ImportExportBundle\Reader\CsvFileReader
         parent: oro_importexport.reader.file.abstract
         tags:
             - { name: oro_importexport.reader, alias: csv }
 
     oro_importexport.reader.xlsx:
-        class: 'Oro\Bundle\ImportExportBundle\Reader\XlsxFileReader'
+        class: Oro\Bundle\ImportExportBundle\Reader\XlsxFileReader
         parent: oro_importexport.reader.file.abstract
         tags:
             - { name: oro_importexport.reader, alias: xlsx }
+
+    oro_importexport.reader.json:
+        class: Oro\Bundle\ImportExportBundle\Reader\JsonFileReader
+        parent: oro_importexport.reader.file.abstract
+        tags:
+            - { name: oro_importexport.reader, alias: json }
 
     oro_importexport.reader.entity:
         class: Oro\Bundle\ImportExportBundle\Reader\EntityReader
@@ -32,7 +38,7 @@ services:
             - { name: oro_importexport.reader, alias: entity }
 
     oro_importexport.reader.template_fixture:
-        class: 'Oro\Bundle\ImportExportBundle\Reader\TemplateFixtureReader'
+        class: Oro\Bundle\ImportExportBundle\Reader\TemplateFixtureReader
         arguments:
             - '@oro_importexport.context_registry'
             - '@oro_importexport.template_fixture.manager'

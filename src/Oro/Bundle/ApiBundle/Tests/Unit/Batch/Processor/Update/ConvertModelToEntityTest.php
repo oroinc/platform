@@ -27,6 +27,17 @@ class ConvertModelToEntityTest extends BatchUpdateProcessorTestCase
         $this->processor->process($this->context);
     }
 
+    public function testProcessWhenFlushDataShouldBeSkipped(): void
+    {
+        $item = $this->createMock(BatchUpdateItem::class);
+        $item->expects(self::never())
+            ->method(self::anything());
+
+        $this->context->setSkipFlushData(true);
+        $this->context->setBatchItems([$item]);
+        $this->processor->process($this->context);
+    }
+
     public function testProcessWhenHasErrors(): void
     {
         $item = $this->createMock(BatchUpdateItem::class);

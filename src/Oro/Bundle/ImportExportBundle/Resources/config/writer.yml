@@ -15,6 +15,24 @@ services:
         tags:
             - { name: oro_importexport.writer, alias: xlsx }
 
+    oro_importexport.writer.json:
+        class: Oro\Bundle\ImportExportBundle\Writer\JsonFileWriter
+        arguments:
+            - '@oro_importexport.context_registry'
+            - '@oro_importexport.writer.doctrine_clear'
+        tags:
+            - { name: oro_importexport.writer, alias: json }
+
+    oro_importexport.writer.json_pretty:
+        class: Oro\Bundle\ImportExportBundle\Writer\JsonFileWriter
+        arguments:
+            - '@oro_importexport.context_registry'
+            - '@oro_importexport.writer.doctrine_clear'
+        calls:
+            - [ setPrettyPrint, [ true ] ]
+        tags:
+            - { name: oro_importexport.writer, alias: json-pretty }
+
     oro_importexport.writer.entity:
         class: Oro\Bundle\ImportExportBundle\Writer\EntityWriter
         arguments:
@@ -25,7 +43,7 @@ services:
             - { name: oro_importexport.writer, alias: entity }
 
     oro_importexport.writer.cumulative:
-        class: 'Oro\Bundle\ImportExportBundle\Writer\CumulativeWriter'
+        class: Oro\Bundle\ImportExportBundle\Writer\CumulativeWriter
         arguments:
             - '@oro_entity.doctrine_helper'
         calls:
@@ -68,4 +86,15 @@ services:
         class: Oro\Bundle\ImportExportBundle\Writer\InsertFromSelectWriter
         arguments:
             - '@oro_entity.orm.insert_from_select_query_executor'
+        abstract: true
+
+    oro_importexport.writer.json_api_batch_api_import_writer:
+        class: Oro\Bundle\ImportExportBundle\Writer\ComplexData\JsonApiBatchApiImportWriter
+        arguments:
+            - '@oro_importexport.context_registry'
+            - '@oro_api.action_processor_bag'
+            - '@oro_api.batch.file_manager'
+            - '@oro_api.batch.error_manager'
+            - '@oro_order.importexport.converter.external_order_import_error_converter'
+            - '@oro_message_queue.client.message_producer'
         abstract: true

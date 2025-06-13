@@ -159,7 +159,6 @@ class CollectFormErrors implements ProcessorInterface
     /**
      * @param array       $foundErrors [[parent form, error], ...]
      * @param FormContext $context
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function fixErrorPaths(array $foundErrors, FormContext $context): void
     {
@@ -192,28 +191,16 @@ class CollectFormErrors implements ProcessorInterface
     }
 
     /**
-     * Recursively finds proper field with error and fixes it error path.
-     *
-     * @param FormInterface $form
-     * @param mixed $formData
-     * @param array $propertyPath Path to the error exploded by {@see ConfigUtil::PATH_DELIMITER}
-     * Example: ["fieldA", "0", "fieldB", "fieldC"]
-     * @param int $propertyPathKey Integer key of the current field from $propertyPath.
-     * Example: 2 for "fieldB" for $propertyPath from the example above.
-     * @param Error $error
-     * @param RequestType $requestType
-     * @param IncludedEntityCollection|null $includedEntities
-     *
-     * @return void
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function fixErrorPathRecursively(
         FormInterface $form,
-        $formData,
+        mixed $formData,
         array $propertyPath,
         int $propertyPathKey,
         Error $error,
         RequestType $requestType,
-        ?IncludedEntityCollection $includedEntities
+        IncludedEntityCollection $includedEntities
     ): void {
         $max = \count($propertyPath);
 
@@ -256,12 +243,23 @@ class CollectFormErrors implements ProcessorInterface
         }
 
         $includedEntityData = $includedEntities->getData($formData);
-        if ($includedEntityData === null) {
+        if (null === $includedEntityData) {
             $propertyPathKey--;
             $includedEntityData = $includedEntities->getData($form->getParent()->getData());
         }
 
-        $this->fixErrorPath($propertyPath[max($propertyPathKey, 0)], $error, $requestType, $includedEntityData);
+        $fieldName = $propertyPath[max($propertyPathKey, 0)];
+        if (null !== $includedEntityData) {
+            $includedEntityMetadata = $includedEntityData->getMetadata();
+            if (null !== $includedEntityMetadata) {
+                $propertyMetadata = $includedEntityMetadata->getPropertyByPropertyPath($fieldName);
+                if (null !== $propertyMetadata) {
+                    $fieldName = $propertyMetadata->getName() ?? $fieldName;
+                }
+            }
+        }
+
+        $this->fixErrorPath($fieldName, $error, $requestType, $includedEntityData);
     }
 
     protected function fixErrorPath(
@@ -324,9 +322,6 @@ class CollectFormErrors implements ProcessorInterface
      * It may happen that the order of elements is different in a source collection
      * and in a collection that was validated. E.g. due to the collection adder and remover methods
      * can keep a position of existing elements without changes.
-     *
-     * @param FormInterface       $field
-     * @param ConstraintViolation $cause
      *
      * @return string[]
      */
@@ -398,8 +393,6 @@ class CollectFormErrors implements ProcessorInterface
     }
 
     /**
-     * @param ConstraintViolation $constraintViolation
-     *
      * @return string[]
      */
     protected function getConstraintViolationPath(ConstraintViolation $constraintViolation): array
@@ -420,8 +413,6 @@ class CollectFormErrors implements ProcessorInterface
     }
 
     /**
-     * @param FormInterface $field
-     *
      * @return string[]
      */
     protected function getFormFieldPath(FormInterface $field): array
