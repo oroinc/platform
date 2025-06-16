@@ -194,3 +194,7 @@ services:
 
     nelmio_alice.generator.resolver.value.chainable.fixture_reference_resolver:
         class: Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\Resolver\AliceFixtureReferenceResolver
+
+    Oro\Bundle\TestFrameworkBundle\Testwork\Tester\Result\Interpretation\PassedOrSkippedInterpretation:
+        tags:
+            - { name: 'test.result.interpretation', priority: 100 }

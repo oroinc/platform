@@ -67,7 +67,7 @@ class PgsqlIsolator implements IsolatorInterface
         if (!$this->dbTemp) {
             return;
         }
-        $event->writeln('<info>Restore database from dump</info>');
+        $event->writeln('<info>Restoring database from dump</info>');
         $this->dropDb($this->dbName);
         $this->restore();
     }
@@ -79,15 +79,15 @@ class PgsqlIsolator implements IsolatorInterface
             return;
         }
 
-        $event->writeln('<info>Begin to restore the state of Db...</info>');
-        $event->writeln('<info>Drop Db</info>');
+        $event->writeln('<info>Begin to restore the state of database...</info>');
+        $event->writeln('<info>Drop database</info>');
         $this->dropDb($this->dbName);
 
-        $event->writeln('<info>Restore Db from dump</info>');
+        $event->writeln('<info>Restore database from dump</info>');
         $this->restore();
-        $event->writeln('<info>Db was restored from dump</info>');
+        $event->writeln('<info>Database was restored from dump</info>');
 
-        $event->writeln('<info>Remove Db dump</info>');
+        $event->writeln('<info>Removing database dump</info>');
         $this->dropDb($this->dbTemp);
     }
 
@@ -122,7 +122,7 @@ class PgsqlIsolator implements IsolatorInterface
             return;
         }
 
-        $event->writeln('<info>Remove Db dump</info>');
+        $event->writeln('<info>Removing database dump</info>');
         $this->dropDb($this->dbTemp);
     }
 

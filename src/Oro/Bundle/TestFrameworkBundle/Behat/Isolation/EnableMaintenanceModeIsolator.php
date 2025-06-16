@@ -15,7 +15,7 @@ class EnableMaintenanceModeIsolator extends MaintenanceModeIsolator
      */
     public function start(BeforeStartTestsEvent $event)
     {
-        $event->writeln('<comment>Enabling maintenance mode.</comment>');
+        $event->writeln('<comment>Enabling maintenance mode</comment>');
         $this->runCommand('oro:maintenance:lock');
     }
 
@@ -24,7 +24,7 @@ class EnableMaintenanceModeIsolator extends MaintenanceModeIsolator
      */
     public function afterTest(AfterIsolatedTestEvent $event)
     {
-        $event->writeln('<comment>Disabling maintenance mode.</comment>');
+        $event->writeln('<comment>Disabling maintenance mode</comment>');
         $this->runCommand('oro:maintenance:unlock');
     }
 
