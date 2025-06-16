@@ -33,6 +33,10 @@ final class BehatSilencingExtension implements TestworkExtension
     {
         $builder
             ->children()
+            ->variableNode('enabled')
+                ->defaultFalse()
+                ->info('Enable or disable the silencing feature')
+            ->end()
             ->variableNode('connection')->info('Doctrine DBAL connection parameters')->end()
             ->end();
     }
@@ -40,6 +44,9 @@ final class BehatSilencingExtension implements TestworkExtension
     #[\Override]
     public function load(ContainerBuilder $container, array $config): void
     {
+        if ((bool)$config['enabled'] === false) {
+            return;
+        }
         if (\array_key_exists('connection', $config)) {
             $container->setParameter('oro_behat_statistic.connection', $config['connection'] ?? []);
             if (!$container->hasDefinition('oro_behat_statistic.database.connection')) {
