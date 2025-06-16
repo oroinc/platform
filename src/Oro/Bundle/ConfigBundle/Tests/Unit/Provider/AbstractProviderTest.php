@@ -18,10 +18,12 @@ use Oro\Bundle\ConfigBundle\Provider\ChainSearchProvider;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormRegistryInterface;
@@ -51,6 +53,8 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
     /** @var FormRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
     private $formRegistry;
 
+    private MockObject|EventDispatcherInterface $eventDispatcher;
+
     abstract public function getParentCheckboxLabel(): string;
 
     abstract public function getProvider(
@@ -68,6 +72,7 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
     {
         parent::setUp();
 
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $this->factory = Forms::createFormFactoryBuilder()
             ->addExtensions($this->getExtensions())
             ->addTypeExtension(
@@ -349,7 +354,7 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
 
         $configBag = new ConfigBag($config, $container);
 
-        return $this->getProvider(
+        $provider = $this->getProvider(
             $configBag,
             $this->translator,
             $this->factory,
@@ -357,6 +362,9 @@ abstract class AbstractProviderTest extends FormIntegrationTestCase
             $this->searchProvider,
             $this->formRegistry
         );
+        $provider->setEventDispatcher($this->eventDispatcher);
+
+        return $provider;
     }
 
     public function getExtensions()

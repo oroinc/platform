@@ -14,6 +14,7 @@ use Oro\Bundle\ConfigBundle\Form\Type\FormFieldType;
 use Oro\Bundle\ConfigBundle\Form\Type\FormType;
 use Oro\Bundle\ConfigBundle\Utils\TreeUtils;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormRegistryInterface;
@@ -59,6 +60,9 @@ abstract class AbstractProvider implements ProviderInterface
     /** @var FormRegistryInterface  */
     protected $formRegistry;
 
+    /** @var EventDispatcher */
+    protected $eventDispatcher;
+
     public function __construct(
         ConfigBag $configBag,
         TranslatorInterface $translator,
@@ -85,6 +89,13 @@ abstract class AbstractProvider implements ProviderInterface
     public function setFeatureChecker(FeatureChecker $featureChecker)
     {
         $this->featureChecker = $featureChecker;
+    }
+
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher): self
+    {
+        $this->eventDispatcher = $eventDispatcher;
+
+        return $this;
     }
 
     /**
@@ -399,37 +410,59 @@ abstract class AbstractProvider implements ProviderInterface
      */
     public function getForm($group)
     {
-        $block = $this->getSubtree($group);
-
-        $toAdd = [];
-        $bc = $block->toBlockConfig();
-
+        $toAddFields = [];
+        $block = $this->getSubTree($group);
+        $blockConfig = $block->toBlockConfig();
         if (!$block->isEmpty()) {
-            $sbc = [];
-
-            /** @var $subblock GroupNodeDefinition */
-            foreach ($block as $subblock) {
-                $sbc += $subblock->toBlockConfig();
-                if (!$subblock->isEmpty()) {
-                    /** @var $field FieldNodeDefinition */
-                    foreach ($subblock as $field) {
-                        $field->replaceOption('block', $block->getName())
-                            ->replaceOption('subblock', $subblock->getName());
-
-                        $toAdd[] = $field;
+            $blockName = $block->getName();
+            $subBlockConfig = [];
+            /** @var GroupNodeDefinition $subBlock */
+            foreach ($block as $subBlock) {
+                $subBlockConfig += $subBlock->toBlockConfig();
+                if (!$subBlock->isEmpty()) {
+                    /** @var FieldNodeDefinition $field */
+                    foreach ($subBlock as $field) {
+                        if (!$field->getAclResource() || $this->checkIsGranted($field->getAclResource())) {
+                            $field->replaceOption('block', $blockName);
+                            $field->replaceOption('subblock', $subBlock->getName());
+                            $toAddFields[] = $field;
+                        }
                     }
                 }
             }
-
-            $bc[$block->getName()]['subblocks'] = $sbc;
+            $blockConfig[$blockName]['subblocks'] = $subBlockConfig;
         }
 
-        $fb = $this->factory->createNamedBuilder($group, FormType::class, null, ['block_config' => $bc]);
-        foreach ($toAdd as $field) {
-            $this->addFieldToForm($fb, $field);
+        $formOptions = [];
+        foreach ($toAddFields as $field) {
+            $formOptions[$field->getPropertyPath()] = $this->getFieldFormOptions($field);
         }
 
-        return $fb->getForm();
+        $formOptions = $this->dispatchConfigSettingFormOptionsEvent($formOptions);
+        $formBuilder = $this->factory->createNamedBuilder(
+            $group,
+            FormType::class,
+            null,
+            ['block_config' => $blockConfig]
+        );
+        foreach ($formOptions as $propertyPath => $options) {
+            $formBuilder->add(
+                str_replace(
+                    ConfigManager::SECTION_MODEL_SEPARATOR,
+                    ConfigManager::SECTION_VIEW_SEPARATOR,
+                    $propertyPath
+                ),
+                FormFieldType::class,
+                $options
+            );
+        }
+
+        return $formBuilder->getForm();
+    }
+
+    protected function dispatchConfigSettingFormOptionsEvent(array $formOptions): array
+    {
+        return $formOptions;
     }
 
     /**
@@ -471,6 +504,37 @@ abstract class AbstractProvider implements ProviderInterface
         return $this->authorizationChecker->isGranted($resourceName);
     }
 
+    protected function getFieldFormOptions(FieldNodeDefinition $fieldDefinition): array
+    {
+        // take config field options form field definition
+        $fieldDefinitionOptions = $fieldDefinition->getOptions();
+        $options = array_intersect_key(
+            $fieldDefinitionOptions,
+            array_flip(['label', 'required', 'block', 'subblock', 'tooltip', 'resettable'])
+        );
+        // pass only options needed to "value" form type
+        $formType = $fieldDefinition->getType();
+        $options['target_field_type'] = $formType;
+        $options['target_field_alias'] = $this->formRegistry->getType($formType)->getBlockPrefix();
+        $options['target_field_options'] = array_diff_key($fieldDefinitionOptions, $options);
+
+        if ($fieldDefinition->needsPageReload()) {
+            $options['target_field_options']['attr']['data-needs-page-reload'] = '';
+            $options['use_parent_field_options']['attr']['data-needs-page-reload'] = '';
+        }
+        $options['parent_checkbox_label'] = $this->getParentCheckboxLabel();
+
+        return $options;
+    }
+
+    /**
+     * @deprecated Will be removed in 5.1.
+     *
+     * @param FormBuilderInterface $form
+     * @param FieldNodeDefinition $fieldDefinition
+     *
+     * @return void
+     */
     protected function addFieldToForm(FormBuilderInterface $form, FieldNodeDefinition $fieldDefinition)
     {
         if ($fieldDefinition->getAclResource() && !$this->checkIsGranted($fieldDefinition->getAclResource())) {
