@@ -198,3 +198,7 @@ services:
 
     oro_test.storage.failed_features:
         class: Oro\Bundle\TestFrameworkBundle\Behat\Storage\FailedFeatures
+
+    Oro\Bundle\TestFrameworkBundle\Testwork\Tester\Result\Interpretation\PassedOrSkippedInterpretation:
+      tags:
+        - { name: 'test.result.interpretation', priority: 100 }

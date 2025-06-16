@@ -2,22 +2,32 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer;
 
+use Behat\Behat\Tester\Result\ExecutedStepResult;
 use Behat\Behat\Tester\Result\StepResult;
 use Behat\Behat\Tester\StepTester;
 use Behat\Gherkin\Node\FeatureNode;
 use Behat\Gherkin\Node\StepNode;
+use Behat\Testwork\Call\CallResult;
 use Behat\Testwork\Environment\Environment;
+use Behat\Testwork\Exception\ExceptionPresenter;
 use Behat\Testwork\Tester\Setup\Setup;
 use Behat\Testwork\Tester\Setup\Teardown;
 use Oro\Bundle\TestFrameworkBundle\Behat\Storage\FailedFeatures;
+use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Repository\SilencedFailureRepository;
 
 /**
  * Tester executing step tests in the runtime with skip all feature steps if some step failed.
  */
 class SkipOnFailureStepTester implements StepTester
 {
-    public function __construct(protected StepTester $baseTester, protected FailedFeatures $failedFeatures)
-    {
+    const SILENCED_STEP_MESSAGE_PREFIX = "Step is silenced: \n";
+
+    public function __construct(
+        protected StepTester $baseTester,
+        protected FailedFeatures $failedFeatures,
+        protected ExceptionPresenter $exceptionPresenter,
+        protected ?SilencedFailureRepository $silencedFailureRepository
+    ) {
     }
 
     public function setUp(Environment $env, FeatureNode $feature, StepNode $step, $skip): Setup
@@ -27,11 +37,15 @@ class SkipOnFailureStepTester implements StepTester
 
     public function test(Environment $env, FeatureNode $feature, StepNode $step, $skip): StepResult
     {
-        if ($this->failedFeatures->isFailureFeature($this->getFeatureHelperId($feature))) {
+        if ($this->failedFeatures->isFailureFeature($feature->getTitle())) {
             $skip = true;
         }
 
-        return $this->baseTester->test($env, $feature, $step, $skip);
+        $stepResult = $this->baseTester->test($env, $feature, $step, $skip);
+        if (!$stepResult instanceof ExecutedStepResult || !$stepResult->hasException()) {
+            return $stepResult;
+        }
+        return $this->processSilences($stepResult);
     }
 
     public function tearDown(
@@ -42,15 +56,33 @@ class SkipOnFailureStepTester implements StepTester
         StepResult $result
     ): Teardown {
         if (!$result->isPassed()) {
-            $this->failedFeatures->addFailureFeature($this->getFeatureHelperId($feature));
+            $this->failedFeatures->addFailureFeature($feature->getTitle());
             $skip = true;
         }
 
         return $this->baseTester->tearDown($env, $feature, $step, $skip, $result);
     }
 
-    private function getFeatureHelperId(FeatureNode $feature): string
+    private function processSilences(ExecutedStepResult $stepResult): ExecutedStepResult
     {
-        return $feature->getFile() . $feature->getTitle();
+        if (null === $this->silencedFailureRepository) {
+            return $stepResult;
+        }
+        $call = $stepResult->getCallResult()->getCall();
+        $step = $call->getStep();
+        $feature = $call->getFeature();
+        $title = $feature->getTitle();
+        $message = $step->getKeyword() . ' ' . $step->getText();
+        $message .= ': ' . $this->exceptionPresenter->presentException($stepResult->getException());
+        $isSilenced = $this->silencedFailureRepository->isSilencedCase($title, $message);
+        if (!$isSilenced) {
+            return $stepResult;
+        }
+        $result = new ExecutedStepResult(
+            $stepResult->getSearchResult(),
+            new CallResult($call, null, null, self::SILENCED_STEP_MESSAGE_PREFIX . $message),
+        );
+        $this->failedFeatures->addFailureFeature($feature->getTitle());
+        return $result;
     }
 }

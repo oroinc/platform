@@ -7,6 +7,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\AfterIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeIsolatedTestEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\BeforeStartTestsEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
@@ -62,12 +63,15 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
     /** {@inheritdoc} */
     public function start(BeforeStartTestsEvent $event)
     {
-        $event->writeln('<info>Create temp directory</info>');
+        $event->writeln('<info>Creating temp directory</info>', OutputInterface::VERBOSITY_VERBOSE);
         $this->cacheTempDir = $this->createCacheTempDirectory();
         $event->writeln('<info>Dumping cache directories</info>');
         $this->createCacheDumpDirectory();
         $this->dumpCache();
-        $event->writeln('<info>Start process for copying Dump to Temp cache directory</info>');
+        $event->writeln(
+            '<info>Start process for copying Dump to Temp cache directory</info>',
+            OutputInterface::VERBOSITY_VERBOSE
+        );
         $this->startCopyDumpToTempDir();
     }
 
@@ -84,7 +88,7 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
         }
 
         $this->waitForProcess();
-        $event->writeln('<info>Restore cache dirs</info>');
+        $event->writeln('<info>Restoring cache directories</info>');
         $this->removeCacheDirs();
         $this->replaceCache();
         $this->startCopyDumpToTempDir();
@@ -97,11 +101,11 @@ abstract class AbstractFileCacheOsRelatedIsolator extends AbstractOsRelatedIsola
             return;
         }
 
-        $event->writeln('<info>Stop copying cache</info>');
+        $event->writeln('<info>Removing Temp and Dump cache directories</info>');
         $this->copyDumpToTempDirProcess->stop();
-        $event->writeln('<info>Remove Temp cache dir</info>');
+        $event->writeln('<info>Remove Temp cache dir</info>', OutputInterface::VERBOSITY_VERBOSE);
         $this->removeTempCacheDir();
-        $event->writeln('<info>Remove Dump cache dir</info>');
+        $event->writeln('<info>Remove Dump cache dir</info>', OutputInterface::VERBOSITY_VERBOSE);
         $this->removeDumpCacheDir();
     }
 

@@ -13,6 +13,7 @@ use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\Event\RestoreStateEvent;
 use Oro\Bundle\TestFrameworkBundle\Behat\Isolation\EventListener\RestrictFlushInitializerListener;
 use Oro\Bundle\TestFrameworkBundle\Test\DataFixtures\AliceFixtureLoader;
 use Symfony\Component\Console\Exception\RuntimeException;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -107,15 +108,13 @@ class DoctrineIsolator implements IsolatorInterface
         });
 
         if ($listenersToDisable) {
-            $event->writeln('<info>Disabling optional listeners:</info>');
+            $event->writeln('<info>Disabling optional listeners</info>');
             foreach ($listenersToDisable as $listener) {
                 $manager->disableListener($listener);
-                $event->writeln(sprintf('<comment>  => %s</comment>', $listener));
+                $event->writeln(sprintf('<comment>  => %s</comment>', $listener), OutputInterface::VERBOSITY_DEBUG);
             }
         }
-
-        $event->writeln('<info>Load fixtures</info>');
-
+        $event->writeln('<info>Loading fixtures</info>');
         $this->initReferences();
         $this->loadFixtures($event);
 
