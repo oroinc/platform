@@ -55,6 +55,12 @@ class ConfigSettingsFormOptionsEventTest extends \PHPUnit\Framework\TestCase
         $this->event->getFormOptions('key3');
     }
 
+    public function testUnsetFormOptions(): void
+    {
+        $this->event->unsetFormOptions('key1');
+        $this->assertFalse($this->event->hasFormOptions('key1'));
+    }
+
     public function testSetFormOptionsForUndefinedConfigKey(): void
     {
         $this->expectException(\LogicException::class);

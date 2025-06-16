@@ -53,6 +53,13 @@ class ConfigSettingsFormOptionsEvent extends Event
         $this->allFormOptions[$configKey] = $options;
     }
 
+    public function unsetFormOptions(string $configKey): void
+    {
+        $this->assertKnownConfigKey($configKey);
+
+        unset($this->allFormOptions[$configKey]);
+    }
+
     private function assertKnownConfigKey(string $configKey): void
     {
         if (!isset($this->allFormOptions[$configKey])) {
