@@ -15,6 +15,7 @@ use Oro\Bundle\TestFrameworkBundle\BehatJunitExtension\Output\Printer\JUnitFeatu
 use Oro\Bundle\TestFrameworkBundle\BehatJunitExtension\Output\Printer\JUnitOutputPrinter;
 use Oro\Bundle\TestFrameworkBundle\BehatJunitExtension\Output\Printer\JUnitScenarioPrinter;
 use Oro\Bundle\TestFrameworkBundle\BehatJunitExtension\Output\Printer\JUnitSetupPrinter;
+use Oro\Bundle\TestFrameworkBundle\BehatJunitExtension\Output\Printer\JUnitSilencedStepPrinter;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -60,6 +61,13 @@ class BehatJunitExtension implements TestworkExtension
             JUnitScenarioPrinter::class
         );
         $junitScenarioPrinter->addArgument(new Reference('output.node.listener.junit.duration'));
+
+        $definition = new Definition(
+            JUnitSilencedStepPrinter::class,
+            [new Reference('.inner')]
+        );
+        $definition->setDecoratedService(new Reference('output.node.printer.junit.step'));
+        $container->setDefinition(JUnitSilencedStepPrinter::class, $definition);
 
         $definition = new Definition(
             ChainEventListener::class,
