@@ -246,3 +246,7 @@ services:
             - '@output.formatter.pretty'
             - '@event_dispatcher'
             - !tagged_iterator oro_test.behat.healer
+
+    Oro\Bundle\TestFrameworkBundle\Testwork\Tester\Result\Interpretation\PassedOrSkippedInterpretation:
+        tags:
+            - { name: 'test.result.interpretation', priority: 100 }
