@@ -19,7 +19,8 @@ class Configuration implements ConfigurationInterface
             'client_secret'  => ['value' => null, 'type' => 'text'],
             'google_api_key' => ['value' => null, 'type' => 'text'],
             'enable_sso'     => ['value' => false, 'type' => 'boolean'],
-            'sso_domains'    => ['value' => [], 'type' => 'array']
+            'sso_domains'    => ['value' => [], 'type' => 'array'],
+            'sso_only_login' => ['value' => false, 'type' => 'boolean']
         ]);
 
         return $treeBuilder;
