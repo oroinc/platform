@@ -107,7 +107,10 @@ class UsernamePasswordOrganizationAuthenticator extends FormLoginAuthenticator
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
     {
-        if ($exception instanceof BadCredentialsException && isset($this->errorMessageOptions[$this->firewallName])) {
+        if ($exception instanceof BadCredentialsException
+            && !$exception instanceof BadUserCredentialsException
+            && isset($this->errorMessageOptions[$this->firewallName])
+        ) {
             $previousException = $exception;
             $exception = new BadUserCredentialsException(
                 $previousException->getMessage(),

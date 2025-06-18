@@ -1,1 +1,4 @@
 "Given email domain is not allowed.": "Given email domain is not allowed."
+oro_sso:
+    sso_login:
+        message: Login with username and password is restricted. Please use Single Sign-On (SSO) to access your account.
