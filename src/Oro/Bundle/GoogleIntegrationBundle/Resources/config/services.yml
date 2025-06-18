@@ -6,3 +6,14 @@ services:
             - '@oro_config.global'
         tags:
             - { name: oro.sso.oauth_user_provider, resource_owner: google }
+
+    oro_google_integration.event.sso_login_event_listener:
+        class: Oro\Bundle\SSOBundle\Event\CheckPassportEventListener
+        arguments:
+            - '@oro_config.global'
+            - 'oro_google_integration.enable_sso'
+            - 'oro_google_integration.sso_domains'
+            - 'oro_google_integration.sso_only_login'
+            - 'main'
+        tags:
+            - { name: kernel.event_listener, event: security.authentication.success, method: onAuthenticationSuccess, priority: 200 }
