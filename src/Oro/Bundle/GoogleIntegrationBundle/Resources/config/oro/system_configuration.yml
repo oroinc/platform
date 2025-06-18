@@ -70,6 +70,15 @@ system_configuration:
                 required: false
                 resettable: false
             priority: 10
+        oro_google_integration.sso_only_login:
+            data_type: boolean
+            type: Oro\Bundle\ConfigBundle\Form\Type\ConfigCheckbox
+            options:
+                label: oro.google_integration.system_configuration.fields.sso_only_login.label
+                tooltip: oro.google_integration.system_configuration.fields.sso_only_login.tooltip
+                required: false
+                resettable: false
+            priority: 10
 
     tree:
         system_configuration:
@@ -89,3 +98,4 @@ system_configuration:
                                         children:
                                             - oro_google_integration.enable_sso
                                             - oro_google_integration.sso_domains
+                                            - oro_google_integration.sso_only_login
