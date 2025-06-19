@@ -30,17 +30,7 @@ class RemoveRestoreConfigFieldHandler
     {
         $validationMessages = $this->validationHelper->getRemoveFieldValidationErrors($field);
         if ($validationMessages) {
-            foreach ($validationMessages as $message) {
-                $this->requestStack->getSession()->getFlashBag()->add('error', $message);
-            }
-
-            return new JsonResponse(
-                [
-                    'message' => implode('. ', $validationMessages),
-                    'successful' => false
-                ],
-                JsonResponse::HTTP_OK
-            );
+            return $this->getValidationErrorResponse($validationMessages);
         }
 
         $entityConfig = $this->configHelper->getEntityConfigByField($field, 'extend');
@@ -71,7 +61,14 @@ class RemoveRestoreConfigFieldHandler
             },
         );
 
+        /**
+         * Condition to detect if table column field was removed just after it was created, without updating DB.
+         * Added check that field which should be removed is in status 'New', so we should skip db update.
+         * Without this check, after first table column field deleting without schema update, we will hide
+         * update schema button and set entityConfig as not upgradeable
+         */
         if ($entityConfig->in('state', [ExtendScope::STATE_UPDATE, ExtendScope::STATE_NEW])
+            && $fieldConfig->is('state', ExtendScope::STATE_NEW)
             && !$entityConfig->get('pending_changes')
             && !$otherFieldsRequireUpdate
         ) {
@@ -130,5 +127,20 @@ class RemoveRestoreConfigFieldHandler
         $this->requestStack->getSession()->getFlashBag()->add('success', $successMessage);
 
         return new JsonResponse(['message' => $successMessage, 'successful' => true], JsonResponse::HTTP_OK);
+    }
+
+    private function getValidationErrorResponse(array $validationMessages): JsonResponse
+    {
+        foreach ($validationMessages as $message) {
+            $this->requestStack->getSession()->getFlashBag()->add('error', $message);
+        }
+
+        return new JsonResponse(
+            [
+                'message' => implode('. ', $validationMessages),
+                'successful' => false
+            ],
+            JsonResponse::HTTP_OK
+        );
     }
 }
