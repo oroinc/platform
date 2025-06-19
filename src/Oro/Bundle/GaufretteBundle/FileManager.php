@@ -697,6 +697,12 @@ class FileManager
      */
     private function isDirectoryEmpty(string $realDirName): bool
     {
+        $adapter = $this->filesystem->getAdapter();
+
+        if ($adapter instanceof LocalAdapter) {
+            return $adapter->isDirectoryEmpty($realDirName . self::DIRECTORY_SEPARATOR);
+        }
+
         $listResult = $this->listKeys($realDirName . self::DIRECTORY_SEPARATOR);
 
         return empty($listResult['keys']) && empty($listResult['dirs']);
