@@ -66,4 +66,14 @@ class LocalAdapter extends BaseAdapter implements ListKeysAware
 
         return $this->normalizePath($this->directory . '/' . substr($prefix, 0, $lastSeparatorPos));
     }
+
+    public function isDirectoryEmpty(string $dirName): bool
+    {
+        $fsIterator = new \FilesystemIterator(
+            $this->getRootDirectoryForListKeys($dirName),
+            \FilesystemIterator::SKIP_DOTS
+        );
+
+        return !$fsIterator->valid();
+    }
 }
