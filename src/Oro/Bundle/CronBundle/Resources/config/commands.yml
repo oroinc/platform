@@ -10,6 +10,7 @@ services:
             - '@oro_cron.async.command_runner'
             - '@oro_cron.command_feature_checker'
             - '@logger'
+            - '@oro_cron.state_cache'
             - '%kernel.environment%'
         tags:
             - { name: console.command }
