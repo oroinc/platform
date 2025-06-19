@@ -6,23 +6,16 @@ use Oro\Bundle\ApiBundle\ApiDoc\Parser\ApiDocMetadata;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ApiDocMetadataTest extends \PHPUnit\Framework\TestCase
+class ApiDocMetadataTest extends TestCase
 {
-    /** @var string */
-    private $action;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityMetadata */
-    private $metadata;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityDefinitionConfig */
-    private $config;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|RequestType */
-    private $requestType;
-
-    /** @var ApiDocMetadata */
-    private $apiDocMetadata;
+    private string $action;
+    private EntityMetadata&MockObject $metadata;
+    private EntityDefinitionConfig&MockObject $config;
+    private RequestType&MockObject $requestType;
+    private ApiDocMetadata $apiDocMetadata;
 
     #[\Override]
     protected function setUp(): void
@@ -35,27 +28,27 @@ class ApiDocMetadataTest extends \PHPUnit\Framework\TestCase
         $this->apiDocMetadata = new ApiDocMetadata($this->action, $this->metadata, $this->config, $this->requestType);
     }
 
-    public function testGetAction()
+    public function testGetAction(): void
     {
         self::assertEquals($this->action, $this->apiDocMetadata->getAction());
     }
 
-    public function testGetMetadata()
+    public function testGetMetadata(): void
     {
         self::assertEquals($this->metadata, $this->apiDocMetadata->getMetadata());
     }
 
-    public function testGetConfig()
+    public function testGetConfig(): void
     {
         self::assertEquals($this->config, $this->apiDocMetadata->getConfig());
     }
 
-    public function testGetRequestType()
+    public function testGetRequestType(): void
     {
         self::assertEquals($this->requestType, $this->apiDocMetadata->getRequestType());
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         self::assertSame([], $this->apiDocMetadata->__serialize());
     }

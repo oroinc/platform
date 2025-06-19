@@ -10,10 +10,11 @@ use Oro\Bundle\ImapBundle\Manager\ImapEmailManagerFactory;
 use Oro\Bundle\ImapBundle\Manager\OAuthManagerInterface;
 use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
+use PHPUnit\Framework\TestCase;
 
-class ImapEmailManagerFactoryTest extends \PHPUnit\Framework\TestCase
+class ImapEmailManagerFactoryTest extends TestCase
 {
-    public function testGetImapEmailManager()
+    public function testGetImapEmailManager(): void
     {
         $crypter = $this->createMock(SymmetricCrypterInterface::class);
         $connectorFactory = $this->createMock(ImapConnectorFactory::class);

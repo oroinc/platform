@@ -57,6 +57,11 @@ HELP
 
         $driver = $this->driverFactory->getDriver();
 
+        if (!$driver->isExists()) {
+            $io->note('Maintenance mode is already disabled.');
+            return Command::SUCCESS;
+        }
+
         if ($driver->unlock() === true) {
             $this->dispatcher->dispatch(new MaintenanceEvent(), MaintenanceEvent::MAINTENANCE_OFF);
             $io->success('Maintenance mode is turned off.');

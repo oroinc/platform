@@ -11,9 +11,7 @@ use Symfony\Component\Form\FormInterface;
 final class EntityFormResolverTest extends TestCase
 {
     private FormFactoryInterface&MockObject $formFactory;
-
     private FormInterface&MockObject $form;
-
     private EntityFormResolver $entityFormResolver;
 
     #[\Override]
@@ -28,22 +26,19 @@ final class EntityFormResolverTest extends TestCase
     public function testResolveSuccessfully(): void
     {
         $formTypeClass = 'SomeFormType';
-        $entity = new \StdClass();
+        $entity = new \stdClass();
         $entityData = ['field' => 'value'];
 
-        $this->formFactory
-            ->expects(self::once())
+        $this->formFactory->expects(self::once())
             ->method('create')
             ->with($formTypeClass, $entity)
             ->willReturn($this->form);
 
-        $this->form
-            ->expects(self::once())
+        $this->form->expects(self::once())
             ->method('submit')
             ->with($entityData);
 
-        $this->form
-            ->expects(self::once())
+        $this->form->expects(self::once())
             ->method('getData')
             ->willReturn($entity);
 

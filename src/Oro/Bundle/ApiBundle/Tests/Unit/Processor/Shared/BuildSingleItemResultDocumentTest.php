@@ -10,19 +10,15 @@ use Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 class BuildSingleItemResultDocumentTest extends GetProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ErrorCompleterRegistry */
-    private $errorCompleterRegistry;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
-    private $logger;
-
-    /** @var BuildSingleItemResultDocument */
-    private $processor;
+    private ErrorCompleterRegistry&MockObject $errorCompleterRegistry;
+    private LoggerInterface&MockObject $logger;
+    private BuildSingleItemResultDocument $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +34,7 @@ class BuildSingleItemResultDocumentTest extends GetProcessorTestCase
         );
     }
 
-    public function testProcessContextWithoutErrorsOnEmptyResult()
+    public function testProcessContextWithoutErrorsOnEmptyResult(): void
     {
         $result = null;
         $metadata = new EntityMetadata('Test\Entity');
@@ -63,7 +59,7 @@ class BuildSingleItemResultDocumentTest extends GetProcessorTestCase
         self::assertNull($this->context->getResult());
     }
 
-    public function testProcessContextWithoutErrorsOnNonEmptyResult()
+    public function testProcessContextWithoutErrorsOnNonEmptyResult(): void
     {
         $result = [new \stdClass()];
         $metadata = new EntityMetadata('Test\Entity');
@@ -87,7 +83,7 @@ class BuildSingleItemResultDocumentTest extends GetProcessorTestCase
         self::assertEquals($result, $this->context->getResult());
     }
 
-    public function testProcessContextWithoutErrorsAndWithInfoRecords()
+    public function testProcessContextWithoutErrorsAndWithInfoRecords(): void
     {
         $result = [new \stdClass()];
         $metadata = new EntityMetadata('Test\Entity');
@@ -114,7 +110,7 @@ class BuildSingleItemResultDocumentTest extends GetProcessorTestCase
         self::assertEquals($result, $this->context->getResult());
     }
 
-    public function testProcessContextWithoutErrorsOnNonEmptyResultAndErroredStatusCode()
+    public function testProcessContextWithoutErrorsOnNonEmptyResultAndErroredStatusCode(): void
     {
         $result = [new \stdClass()];
 
@@ -128,7 +124,7 @@ class BuildSingleItemResultDocumentTest extends GetProcessorTestCase
         self::assertEquals($result, $this->context->getResult());
     }
 
-    public function testProcessWithErrors()
+    public function testProcessWithErrors(): void
     {
         $error = new Error();
 
@@ -156,7 +152,7 @@ class BuildSingleItemResultDocumentTest extends GetProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWithException()
+    public function testProcessWithException(): void
     {
         $exception = new \LogicException();
 

@@ -4,18 +4,19 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config\Loader;
 
 use Oro\Bundle\ApiBundle\Config\Loader\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Tests\Unit\Config\ConfigExtensionRegistryTrait;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Yaml\Yaml;
 
-class ConfigLoaderTest extends \PHPUnit\Framework\TestCase
+class ConfigLoaderTest extends TestCase
 {
     use ConfigExtensionRegistryTrait;
 
     /**
      * @dataProvider dataProvider
      */
-    public function testLoaders(string $configType, array $config, array $expected)
+    public function testLoaders(string $configType, array $config, array $expected): void
     {
         $configLoaderFactory = new ConfigLoaderFactory($this->createConfigExtensionRegistry());
 

@@ -4,8 +4,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBag;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
+use PHPUnit\Framework\TestCase;
 
-class ActionProcessorBagTest extends \PHPUnit\Framework\TestCase
+class ActionProcessorBagTest extends TestCase
 {
     private function getActionProcessor(string $action): ActionProcessorInterface
     {
@@ -17,7 +18,7 @@ class ActionProcessorBagTest extends \PHPUnit\Framework\TestCase
         return $processor;
     }
 
-    public function testGetProcessor()
+    public function testGetProcessor(): void
     {
         $processor = $this->getActionProcessor('test');
 
@@ -27,7 +28,7 @@ class ActionProcessorBagTest extends \PHPUnit\Framework\TestCase
         self::assertSame($processor, $actionProcessorBag->getProcessor('test'));
     }
 
-    public function testGetUnknownProcessor()
+    public function testGetUnknownProcessor(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('A processor for "unknown" action was not found.');
@@ -40,7 +41,7 @@ class ActionProcessorBagTest extends \PHPUnit\Framework\TestCase
         $actionProcessorBag->getProcessor('unknown');
     }
 
-    public function testGetActions()
+    public function testGetActions(): void
     {
         $actionProcessorBag = new ActionProcessorBag();
         self::assertSame([], $actionProcessorBag->getActions());

@@ -3,8 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config\Extra;
 
 use Oro\Bundle\ApiBundle\Config\Extra\DisabledAssociationsConfigExtra;
+use PHPUnit\Framework\TestCase;
 
-class DisabledAssociationsConfigExtraTest extends \PHPUnit\Framework\TestCase
+class DisabledAssociationsConfigExtraTest extends TestCase
 {
     private DisabledAssociationsConfigExtra $extra;
 

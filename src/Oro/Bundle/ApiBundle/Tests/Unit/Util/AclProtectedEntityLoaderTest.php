@@ -16,6 +16,7 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Bundle\ApiBundle\Util\QueryAclHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
@@ -23,20 +24,10 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
  */
 class AclProtectedEntityLoaderTest extends OrmRelatedTestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    protected $doctrineHelper;
-
-    /** @var EntityIdHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityIdHelper;
-
-    /** @var QueryAclHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $queryAclHelper;
-
-    /** @var QueryHintResolverInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $queryHintResolver;
-
-    /** @var AclProtectedEntityLoader */
-    private $entityLoader;
+    private EntityIdHelper&MockObject $entityIdHelper;
+    private QueryAclHelper&MockObject $queryAclHelper;
+    private QueryHintResolverInterface&MockObject $queryHintResolver;
+    private AclProtectedEntityLoader $entityLoader;
 
     #[\Override]
     protected function setUp(): void

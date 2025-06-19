@@ -24,11 +24,11 @@ class RestDocumentBuilder extends AbstractDocumentBuilder
     public const LINKS = 'links';
     public const HREF = 'href';
 
-    private const ERROR_CODE = 'code';
-    private const ERROR_TITLE = 'title';
-    private const ERROR_DETAIL = 'detail';
-    private const ERROR_SOURCE = 'source';
-    private const ERROR_PROPERTIES = 'properties';
+    public const ERROR_CODE = 'code';
+    public const ERROR_TITLE = 'title';
+    public const ERROR_DETAIL = 'detail';
+    public const ERROR_SOURCE = 'source';
+    public const ERROR_PROPERTIES = 'properties';
 
     #[\Override]
     public function getDocument(): array

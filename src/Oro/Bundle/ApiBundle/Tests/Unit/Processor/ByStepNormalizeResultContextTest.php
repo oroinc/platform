@@ -3,8 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
 use Oro\Bundle\ApiBundle\Processor\ByStepNormalizeResultContext;
+use PHPUnit\Framework\TestCase;
 
-class ByStepNormalizeResultContextTest extends \PHPUnit\Framework\TestCase
+class ByStepNormalizeResultContextTest extends TestCase
 {
     private ByStepNormalizeResultContext $context;
 
@@ -14,7 +15,7 @@ class ByStepNormalizeResultContextTest extends \PHPUnit\Framework\TestCase
         $this->context = new ByStepNormalizeResultContext();
     }
 
-    public function testSourceGroup()
+    public function testSourceGroup(): void
     {
         self::assertNull($this->context->getSourceGroup());
 
@@ -31,7 +32,7 @@ class ByStepNormalizeResultContextTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->context->has('sourceGroup'));
     }
 
-    public function testFailedGroup()
+    public function testFailedGroup(): void
     {
         self::assertNull($this->context->getFailedGroup());
 

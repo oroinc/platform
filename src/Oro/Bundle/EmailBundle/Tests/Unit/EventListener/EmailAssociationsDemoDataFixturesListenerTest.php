@@ -13,28 +13,20 @@ use Oro\Bundle\EmailBundle\EventListener\EmailAssociationsDemoDataFixturesListen
 use Oro\Bundle\MigrationBundle\Event\MigrationDataFixturesEvent;
 use Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class EmailAssociationsDemoDataFixturesListenerTest extends OrmTestCase
 {
-    private const LISTENERS = [
+    private const array LISTENERS = [
         'test_listener_1',
         'test_listener_2',
     ];
 
-    /** @var EntityManagerInterface */
-    private $em;
-
-    /** @var OptionalListenerManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $listenerManager;
-
-    /** @var AssociationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $associationManager;
-
-    /** @var EmailAddressVisibilityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailAddressVisibilityManager;
-
-    /** @var EmailAssociationsDemoDataFixturesListener */
-    private $listener;
+    private EntityManagerInterface $em;
+    private OptionalListenerManager&MockObject $listenerManager;
+    private AssociationManager&MockObject $associationManager;
+    private EmailAddressVisibilityManager&MockObject $emailAddressVisibilityManager;
+    private EmailAssociationsDemoDataFixturesListener $listener;
 
     #[\Override]
     protected function setUp(): void

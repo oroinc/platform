@@ -48,7 +48,7 @@ class CustomIdentifierTest extends RestJsonApiTestCase
                         'type'          => $entityType,
                         'id'            => $this->getEntityId('item 1'),
                         'attributes'    => [
-                            'databaseId' => '@test_custom_id1->id',
+                            'databaseId' => '@test_custom_id1->autoincrementKey',
                             'name'       => 'Item 1'
                         ],
                         'relationships' => [
@@ -66,7 +66,7 @@ class CustomIdentifierTest extends RestJsonApiTestCase
                         'type'          => $entityType,
                         'id'            => $this->getEntityId('item 2'),
                         'attributes'    => [
-                            'databaseId' => '@test_custom_id2->id',
+                            'databaseId' => '@test_custom_id2->autoincrementKey',
                             'name'       => 'Item 2'
                         ],
                         'relationships' => [
@@ -82,7 +82,7 @@ class CustomIdentifierTest extends RestJsonApiTestCase
                         'type'          => $entityType,
                         'id'            => $this->getEntityId('item 3'),
                         'attributes'    => [
-                            'databaseId' => '@test_custom_id3->id',
+                            'databaseId' => '@test_custom_id3->autoincrementKey',
                             'name'       => 'Item 3'
                         ],
                         'relationships' => [
@@ -226,7 +226,7 @@ class CustomIdentifierTest extends RestJsonApiTestCase
                         'type'          => $entityType,
                         'id'            => $this->getEntityId('item 3'),
                         'attributes'    => [
-                            'databaseId' => '@test_custom_id3->id',
+                            'databaseId' => '@test_custom_id3->autoincrementKey',
                             'name'       => 'Item 3'
                         ],
                         'relationships' => [
@@ -262,7 +262,7 @@ class CustomIdentifierTest extends RestJsonApiTestCase
                         'type'          => $entityType,
                         'id'            => $this->getEntityId('item 1'),
                         'attributes'    => [
-                            'databaseId' => '@test_custom_id1->id',
+                            'databaseId' => '@test_custom_id1->autoincrementKey',
                             'name'       => 'Item 1'
                         ],
                         'relationships' => [
@@ -280,7 +280,7 @@ class CustomIdentifierTest extends RestJsonApiTestCase
                         'type'          => $entityType,
                         'id'            => $this->getEntityId('item 3'),
                         'attributes'    => [
-                            'databaseId' => '@test_custom_id3->id',
+                            'databaseId' => '@test_custom_id3->autoincrementKey',
                             'name'       => 'Item 3'
                         ],
                         'relationships' => [
@@ -306,7 +306,7 @@ class CustomIdentifierTest extends RestJsonApiTestCase
 
         $response = $this->cget(
             ['entity' => $entityType],
-            ['filter[databaseId]' => '@test_custom_id3->id']
+            ['filter[databaseId]' => '@test_custom_id3->autoincrementKey']
         );
 
         $this->assertResponseContains(
@@ -316,7 +316,7 @@ class CustomIdentifierTest extends RestJsonApiTestCase
                         'type'          => $entityType,
                         'id'            => $this->getEntityId('item 3'),
                         'attributes'    => [
-                            'databaseId' => '@test_custom_id3->id',
+                            'databaseId' => '@test_custom_id3->autoincrementKey',
                             'name'       => 'Item 3'
                         ],
                         'relationships' => [
@@ -352,7 +352,7 @@ class CustomIdentifierTest extends RestJsonApiTestCase
                         'type'          => $entityType,
                         'id'            => $this->getEntityId('item 3'),
                         'attributes'    => [
-                            'databaseId' => '@test_custom_id3->id',
+                            'databaseId' => '@test_custom_id3->autoincrementKey',
                             'name'       => 'Item 3'
                         ],
                         'relationships' => [
@@ -388,7 +388,7 @@ class CustomIdentifierTest extends RestJsonApiTestCase
                         'type'          => $entityType,
                         'id'            => $this->getEntityId('item 1'),
                         'attributes'    => [
-                            'databaseId' => '@test_custom_id1->id',
+                            'databaseId' => '@test_custom_id1->autoincrementKey',
                             'name'       => 'Item 1'
                         ],
                         'relationships' => [
@@ -447,7 +447,7 @@ class CustomIdentifierTest extends RestJsonApiTestCase
                     'type'          => $entityType,
                     'id'            => $this->getEntityId('item 3'),
                     'attributes'    => [
-                        'databaseId' => '@test_custom_id3->id',
+                        'databaseId' => '@test_custom_id3->autoincrementKey',
                         'name'       => 'Item 3'
                     ],
                     'relationships' => [
@@ -664,12 +664,18 @@ class CustomIdentifierTest extends RestJsonApiTestCase
         self::assertNotNull($createdEntity);
 
         $result = self::jsonToArray($response->getContent());
-        self::assertSame($createdEntity->id, $result['data']['attributes']['databaseId']);
+        self::assertSame($createdEntity->autoincrementKey, $result['data']['attributes']['databaseId']);
 
         self::assertSame('New Item', $createdEntity->name);
-        self::assertSame($this->getReference('test_custom_id1')->id, $createdEntity->getParent()->id);
+        self::assertSame(
+            $this->getReference('test_custom_id1')->autoincrementKey,
+            $createdEntity->getParent()->autoincrementKey
+        );
         self::assertCount(1, $createdEntity->getChildren());
-        self::assertSame($this->getReference('test_custom_id1')->id, $createdEntity->getChildren()->first()->id);
+        self::assertSame(
+            $this->getReference('test_custom_id1')->autoincrementKey,
+            $createdEntity->getChildren()->first()->autoincrementKey
+        );
     }
 
     public function testTryToCreateWithoutName()
@@ -717,7 +723,7 @@ class CustomIdentifierTest extends RestJsonApiTestCase
                 'type'          => $entityType,
                 'id'            => $this->getEntityId('item 1'),
                 'attributes'    => [
-                    'databaseId' => '@test_custom_id1->id',
+                    'databaseId' => '@test_custom_id1->autoincrementKey',
                     'name'       => 'Updated Name'
                 ],
                 'relationships' => [
@@ -765,9 +771,15 @@ class CustomIdentifierTest extends RestJsonApiTestCase
             ->findOneBy(['key' => 'item 1']);
         self::assertNotNull($updatedEntity);
         self::assertSame('Updated Name', $updatedEntity->name);
-        self::assertSame($this->getReference('test_custom_id2')->id, $updatedEntity->getParent()->id);
+        self::assertSame(
+            $this->getReference('test_custom_id2')->autoincrementKey,
+            $updatedEntity->getParent()->autoincrementKey
+        );
         self::assertCount(1, $updatedEntity->getChildren());
-        self::assertSame($this->getReference('test_custom_id2')->id, $updatedEntity->getChildren()->first()->id);
+        self::assertSame(
+            $this->getReference('test_custom_id2')->autoincrementKey,
+            $updatedEntity->getChildren()->first()->autoincrementKey
+        );
     }
 
     public function testTryToUpdateNameToNull()
@@ -781,7 +793,7 @@ class CustomIdentifierTest extends RestJsonApiTestCase
                     'type' => $entityType,
                     'id' => $this->getEntityId('item 1'),
                     'attributes' => [
-                        'databaseId' => '@test_custom_id1->id',
+                        'databaseId' => '@test_custom_id1->autoincrementKey',
                         'name' => null
                     ]
                 ]
@@ -827,7 +839,7 @@ class CustomIdentifierTest extends RestJsonApiTestCase
                     'type'          => $entityType,
                     'id'            => $this->getEntityId('item 1'),
                     'attributes'    => [
-                        'databaseId' => '@test_custom_id1->id',
+                        'databaseId' => '@test_custom_id1->autoincrementKey',
                         'name'       => 'Item 1'
                     ],
                     'relationships' => [
@@ -884,7 +896,7 @@ class CustomIdentifierTest extends RestJsonApiTestCase
                         'type'          => $entityType,
                         'id'            => $this->getEntityId('item 2'),
                         'attributes'    => [
-                            'databaseId' => '@test_custom_id2->id',
+                            'databaseId' => '@test_custom_id2->autoincrementKey',
                             'name'       => 'Item 2'
                         ],
                         'relationships' => [
@@ -978,7 +990,10 @@ class CustomIdentifierTest extends RestJsonApiTestCase
             ->getRepository(TestEntity::class)
             ->findOneBy(['key' => 'item 3']);
         self::assertNotNull($updatedEntity);
-        self::assertSame($this->getReference('test_custom_id2')->id, $updatedEntity->getParent()->id);
+        self::assertSame(
+            $this->getReference('test_custom_id2')->autoincrementKey,
+            $updatedEntity->getParent()->autoincrementKey
+        );
     }
 
     public function testUpdateRelationshipForToManyAssociation()
@@ -1002,10 +1017,13 @@ class CustomIdentifierTest extends RestJsonApiTestCase
             ->findOneBy(['key' => 'item 3']);
         self::assertNotNull($updatedEntity);
         self::assertCount(2, $updatedEntity->getChildren());
-        $ids = [$updatedEntity->getChildren()->get(0)->id, $updatedEntity->getChildren()->get(1)->id];
+        $ids = [
+            $updatedEntity->getChildren()->get(0)->autoincrementKey,
+            $updatedEntity->getChildren()->get(1)->autoincrementKey
+        ];
         sort($ids);
-        self::assertSame($this->getReference('test_custom_id1')->id, $ids[0]);
-        self::assertSame($this->getReference('test_custom_id2')->id, $ids[1]);
+        self::assertSame($this->getReference('test_custom_id1')->autoincrementKey, $ids[0]);
+        self::assertSame($this->getReference('test_custom_id2')->autoincrementKey, $ids[1]);
     }
 
     public function testDeleteRelationshipForToManyAssociation()
@@ -1050,9 +1068,12 @@ class CustomIdentifierTest extends RestJsonApiTestCase
             ->findOneBy(['key' => 'item 3']);
         self::assertNotNull($updatedEntity);
         self::assertCount(2, $updatedEntity->getChildren());
-        $ids = [$updatedEntity->getChildren()->get(0)->id, $updatedEntity->getChildren()->get(1)->id];
+        $ids = [
+            $updatedEntity->getChildren()->get(0)->autoincrementKey,
+            $updatedEntity->getChildren()->get(1)->autoincrementKey
+        ];
         sort($ids);
-        self::assertSame($this->getReference('test_custom_id1')->id, $ids[0]);
-        self::assertSame($this->getReference('test_custom_id2')->id, $ids[1]);
+        self::assertSame($this->getReference('test_custom_id1')->autoincrementKey, $ids[0]);
+        self::assertSame($this->getReference('test_custom_id2')->autoincrementKey, $ids[1]);
     }
 }

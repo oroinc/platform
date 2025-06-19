@@ -12,11 +12,8 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class InitializeCriteriaTest extends GetListProcessorOrmRelatedTestCase
 {
-    /** @var EntityClassResolver */
-    private $entityClassResolver;
-
-    /** @var InitializeCriteria */
-    private $processor;
+    private EntityClassResolver $entityClassResolver;
+    private InitializeCriteria $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +28,7 @@ class InitializeCriteriaTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    public function testProcessWhenDataAreAlreadyLoaded()
+    public function testProcessWhenDataAreAlreadyLoaded(): void
     {
         $this->context->setResult([]);
         $this->processor->process($this->context);
@@ -39,7 +36,7 @@ class InitializeCriteriaTest extends GetListProcessorOrmRelatedTestCase
         self::assertNull($this->context->getCriteria());
     }
 
-    public function testProcessWhenCriteriaIsAlreadyInitialized()
+    public function testProcessWhenCriteriaIsAlreadyInitialized(): void
     {
         $criteria = new Criteria($this->entityClassResolver);
 
@@ -49,7 +46,7 @@ class InitializeCriteriaTest extends GetListProcessorOrmRelatedTestCase
         self::assertSame($criteria, $this->context->getCriteria());
     }
 
-    public function testProcessForNotManageableEntity()
+    public function testProcessForNotManageableEntity(): void
     {
         $entityClass = 'Test\Class';
         $this->notManageableClassNames = [$entityClass];
@@ -64,7 +61,7 @@ class InitializeCriteriaTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    public function testProcessForManageableEntity()
+    public function testProcessForManageableEntity(): void
     {
         $entityClass = Entity\Product::class;
 
@@ -78,7 +75,7 @@ class InitializeCriteriaTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    public function testProcessForResourceBasedOnManageableEntity()
+    public function testProcessForResourceBasedOnManageableEntity(): void
     {
         $entityClass = Entity\UserProfile::class;
         $parentResourceClass = Entity\User::class;
@@ -97,7 +94,7 @@ class InitializeCriteriaTest extends GetListProcessorOrmRelatedTestCase
         );
     }
 
-    public function testProcessForResourceBasedOnNotManageableEntity()
+    public function testProcessForResourceBasedOnNotManageableEntity(): void
     {
         $entityClass = 'Test\Class';
         $parentResourceClass = 'Test\ParentClass';

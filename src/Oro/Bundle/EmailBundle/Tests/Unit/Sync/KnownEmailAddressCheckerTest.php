@@ -19,10 +19,10 @@ use Psr\Log\LoggerInterface;
 
 class KnownEmailAddressCheckerTest extends TestCase
 {
-    private const EMAIL_ADDRESS_PROXY_CLASS = 'Entity\TestEmailAddress';
-    private const TEST_CONTACT_CLASS = 'Entity\TestContact';
-    private const USER_CLASS = User::class;
-    private const MAILBOX_CLASS = Mailbox::class;
+    private const string EMAIL_ADDRESS_PROXY_CLASS = 'Entity\TestEmailAddress';
+    private const string TEST_CONTACT_CLASS = 'Entity\TestContact';
+    private const string USER_CLASS = User::class;
+    private const string MAILBOX_CLASS = Mailbox::class;
 
     private LoggerInterface&MockObject $logger;
     private EntityManagerInterface&MockObject $em;

@@ -15,17 +15,14 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
+class FileEntityConfigDumperExtensionTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var FieldTypeHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldTypeHelper;
-
-    /** @var FileEntityConfigDumperExtension */
-    private $extension;
+    private ConfigManager&MockObject $configManager;
+    private FieldTypeHelper&MockObject $fieldTypeHelper;
+    private FileEntityConfigDumperExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -39,7 +36,7 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPreUpdateWithoutConfigs()
+    public function testPreUpdateWithoutConfigs(): void
     {
         $this->configManager->expects(self::once())
             ->method('getConfigs')
@@ -52,7 +49,7 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->preUpdate();
     }
 
-    public function testPreUpdateWithoutIsExtendConfigs()
+    public function testPreUpdateWithoutIsExtendConfigs(): void
     {
         $this->configManager->expects(self::once())
             ->method('getConfigs')
@@ -67,7 +64,7 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->preUpdate();
     }
 
-    public function testPreUpdateWithUnsupportedState()
+    public function testPreUpdateWithUnsupportedState(): void
     {
         $entityConfig = new Config(new EntityConfigId('extend', TestEntity1::class));
         $entityConfig->set('is_extend', true);
@@ -90,7 +87,7 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testPreUpdateWithManyToOneRelation()
+    public function testPreUpdateWithManyToOneRelation(): void
     {
         $entityConfig = $this->createExtendEntityConfig(TestEntity1::class);
         $fieldConfig = $this->createExtendFieldConfig(TestEntity1::class, 'fieldName', 'type');
@@ -237,7 +234,7 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testPreUpdateWithOneToManyRelation()
+    public function testPreUpdateWithOneToManyRelation(): void
     {
         $entityConfig = $this->createExtendEntityConfig(TestEntity1::class);
         $fieldConfig = $this->createExtendFieldConfig(TestEntity1::class, 'fieldName', 'type');

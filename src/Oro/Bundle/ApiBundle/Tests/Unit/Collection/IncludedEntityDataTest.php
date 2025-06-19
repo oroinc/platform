@@ -5,11 +5,12 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection;
 use Oro\Bundle\ApiBundle\Collection\IncludedEntityData;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class IncludedEntityDataTest extends \PHPUnit\Framework\TestCase
+class IncludedEntityDataTest extends TestCase
 {
     public function testShouldBeMarkedAsNewByDefault(): void
     {

@@ -13,8 +13,9 @@ use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\ProcessorIterator;
 use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 use Oro\Component\ChainProcessor\Tests\Unit\ProcessorMock;
+use PHPUnit\Framework\TestCase;
 
-class MatchApplicableCheckerTest extends \PHPUnit\Framework\TestCase
+class MatchApplicableCheckerTest extends TestCase
 {
     private function getApplicableChecker(): ChainApplicableChecker
     {

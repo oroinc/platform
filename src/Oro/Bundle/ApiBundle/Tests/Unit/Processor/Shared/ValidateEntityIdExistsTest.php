@@ -9,8 +9,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 
 class ValidateEntityIdExistsTest extends GetProcessorTestCase
 {
-    /** @var ValidateEntityIdExists */
-    private $processor;
+    private ValidateEntityIdExists $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +19,7 @@ class ValidateEntityIdExistsTest extends GetProcessorTestCase
         $this->processor = new ValidateEntityIdExists();
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $this->context->setId(123);
         $this->processor->process($this->context);
@@ -28,7 +27,7 @@ class ValidateEntityIdExistsTest extends GetProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWhenIdIsStringWithValue0()
+    public function testProcessWhenIdIsStringWithValue0(): void
     {
         $this->context->setId('0');
         $this->processor->process($this->context);
@@ -36,7 +35,7 @@ class ValidateEntityIdExistsTest extends GetProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWhenIdIsIntegerWithValue0()
+    public function testProcessWhenIdIsIntegerWithValue0(): void
     {
         $this->context->setId(0);
         $this->processor->process($this->context);
@@ -44,7 +43,7 @@ class ValidateEntityIdExistsTest extends GetProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWhenNoId()
+    public function testProcessWhenNoId(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -63,7 +62,7 @@ class ValidateEntityIdExistsTest extends GetProcessorTestCase
         );
     }
 
-    public function testProcessWhenIdIsEmpty()
+    public function testProcessWhenIdIsEmpty(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -83,7 +82,7 @@ class ValidateEntityIdExistsTest extends GetProcessorTestCase
         );
     }
 
-    public function testProcessWhenNoIdAndEntityDoesNotHaveIdentifierFields()
+    public function testProcessWhenNoIdAndEntityDoesNotHaveIdentifierFields(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
 

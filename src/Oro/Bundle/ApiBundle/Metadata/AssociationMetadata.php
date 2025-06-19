@@ -117,6 +117,16 @@ class AssociationMetadata extends PropertyMetadata
     }
 
     /**
+     * Sets a flag that manages whether the full metadata should be returned
+     * by the {@see getTargetMetadata()} method in case then the target class name is specified.
+     */
+    public function setTargetMetadataFullMode(bool $full): void
+    {
+        $this->targetMetadataAccessor?->setFullMode($full);
+        $this->targetMetadata?->setEntityMetadataFullMode($full);
+    }
+
+    /**
      * Gets metadata for the given association target class.
      */
     public function getTargetMetadata(?string $targetClassName = null): ?EntityMetadata
@@ -124,7 +134,7 @@ class AssociationMetadata extends PropertyMetadata
         if (null === $this->targetMetadataAccessor
             || !$this->associationPath
             || !$targetClassName
-            || $targetClassName === $this->targetClass
+            || ($targetClassName === $this->targetClass && !$this->targetMetadataAccessor->isFullMode())
         ) {
             return $this->targetMetadata;
         }

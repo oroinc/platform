@@ -8,7 +8,7 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class MimeTypeConfigTypeTest extends FormIntegrationTestCase
 {
-    private const ALLOWED_MIME_TYPES = [
+    private const array ALLOWED_MIME_TYPES = [
         'application/vnd.ms-excel',
         'application/pdf',
         'image/png'

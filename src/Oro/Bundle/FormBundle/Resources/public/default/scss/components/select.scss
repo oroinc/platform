@@ -65,16 +65,6 @@
     }
 }
 
-// stylelint-disable-next-line  at-rule-no-vendor-prefix
-@-moz-document url-prefix('') {
-    .select {
-        height: $select-firefox-height;
-        line-height: $select-firefox-line-height;
-        padding-top: $select-firefox-inner-offset-top;
-        padding-bottom: $select-firefox-inner-offset-bottom;
-    }
-}
-
 .select-plain {
     --select-arrow-position: #{$select-plain-arrow-position};
 

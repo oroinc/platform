@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 
@@ -12,9 +13,9 @@ use Symfony\Component\Validator\Constraints\NotNull;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
+class EntityDefinitionFieldConfigTest extends TestCase
 {
-    public function testCustomAttribute()
+    public function testCustomAttribute(): void
     {
         $attrName = 'test';
 
@@ -42,7 +43,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $config->keys());
     }
 
-    public function testExcluded()
+    public function testExcluded(): void
     {
         $config = new EntityDefinitionFieldConfig();
         self::assertFalse($config->hasExcluded());
@@ -59,7 +60,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testPropertyPath()
+    public function testPropertyPath(): void
     {
         $config = new EntityDefinitionFieldConfig();
         self::assertFalse($config->hasPropertyPath());
@@ -85,7 +86,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testDescription()
+    public function testDescription(): void
     {
         $config = new EntityDefinitionFieldConfig();
         self::assertFalse($config->hasDescription());
@@ -108,7 +109,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testDataType()
+    public function testDataType(): void
     {
         $config = new EntityDefinitionFieldConfig();
         self::assertFalse($config->hasDataType());
@@ -126,7 +127,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($config->isEmpty());
     }
 
-    public function testDirection()
+    public function testDirection(): void
     {
         $config = new EntityDefinitionFieldConfig();
         self::assertFalse($config->hasDirection());
@@ -158,7 +159,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testSetInvalidDirection()
+    public function testSetInvalidDirection(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -170,7 +171,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         $config->setDirection('another');
     }
 
-    public function testMetaProperty()
+    public function testMetaProperty(): void
     {
         $config = new EntityDefinitionFieldConfig();
         self::assertFalse($config->isMetaProperty());
@@ -184,7 +185,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testGetOrCreateTargetEntity()
+    public function testGetOrCreateTargetEntity(): void
     {
         $config = new EntityDefinitionFieldConfig();
         self::assertFalse($config->hasTargetEntity());
@@ -199,7 +200,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertSame($targetEntity1, $config->getTargetEntity());
     }
 
-    public function testCreateAndSetTargetEntity()
+    public function testCreateAndSetTargetEntity(): void
     {
         $config = new EntityDefinitionFieldConfig();
         self::assertFalse($config->hasTargetEntity());
@@ -214,7 +215,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertSame($targetEntity1, $config->getTargetEntity());
     }
 
-    public function testTargetClass()
+    public function testTargetClass(): void
     {
         $config = new EntityDefinitionFieldConfig();
         self::assertNull($config->getTargetClass());
@@ -228,7 +229,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testTargetType()
+    public function testTargetType(): void
     {
         $config = new EntityDefinitionFieldConfig();
         self::assertFalse($config->hasTargetType());
@@ -254,7 +255,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testCollapsed()
+    public function testCollapsed(): void
     {
         $config = new EntityDefinitionFieldConfig();
         self::assertFalse($config->hasCollapsed());
@@ -271,7 +272,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testFormType()
+    public function testFormType(): void
     {
         $config = new EntityDefinitionFieldConfig();
         self::assertNull($config->getFormType());
@@ -285,7 +286,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testFormOptions()
+    public function testFormOptions(): void
     {
         $config = new EntityDefinitionFieldConfig();
         self::assertNull($config->getFormOptions());
@@ -311,7 +312,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertSame('', $config->getFormOption('key', ''));
     }
 
-    public function testSetFormOption()
+    public function testSetFormOption(): void
     {
         $config = new EntityDefinitionFieldConfig();
 
@@ -329,7 +330,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFormConstraints()
+    public function testFormConstraints(): void
     {
         $config = new EntityDefinitionFieldConfig();
 
@@ -345,7 +346,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([new NotNull(), new NotBlank()], $config->getFormConstraints());
     }
 
-    public function testRemoveFormConstraint()
+    public function testRemoveFormConstraint(): void
     {
         $config = new EntityDefinitionFieldConfig();
 
@@ -371,7 +372,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertNull($config->getFormOptions());
     }
 
-    public function testPostProcessor()
+    public function testPostProcessor(): void
     {
         $config = new EntityDefinitionFieldConfig();
         self::assertFalse($config->hasPostProcessor());
@@ -393,7 +394,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testPostProcessorOptions()
+    public function testPostProcessorOptions(): void
     {
         $config = new EntityDefinitionFieldConfig();
         self::assertNull($config->getPostProcessorOptions());
@@ -407,7 +408,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testSetDataTransformers()
+    public function testSetDataTransformers(): void
     {
         $config = new EntityDefinitionFieldConfig();
         self::assertFalse($config->hasDataTransformers());
@@ -429,7 +430,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testDependsOn()
+    public function testDependsOn(): void
     {
         $config = new EntityDefinitionFieldConfig();
         self::assertNull($config->getDependsOn());
@@ -455,7 +456,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['depends_on' => ['field1', 'field2']], $config->toArray());
     }
 
-    public function testAssociationQuery()
+    public function testAssociationQuery(): void
     {
         $config = new EntityDefinitionFieldConfig();
         self::assertNull($config->getAssociationQuery());
@@ -472,7 +473,7 @@ class EntityDefinitionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($config->has(ConfigUtil::ASSOCIATION_QUERY));
     }
 
-    public function testSetAssociationQueryWhenNoTargetClass()
+    public function testSetAssociationQueryWhenNoTargetClass(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The target class must be specified to be able to use an association query.');

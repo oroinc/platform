@@ -10,17 +10,13 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class NormalizeParentEntityClassTest extends GetSubresourceProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
-    private $valueNormalizer;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
-    private $resourcesProvider;
-
-    /** @var NormalizeParentEntityClass */
-    private $processor;
+    private ValueNormalizer&MockObject $valueNormalizer;
+    private ResourcesProvider&MockObject $resourcesProvider;
+    private NormalizeParentEntityClass $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +32,7 @@ class NormalizeParentEntityClassTest extends GetSubresourceProcessorTestCase
         );
     }
 
-    public function testProcessWhenParentClassNameIsNotSet()
+    public function testProcessWhenParentClassNameIsNotSet(): void
     {
         $this->processor->process($this->context);
 
@@ -52,7 +48,7 @@ class NormalizeParentEntityClassTest extends GetSubresourceProcessorTestCase
         );
     }
 
-    public function testProcessWhenParentClassNameIsEmpty()
+    public function testProcessWhenParentClassNameIsEmpty(): void
     {
         $this->context->setParentClassName('');
         $this->processor->process($this->context);
@@ -69,7 +65,7 @@ class NormalizeParentEntityClassTest extends GetSubresourceProcessorTestCase
         );
     }
 
-    public function testProcessWhenParentClassAlreadyNormalized()
+    public function testProcessWhenParentClassAlreadyNormalized(): void
     {
         $this->valueNormalizer->expects(self::never())
             ->method('normalizeValue');
@@ -78,7 +74,7 @@ class NormalizeParentEntityClassTest extends GetSubresourceProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testConvertParentEntityTypeToEntityClass()
+    public function testConvertParentEntityTypeToEntityClass(): void
     {
         $parentEntityType = 'test';
 
@@ -97,7 +93,7 @@ class NormalizeParentEntityClassTest extends GetSubresourceProcessorTestCase
         self::assertSame('Test\Class', $this->context->getParentClassName());
     }
 
-    public function testProcessForNotAccessibleParentEntityType()
+    public function testProcessForNotAccessibleParentEntityType(): void
     {
         $this->expectException(ResourceNotAccessibleException::class);
 
@@ -116,7 +112,7 @@ class NormalizeParentEntityClassTest extends GetSubresourceProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForInvalidParentEntityType()
+    public function testProcessForInvalidParentEntityType(): void
     {
         $parentEntityType = 'test';
 

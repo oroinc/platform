@@ -9,20 +9,15 @@ use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\EmailBundle\Datagrid\EmailQueryFactory;
 use Oro\Bundle\EmailBundle\EventListener\Datagrid\UserEmailGridListener;
 use Oro\Bundle\FeatureToggleBundle\Checker\FeatureChecker;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class UserEmailGridListenerTest extends \PHPUnit\Framework\TestCase
+class UserEmailGridListenerTest extends TestCase
 {
-    /** @var UserEmailGridListener */
-    private $listener;
-
-    /** @var EmailQueryFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $queryFactory;
-
-    /** @var FeatureChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $featureChecker;
-
-    /** @var DatagridInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $datagrid;
+    private EmailQueryFactory&MockObject $queryFactory;
+    private FeatureChecker&MockObject $featureChecker;
+    private DatagridInterface&MockObject $datagrid;
+    private UserEmailGridListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -37,7 +32,7 @@ class UserEmailGridListenerTest extends \PHPUnit\Framework\TestCase
         $this->datagrid = $this->createMock(DatagridInterface::class);
     }
 
-    public function testOnBuildAfterWithDisabledFeature()
+    public function testOnBuildAfterWithDisabledFeature(): void
     {
         $this->featureChecker->expects($this->once())
             ->method('isFeatureEnabled')
@@ -49,7 +44,7 @@ class UserEmailGridListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onBuildAfter(new BuildAfter($this->datagrid));
     }
 
-    public function testOnBuildAfter()
+    public function testOnBuildAfter(): void
     {
         $this->featureChecker->expects($this->once())
             ->method('isFeatureEnabled')

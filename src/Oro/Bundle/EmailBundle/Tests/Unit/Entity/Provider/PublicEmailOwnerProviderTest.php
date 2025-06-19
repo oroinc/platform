@@ -4,11 +4,11 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\Provider;
 
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Provider\PublicEmailOwnerProvider;
+use PHPUnit\Framework\TestCase;
 
-class PublicEmailOwnerProviderTest extends \PHPUnit\Framework\TestCase
+class PublicEmailOwnerProviderTest extends TestCase
 {
-    /** @var PublicEmailOwnerProvider */
-    private $provider;
+    private PublicEmailOwnerProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -16,7 +16,7 @@ class PublicEmailOwnerProviderTest extends \PHPUnit\Framework\TestCase
         $this->provider = new PublicEmailOwnerProvider([\stdClass::class]);
     }
 
-    public function testIsPublicEmailOwner()
+    public function testIsPublicEmailOwner(): void
     {
         $publicEmailOwnerClass = \stdClass::class;
         $extendedPublicEmailOwnerClass = get_class($this->createMock($publicEmailOwnerClass));

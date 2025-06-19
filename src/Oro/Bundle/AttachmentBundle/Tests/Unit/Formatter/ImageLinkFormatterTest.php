@@ -5,18 +5,15 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Formatter;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Formatter\ImageLinkFormatter;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ImageLinkFormatterTest extends \PHPUnit\Framework\TestCase
+class ImageLinkFormatterTest extends TestCase
 {
-    /** @var AttachmentManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $manager;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var ImageLinkFormatter */
-    private $formatter;
+    private AttachmentManager&MockObject $manager;
+    private TranslatorInterface&MockObject $translator;
+    private ImageLinkFormatter $formatter;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +24,7 @@ class ImageLinkFormatterTest extends \PHPUnit\Framework\TestCase
         $this->formatter = new ImageLinkFormatter($this->manager, $this->translator);
     }
 
-    public function testGetDefaultValue()
+    public function testGetDefaultValue(): void
     {
         $this->translator->expects($this->once())
             ->method('trans')
@@ -36,7 +33,7 @@ class ImageLinkFormatterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test', $this->formatter->getDefaultValue());
     }
 
-    public function testFormat()
+    public function testFormat(): void
     {
         $file = new File();
         $file->setOriginalFilename('test.png');
@@ -48,7 +45,7 @@ class ImageLinkFormatterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('<a href="http://test.com/image.png">test.png</a>', $this->formatter->format($file));
     }
 
-    public function testFormatWithArguments()
+    public function testFormatWithArguments(): void
     {
         $file = new File();
         $file->setOriginalFilename('some_name.png');

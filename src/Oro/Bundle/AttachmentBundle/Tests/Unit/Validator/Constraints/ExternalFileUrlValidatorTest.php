@@ -5,14 +5,14 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Validator\Constraints;
 use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
 use Oro\Bundle\AttachmentBundle\Validator\Constraints\ExternalFileUrl;
 use Oro\Bundle\AttachmentBundle\Validator\Constraints\ExternalFileUrlValidator;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class ExternalFileUrlValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
+    private LoggerInterface&MockObject $logger;
 
     #[\Override]
     protected function setUp(): void

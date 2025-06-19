@@ -27,6 +27,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -35,11 +36,8 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class RegisterDynamicFiltersTest extends GetListProcessorOrmRelatedTestCase
 {
-    /** @var FilterFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $filterFactory;
-
-    /** @var RegisterDynamicFilters */
-    private $processor;
+    private FilterFactoryInterface&MockObject $filterFactory;
+    private RegisterDynamicFilters $processor;
 
     #[\Override]
     protected function setUp(): void

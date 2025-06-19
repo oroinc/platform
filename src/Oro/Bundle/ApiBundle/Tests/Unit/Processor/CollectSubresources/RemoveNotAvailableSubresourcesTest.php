@@ -3,21 +3,18 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CollectSubresources;
 
 use Oro\Bundle\ApiBundle\Processor\CollectSubresources\CollectSubresourcesContext;
-use Oro\Bundle\ApiBundle\Processor\CollectSubresources\LoadFromConfigBag;
 use Oro\Bundle\ApiBundle\Processor\CollectSubresources\RemoveNotAvailableSubresources;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresourcesCollection;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use PHPUnit\Framework\TestCase;
 
-class RemoveNotAvailableSubresourcesTest extends \PHPUnit\Framework\TestCase
+class RemoveNotAvailableSubresourcesTest extends TestCase
 {
-    /** @var CollectSubresourcesContext */
-    private $context;
-
-    /** @var LoadFromConfigBag */
-    private $processor;
+    private CollectSubresourcesContext $context;
+    private RemoveNotAvailableSubresources $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +35,7 @@ class RemoveNotAvailableSubresourcesTest extends \PHPUnit\Framework\TestCase
         return $subresources;
     }
 
-    public function testSubresourceWithoutExcludedActions()
+    public function testSubresourceWithoutExcludedActions(): void
     {
         $entityClass = 'Test\Class';
         $targetEntityClass = 'Test\TargetClass';
@@ -61,7 +58,7 @@ class RemoveNotAvailableSubresourcesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSubresourceWhenAllActionsAreExcluded()
+    public function testSubresourceWhenAllActionsAreExcluded(): void
     {
         $entityClass = 'Test\Class';
         $targetEntityClass = 'Test\TargetClass';
@@ -91,7 +88,7 @@ class RemoveNotAvailableSubresourcesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSubresourceWhenNotAllActionsAreExcluded()
+    public function testSubresourceWhenNotAllActionsAreExcluded(): void
     {
         $entityClass = 'Test\Class';
         $targetEntityClass = 'Test\TargetClass';

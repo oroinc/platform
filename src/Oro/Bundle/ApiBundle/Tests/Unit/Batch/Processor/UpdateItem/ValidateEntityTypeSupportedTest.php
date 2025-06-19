@@ -7,14 +7,12 @@ use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class ValidateEntityTypeSupportedTest extends BatchUpdateItemProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
-    private $valueNormalizer;
-
-    /** @var ValidateEntityTypeSupported */
-    private $processor;
+    private ValueNormalizer&MockObject $valueNormalizer;
+    private ValidateEntityTypeSupported $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -26,14 +24,14 @@ class ValidateEntityTypeSupportedTest extends BatchUpdateItemProcessorTestCase
         $this->processor = new ValidateEntityTypeSupported($this->valueNormalizer);
     }
 
-    public function testProcessWithoutRestrictionsToSupportedEntityClasses()
+    public function testProcessWithoutRestrictionsToSupportedEntityClasses(): void
     {
         $this->processor->process($this->context);
 
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWithoutEntityClass()
+    public function testProcessWithoutEntityClass(): void
     {
         $this->context->setSupportedEntityClasses(['Test\Entity']);
         $this->processor->process($this->context);
@@ -41,7 +39,7 @@ class ValidateEntityTypeSupportedTest extends BatchUpdateItemProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWhenEntityClassWasNotNormalized()
+    public function testProcessWhenEntityClassWasNotNormalized(): void
     {
         $this->context->setClassName('entity');
         $this->context->setSupportedEntityClasses(['Test\Entity']);
@@ -50,7 +48,7 @@ class ValidateEntityTypeSupportedTest extends BatchUpdateItemProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWhenEntityClassIsSupported()
+    public function testProcessWhenEntityClassIsSupported(): void
     {
         $this->context->setClassName('Test\Entity');
         $this->context->setSupportedEntityClasses(['Test\Entity']);
@@ -59,7 +57,7 @@ class ValidateEntityTypeSupportedTest extends BatchUpdateItemProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWhenEntityClassIsNotSupported()
+    public function testProcessWhenEntityClassIsNotSupported(): void
     {
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')
@@ -80,7 +78,7 @@ class ValidateEntityTypeSupportedTest extends BatchUpdateItemProcessorTestCase
         );
     }
 
-    public function testProcessWhenEntityClassIsNotSupportedAndEntityTypeResolvingFailed()
+    public function testProcessWhenEntityClassIsNotSupportedAndEntityTypeResolvingFailed(): void
     {
         $this->valueNormalizer->expects(self::once())
             ->method('normalizeValue')

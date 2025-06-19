@@ -3,11 +3,11 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Converter;
 
 use Oro\Bundle\FormBundle\Form\Converter\TagDefinitionConverter;
+use PHPUnit\Framework\TestCase;
 
-class TagDefinitionConverterTest extends \PHPUnit\Framework\TestCase
+class TagDefinitionConverterTest extends TestCase
 {
-    /** @var TagDefinitionConverter */
-    private $converter;
+    private TagDefinitionConverter $converter;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class TagDefinitionConverterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider elementsDataProvider
      */
-    public function testGetElements(string $allowedElements, array $expected)
+    public function testGetElements(string $allowedElements, array $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -48,7 +48,7 @@ class TagDefinitionConverterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider attributesDataProvider
      */
-    public function testGetAttributes(string $allowedElements, array $expected)
+    public function testGetAttributes(string $allowedElements, array $expected): void
     {
         $this->assertEquals(
             $expected,

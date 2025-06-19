@@ -9,26 +9,19 @@ use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ExtendedAssociationProviderTest extends \PHPUnit\Framework\TestCase
+class ExtendedAssociationProviderTest extends TestCase
 {
-    /** @var AssociationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $associationManager;
-
-    /** @var ResourcesProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $resourcesProvider;
-
-    /** @var EntityOverrideProviderRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityOverrideProviderRegistry;
-
-    /** @var ExtendedAssociationProvider */
-    private $extendedAssociationProvider;
+    private AssociationManager&MockObject $associationManager;
+    private ResourcesProvider&MockObject $resourcesProvider;
+    private EntityOverrideProviderRegistry&MockObject $entityOverrideProviderRegistry;
+    private ExtendedAssociationProvider $extendedAssociationProvider;
 
     #[\Override]
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->associationManager = $this->createMock(AssociationManager::class);
         $this->resourcesProvider = $this->createMock(ResourcesProvider::class);
         $this->entityOverrideProviderRegistry = $this->createMock(EntityOverrideProviderRegistry::class);

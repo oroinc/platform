@@ -6,18 +6,17 @@ use Oro\Bundle\ImapBundle\EventListener\LoginListener;
 use Oro\Bundle\ImapBundle\OriginSyncCredentials\SyncCredentialsIssueManager;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Tests\Unit\Stub\AbstractUserStub;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 
-class LoginListenerTest extends \PHPUnit\Framework\TestCase
+class LoginListenerTest extends TestCase
 {
-    /** @var SyncCredentialsIssueManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $syncCredentialsManager;
-
-    /** @var LoginListener */
-    private $listener;
+    private SyncCredentialsIssueManager&MockObject $syncCredentialsManager;
+    private LoginListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +26,7 @@ class LoginListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new LoginListener($this->syncCredentialsManager);
     }
 
-    public function testOnLoginWithAnonUser()
+    public function testOnLoginWithAnonUser(): void
     {
         $token = new UsernamePasswordToken($this->createMock(UserInterface::class), 'test');
         $event = new InteractiveLoginEvent($this->createMock(Request::class), $token);
@@ -38,7 +37,7 @@ class LoginListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onLogin($event);
     }
 
-    public function testOnLoginWithNonUserExtendsUserInToken()
+    public function testOnLoginWithNonUserExtendsUserInToken(): void
     {
         $user = new AbstractUserStub();
         $token = new UsernamePasswordToken($user, 'key', ['user']);
@@ -50,7 +49,7 @@ class LoginListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onLogin($event);
     }
 
-    public function testOnLoginWitUserInToken()
+    public function testOnLoginWitUserInToken(): void
     {
         $user = new User();
         $token = new UsernamePasswordToken($user, 'key', ['user']);

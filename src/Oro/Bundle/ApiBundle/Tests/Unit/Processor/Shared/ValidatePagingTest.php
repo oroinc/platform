@@ -35,7 +35,7 @@ class ValidatePagingTest extends GetListProcessorTestCase
         );
     }
 
-    public function testProcessWhenQueryIsAlreadyBuilt()
+    public function testProcessWhenQueryIsAlreadyBuilt(): void
     {
         $query = new \stdClass();
 
@@ -47,7 +47,7 @@ class ValidatePagingTest extends GetListProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWhenPageSizeFilterIsNotSupported()
+    public function testProcessWhenPageSizeFilterIsNotSupported(): void
     {
         $this->context->setConfig(new EntityDefinitionConfig());
         $processor = $this->getProcessor(9);
@@ -56,7 +56,7 @@ class ValidatePagingTest extends GetListProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWhenPageSizeIsNotRequested()
+    public function testProcessWhenPageSizeIsNotRequested(): void
     {
         $this->context->getFilters()->add('page[size]', new PageSizeFilter(DataType::INTEGER), false);
 
@@ -67,7 +67,7 @@ class ValidatePagingTest extends GetListProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWhenUnlimitedMaxResults()
+    public function testProcessWhenUnlimitedMaxResults(): void
     {
         $this->context->getFilters()->add('page[size]', new PageSizeFilter(DataType::INTEGER), false);
         $this->context->getFilterValues()->set('page[size]', new FilterValue('page[size]', 10));
@@ -79,7 +79,7 @@ class ValidatePagingTest extends GetListProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWhenPageSizeLessThanMaxResults()
+    public function testProcessWhenPageSizeLessThanMaxResults(): void
     {
         $this->context->getFilters()->add('page[size]', new PageSizeFilter(DataType::INTEGER), false);
         $this->context->getFilterValues()->set('page[size]', new FilterValue('page[size]', 10));
@@ -91,7 +91,7 @@ class ValidatePagingTest extends GetListProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWhenPageSizeEqualsToMaxResults()
+    public function testProcessWhenPageSizeEqualsToMaxResults(): void
     {
         $this->context->getFilters()->add('page[size]', new PageSizeFilter(DataType::INTEGER), false);
         $this->context->getFilterValues()->set('page[size]', new FilterValue('page[size]', 10));
@@ -103,7 +103,7 @@ class ValidatePagingTest extends GetListProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWhenPageSizeGreaterThanMaxResults()
+    public function testProcessWhenPageSizeGreaterThanMaxResults(): void
     {
         $this->context->getFilters()->add('page[size]', new PageSizeFilter(DataType::INTEGER), false);
         $this->context->getFilterValues()->set('page[size]', new FilterValue('page[size]', 10));
@@ -121,7 +121,7 @@ class ValidatePagingTest extends GetListProcessorTestCase
         );
     }
 
-    public function testProcessWhenPageSizeGreaterThanMaxResultsInConfig()
+    public function testProcessWhenPageSizeGreaterThanMaxResultsInConfig(): void
     {
         $this->context->getFilters()->add('page[size]', new PageSizeFilter(DataType::INTEGER), false);
         $this->context->getFilterValues()->set('page[size]', new FilterValue('page[size]', 10));

@@ -7,14 +7,13 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository;
 use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Provider\ParentMessageIdProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ParentMessageIdProviderTest extends \PHPUnit\Framework\TestCase
+class ParentMessageIdProviderTest extends TestCase
 {
-    /** @var EmailRepository|\PHPUnit\Framework\MockObject\MockObject */
-    private $repository;
-
-    /** @var ParentMessageIdProvider */
-    private $provider;
+    private EmailRepository&MockObject $repository;
+    private ParentMessageIdProvider $provider;
 
     #[\Override]
     protected function setUp(): void

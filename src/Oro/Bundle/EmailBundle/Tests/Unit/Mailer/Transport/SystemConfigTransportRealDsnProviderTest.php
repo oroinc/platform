@@ -6,18 +6,15 @@ use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\EmailBundle\Mailer\Transport\DsnFromSmtpSettingsFactory;
 use Oro\Bundle\EmailBundle\Mailer\Transport\SystemConfigTransportRealDsnProvider;
 use Oro\Bundle\EmailBundle\Provider\SmtpSettingsProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Transport\Dsn;
 
-class SystemConfigTransportRealDsnProviderTest extends \PHPUnit\Framework\TestCase
+class SystemConfigTransportRealDsnProviderTest extends TestCase
 {
-    /** @var SmtpSettingsProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $smtpSettingsProvider;
-
-    /** @var DsnFromSmtpSettingsFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $dsnFromSmtpSettingsFactory;
-
-    /** @var SystemConfigTransportRealDsnProvider */
-    private $provider;
+    private SmtpSettingsProviderInterface&MockObject $smtpSettingsProvider;
+    private DsnFromSmtpSettingsFactory&MockObject $dsnFromSmtpSettingsFactory;
+    private SystemConfigTransportRealDsnProvider $provider;
 
     #[\Override]
     protected function setUp(): void

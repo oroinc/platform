@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class GetListProcessorOrmRelatedTestCase extends OrmRelatedTestCase
 {
@@ -18,12 +19,8 @@ class GetListProcessorOrmRelatedTestCase extends OrmRelatedTestCase
     protected const TEST_REQUEST_TYPE = RequestType::REST;
 
     protected GetListContext $context;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
-    protected $configProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
-    protected $metadataProvider;
+    protected ConfigProvider&MockObject $configProvider;
+    protected MetadataProvider&MockObject $metadataProvider;
 
     #[\Override]
     protected function setUp(): void

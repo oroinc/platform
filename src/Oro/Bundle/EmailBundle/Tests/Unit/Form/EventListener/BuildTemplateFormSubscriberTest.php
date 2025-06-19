@@ -6,6 +6,8 @@ use Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber;
 use Oro\Bundle\NotificationBundle\Entity\EmailNotification;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
@@ -14,13 +16,10 @@ use Symfony\Component\Form\ResolvedFormTypeInterface;
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-class BuildTemplateFormSubscriberTest extends \PHPUnit\Framework\TestCase
+class BuildTemplateFormSubscriberTest extends TestCase
 {
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenStorage;
-
-    /** @var BuildTemplateFormSubscriber */
-    private $listener;
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private BuildTemplateFormSubscriber $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +29,7 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->listener = new BuildTemplateFormSubscriber($this->tokenStorage);
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $result = $this->listener->getSubscribedEvents();
 
@@ -39,7 +38,7 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey(FormEvents::PRE_SUBMIT, $result);
     }
 
-    public function testPreSetDataEmptyData()
+    public function testPreSetDataEmptyData(): void
     {
         $eventMock = $this->createMock(FormEvent::class);
 
@@ -52,7 +51,7 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->listener->preSetData($eventMock);
     }
 
-    public function testPreSetDataEmptyEntityName()
+    public function testPreSetDataEmptyEntityName(): void
     {
         $eventMock = $this->createMock(FormEvent::class);
 
@@ -68,7 +67,7 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->listener->preSetData($eventMock);
     }
 
-    public function testPreSetDataHasTemplates()
+    public function testPreSetDataHasTemplates(): void
     {
         $organization = $this->createMock(Organization::class);
         $token = $this->createMock(UsernamePasswordOrganizationToken::class);
@@ -125,7 +124,7 @@ class BuildTemplateFormSubscriberTest extends \PHPUnit\Framework\TestCase
         $this->listener->preSetData($eventMock);
     }
 
-    public function testPreSubmitData()
+    public function testPreSubmitData(): void
     {
         $organization = $this->createMock(Organization::class);
         $token = $this->createMock(UsernamePasswordOrganizationToken::class);

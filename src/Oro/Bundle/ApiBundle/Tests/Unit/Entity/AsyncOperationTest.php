@@ -6,14 +6,15 @@ use Oro\Bundle\ApiBundle\Entity\AsyncOperation;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class AsyncOperationTest extends \PHPUnit\Framework\TestCase
+class AsyncOperationTest extends TestCase
 {
     /**
      * @dataProvider getSetDataProvider
      */
-    public function testSetGet(string $property, mixed $value, bool $allowNull = false)
+    public function testSetGet(string $property, mixed $value, bool $allowNull = false): void
     {
         $entity = new AsyncOperation();
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
@@ -43,21 +44,21 @@ class AsyncOperationTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testId()
+    public function testId(): void
     {
         $entity = new AsyncOperation();
         ReflectionUtil::setId($entity, 100);
         self::assertEquals(100, $entity->getId());
     }
 
-    public function testCreatedAtForNewEntity()
+    public function testCreatedAtForNewEntity(): void
     {
         $entity = new AsyncOperation();
         $entity->beforeSave();
         self::assertInstanceOf(\DateTime::class, $entity->getCreatedAt());
     }
 
-    public function testUpdatedAtForNewEntity()
+    public function testUpdatedAtForNewEntity(): void
     {
         $entity = new AsyncOperation();
         $entity->beforeSave();
@@ -66,7 +67,7 @@ class AsyncOperationTest extends \PHPUnit\Framework\TestCase
         self::assertNotSame($entity->getCreatedAt(), $entity->getUpdatedAt());
     }
 
-    public function testUpdatedAtForUpdatedEntity()
+    public function testUpdatedAtForUpdatedEntity(): void
     {
         $entity = new AsyncOperation();
         $entity->beforeSave();
@@ -75,14 +76,14 @@ class AsyncOperationTest extends \PHPUnit\Framework\TestCase
         self::assertNotSame($previousUpdatedAt, $entity->getUpdatedAt());
     }
 
-    public function testElapsedTimeForNewEntity()
+    public function testElapsedTimeForNewEntity(): void
     {
         $entity = new AsyncOperation();
         $entity->beforeSave();
         self::assertSame(0, $entity->getElapsedTime());
     }
 
-    public function testElapsedTimeForUpdatedEntity()
+    public function testElapsedTimeForUpdatedEntity(): void
     {
         $entity = new AsyncOperation();
         $entity->beforeSave();

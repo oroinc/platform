@@ -45,7 +45,7 @@ class ComputeTagEntities implements ProcessorInterface
         if (null !== $expandConfigExtra && $expandConfigExtra->isExpandRequested(self::FIELD_NAME)) {
             $entityIdFieldName = $this->getIdentifierFieldName($context->getConfig());
             $ids = $this->getEntityIds($data, $entityIdFieldName);
-            $expandedData = $this->loadExpandedEntityDataByIds($ids, $entityIdFieldName, $context);
+            $expandedData = $this->loadExpandedEntityDataByIds($ids, $context);
             foreach ($data as $key => $item) {
                 $associationData = $item[self::FIELD_NAME];
                 foreach ($associationData as $dataIndex => $dataItem) {
@@ -107,11 +107,8 @@ class ComputeTagEntities implements ProcessorInterface
     /**
      * @return array|null [entity class => [entity id => entity data, ...], ...]
      */
-    private function loadExpandedEntityDataByIds(
-        array $ids,
-        string $entityIdFieldName,
-        CustomizeLoadedDataContext $context
-    ): ?array {
+    private function loadExpandedEntityDataByIds(array $ids, CustomizeLoadedDataContext $context): ?array
+    {
         $entityPropertyPath = $context->getPropertyPath();
         $associationPath = $entityPropertyPath
             ? $entityPropertyPath . ConfigUtil::PATH_DELIMITER . self::FIELD_NAME
@@ -122,7 +119,6 @@ class ComputeTagEntities implements ProcessorInterface
             $expandedEntityData = $this->dataLoader->loadExpandedEntityData(
                 $entityClass,
                 $entityIds,
-                $entityIdFieldName,
                 $context,
                 $associationPath
             );

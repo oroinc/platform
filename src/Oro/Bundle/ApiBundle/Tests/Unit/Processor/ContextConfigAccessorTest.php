@@ -10,14 +10,13 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ContextConfigAccessorTest extends \PHPUnit\Framework\TestCase
+class ContextConfigAccessorTest extends TestCase
 {
-    /** @var Context|\PHPUnit\Framework\MockObject\MockObject */
-    private $context;
-
-    /** @var ContextConfigAccessor */
-    private $configAccessor;
+    private Context&MockObject $context;
+    private ContextConfigAccessor $configAccessor;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +26,7 @@ class ContextConfigAccessorTest extends \PHPUnit\Framework\TestCase
         $this->configAccessor = new ContextConfigAccessor($this->context);
     }
 
-    public function testGetConfigForContextClass()
+    public function testGetConfigForContextClass(): void
     {
         $className = User::class;
         $config = new EntityDefinitionConfig();
@@ -42,7 +41,7 @@ class ContextConfigAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertSame($config, $this->configAccessor->getConfig($className));
     }
 
-    public function testGetConfigForContextClassForCaseWhenApiResourceIsBasedOnManageableEntity()
+    public function testGetConfigForContextClassForCaseWhenApiResourceIsBasedOnManageableEntity(): void
     {
         $className = User::class;
         $config = new EntityDefinitionConfig();
@@ -57,7 +56,7 @@ class ContextConfigAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertSame($config, $this->configAccessor->getConfig($className));
     }
 
-    public function testGetConfigForNotContextClass()
+    public function testGetConfigForNotContextClass(): void
     {
         $config = new EntityDefinitionConfig();
 
@@ -71,7 +70,7 @@ class ContextConfigAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->configAccessor->getConfig(Product::class));
     }
 
-    public function testGetConfigForForFormDataClass()
+    public function testGetConfigForForFormDataClass(): void
     {
         $className = User::class;
         $formDataClass = Contact::class;
@@ -88,7 +87,7 @@ class ContextConfigAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertSame($config, $this->configAccessor->getConfig($formDataClass));
     }
 
-    public function testGetConfigForNotFormDataClass()
+    public function testGetConfigForNotFormDataClass(): void
     {
         $className = User::class;
         $formDataClass = Contact::class;

@@ -4,10 +4,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityIdMetadataAdapter;
+use PHPUnit\Framework\TestCase;
 
-class EntityIdMetadataAdapterTest extends \PHPUnit\Framework\TestCase
+class EntityIdMetadataAdapterTest extends TestCase
 {
-    public function testGetClassName()
+    public function testGetClassName(): void
     {
         $className = 'Test\Class';
 
@@ -16,7 +17,7 @@ class EntityIdMetadataAdapterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($className, $adapter->getClassName());
     }
 
-    public function testGetIdentifierFieldNames()
+    public function testGetIdentifierFieldNames(): void
     {
         $identifierFieldNames = ['id'];
         $config = new EntityDefinitionConfig();
@@ -27,7 +28,7 @@ class EntityIdMetadataAdapterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($identifierFieldNames, $adapter->getIdentifierFieldNames());
     }
 
-    public function testGetPropertyPathForUnknownField()
+    public function testGetPropertyPathForUnknownField(): void
     {
         $config = new EntityDefinitionConfig();
 
@@ -36,7 +37,7 @@ class EntityIdMetadataAdapterTest extends \PHPUnit\Framework\TestCase
         self::assertNull($adapter->getPropertyPath('unknown'));
     }
 
-    public function testGetPropertyPathForNotRenamedField()
+    public function testGetPropertyPathForNotRenamedField(): void
     {
         $fieldName = 'field1';
         $config = new EntityDefinitionConfig();
@@ -47,7 +48,7 @@ class EntityIdMetadataAdapterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($fieldName, $adapter->getPropertyPath($fieldName));
     }
 
-    public function testGetPropertyPathForRenamedField()
+    public function testGetPropertyPathForRenamedField(): void
     {
         $fieldName = 'renamedField1';
         $fieldPropertyPath = 'field1';
@@ -59,14 +60,14 @@ class EntityIdMetadataAdapterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($fieldPropertyPath, $adapter->getPropertyPath($fieldName));
     }
 
-    public function testGetHintsWhenNoHintsInConfig()
+    public function testGetHintsWhenNoHintsInConfig(): void
     {
         $adapter = new EntityIdMetadataAdapter('Test\Class', new EntityDefinitionConfig());
 
         self::assertSame([], $adapter->getHints());
     }
 
-    public function testGetHintsWhenConfigHasHints()
+    public function testGetHintsWhenConfigHasHints(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addHint('HINT_TEST');

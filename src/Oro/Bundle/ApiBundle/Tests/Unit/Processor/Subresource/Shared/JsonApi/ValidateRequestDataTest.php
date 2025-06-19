@@ -10,8 +10,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProc
 
 class ValidateRequestDataTest extends ChangeRelationshipProcessorTestCase
 {
-    /** @var ValidateRequestData */
-    private $processor;
+    private ValidateRequestData $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class ValidateRequestDataTest extends ChangeRelationshipProcessorTestCase
         $this->processor = new ValidateRequestData();
     }
 
-    public function testProcessWhenRequestDataAlreadyValidated()
+    public function testProcessWhenRequestDataAlreadyValidated(): void
     {
         $this->context->setRequestData([]);
         $this->context->setProcessed(ValidateRequestData::OPERATION_NAME);
@@ -29,7 +28,7 @@ class ValidateRequestDataTest extends ChangeRelationshipProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWithValidRequestDataForToOneAssociation()
+    public function testProcessWithValidRequestDataForToOneAssociation(): void
     {
         $requestData = [
             'data' => ['type' => 'products', 'id' => '123']
@@ -43,7 +42,7 @@ class ValidateRequestDataTest extends ChangeRelationshipProcessorTestCase
         self::assertTrue($this->context->isProcessed(ValidateRequestData::OPERATION_NAME));
     }
 
-    public function testProcessWithValidRequestDataForToManyAssociation()
+    public function testProcessWithValidRequestDataForToManyAssociation(): void
     {
         $requestData = [
             'data' => [
@@ -59,7 +58,7 @@ class ValidateRequestDataTest extends ChangeRelationshipProcessorTestCase
         self::assertTrue($this->context->isProcessed(ValidateRequestData::OPERATION_NAME));
     }
 
-    public function testProcessWithInvalidRequestDataForToOneAssociation()
+    public function testProcessWithInvalidRequestDataForToOneAssociation(): void
     {
         $requestData = ['data' => []];
 
@@ -79,7 +78,7 @@ class ValidateRequestDataTest extends ChangeRelationshipProcessorTestCase
         self::assertTrue($this->context->isProcessed(ValidateRequestData::OPERATION_NAME));
     }
 
-    public function testProcessWithInvalidRequestDataForToManyAssociation()
+    public function testProcessWithInvalidRequestDataForToManyAssociation(): void
     {
         $requestData = ['data' => null];
 

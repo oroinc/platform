@@ -15,7 +15,7 @@ $floating-validation-message-label-color: get-var-color('destructive', 'main') !
 $floating-validation-message-label-inner-offset: spacing('sm') spacing('md') !default;
 $floating-validation-message-label-border-radius: $base-ui-element-border-radius !default;
 $floating-validation-message-label-font-size: 13px !default;
-$floating-validation-message-box-shadow: 0px 3px 10px 0px rgba(125, 87, 87, .16),
-    0px 0px 3px 0px rgba(66, 5, 5, .1) !default;
+$floating-validation-message-box-shadow: 0 3px 10px 0 rgba(125, 87, 87, .16),
+    0 0 3px 0 rgba(66, 5, 5, .1) !default;
 
 $floating-validation-message-icon-display: none !default;

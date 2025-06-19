@@ -4,10 +4,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 
 use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
+use PHPUnit\Framework\TestCase;
 
-class ExceptionUtilTest extends \PHPUnit\Framework\TestCase
+class ExceptionUtilTest extends TestCase
 {
-    public function testGetProcessorUnderlyingExceptionWithoutInnerException()
+    public function testGetProcessorUnderlyingExceptionWithoutInnerException(): void
     {
         $exception = new \InvalidArgumentException();
 
@@ -17,7 +18,7 @@ class ExceptionUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetProcessorUnderlyingExceptionWithoutExecutionFailedAsInnerException()
+    public function testGetProcessorUnderlyingExceptionWithoutExecutionFailedAsInnerException(): void
     {
         $exception = new \LogicException(
             'test',
@@ -31,10 +32,10 @@ class ExceptionUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetProcessorUnderlyingExceptionForExecutionFailedAsRootException()
+    public function testGetProcessorUnderlyingExceptionForExecutionFailedAsRootException(): void
     {
         $innerException = new \InvalidArgumentException();
-        $exception      = new ExecutionFailedException(
+        $exception = new ExecutionFailedException(
             'processor1',
             null,
             null,
@@ -47,16 +48,16 @@ class ExceptionUtilTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetProcessorUnderlyingExceptionForExecutionFailedAsInnerException()
+    public function testGetProcessorUnderlyingExceptionForExecutionFailedAsInnerException(): void
     {
-        $innerException           = new \InvalidArgumentException();
+        $innerException = new \InvalidArgumentException();
         $executionFailedException = new ExecutionFailedException(
             'processor1',
             null,
             null,
             $innerException
         );
-        $exception                = new \LogicException(
+        $exception = new \LogicException(
             'test',
             0,
             $executionFailedException

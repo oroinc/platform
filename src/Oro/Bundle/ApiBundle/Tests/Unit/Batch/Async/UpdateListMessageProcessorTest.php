@@ -45,8 +45,8 @@ class UpdateListMessageProcessorTest extends TestCase
 {
     use MessageQueueExtension;
 
-    private const SPLIT_FILE_TIMEOUT = 30000;
-    private const JOB_NAME = 'oro:batch_api:';
+    private const int SPLIT_FILE_TIMEOUT = 30000;
+    private const string JOB_NAME = 'oro:batch_api:';
 
     private JobRunner&MockObject $jobRunner;
     private JobManagerInterface&MockObject $jobManager;

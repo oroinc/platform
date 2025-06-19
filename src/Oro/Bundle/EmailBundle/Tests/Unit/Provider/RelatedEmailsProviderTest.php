@@ -17,27 +17,18 @@ use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
+class RelatedEmailsProviderTest extends TestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var EmailRecipientsHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailRecipientsHelper;
-
-    /** @var EntityFieldProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityFieldProvider;
-
-    /** @var EmailAttributeProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailAttributeProvider;
-
-    /** @var RelatedEmailsProvider */
-    private $provider;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private EmailRecipientsHelper&MockObject $emailRecipientsHelper;
+    private EntityFieldProvider&MockObject $entityFieldProvider;
+    private EmailAttributeProvider&MockObject $emailAttributeProvider;
+    private RelatedEmailsProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -69,7 +60,7 @@ class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
         bool $viewGranted,
         object $tokenUser,
         array $expected
-    ) {
+    ): void {
         $this->emailRecipientsHelper->expects(self::any())
             ->method('isObjectAllowedForOrganization')
             ->with($object, $organization)
@@ -160,7 +151,7 @@ class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
         array $emailsFromAttributes,
         array $recipientsFromEmails,
         array $expected
-    ) {
+    ): void {
         $this->emailRecipientsHelper->expects(self::exactly($permissionsChecksNumberOfCalls))
             ->method('isObjectAllowedForOrganization')
             ->with($object, $organization)
@@ -297,7 +288,7 @@ class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testGetRecipientsRecursive()
+    public function testGetRecipientsRecursive(): void
     {
         $user = new UserStub(1, 'user@example.com');
         $customer = new CustomerStub();
@@ -446,7 +437,7 @@ class RelatedEmailsProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEmails()
+    public function testGetEmails(): void
     {
         $object = new \stdClass();
         $depth = 2;

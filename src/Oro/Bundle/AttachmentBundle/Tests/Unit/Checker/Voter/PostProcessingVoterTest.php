@@ -6,14 +6,13 @@ use Oro\Bundle\AttachmentBundle\Checker\Voter\PostProcessingVoter;
 use Oro\Bundle\AttachmentBundle\DependencyInjection\Configuration;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FeatureToggleBundle\Checker\Voter\VoterInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class PostProcessingVoterTest extends \PHPUnit\Framework\TestCase
+class PostProcessingVoterTest extends TestCase
 {
-    /** @var PostProcessingVoter */
-    private $postProcessingVoter;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
+    private PostProcessingVoter $postProcessingVoter;
+    private ConfigManager&MockObject $configManager;
 
     #[\Override]
     protected function setUp(): void

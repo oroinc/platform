@@ -9,15 +9,13 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\ValidateParentEntityTypeFeature;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ValidateParentEntityTypeFeatureTest extends GetSubresourceProcessorTestCase
 {
-    /** @var ResourcesProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $resourcesProvider;
-
-    /** @var ValidateParentEntityTypeFeature */
-    private $processor;
+    private ResourcesProvider&MockObject $resourcesProvider;
+    private ValidateParentEntityTypeFeature $processor;
 
     #[\Override]
     protected function setUp(): void

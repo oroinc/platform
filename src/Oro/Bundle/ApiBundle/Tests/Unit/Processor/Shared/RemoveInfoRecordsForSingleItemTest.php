@@ -13,8 +13,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class RemoveInfoRecordsForSingleItemTest extends GetListProcessorTestCase
 {
-    /** @var RemoveInfoRecordsForSingleItem */
-    private $processor;
+    private RemoveInfoRecordsForSingleItem $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +37,7 @@ class RemoveInfoRecordsForSingleItemTest extends GetListProcessorTestCase
         return $associationMetadata;
     }
 
-    public function testProcessWithoutMetadata()
+    public function testProcessWithoutMetadata(): void
     {
         $data = [
             'id'    => 1,
@@ -54,7 +53,7 @@ class RemoveInfoRecordsForSingleItemTest extends GetListProcessorTestCase
         self::assertNull($this->context->getInfoRecords());
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('id'));
@@ -118,7 +117,7 @@ class RemoveInfoRecordsForSingleItemTest extends GetListProcessorTestCase
         self::assertEquals($expectedInfoRecords, $this->context->getInfoRecords());
     }
 
-    public function testProcessForMultiTargetAssociation()
+    public function testProcessForMultiTargetAssociation(): void
     {
         $targetMetadataAccessor = $this->createMock(TargetMetadataAccessorInterface::class);
         $metadata = new EntityMetadata(EntityIdentifier::class);

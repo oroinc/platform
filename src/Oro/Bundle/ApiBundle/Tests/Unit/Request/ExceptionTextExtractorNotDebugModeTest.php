@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Exception\ResourceNotAccessibleException;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\ApiBundle\Request\ExceptionTextExtractor;
 use Oro\Component\ChainProcessor\Exception\ExecutionFailedException;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -19,7 +20,7 @@ use Symfony\Component\Security\Core\Exception\LockedException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ExceptionTextExtractorNotDebugModeTest extends \PHPUnit\Framework\TestCase
+class ExceptionTextExtractorNotDebugModeTest extends TestCase
 {
     private ExceptionTextExtractor $exceptionTextExtractor;
 

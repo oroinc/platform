@@ -1,5 +1,5 @@
 .simplecolorpicker.fontawesome span.color[data-selected]:after {
-  font-family: 'FontAwesome';
+  font-family: 'FontAwesome', serif;
   -webkit-font-smoothing: antialiased;
 
   content: '\f00c'; /* Ok/check mark */

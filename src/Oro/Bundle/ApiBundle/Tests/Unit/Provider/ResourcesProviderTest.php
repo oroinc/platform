@@ -14,27 +14,20 @@ use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
+class ResourcesProviderTest extends TestCase
 {
-    /** @var CollectResourcesProcessor|\PHPUnit\Framework\MockObject\MockObject */
-    private $processor;
-
-    /** @var ResourcesCache|\PHPUnit\Framework\MockObject\MockObject */
-    private $resourcesCache;
-
-    /** @var ResourcesWithoutIdentifierLoader|\PHPUnit\Framework\MockObject\MockObject */
-    private $resourcesWithoutIdentifierLoader;
-
-    /** @var ResourceCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $resourceChecker;
-
-    /** @var ResourcesProvider */
-    private $resourcesProvider;
+    private CollectResourcesProcessor&MockObject $processor;
+    private ResourcesCache&MockObject $resourcesCache;
+    private ResourcesWithoutIdentifierLoader&MockObject $resourcesWithoutIdentifierLoader;
+    private ResourceCheckerInterface&MockObject $resourceChecker;
+    private ResourcesProvider $resourcesProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -55,7 +48,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetResourcesNoCache()
+    public function testGetResourcesNoCache(): void
     {
         $version = '1.2.3';
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
@@ -148,7 +141,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testGetResourcesNoCacheButWithCachedResourcesWithoutIdentifier()
+    public function testGetResourcesNoCacheButWithCachedResourcesWithoutIdentifier(): void
     {
         $version = '1.2.3';
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
@@ -250,7 +243,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testGetResourcesWhenGetAndGetListActionsAreExcluded()
+    public function testGetResourcesWhenGetAndGetListActionsAreExcluded(): void
     {
         $version = '1.2.3';
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
@@ -417,7 +410,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetResourcesFromCache()
+    public function testGetResourcesFromCache(): void
     {
         $version = '1.2.3';
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
@@ -457,7 +450,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAccessibleResourcesWhenCacheExists()
+    public function testGetAccessibleResourcesWhenCacheExists(): void
     {
         $version = '1.2.3';
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
@@ -501,7 +494,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAccessibleResourcesWhenCacheDoesNotExist()
+    public function testGetAccessibleResourcesWhenCacheDoesNotExist(): void
     {
         $version = '1.2.3';
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
@@ -567,7 +560,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAccessibleResourcesForNotAccessibleResourceWithoutIdentifier()
+    public function testGetAccessibleResourcesForNotAccessibleResourceWithoutIdentifier(): void
     {
         $version = '1.2.3';
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
@@ -605,7 +598,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsResourceAccessibleWhenCacheExists()
+    public function testIsResourceAccessibleWhenCacheExists(): void
     {
         $version = '1.2.3';
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
@@ -653,7 +646,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsResourceAccessibleWhenCacheDoesNotExist()
+    public function testIsResourceAccessibleWhenCacheDoesNotExist(): void
     {
         $version = '1.2.3';
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
@@ -723,7 +716,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsResourceAccessibleForNotAccessibleResourceWithoutIdentifier()
+    public function testIsResourceAccessibleForNotAccessibleResourceWithoutIdentifier(): void
     {
         $version = '1.2.3';
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
@@ -759,7 +752,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsResourceKnownWhenCacheExists()
+    public function testIsResourceKnownWhenCacheExists(): void
     {
         $version = '1.2.3';
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
@@ -803,7 +796,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsResourceKnownWhenCacheDoesNotExist()
+    public function testIsResourceKnownWhenCacheDoesNotExist(): void
     {
         $version = '1.2.3';
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
@@ -873,7 +866,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsResourceEnabled()
+    public function testIsResourceEnabled(): void
     {
         $action = 'get';
         $version = '1.2.3';
@@ -901,7 +894,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetResourceExcludeActionsWhenCacheExists()
+    public function testGetResourceExcludeActionsWhenCacheExists(): void
     {
         $version = '1.2.3';
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
@@ -952,7 +945,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetResourceExcludeActionsWhenCacheDoesNotExist()
+    public function testGetResourceExcludeActionsWhenCacheDoesNotExist(): void
     {
         $version = '1.2.3';
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
@@ -1037,7 +1030,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isReadOnlyResourceDataProvider
      */
-    public function testIsReadOnlyResource(bool $result, int $accessible, array $excludedActions)
+    public function testIsReadOnlyResource(bool $result, int $accessible, array $excludedActions): void
     {
         $version = '1.2.3';
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
@@ -1124,7 +1117,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testGetResourcesWithoutIdentifierWhenCacheExists()
+    public function testGetResourcesWithoutIdentifierWhenCacheExists(): void
     {
         $version = '1.2.3';
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
@@ -1153,7 +1146,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetResourcesWithoutIdentifierWhenCacheDoesNotExist()
+    public function testGetResourcesWithoutIdentifierWhenCacheDoesNotExist(): void
     {
         $version = '1.2.3';
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
@@ -1201,7 +1194,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsResourceWithoutIdentifierWhenCacheExists()
+    public function testIsResourceWithoutIdentifierWhenCacheExists(): void
     {
         $version = '1.2.3';
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
@@ -1234,7 +1227,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testIsResourceWithoutIdentifierWhenCacheDoesNotExist()
+    public function testIsResourceWithoutIdentifierWhenCacheDoesNotExist(): void
     {
         $version = '1.2.3';
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
@@ -1283,7 +1276,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testClearCache()
+    public function testClearCache(): void
     {
         $action = 'get';
         $version = '1.2.3';
@@ -1354,7 +1347,7 @@ class ResourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $action = 'get';
         $version = '1.2.3';

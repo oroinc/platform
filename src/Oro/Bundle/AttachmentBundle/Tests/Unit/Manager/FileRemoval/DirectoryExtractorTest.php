@@ -3,10 +3,11 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Manager\FileRemoval;
 
 use Oro\Bundle\AttachmentBundle\Manager\FileRemoval\DirectoryExtractor;
+use PHPUnit\Framework\TestCase;
 
-class DirectoryExtractorTest extends \PHPUnit\Framework\TestCase
+class DirectoryExtractorTest extends TestCase
 {
-    public function testWhenDirectoryMatchExpressionStartsWithInvalidExpression()
+    public function testWhenDirectoryMatchExpressionStartsWithInvalidExpression(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
@@ -17,7 +18,7 @@ class DirectoryExtractorTest extends \PHPUnit\Framework\TestCase
         new DirectoryExtractor('/(attachment\/resize\/\d+)\/\d+\/\d+\/\w+/', false);
     }
 
-    public function testWhenDirectoryMatchExpressionStartsWithSlash()
+    public function testWhenDirectoryMatchExpressionStartsWithSlash(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
@@ -28,19 +29,19 @@ class DirectoryExtractorTest extends \PHPUnit\Framework\TestCase
         new DirectoryExtractor('/^(\/attachment\/resize\/\d+)\/\d+\/\d+\/\w+/', true);
     }
 
-    public function testWhenAllowedToUseForSingleFile()
+    public function testWhenAllowedToUseForSingleFile(): void
     {
         $extractor = new DirectoryExtractor('/^(attachment\/resize\/\d+)\/\d+\/\d+\/\w+/', true);
         self::assertTrue($extractor->isAllowedToUseForSingleFile());
     }
 
-    public function testWhenNotAllowedToUseForSingleFile()
+    public function testWhenNotAllowedToUseForSingleFile(): void
     {
         $extractor = new DirectoryExtractor('/^(attachment\/resize\/\d+)\/\d+\/\d+\/\w+/', false);
         self::assertFalse($extractor->isAllowedToUseForSingleFile());
     }
 
-    public function testExtract()
+    public function testExtract(): void
     {
         $extractor = new DirectoryExtractor('/^(attachment\/resize\/\d+)\/\d+\/\d+\/\w+/', false);
         self::assertEquals(

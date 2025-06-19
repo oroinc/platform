@@ -5,14 +5,14 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 use Oro\Bundle\ApiBundle\Request\ChainConstraintTextExtractor;
 use Oro\Bundle\ApiBundle\Request\ConstraintTextExtractorInterface;
 use Oro\Bundle\ApiBundle\Validator\Constraints\AccessGranted;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChainConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
+class ChainConstraintTextExtractorTest extends TestCase
 {
-    /** @var ChainConstraintTextExtractor */
-    private $extractor;
-
-    /** @var ConstraintTextExtractorInterface[]|\PHPUnit\Framework\MockObject\MockObject[] */
-    private $extractors = [];
+    /** @var ConstraintTextExtractorInterface[]&MockObject[] */
+    private array $extractors = [];
+    private ChainConstraintTextExtractor $chainExtractor;
 
     #[\Override]
     protected function setUp(): void
@@ -21,10 +21,10 @@ class ChainConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
         $secondExtractor = $this->createMock(ConstraintTextExtractorInterface::class);
 
         $this->extractors = [$firstExtractor, $secondExtractor];
-        $this->extractor = new ChainConstraintTextExtractor($this->extractors);
+        $this->chainExtractor = new ChainConstraintTextExtractor($this->extractors);
     }
 
-    public function testGetConstraintStatusCodeByFirstExtractor()
+    public function testGetConstraintStatusCodeByFirstExtractor(): void
     {
         $constraint = new AccessGranted();
 
@@ -35,10 +35,10 @@ class ChainConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
         $this->extractors[1]->expects(self::never())
             ->method('getConstraintStatusCode');
 
-        self::assertEquals(400, $this->extractor->getConstraintStatusCode($constraint));
+        self::assertEquals(400, $this->chainExtractor->getConstraintStatusCode($constraint));
     }
 
-    public function testGetConstraintStatusCodeBySecondExtractor()
+    public function testGetConstraintStatusCodeBySecondExtractor(): void
     {
         $constraint = new AccessGranted();
 
@@ -51,10 +51,10 @@ class ChainConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
             ->with(self::identicalTo($constraint))
             ->willReturn(401);
 
-        self::assertEquals(401, $this->extractor->getConstraintStatusCode($constraint));
+        self::assertEquals(401, $this->chainExtractor->getConstraintStatusCode($constraint));
     }
 
-    public function testGetConstraintStatusCodeWithNullResult()
+    public function testGetConstraintStatusCodeWithNullResult(): void
     {
         $constraint = new AccessGranted();
 
@@ -67,10 +67,10 @@ class ChainConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
             ->with(self::identicalTo($constraint))
             ->willReturn(null);
 
-        self::assertNull($this->extractor->getConstraintStatusCode($constraint));
+        self::assertNull($this->chainExtractor->getConstraintStatusCode($constraint));
     }
 
-    public function testGetConstraintCodeByFirstExtractor()
+    public function testGetConstraintCodeByFirstExtractor(): void
     {
         $constraint = new AccessGranted();
 
@@ -81,10 +81,10 @@ class ChainConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
         $this->extractors[1]->expects(self::never())
             ->method('getConstraintCode');
 
-        self::assertEquals('code1', $this->extractor->getConstraintCode($constraint));
+        self::assertEquals('code1', $this->chainExtractor->getConstraintCode($constraint));
     }
 
-    public function testGetConstraintCodeBySecondExtractor()
+    public function testGetConstraintCodeBySecondExtractor(): void
     {
         $constraint = new AccessGranted();
 
@@ -97,10 +97,10 @@ class ChainConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
             ->with(self::identicalTo($constraint))
             ->willReturn('code2');
 
-        self::assertEquals('code2', $this->extractor->getConstraintCode($constraint));
+        self::assertEquals('code2', $this->chainExtractor->getConstraintCode($constraint));
     }
 
-    public function testGetConstraintCodeWithNullResult()
+    public function testGetConstraintCodeWithNullResult(): void
     {
         $constraint = new AccessGranted();
 
@@ -113,10 +113,10 @@ class ChainConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
             ->with(self::identicalTo($constraint))
             ->willReturn(null);
 
-        self::assertNull($this->extractor->getConstraintCode($constraint));
+        self::assertNull($this->chainExtractor->getConstraintCode($constraint));
     }
 
-    public function testGetConstraintTypeByFirstExtractor()
+    public function testGetConstraintTypeByFirstExtractor(): void
     {
         $constraint = new AccessGranted();
 
@@ -127,10 +127,10 @@ class ChainConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
         $this->extractors[1]->expects(self::never())
             ->method('getConstraintType');
 
-        self::assertEquals('first extractor type', $this->extractor->getConstraintType($constraint));
+        self::assertEquals('first extractor type', $this->chainExtractor->getConstraintType($constraint));
     }
 
-    public function testGetConstraintTypeBySecondExtractor()
+    public function testGetConstraintTypeBySecondExtractor(): void
     {
         $constraint = new AccessGranted();
 
@@ -143,10 +143,10 @@ class ChainConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
             ->with(self::identicalTo($constraint))
             ->willReturn('second extractor type');
 
-        self::assertEquals('second extractor type', $this->extractor->getConstraintType($constraint));
+        self::assertEquals('second extractor type', $this->chainExtractor->getConstraintType($constraint));
     }
 
-    public function testGetConstraintTypWithNullResult()
+    public function testGetConstraintTypWithNullResult(): void
     {
         $constraint = new AccessGranted();
 
@@ -159,6 +159,6 @@ class ChainConstraintTextExtractorTest extends \PHPUnit\Framework\TestCase
             ->with(self::identicalTo($constraint))
             ->willReturn(null);
 
-        self::assertNull($this->extractor->getConstraintType($constraint));
+        self::assertNull($this->chainExtractor->getConstraintType($constraint));
     }
 }

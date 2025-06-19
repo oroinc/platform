@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Mail\Storage;
 
 use Oro\Bundle\ImapBundle\Mail\Storage\Value;
+use PHPUnit\Framework\TestCase;
 
-class ValueTest extends \PHPUnit\Framework\TestCase
+class ValueTest extends TestCase
 {
-    public function testConstructorAndGetters()
+    public function testConstructorAndGetters(): void
     {
         $value = 'testValue';
         $encoding = 'testEncoding';

@@ -4,22 +4,20 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\JsonApi;
 
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\JsonApi\RequestDataValidator;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class RequestDataValidatorTest extends \PHPUnit\Framework\TestCase
+class RequestDataValidatorTest extends TestCase
 {
-    /** @var RequestDataValidator */
-    private $validator;
+    private RequestDataValidator $validator;
 
     #[\Override]
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->validator = new RequestDataValidator();
     }
 
@@ -29,7 +27,7 @@ class RequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         string $expectedTitle,
         int $expectedStatusCode,
         array $errors
-    ) {
+    ): void {
         self::assertCount(count($expectedErrors), $errors);
         foreach ($errors as $key => $error) {
             self::assertEquals($expectedTitle, $error->getTitle());
@@ -42,7 +40,7 @@ class RequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validResourceObjectProvider
      */
-    public function testValidResourceObject(array $requestData)
+    public function testValidResourceObject(array $requestData): void
     {
         $errors = $this->validator->validateResourceObject($requestData, false);
 
@@ -52,7 +50,7 @@ class RequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validResourceObjectWithIncludedResourcesProvider
      */
-    public function testValidResourceObjectWithIncludedResources(array $requestData)
+    public function testValidResourceObjectWithIncludedResources(array $requestData): void
     {
         $errors = $this->validator->validateResourceObject($requestData, true);
 
@@ -151,7 +149,7 @@ class RequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validResourceObjectCollectionProvider
      */
-    public function testValidResourceObjectCollection(array $requestData)
+    public function testValidResourceObjectCollection(array $requestData): void
     {
         $errors = $this->validator->validateResourceObjectCollection($requestData, false);
 
@@ -161,7 +159,7 @@ class RequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validResourceObjectCollectionWithIncludedResourcesProvider
      */
-    public function testValidResourceObjectCollectionWithIncludedResources(array $requestData)
+    public function testValidResourceObjectCollectionWithIncludedResources(array $requestData): void
     {
         $errors = $this->validator->validateResourceObjectCollection($requestData, true);
 
@@ -266,7 +264,7 @@ class RequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         string $pointer,
         string $title = Constraint::REQUEST_DATA,
         int $statusCode = 400
-    ) {
+    ): void {
         $errors = $this->validator->validateResourceObject($requestData, false);
 
         $this->assertValidationErrors((array)$expectedError, (array)$pointer, $title, $statusCode, $errors);
@@ -281,7 +279,7 @@ class RequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         string|array $pointer,
         string $title = Constraint::REQUEST_DATA,
         int $statusCode = 400
-    ) {
+    ): void {
         $errors = $this->validator->validateResourceObject($requestData, true);
 
         $this->assertValidationErrors((array)$expectedError, (array)$pointer, $title, $statusCode, $errors);
@@ -658,7 +656,7 @@ class RequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         string $pointer,
         string $title = Constraint::REQUEST_DATA,
         int $statusCode = 400
-    ) {
+    ): void {
         $errors = $this->validator->validateResourceObjectCollection($requestData, false);
 
         $this->assertValidationErrors((array)$expectedError, (array)$pointer, $title, $statusCode, $errors);
@@ -673,7 +671,7 @@ class RequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         string|array $pointer,
         string $title = Constraint::REQUEST_DATA,
         int $statusCode = 400
-    ) {
+    ): void {
         $errors = $this->validator->validateResourceObjectCollection($requestData, true);
 
         $this->assertValidationErrors((array)$expectedError, (array)$pointer, $title, $statusCode, $errors);
@@ -1063,7 +1061,7 @@ class RequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         string $pointer,
         string $title = Constraint::REQUEST_DATA,
         int $statusCode = 400
-    ) {
+    ): void {
         $errors = $this->validator->validateResourceObject($requestData, false, true);
 
         $this->assertValidationErrors((array)$expectedError, (array)$pointer, $title, $statusCode, $errors);
@@ -1078,7 +1076,7 @@ class RequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         string $pointer,
         string $title = Constraint::REQUEST_DATA,
         int $statusCode = 400
-    ) {
+    ): void {
         $errors = $this->validator->validateResourceObject($requestData, true, true);
 
         $this->assertValidationErrors((array)$expectedError, (array)$pointer, $title, $statusCode, $errors);
@@ -1109,7 +1107,7 @@ class RequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         string $pointer,
         string $title = Constraint::REQUEST_DATA,
         int $statusCode = 400
-    ) {
+    ): void {
         $errors = $this->validator->validateResourceObjectCollection(
             $requestData,
             false,
@@ -1128,7 +1126,7 @@ class RequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         string $pointer,
         string $title = Constraint::REQUEST_DATA,
         int $statusCode = 400
-    ) {
+    ): void {
         $errors = $this->validator->validateResourceObjectCollection(
             $requestData,
             true,
@@ -1149,7 +1147,7 @@ class RequestDataValidatorTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testValidateResourceObjectShouldNotContainIncludedSection()
+    public function testValidateResourceObjectShouldNotContainIncludedSection(): void
     {
         $requestData = [
             'data'     => ['type' => 'products', 'id' => '1', 'attributes' => ['test' => null]],
@@ -1170,7 +1168,7 @@ class RequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validMetaObjectProvider
      */
-    public function testValidMetaObject(array $requestData)
+    public function testValidMetaObject(array $requestData): void
     {
         $errors = $this->validator->validateMetaObject($requestData);
 
@@ -1189,7 +1187,7 @@ class RequestDataValidatorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidMetaObjectProvider
      */
-    public function testInvalidMetaObject(array $requestData, string|array $expectedError, string|array $pointer)
+    public function testInvalidMetaObject(array $requestData, string|array $expectedError, string|array $pointer): void
     {
         $errors = $this->validator->validateMetaObject($requestData);
 

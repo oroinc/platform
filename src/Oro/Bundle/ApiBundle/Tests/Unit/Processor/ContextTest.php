@@ -16,6 +16,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\Extra\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\Extra\HateoasMetadataExtra;
+use Oro\Bundle\ApiBundle\Metadata\TargetMetadataAccessorInterface;
 use Oro\Bundle\ApiBundle\Model\NotResolvedIdentifier;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
@@ -24,6 +25,9 @@ use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
+use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -32,16 +36,11 @@ use Oro\Component\ChainProcessor\ParameterBagInterface;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ContextTest extends \PHPUnit\Framework\TestCase
+class ContextTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
-    private $configProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
-    private $metadataProvider;
-
-    /** @var Context */
-    private $context;
+    private ConfigProvider&MockObject $configProvider;
+    private MetadataProvider&MockObject $metadataProvider;
+    private Context $context;
 
     #[\Override]
     protected function setUp(): void
@@ -65,7 +64,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     /**
      * keys of request headers should be case insensitive
      */
-    public function testRequestHeaders()
+    public function testRequestHeaders(): void
     {
         $headers = $this->context->getRequestHeaders();
 
@@ -124,7 +123,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     /**
      * keys of response headers should be case sensitive
      */
-    public function testResponseHeaders()
+    public function testResponseHeaders(): void
     {
         $headers = $this->context->getResponseHeaders();
 
@@ -184,7 +183,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertCount(0, $headers);
     }
 
-    public function testResponseStatusCode()
+    public function testResponseStatusCode(): void
     {
         self::assertNull($this->context->getResponseStatusCode());
 
@@ -193,7 +192,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(500, $this->context->get('responseStatusCode'));
     }
 
-    public function testIsSuccessResponse()
+    public function testIsSuccessResponse(): void
     {
         self::assertFalse($this->context->isSuccessResponse());
 
@@ -208,7 +207,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->context->isSuccessResponse());
     }
 
-    public function testResponseDocumentBuilder()
+    public function testResponseDocumentBuilder(): void
     {
         self::assertNull($this->context->getResponseDocumentBuilder());
 
@@ -220,7 +219,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getResponseDocumentBuilder());
     }
 
-    public function testClassName()
+    public function testClassName(): void
     {
         self::assertNull($this->context->getClassName());
 
@@ -233,7 +232,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->context->has('class'));
     }
 
-    public function testGetConfigSections()
+    public function testGetConfigSections(): void
     {
         $configExtras = [
             new TestConfigSection('section1'),
@@ -249,7 +248,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoadConfigByGetConfig()
+    public function testLoadConfigByGetConfig(): void
     {
         $version = '1.1';
         $requestType = 'rest';
@@ -304,7 +303,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($config, $this->context->getConfig());
     }
 
-    public function testLoadConfigByGetConfigWhenExceptionOccurs()
+    public function testLoadConfigByGetConfigWhenExceptionOccurs(): void
     {
         $version = '1.1';
         $requestType = 'rest';
@@ -353,7 +352,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getConfig());
     }
 
-    public function testLoadConfigByGetConfigOf()
+    public function testLoadConfigByGetConfigOf(): void
     {
         $version = '1.1';
         $requestType = 'rest';
@@ -407,7 +406,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($config, $this->context->getConfig());
     }
 
-    public function testLoadConfigByGetConfigOfWhenExceptionOccurs()
+    public function testLoadConfigByGetConfigOfWhenExceptionOccurs(): void
     {
         $version = '1.1';
         $requestType = 'rest';
@@ -455,7 +454,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getConfig());
     }
 
-    public function testLoadConfigNoClassName()
+    public function testLoadConfigNoClassName(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('A class name must be set in the context before a configuration is loaded.');
@@ -463,7 +462,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->context->getConfig();
     }
 
-    public function testConfigWhenItIsSetExplicitly()
+    public function testConfigWhenItIsSetExplicitly(): void
     {
         $config = new EntityDefinitionConfig();
         $config->setExcludeAll();
@@ -490,7 +489,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getConfigOf('section1'));
     }
 
-    public function testConfigWhenItIsSetExplicitlyForSection()
+    public function testConfigWhenItIsSetExplicitlyForSection(): void
     {
         $section1Config = ['test'];
 
@@ -517,7 +516,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getConfig());
     }
 
-    public function testHasConfigOfUndefinedSection()
+    public function testHasConfigOfUndefinedSection(): void
     {
         $this->context->setConfigExtras([new TestConfigSection('section1')]);
         $this->context->setClassName('Test\Class');
@@ -528,7 +527,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->context->hasConfigOf('undefined'));
     }
 
-    public function testGetConfigOfUndefinedSection()
+    public function testGetConfigOfUndefinedSection(): void
     {
         $this->context->setConfigExtras([new TestConfigSection('section1')]);
         $this->context->setClassName('Test\Class');
@@ -539,7 +538,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getConfigOf('undefined'));
     }
 
-    public function testSetConfigOfUndefinedSection()
+    public function testSetConfigOfUndefinedSection(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->context->setConfigExtras([new TestConfigSection('section1')]);
@@ -554,7 +553,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider configSectionProvider
      */
-    public function testLoadKnownSectionConfigByGetConfigOf(string $configSection, object $sectionConfig)
+    public function testLoadKnownSectionConfigByGetConfigOf(string $configSection, object $sectionConfig): void
     {
         $mainConfig = new EntityDefinitionConfig();
 
@@ -603,7 +602,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider configSectionProvider
      */
-    public function testConfigWhenIsSetExplicitlyForKnownSection(string $configSection, object $sectionConfig)
+    public function testConfigWhenIsSetExplicitlyForKnownSection(string $configSection, object $sectionConfig): void
     {
         $this->context->setClassName('Test\Class');
         // set "known" sections
@@ -637,7 +636,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testFilters()
+    public function testFilters(): void
     {
         $testFilter = $this->createMock(FilterInterface::class);
 
@@ -647,14 +646,14 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($testFilter, $this->context->getFilters()->get('test'));
     }
 
-    public function testDefaultAccessorForFilterValues()
+    public function testDefaultAccessorForFilterValues(): void
     {
         self::assertNotNull($this->context->getFilterValues());
         self::assertFalse($this->context->getFilterValues()->has('test'));
         self::assertNull($this->context->getFilterValues()->getOne('test'));
     }
 
-    public function testFilterValues()
+    public function testFilterValues(): void
     {
         $accessor = $this->createMock(FilterValueAccessorInterface::class);
         $this->context->setFilterValues($accessor);
@@ -662,7 +661,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($accessor, $this->context->getFilterValues());
     }
 
-    public function testMainRequest()
+    public function testMainRequest(): void
     {
         self::assertFalse($this->context->isMainRequest());
         self::assertFalse($this->context->get('mainRequest'));
@@ -672,7 +671,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->context->get('mainRequest'));
     }
 
-    public function testCorsRequest()
+    public function testCorsRequest(): void
     {
         self::assertFalse($this->context->isCorsRequest());
         self::assertFalse($this->context->get('cors'));
@@ -682,7 +681,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->context->get('cors'));
     }
 
-    public function testHateoas()
+    public function testHateoas(): void
     {
         self::assertFalse($this->context->isHateoasEnabled());
         self::assertFalse($this->context->get('hateoas'));
@@ -696,7 +695,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->context->get('hateoas'));
     }
 
-    public function testHateoasForConfigExtras()
+    public function testHateoasForConfigExtras(): void
     {
         $this->context->setHateoas(true);
         self::assertEquals([new HateoasConfigExtra()], $this->context->getConfigExtras());
@@ -705,7 +704,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $this->context->getConfigExtras());
     }
 
-    public function testHateoasForMetadataExtras()
+    public function testHateoasForMetadataExtras(): void
     {
         // make sure that metadata extras are initialized
         $this->context->getMetadataExtras();
@@ -720,7 +719,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $this->context->getMetadataExtras());
     }
 
-    public function testSharedData()
+    public function testSharedData(): void
     {
         self::assertInstanceOf(ParameterBagInterface::class, $this->context->getSharedData());
 
@@ -729,7 +728,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($sharedData, $this->context->getSharedData());
     }
 
-    public function testGetNormalizationContext()
+    public function testGetNormalizationContext(): void
     {
         $action = 'test_action';
         $version = '1.2';
@@ -748,7 +747,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($sharedData, $normalizationContext['sharedData']);
     }
 
-    public function testInfoRecords()
+    public function testInfoRecords(): void
     {
         self::assertNull($this->context->getInfoRecords());
 
@@ -773,7 +772,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getInfoRecords());
     }
 
-    public function testAddAssociationInfoRecords()
+    public function testAddAssociationInfoRecords(): void
     {
         self::assertNull($this->context->getInfoRecords());
 
@@ -807,7 +806,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testNotResolvedIdentifiers()
+    public function testNotResolvedIdentifiers(): void
     {
         self::assertFalse($this->context->has('not_resolved_identifiers'));
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
@@ -836,7 +835,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $this->context->getNotResolvedIdentifiers());
     }
 
-    public function testConfigExtras()
+    public function testConfigExtras(): void
     {
         self::assertSame([], $this->context->getConfigExtras());
 
@@ -869,7 +868,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $this->context->getConfigExtras());
     }
 
-    public function testSetConfigExtrasForHateoas()
+    public function testSetConfigExtrasForHateoas(): void
     {
         $this->context->setHateoas(true);
         $configExtra = new TestConfigExtra('test');
@@ -885,7 +884,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($configExtras, $this->context->getConfigExtras());
     }
 
-    public function testSetInvalidConfigExtras()
+    public function testSetInvalidConfigExtras(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected an array of "Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface".');
@@ -893,7 +892,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setConfigExtras(['test']);
     }
 
-    public function testAddDuplicateConfigExtra()
+    public function testAddDuplicateConfigExtra(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "test" config extra already exists.');
@@ -904,7 +903,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->context->addConfigExtra(new TestConfigExtra('test'));
     }
 
-    public function testLoadMetadata()
+    public function testLoadMetadata(): void
     {
         $version = '1.1';
         $requestType = 'rest';
@@ -950,13 +949,19 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($metadata, $this->context->getMetadata()); // load metadata
         self::assertTrue($this->context->hasMetadata());
 
+        // test that metadata is initialized
+        self::assertInstanceOf(
+            TargetMetadataAccessorInterface::class,
+            ReflectionUtil::getPropertyValue($metadata, 'targetMetadataAccessor')
+        );
+
         self::assertEquals($config, $this->context->getConfig());
 
         // test that metadata are loaded only once
         self::assertSame($metadata, $this->context->getMetadata());
     }
 
-    public function testLoadMetadataWhenHateoasIsEnabled()
+    public function testLoadMetadataWhenHateoasIsEnabled(): void
     {
         $version = '1.1';
         $requestType = 'rest';
@@ -1003,13 +1008,19 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($metadata, $this->context->getMetadata()); // load metadata
         self::assertTrue($this->context->hasMetadata());
 
+        // test that metadata is initialized
+        self::assertInstanceOf(
+            TargetMetadataAccessorInterface::class,
+            ReflectionUtil::getPropertyValue($metadata, 'targetMetadataAccessor')
+        );
+
         self::assertEquals($config, $this->context->getConfig());
 
         // test that metadata are loaded only once
         self::assertSame($metadata, $this->context->getMetadata());
     }
 
-    public function testLoadMetadataNoClassName()
+    public function testLoadMetadataNoClassName(): void
     {
         $this->metadataProvider->expects(self::never())
             ->method('getMetadata');
@@ -1018,7 +1029,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->context->hasMetadata());
     }
 
-    public function testLoadMetadataWhenExceptionOccurs()
+    public function testLoadMetadataWhenExceptionOccurs(): void
     {
         $version = '1.1';
         $requestType = 'rest';
@@ -1074,7 +1085,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getMetadata());
     }
 
-    public function testLoadMetadataWhenExceptionOccursInLoadConfig()
+    public function testLoadMetadataWhenExceptionOccursInLoadConfig(): void
     {
         $version = '1.1';
         $requestType = 'rest';
@@ -1123,7 +1134,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getMetadata());
     }
 
-    public function testMetadataWhenItIsSetExplicitly()
+    public function testMetadataWhenItIsSetExplicitly(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
 
@@ -1145,7 +1156,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getMetadata());
     }
 
-    public function testMetadataExtras()
+    public function testMetadataExtras(): void
     {
         self::assertSame([], $this->context->getMetadataExtras());
 
@@ -1177,7 +1188,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $this->context->getMetadataExtras());
     }
 
-    public function testMetadataExtrasWhenActionExistsInContext()
+    public function testMetadataExtrasWhenActionExistsInContext(): void
     {
         $action = 'test_action';
         $this->context->setAction($action);
@@ -1194,7 +1205,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSetMetadataExtrasForHateoas()
+    public function testSetMetadataExtrasForHateoas(): void
     {
         $this->context->setHateoas(true);
         $metadataExtra = new TestMetadataExtra('test');
@@ -1210,7 +1221,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($metadataExtras, $this->context->getMetadataExtras());
     }
 
-    public function testGetMetadataExtrasForHateoas()
+    public function testGetMetadataExtrasForHateoas(): void
     {
         $this->context->setHateoas(true);
 
@@ -1220,12 +1231,12 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetMetadataExtrasForNoHateoas()
+    public function testGetMetadataExtrasForNoHateoas(): void
     {
         self::assertEquals([], $this->context->getMetadataExtras());
     }
 
-    public function testActionMetadataExtrasCannotBeOverridden()
+    public function testActionMetadataExtrasCannotBeOverridden(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "action" metadata extra already exists.');
@@ -1235,7 +1246,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->context->addMetadataExtra(new ActionMetadataExtra('other_action'));
     }
 
-    public function testSetInvalidMetadataExtras()
+    public function testSetInvalidMetadataExtras(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -1245,7 +1256,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setMetadataExtras(['test']);
     }
 
-    public function testAddDuplicateMetadataExtra()
+    public function testAddDuplicateMetadataExtra(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "test" metadata extra already exists.');
@@ -1256,7 +1267,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         $this->context->addMetadataExtra(new TestMetadataExtra('test'));
     }
 
-    public function testHasIdentifierFieldsShouldCauseMetadataLoading()
+    public function testHasIdentifierFieldsShouldCauseMetadataLoading(): void
     {
         $entityClass = 'Test\Class';
         $metadata = new EntityMetadata('Test\Entity');
@@ -1275,14 +1286,14 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->context->hasIdentifierFields());
     }
 
-    public function testHasIdentifierFieldsWithoutMetadata()
+    public function testHasIdentifierFieldsWithoutMetadata(): void
     {
         $this->context->setMetadata(null);
 
         self::assertFalse($this->context->hasIdentifierFields());
     }
 
-    public function testHasIdentifierFieldsWithoutIdInMetadata()
+    public function testHasIdentifierFieldsWithoutIdInMetadata(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
 
@@ -1291,7 +1302,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->context->hasIdentifierFields());
     }
 
-    public function testHasIdentifierFieldsWithIdInMetadata()
+    public function testHasIdentifierFieldsWithIdInMetadata(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -1301,7 +1312,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->context->hasIdentifierFields());
     }
 
-    public function testQuery()
+    public function testQuery(): void
     {
         $query = new \stdClass();
 
@@ -1317,7 +1328,7 @@ class ContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getQuery());
     }
 
-    public function testCriteria()
+    public function testCriteria(): void
     {
         self::assertNull($this->context->getCriteria());
 

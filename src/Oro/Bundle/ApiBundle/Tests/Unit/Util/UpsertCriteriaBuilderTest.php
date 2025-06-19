@@ -14,20 +14,17 @@ use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormContextStub;
 use Oro\Bundle\ApiBundle\Util\UpsertCriteriaBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class UpsertCriteriaBuilderTest extends \PHPUnit\Framework\TestCase
+class UpsertCriteriaBuilderTest extends TestCase
 {
-    /** @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject */
-    private $valueNormalizer;
-
-    /** @var UpsertCriteriaBuilder */
-    private $upsertCriteriaBuilder;
+    private ValueNormalizer&MockObject $valueNormalizer;
+    private UpsertCriteriaBuilder $upsertCriteriaBuilder;
 
     #[\Override]
     protected function setUp(): void
     {
-        parent::setUp();
-
         $this->valueNormalizer = $this->createMock(ValueNormalizer::class);
 
         $this->upsertCriteriaBuilder = new UpsertCriteriaBuilder($this->valueNormalizer);

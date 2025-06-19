@@ -17,22 +17,19 @@ use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
 use Oro\Component\Testing\Unit\ORM\OrmTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub\ReturnCallback;
 
 class RecalculateEmailVisibilityProcessorTest extends OrmTestCase
 {
     use MessageQueueExtension;
-    private const CHUNK_SIZE = 500;
-    private const JOB_NAME = 'oro.email.recalculate_email_visibility';
 
-    /** @var JobRunner|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobRunner;
+    private const int CHUNK_SIZE = 500;
+    private const string JOB_NAME = 'oro.email.recalculate_email_visibility';
 
-    /** @var EntityManagerInterface */
-    private $em;
-
-    /** @var RecalculateEmailVisibilityProcessor */
-    private $processor;
+    private JobRunner&MockObject $jobRunner;
+    private EntityManagerInterface $em;
+    private RecalculateEmailVisibilityProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -265,7 +262,7 @@ class RecalculateEmailVisibilityProcessorTest extends OrmTestCase
         $this->addDataQueryExpectation($email, $chunk2Data, self::CHUNK_SIZE);
         $this->applyQueryExpectations($this->getDriverConnectionMock($this->em));
 
-        $this->expectsRunUnique($message, $email);
+        $this->expectsRunUnique($message);
         $this->jobRunner->expects(self::exactly(2))
             ->method('createDelayed')
             ->withConsecutive([sprintf('%s:1', $jobName)], [sprintf('%s:2', $jobName)])

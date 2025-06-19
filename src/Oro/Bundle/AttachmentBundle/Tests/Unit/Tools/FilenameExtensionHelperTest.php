@@ -3,8 +3,9 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\AttachmentBundle\Tools\FilenameExtensionHelper;
+use PHPUnit\Framework\TestCase;
 
-class FilenameExtensionHelperTest extends \PHPUnit\Framework\TestCase
+class FilenameExtensionHelperTest extends TestCase
 {
     private FilenameExtensionHelper $filenameExtensionHelper;
 

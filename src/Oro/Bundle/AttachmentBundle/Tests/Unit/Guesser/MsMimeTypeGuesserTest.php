@@ -3,11 +3,11 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Guesser;
 
 use Oro\Bundle\AttachmentBundle\Guesser\MsMimeTypeGuesser;
+use PHPUnit\Framework\TestCase;
 
-class MsMimeTypeGuesserTest extends \PHPUnit\Framework\TestCase
+class MsMimeTypeGuesserTest extends TestCase
 {
-    /** @var MsMimeTypeGuesser */
-    private $guesser;
+    private MsMimeTypeGuesser $guesser;
 
     private array $files = [];
 

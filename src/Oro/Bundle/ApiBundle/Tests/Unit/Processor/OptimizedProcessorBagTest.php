@@ -10,26 +10,17 @@ use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Component\ChainProcessor\ProcessorIterator;
 use Oro\Component\ChainProcessor\ProcessorIteratorFactoryInterface;
 use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class OptimizedProcessorBagTest extends \PHPUnit\Framework\TestCase
+class OptimizedProcessorBagTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorRegistryInterface */
-    private $processorRegistry;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorApplicableCheckerFactoryInterface */
-    private $applicableCheckerFactory;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorIteratorFactoryInterface */
-    private $processorIteratorFactory;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorIteratorFactoryInterface */
-    private $ungroupedProcessorIteratorFactory;
-
-    /** @var ChainApplicableChecker */
-    private $applicableChecker;
-
-    /** @var OptimizedProcessorBag */
-    private $processorBag;
+    private ProcessorRegistryInterface&MockObject $processorRegistry;
+    private ProcessorApplicableCheckerFactoryInterface&MockObject $applicableCheckerFactory;
+    private ProcessorIteratorFactoryInterface&MockObject $processorIteratorFactory;
+    private ProcessorIteratorFactoryInterface&MockObject $ungroupedProcessorIteratorFactory;
+    private ChainApplicableChecker $applicableChecker;
+    private OptimizedProcessorBag $processorBag;
 
     #[\Override]
     protected function setUp(): void
@@ -59,7 +50,7 @@ class OptimizedProcessorBagTest extends \PHPUnit\Framework\TestCase
         $processorBagConfigBuilder->addProcessor('processor2', [], 'action_without_groups');
     }
 
-    public function testBagWithGroups()
+    public function testBagWithGroups(): void
     {
         $context = new Context();
         $context->setAction('action_with_groups');
@@ -82,7 +73,7 @@ class OptimizedProcessorBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testBagWithoutGroups()
+    public function testBagWithoutGroups(): void
     {
         $context = new Context();
         $context->setAction('action_without_groups');

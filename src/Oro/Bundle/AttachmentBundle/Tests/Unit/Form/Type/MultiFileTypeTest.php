@@ -6,18 +6,17 @@ use Oro\Bundle\AttachmentBundle\Form\Type\FileItemType;
 use Oro\Bundle\AttachmentBundle\Form\Type\MultiFileType;
 use Oro\Bundle\AttachmentBundle\Provider\MultipleFileConstraintsProvider;
 use Oro\Bundle\FormBundle\Form\Type\CollectionType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Valid;
 
-class MultiFileTypeTest extends \PHPUnit\Framework\TestCase
+class MultiFileTypeTest extends TestCase
 {
-    /** @var EventSubscriberInterface */
-    private $eventSubscriber;
-
-    /** @var MultiFileType */
-    private $type;
+    private EventSubscriberInterface&MockObject $eventSubscriber;
+    private MultiFileType $type;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +26,7 @@ class MultiFileTypeTest extends \PHPUnit\Framework\TestCase
         $this->type = new MultiFileType($this->eventSubscriber, $multipleFileConstraintsProvider);
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects(self::once())
@@ -43,17 +42,17 @@ class MultiFileTypeTest extends \PHPUnit\Framework\TestCase
         $this->type->configureOptions($resolver);
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals(MultiFileType::TYPE, $this->type->getName());
     }
 
-    public function testGetBlockPrefix()
+    public function testGetBlockPrefix(): void
     {
         $this->assertEquals(MultiFileType::TYPE, $this->type->getBlockPrefix());
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $this->assertEquals(CollectionType::class, $this->type->getParent());
     }

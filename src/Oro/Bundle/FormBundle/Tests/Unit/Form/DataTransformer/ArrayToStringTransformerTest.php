@@ -3,12 +3,13 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\FormBundle\Form\DataTransformer\ArrayToStringTransformer;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ArrayToStringTransformerTest extends \PHPUnit\Framework\TestCase
+class ArrayToStringTransformerTest extends TestCase
 {
     private function getTestTransformer(
         bool $allowNull = false,

@@ -11,8 +11,7 @@ class EmailBodyTest extends TestCase
 {
     use EntityTestCaseTrait;
 
-    /** @var EmailBody */
-    private $emailBody;
+    private EmailBody $emailBody;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class EmailBodyTest extends TestCase
     /**
      * Test setters getters
      */
-    public function testAccessors()
+    public function testAccessors(): void
     {
         $this->assertPropertyAccessors(
             $this->emailBody,
@@ -36,11 +35,8 @@ class EmailBodyTest extends TestCase
 
     /**
      * @dataProvider originalContentTypeProvider
-     *
-     * @param string|ContentType $contentType
-     * @param string $expected
      */
-    public function testOriginalContentType($contentType, $expected)
+    public function testOriginalContentType(string|ContentType $contentType, string $expected): void
     {
         $this->emailBody->setOriginalContentType($contentType);
 

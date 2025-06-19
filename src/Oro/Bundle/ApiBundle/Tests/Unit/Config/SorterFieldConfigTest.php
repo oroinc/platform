@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ApiBundle\Config\SorterFieldConfig;
+use PHPUnit\Framework\TestCase;
 
-class SorterFieldConfigTest extends \PHPUnit\Framework\TestCase
+class SorterFieldConfigTest extends TestCase
 {
-    public function testCustomAttribute()
+    public function testCustomAttribute(): void
     {
         $attrName = 'test';
 
@@ -34,7 +35,7 @@ class SorterFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $config->keys());
     }
 
-    public function testClone()
+    public function testClone(): void
     {
         $config = new SorterFieldConfig();
         self::assertEmpty($config->toArray());
@@ -50,7 +51,7 @@ class SorterFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertNotSame($objValue, $configClone->get('test_object'));
     }
 
-    public function testExcluded()
+    public function testExcluded(): void
     {
         $config = new SorterFieldConfig();
         self::assertFalse($config->hasExcluded());
@@ -67,7 +68,7 @@ class SorterFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testPropertyPath()
+    public function testPropertyPath(): void
     {
         $config = new SorterFieldConfig();
         self::assertFalse($config->hasPropertyPath());

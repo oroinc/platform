@@ -24,6 +24,7 @@ use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Validator\Constraints\ValidValidator;
 use Symfony\Component\Validator\ConstraintValidatorInterface;
@@ -31,23 +32,14 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ConfigurationTypeTest extends FormIntegrationTestCase
 {
-    private const TEST_PASSWORD = 'somePassword';
-    private const OAUTH_ACCOUNT_TYPE = 'oauth1';
+    private const string TEST_PASSWORD = 'somePassword';
+    private const string OAUTH_ACCOUNT_TYPE = 'oauth1';
 
-    /** @var SymmetricCrypterInterface */
-    private $encryptor;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var ImapSettingsChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $imapSettingsChecker;
-
-    /** @var SmtpSettingsChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $smtpSettingsChecker;
+    private SymmetricCrypterInterface $encryptor;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private TranslatorInterface&MockObject $translator;
+    private ImapSettingsChecker&MockObject $imapSettingsChecker;
+    private SmtpSettingsChecker&MockObject $smtpSettingsChecker;
 
     #[\Override]
     protected function setUp(): void

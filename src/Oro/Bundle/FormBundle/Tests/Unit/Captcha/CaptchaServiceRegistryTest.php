@@ -11,8 +11,8 @@ use PHPUnit\Framework\TestCase;
 
 class CaptchaServiceRegistryTest extends TestCase
 {
-    private ConfigManager|MockObject $configManager;
-    private CaptchaServiceInterface|MockObject $captchaService;
+    private ConfigManager&MockObject $configManager;
+    private CaptchaServiceInterface&MockObject $captchaService;
     private CaptchaServiceRegistry $captchaServiceRegistry;
 
     #[\Override]
@@ -27,7 +27,7 @@ class CaptchaServiceRegistryTest extends TestCase
         );
     }
 
-    public function testGetCaptchaServiceAliases()
+    public function testGetCaptchaServiceAliases(): void
     {
         $aliases = $this->captchaServiceRegistry->getCaptchaServiceAliases();
 
@@ -36,10 +36,9 @@ class CaptchaServiceRegistryTest extends TestCase
         $this->assertContains('service1', $aliases);
     }
 
-    public function testGetCaptchaService()
+    public function testGetCaptchaService(): void
     {
-        $this->configManager
-            ->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('get')
             ->with(Configuration::getConfigKey(Configuration::CAPTCHA_SERVICE))
             ->willReturn('service1');
@@ -49,10 +48,9 @@ class CaptchaServiceRegistryTest extends TestCase
         $this->assertSame($this->captchaService, $service);
     }
 
-    public function testGetCaptchaServiceThrowsExceptionWhenServiceNotFound()
+    public function testGetCaptchaServiceThrowsExceptionWhenServiceNotFound(): void
     {
-        $this->configManager
-            ->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('get')
             ->with(Configuration::getConfigKey(Configuration::CAPTCHA_SERVICE))
             ->willReturn('service3');

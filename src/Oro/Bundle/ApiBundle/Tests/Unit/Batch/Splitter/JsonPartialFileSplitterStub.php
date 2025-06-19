@@ -6,7 +6,7 @@ use Oro\Bundle\ApiBundle\Batch\Splitter\JsonPartialFileSplitter;
 
 class JsonPartialFileSplitterStub extends JsonPartialFileSplitter
 {
-    private int $sleepTimeout;
+    private readonly int $sleepTimeout;
 
     public function __construct(int $sleepTimeout)
     {

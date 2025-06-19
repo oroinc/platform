@@ -3,12 +3,12 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension;
 
 use Oro\Bundle\FormBundle\Form\Extension\ExtraFieldsValidationExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ExtraFieldsValidationExtensionTest extends \PHPUnit\Framework\TestCase
+class ExtraFieldsValidationExtensionTest extends TestCase
 {
-    /** @var ExtraFieldsValidationExtension */
-    private $extension;
+    private ExtraFieldsValidationExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -16,7 +16,7 @@ class ExtraFieldsValidationExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new ExtraFieldsValidationExtension();
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = new OptionsResolver();
 

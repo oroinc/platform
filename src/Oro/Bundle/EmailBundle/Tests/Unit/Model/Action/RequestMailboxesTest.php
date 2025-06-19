@@ -16,14 +16,9 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class RequestMailboxesTest extends TestCase
 {
-    /** @var ContextAccessor|MockObject */
-    private $contextAccessor;
-
-    /** @var MailboxRepository|MockObject */
-    private $repository;
-
-    /** @var RequestMailboxes */
-    private $action;
+    private ContextAccessor&MockObject $contextAccessor;
+    private MailboxRepository&MockObject $repository;
+    private RequestMailboxes $action;
 
     #[\Override]
     protected function setUp(): void
@@ -56,7 +51,7 @@ class RequestMailboxesTest extends TestCase
         $this->action->setDispatcher($this->createMock(EventDispatcherInterface::class));
     }
 
-    public function testExecuteAction()
+    public function testExecuteAction(): void
     {
         $options = [
             'process_type' => 'demo',

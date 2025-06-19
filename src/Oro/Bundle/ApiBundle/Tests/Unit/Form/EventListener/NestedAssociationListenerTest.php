@@ -6,12 +6,13 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Form\EventListener\NestedAssociationListener;
 use Oro\Bundle\ApiBundle\Model\EntityIdentifier;
 use Oro\Bundle\ApiBundle\Tests\Unit\Form\EventListener\Fixtures\ObjectWithNestedAssociation;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
-class NestedAssociationListenerTest extends \PHPUnit\Framework\TestCase
+class NestedAssociationListenerTest extends TestCase
 {
     private NestedAssociationListener $listener;
 
@@ -44,7 +45,7 @@ class NestedAssociationListenerTest extends \PHPUnit\Framework\TestCase
         return new FormEvent($form, null);
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         self::assertEquals(
             [
@@ -54,7 +55,7 @@ class NestedAssociationListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldSetRelatedFieldsOnPostSubmit()
+    public function testShouldSetRelatedFieldsOnPostSubmit(): void
     {
         $entity = new ObjectWithNestedAssociation();
 
@@ -66,7 +67,7 @@ class NestedAssociationListenerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(123, $entity->relatedObjectId);
     }
 
-    public function testPostSubmitWithNullData()
+    public function testPostSubmitWithNullData(): void
     {
         $entity = new ObjectWithNestedAssociation();
 
@@ -78,7 +79,7 @@ class NestedAssociationListenerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($entity->relatedObjectId);
     }
 
-    public function testPostSubmitWithUnexpectedData()
+    public function testPostSubmitWithUnexpectedData(): void
     {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage(
@@ -92,7 +93,7 @@ class NestedAssociationListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testPostSubmitWithUnexpectedObjectData()
+    public function testPostSubmitWithUnexpectedObjectData(): void
     {
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage(

@@ -13,16 +13,18 @@ use Oro\Bundle\AttachmentBundle\Exception\ExternalFileNotAccessibleException;
 use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
 use Oro\Bundle\AttachmentBundle\Tools\ExternalFileFactory;
 use Oro\Component\Testing\Logger\BufferingLogger;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 
-class ExternalFileFactoryTest extends \PHPUnit\Framework\TestCase
+class ExternalFileFactoryTest extends TestCase
 {
-    private const URL = 'http://example.org/image.png';
-    private const DEFAULT_HTTP_OPTIONS = ['sample_key' => 'sample_value'];
+    private const string URL = 'http://example.org/image.png';
+    private const array DEFAULT_HTTP_OPTIONS = ['sample_key' => 'sample_value'];
 
-    private ClientInterface|\PHPUnit\Framework\MockObject\MockObject $httpClient;
+    private ClientInterface&MockObject $httpClient;
     private LoggerInterface $logger;
     private ExternalFileFactory $factory;
 

@@ -8,14 +8,13 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ContextParentConfigAccessorTest extends \PHPUnit\Framework\TestCase
+class ContextParentConfigAccessorTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|SubresourceContext */
-    private $context;
-
-    /** @var ContextParentConfigAccessor */
-    private $configAccessor;
+    private SubresourceContext&MockObject $context;
+    private ContextParentConfigAccessor $configAccessor;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +24,7 @@ class ContextParentConfigAccessorTest extends \PHPUnit\Framework\TestCase
         $this->configAccessor = new ContextParentConfigAccessor($this->context);
     }
 
-    public function testGetConfigForContextParentClass()
+    public function testGetConfigForContextParentClass(): void
     {
         $className = User::class;
         $config = new EntityDefinitionConfig();
@@ -40,7 +39,7 @@ class ContextParentConfigAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertSame($config, $this->configAccessor->getConfig($className));
     }
 
-    public function testGetConfigForContextParentClassForCaseWhenParentApiResourceIsBasedOnManageableEntity()
+    public function testGetConfigForContextParentClassForCaseWhenParentApiResourceIsBasedOnManageableEntity(): void
     {
         $className = User::class;
         $config = new EntityDefinitionConfig();
@@ -55,7 +54,7 @@ class ContextParentConfigAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertSame($config, $this->configAccessor->getConfig($className));
     }
 
-    public function testGetConfigForNotContextParentClass()
+    public function testGetConfigForNotContextParentClass(): void
     {
         $this->context->expects(self::once())
             ->method('getParentClassName')

@@ -5,11 +5,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc\AnnotationHandler;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Bundle\ApiBundle\ApiDoc\AnnotationHandler\RestDocStatusCodesHandler;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
+use PHPUnit\Framework\TestCase;
 
-class RestDocStatusCodesHandlerTest extends \PHPUnit\Framework\TestCase
+class RestDocStatusCodesHandlerTest extends TestCase
 {
-    /** @var RestDocStatusCodesHandler */
-    private $statusCodesHandler;
+    private RestDocStatusCodesHandler $statusCodesHandler;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +24,7 @@ class RestDocStatusCodesHandlerTest extends \PHPUnit\Framework\TestCase
         return $data['statusCodes'] ?? null;
     }
 
-    public function testHandleWithoutStatusCodes()
+    public function testHandleWithoutStatusCodes(): void
     {
         $annotation = new ApiDoc([]);
         $statusCodes = new StatusCodesConfig();
@@ -34,7 +34,7 @@ class RestDocStatusCodesHandlerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->getAnnotationStatusCodes($annotation));
     }
 
-    public function testHandle()
+    public function testHandle(): void
     {
         $annotation = new ApiDoc([]);
         $statusCodes = new StatusCodesConfig();

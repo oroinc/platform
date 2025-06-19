@@ -4,25 +4,26 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config\Extra;
 
 use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EntityDefinitionConfigExtraTest extends \PHPUnit\Framework\TestCase
+class EntityDefinitionConfigExtraTest extends TestCase
 {
-    public function testGetName()
+    public function testGetName(): void
     {
         $extra = new EntityDefinitionConfigExtra();
         self::assertEquals(EntityDefinitionConfigExtra::NAME, $extra->getName());
     }
 
-    public function testIsPropagable()
+    public function testIsPropagable(): void
     {
         $extra = new EntityDefinitionConfigExtra();
         self::assertTrue($extra->isPropagable());
     }
 
-    public function testCacheKeyPartNoParameters()
+    public function testCacheKeyPartNoParameters(): void
     {
         $extra = new EntityDefinitionConfigExtra();
         self::assertEquals(
@@ -31,7 +32,7 @@ class EntityDefinitionConfigExtraTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCacheKeyPartForSingleItemResource()
+    public function testCacheKeyPartForSingleItemResource(): void
     {
         $extra = new EntityDefinitionConfigExtra('action');
         self::assertEquals(
@@ -40,7 +41,7 @@ class EntityDefinitionConfigExtraTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCacheKeyPartForCollectionResource()
+    public function testCacheKeyPartForCollectionResource(): void
     {
         $extra = new EntityDefinitionConfigExtra('action', true);
         self::assertEquals(
@@ -49,7 +50,7 @@ class EntityDefinitionConfigExtraTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCacheKeyPartForSingleItemSubresource()
+    public function testCacheKeyPartForSingleItemSubresource(): void
     {
         $extra = new EntityDefinitionConfigExtra('action', false, 'Test\ParentClass', 'association');
         self::assertEquals(
@@ -58,7 +59,7 @@ class EntityDefinitionConfigExtraTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCacheKeyPartForCollectionSubresource()
+    public function testCacheKeyPartForCollectionSubresource(): void
     {
         $extra = new EntityDefinitionConfigExtra('action', true, 'Test\ParentClass', 'association');
         self::assertEquals(
@@ -67,7 +68,7 @@ class EntityDefinitionConfigExtraTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConfigureContextAndAttributesForNoParameters()
+    public function testConfigureContextAndAttributesForNoParameters(): void
     {
         $extra = new EntityDefinitionConfigExtra();
         $context = new ConfigContext();
@@ -84,7 +85,7 @@ class EntityDefinitionConfigExtraTest extends \PHPUnit\Framework\TestCase
         self::assertNull($extra->getAssociationName());
     }
 
-    public function testConfigureContextAndAttributesForSingleItemResource()
+    public function testConfigureContextAndAttributesForSingleItemResource(): void
     {
         $extra = new EntityDefinitionConfigExtra('action');
         $context = new ConfigContext();
@@ -101,7 +102,7 @@ class EntityDefinitionConfigExtraTest extends \PHPUnit\Framework\TestCase
         self::assertNull($extra->getAssociationName());
     }
 
-    public function testConfigureContextAndAttributesForCollectionResource()
+    public function testConfigureContextAndAttributesForCollectionResource(): void
     {
         $extra = new EntityDefinitionConfigExtra('action', true);
         $context = new ConfigContext();
@@ -118,7 +119,7 @@ class EntityDefinitionConfigExtraTest extends \PHPUnit\Framework\TestCase
         self::assertNull($extra->getAssociationName());
     }
 
-    public function testConfigureContextAndAttributesForSingleItemSubresource()
+    public function testConfigureContextAndAttributesForSingleItemSubresource(): void
     {
         $extra = new EntityDefinitionConfigExtra('action', false, 'Test\ParentClass', 'association');
         $context = new ConfigContext();
@@ -135,7 +136,7 @@ class EntityDefinitionConfigExtraTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('association', $extra->getAssociationName());
     }
 
-    public function testConfigureContextAndAttributesForCollectionSubresource()
+    public function testConfigureContextAndAttributesForCollectionSubresource(): void
     {
         $extra = new EntityDefinitionConfigExtra('action', true, 'Test\ParentClass', 'association');
         $context = new ConfigContext();

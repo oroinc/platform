@@ -4,11 +4,11 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Imagine\Factory;
 
 use Oro\Bundle\AttachmentBundle\Imagine\Factory\ClassFactory;
 use Oro\Bundle\AttachmentBundle\Imagine\Loader\Loader;
+use PHPUnit\Framework\TestCase;
 
-class ClassFactoryTest extends \PHPUnit\Framework\TestCase
+class ClassFactoryTest extends TestCase
 {
-    /** @var ClassFactory */
-    private $factory;
+    private ClassFactory $factory;
 
     #[\Override]
     protected function setUp(): void

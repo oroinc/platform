@@ -6,16 +6,14 @@ use Oro\Bundle\FormBundle\Autocomplete\SearchHandlerInterface;
 use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
 use Oro\Bundle\FormBundle\Form\Type\OroAutocompleteType;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroAutocompleteTypeTest extends FormIntegrationTestCase
 {
-    /** @var SearchHandlerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $searchHandler;
-
-    /** @var OroAutocompleteType */
-    private $formType;
+    private SearchHandlerInterface|MockObject|null $searchHandler = null;
+    private OroAutocompleteType $formType;
 
     #[\Override]
     protected function setUp(): void

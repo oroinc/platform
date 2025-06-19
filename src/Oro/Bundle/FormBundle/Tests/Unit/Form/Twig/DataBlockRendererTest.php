@@ -5,6 +5,8 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Twig;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 use Oro\Bundle\FormBundle\Form\Twig\DataBlockRenderer;
 use Oro\Component\Testing\Unit\TwigExtensionTestCaseTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -15,21 +17,14 @@ use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 use Twig\RuntimeLoader\ContainerRuntimeLoader;
 
-class DataBlockRendererTest extends \PHPUnit\Framework\TestCase
+class DataBlockRendererTest extends TestCase
 {
     use TwigExtensionTestCaseTrait;
 
-    /** @var Environment */
-    private $environment;
-
-    /** @var FormFactory */
-    private $factory;
-
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
-    /** @var DataBlockRenderer */
-    private $renderer;
+    private Environment $environment;
+    private FormFactory $factory;
+    private ContainerInterface&MockObject $container;
+    private DataBlockRenderer $renderer;
 
     private array $testFormConfig = [
         0 => [
@@ -116,7 +111,7 @@ class DataBlockRendererTest extends \PHPUnit\Framework\TestCase
         $this->environment->addRuntimeLoader(new ContainerRuntimeLoader($this->container));
     }
 
-    public function testRender()
+    public function testRender(): void
     {
         $this->environment->setLoader(new ArrayLoader([
             '@OroForm/Form/data_block_item.html.twig' => '',

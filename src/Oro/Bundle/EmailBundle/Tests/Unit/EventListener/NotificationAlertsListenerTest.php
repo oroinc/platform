@@ -11,6 +11,8 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
@@ -23,36 +25,19 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class NotificationAlertsListenerTest extends \PHPUnit\Framework\TestCase
+class NotificationAlertsListenerTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var RouterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $router;
-
-    /** @var Session|\PHPUnit\Framework\MockObject\MockObject */
-    private $session;
-
-    /** @var RequestStack|\PHPUnit\Framework\MockObject\MockObject */
-    private $requestStack;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var NotificationAlertManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $notificationAlertManager;
-
-    /** @var mixed|MailboxManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $mailboxManager;
-
-    /** @var mixed|TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var FlashBag */
-    private $flashbag;
-
-    /** @var NotificationAlertsListener */
-    private $listener;
+    private RouterInterface&MockObject $router;
+    private Session&MockObject $session;
+    private RequestStack&MockObject $requestStack;
+    private TranslatorInterface&MockObject $translator;
+    private NotificationAlertManager&MockObject $notificationAlertManager;
+    private MailboxManager&MockObject $mailboxManager;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private FlashBag $flashbag;
+    private NotificationAlertsListener $listener;
 
     #[\Override]
     protected function setUp(): void

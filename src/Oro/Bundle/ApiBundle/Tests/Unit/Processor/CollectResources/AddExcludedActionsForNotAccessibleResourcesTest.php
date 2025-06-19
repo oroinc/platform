@@ -7,14 +7,13 @@ use Oro\Bundle\ApiBundle\Processor\CollectResources\AddExcludedActionsForNotAcce
 use Oro\Bundle\ApiBundle\Processor\CollectResources\CollectResourcesContext;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiResourceCollection;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AddExcludedActionsForNotAccessibleResourcesTest extends \PHPUnit\Framework\TestCase
+class AddExcludedActionsForNotAccessibleResourcesTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorBagInterface */
-    private $actionProcessorBag;
-
-    /** @var AddExcludedActionsForNotAccessibleResources */
-    private $processor;
+    private ActionProcessorBagInterface&MockObject $actionProcessorBag;
+    private AddExcludedActionsForNotAccessibleResources $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +23,7 @@ class AddExcludedActionsForNotAccessibleResourcesTest extends \PHPUnit\Framework
         $this->processor = new AddExcludedActionsForNotAccessibleResources($this->actionProcessorBag);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $accessibleResources = ['Test\Class1'];
         $allActions = ['action1', 'action2'];

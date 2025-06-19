@@ -18,28 +18,20 @@ use Oro\Bundle\SecurityBundle\Encoder\DefaultCrypter;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ChoiceAccountTypeTest extends FormIntegrationTestCase
 {
-    private const OAUTH_ACCOUNT_TYPE = 'oauth1';
+    private const string OAUTH_ACCOUNT_TYPE = 'oauth1';
 
-    /** @var SymmetricCrypterInterface */
-    private $encryptor;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var OAuthManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $oauthManagerRegistry;
-
-    /** @var User */
-    private $user;
+    private SymmetricCrypterInterface $encryptor;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private TranslatorInterface&MockObject $translator;
+    private OAuthManagerRegistry&MockObject $oauthManagerRegistry;
+    private User $user;
 
     #[\Override]
     protected function setUp(): void

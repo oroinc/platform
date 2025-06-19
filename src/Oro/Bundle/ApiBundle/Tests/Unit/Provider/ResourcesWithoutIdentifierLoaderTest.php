@@ -11,14 +11,13 @@ use Oro\Bundle\ApiBundle\Provider\ResourcesWithoutIdentifierLoader;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ResourcesWithoutIdentifierLoaderTest extends \PHPUnit\Framework\TestCase
+class ResourcesWithoutIdentifierLoaderTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
-    private $configProvider;
-
-    /** @var ResourcesWithoutIdentifierLoader */
-    private $loader;
+    private ConfigProvider&MockObject $configProvider;
+    private ResourcesWithoutIdentifierLoader $loader;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +27,7 @@ class ResourcesWithoutIdentifierLoaderTest extends \PHPUnit\Framework\TestCase
         $this->loader = new ResourcesWithoutIdentifierLoader($this->configProvider);
     }
 
-    public function testLoadForEntityWithoutIdentifierFields()
+    public function testLoadForEntityWithoutIdentifierFields(): void
     {
         $version = '1.2.3';
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
@@ -53,7 +52,7 @@ class ResourcesWithoutIdentifierLoaderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testLoadForEntityWithIdentifierFields()
+    public function testLoadForEntityWithIdentifierFields(): void
     {
         $version = '1.2.3';
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);

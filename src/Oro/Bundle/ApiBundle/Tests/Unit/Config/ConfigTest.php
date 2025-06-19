@@ -8,10 +8,11 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Oro\Bundle\ApiBundle\Config\SubresourcesConfig;
+use PHPUnit\Framework\TestCase;
 
-class ConfigTest extends \PHPUnit\Framework\TestCase
+class ConfigTest extends TestCase
 {
-    public function testCustomAttribute()
+    public function testCustomAttribute(): void
     {
         $attrName = 'test';
 
@@ -35,7 +36,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testDefinition()
+    public function testDefinition(): void
     {
         $config = new Config();
         self::assertFalse($config->hasDefinition());
@@ -51,7 +52,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         self::assertNull($config->getDefinition());
     }
 
-    public function testFilters()
+    public function testFilters(): void
     {
         $config = new Config();
         self::assertFalse($config->hasFilters());
@@ -67,7 +68,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         self::assertNull($config->getFilters());
     }
 
-    public function testSorters()
+    public function testSorters(): void
     {
         $config = new Config();
         self::assertFalse($config->hasSorters());
@@ -83,7 +84,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         self::assertNull($config->getSorters());
     }
 
-    public function testActions()
+    public function testActions(): void
     {
         $config = new Config();
         self::assertFalse($config->hasActions());
@@ -99,7 +100,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         self::assertNull($config->getActions());
     }
 
-    public function testSubresources()
+    public function testSubresources(): void
     {
         $config = new Config();
         self::assertFalse($config->hasSubresources());
@@ -115,7 +116,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         self::assertNull($config->getSubresources());
     }
 
-    public function testToArrayAndGetIterator()
+    public function testToArrayAndGetIterator(): void
     {
         $config = new Config();
         self::assertTrue($config->isEmpty());
@@ -160,7 +161,7 @@ class ConfigTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testClone()
+    public function testClone(): void
     {
         $config = new Config();
         $config->set('key', 'val');

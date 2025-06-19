@@ -51,7 +51,7 @@ class TurnstileCaptchaTypeTest extends TypeTestCase
         );
 
         $this->assertArrayHasKey('data-page-component-options', $view->vars['attr']);
-        $options = json_decode($view->vars['attr']['data-page-component-options'], true);
+        $options = json_decode((string) $view->vars['attr']['data-page-component-options'], true);
         $this->assertEquals($publicKey, $options['site_key']);
     }
 

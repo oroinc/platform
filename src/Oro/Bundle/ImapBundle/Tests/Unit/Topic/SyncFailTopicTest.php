@@ -8,31 +8,22 @@ use Oro\Bundle\ImapBundle\Topic\SyncFailTopic;
 use Oro\Bundle\SyncBundle\Client\ClientManipulator;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\Unit\EntityTrait;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\Topic;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
-class SyncFailTopicTest extends \PHPUnit\Framework\TestCase
+class SyncFailTopicTest extends TestCase
 {
     use EntityTrait;
 
-    /** @var ClientManipulator|\PHPUnit\Framework\MockObject\MockObject */
-    private $clientManipulator;
-
-    /** @var ConnectionInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $conn;
-
-    /** @var Topic|\PHPUnit\Framework\MockObject\MockObject */
-    private $topic;
-
-    /** @var ParameterBag|\PHPUnit\Framework\MockObject\MockObject */
-    private $parameterBag;
-
-    /** @var WampRequest|\PHPUnit\Framework\MockObject\MockObject */
-    private $request;
-
-    /** @var SyncFailTopic */
-    private $syncFailTopic;
+    private ClientManipulator&MockObject $clientManipulator;
+    private ConnectionInterface&MockObject $conn;
+    private Topic&MockObject $topic;
+    private ParameterBag&MockObject $parameterBag;
+    private WampRequest $request;
+    private SyncFailTopic $syncFailTopic;
 
     #[\Override]
     protected function setUp(): void
@@ -51,7 +42,7 @@ class SyncFailTopicTest extends \PHPUnit\Framework\TestCase
         $this->syncFailTopic = new SyncFailTopic('oro_imap.sync_fail', $this->clientManipulator);
     }
 
-    public function testOnSubscribeGeneralTopic()
+    public function testOnSubscribeGeneralTopic(): void
     {
         $this->parameterBag->expects($this->once())
             ->method('get')
@@ -64,7 +55,7 @@ class SyncFailTopicTest extends \PHPUnit\Framework\TestCase
         $this->syncFailTopic->onSubscribe($this->conn, $this->topic, $this->request);
     }
 
-    public function testOnSubscribeWithoutUserId()
+    public function testOnSubscribeWithoutUserId(): void
     {
         $this->parameterBag->expects($this->once())
             ->method('get')
@@ -80,7 +71,7 @@ class SyncFailTopicTest extends \PHPUnit\Framework\TestCase
         $this->syncFailTopic->onSubscribe($this->conn, $this->topic, $this->request);
     }
 
-    public function testOnSubscribeWithWrongId()
+    public function testOnSubscribeWithWrongId(): void
     {
         $user = $this->getEntity(User::class, ['id' => 111]);
 
@@ -103,7 +94,7 @@ class SyncFailTopicTest extends \PHPUnit\Framework\TestCase
         $this->syncFailTopic->onSubscribe($this->conn, $this->topic, $this->request);
     }
 
-    public function testOnSubscribe()
+    public function testOnSubscribe(): void
     {
         $user = $this->getEntity(User::class, ['id' => 111]);
 

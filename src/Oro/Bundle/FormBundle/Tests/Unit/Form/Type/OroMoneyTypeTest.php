@@ -6,19 +6,15 @@ use Oro\Bundle\FormBundle\Form\Type\OroMoneyType;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroMoneyTypeTest extends FormIntegrationTestCase
 {
-    /** @var LocaleSettings|\PHPUnit\Framework\MockObject\MockObject */
-    private $localeSettings;
-
-    /** @var NumberFormatter|\PHPUnit\Framework\MockObject\MockObject */
-    private $numberFormatter;
-
-    /** @var OroMoneyType */
-    private $formType;
+    private LocaleSettings&MockObject $localeSettings;
+    private NumberFormatter&MockObject $numberFormatter;
+    private OroMoneyType $formType;
 
     #[\Override]
     protected function setUp(): void

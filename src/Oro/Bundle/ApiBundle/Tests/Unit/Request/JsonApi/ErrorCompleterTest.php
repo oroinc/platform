@@ -22,25 +22,20 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
+class ErrorCompleterTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ExceptionTextExtractorInterface */
-    private $exceptionTextExtractor;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ValueNormalizer */
-    private $valueNormalizer;
-
-    /** @var RequestType */
-    private $requestType;
-
-    /** @var ErrorCompleter */
-    private $errorCompleter;
+    private ExceptionTextExtractorInterface&MockObject $exceptionTextExtractor;
+    private ValueNormalizer&MockObject $valueNormalizer;
+    private RequestType $requestType;
+    private ErrorCompleter $errorCompleter;
 
     #[\Override]
     protected function setUp(): void
@@ -69,7 +64,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCompleteErrorWhenErrorTitleHasSubstitution()
+    public function testCompleteErrorWhenErrorTitleHasSubstitution(): void
     {
         $error = new Error();
         $error->setStatusCode(400);
@@ -85,7 +80,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorWithoutInnerException()
+    public function testCompleteErrorWithoutInnerException(): void
     {
         $error = new Error();
         $expectedError = new Error();
@@ -94,7 +89,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorWithInnerExceptionAndAlreadyCompletedProperties()
+    public function testCompleteErrorWithInnerExceptionAndAlreadyCompletedProperties(): void
     {
         $exception = new \Exception('some exception');
 
@@ -116,7 +111,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorWithInnerExceptionAndExceptionTextExtractorReturnsNothing()
+    public function testCompleteErrorWithInnerExceptionAndExceptionTextExtractorReturnsNothing(): void
     {
         $exception = new \Exception('some exception');
 
@@ -130,7 +125,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorWithInnerException()
+    public function testCompleteErrorWithInnerException(): void
     {
         $exception = new \Exception('some exception');
 
@@ -165,7 +160,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorTitleByStatusCode()
+    public function testCompleteErrorTitleByStatusCode(): void
     {
         $error = new Error();
         $error->setStatusCode(400);
@@ -178,7 +173,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorTitleByUnknownStatusCode()
+    public function testCompleteErrorTitleByUnknownStatusCode(): void
     {
         $error = new Error();
         $error->setStatusCode(1000);
@@ -190,7 +185,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorWithPropertyPathAndPointer()
+    public function testCompleteErrorWithPropertyPathAndPointer(): void
     {
         $error = new Error();
         $errorSource = new ErrorSource();
@@ -210,7 +205,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorWithPropertyPathAndDetailEndsWithPoint()
+    public function testCompleteErrorWithPropertyPathAndDetailEndsWithPoint(): void
     {
         $error = new Error();
         $error->setDetail('test detail.');
@@ -226,7 +221,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider completeErrorWithPropertyPathButWithoutMetadataDataProvider
      */
-    public function testCompleteErrorWithPropertyPathButWithoutMetadata(string $property, array $expectedResult)
+    public function testCompleteErrorWithPropertyPathButWithoutMetadata(string $property, array $expectedResult): void
     {
         $error = new Error();
         $error->setDetail('test detail');
@@ -269,7 +264,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testCompleteErrorForIdentifier()
+    public function testCompleteErrorForIdentifier(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -289,7 +284,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorForField()
+    public function testCompleteErrorForField(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -309,7 +304,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorForCompositeField()
+    public function testCompleteErrorForCompositeField(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -329,7 +324,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorForToOneAssociation()
+    public function testCompleteErrorForToOneAssociation(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -349,7 +344,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorForToManyAssociation()
+    public function testCompleteErrorForToManyAssociation(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -370,7 +365,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorForChildOfToManyAssociation()
+    public function testCompleteErrorForChildOfToManyAssociation(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -391,7 +386,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorForNotMappedPointer()
+    public function testCompleteErrorForNotMappedPointer(): void
     {
         $error = new Error();
         $error->setDetail('test detail');
@@ -404,7 +399,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorForCollapsedArrayAssociation()
+    public function testCompleteErrorForCollapsedArrayAssociation(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -427,7 +422,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorForChildOfCollapsedArrayAssociation()
+    public function testCompleteErrorForChildOfCollapsedArrayAssociation(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -450,7 +445,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorForChildFieldOfCollapsedArrayAssociation()
+    public function testCompleteErrorForChildFieldOfCollapsedArrayAssociation(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -473,7 +468,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorForNotCollapsedArrayAssociation()
+    public function testCompleteErrorForNotCollapsedArrayAssociation(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -495,7 +490,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorForChildOfNotCollapsedArrayAssociation()
+    public function testCompleteErrorForChildOfNotCollapsedArrayAssociation(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -517,7 +512,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorForChildFieldOfNotCollapsedArrayAssociation()
+    public function testCompleteErrorForChildFieldOfNotCollapsedArrayAssociation(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -539,7 +534,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorForFieldOfEntityWithoutIdentifierFields()
+    public function testCompleteErrorForFieldOfEntityWithoutIdentifierFields(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $firstNameField = new FieldMetadata();
@@ -558,7 +553,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorForCompositeFieldOfEntityWithoutIdentifierFields()
+    public function testCompleteErrorForCompositeFieldOfEntityWithoutIdentifierFields(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $firstNameField = new FieldMetadata();
@@ -577,7 +572,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorForAssociationOfEntityWithoutIdentifierFields()
+    public function testCompleteErrorForAssociationOfEntityWithoutIdentifierFields(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $userAssociation = new AssociationMetadata();
@@ -596,7 +591,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorForMetaProperty()
+    public function testCompleteErrorForMetaProperty(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -614,7 +609,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorForMetaPropertyOfEntityWithoutIdentifierFields()
+    public function testCompleteErrorForMetaPropertyOfEntityWithoutIdentifierFields(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addMetaProperty(new MetaPropertyMetadata('test'));
@@ -631,7 +626,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorForExpandRelatedEntitiesConfigFilterConstraint()
+    public function testCompleteErrorForExpandRelatedEntitiesConfigFilterConstraint(): void
     {
         $exception = new NotSupportedConfigOperationException(
             'Test\Class',
@@ -666,7 +661,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorForFilterFieldsConfigFilterConstraint()
+    public function testCompleteErrorForFilterFieldsConfigFilterConstraint(): void
     {
         $exception = new NotSupportedConfigOperationException(
             'Test\Class',
@@ -706,7 +701,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorForIdentifierInCollection()
+    public function testCompleteErrorForIdentifierInCollection(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -726,7 +721,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorForFieldInCollection()
+    public function testCompleteErrorForFieldInCollection(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -746,7 +741,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorForAssociationInCollection()
+    public function testCompleteErrorForAssociationInCollection(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -766,7 +761,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorForNotMappedPointerInCollection()
+    public function testCompleteErrorForNotMappedPointerInCollection(): void
     {
         $error = new Error();
         $error->setDetail('test detail');
@@ -779,7 +774,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testCompleteErrorWithMetaPropertyWithNullValue()
+    public function testCompleteErrorWithMetaPropertyWithNullValue(): void
     {
         $error = new Error();
         $error->setDetail('test detail');
@@ -805,7 +800,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         bool $isArrayAllowed,
         mixed $value,
         mixed $normalizedValue
-    ) {
+    ): void {
         $error = new Error();
         $error->setDetail('test detail');
         $error->addMetaProperty('meta1', new ErrorMetaProperty($value, $dataType));
@@ -833,7 +828,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testFixIncludedEntityPathForErrorWithPropertyPathToOwnField()
+    public function testFixIncludedEntityPathForErrorWithPropertyPathToOwnField(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -855,7 +850,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testFixIncludedEntityPathForErrorWithPropertyPathToNestedField()
+    public function testFixIncludedEntityPathForErrorWithPropertyPathToNestedField(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -877,7 +872,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testFixIncludedEntityPathForErrorWithPropertyPathToUnknownField()
+    public function testFixIncludedEntityPathForErrorWithPropertyPathToUnknownField(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -894,7 +889,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testFixIncludedEntityPathForErrorWithoutSource()
+    public function testFixIncludedEntityPathForErrorWithoutSource(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);
@@ -913,7 +908,7 @@ class ErrorCompleterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($expectedError, $error);
     }
 
-    public function testFixIncludedEntityPathForErrorWithPointerStartsWithData()
+    public function testFixIncludedEntityPathForErrorWithPointerStartsWithData(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->setIdentifierFieldNames(['id']);

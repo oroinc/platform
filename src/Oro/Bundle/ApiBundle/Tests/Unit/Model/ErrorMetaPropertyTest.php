@@ -3,8 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ApiBundle\Model\ErrorMetaProperty;
+use PHPUnit\Framework\TestCase;
 
-class ErrorMetaPropertyTest extends \PHPUnit\Framework\TestCase
+class ErrorMetaPropertyTest extends TestCase
 {
     public function testCreateWithoutDataType(): void
     {

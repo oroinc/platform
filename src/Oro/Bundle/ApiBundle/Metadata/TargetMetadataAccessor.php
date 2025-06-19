@@ -4,6 +4,8 @@ namespace Oro\Bundle\ApiBundle\Metadata;
 
 use Oro\Bundle\ApiBundle\Config\Extra\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FilterFieldsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\TargetConfigExtraBuilder;
 use Oro\Bundle\ApiBundle\Metadata\Extra\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
@@ -29,6 +31,7 @@ class TargetMetadataAccessor implements TargetMetadataAccessorInterface
     private array $configExtras;
     /** @var array [association path => ConfigExtraInterface[], ...] */
     private array $processedConfigExtras = [];
+    private bool $fullMode = true;
 
     /**
      * @param string                   $version
@@ -57,10 +60,6 @@ class TargetMetadataAccessor implements TargetMetadataAccessorInterface
     #[\Override]
     public function getTargetMetadata(string $targetClassName, ?string $associationPath): ?EntityMetadata
     {
-        if (!$this->isExpandRequested($associationPath)) {
-            return null;
-        }
-
         $config = $this->configProvider->getConfig(
             $targetClassName,
             $this->version,
@@ -80,12 +79,20 @@ class TargetMetadataAccessor implements TargetMetadataAccessorInterface
         );
     }
 
-    private function isExpandRequested(?string $associationPath): bool
+    #[\Override]
+    public function isFullMode(): bool
     {
-        if (!$associationPath) {
-            return true;
-        }
+        return $this->fullMode;
+    }
 
+    #[\Override]
+    public function setFullMode(bool $full = true): void
+    {
+        $this->fullMode = $full;
+    }
+
+    private function isExpandRequested(string $associationPath): bool
+    {
         /** @var ExpandRelatedEntitiesConfigExtra|null $expandConfigExtra */
         $expandConfigExtra = $this->getConfigExtra(ExpandRelatedEntitiesConfigExtra::NAME);
         if (null === $expandConfigExtra) {
@@ -107,20 +114,65 @@ class TargetMetadataAccessor implements TargetMetadataAccessorInterface
     }
 
     /**
-     * @param string|null $associationPath
-     *
      * @return ConfigExtraInterface[]
      */
     private function buildConfigExtras(?string $associationPath): array
     {
-        $cacheKey = $associationPath ?? '';
+        $idOnly = false;
+        $cacheKey = '';
+        if ($associationPath) {
+            $cacheKey = $associationPath;
+            if (!$this->fullMode && !$this->isExpandRequested($associationPath)) {
+                $idOnly = true;
+                $cacheKey .= '|idOnly';
+            }
+        }
+        if ($this->fullMode) {
+            $cacheKey .= '|full';
+        }
+
         if (!isset($this->processedConfigExtras[$cacheKey])) {
-            $this->processedConfigExtras[$cacheKey] = TargetConfigExtraBuilder::buildConfigExtras(
-                $this->configExtras,
-                $associationPath
+            $this->processedConfigExtras[$cacheKey] = $this->createConfigExtras(
+                $associationPath,
+                $idOnly,
+                $this->fullMode
             );
         }
 
         return $this->processedConfigExtras[$cacheKey];
+    }
+
+    /**
+     * @return ConfigExtraInterface[]
+     */
+    private function createConfigExtras(?string $associationPath, bool $idOnly, bool $full): array
+    {
+        $configExtras = TargetConfigExtraBuilder::buildConfigExtras($this->configExtras, $associationPath);
+        if ($idOnly && !$this->hasFilterIdentifierFieldsConfigExtra($configExtras)) {
+            $configExtras[] = new FilterIdentifierFieldsConfigExtra();
+        }
+        if ($full) {
+            $configExtras = array_values(
+                array_filter($configExtras, static function (ConfigExtraInterface $extra): bool {
+                    return
+                        !$extra instanceof FilterIdentifierFieldsConfigExtra
+                        && !$extra instanceof FilterFieldsConfigExtra
+                        && !$extra instanceof ExpandRelatedEntitiesConfigExtra;
+                })
+            );
+        }
+
+        return $configExtras;
+    }
+
+    private function hasFilterIdentifierFieldsConfigExtra(array $configExtras): bool
+    {
+        foreach ($configExtras as $extra) {
+            if ($extra instanceof FilterIdentifierFieldsConfigExtra) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

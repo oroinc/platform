@@ -12,14 +12,12 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class UpdateSummaryCountersTest extends BatchUpdateProcessorTestCase
 {
-    /** @var EntityIdHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityIdHelper;
-
-    /** @var UpdateSummaryCounters */
-    private $processor;
+    private EntityIdHelper&MockObject $entityIdHelper;
+    private UpdateSummaryCounters $processor;
 
     #[\Override]
     protected function setUp(): void

@@ -9,22 +9,18 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\FormBundle\Form\Type\EntityIdentifierType;
 use Oro\Bundle\FormBundle\Form\Type\MultipleEntityType;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class MultipleEntityTypeTest extends FormIntegrationTestCase
 {
-    private const PERMISSION_ALLOW = 'test_permission_allow';
-    private const PERMISSION_DISALLOW = 'test_permission_disallow';
+    private const string PERMISSION_ALLOW = 'test_permission_allow';
+    private const string PERMISSION_DISALLOW = 'test_permission_disallow';
 
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private ManagerRegistry&MockObject $registry;
 
     #[\Override]
     protected function setUp(): void

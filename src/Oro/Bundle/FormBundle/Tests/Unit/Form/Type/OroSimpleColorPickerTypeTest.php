@@ -13,8 +13,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class OroSimpleColorPickerTypeTest extends FormIntegrationTestCase
 {
-    /** @var OroSimpleColorPickerType */
-    private $formType;
+    private OroSimpleColorPickerType $formType;
 
     #[\Override]
     protected function setUp(): void

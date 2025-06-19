@@ -12,8 +12,10 @@ use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MetadataProcessorTestCase extends \PHPUnit\Framework\TestCase
+class MetadataProcessorTestCase extends TestCase
 {
     protected const TEST_CLASS_NAME = 'Test\Class';
     protected const TEST_VERSION = '1.1';
@@ -44,9 +46,8 @@ class MetadataProcessorTestCase extends \PHPUnit\Framework\TestCase
         return $this->configLoaderFactory->getLoader(ConfigUtil::DEFINITION)->load($config);
     }
 
-    protected function getClassMetadataMock(
-        ?string $className = null
-    ): ClassMetadata|\PHPUnit\Framework\MockObject\MockObject {
+    protected function getClassMetadataMock(?string $className = null): ClassMetadata&MockObject
+    {
         if ($className) {
             $classMetadata = $this->getMockBuilder(ClassMetadata::class)
                 ->setConstructorArgs([$className])

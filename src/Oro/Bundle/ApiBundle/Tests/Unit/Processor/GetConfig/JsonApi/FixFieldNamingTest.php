@@ -10,8 +10,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig\ConfigProcessorTestCase;
  */
 class FixFieldNamingTest extends ConfigProcessorTestCase
 {
-    /** @var FixFieldNaming */
-    private $processor;
+    private FixFieldNaming $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         $this->processor = new FixFieldNaming();
     }
 
-    public function testProcessWhenNoFields()
+    public function testProcessWhenNoFields(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -40,7 +39,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWithUnknownIdentifierAndFieldNamedId()
+    public function testProcessWithUnknownIdentifierAndFieldNamedId(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -63,7 +62,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWithIdentifierNamedId()
+    public function testProcessWithIdentifierNamedId(): void
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -88,7 +87,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWithIdentifierNotNamedId()
+    public function testProcessWithIdentifierNotNamedId(): void
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -119,7 +118,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWithIdentifierNotNamedIdAndHasFieldNamedIdButDoesNotHaveIdentifierField()
+    public function testProcessWithIdentifierNotNamedIdAndHasFieldNamedIdButDoesNotHaveIdentifierField(): void
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -146,7 +145,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWithCompositeIdentifierWhenFieldNamedIdIsPartOfIdentifier()
+    public function testProcessWithCompositeIdentifierWhenFieldNamedIdIsPartOfIdentifier(): void
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -175,7 +174,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWithCompositeIdentifierWhenFieldNamedIdIsPartOfIdentifierAndHasPropertyPath()
+    public function testProcessWithCompositeIdentifierWhenFieldNamedIdIsPartOfIdentifierAndHasPropertyPath(): void
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -206,7 +205,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWithCompositeIdentifierWhenNoFieldNamedIdInIdentifier()
+    public function testProcessWithCompositeIdentifierWhenNoFieldNamedIdInIdentifier(): void
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -233,7 +232,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWhenExistsFieldNamedType()
+    public function testProcessWhenExistsFieldNamedType(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -258,7 +257,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWhenIdentifierFieldNamedIdHasPropertyPath()
+    public function testProcessWhenIdentifierFieldNamedIdHasPropertyPath(): void
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -287,7 +286,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWhenFieldNamedIdHasPropertyPath()
+    public function testProcessWhenFieldNamedIdHasPropertyPath(): void
     {
         $config = [
             'exclusion_policy'       => 'all',
@@ -320,7 +319,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWhenFieldNamedTypeHasPropertyPath()
+    public function testProcessWhenFieldNamedTypeHasPropertyPath(): void
     {
         $config = [
             'exclusion_policy' => 'all',
@@ -347,7 +346,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWhenIdFieldWithGuessedNameAlreadyExists()
+    public function testProcessWhenIdFieldWithGuessedNameAlreadyExists(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(
@@ -369,7 +368,7 @@ class FixFieldNamingTest extends ConfigProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenTypeFieldWithGuessedNameAlreadyExists()
+    public function testProcessWhenTypeFieldWithGuessedNameAlreadyExists(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(

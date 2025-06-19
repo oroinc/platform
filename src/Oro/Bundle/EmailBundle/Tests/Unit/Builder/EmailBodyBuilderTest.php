@@ -4,14 +4,13 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Builder;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Builder\EmailBodyBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EmailBodyBuilderTest extends \PHPUnit\Framework\TestCase
+class EmailBodyBuilderTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var EmailBodyBuilder */
-    private $emailBodyBuilder;
+    private ConfigManager&MockObject $configManager;
+    private EmailBodyBuilder $emailBodyBuilder;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class EmailBodyBuilderTest extends \PHPUnit\Framework\TestCase
         $this->emailBodyBuilder = new EmailBodyBuilder($this->configManager);
     }
 
-    public function testCreateEmailBody()
+    public function testCreateEmailBody(): void
     {
         $this->emailBodyBuilder->setEmailBody('test', true);
         $body = $this->emailBodyBuilder->getEmailBody();
@@ -30,13 +29,13 @@ class EmailBodyBuilderTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('test', $body->getTextBody());
     }
 
-    public function testGetEmptyEmailBody()
+    public function testGetEmptyEmailBody(): void
     {
         $this->expectException(\LogicException::class);
         $this->emailBodyBuilder->getEmailBody();
     }
 
-    public function testAddEmailAttachmentWithoutBody()
+    public function testAddEmailAttachmentWithoutBody(): void
     {
         $this->expectException(\LogicException::class);
         $this->emailBodyBuilder->addEmailAttachment(
@@ -57,7 +56,7 @@ class EmailBodyBuilderTest extends \PHPUnit\Framework\TestCase
         array $data,
         ?bool $configSyncEnabled,
         int|float|null $configSyncMaxSize
-    ) {
+    ): void {
         $this->emailBodyBuilder->setEmailBody('test', true);
 
         if ($configSyncEnabled) {

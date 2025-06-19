@@ -3,8 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Exception;
 
 use Oro\Bundle\ApiBundle\Exception\ChunkLimitExceededFileSplitterException;
+use PHPUnit\Framework\TestCase;
 
-class ChunkLimitExceededFileSplitterExceptionTest extends \PHPUnit\Framework\TestCase
+class ChunkLimitExceededFileSplitterExceptionTest extends TestCase
 {
     public function testConstructorWhenNoSectionName(): void
     {

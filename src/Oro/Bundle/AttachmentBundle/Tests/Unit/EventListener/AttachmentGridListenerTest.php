@@ -12,11 +12,11 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use PHPUnit\Framework\TestCase;
 
-class AttachmentGridListenerTest extends \PHPUnit\Framework\TestCase
+class AttachmentGridListenerTest extends TestCase
 {
-    /** @var AttachmentGridListener */
-    private $listener;
+    private AttachmentGridListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -37,7 +37,7 @@ class AttachmentGridListenerTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function testOnBuildBefore()
+    public function testOnBuildBefore(): void
     {
         $gridConfig = $this->getGridConfiguration();
 
@@ -62,7 +62,7 @@ class AttachmentGridListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnBuildBeforeWhichTableName()
+    public function testOnBuildBeforeWhichTableName(): void
     {
         $gridConfig = $this->getGridConfiguration();
 
@@ -92,7 +92,7 @@ class AttachmentGridListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnBuildAfter()
+    public function testOnBuildAfter(): void
     {
         $entityId = 458;
 

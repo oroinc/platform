@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 
 use Oro\Bundle\ApiBundle\Util\RequestDataAccessor;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 
-class RequestDataAccessorTest extends \PHPUnit\Framework\TestCase
+class RequestDataAccessorTest extends TestCase
 {
     private RequestDataAccessor $requestDataAccessor;
 
@@ -16,7 +17,7 @@ class RequestDataAccessorTest extends \PHPUnit\Framework\TestCase
         $this->requestDataAccessor = new RequestDataAccessor();
     }
 
-    public function testGetValue()
+    public function testGetValue(): void
     {
         $requestData = [
             [
@@ -31,7 +32,7 @@ class RequestDataAccessorTest extends \PHPUnit\Framework\TestCase
         self::assertSame('value2', $this->requestDataAccessor->getValue($requestData, '0.0.key2'));
     }
 
-    public function testGetValueForNotExistingIndex()
+    public function testGetValueForNotExistingIndex(): void
     {
         $this->expectException(NoSuchIndexException::class);
         $requestData = ['key1' => 'value1'];
@@ -39,7 +40,7 @@ class RequestDataAccessorTest extends \PHPUnit\Framework\TestCase
         $this->requestDataAccessor->getValue($requestData, 'key2');
     }
 
-    public function testGetValueWhenValueWithinPathIsNotArray()
+    public function testGetValueWhenValueWithinPathIsNotArray(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $requestData = ['key1' => 'value1'];
@@ -47,7 +48,7 @@ class RequestDataAccessorTest extends \PHPUnit\Framework\TestCase
         $this->requestDataAccessor->getValue($requestData, 'key1.key2');
     }
 
-    public function testSetValue()
+    public function testSetValue(): void
     {
         $requestData = [
             [
@@ -76,7 +77,7 @@ class RequestDataAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSetValueWhenValueWithinPathIsNotArray()
+    public function testSetValueWhenValueWithinPathIsNotArray(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $requestData = ['key1' => 'value1'];

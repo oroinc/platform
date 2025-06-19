@@ -13,8 +13,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
  */
 class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
 {
-    /** @var ValidateIncludedDataDependencies */
-    private $processor;
+    private ValidateIncludedDataDependencies $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +37,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         return $error;
     }
 
-    public function testProcessWithoutIncludedData()
+    public function testProcessWithoutIncludedData(): void
     {
         $requestData = [
             'data' => [
@@ -52,7 +51,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWithNotArrayData()
+    public function testProcessWithNotArrayData(): void
     {
         $requestData = [
             'data'     => 'test',
@@ -70,7 +69,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWithNotArrayIncludedData()
+    public function testProcessWithNotArrayIncludedData(): void
     {
         $requestData = [
             'data' => [
@@ -85,7 +84,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWithNotArrayIncludedDataItem()
+    public function testProcessWithNotArrayIncludedDataItem(): void
     {
         $requestData = [
             'data' => [
@@ -105,7 +104,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         );
     }
 
-    public function testProcessIncludedDataWithoutPrimaryData()
+    public function testProcessIncludedDataWithoutPrimaryData(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The "data" section must exist in the request data.');
@@ -123,7 +122,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessDirectToOneRelationship()
+    public function testProcessDirectToOneRelationship(): void
     {
         $requestData = [
             'data'     => [
@@ -148,7 +147,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessDirectToManyRelationship()
+    public function testProcessDirectToManyRelationship(): void
     {
         $requestData = [
             'data'     => [
@@ -175,7 +174,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessDirectInverseRelationship()
+    public function testProcessDirectInverseRelationship(): void
     {
         $requestData = [
             'data'     => [
@@ -210,7 +209,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessIndirectToOneRelationship()
+    public function testProcessIndirectToOneRelationship(): void
     {
         $requestData = [
             'data'     => [
@@ -244,7 +243,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessIndirectToManyRelationship()
+    public function testProcessIndirectToManyRelationship(): void
     {
         $requestData = [
             'data'     => [
@@ -282,7 +281,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessIndirectInverseRelationship()
+    public function testProcessIndirectInverseRelationship(): void
     {
         $requestData = [
             'data'     => [
@@ -326,7 +325,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessThirdLevelIndirectInverseRelationshipOn()
+    public function testProcessThirdLevelIndirectInverseRelationshipOn(): void
     {
         $requestData = [
             'data'     => [
@@ -379,7 +378,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessMixOfIndirectInverseAndNotInverseRelationship()
+    public function testProcessMixOfIndirectInverseAndNotInverseRelationship(): void
     {
         $requestData = [
             'data'     => [
@@ -434,7 +433,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testNullRelationshipShouldBeIgnored()
+    public function testNullRelationshipShouldBeIgnored(): void
     {
         $requestData = [
             'data'     => [
@@ -462,7 +461,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessNotRelatedEntity()
+    public function testProcessNotRelatedEntity(): void
     {
         $requestData = [
             'data'     => [
@@ -490,7 +489,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         );
     }
 
-    public function testProcessNotRelatedEntityWithNestedEntity()
+    public function testProcessNotRelatedEntityWithNestedEntity(): void
     {
         $requestData = [
             'data'     => [
@@ -527,7 +526,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         );
     }
 
-    public function testProcessRelationshipWithoutData()
+    public function testProcessRelationshipWithoutData(): void
     {
         $requestData = [
             'data'     => [
@@ -554,7 +553,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         );
     }
 
-    public function testProcessRelationshipWithoutDataButEntityHasOtherValidRelationship()
+    public function testProcessRelationshipWithoutDataButEntityHasOtherValidRelationship(): void
     {
         $requestData = [
             'data'     => [
@@ -581,7 +580,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessRelationshipWithInvalidData()
+    public function testProcessRelationshipWithInvalidData(): void
     {
         $requestData = [
             'data'     => [
@@ -608,7 +607,7 @@ class ValidateIncludedDataDependenciesTest extends FormProcessorTestCase
         );
     }
 
-    public function testProcessRelationshipWithInvalidDataButEntityHasOtherValidRelationship()
+    public function testProcessRelationshipWithInvalidDataButEntityHasOtherValidRelationship(): void
     {
         $requestData = [
             'data'     => [

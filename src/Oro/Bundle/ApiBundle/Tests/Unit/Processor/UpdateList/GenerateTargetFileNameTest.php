@@ -4,14 +4,12 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\UpdateList;
 
 use Oro\Bundle\ApiBundle\Batch\FileNameProvider;
 use Oro\Bundle\ApiBundle\Processor\UpdateList\GenerateTargetFileName;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class GenerateTargetFileNameTest extends UpdateListProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FileNameProvider */
-    private $fileNameProvider;
-
-    /** @var GenerateTargetFileName */
-    private $processor;
+    private FileNameProvider&MockObject $fileNameProvider;
+    private GenerateTargetFileName $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +20,7 @@ class GenerateTargetFileNameTest extends UpdateListProcessorTestCase
         $this->processor = new GenerateTargetFileName($this->fileNameProvider);
     }
 
-    public function testProcessOnExistingFileName()
+    public function testProcessOnExistingFileName(): void
     {
         $fileName = 'test.txt';
 
@@ -34,7 +32,7 @@ class GenerateTargetFileNameTest extends UpdateListProcessorTestCase
         self::assertEquals($fileName, $this->context->getTargetFileName());
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $fileName = 'test.txt';
 

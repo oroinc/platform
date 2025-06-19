@@ -6,10 +6,11 @@ use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressVisibilityManager;
 use Oro\Bundle\EmailBundle\Event\EmailUserAdded;
 use Oro\Bundle\EmailBundle\EventListener\UpdateVisibilityForNewEmailUserListener;
+use PHPUnit\Framework\TestCase;
 
-class UpdateVisibilityForNewEmailUserListenerTest extends \PHPUnit\Framework\TestCase
+class UpdateVisibilityForNewEmailUserListenerTest extends TestCase
 {
-    public function testUpdateVisibilityForEmailUser()
+    public function testUpdateVisibilityForEmailUser(): void
     {
         $emailUser = new EmailUser();
         $event = new EmailUserAdded($emailUser);

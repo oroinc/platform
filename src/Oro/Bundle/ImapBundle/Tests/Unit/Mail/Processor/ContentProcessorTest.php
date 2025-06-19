@@ -9,14 +9,13 @@ use Laminas\Mail\Storage\Part;
 use Oro\Bundle\ImapBundle\Mail\Processor\ContentProcessor;
 use Oro\Bundle\ImapBundle\Mail\Storage\Content;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ContentProcessorTest extends \PHPUnit\Framework\TestCase
+class ContentProcessorTest extends TestCase
 {
-    /** @var Part|\PHPUnit\Framework\MockObject\MockObject */
-    private $part;
-
-    /** @var ContentProcessor */
-    private $processor;
+    private Part&MockObject $part;
+    private ContentProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +24,7 @@ class ContentProcessorTest extends \PHPUnit\Framework\TestCase
 
         $this->processor = new ContentProcessor();
     }
-    public function testGetPartContentType()
+    public function testGetPartContentType(): void
     {
         $headers = $this->createMock(Headers::class);
         $headers->expects($this->once())
@@ -49,7 +48,7 @@ class ContentProcessorTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($header, $result);
     }
 
-    public function testGetPartContentTypeWithNoContentTypeHeader()
+    public function testGetPartContentTypeWithNoContentTypeHeader(): void
     {
         $headers = $this->createMock(Headers::class);
         $headers->expects($this->once())
@@ -76,7 +75,7 @@ class ContentProcessorTest extends \PHPUnit\Framework\TestCase
         $contentValue,
         $expected,
         $decodedValue
-    ) {
+    ): void {
         // Content-Type header
         $contentTypeHeader = $this->createMock(ContentType::class);
         if ($contentType !== null) {

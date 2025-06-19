@@ -7,13 +7,14 @@ use Gaufrette\StreamWrapper;
 use Oro\Bundle\AttachmentBundle\Imagine\Loader\Loader;
 use Oro\Bundle\GaufretteBundle\Adapter\LocalAdapter;
 use Oro\Component\Testing\TempDirExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 
-class LoaderTest extends \PHPUnit\Framework\TestCase
+class LoaderTest extends TestCase
 {
     use TempDirExtension;
 
-    private const TEST_FILE_SYSTEM_NAME  = 'testFileSystem';
+    private const string TEST_FILE_SYSTEM_NAME  = 'testFileSystem';
 
     private string $directory;
     private SymfonyFilesystem $fileSystem;

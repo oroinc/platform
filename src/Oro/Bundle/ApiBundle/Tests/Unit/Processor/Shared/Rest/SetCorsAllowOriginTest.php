@@ -24,7 +24,7 @@ class SetCorsAllowOriginTest extends GetListProcessorTestCase
         );
     }
 
-    public function testAllowOriginIsAlreadySet()
+    public function testAllowOriginIsAlreadySet(): void
     {
         $processor = new SetCorsAllowOrigin($this->getCorsSettings(['https://foo.com', 'https://bar.com']));
 
@@ -36,7 +36,7 @@ class SetCorsAllowOriginTest extends GetListProcessorTestCase
         self::assertEquals('*', $this->context->getResponseHeaders()->get('Access-Control-Allow-Origin'));
     }
 
-    public function testNoOriginRequestHeader()
+    public function testNoOriginRequestHeader(): void
     {
         $processor = new SetCorsAllowOrigin($this->getCorsSettings([]));
 
@@ -47,7 +47,7 @@ class SetCorsAllowOriginTest extends GetListProcessorTestCase
         self::assertFalse($this->context->getResponseHeaders()->has('Access-Control-Allow-Origin'));
     }
 
-    public function testAllowOriginWhenOriginIsMatched()
+    public function testAllowOriginWhenOriginIsMatched(): void
     {
         $processor = new SetCorsAllowOrigin($this->getCorsSettings(['https://foo.com', 'https://bar.com']));
 
@@ -61,7 +61,7 @@ class SetCorsAllowOriginTest extends GetListProcessorTestCase
         );
     }
 
-    public function testAllowOriginWhenOriginIsNotMatched()
+    public function testAllowOriginWhenOriginIsNotMatched(): void
     {
         $processor = new SetCorsAllowOrigin($this->getCorsSettings(['https://foo.com', 'https://bar.com']));
 
@@ -72,7 +72,7 @@ class SetCorsAllowOriginTest extends GetListProcessorTestCase
         self::assertFalse($this->context->getResponseHeaders()->has('Access-Control-Allow-Origin'));
     }
 
-    public function testAllowOriginWhenAllOriginsAreAllowed()
+    public function testAllowOriginWhenAllOriginsAreAllowed(): void
     {
         $processor = new SetCorsAllowOrigin($this->getCorsSettings(['https://foo.com', '*']));
 

@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Config\Extra\HateoasConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\Extra\ActionMetadataExtra;
 use Oro\Bundle\ApiBundle\Metadata\Extra\HateoasMetadataExtra;
+use Oro\Bundle\ApiBundle\Metadata\TargetMetadataAccessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Subresource\SubresourceContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
@@ -17,21 +18,19 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestMetadataExtra;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class SubresourceContextTest extends \PHPUnit\Framework\TestCase
+class SubresourceContextTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
-    private $configProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
-    private $metadataProvider;
-
-    /** @var SubresourceContext */
-    private $context;
+    private ConfigProvider&MockObject $configProvider;
+    private MetadataProvider&MockObject $metadataProvider;
+    private SubresourceContext $context;
 
     #[\Override]
     protected function setUp(): void
@@ -52,7 +51,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-    public function testParentClassName()
+    public function testParentClassName(): void
     {
         self::assertNull($this->context->getParentClassName());
 
@@ -65,7 +64,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->context->has('parentClass'));
     }
 
-    public function testParentId()
+    public function testParentId(): void
     {
         self::assertNull($this->context->getParentId());
 
@@ -77,7 +76,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getParentId());
     }
 
-    public function testAssociationName()
+    public function testAssociationName(): void
     {
         self::assertNull($this->context->getAssociationName());
 
@@ -90,7 +89,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->context->has('association'));
     }
 
-    public function testIsCollection()
+    public function testIsCollection(): void
     {
         self::assertFalse($this->context->isCollection());
         self::assertTrue($this->context->has('collection'));
@@ -101,7 +100,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->context->get('collection'));
     }
 
-    public function testGetParentConfigExtras()
+    public function testGetParentConfigExtras(): void
     {
         $action = 'update_relationship';
         $isCollection = true;
@@ -122,7 +121,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSetParentConfigExtras()
+    public function testSetParentConfigExtras(): void
     {
         $this->context->setParentConfigExtras([new EntityDefinitionConfigExtra('get_list')]);
         self::assertEquals(
@@ -131,7 +130,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSetParentConfigExtrasForHateoas()
+    public function testSetParentConfigExtrasForHateoas(): void
     {
         $this->context->setHateoas(true);
         $configExtra = new TestConfigExtra('test');
@@ -147,7 +146,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($configExtras, $this->context->getParentConfigExtras());
     }
 
-    public function testRemoveParentConfigExtras()
+    public function testRemoveParentConfigExtras(): void
     {
         $action = 'update_relationship';
         $isCollection = true;
@@ -170,7 +169,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSetInvalidParentConfigExtras()
+    public function testSetInvalidParentConfigExtras(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -180,7 +179,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setParentConfigExtras(['test']);
     }
 
-    public function testHasParentConfigExtra()
+    public function testHasParentConfigExtra(): void
     {
         $action = 'update_relationship';
         $isCollection = true;
@@ -196,7 +195,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->context->hasParentConfigExtra('another'));
     }
 
-    public function testGetParentConfigExtra()
+    public function testGetParentConfigExtra(): void
     {
         $action = 'update_relationship';
         $isCollection = true;
@@ -215,7 +214,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getParentConfigExtra('another'));
     }
 
-    public function testAddAndRemoveParentConfigExtra()
+    public function testAddAndRemoveParentConfigExtra(): void
     {
         $action = 'update_relationship';
         $isCollection = true;
@@ -237,7 +236,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->context->hasParentConfigExtra($extra->getName()));
     }
 
-    public function testLoadParentConfig()
+    public function testLoadParentConfig(): void
     {
         $version = '1.1';
         $requestType = 'rest';
@@ -279,7 +278,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($config, $this->context->getParentConfig());
     }
 
-    public function testLoadParentConfigWhenExceptionOccurs()
+    public function testLoadParentConfigWhenExceptionOccurs(): void
     {
         $version = '1.1';
         $requestType = 'rest';
@@ -326,7 +325,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getParentConfig());
     }
 
-    public function testLoadParentConfigWhenNoParentClassName()
+    public function testLoadParentConfigWhenNoParentClassName(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(
@@ -336,7 +335,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         $this->context->getParentConfig();
     }
 
-    public function testParentConfigWhenItIsSetExplicitly()
+    public function testParentConfigWhenItIsSetExplicitly(): void
     {
         $config = new EntityDefinitionConfig();
         $config->setExcludeAll();
@@ -355,7 +354,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getParentConfig());
     }
 
-    public function testGetParentMetadataExtras()
+    public function testGetParentMetadataExtras(): void
     {
         self::assertEquals(
             [],
@@ -363,7 +362,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetParentMetadataExtrasWhenActionExistsInContext()
+    public function testGetParentMetadataExtrasWhenActionExistsInContext(): void
     {
         $action = 'test_action';
         $this->context->setAction($action);
@@ -374,7 +373,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSetParentMetadataExtras()
+    public function testSetParentMetadataExtras(): void
     {
         $this->context->setParentMetadataExtras([new TestMetadataExtra('test')]);
         self::assertEquals(
@@ -383,7 +382,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSetParentMetadataExtrasForHateoas()
+    public function testSetParentMetadataExtrasForHateoas(): void
     {
         $this->context->setHateoas(true);
         $metadataExtra = new TestMetadataExtra('test');
@@ -399,7 +398,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($metadataExtras, $this->context->getParentMetadataExtras());
     }
 
-    public function testGetParentMetadataExtrasForHateoas()
+    public function testGetParentMetadataExtrasForHateoas(): void
     {
         $this->context->setHateoas(true);
 
@@ -409,12 +408,12 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetParentMetadataExtrasForNoHateoas()
+    public function testGetParentMetadataExtrasForNoHateoas(): void
     {
         self::assertEquals([], $this->context->getParentMetadataExtras());
     }
 
-    public function testRemoveParentMetadataExtras()
+    public function testRemoveParentMetadataExtras(): void
     {
         $this->context->setParentMetadataExtras([]);
         self::assertEquals(
@@ -423,7 +422,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSetInvalidParentMetadataExtras()
+    public function testSetInvalidParentMetadataExtras(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -433,7 +432,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setParentMetadataExtras(['test']);
     }
 
-    public function testLoadParentMetadata()
+    public function testLoadParentMetadata(): void
     {
         $version = '1.1';
         $requestType = 'rest';
@@ -483,13 +482,19 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($metadata, $this->context->getParentMetadata()); // load metadata
         self::assertTrue($this->context->hasParentMetadata());
 
+        // test that metadata is initialized
+        self::assertInstanceOf(
+            TargetMetadataAccessorInterface::class,
+            ReflectionUtil::getPropertyValue($metadata, 'targetMetadataAccessor')
+        );
+
         self::assertEquals($config, $this->context->getParentConfig());
 
         // test that metadata are loaded only once
         self::assertSame($metadata, $this->context->getParentMetadata());
     }
 
-    public function testLoadParentMetadataWhenHateoasIsEnabled()
+    public function testLoadParentMetadataWhenHateoasIsEnabled(): void
     {
         $version = '1.1';
         $requestType = 'rest';
@@ -541,13 +546,19 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($metadata, $this->context->getParentMetadata()); // load metadata
         self::assertTrue($this->context->hasParentMetadata());
 
+        // test that metadata is initialized
+        self::assertInstanceOf(
+            TargetMetadataAccessorInterface::class,
+            ReflectionUtil::getPropertyValue($metadata, 'targetMetadataAccessor')
+        );
+
         self::assertEquals($config, $this->context->getParentConfig());
 
         // test that metadata are loaded only once
         self::assertSame($metadata, $this->context->getParentMetadata());
     }
 
-    public function testLoadParentMetadataWhenNoParentClassName()
+    public function testLoadParentMetadataWhenNoParentClassName(): void
     {
         $this->metadataProvider->expects(self::never())
             ->method('getMetadata');
@@ -556,7 +567,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->context->hasParentMetadata());
     }
 
-    public function testLoadParentMetadataWhenExceptionOccurs()
+    public function testLoadParentMetadataWhenExceptionOccurs(): void
     {
         $version = '1.1';
         $requestType = 'rest';
@@ -616,7 +627,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getParentMetadata());
     }
 
-    public function testParentMetadataWhenItIsSetExplicitly()
+    public function testParentMetadataWhenItIsSetExplicitly(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
 
@@ -636,7 +647,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getParentMetadata());
     }
 
-    public function testHateoas()
+    public function testHateoas(): void
     {
         self::assertFalse($this->context->isHateoasEnabled());
         self::assertFalse($this->context->get('hateoas'));
@@ -650,7 +661,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->context->get('hateoas'));
     }
 
-    public function testHateoasForConfigExtras()
+    public function testHateoasForConfigExtras(): void
     {
         $this->context->setHateoas(true);
         self::assertEquals([new HateoasConfigExtra()], $this->context->getConfigExtras());
@@ -659,7 +670,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $this->context->getConfigExtras());
     }
 
-    public function testHateoasForMetadataExtras()
+    public function testHateoasForMetadataExtras(): void
     {
         // make sure that metadata extras are initialized
         $this->context->getMetadataExtras();
@@ -674,7 +685,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $this->context->getMetadataExtras());
     }
 
-    public function testHateoasForParentConfigExtras()
+    public function testHateoasForParentConfigExtras(): void
     {
         $this->context->setAction('action');
         $this->context->setParentClassName('Test\ParentEntity');
@@ -700,7 +711,7 @@ class SubresourceContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHateoasForParentMetadataExtras()
+    public function testHateoasForParentMetadataExtras(): void
     {
         $this->context->setAction('action');
 

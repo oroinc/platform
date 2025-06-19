@@ -15,6 +15,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class ValidateFileViewAccess implements ProcessorInterface
 {
     private AuthorizationCheckerInterface $authorizationChecker;
+    private const VIEW_ACCESS_KEY = 'granted_view_access';
 
     public function __construct(AuthorizationCheckerInterface $authorizationChecker)
     {
@@ -32,5 +33,14 @@ class ValidateFileViewAccess implements ProcessorInterface
         )) {
             throw new AccessDeniedException('No access to the entity.');
         }
+
+        $context->getSharedData()->set(
+            self::VIEW_ACCESS_KEY,
+            [
+                $context->getAction(),
+                $context->getClassName(),
+                $context->getId()
+            ]
+        );
     }
 }

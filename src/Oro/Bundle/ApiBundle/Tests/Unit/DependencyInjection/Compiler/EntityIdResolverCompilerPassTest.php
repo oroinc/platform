@@ -4,18 +4,17 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\EntityIdResolverCompilerPass;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class EntityIdResolverCompilerPassTest extends \PHPUnit\Framework\TestCase
+class EntityIdResolverCompilerPassTest extends TestCase
 {
     private EntityIdResolverCompilerPass $compiler;
-
     private ContainerBuilder $container;
-
     private Definition $registry;
 
     #[\Override]

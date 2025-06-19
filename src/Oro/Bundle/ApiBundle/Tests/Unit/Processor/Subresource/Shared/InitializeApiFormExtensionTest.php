@@ -11,17 +11,13 @@ use Oro\Bundle\ApiBundle\Processor\Subresource\ContextParentConfigAccessor;
 use Oro\Bundle\ApiBundle\Processor\Subresource\ContextParentMetadataAccessor;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\InitializeApiFormExtension;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class InitializeApiFormExtensionTest extends ChangeRelationshipProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FormExtensionSwitcherInterface */
-    private $formExtensionSwitcher;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataTypeGuesser */
-    private $metadataTypeGuesser;
-
-    /** @var InitializeApiFormExtension */
-    private $processor;
+    private FormExtensionSwitcherInterface&MockObject $formExtensionSwitcher;
+    private MetadataTypeGuesser&MockObject $metadataTypeGuesser;
+    private InitializeApiFormExtension $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -37,7 +33,7 @@ class InitializeApiFormExtensionTest extends ChangeRelationshipProcessorTestCase
         );
     }
 
-    public function testProcessWhenApiFormExtensionIsNotActivated()
+    public function testProcessWhenApiFormExtensionIsNotActivated(): void
     {
         $this->formExtensionSwitcher->expects(self::once())
             ->method('switchToApiFormExtension');
@@ -67,7 +63,7 @@ class InitializeApiFormExtensionTest extends ChangeRelationshipProcessorTestCase
         self::assertFalse($this->context->has('previousConfigAccessor'));
     }
 
-    public function testProcessWhenApiFormExtensionIsActivated()
+    public function testProcessWhenApiFormExtensionIsActivated(): void
     {
         $this->formExtensionSwitcher->expects(self::never())
             ->method('switchToApiFormExtension');
@@ -88,7 +84,7 @@ class InitializeApiFormExtensionTest extends ChangeRelationshipProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenMetadataTypeGuesserHasContext()
+    public function testProcessWhenMetadataTypeGuesserHasContext(): void
     {
         $currentIncludedEntities = $this->createMock(IncludedEntityCollection::class);
 

@@ -9,24 +9,17 @@ use Doctrine\Persistence\ManagerRegistry;
 use Oro\Bundle\EmailBundle\Sync\NotificationAlertManager;
 use Oro\Bundle\NotificationBundle\Entity\NotificationAlert;
 use Oro\Bundle\SecurityBundle\Authentication\TokenAccessorInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class NotificationAlertManagerTest extends \PHPUnit\Framework\TestCase
+class NotificationAlertManagerTest extends TestCase
 {
-    /** @var EntityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var Connection|\PHPUnit\Framework\MockObject\MockObject */
-    private $connection;
-
-    /** @var TokenAccessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenAccessor;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var NotificationAlertManager */
-    private $notificationAlertManager;
+    private EntityManager&MockObject $em;
+    private Connection&MockObject $connection;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private LoggerInterface&MockObject $logger;
+    private NotificationAlertManager $notificationAlertManager;
 
     #[\Override]
     protected function setUp(): void

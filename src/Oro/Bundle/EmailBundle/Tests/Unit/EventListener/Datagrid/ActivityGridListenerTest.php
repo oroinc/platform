@@ -9,17 +9,14 @@ use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\EmailBundle\Datagrid\EmailGridHelper;
 use Oro\Bundle\EmailBundle\EventListener\Datagrid\ActivityGridListener;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ActivityGridListenerTest extends \PHPUnit\Framework\TestCase
+class ActivityGridListenerTest extends TestCase
 {
-    /** @var ActivityGridListener */
-    private $listener;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $emailGridHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $entityRoutingHelper;
+    private EmailGridHelper&MockObject $emailGridHelper;
+    private EntityRoutingHelper&MockObject $entityRoutingHelper;
+    private ActivityGridListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +30,7 @@ class ActivityGridListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testOnBuildAfter()
+    public function testOnBuildAfter(): void
     {
         $encodedEntityClass = 'Test_Entity';
         $entityClass        = 'Test\Entity';
@@ -67,7 +64,7 @@ class ActivityGridListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener->onBuildAfter($event);
     }
 
-    public function testOnBuildAfterForUser()
+    public function testOnBuildAfterForUser(): void
     {
         $encodedEntityClass = 'Test_Entity';
         $entityClass        = 'Test\Entity';

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\Shared;
 
+use Doctrine\ORM\Query\Expr\Join;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
@@ -10,9 +11,11 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\GetSubresourceProcessorOrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
+use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTestCase
 {
@@ -29,13 +32,13 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessWhenQueryDoesNotExist()
+    public function testProcessWhenQueryDoesNotExist(): void
     {
         $this->processor->process($this->context);
         self::assertNull($this->context->getQuery());
     }
 
-    public function testProcessForUnsupportedQuery()
+    public function testProcessForUnsupportedQuery(): void
     {
         $query = new \stdClass();
 
@@ -44,7 +47,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         self::assertSame($query, $this->context->getQuery());
     }
 
-    public function testProcessForQueryWithSeveralRootAliases()
+    public function testProcessForQueryWithSeveralRootAliases(): void
     {
         $query = $this->doctrineHelper
             ->getEntityManagerForClass(Entity\Product::class)
@@ -65,7 +68,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForSubresourceThatDoesNotAssociatedWithAnyFieldInParentEntityConfig()
+    public function testProcessForSubresourceThatDoesNotAssociatedWithAnyFieldInParentEntityConfig(): void
     {
         $associationName = 'association';
 
@@ -95,7 +98,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         self::assertCount(0, $this->context->getQuery()->getParameters());
     }
 
-    public function testProcessForComputedAssociationWhenQueryForItIsPreparedByAnotherProcessor()
+    public function testProcessForComputedAssociationWhenQueryForItIsPreparedByAnotherProcessor(): void
     {
         $associationName = 'owner';
         $parentId = 123;
@@ -135,7 +138,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForComputedAssociationWhenQueryForItIsNotPreparedByAnotherProcessor()
+    public function testProcessForComputedAssociationWhenQueryForItIsNotPreparedByAnotherProcessor(): void
     {
         $associationName = 'owner';
         $parentId = 123;
@@ -175,7 +178,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForComputedAssociationAndCompositeParentIdWhenQueryForItIsPreparedByAnotherProcessor()
+    public function testProcessForComputedAssocAndCompositeParentIdWhenQueryForItIsPreparedByAnotherProcessor(): void
     {
         $associationName = 'owner';
         $parentId = ['id' => 123, 'title' => 'test'];
@@ -224,7 +227,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForComputedAssociationAndCompositeParentIdWhenQueryForItIsNotPreparedByAnotherProcessor()
+    public function testProcessForComputedAssocAndCompositeParentIdWhenQueryForItIsNotPreparedByAnotherProcessor(): void
     {
         $associationName = 'owner';
         $parentId = ['id' => 123, 'title' => 'test'];
@@ -270,7 +273,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForSubresourceWhenQueryForItIsPreparedByAnotherProcessor()
+    public function testProcessForSubresourceWhenQueryForItIsPreparedByAnotherProcessor(): void
     {
         $associationName = 'owner';
         $parentId = 123;
@@ -310,7 +313,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForToManyBidirectionalAssociation()
+    public function testProcessForToManyBidirectionalAssociation(): void
     {
         $associationName = 'products';
         $parentId = 123;
@@ -347,7 +350,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForToManyUnidirectionalAssociation()
+    public function testProcessForToManyUnidirectionalAssociation(): void
     {
         $associationName = 'users';
         $parentId = 123;
@@ -385,7 +388,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForToManyRenamedBidirectionalAssociation()
+    public function testProcessForToManyRenamedBidirectionalAssociation(): void
     {
         $associationName = 'renamedProducts';
         $parentId = 123;
@@ -422,7 +425,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForToManyRenamedUnidirectionalAssociation()
+    public function testProcessForToManyRenamedUnidirectionalAssociation(): void
     {
         $associationName = 'renamedUsers';
         $parentId = 123;
@@ -460,7 +463,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForToOneBidirectionalAssociation()
+    public function testProcessForToOneBidirectionalAssociation(): void
     {
         $associationName = 'owner';
         $parentId = 123;
@@ -496,7 +499,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForToOneUnidirectionalAssociation()
+    public function testProcessForToOneUnidirectionalAssociation(): void
     {
         $associationName = 'user';
         $parentId = 123;
@@ -533,7 +536,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForToOneRenamedBidirectionalAssociation()
+    public function testProcessForToOneRenamedBidirectionalAssociation(): void
     {
         $associationName = 'renamedOwner';
         $parentId = 123;
@@ -569,7 +572,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForToOneRenamedUnidirectionalAssociation()
+    public function testProcessForToOneRenamedUnidirectionalAssociation(): void
     {
         $associationName = 'renamedUser';
         $parentId = 123;
@@ -606,7 +609,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForToOneInverseSideBidirectionalAssociation()
+    public function testProcessForToOneInverseSideBidirectionalAssociation(): void
     {
         $associationName = 'origin';
         $parentId = 123;
@@ -642,7 +645,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForToOneRenamedInverseSideBidirectionalAssociation()
+    public function testProcessForToOneRenamedInverseSideBidirectionalAssociation(): void
     {
         $associationName = 'renamedOrigin';
         $parentId = 123;
@@ -678,7 +681,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForRenamedParentIdentifierField()
+    public function testProcessForRenamedParentIdentifierField(): void
     {
         $associationName = 'owner';
         $parentId = 123;
@@ -714,7 +717,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForCompositeParentIdentifier()
+    public function testProcessForCompositeParentIdentifier(): void
     {
         $associationName = 'children';
         $parentId = ['id' => 123, 'title' => 'test'];
@@ -757,7 +760,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForRenamedCompositeParentIdentifier()
+    public function testProcessForRenamedCompositeParentIdentifier(): void
     {
         $associationName = 'children';
         $parentId = ['renamedId' => 123, 'renamedTitle' => 'test'];
@@ -800,7 +803,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForAssociationWithDeepPropertyPath()
+    public function testProcessForAssociationWithDeepPropertyPath(): void
     {
         $associationName = 'category';
         $parentId = 123;
@@ -842,7 +845,7 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
         );
     }
 
-    public function testProcessForApiResourceBasedOnManageableEntity()
+    public function testProcessForApiResourceBasedOnManageableEntity(): void
     {
         $this->notManageableClassNames[] = Entity\UserProfile::class;
 
@@ -874,6 +877,96 @@ class AddParentEntityIdToQueryTest extends GetSubresourceProcessorOrmRelatedTest
             . ' INNER JOIN Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User parent_entity1'
             . ' WITH parent_entity1.category = e'
             . ' WHERE parent_entity1.id = :parent_entity_id',
+            $this->context->getQuery()->getDQL()
+        );
+        self::assertEquals(
+            $parentId,
+            $this->context->getQuery()->getParameter('parent_entity_id')->getValue()
+        );
+    }
+
+    public function testProcessForEnumAssociation()
+    {
+        $associationName = 'enum';
+        $parentId = 123;
+
+        $parentConfig = new EntityDefinitionConfig();
+        $parentConfig->setIdentifierFieldNames(['id']);
+        $parentConfig->addField('id');
+        $parentConfig->addField($associationName)
+            ->createAndSetTargetEntity()
+            ->addHint('HINT_ENUM_OPTION', true);
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
+        $parentMetadata->addField(new FieldMetadata('id'));
+
+        $query = $this->doctrineHelper
+            ->getEntityRepositoryForClass(EnumOption::class)
+            ->createQueryBuilder('r')
+            ->innerJoin(Entity\Product::class, 'e', Join::WITH, 'JSON_EXTRACT(e.serialized_data, \'enum\') = r.id');
+
+        $this->context->setParentClassName(Entity\Product::class);
+        $this->context->setParentId($parentId);
+        $this->context->setAssociationName($associationName);
+        $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
+        $this->context->setQuery($query);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            'SELECT r'
+            . ' FROM Oro\Bundle\EntityExtendBundle\Entity\EnumOption r'
+            . ' INNER JOIN Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product e'
+            . ' WITH JSON_EXTRACT(e.serialized_data, \'enum\') = r.id'
+            . ' WHERE e.id = :parent_entity_id',
+            $this->context->getQuery()->getDQL()
+        );
+        self::assertEquals(
+            $parentId,
+            $this->context->getQuery()->getParameter('parent_entity_id')->getValue()
+        );
+    }
+
+    public function testProcessForRenamedEnumAssociation()
+    {
+        $associationName = 'enum';
+        $parentId = 123;
+
+        $parentConfig = new EntityDefinitionConfig();
+        $parentConfig->setIdentifierFieldNames(['id']);
+        $parentConfig->addField('id');
+        $associationFieldConfig = $parentConfig->addField($associationName);
+        $associationFieldConfig->setPropertyPath('enum_field');
+        $associationFieldConfig->createAndSetTargetEntity()
+            ->addHint('HINT_ENUM_OPTION', true);
+        $parentMetadata = new EntityMetadata('Test\Entity');
+        $parentMetadata->setIdentifierFieldNames($parentConfig->getIdentifierFieldNames());
+        $parentMetadata->addField(new FieldMetadata('id'));
+
+        $query = $this->doctrineHelper
+            ->getEntityRepositoryForClass(EnumOption::class)
+            ->createQueryBuilder('r')
+            ->innerJoin(
+                Entity\Product::class,
+                'e',
+                Join::WITH,
+                'JSON_EXTRACT(e.serialized_data, \'enum_field\') = r.id'
+            );
+
+        $this->context->setParentClassName(Entity\Product::class);
+        $this->context->setParentId($parentId);
+        $this->context->setAssociationName($associationName);
+        $this->context->setParentConfig($parentConfig);
+        $this->context->setParentMetadata($parentMetadata);
+        $this->context->setQuery($query);
+        $this->processor->process($this->context);
+
+        self::assertEquals(
+            'SELECT r'
+            . ' FROM Oro\Bundle\EntityExtendBundle\Entity\EnumOption r'
+            . ' INNER JOIN Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product e'
+            . ' WITH JSON_EXTRACT(e.serialized_data, \'enum_field\') = r.id'
+            . ' WHERE e.id = :parent_entity_id',
             $this->context->getQuery()->getDQL()
         );
         self::assertEquals(

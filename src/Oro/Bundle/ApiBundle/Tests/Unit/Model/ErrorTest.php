@@ -6,21 +6,22 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorMetaProperty;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Model\Label;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ErrorTest extends \PHPUnit\Framework\TestCase
+class ErrorTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         $error = Error::create('title', 'detail');
         self::assertEquals('title', $error->getTitle());
         self::assertEquals('detail', $error->getDetail());
     }
 
-    public function testCreateValidationError()
+    public function testCreateValidationError(): void
     {
         $error = Error::createValidationError('title', 'detail');
         self::assertEquals(400, $error->getStatusCode());
@@ -28,7 +29,7 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('detail', $error->getDetail());
     }
 
-    public function testCreateConflictValidationError()
+    public function testCreateConflictValidationError(): void
     {
         $error = Error::createConflictValidationError('detail');
         self::assertEquals(409, $error->getStatusCode());
@@ -36,14 +37,14 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('detail', $error->getDetail());
     }
 
-    public function testCreateByException()
+    public function testCreateByException(): void
     {
         $exception = new \Exception();
         $error = Error::createByException($exception);
         self::assertSame($exception, $error->getInnerException());
     }
 
-    public function testStatusCode()
+    public function testStatusCode(): void
     {
         $error = new Error();
         self::assertNull($error->getStatusCode());
@@ -52,7 +53,7 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(400, $error->getStatusCode());
     }
 
-    public function testCode()
+    public function testCode(): void
     {
         $error = new Error();
         self::assertNull($error->getCode());
@@ -61,7 +62,7 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('test', $error->getCode());
     }
 
-    public function testTitle()
+    public function testTitle(): void
     {
         $error = new Error();
         self::assertNull($error->getTitle());
@@ -70,7 +71,7 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('test', $error->getTitle());
     }
 
-    public function testDetail()
+    public function testDetail(): void
     {
         $error = new Error();
         self::assertNull($error->getDetail());
@@ -79,7 +80,7 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('test', $error->getDetail());
     }
 
-    public function testSource()
+    public function testSource(): void
     {
         $error = new Error();
         self::assertNull($error->getSource());
@@ -92,7 +93,7 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
         self::assertNull($error->getSource());
     }
 
-    public function testInnerException()
+    public function testInnerException(): void
     {
         $error = new Error();
         self::assertNull($error->getInnerException());
@@ -105,7 +106,7 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
         self::assertNull($error->getInnerException());
     }
 
-    public function testMetaProperties()
+    public function testMetaProperties(): void
     {
         $error = new Error();
         self::assertSame([], $error->getMetaProperties());
@@ -118,7 +119,7 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $error->getMetaProperties());
     }
 
-    public function testTrans()
+    public function testTrans(): void
     {
         $error = new Error();
         $error->setTitle(new Label('title'));
@@ -136,7 +137,7 @@ class ErrorTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('translated_detail', $error->getDetail());
     }
 
-    public function testTransWhenNothingToTranslate()
+    public function testTransWhenNothingToTranslate(): void
     {
         $error = new Error();
 

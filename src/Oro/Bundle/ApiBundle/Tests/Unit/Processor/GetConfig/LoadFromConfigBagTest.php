@@ -26,6 +26,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\AdvancedUserProfile;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\UserProfile;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -33,17 +34,10 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class LoadFromConfigBagTest extends ConfigProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigBagInterface */
-    private $configBag;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
-    private $resourcesProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
-    private $configProvider;
-
-    /** @var LoadFromConfigBag */
-    private $processor;
+    private ConfigBagInterface&MockObject $configBag;
+    private ResourcesProvider&MockObject $resourcesProvider;
+    private ConfigProvider&MockObject $configProvider;
+    private LoadFromConfigBag $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -78,7 +72,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWhenConfigAlreadyExists()
+    public function testProcessWhenConfigAlreadyExists(): void
     {
         $config = [];
 
@@ -94,7 +88,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWhenNoConfigIsReturnedFromConfigBag()
+    public function testProcessWhenNoConfigIsReturnedFromConfigBag(): void
     {
         $this->configBag->expects(self::exactly(2))
             ->method('getConfig')
@@ -109,7 +103,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
         self::assertFalse($this->context->hasResult());
     }
 
-    public function testProcessWithInheritanceWhenNoParentConfigIsReturnedFromConfigBag()
+    public function testProcessWithInheritanceWhenNoParentConfigIsReturnedFromConfigBag(): void
     {
         $this->configBag->expects(self::exactly(2))
             ->method('getConfig')
@@ -124,7 +118,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
         self::assertFalse($this->context->hasResult());
     }
 
-    public function testProcessWhenConfigWithoutInheritanceIsReturnedFromConfigBag()
+    public function testProcessWhenConfigWithoutInheritanceIsReturnedFromConfigBag(): void
     {
         $this->configBag->expects(self::once())
             ->method('getConfig')
@@ -137,7 +131,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
         self::assertFalse($this->context->hasResult());
     }
 
-    public function testProcessWithDescriptions()
+    public function testProcessWithDescriptions(): void
     {
         $config = [
             'form_type'    => 'test_form',
@@ -220,7 +214,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
         self::assertFalse($this->context->has(ConfigUtil::ACTIONS));
     }
 
-    public function testProcessWithoutInheritance()
+    public function testProcessWithoutInheritance(): void
     {
         $config = [
             'form_type'    => 'test_form',
@@ -314,7 +308,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
         self::assertFalse($this->context->has(ConfigUtil::ACTIONS));
     }
 
-    public function testProcessForPrimaryResourceWithSubresourcesConfig()
+    public function testProcessForPrimaryResourceWithSubresourcesConfig(): void
     {
         $config = [
             'description'  => 'Test Description',
@@ -413,7 +407,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessForSubresourceWithSubresourcesConfig()
+    public function testProcessForSubresourceWithSubresourcesConfig(): void
     {
         $config = [
             'description'  => 'Test Description',
@@ -520,7 +514,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessForSubresourceWithSubresourcesConfigAndDescriptionsConfigExtra()
+    public function testProcessForSubresourceWithSubresourcesConfigAndDescriptionsConfigExtra(): void
     {
         $config = [
             'description'  => 'Test Description',
@@ -631,7 +625,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
         self::assertFalse($this->context->has(ConfigUtil::SUBRESOURCES));
     }
 
-    public function testProcessMergeSubresourceFilters()
+    public function testProcessMergeSubresourceFilters(): void
     {
         $config = [
             'filters' => [
@@ -695,7 +689,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessSubresourceFiltersShouldCompletelyReplaceOwnFilters()
+    public function testProcessSubresourceFiltersShouldCompletelyReplaceOwnFilters(): void
     {
         $config = [
             'filters' => [
@@ -758,7 +752,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessMergeSubresourceFiltersWhenTargetEntityDoesNotHaveOwnFilters()
+    public function testProcessMergeSubresourceFiltersWhenTargetEntityDoesNotHaveOwnFilters(): void
     {
         $config = [];
         $parentConfig = [
@@ -802,7 +796,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessMergeSubresourceSorters()
+    public function testProcessMergeSubresourceSorters(): void
     {
         $config = [
             'sorters' => [
@@ -866,7 +860,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessSubresourceSortersShouldCompletelyReplaceOwnSorters()
+    public function testProcessSubresourceSortersShouldCompletelyReplaceOwnSorters(): void
     {
         $config = [
             'sorters' => [
@@ -929,7 +923,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessMergeSubresourceSortersWhenTargetEntityDoesNotHaveOwnSorters()
+    public function testProcessMergeSubresourceSortersWhenTargetEntityDoesNotHaveOwnSorters(): void
     {
         $config = [];
         $parentConfig = [
@@ -976,7 +970,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testProcessWithInheritance()
+    public function testProcessWithInheritance(): void
     {
         $config = [
             'order_by' => [
@@ -1110,7 +1104,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWithInheritanceAndNoConfigIsReturnedFromConfigBag()
+    public function testProcessWithInheritanceAndNoConfigIsReturnedFromConfigBag(): void
     {
         $parentConfig1 = [
             'order_by' => [
@@ -1175,7 +1169,7 @@ class LoadFromConfigBagTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessWithInheritanceWhenParentClassIsAvailableAsStandaloneResource()
+    public function testProcessWithInheritanceWhenParentClassIsAvailableAsStandaloneResource(): void
     {
         $config = [
             'fields'  => [

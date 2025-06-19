@@ -5,8 +5,9 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Checker\Voter;
 use Oro\Bundle\AttachmentBundle\Checker\Voter\WebpFeatureVoter;
 use Oro\Bundle\AttachmentBundle\Tools\WebpConfiguration;
 use Oro\Bundle\FeatureToggleBundle\Checker\Voter\VoterInterface;
+use PHPUnit\Framework\TestCase;
 
-class WebpFeatureVoterTest extends \PHPUnit\Framework\TestCase
+class WebpFeatureVoterTest extends TestCase
 {
     public function testVoteReturnsAbstainWhenFeatureNotSupported(): void
     {

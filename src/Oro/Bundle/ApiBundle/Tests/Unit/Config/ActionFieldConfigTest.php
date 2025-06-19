@@ -3,15 +3,16 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ApiBundle\Config\ActionFieldConfig;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ActionFieldConfigTest extends \PHPUnit\Framework\TestCase
+class ActionFieldConfigTest extends TestCase
 {
-    public function testClone()
+    public function testClone(): void
     {
         $config = new ActionFieldConfig();
         self::assertEmpty($config->toArray());
@@ -27,7 +28,7 @@ class ActionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertNotSame($objValue, $configClone->get('test_object'));
     }
 
-    public function testCustomAttribute()
+    public function testCustomAttribute(): void
     {
         $attrName = 'test';
 
@@ -55,7 +56,7 @@ class ActionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $config->keys());
     }
 
-    public function testExcluded()
+    public function testExcluded(): void
     {
         $config = new ActionFieldConfig();
         self::assertFalse($config->hasExcluded());
@@ -72,7 +73,7 @@ class ActionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testPropertyPath()
+    public function testPropertyPath(): void
     {
         $config = new ActionFieldConfig();
         self::assertFalse($config->hasPropertyPath());
@@ -98,7 +99,7 @@ class ActionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testDirection()
+    public function testDirection(): void
     {
         $config = new ActionFieldConfig();
         self::assertFalse($config->hasDirection());
@@ -130,7 +131,7 @@ class ActionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testSetInvalidDirection()
+    public function testSetInvalidDirection(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -142,7 +143,7 @@ class ActionFieldConfigTest extends \PHPUnit\Framework\TestCase
         $config->setDirection('another');
     }
 
-    public function testFormType()
+    public function testFormType(): void
     {
         $config = new ActionFieldConfig();
         self::assertNull($config->getFormType());
@@ -156,7 +157,7 @@ class ActionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testFormOptions()
+    public function testFormOptions(): void
     {
         $config = new ActionFieldConfig();
         self::assertNull($config->getFormOptions());
@@ -182,7 +183,7 @@ class ActionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertSame('', $config->getFormOption('key', ''));
     }
 
-    public function testSetFormOption()
+    public function testSetFormOption(): void
     {
         $config = new ActionFieldConfig();
 
@@ -200,7 +201,7 @@ class ActionFieldConfigTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFormConstraints()
+    public function testFormConstraints(): void
     {
         $config = new ActionFieldConfig();
 
@@ -216,7 +217,7 @@ class ActionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([new NotNull(), new NotBlank()], $config->getFormConstraints());
     }
 
-    public function testRemoveFormConstraint()
+    public function testRemoveFormConstraint(): void
     {
         $config = new ActionFieldConfig();
 
@@ -242,7 +243,7 @@ class ActionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertNull($config->getFormOptions());
     }
 
-    public function testPostProcessor()
+    public function testPostProcessor(): void
     {
         $config = new ActionFieldConfig();
         self::assertFalse($config->hasPostProcessor());
@@ -264,7 +265,7 @@ class ActionFieldConfigTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $config->toArray());
     }
 
-    public function testPostProcessorOptions()
+    public function testPostProcessorOptions(): void
     {
         $config = new ActionFieldConfig();
         self::assertNull($config->getPostProcessorOptions());

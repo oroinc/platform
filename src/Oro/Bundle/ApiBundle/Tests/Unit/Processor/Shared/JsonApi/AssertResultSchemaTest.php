@@ -9,8 +9,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
 class AssertResultSchemaTest extends GetListProcessorTestCase
 {
-    /** @var AssertResultSchema */
-    private $processor;
+    private AssertResultSchema $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -20,12 +19,12 @@ class AssertResultSchemaTest extends GetListProcessorTestCase
         $this->processor = new AssertResultSchema();
     }
 
-    public function testProcessWhenResultDoesNotExist()
+    public function testProcessWhenResultDoesNotExist(): void
     {
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenResultIsNotArray()
+    public function testProcessWhenResultIsNotArray(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The result must be an array.');
@@ -34,7 +33,7 @@ class AssertResultSchemaTest extends GetListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenResultIsEmptyArray()
+    public function testProcessWhenResultIsEmptyArray(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
@@ -45,7 +44,7 @@ class AssertResultSchemaTest extends GetListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenResultDoesNotContainAnyRequiresSection()
+    public function testProcessWhenResultDoesNotContainAnyRequiresSection(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
@@ -56,25 +55,25 @@ class AssertResultSchemaTest extends GetListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenResultContainsDataSection()
+    public function testProcessWhenResultContainsDataSection(): void
     {
         $this->context->setResult([JsonApiDoc::DATA => []]);
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenResultContainsErrorsSection()
+    public function testProcessWhenResultContainsErrorsSection(): void
     {
         $this->context->setResult([JsonApiDoc::ERRORS => []]);
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenResultContainsMetaSection()
+    public function testProcessWhenResultContainsMetaSection(): void
     {
         $this->context->setResult([JsonApiDoc::META => []]);
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenResultContainsBothDataAndErrorsSections()
+    public function testProcessWhenResultContainsBothDataAndErrorsSections(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The sections "data" and "errors" must not coexist in the result.');
@@ -83,7 +82,7 @@ class AssertResultSchemaTest extends GetListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenResultContainsIncludedSectionButDoesNotContainDataSection()
+    public function testProcessWhenResultContainsIncludedSectionButDoesNotContainDataSection(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
@@ -94,7 +93,7 @@ class AssertResultSchemaTest extends GetListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenResultContainsDataAndIncludedSections()
+    public function testProcessWhenResultContainsDataAndIncludedSections(): void
     {
         $this->context->setResult([JsonApiDoc::DATA => [], JsonApiDoc::INCLUDED => []]);
         $this->processor->process($this->context);

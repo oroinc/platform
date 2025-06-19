@@ -15,15 +15,11 @@ use Symfony\Component\Form\FormView;
 
 class FormFieldsMapProviderTest extends TestCase
 {
-    private ManagerRegistry|MockObject $managerRegistry;
-
-    private EntityManagerInterface|MockObject $entityManager;
-
+    private ManagerRegistry&MockObject $managerRegistry;
+    private EntityManagerInterface&MockObject $entityManager;
+    private ClassMetadata&MockObject $classMetadata;
+    private FormConfigInterface&MockObject $formConfig;
     private FormFieldsMapProvider $fieldsMapProvider;
-
-    private ClassMetadata|MockObject $classMetadata;
-
-    private FormConfigInterface|MockObject $formConfig;
 
     #[\Override]
     protected function setUp(): void
@@ -49,9 +45,7 @@ class FormFieldsMapProviderTest extends TestCase
         $dataClass = 'TestClass';
         $view = new FormView();
         $form = $this->createMock(FormInterface::class);
-        $this
-            ->managerRegistry
-            ->expects(self::once())
+        $this->managerRegistry->expects(self::once())
             ->method('getManagerForClass')
             ->with($dataClass)
             ->willReturn(null);
@@ -65,15 +59,11 @@ class FormFieldsMapProviderTest extends TestCase
         $dataClass = 'TestClass';
         $view = new FormView();
         $form = $this->createMock(FormInterface::class);
-        $this
-            ->entityManager
-            ->expects(self::once())
+        $this->entityManager->expects(self::once())
             ->method('getClassMetadata')
             ->with($dataClass)
             ->willReturn(null);
-        $this
-            ->managerRegistry
-            ->expects(self::once())
+        $this->managerRegistry->expects(self::once())
             ->method('getManagerForClass')
             ->with($dataClass)
             ->willReturn($this->entityManager);
@@ -92,13 +82,11 @@ class FormFieldsMapProviderTest extends TestCase
         $form = $this->createMock(FormInterface::class);
         $childForm = $this->createMock(FormInterface::class);
 
-        $this->formConfig
-            ->expects(self::once())
+        $this->formConfig->expects(self::once())
             ->method('getOptions')
             ->willReturn(['mapped' => false]);
 
-        $childForm
-            ->expects(self::once())
+        $childForm->expects(self::once())
             ->method('getConfig')
             ->willReturn($this->formConfig);
 
@@ -107,18 +95,15 @@ class FormFieldsMapProviderTest extends TestCase
             ->with($viewName)
             ->willReturn($childForm);
 
-        $this->classMetadata
-            ->expects(self::never())
+        $this->classMetadata->expects(self::never())
             ->method('getTypeOfField');
 
-        $this->entityManager
-            ->expects(self::once())
+        $this->entityManager->expects(self::once())
             ->method('getClassMetadata')
             ->with($dataClass)
             ->willReturn($this->classMetadata);
 
-        $this->managerRegistry
-            ->expects(self::once())
+        $this->managerRegistry->expects(self::once())
             ->method('getManagerForClass')
             ->with($dataClass)
             ->willReturn($this->entityManager);
@@ -137,13 +122,11 @@ class FormFieldsMapProviderTest extends TestCase
         $form = $this->createMock(FormInterface::class);
         $childForm = $this->createMock(FormInterface::class);
 
-        $this->formConfig
-            ->expects(self::once())
+        $this->formConfig->expects(self::once())
             ->method('getOptions')
             ->willReturn(['mapped' => true]);
 
-        $childForm
-            ->expects(self::once())
+        $childForm->expects(self::once())
             ->method('getConfig')
             ->willReturn($this->formConfig);
 
@@ -152,18 +135,15 @@ class FormFieldsMapProviderTest extends TestCase
             ->with($viewName)
             ->willReturn($childForm);
 
-        $this->classMetadata
-            ->expects(self::never())
+        $this->classMetadata->expects(self::never())
             ->method('getTypeOfField');
 
-        $this->entityManager
-            ->expects(self::once())
+        $this->entityManager->expects(self::once())
             ->method('getClassMetadata')
             ->with($dataClass)
             ->willReturn($this->classMetadata);
 
-        $this->managerRegistry
-            ->expects(self::once())
+        $this->managerRegistry->expects(self::once())
             ->method('getManagerForClass')
             ->with($dataClass)
             ->willReturn($this->entityManager);
@@ -194,13 +174,11 @@ class FormFieldsMapProviderTest extends TestCase
         $form = $this->createMock(FormInterface::class);
         $childForm = $this->createMock(FormInterface::class);
 
-        $this->formConfig
-            ->expects(self::once())
+        $this->formConfig->expects(self::once())
             ->method('getOptions')
             ->willReturn(['mapped' => true, 'is_dynamic_field' => true]);
 
-        $childForm
-            ->expects(self::once())
+        $childForm->expects(self::once())
             ->method('getConfig')
             ->willReturn($this->formConfig);
 
@@ -209,20 +187,17 @@ class FormFieldsMapProviderTest extends TestCase
             ->with($viewName)
             ->willReturn($childForm);
 
-        $this->classMetadata
-            ->expects(self::once())
+        $this->classMetadata->expects(self::once())
             ->method('getTypeOfField')
             ->with($viewName)
             ->willReturn($type);
 
-        $this->entityManager
-            ->expects(self::once())
+        $this->entityManager->expects(self::once())
             ->method('getClassMetadata')
             ->with($dataClass)
             ->willReturn($this->classMetadata);
 
-        $this->managerRegistry
-            ->expects(self::once())
+        $this->managerRegistry->expects(self::once())
             ->method('getManagerForClass')
             ->with($dataClass)
             ->willReturn($this->entityManager);

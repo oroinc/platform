@@ -4,6 +4,7 @@ namespace Oro\Component\ChainProcessor\Tests\Unit\DependencyInjection;
 
 use Oro\Component\ChainProcessor\DependencyInjection\LoadProcessorsCompilerPass;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -11,9 +12,9 @@ use Symfony\Component\DependencyInjection\Definition;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class LoadProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
+class LoadProcessorsCompilerPassTest extends TestCase
 {
-    public function testProcessWithoutProcessorBagConfigBuilder()
+    public function testProcessWithoutProcessorBagConfigBuilder(): void
     {
         $container = new ContainerBuilder();
 
@@ -29,7 +30,7 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
         $compilerPass->process($container);
     }
 
-    public function testCommonProcessor()
+    public function testCommonProcessor(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -58,7 +59,7 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testUngroupedProcessor()
+    public function testUngroupedProcessor(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -87,7 +88,7 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessorsWithScalarAttributes()
+    public function testProcessorsWithScalarAttributes(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -132,7 +133,7 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessorWithComplexConditions()
+    public function testProcessorWithComplexConditions(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -187,7 +188,7 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessorWithExistsOperatorInConditions()
+    public function testProcessorWithExistsOperatorInConditions(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -224,7 +225,7 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessorWithExistsOperatorInAndExpression()
+    public function testProcessorWithExistsOperatorInAndExpression(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -249,7 +250,7 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
         $compilerPass->process($container);
     }
 
-    public function testProcessorWithExistsOperatorInOrExpression()
+    public function testProcessorWithExistsOperatorInOrExpression(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -274,7 +275,7 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
         $compilerPass->process($container);
     }
 
-    public function testProcessWithInvalidConfigurationOfCommonProcessor()
+    public function testProcessWithInvalidConfigurationOfCommonProcessor(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -299,7 +300,7 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
         $compilerPass->process($container);
     }
 
-    public function testProcessForProcessorBagConfigBuilderWithoutArguments()
+    public function testProcessForProcessorBagConfigBuilderWithoutArguments(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -328,7 +329,7 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessForProcessorBagConfigBuilderWithoutProcessorsArgument()
+    public function testProcessForProcessorBagConfigBuilderWithoutProcessorsArgument(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -358,7 +359,7 @@ class LoadProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessForDecoratedProcessors()
+    public function testProcessForDecoratedProcessors(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);

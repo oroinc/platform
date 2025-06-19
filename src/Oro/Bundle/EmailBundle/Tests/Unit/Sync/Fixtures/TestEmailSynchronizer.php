@@ -17,7 +17,6 @@ class TestEmailSynchronizer extends AbstractEmailSynchronizer
     public const EMAIL_ORIGIN_ENTITY = 'AcmeBundle:EmailOrigin';
 
     private EmailEntityBuilder $emailEntityBuilder;
-
     private ?\DateTime $now = null;
 
     public function __construct(

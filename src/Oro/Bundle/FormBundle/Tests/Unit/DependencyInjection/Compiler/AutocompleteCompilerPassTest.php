@@ -3,12 +3,13 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\FormBundle\DependencyInjection\Compiler\AutocompleteCompilerPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class AutocompleteCompilerPassTest extends \PHPUnit\Framework\TestCase
+class AutocompleteCompilerPassTest extends TestCase
 {
     public function testProcess(): void
     {

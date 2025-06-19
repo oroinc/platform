@@ -6,15 +6,13 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CompleteCustomDa
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDefinition\CustomDataTypeCompleterInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Container\ContainerInterface;
 
 class CompleteCustomDataTypeHelperTest extends CompleteDefinitionHelperTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
-    private $container;
-
-    /** @var CompleteCustomDataTypeHelper */
-    private $completeAssociationHelper;
+    private ContainerInterface&MockObject $container;
+    private CompleteCustomDataTypeHelper $completeAssociationHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -34,7 +32,7 @@ class CompleteCustomDataTypeHelperTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    public function testCompleteCustomDataTypesWhenAllCompletersDoNotCompleteField()
+    public function testCompleteCustomDataTypesWhenAllCompletersDoNotCompleteField(): void
     {
         $fieldName = 'field1';
         $dataType = 'dataType1';
@@ -91,7 +89,7 @@ class CompleteCustomDataTypeHelperTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    public function testCompleteCustomDataTypesWhenFirstCompleterDoCompleteField()
+    public function testCompleteCustomDataTypesWhenFirstCompleterDoCompleteField(): void
     {
         $fieldName = 'field1';
         $dataType = 'dataType1';

@@ -81,7 +81,11 @@ class RegisterConfiguredFilters extends RegisterFilters
             }
             $propertyPath = $field->getPropertyPath($filterKey);
             try {
-                $filter = $this->createFilter($field, $propertyPath, $context);
+                $filter = $this->createFilter(
+                    $field,
+                    ConfigUtil::IGNORE_PROPERTY_PATH !== $propertyPath ? $propertyPath : $filterKey,
+                    $context
+                );
             } catch (\Throwable $e) {
                 throw new \LogicException(
                     sprintf('The filter "%s" for "%s" cannot be created.', $filterKey, $context->getClassName()),
@@ -97,7 +101,7 @@ class RegisterConfiguredFilters extends RegisterFilters
                     if (\in_array($propertyPath, $associationNames, true)) {
                         $this->updateAssociationOperators($filter, $field->isCollection());
                     }
-                    $fieldConfig = $config->getField($propertyPath);
+                    $fieldConfig = $config->findField($propertyPath, true);
                     if (null !== $fieldConfig) {
                         $targetEntityClass = $fieldConfig->getTargetClass();
                         if ($targetEntityClass) {

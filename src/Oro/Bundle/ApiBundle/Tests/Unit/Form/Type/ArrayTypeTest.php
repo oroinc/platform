@@ -10,7 +10,7 @@ class ArrayTypeTest extends ApiFormTypeTestCase
     /**
      * @dataProvider validValuesDataProvider
      */
-    public function testWithValidValue(array $value, array $expected)
+    public function testWithValidValue(array $value, array $expected): void
     {
         $form = $this->factory->create(ArrayType::class);
         $form->submit($value);
@@ -30,7 +30,7 @@ class ArrayTypeTest extends ApiFormTypeTestCase
     /**
      * @dataProvider invalidValuesDataProvider
      */
-    public function testWithInvalidValue(mixed $value)
+    public function testWithInvalidValue(mixed $value): void
     {
         $form = $this->factory->create(ArrayType::class);
         $form->submit($value);

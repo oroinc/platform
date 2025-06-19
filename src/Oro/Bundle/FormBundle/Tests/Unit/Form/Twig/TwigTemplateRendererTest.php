@@ -4,6 +4,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Twig;
 
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 use Oro\Bundle\FormBundle\Form\Twig\TwigTemplateRenderer;
+use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -13,7 +14,7 @@ use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 use Twig\RuntimeLoader\ContainerRuntimeLoader;
 
-class TwigTemplateRendererTest extends \PHPUnit\Framework\TestCase
+class TwigTemplateRendererTest extends TestCase
 {
     /**
      * @dataProvider renderDataProvider

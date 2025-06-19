@@ -5,8 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CollectSubresources;
 use Oro\Bundle\ApiBundle\Processor\CollectSubresources\CollectSubresourcesContext;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresourcesCollection;
+use PHPUnit\Framework\TestCase;
 
-class CollectSubresourcesContextTest extends \PHPUnit\Framework\TestCase
+class CollectSubresourcesContextTest extends TestCase
 {
     private CollectSubresourcesContext $context;
 
@@ -16,12 +17,12 @@ class CollectSubresourcesContextTest extends \PHPUnit\Framework\TestCase
         $this->context = new CollectSubresourcesContext();
     }
 
-    public function testResultShouldBeInitialized()
+    public function testResultShouldBeInitialized(): void
     {
         self::assertInstanceOf(ApiResourceSubresourcesCollection::class, $this->context->getResult());
     }
 
-    public function testResources()
+    public function testResources(): void
     {
         self::assertEquals([], $this->context->getResources());
         self::assertFalse($this->context->hasResource('Test\Class'));
@@ -34,7 +35,7 @@ class CollectSubresourcesContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($resource, $this->context->getResource('Test\Class'));
     }
 
-    public function testAccessibleResources()
+    public function testAccessibleResources(): void
     {
         self::assertEquals([], $this->context->getAccessibleResources());
 

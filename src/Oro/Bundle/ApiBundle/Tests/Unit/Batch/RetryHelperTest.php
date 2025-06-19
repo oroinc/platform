@@ -6,11 +6,11 @@ use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateItem;
 use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateItemStatus as S;
 use Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\BatchUpdateItemContext;
 use Oro\Bundle\ApiBundle\Batch\RetryHelper;
+use PHPUnit\Framework\TestCase;
 
-class RetryHelperTest extends \PHPUnit\Framework\TestCase
+class RetryHelperTest extends TestCase
 {
-    /** @var RetryHelper */
-    private $helper;
+    private RetryHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class RetryHelperTest extends \PHPUnit\Framework\TestCase
         $this->helper = new RetryHelper();
     }
 
-    public function testHasItemErrorsToSaveWhenItemDoesNotHaveErrors()
+    public function testHasItemErrorsToSaveWhenItemDoesNotHaveErrors(): void
     {
         $hasItemsToRetry = false;
         $processedItemStatuses = [S::HAS_ERRORS];
@@ -35,7 +35,7 @@ class RetryHelperTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->helper->hasItemErrorsToSave($item, $hasItemsToRetry, $processedItemStatuses));
     }
 
-    public function testHasItemErrorsToSaveWhenItemHasErrorsAndNoItemsToRetry()
+    public function testHasItemErrorsToSaveWhenItemHasErrorsAndNoItemsToRetry(): void
     {
         $hasItemsToRetry = false;
         $processedItemStatuses = [S::HAS_ERRORS];
@@ -52,7 +52,7 @@ class RetryHelperTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->helper->hasItemErrorsToSave($item, $hasItemsToRetry, $processedItemStatuses));
     }
 
-    public function testHasItemErrorsToSaveWhenItemHasErrorsAndHasItemsToRetryAndItemDoesNotHavePermanentErrors()
+    public function testHasItemErrorsToSaveWhenItemHasErrorsAndHasItemsToRetryAndItemDoesNotHavePermanentErrors(): void
     {
         $hasItemsToRetry = true;
         $processedItemStatuses = [S::HAS_ERRORS];
@@ -69,7 +69,7 @@ class RetryHelperTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->helper->hasItemErrorsToSave($item, $hasItemsToRetry, $processedItemStatuses));
     }
 
-    public function testHasItemErrorsToSaveWhenItemHasErrorsAndHasItemsToRetryAndItemHasPermanentErrors()
+    public function testHasItemErrorsToSaveWhenItemHasErrorsAndHasItemsToRetryAndItemHasPermanentErrors(): void
     {
         $hasItemsToRetry = true;
         $processedItemStatuses = [S::HAS_PERMANENT_ERRORS];
@@ -89,7 +89,7 @@ class RetryHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider hasItemsToRetryDataProvider
      */
-    public function testHasItemsToRetry(array $rawItems, array $processedItemStatuses, bool $expectedResult)
+    public function testHasItemsToRetry(array $rawItems, array $processedItemStatuses, bool $expectedResult): void
     {
         self::assertSame(
             $expectedResult,
@@ -171,7 +171,7 @@ class RetryHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getChunksToRetryDataProvider
      */
-    public function testGetChunksToRetry(array $rawItems, array $processedItemStatuses, array $expectedChunks)
+    public function testGetChunksToRetry(array $rawItems, array $processedItemStatuses, array $expectedChunks): void
     {
         self::assertEquals(
             $expectedChunks,

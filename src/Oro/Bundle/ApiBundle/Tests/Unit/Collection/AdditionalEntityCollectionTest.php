@@ -3,11 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection;
 
 use Oro\Bundle\ApiBundle\Collection\AdditionalEntityCollection;
+use PHPUnit\Framework\TestCase;
 
-class AdditionalEntityCollectionTest extends \PHPUnit\Framework\TestCase
+class AdditionalEntityCollectionTest extends TestCase
 {
-    /** @var AdditionalEntityCollection */
-    private $collection;
+    private AdditionalEntityCollection $collection;
 
     #[\Override]
     protected function setUp(): void

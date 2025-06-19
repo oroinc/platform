@@ -4,13 +4,13 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension;
 
 use Oro\Bundle\FormBundle\Form\Extension\ConstraintAsOptionExtension;
 use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class ConstraintAsOptionExtensionTest extends \PHPUnit\Framework\TestCase
+class ConstraintAsOptionExtensionTest extends TestCase
 {
-    /** @var ConstraintAsOptionExtension */
-    private $extension;
+    private ConstraintAsOptionExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class ConstraintAsOptionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new ConstraintAsOptionExtension(new ConstraintFactory());
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $constraintOptions = [
             new Assert\NotBlank(),

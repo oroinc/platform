@@ -9,17 +9,14 @@ use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailThreadManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EmailThreadManagerTest extends \PHPUnit\Framework\TestCase
+class EmailThreadManagerTest extends TestCase
 {
-    /** @var EmailThreadProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailThreadProvider;
-
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var EmailThreadManager */
-    private $emailThreadManager;
+    private EmailThreadProvider&MockObject $emailThreadProvider;
+    private EntityManagerInterface&MockObject $em;
+    private EmailThreadManager $emailThreadManager;
 
     #[\Override]
     protected function setUp(): void

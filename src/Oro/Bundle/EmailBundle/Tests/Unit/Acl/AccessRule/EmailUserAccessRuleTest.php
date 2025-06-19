@@ -14,14 +14,13 @@ use Oro\Bundle\SecurityBundle\AccessRule\Expr\Path;
 use Oro\Bundle\SecurityBundle\AccessRule\Expr\Value;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AccessRuleWalker;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclConditionDataBuilderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EmailUserAccessRuleTest extends \PHPUnit\Framework\TestCase
+class EmailUserAccessRuleTest extends TestCase
 {
-    /** @var AclConditionDataBuilderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $aclConditionDataBuilder;
-
-    /** @var EmailUserAccessRule */
-    private $accessRule;
+    private AclConditionDataBuilderInterface&MockObject $aclConditionDataBuilder;
+    private EmailUserAccessRule $accessRule;
 
     #[\Override]
     protected function setUp(): void

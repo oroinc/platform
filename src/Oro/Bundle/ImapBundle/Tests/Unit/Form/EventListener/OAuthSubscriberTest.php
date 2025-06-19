@@ -5,20 +5,17 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Form\EventListener;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Form\EventListener\OAuthSubscriber;
 use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class OAuthSubscriberTest extends \PHPUnit\Framework\TestCase
+class OAuthSubscriberTest extends TestCase
 {
-    /** @var TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translator;
-
-    /** @var OAuthManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $oauthManagerRegistry;
-
-    /** @var OAuthSubscriber */
-    private $subscriber;
+    private TranslatorInterface&MockObject $translator;
+    private OAuthManagerRegistry&MockObject $oauthManagerRegistry;
+    private OAuthSubscriber $subscriber;
 
     #[\Override]
     protected function setUp(): void

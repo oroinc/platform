@@ -10,6 +10,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -19,17 +20,10 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  */
 class EntityDescriptionProviderTest extends OrmRelatedTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityClassNameProviderInterface */
-    private $entityClassNameProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
-    private $configManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
-    private $translator;
-
-    /** @var EntityDescriptionProvider */
-    private $entityDescriptionProvider;
+    private EntityClassNameProviderInterface&MockObject $entityClassNameProvider;
+    private ConfigManager&MockObject $configManager;
+    private TranslatorInterface&MockObject $translator;
+    private EntityDescriptionProvider $entityDescriptionProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -64,7 +58,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         return $config;
     }
 
-    public function testGetEntityDescription()
+    public function testGetEntityDescription(): void
     {
         $entityClass = 'Test\Class';
         $humanReadableClassName = 'test name';
@@ -86,7 +80,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetEntityPluralDescription()
+    public function testGetEntityPluralDescription(): void
     {
         $entityClass = 'Test\Class';
         $humanReadableClassName = 'test name';
@@ -108,7 +102,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testNoCollisionsBetweenGetEntityDescriptionAndPluralDescription()
+    public function testNoCollisionsBetweenGetEntityDescriptionAndPluralDescription(): void
     {
         $entityClass = 'Test\Class';
         $humanReadableClassName = 'test name';
@@ -133,7 +127,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetEntityDocumentationForNotConfigurableEntity()
+    public function testGetEntityDocumentationForNotConfigurableEntity(): void
     {
         $entityClass = Entity\Product::class;
         $expectedValue = null;
@@ -150,7 +144,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetEntityDocumentationForConfigurableEntityWithoutDescription()
+    public function testGetEntityDocumentationForConfigurableEntityWithoutDescription(): void
     {
         $entityClass = Entity\Product::class;
         $expectedValue = null;
@@ -180,7 +174,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetEntityDocumentationForConfigurableEntityWithMissingTranslation()
+    public function testGetEntityDocumentationForConfigurableEntityWithMissingTranslation(): void
     {
         $entityClass = Entity\Product::class;
         $entityDescription = 'description trans key';
@@ -216,7 +210,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetEntityDocumentationForConfigurableEntityWhenTranslationExists()
+    public function testGetEntityDocumentationForConfigurableEntityWhenTranslationExists(): void
     {
         $entityClass = Entity\Product::class;
         $entityDescription = 'description trans key';
@@ -252,7 +246,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetEntityDocumentationForHiddenConfigurableEntity()
+    public function testGetEntityDocumentationForHiddenConfigurableEntity(): void
     {
         $entityClass = Entity\Product::class;
         $expectedValue = null;
@@ -280,7 +274,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDescriptionForNotManageableEntity()
+    public function testGetFieldDescriptionForNotManageableEntity(): void
     {
         $entityClass = Entity\Product::class;
         $fieldName = 'updatedAt';
@@ -300,7 +294,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDescriptionForManageableEntity()
+    public function testGetFieldDescriptionForManageableEntity(): void
     {
         $entityClass = Entity\Product::class;
         $fieldName = 'updatedAt';
@@ -318,7 +312,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDescriptionForConfigurableEntityButNotConfigurableField()
+    public function testGetFieldDescriptionForConfigurableEntityButNotConfigurableField(): void
     {
         $entityClass = Entity\Product::class;
         $fieldName = 'updatedAt';
@@ -347,7 +341,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDescriptionForConfigurableEntityWithoutFieldLabel()
+    public function testGetFieldDescriptionForConfigurableEntityWithoutFieldLabel(): void
     {
         $entityClass = Entity\Product::class;
         $fieldName = 'updatedAt';
@@ -382,7 +376,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDescriptionForConfigurableEntityWithoutTranslationForFieldLabel()
+    public function testGetFieldDescriptionForConfigurableEntityWithoutTranslationForFieldLabel(): void
     {
         $entityClass = Entity\Product::class;
         $fieldName = 'updatedAt';
@@ -423,7 +417,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDescriptionForConfigurableEntityWhenTranslationForFieldLabelExists()
+    public function testGetFieldDescriptionForConfigurableEntityWhenTranslationForFieldLabelExists(): void
     {
         $entityClass = Entity\Product::class;
         $fieldName = 'updatedAt';
@@ -464,7 +458,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDescriptionForHiddenConfigurableEntity()
+    public function testGetFieldDescriptionForHiddenConfigurableEntity(): void
     {
         $entityClass = Entity\Product::class;
         $fieldName = 'updatedAt';
@@ -493,7 +487,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDescriptionForHiddenConfigurableField()
+    public function testGetFieldDescriptionForHiddenConfigurableField(): void
     {
         $entityClass = Entity\Product::class;
         $fieldName = 'updatedAt';
@@ -532,7 +526,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDescriptionForHiddenConfigurableFieldWhenTranslationExists()
+    public function testGetFieldDescriptionForHiddenConfigurableFieldWhenTranslationExists(): void
     {
         $entityClass = Entity\Product::class;
         $fieldName = 'updatedAt';
@@ -571,7 +565,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDescriptionForRelatedEntity()
+    public function testGetFieldDescriptionForRelatedEntity(): void
     {
         $entityClass = Entity\Product::class;
         $propertyPath = 'category.name';
@@ -612,7 +606,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDescriptionForRelatedNotConfigurableEntity()
+    public function testGetFieldDescriptionForRelatedNotConfigurableEntity(): void
     {
         $entityClass = Entity\Product::class;
         $propertyPath = 'category.name';
@@ -643,7 +637,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDescriptionForRelatedNotConfigurableEntityWhenTranslationExists()
+    public function testGetFieldDescriptionForRelatedNotConfigurableEntityWhenTranslationExists(): void
     {
         $entityClass = Entity\Product::class;
         $propertyPath = 'category.name';
@@ -674,7 +668,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDocumentationForNotManageableEntity()
+    public function testGetFieldDocumentationForNotManageableEntity(): void
     {
         $entityClass = Entity\Product::class;
         $fieldName = 'updatedAt';
@@ -694,7 +688,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDocumentationForManageableEntity()
+    public function testGetFieldDocumentationForManageableEntity(): void
     {
         $entityClass = Entity\Product::class;
         $fieldName = 'updatedAt';
@@ -712,7 +706,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDocumentationForConfigurableEntityButNotConfigurableField()
+    public function testGetFieldDocumentationForConfigurableEntityButNotConfigurableField(): void
     {
         $entityClass = Entity\Product::class;
         $fieldName = 'updatedAt';
@@ -741,7 +735,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDocumentationForConfigurableEntityWithoutFieldDescription()
+    public function testGetFieldDocumentationForConfigurableEntityWithoutFieldDescription(): void
     {
         $entityClass = Entity\Product::class;
         $fieldName = 'updatedAt';
@@ -776,7 +770,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDocumentationForConfigurableEntityWithoutTranslationForFieldDescription()
+    public function testGetFieldDocumentationForConfigurableEntityWithoutTranslationForFieldDescription(): void
     {
         $entityClass = Entity\Product::class;
         $fieldName = 'updatedAt';
@@ -817,7 +811,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDocumentationForConfigurableEntityWhenTranslationForFieldDescriptionExists()
+    public function testGetFieldDocumentationForConfigurableEntityWhenTranslationForFieldDescriptionExists(): void
     {
         $entityClass = Entity\Product::class;
         $fieldName = 'updatedAt';
@@ -858,7 +852,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDocumentationForHiddenConfigurableEntity()
+    public function testGetFieldDocumentationForHiddenConfigurableEntity(): void
     {
         $entityClass = Entity\Product::class;
         $fieldName = 'updatedAt';
@@ -887,7 +881,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDocumentationForHiddenConfigurableField()
+    public function testGetFieldDocumentationForHiddenConfigurableField(): void
     {
         $entityClass = Entity\Product::class;
         $fieldName = 'updatedAt';
@@ -926,7 +920,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDocumentationForHiddenConfigurableFieldWhenTranslationExists()
+    public function testGetFieldDocumentationForHiddenConfigurableFieldWhenTranslationExists(): void
     {
         $entityClass = Entity\Product::class;
         $fieldName = 'updatedAt';
@@ -965,7 +959,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDocumentationForRelatedEntity()
+    public function testGetFieldDocumentationForRelatedEntity(): void
     {
         $entityClass = Entity\Product::class;
         $propertyPath = 'category.name';
@@ -1006,7 +1000,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDocumentationForRelatedNotConfigurableEntity()
+    public function testGetFieldDocumentationForRelatedNotConfigurableEntity(): void
     {
         $entityClass = Entity\Product::class;
         $propertyPath = 'category.name';
@@ -1037,7 +1031,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDocumentationForRelatedNotConfigurableEntityWhenTranslationExists()
+    public function testGetFieldDocumentationForRelatedNotConfigurableEntityWhenTranslationExists(): void
     {
         $entityClass = Entity\Product::class;
         $propertyPath = 'category.name';
@@ -1068,7 +1062,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDocumentationForRelatedHiddenConfigurableEntity()
+    public function testGetFieldDocumentationForRelatedHiddenConfigurableEntity(): void
     {
         $entityClass = Entity\Product::class;
         $propertyPath = 'category.name';
@@ -1101,7 +1095,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDocumentationForRelatedHiddenConfigurableEntityWhenTranslationExists()
+    public function testGetFieldDocumentationForRelatedHiddenConfigurableEntityWhenTranslationExists(): void
     {
         $entityClass = Entity\Product::class;
         $propertyPath = 'category.name';
@@ -1137,7 +1131,7 @@ class EntityDescriptionProviderTest extends OrmRelatedTestCase
     /**
      * @dataProvider humanizeAssociationNameDataProvider
      */
-    public function testHumanizeAssociationName(string $associationName, string $humanReadableAssociationName)
+    public function testHumanizeAssociationName(string $associationName, string $humanReadableAssociationName): void
     {
         self::assertEquals(
             $humanReadableAssociationName,

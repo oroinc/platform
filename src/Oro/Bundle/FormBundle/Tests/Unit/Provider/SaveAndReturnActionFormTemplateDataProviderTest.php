@@ -3,16 +3,16 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\FormBundle\Provider\SaveAndReturnActionFormTemplateDataProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\HttpFoundation\Request;
 
-class SaveAndReturnActionFormTemplateDataProviderTest extends \PHPUnit\Framework\TestCase
+class SaveAndReturnActionFormTemplateDataProviderTest extends TestCase
 {
-    private FormInterface|\PHPUnit\Framework\MockObject\MockObject $form;
-
-    private Request|\PHPUnit\Framework\MockObject\MockObject $request;
-
+    private FormInterface&MockObject $form;
+    private Request&MockObject $request;
     private SaveAndReturnActionFormTemplateDataProvider $provider;
 
     #[\Override]

@@ -3,8 +3,9 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Tools;
 
 use Oro\Bundle\AttachmentBundle\Tools\FilenameSanitizer;
+use PHPUnit\Framework\TestCase;
 
-class FilenameSanitizerTest extends \PHPUnit\Framework\TestCase
+class FilenameSanitizerTest extends TestCase
 {
     /**
      * @dataProvider fileNameDataProvider

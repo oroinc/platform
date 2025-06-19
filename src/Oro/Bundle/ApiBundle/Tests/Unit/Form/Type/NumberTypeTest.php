@@ -10,7 +10,7 @@ class NumberTypeTest extends ApiFormTypeTestCase
     /**
      * @dataProvider validValuesDataProvider
      */
-    public function testWithValidValue(?int $scale, string $value, string $expected)
+    public function testWithValidValue(?int $scale, string $value, string $expected): void
     {
         $form = $this->factory->create(NumberType::class, null, ['scale' => $scale]);
         $form->submit($value);
@@ -31,7 +31,7 @@ class NumberTypeTest extends ApiFormTypeTestCase
     /**
      * @dataProvider invalidValuesDataProvider
      */
-    public function testWithInvalidValue(?int $scale, string $value)
+    public function testWithInvalidValue(?int $scale, string $value): void
     {
         $form = $this->factory->create(NumberType::class, null, ['scale' => $scale]);
         $form->submit($value);

@@ -7,18 +7,15 @@ use Oro\Bundle\ImapBundle\OriginSyncCredentials\WrongCredentialsOriginsDriverInt
 use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestNotificationSender;
 use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestUserEmailOrigin;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class SyncCredentialsIssueManagerTest extends \PHPUnit\Framework\TestCase
+class SyncCredentialsIssueManagerTest extends TestCase
 {
-    /** @var WrongCredentialsOriginsDriverInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $credentialsDriver;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var SyncCredentialsIssueManager */
-    private $manager;
+    private WrongCredentialsOriginsDriverInterface&MockObject $credentialsDriver;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private SyncCredentialsIssueManager $manager;
 
     #[\Override]
     protected function setUp(): void
@@ -29,7 +26,7 @@ class SyncCredentialsIssueManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager = new SyncCredentialsIssueManager($this->credentialsDriver, $this->authorizationChecker);
     }
 
-    public function testAddInvalidSystemOrigin()
+    public function testAddInvalidSystemOrigin(): void
     {
         $origin = new TestUserEmailOrigin(123);
 
@@ -40,7 +37,7 @@ class SyncCredentialsIssueManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->addInvalidOrigin($origin);
     }
 
-    public function testAddInvalidOrigin()
+    public function testAddInvalidOrigin(): void
     {
         $origin = new TestUserEmailOrigin(123);
         $user = new User();
@@ -54,7 +51,7 @@ class SyncCredentialsIssueManagerTest extends \PHPUnit\Framework\TestCase
         $this->manager->addInvalidOrigin($origin);
     }
 
-    public function testProcessInvalidOrigins()
+    public function testProcessInvalidOrigins(): void
     {
         $origin = new TestUserEmailOrigin(123);
 
@@ -73,7 +70,7 @@ class SyncCredentialsIssueManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([$origin], $processedOrigins);
     }
 
-    public function testProcessInvalidOriginsForUserWithoutPermissionToGetSystemOriginNotifications()
+    public function testProcessInvalidOriginsForUserWithoutPermissionToGetSystemOriginNotifications(): void
     {
         $origin = new TestUserEmailOrigin(123);
         $user = new User();
@@ -100,7 +97,7 @@ class SyncCredentialsIssueManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([$origin], $notificationSender->processedOrigins);
     }
 
-    public function testProcessInvalidOriginsForUserWithPermissionToGetSystemOriginNotifications()
+    public function testProcessInvalidOriginsForUserWithPermissionToGetSystemOriginNotifications(): void
     {
         $origin = new TestUserEmailOrigin(123);
         $user = new User();
@@ -132,7 +129,7 @@ class SyncCredentialsIssueManagerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals([$origin, $systemOrigin], $notificationSender->processedOrigins);
     }
 
-    public function testRemoveOriginFromTheFailed()
+    public function testRemoveOriginFromTheFailed(): void
     {
         $origin = new TestUserEmailOrigin(123);
         $this->credentialsDriver->expects($this->once())

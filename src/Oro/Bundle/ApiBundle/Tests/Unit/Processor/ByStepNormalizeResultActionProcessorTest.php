@@ -12,6 +12,8 @@ use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
 use Oro\Component\Testing\Logger\BufferingLogger;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -20,18 +22,13 @@ use Psr\Log\LoggerInterface;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCase
+class ByStepNormalizeResultActionProcessorTest extends TestCase
 {
-    private const TEST_ACTION = 'test';
+    private const string TEST_ACTION = 'test';
 
-    /** @var ProcessorRegistryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $processorRegistry;
-
-    /** @var ProcessorBagConfigBuilder */
-    private $processorBagConfigBuilder;
-
-    /** @var ByStepNormalizeResultActionProcessor */
-    private $processor;
+    private ProcessorRegistryInterface&MockObject $processorRegistry;
+    private ProcessorBagConfigBuilder $processorBagConfigBuilder;
+    private ByStepNormalizeResultActionProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -64,7 +61,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @param array $processors [processorId => groupName, ...]
      *
-     * @return ProcessorInterface[]|\PHPUnit\Framework\MockObject\MockObject[]
+     * @return ProcessorInterface[]&MockObject[]
      */
     private function addProcessors(array $processors): array
     {
@@ -96,7 +93,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
         ];
     }
 
-    public function testBothFirstAndLastGroupsAreNotSet()
+    public function testBothFirstAndLastGroupsAreNotSet(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
@@ -109,7 +106,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
         $this->processor->process($context);
     }
 
-    public function testFirstGroupIsNotSet()
+    public function testFirstGroupIsNotSet(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
@@ -123,7 +120,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
         $this->processor->process($context);
     }
 
-    public function testLastGroupIsNotSet()
+    public function testLastGroupIsNotSet(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
@@ -137,7 +134,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
         $this->processor->process($context);
     }
 
-    public function testFirstGroupIsNotEqualLastGroup()
+    public function testFirstGroupIsNotEqualLastGroup(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
@@ -152,13 +149,13 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
         $this->processor->process($context);
     }
 
-    public function testWhenNoProcessors()
+    public function testWhenNoProcessors(): void
     {
         $context = $this->getContext();
         $this->processor->process($context);
     }
 
-    public function testShouldRemoveSkippedGroupsBeforeCallParentProcess()
+    public function testShouldRemoveSkippedGroupsBeforeCallParentProcess(): void
     {
         $context = $this->getContext();
         $context->skipGroup('group2');
@@ -179,7 +176,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
         self::assertFalse($context->hasErrors());
     }
 
-    public function testShouldRemoveSourceGroupBeforeCallParentProcess()
+    public function testShouldRemoveSourceGroupBeforeCallParentProcess(): void
     {
         $context = $this->getContext();
         $context->setSourceGroup('group2');
@@ -200,7 +197,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
         self::assertFalse($context->hasErrors());
     }
 
-    public function testShouldRemoveFailedGroupBeforeCallParentProcess()
+    public function testShouldRemoveFailedGroupBeforeCallParentProcess(): void
     {
         $context = $this->getContext();
         $context->setFailedGroup('group2');
@@ -221,7 +218,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
         self::assertFalse($context->hasErrors());
     }
 
-    public function testWhenNoExceptionsAndErrors()
+    public function testWhenNoExceptionsAndErrors(): void
     {
         $context = $this->getContext();
 
@@ -247,7 +244,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionOccurs(bool $withLogger)
+    public function testWhenExceptionOccurs(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -308,7 +305,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionOccursAndSoftErrorsHandlingEnabled(bool $withLogger)
+    public function testWhenExceptionOccursAndSoftErrorsHandlingEnabled(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -370,7 +367,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccurs(bool $withLogger)
+    public function testWhenErrorOccurs(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -431,7 +428,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursInLastProcessor(bool $withLogger)
+    public function testWhenErrorOccursInLastProcessor(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -490,7 +487,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursAndSoftErrorsHandlingEnabled(bool $withLogger)
+    public function testWhenErrorOccursAndSoftErrorsHandlingEnabled(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -552,7 +549,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursInLastProcessorAndSoftErrorsHandlingEnabled(bool $withLogger)
+    public function testWhenErrorOccursInLastProcessorAndSoftErrorsHandlingEnabled(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -609,7 +606,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
         self::assertEquals([$error], $context->getErrors());
     }
 
-    public function testWhenNoExceptionsAndErrorsAndHasInitialErrors()
+    public function testWhenNoExceptionsAndErrorsAndHasInitialErrors(): void
     {
         $context = $this->getContext();
         $initialError = Error::create('initial error');
@@ -642,7 +639,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionOccursAndHasInitialErrors(bool $withLogger)
+    public function testWhenExceptionOccursAndHasInitialErrors(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -705,7 +702,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionOccursAndSoftErrorsHandlingEnabledAndHasInitialErrors(bool $withLogger)
+    public function testWhenExceptionOccursAndSoftErrorsHandlingEnabledAndHasInitialErrors(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -769,7 +766,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursAndHasInitialErrors(bool $withLogger)
+    public function testWhenErrorOccursAndHasInitialErrors(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -835,7 +832,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursInLastProcessorAndHasInitialErrors(bool $withLogger)
+    public function testWhenErrorOccursInLastProcessorAndHasInitialErrors(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -899,7 +896,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursAndSoftErrorsHandlingEnabledAndHasInitialErrors(bool $withLogger)
+    public function testWhenErrorOccursAndSoftErrorsHandlingEnabledAndHasInitialErrors(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -966,8 +963,9 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursInLastProcessorAndSoftErrorsHandlingEnabledAndHasInitialErrors(bool $withLogger)
-    {
+    public function testWhenErrorOccursInLastProcessorAndSoftErrorsHandlingEnabledAndHasInitialErrors(
+        bool $withLogger
+    ): void {
         $logger = null;
         if ($withLogger) {
             $logger = $this->createMock(LoggerInterface::class);
@@ -1031,7 +1029,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionOccursInNormalizeResultGroup(bool $withLogger)
+    public function testWhenExceptionOccursInNormalizeResultGroup(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -1085,7 +1083,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenExceptionOccursInNormalizeResultGroupAndSoftErrorsHandlingEnabled(bool $withLogger)
+    public function testWhenExceptionOccursInNormalizeResultGroupAndSoftErrorsHandlingEnabled(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -1141,7 +1139,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursInNormalizeResultGroup(bool $withLogger)
+    public function testWhenErrorOccursInNormalizeResultGroup(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -1188,7 +1186,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenErrorOccursInNormalizeResultGroupAndSoftErrorsHandlingEnabled(bool $withLogger)
+    public function testWhenErrorOccursInNormalizeResultGroupAndSoftErrorsHandlingEnabled(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {
@@ -1236,7 +1234,7 @@ class ByStepNormalizeResultActionProcessorTest extends \PHPUnit\Framework\TestCa
     /**
      * @dataProvider loggerProvider
      */
-    public function testWhenInternalPhpErrorOccursAndHasInitialErrors(bool $withLogger)
+    public function testWhenInternalPhpErrorOccursAndHasInitialErrors(bool $withLogger): void
     {
         $logger = null;
         if ($withLogger) {

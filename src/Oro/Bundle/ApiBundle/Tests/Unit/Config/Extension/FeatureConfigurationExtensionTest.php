@@ -5,17 +5,16 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config\Extension;
 use Oro\Bundle\ApiBundle\Config\Extension\FeatureConfigurationExtension;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Provider\ResourceCheckerConfigProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 
-class FeatureConfigurationExtensionTest extends \PHPUnit\Framework\TestCase
+class FeatureConfigurationExtensionTest extends TestCase
 {
-    /** @var ResourceCheckerConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var FeatureConfigurationExtension */
-    private $extension;
+    private ResourceCheckerConfigProvider&MockObject $configProvider;
+    private FeatureConfigurationExtension $extension;
 
     #[\Override]
     protected function setUp(): void

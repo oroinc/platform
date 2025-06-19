@@ -4,8 +4,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\NormalizeResultContext;
+use PHPUnit\Framework\TestCase;
 
-class NormalizeResultContextTest extends \PHPUnit\Framework\TestCase
+class NormalizeResultContextTest extends TestCase
 {
     private NormalizeResultContext $context;
 
@@ -15,7 +16,7 @@ class NormalizeResultContextTest extends \PHPUnit\Framework\TestCase
         $this->context = new NormalizeResultContext();
     }
 
-    public function testErrors()
+    public function testErrors(): void
     {
         self::assertFalse($this->context->hasErrors());
         self::assertSame([], $this->context->getErrors());
@@ -29,7 +30,7 @@ class NormalizeResultContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $this->context->getErrors());
     }
 
-    public function testSoftErrorsHandling()
+    public function testSoftErrorsHandling(): void
     {
         self::assertFalse($this->context->isSoftErrorsHandling());
 

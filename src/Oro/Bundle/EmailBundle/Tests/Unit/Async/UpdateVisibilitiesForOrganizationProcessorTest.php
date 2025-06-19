@@ -12,19 +12,16 @@ use Oro\Component\MessageQueue\Job\Job;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\MessageInterface;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class UpdateVisibilitiesForOrganizationProcessorTest extends \PHPUnit\Framework\TestCase
+class UpdateVisibilitiesForOrganizationProcessorTest extends TestCase
 {
     use MessageQueueExtension;
 
-    /** @var EmailAddressVisibilityManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailAddressVisibilityManager;
-
-    /** @var JobRunner|\PHPUnit\Framework\MockObject\MockObject */
-    private $jobRunner;
-
-    /** @var UpdateVisibilitiesForOrganizationProcessor */
-    private $processor;
+    private EmailAddressVisibilityManager&MockObject $emailAddressVisibilityManager;
+    private JobRunner&MockObject $jobRunner;
+    private UpdateVisibilitiesForOrganizationProcessor $processor;
 
     #[\Override]
     protected function setUp(): void

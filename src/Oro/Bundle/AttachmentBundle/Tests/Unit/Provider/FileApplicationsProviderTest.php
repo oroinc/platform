@@ -7,18 +7,17 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Provider\AttachmentEntityConfigProviderInterface;
 use Oro\Bundle\AttachmentBundle\Provider\FileApplicationsProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class FileApplicationsProviderTest extends \PHPUnit\Framework\TestCase
+class FileApplicationsProviderTest extends TestCase
 {
-    private const PARENT_ENTITY_CLASS = \stdClass::class;
-    private const PARENT_ENTITY_ID = 1;
-    private const PARENT_ENTITY_FIELD_NAME = 'sampleField';
+    private const string PARENT_ENTITY_CLASS = \stdClass::class;
+    private const int PARENT_ENTITY_ID = 1;
+    private const string PARENT_ENTITY_FIELD_NAME = 'sampleField';
 
-    /** @var AttachmentEntityConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $attachmentEntityConfigProvider;
-
-    /** @var FileApplicationsProvider */
-    private $provider;
+    private AttachmentEntityConfigProviderInterface&MockObject $attachmentEntityConfigProvider;
+    private FileApplicationsProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -39,17 +38,16 @@ class FileApplicationsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFileApplications(): void
     {
-        $this->attachmentEntityConfigProvider
-            ->expects(self::once())
+        $config = $this->createMock(Config::class);
+        $fileApplications = ['sample_app1', 'sample_app2'];
+        $this->attachmentEntityConfigProvider->expects(self::once())
             ->method('getFieldConfig')
             ->with(self::PARENT_ENTITY_CLASS, self::PARENT_ENTITY_FIELD_NAME)
-            ->willReturn($config = $this->createMock(Config::class));
-
-        $config
-            ->expects(self::once())
+            ->willReturn($config);
+        $config->expects(self::once())
             ->method('get')
             ->with('file_applications', false, [CurrentApplicationProviderInterface::DEFAULT_APPLICATION])
-            ->willReturn($fileApplications = ['sample_app1', 'sample_app2']);
+            ->willReturn($fileApplications);
 
         self::assertEquals(
             $fileApplications,
@@ -107,8 +105,7 @@ class FileApplicationsProviderTest extends \PHPUnit\Framework\TestCase
 
     public function testGetFileApplicationsWhenNoFieldConfig(): void
     {
-        $this->attachmentEntityConfigProvider
-            ->expects(self::once())
+        $this->attachmentEntityConfigProvider->expects(self::once())
             ->method('getFieldConfig')
             ->with(self::PARENT_ENTITY_CLASS, self::PARENT_ENTITY_FIELD_NAME)
             ->willReturn(null);

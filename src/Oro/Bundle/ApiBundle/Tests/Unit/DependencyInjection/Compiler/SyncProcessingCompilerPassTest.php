@@ -4,11 +4,12 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\SyncProcessingCompilerPass;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class SyncProcessingCompilerPassTest extends \PHPUnit\Framework\TestCase
+class SyncProcessingCompilerPassTest extends TestCase
 {
     public function testProcess(): void
     {

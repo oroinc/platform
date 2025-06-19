@@ -5,14 +5,13 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Formatter;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Formatter\ImageSrcFormatter;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ImageSrcFormatterTest extends \PHPUnit\Framework\TestCase
+class ImageSrcFormatterTest extends TestCase
 {
-    /** @var AttachmentManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $manager;
-
-    /** @var ImageSrcFormatter */
-    private $formatter;
+    private AttachmentManager&MockObject $manager;
+    private ImageSrcFormatter $formatter;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +21,7 @@ class ImageSrcFormatterTest extends \PHPUnit\Framework\TestCase
         $this->formatter = new ImageSrcFormatter($this->manager);
     }
 
-    public function testFormat()
+    public function testFormat(): void
     {
         $file = new File();
 
@@ -33,7 +32,7 @@ class ImageSrcFormatterTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('http://test.com/image.png', $this->formatter->format($file));
     }
 
-    public function testFormatWithArguments()
+    public function testFormatWithArguments(): void
     {
         $file = new File();
         $file->setOriginalFilename('some_name.png');
@@ -61,7 +60,7 @@ class ImageSrcFormatterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDefaultValue()
+    public function testGetDefaultValue(): void
     {
         $this->assertEquals('#', $this->formatter->getDefaultValue());
     }

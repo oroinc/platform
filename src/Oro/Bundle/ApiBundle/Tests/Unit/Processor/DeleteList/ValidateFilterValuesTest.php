@@ -9,8 +9,7 @@ use Oro\Bundle\ApiBundle\Processor\DeleteList\ValidateFilterValues;
 
 class ValidateFilterValuesTest extends DeleteListProcessorTestCase
 {
-    /** @var ValidateFilterValues */
-    private $processor;
+    private ValidateFilterValues $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +19,7 @@ class ValidateFilterValuesTest extends DeleteListProcessorTestCase
         $this->processor = new ValidateFilterValues();
     }
 
-    public function testProcessWhenQueryIsAlreadyBuilt()
+    public function testProcessWhenQueryIsAlreadyBuilt(): void
     {
         $this->context->setQuery(new \stdClass());
         $context = clone $this->context;
@@ -28,7 +27,7 @@ class ValidateFilterValuesTest extends DeleteListProcessorTestCase
         self::assertEquals($context, $this->context);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $filters = $this->context->getFilters();
         $integerFilter = new ComparisonFilter('integer');
@@ -41,7 +40,7 @@ class ValidateFilterValuesTest extends DeleteListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenNoFilters()
+    public function testProcessWhenNoFilters(): void
     {
         $filters = $this->context->getFilters();
         $integerFilter = new ComparisonFilter('integer');

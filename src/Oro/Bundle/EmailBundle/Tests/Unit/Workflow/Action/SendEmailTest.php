@@ -16,26 +16,23 @@ use Oro\Bundle\TestFrameworkBundle\Test\Logger\LoggerAwareTraitTestTrait;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\ConfigExpression\ContextAccessor;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class SendEmailTest extends \PHPUnit\Framework\TestCase
+class SendEmailTest extends TestCase
 {
     use LoggerAwareTraitTestTrait;
 
-    private ContextAccessor|\PHPUnit\Framework\MockObject\MockObject $contextAccessor;
-
-    private ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject $validator;
-
-    private EntityNameResolver|\PHPUnit\Framework\MockObject\MockObject $entityNameResolver;
-
-    private EmailModelSender|\PHPUnit\Framework\MockObject\MockObject $emailModelSender;
-
-    private EmailOriginHelper|\PHPUnit\Framework\MockObject\MockObject $emailOriginHelper;
-
+    private ContextAccessor&MockObject $contextAccessor;
+    private ValidatorInterface&MockObject $validator;
+    private EntityNameResolver&MockObject $entityNameResolver;
+    private EmailModelSender&MockObject $emailModelSender;
+    private EmailOriginHelper&MockObject $emailOriginHelper;
     private SendEmail $action;
 
     #[\Override]

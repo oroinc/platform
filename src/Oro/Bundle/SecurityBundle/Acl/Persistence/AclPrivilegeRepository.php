@@ -83,8 +83,9 @@ class AclPrivilegeRepository
      * @param string|null $aclGroup
      *
      * @return ArrayCollection|AclPrivilege[]
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public function getPrivileges(SID $sid, $aclGroup = null)
+    public function getPrivileges(SID $sid, $aclGroup = null, bool $checkACLSupport = false)
     {
         $privileges = new ArrayCollection();
         foreach ($this->manager->getAllExtensions() as $extension) {
@@ -98,7 +99,13 @@ class AclPrivilegeRepository
             $extensionClasses = $extension->getClasses();
             foreach ($extensionClasses as $class) {
                 $className = $class->getClassName();
-                $oids[] = new OID($extensionKey, $className);
+                $oid = new OID($extensionKey, $className);
+
+                if ($checkACLSupport && !$extension->supports($oid->getType(), $oid->getIdentifier())) {
+                    continue;
+                }
+
+                $oids[] = $oid;
                 $classes[$className] = $class;
             }
 

@@ -11,7 +11,7 @@ use Oro\Bundle\ApiBundle\Batch\Splitter\JsonPartialFileSplitter;
  */
 class JsonApiPartialFileSplitterTest extends FileSplitterTestCase
 {
-    public function testSplitWithoutTimeout()
+    public function testSplitWithoutTimeout(): void
     {
         $inputJson = <<<JSON
 {"data":[
@@ -76,7 +76,7 @@ JSON;
         $this->assertChunkContent($result[1], $resultFileContents[1]);
     }
 
-    public function testSplitWithoutTimeoutAndWithHeaderSection()
+    public function testSplitWithoutTimeoutAndWithHeaderSection(): void
     {
         $inputJson = <<<JSON
 {"jsonapi": {"version": "1.0"},
@@ -146,7 +146,7 @@ JSON;
         $this->assertChunkContent($result[1], $resultFileContents[1]);
     }
 
-    public function testSplitWithTimeoutButWhenItIsNotExceeded()
+    public function testSplitWithTimeoutButWhenItIsNotExceeded(): void
     {
         $inputJson = <<<JSON
 {"data":[
@@ -210,7 +210,7 @@ JSON;
         $this->assertChunkContent($result[1], $resultFileContents[1]);
     }
 
-    public function testSplitWhenTimeoutExceededAfterEachObjectAndDifferentInstancesOfSplitterAreUsed()
+    public function testSplitWhenTimeoutExceededAfterEachObjectAndDifferentInstancesOfSplitterAreUsed(): void
     {
         $this->runTestSplitWhenTimeoutExceededAfterEachObject(function (JsonPartialFileSplitterStub $splitter) {
             $state = $splitter->getState();
@@ -223,7 +223,7 @@ JSON;
         });
     }
 
-    public function testSplitWhenTimeoutExceededAfterEachObjectAndTheSameInstanceOfSplitterIsUsed()
+    public function testSplitWhenTimeoutExceededAfterEachObjectAndTheSameInstanceOfSplitterIsUsed(): void
     {
         $splitter = new JsonPartialFileSplitterStub(50);
         $splitter->setChunkSize(1);
@@ -238,7 +238,7 @@ JSON;
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    private function runTestSplitWhenTimeoutExceededAfterEachObject(callable $getNextSplitter)
+    private function runTestSplitWhenTimeoutExceededAfterEachObject(callable $getNextSplitter): void
     {
         $inputJson = <<<JSON
 {"data":[
@@ -416,7 +416,7 @@ JSON;
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testSplitWhenTimeoutExceededAfterFewObjectsAndDifferentInstancesOfSplittersAreUsed()
+    public function testSplitWhenTimeoutExceededAfterFewObjectsAndDifferentInstancesOfSplittersAreUsed(): void
     {
         $this->runTestSplitWhenTimeoutExceededAfterFewObjects(function (JsonPartialFileSplitterStub $splitter) {
             $state = $splitter->getState();
@@ -432,7 +432,7 @@ JSON;
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testSplitWhenTimeoutExceededAfterFewObjectsAndTheSameInstanceOfSplitterIsUsed()
+    public function testSplitWhenTimeoutExceededAfterFewObjectsAndTheSameInstanceOfSplitterIsUsed(): void
     {
         $this->runTestSplitWhenTimeoutExceededAfterFewObjects(function (JsonPartialFileSplitterStub $splitter) {
             return $splitter;
@@ -442,7 +442,7 @@ JSON;
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function runTestSplitWhenTimeoutExceededAfterFewObjects(callable $getNextSplitter)
+    public function runTestSplitWhenTimeoutExceededAfterFewObjects(callable $getNextSplitter): void
     {
         $inputJson = <<<JSON
 {"data":[
@@ -550,7 +550,7 @@ JSON;
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testSplitWhenTimeoutExceededAndDifferentInstancesOfSplittersAreUsedAndWithHeaderSection()
+    public function testSplitWhenTimeoutExceededAndDifferentInstancesOfSplittersAreUsedAndWithHeaderSection(): void
     {
         $this->markTestSkipped('BAP-22891');
 
@@ -671,7 +671,7 @@ JSON;
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testSplitWhenTimeoutExceededAndFileContainsMultibyteSymbols()
+    public function testSplitWhenTimeoutExceededAndFileContainsMultibyteSymbols(): void
     {
         $this->markTestSkipped('BAP-22891');
         $inputJson = <<<JSON
@@ -775,7 +775,7 @@ JSON;
         $this->assertChunkContent($result[2], $resultFileContents[0]);
     }
 
-    public function testSplitWhenTimeoutExceededAndFileHasErrorInFirstIteration()
+    public function testSplitWhenTimeoutExceededAndFileHasErrorInFirstIteration(): void
     {
         $inputJson = <<<JSON
 {"data":[
@@ -798,7 +798,7 @@ JSON;
         );
     }
 
-    public function testSplitWhenTimeoutExceededAndFileHasErrorInSecondIteration()
+    public function testSplitWhenTimeoutExceededAndFileHasErrorInSecondIteration(): void
     {
         $inputJson = <<<JSON
 {"data":[

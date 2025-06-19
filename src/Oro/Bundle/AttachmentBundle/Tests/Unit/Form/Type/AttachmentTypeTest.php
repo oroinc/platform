@@ -5,14 +5,14 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Form\Type\AttachmentType;
 use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Test\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class AttachmentTypeTest extends \PHPUnit\Framework\TestCase
+class AttachmentTypeTest extends TestCase
 {
-    /** @var AttachmentType */
-    private $attachmentType;
+    private AttachmentType $attachmentType;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +20,7 @@ class AttachmentTypeTest extends \PHPUnit\Framework\TestCase
         $this->attachmentType = new AttachmentType();
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
@@ -37,7 +37,7 @@ class AttachmentTypeTest extends \PHPUnit\Framework\TestCase
         $this->attachmentType->configureOptions($resolver);
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $builder = $this->createMock(FormBuilderInterface::class);
         $builder->expects($this->exactly(2))

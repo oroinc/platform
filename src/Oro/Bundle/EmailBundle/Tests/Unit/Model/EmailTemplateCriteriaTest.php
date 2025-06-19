@@ -7,8 +7,8 @@ use PHPUnit\Framework\TestCase;
 
 class EmailTemplateCriteriaTest extends TestCase
 {
-    private const TEMPLATE_NAME = 'template_name';
-    private const TEMPLATE_ENTITY_NAME = 'template_entity_name';
+    private const string TEMPLATE_NAME = 'template_name';
+    private const string TEMPLATE_ENTITY_NAME = 'template_entity_name';
 
     public function testEmailTemplateCriteriaWithoutEntityName(): void
     {

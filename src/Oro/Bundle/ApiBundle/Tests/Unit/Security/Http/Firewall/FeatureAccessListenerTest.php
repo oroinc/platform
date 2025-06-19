@@ -3,18 +3,17 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Security\Http\Firewall;
 
 use Oro\Bundle\ApiBundle\Security\Http\Firewall\FeatureAccessListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class FeatureAccessListenerTest extends \PHPUnit\Framework\TestCase
+class FeatureAccessListenerTest extends TestCase
 {
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenStorage;
-
-    /** @var FeatureAccessListener */
-    private $listener;
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private FeatureAccessListener $listener;
 
     #[\Override]
     protected function setUp(): void

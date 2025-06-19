@@ -9,14 +9,13 @@ use Oro\Bundle\AttachmentBundle\EventListener\EntityDeleteListener;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Stub\FileAwareEntityStub;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Component\Testing\Unit\ORM\Mocks\UnitOfWorkMock;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EntityDeleteListenerTest extends \PHPUnit\Framework\TestCase
+class EntityDeleteListenerTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var EntityDeleteListener */
-    private $listener;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private EntityDeleteListener $listener;
 
     #[\Override]
     protected function setUp(): void

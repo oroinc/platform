@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\Loader;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\TargetConfigExtraBuilder;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
@@ -43,9 +44,9 @@ class MultiTargetAssociationDataLoader
     public function loadExpandedEntityData(
         string $entityClass,
         array $entityIds,
-        string $entityIdFieldName,
         CustomizeLoadedDataContext $context,
-        ?string $associationPath
+        ?string $associationPath,
+        bool $idOnly = false
     ): ?array {
         $version = $context->getVersion();
         $requestType = $context->getRequestType();
@@ -57,6 +58,9 @@ class MultiTargetAssociationDataLoader
             $context->getConfigExtras(),
             $associationPath
         );
+        if ($idOnly && !$this->hasFilterIdentifierFieldsConfigExtra($configExtras)) {
+            $configExtras[] = new FilterIdentifierFieldsConfigExtra();
+        }
         $entityConfig = $this->configProvider
             ->getConfig($entityClass, $version, $requestType, $configExtras)
             ->getDefinition();
@@ -64,34 +68,34 @@ class MultiTargetAssociationDataLoader
             return null;
         }
 
-        $normalizationContext = $context->getNormalizationContext();
         if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
             $items = $this->loadExpandedDataForManageableEntities(
                 $entityClass,
                 $entityIds,
                 $entityConfig,
-                $normalizationContext
+                $context->getNormalizationContext()
             );
         } else {
             $items = $this->loadExpandedDataForNotManageableEntities(
                 $entityClass,
                 $entityIds,
                 $entityConfig,
-                $normalizationContext
+                $context->getNormalizationContext()
             );
         }
 
-        $result = [];
-        foreach ($items as $item) {
+        foreach ($items as &$item) {
             if (!isset($item[ConfigUtil::CLASS_NAME])) {
                 $item[ConfigUtil::CLASS_NAME] = $entityClass;
             }
-            $result[$item[$entityIdFieldName]] = $item;
         }
 
-        return $result;
+        return $items;
     }
 
+    /**
+     * @return array [entity id => entity data, ...]
+     */
     private function loadExpandedDataForManageableEntities(
         string $entityClass,
         array $entityIds,
@@ -102,9 +106,14 @@ class MultiTargetAssociationDataLoader
             ->where('e IN (:ids)')
             ->setParameter('ids', $entityIds);
 
+        $normalizationContext['use_id_as_key'] = true;
+
         return $this->entitySerializer->serialize($qb, $entityConfig, $normalizationContext);
     }
 
+    /**
+     * @return array [entity id => entity data, ...]
+     */
     private function loadExpandedDataForNotManageableEntities(
         string $entityClass,
         array $entityIds,
@@ -119,7 +128,7 @@ class MultiTargetAssociationDataLoader
         $items = [];
         $idFieldName = reset($idFieldNames);
         foreach ($entityIds as $entityId) {
-            $items[] = $this->serializationHelper->postSerializeItem(
+            $items[$entityId] = $this->serializationHelper->postSerializeItem(
                 [ConfigUtil::CLASS_NAME => $entityClass, $idFieldName => $entityId],
                 $entityConfig,
                 $normalizationContext
@@ -131,5 +140,16 @@ class MultiTargetAssociationDataLoader
             $entityConfig,
             $normalizationContext
         );
+    }
+
+    private function hasFilterIdentifierFieldsConfigExtra(array $configExtras): bool
+    {
+        foreach ($configExtras as $extra) {
+            if ($extra instanceof FilterIdentifierFieldsConfigExtra) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

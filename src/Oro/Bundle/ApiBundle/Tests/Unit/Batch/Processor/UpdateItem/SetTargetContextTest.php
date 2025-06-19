@@ -25,7 +25,7 @@ class SetTargetContextTest extends BatchUpdateItemProcessorTestCase
         $this->processor = new SetTargetContext();
     }
 
-    public function testProcessWhenTargetContextAlreadySet()
+    public function testProcessWhenTargetContextAlreadySet(): void
     {
         $targetContext = $this->createMock(Context::class);
 
@@ -35,7 +35,7 @@ class SetTargetContextTest extends BatchUpdateItemProcessorTestCase
         self::assertSame($targetContext, $this->context->getTargetContext());
     }
 
-    public function testProcessWhenTargetProcessorIsNotSet()
+    public function testProcessWhenTargetProcessorIsNotSet(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The target processor is not defined.');
@@ -43,7 +43,7 @@ class SetTargetContextTest extends BatchUpdateItemProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenTargetContextIsInstanceOfContextClass()
+    public function testProcessWhenTargetContextIsInstanceOfContextClass(): void
     {
         $targetContext = new Context(
             $this->createMock(ConfigProvider::class),
@@ -71,7 +71,7 @@ class SetTargetContextTest extends BatchUpdateItemProcessorTestCase
         self::assertSame($sharedData, $this->context->getSharedData());
     }
 
-    public function testProcessWhenTargetContextIsInstanceOfSingleItemContextClass()
+    public function testProcessWhenTargetContextIsInstanceOfSingleItemContextClass(): void
     {
         $targetContext = new SingleItemContext(
             $this->createMock(ConfigProvider::class),
@@ -100,7 +100,7 @@ class SetTargetContextTest extends BatchUpdateItemProcessorTestCase
         self::assertSame($sharedData, $this->context->getSharedData());
     }
 
-    public function testProcessWhenTargetContextIsInstanceOfFormContextClass()
+    public function testProcessWhenTargetContextIsInstanceOfFormContextClass(): void
     {
         $targetContext = new CreateContext(
             $this->createMock(ConfigProvider::class),

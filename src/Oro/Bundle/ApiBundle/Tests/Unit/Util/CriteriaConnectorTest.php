@@ -27,6 +27,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Component\Testing\Unit\ORM\Mocks\ConnectionMock;
 use Oro\Component\Testing\Unit\ORM\Mocks\DatabasePlatformMock;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -34,12 +35,9 @@ use Oro\Component\Testing\Unit\ORM\Mocks\DatabasePlatformMock;
  */
 class CriteriaConnectorTest extends OrmRelatedTestCase
 {
-    private const ENTITY_NAMESPACE = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\\';
-
-    /** @var FieldDqlExpressionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $fieldDqlExpressionProvider;
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
+    private const string ENTITY_NAMESPACE = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\\';
+    private FieldDqlExpressionProviderInterface&MockObject $fieldDqlExpressionProvider;
+    private ConfigManager&MockObject $configManager;
     private EntityClassResolver $entityClassResolver;
     private CriteriaConnector $criteriaConnector;
 
@@ -138,7 +136,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         ];
     }
 
-    public function testOrderBy()
+    public function testOrderBy(): void
     {
         $criteria = $this->createCriteria();
         $criteria->orderBy(['id' => Criteria::ASC, 'category.name' => Criteria::ASC]);
@@ -161,7 +159,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testOrderByAssociation()
+    public function testOrderByAssociation(): void
     {
         $criteria = $this->createCriteria();
         $criteria->orderBy(['id' => Criteria::ASC, 'category' => Criteria::ASC]);
@@ -184,7 +182,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testOrderByForFieldWithDqlExpression()
+    public function testOrderByForFieldWithDqlExpression(): void
     {
         $criteria = $this->createCriteria();
         $criteria->orderBy(['id' => Criteria::ASC, 'category.name' => Criteria::ASC]);
@@ -210,7 +208,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testOrderByEnumField()
+    public function testOrderByEnumField(): void
     {
         $criteria = $this->createCriteria();
         $criteria->orderBy(['enumField' => Criteria::ASC]);
@@ -241,7 +239,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testOrderByMultiEnumField()
+    public function testOrderByMultiEnumField(): void
     {
         $criteria = $this->createCriteria();
         $criteria->orderBy(['enumField' => Criteria::ASC]);
@@ -278,7 +276,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testWhere()
+    public function testWhere(): void
     {
         $criteria = $this->createCriteria();
         $criteria->andWhere(
@@ -297,7 +295,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testWhereWhenJoinAliasEqualsToDatabaseKeyword()
+    public function testWhereWhenJoinAliasEqualsToDatabaseKeyword(): void
     {
         $criteria = $this->createCriteria();
         $criteria->andWhere(
@@ -315,7 +313,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testWhereByAssociation()
+    public function testWhereByAssociation(): void
     {
         $criteria = $this->createCriteria();
         $criteria->andWhere(
@@ -334,7 +332,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testWhereByEnumField()
+    public function testWhereByEnumField(): void
     {
         $criteria = $this->createCriteria();
         $criteria->andWhere($criteria::expr()->eq('enumField', 'test'));
@@ -365,7 +363,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testWhereByMultiEnumField()
+    public function testWhereByMultiEnumField(): void
     {
         $criteria = $this->createCriteria();
         $criteria->andWhere($criteria::expr()->memberOf('enumField', ['test']));
@@ -404,7 +402,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testShouldOptimizeJoinForExists()
+    public function testShouldOptimizeJoinForExists(): void
     {
         $criteria = $this->createCriteria();
         $criteria->andWhere(
@@ -423,7 +421,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testShouldNotOptimizeJoinForNotExists()
+    public function testShouldNotOptimizeJoinForNotExists(): void
     {
         $criteria = $this->createCriteria();
         $criteria->andWhere(
@@ -442,7 +440,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testShouldNotOptimizeJoinForNeqOrNull()
+    public function testShouldNotOptimizeJoinForNeqOrNull(): void
     {
         $criteria = $this->createCriteria();
         $criteria->andWhere(
@@ -462,7 +460,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testShouldNotOptimizeJoinForNeqOrEmpty()
+    public function testShouldNotOptimizeJoinForNeqOrEmpty(): void
     {
         $criteria = $this->createCriteria();
         $criteria->andWhere(
@@ -487,7 +485,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testShouldNotOptimizeJoinForEmpty()
+    public function testShouldNotOptimizeJoinForEmpty(): void
     {
         $criteria = $this->createCriteria();
         $criteria->andWhere(
@@ -512,7 +510,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testShouldOptimizeJoinForNotEmpty()
+    public function testShouldOptimizeJoinForNotEmpty(): void
     {
         $criteria = $this->createCriteria();
         $criteria->andWhere(
@@ -537,7 +535,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testShouldNotOptimizeJoinForAllMemberOf()
+    public function testShouldNotOptimizeJoinForAllMemberOf(): void
     {
         $criteria = $this->createCriteria();
         $criteria->andWhere(
@@ -562,7 +560,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testShouldNotOptimizeJoinForAllNotMemberOf()
+    public function testShouldNotOptimizeJoinForAllNotMemberOf(): void
     {
         $criteria = $this->createCriteria();
         $criteria->andWhere(
@@ -587,7 +585,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testShouldNotRequireJoinForEmpty()
+    public function testShouldNotRequireJoinForEmpty(): void
     {
         $criteria = $this->createCriteria();
         $criteria->andWhere(
@@ -609,7 +607,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testShouldRequireJoinForNotEmpty()
+    public function testShouldRequireJoinForNotEmpty(): void
     {
         $criteria = $this->createCriteria();
         $criteria->andWhere(
@@ -634,7 +632,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
     /**
      * @dataProvider criteriaDataProvider
      */
-    public function testShouldNotRequireAnyJoinWhenOnlyEmpty(bool $isCommonCriteria)
+    public function testShouldNotRequireAnyJoinWhenOnlyEmpty(bool $isCommonCriteria): void
     {
         $criteria = $this->createCriteria($isCommonCriteria);
         $criteria->andWhere(
@@ -654,7 +652,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
     /**
      * @dataProvider criteriaDataProvider
      */
-    public function testShouldNotRequireAnyJoinsWhenOnlyNotEmpty(bool $isCommonCriteria)
+    public function testShouldNotRequireAnyJoinsWhenOnlyNotEmpty(bool $isCommonCriteria): void
     {
         $criteria = $this->createCriteria($isCommonCriteria);
         $criteria->andWhere(
@@ -674,7 +672,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
     /**
      * @dataProvider criteriaDataProvider
      */
-    public function testShouldNotRequireAnyJoinsWhenOnlyAllMemberOf(bool $isCommonCriteria)
+    public function testShouldNotRequireAnyJoinsWhenOnlyAllMemberOf(bool $isCommonCriteria): void
     {
         $criteria = $this->createCriteria($isCommonCriteria);
         $criteria->andWhere(
@@ -694,7 +692,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
     /**
      * @dataProvider criteriaDataProvider
      */
-    public function testShouldNotRequireAnyJoinsWhenOnlyAllNotMemberOf(bool $isCommonCriteria)
+    public function testShouldNotRequireAnyJoinsWhenOnlyAllNotMemberOf(bool $isCommonCriteria): void
     {
         $criteria = $this->createCriteria($isCommonCriteria);
         $criteria->andWhere(
@@ -711,7 +709,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testNestedFieldInOrderBy()
+    public function testNestedFieldInOrderBy(): void
     {
         $criteria = $this->createCriteria();
         $criteria->orderBy(['id' => Criteria::ASC, 'products.category.name' => Criteria::ASC]);
@@ -725,7 +723,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testNestedAssociationInOrderBy()
+    public function testNestedAssociationInOrderBy(): void
     {
         $criteria = $this->createCriteria();
         $criteria->orderBy(['id' => Criteria::ASC, 'products.category' => Criteria::ASC]);
@@ -739,7 +737,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testNestedFieldInWhere()
+    public function testNestedFieldInWhere(): void
     {
         $criteria = $this->createCriteria();
         $criteria->andWhere(
@@ -755,7 +753,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testNestedAssociationInWhere()
+    public function testNestedAssociationInWhere(): void
     {
         $criteria = $this->createCriteria();
         $criteria->andWhere(
@@ -771,7 +769,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testNestedFieldInOrderByAndJoinsAlreadyExist()
+    public function testNestedFieldInOrderByAndJoinsAlreadyExist(): void
     {
         $criteria = $this->createCriteria();
         $criteria->addLeftJoin('products', '{root}.products')->setAlias('products');
@@ -787,7 +785,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testNestedFieldInWhereAndJoinsAlreadyExist()
+    public function testNestedFieldInWhereAndJoinsAlreadyExist(): void
     {
         $criteria = $this->createCriteria();
         $criteria->addLeftJoin('products', '{root}.products')->setAlias('products');
@@ -805,7 +803,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testNestedFieldWithPlaceholderInWhereAndJoinsAlreadyExist()
+    public function testNestedFieldWithPlaceholderInWhereAndJoinsAlreadyExist(): void
     {
         $criteria = $this->createCriteria();
         $criteria->addLeftJoin('products', '{root}.products')->setAlias('products');
@@ -823,7 +821,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testPlaceholdersInOrderBy()
+    public function testPlaceholdersInOrderBy(): void
     {
         $criteria = $this->createCriteria();
         $criteria->addLeftJoin('category', '{root}.category');
@@ -850,7 +848,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testPlaceholdersInWhere()
+    public function testPlaceholdersInWhere(): void
     {
         $criteria = $this->createCriteria();
         $criteria->addLeftJoin('category', '{root}.category');
@@ -878,7 +876,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         );
     }
 
-    public function testAssociationsWithSameName()
+    public function testAssociationsWithSameName(): void
     {
         $criteria = $this->createCriteria();
         $criteria->orderBy(['owner.owner.owner.name' => Criteria::ASC]);
@@ -896,7 +894,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
     /**
      * @dataProvider criteriaDataProvider
      */
-    public function testCriteriaWhenFirstResultIsNotSet(bool $isCommonCriteria)
+    public function testCriteriaWhenFirstResultIsNotSet(bool $isCommonCriteria): void
     {
         $qb = new QueryBuilder($this->em);
         $qb->select('e')->from(Entity\User::class, 'e');
@@ -910,7 +908,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
     /**
      * @dataProvider criteriaDataProvider
      */
-    public function testCriteriaWithFirstResult(bool $isCommonCriteria)
+    public function testCriteriaWithFirstResult(bool $isCommonCriteria): void
     {
         $qb = new QueryBuilder($this->em);
         $qb->select('e')->from(Entity\User::class, 'e');
@@ -926,7 +924,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
     /**
      * @dataProvider criteriaDataProvider
      */
-    public function testCriteriaWhenMaxResultsIsNotSet(bool $isCommonCriteria)
+    public function testCriteriaWhenMaxResultsIsNotSet(bool $isCommonCriteria): void
     {
         $qb = new QueryBuilder($this->em);
         $qb->select('e')->from(Entity\User::class, 'e');
@@ -940,7 +938,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
     /**
      * @dataProvider criteriaDataProvider
      */
-    public function testCriteriaWithMaxResults(bool $isCommonCriteria)
+    public function testCriteriaWithMaxResults(bool $isCommonCriteria): void
     {
         $qb = new QueryBuilder($this->em);
         $qb->select('e')->from(Entity\User::class, 'e');
@@ -953,7 +951,7 @@ class CriteriaConnectorTest extends OrmRelatedTestCase
         self::assertSame(3, $qb->getMaxResults());
     }
 
-    public function testPlaceholdersForManuallyJoinedEntity()
+    public function testPlaceholdersForManuallyJoinedEntity(): void
     {
         $criteria = $this->createCriteria();
         $criteria->andWhere($criteria::expr()->eq('{role}.name', 'test_role'));

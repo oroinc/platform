@@ -7,26 +7,19 @@ use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
 use Oro\Bundle\EmailBundle\Form\DataMapper\LocalizationAwareEmailTemplateDataMapper;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\FormInterface;
 
-class LocalizationAwareEmailTemplateDataMapperTest extends \PHPUnit\Framework\TestCase
+class LocalizationAwareEmailTemplateDataMapperTest extends TestCase
 {
-    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $translationsForm;
-
-    /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $anotherForm;
-
-    /** @var iterable */
-    private $forms;
-
-    /** @var DataMapperInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $innerDataMapper;
-
-    /** @var LocalizationAwareEmailTemplateDataMapper */
-    private $dataMapper;
+    private FormInterface&MockObject $translationsForm;
+    private FormInterface&MockObject $anotherForm;
+    private iterable $forms;
+    private DataMapperInterface&MockObject $innerDataMapper;
+    private LocalizationAwareEmailTemplateDataMapper $dataMapper;
 
     #[\Override]
     protected function setUp(): void

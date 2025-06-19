@@ -9,17 +9,13 @@ use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser;
 use Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Shared\RestoreDefaultFormExtension;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class RestoreDefaultFormExtensionTest extends FormProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FormExtensionSwitcherInterface */
-    private $formExtensionSwitcher;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataTypeGuesser */
-    private $metadataTypeGuesser;
-
-    /** @var RestoreDefaultFormExtension */
-    private $processor;
+    private FormExtensionSwitcherInterface&MockObject $formExtensionSwitcher;
+    private MetadataTypeGuesser&MockObject $metadataTypeGuesser;
+    private RestoreDefaultFormExtension $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +31,7 @@ class RestoreDefaultFormExtensionTest extends FormProcessorTestCase
         );
     }
 
-    public function testProcessWhenApiFormExtensionIsNotActivated()
+    public function testProcessWhenApiFormExtensionIsNotActivated(): void
     {
         $this->formExtensionSwitcher->expects(self::never())
             ->method('switchToDefaultFormExtension');
@@ -52,7 +48,7 @@ class RestoreDefaultFormExtensionTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenApiFormExtensionIsActivated()
+    public function testProcessWhenApiFormExtensionIsActivated(): void
     {
         $this->formExtensionSwitcher->expects(self::once())
             ->method('switchToDefaultFormExtension');
@@ -70,7 +66,7 @@ class RestoreDefaultFormExtensionTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForPreviouslyRememberedContext()
+    public function testProcessForPreviouslyRememberedContext(): void
     {
         $includedEntities = $this->createMock(IncludedEntityCollection::class);
         $metadataAccessor = $this->createMock(MetadataAccessorInterface::class);

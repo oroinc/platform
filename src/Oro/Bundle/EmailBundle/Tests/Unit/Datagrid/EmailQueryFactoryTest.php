@@ -18,24 +18,15 @@ use Symfony\Component\Form\FormFactoryInterface;
 
 class EmailQueryFactoryTest extends OrmTestCase
 {
-    private const JOIN_ALIAS = 'a';
-    private const TEST_ENTITY = User::class;
-    private const TEST_NAME_DQL_FORMATTED = 'CONCAT(a.firstName, CONCAT(a.lastName, \'\'))';
+    private const string JOIN_ALIAS = 'a';
+    private const string TEST_ENTITY = User::class;
+    private const string TEST_NAME_DQL_FORMATTED = 'CONCAT(a.firstName, CONCAT(a.lastName, \'\'))';
 
-    /** @var EmailOwnerProviderStorage */
-    private $providerStorage;
-
-    /** @var EntityNameResolver|MockObject */
-    private $entityNameResolver;
-
-    /** @var TokenAccessorInterface|MockObject */
-    private $tokenAccessor;
-
-    /** @var MailboxManager|MockObject */
-    private $mailboxManager;
-
-    /** @var EmailQueryFactory */
-    private $factory;
+    private EmailOwnerProviderStorage $providerStorage;
+    private EntityNameResolver&MockObject $entityNameResolver;
+    private TokenAccessorInterface&MockObject $tokenAccessor;
+    private MailboxManager&MockObject $mailboxManager;
+    private EmailQueryFactory $factory;
 
     #[\Override]
     protected function setUp(): void

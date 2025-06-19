@@ -3,15 +3,15 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\EmailBundle\Tests\Unit\DependencyInjection\Compiler\Stub\TwigSandboxConfigurationPassStub;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 
-class AbstractTwigSandboxConfigurationPassTest extends \PHPUnit\Framework\TestCase
+class AbstractTwigSandboxConfigurationPassTest extends TestCase
 {
-    /** @var CompilerPassInterface */
-    private $compiler;
+    private CompilerPassInterface $compiler;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class AbstractTwigSandboxConfigurationPassTest extends \PHPUnit\Framework\TestCa
         $this->compiler = new TwigSandboxConfigurationPassStub();
     }
 
-    public function testProcessWithoutEmailSecurityPoliceService()
+    public function testProcessWithoutEmailSecurityPoliceService(): void
     {
         $this->expectException(ServiceNotFoundException::class);
         $this->expectExceptionMessage(
@@ -31,7 +31,7 @@ class AbstractTwigSandboxConfigurationPassTest extends \PHPUnit\Framework\TestCa
         $this->compiler->process($container);
     }
 
-    public function testProcessWithoutEmailRendererService()
+    public function testProcessWithoutEmailRendererService(): void
     {
         $this->expectException(ServiceNotFoundException::class);
         $this->expectExceptionMessage('You have requested a non-existent service "oro_email.twig.email_environment"');
@@ -43,7 +43,7 @@ class AbstractTwigSandboxConfigurationPassTest extends \PHPUnit\Framework\TestCa
         $this->compiler->process($container);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $securityPolicyDef = $container->register('oro_email.twig.email_security_policy')

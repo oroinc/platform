@@ -25,7 +25,7 @@ $select2-arrow-size: 20px !default;
 
 $select2-drop-background-color: get-var-color('neutral', 'white-100');
 $select2-drop-box-shadow: 0 4px 12px rgba(91 126 131 / .14), 0 1px 4px rgba(5 59 66 / .08) !default;
-$select2-container-drop-above-box-shadow: 0 -4px -12px rgba(91 126 131 / .14), 0 -1px -4px rgba(5 59 66 / .08) !default;
+$select2-container-drop-above-box-shadow: 0 4px 12px rgba(91 126 131 / .14), 0 1px 4px rgba(5 59 66 / .08) !default;
 
 $select2-drop-border-radius: $base-ui-element-border-radius !default;
 $select2-drop-above-border-radius: 4px 4px 0 0 !default;

@@ -5,14 +5,12 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Create;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Create\SetEntityId;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class SetEntityIdTest extends CreateProcessorTestCase
 {
-    /** @var EntityIdHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityIdHelper;
-
-    /** @var SetEntityId */
-    private $processor;
+    private EntityIdHelper&MockObject $entityIdHelper;
+    private SetEntityId $processor;
 
     #[\Override]
     protected function setUp(): void

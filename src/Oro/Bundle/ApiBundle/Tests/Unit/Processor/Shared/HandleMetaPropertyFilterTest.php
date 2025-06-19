@@ -16,14 +16,12 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class HandleMetaPropertyFilterTest extends GetProcessorTestCase
 {
-    /** @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject */
-    private $valueNormalizer;
-
-    /** @var HandleMetaPropertyFilter */
-    private $processor;
+    private ValueNormalizer&MockObject $valueNormalizer;
+    private HandleMetaPropertyFilter $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -47,14 +45,14 @@ class HandleMetaPropertyFilterTest extends GetProcessorTestCase
         );
     }
 
-    public function testProcessWhenNoMetaFilterValue()
+    public function testProcessWhenNoMetaFilterValue(): void
     {
         $this->processor->process($this->context);
 
         self::assertFalse($this->context->hasConfigExtra(MetaPropertiesConfigExtra::NAME));
     }
 
-    public function testProcessWhenNoMetaFilter()
+    public function testProcessWhenNoMetaFilter(): void
     {
         $filterValue = FilterValue::createFromSource('meta', 'meta', 'test');
 
@@ -64,7 +62,7 @@ class HandleMetaPropertyFilterTest extends GetProcessorTestCase
         self::assertFalse($this->context->hasConfigExtra(MetaPropertiesConfigExtra::NAME));
     }
 
-    public function testProcessWhenMetaFilterValueExists()
+    public function testProcessWhenMetaFilterValueExists(): void
     {
         $filterValue = FilterValue::createFromSource('meta', 'meta', 'test1,test2');
         $filter = new MetaPropertyFilter('string');
@@ -91,7 +89,7 @@ class HandleMetaPropertyFilterTest extends GetProcessorTestCase
         self::assertFalse($this->context->hasErrors());
     }
 
-    public function testProcessWhenMetaFilterHasInvalidValue()
+    public function testProcessWhenMetaFilterHasInvalidValue(): void
     {
         $filterValue = FilterValue::createFromSource('meta', 'meta', 'test1,');
         $filter = new MetaPropertyFilter('string');
@@ -118,7 +116,7 @@ class HandleMetaPropertyFilterTest extends GetProcessorTestCase
         self::assertEquals($expectedErrors, $this->context->getErrors());
     }
 
-    public function testProcessWhenNotAllowedMetaPropertyIsRequested()
+    public function testProcessWhenNotAllowedMetaPropertyIsRequested(): void
     {
         $filterValue = FilterValue::createFromSource('meta', 'meta', 'test1,test2');
         $filter = new MetaPropertyFilter('string');
@@ -151,7 +149,7 @@ class HandleMetaPropertyFilterTest extends GetProcessorTestCase
         self::assertEquals($expectedErrors, $this->context->getErrors());
     }
 
-    public function testProcessWhenFilterAllowedMetaPropertiesAreEmpty()
+    public function testProcessWhenFilterAllowedMetaPropertiesAreEmpty(): void
     {
         $filterValue = FilterValue::createFromSource('meta', 'meta', 'test1,test2');
         $filter = new MetaPropertyFilter('string');

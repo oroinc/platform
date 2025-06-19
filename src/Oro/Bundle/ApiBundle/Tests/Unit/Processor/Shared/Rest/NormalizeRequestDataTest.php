@@ -12,14 +12,12 @@ use Oro\Bundle\ApiBundle\Processor\Shared\Rest\NormalizeRequestData;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class NormalizeRequestDataTest extends FormProcessorTestCase
 {
-    /** @var EntityIdTransformerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityIdTransformer;
-
-    /** @var NormalizeRequestData */
-    private $processor;
+    private EntityIdTransformerInterface&MockObject $entityIdTransformer;
+    private NormalizeRequestData $processor;
 
     #[\Override]
     protected function setUp(): void

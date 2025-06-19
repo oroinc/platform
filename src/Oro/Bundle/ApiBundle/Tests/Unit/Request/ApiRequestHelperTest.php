@@ -3,11 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
 use Oro\Bundle\ApiBundle\Request\ApiRequestHelper;
+use PHPUnit\Framework\TestCase;
 
-class ApiRequestHelperTest extends \PHPUnit\Framework\TestCase
+class ApiRequestHelperTest extends TestCase
 {
-    /** @var ApiRequestHelper */
-    private $apiRequestHelper;
+    private ApiRequestHelper $apiRequestHelper;
 
     #[\Override]
     protected function setUp(): void

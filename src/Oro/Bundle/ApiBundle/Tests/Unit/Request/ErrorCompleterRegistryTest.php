@@ -6,12 +6,13 @@ use Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
-class ErrorCompleterRegistryTest extends \PHPUnit\Framework\TestCase
+class ErrorCompleterRegistryTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
-    private $container;
+    private ContainerInterface&MockObject $container;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +29,7 @@ class ErrorCompleterRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldReturnErrorCompleterIfItExistsForSpecificRequestType()
+    public function testShouldReturnErrorCompleterIfItExistsForSpecificRequestType(): void
     {
         $registry = $this->getErrorCompleterRegistry([
             ['errorCompleter1', 'rest&json_api'],
@@ -48,7 +49,7 @@ class ErrorCompleterRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldReturnDefaultErrorCompleterIfNoErrorCompleterForSpecificRequestType()
+    public function testShouldReturnDefaultErrorCompleterIfNoErrorCompleterForSpecificRequestType(): void
     {
         $registry = $this->getErrorCompleterRegistry([
             ['errorCompleter1', 'rest&json_api'],
@@ -68,7 +69,7 @@ class ErrorCompleterRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldThrowExceptionIfNoErrorCompleterForSpecificRequestTypeAndNoDefaultErrorCompleter()
+    public function testShouldThrowExceptionIfNoErrorCompleterForSpecificRequestTypeAndNoDefaultErrorCompleter(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot find an error completer for the request "another".');

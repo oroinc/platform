@@ -14,23 +14,15 @@ use Oro\Bundle\ApiBundle\Util\AclProtectedEntityLoader;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityIdHelper;
 use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class LoadUpsertEntityTest extends UpdateProcessorTestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var AclProtectedEntityLoader|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityLoader;
-
-    /** @var EntityInstantiator|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityInstantiator;
-
-    /** @var EntityIdHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityIdHelper;
-
-    /** @var LoadUpsertEntity */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private AclProtectedEntityLoader&MockObject $entityLoader;
+    private EntityInstantiator&MockObject $entityInstantiator;
+    private EntityIdHelper&MockObject $entityIdHelper;
+    private LoadUpsertEntity $processor;
 
     #[\Override]
     protected function setUp(): void

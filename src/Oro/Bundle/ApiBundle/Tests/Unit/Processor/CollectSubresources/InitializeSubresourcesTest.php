@@ -20,25 +20,21 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Account;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
+class InitializeSubresourcesTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
-    private $configProvider;
+    private ConfigProvider&MockObject $configProvider;
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
-    private $metadataProvider;
-
-    /** @var CollectSubresourcesContext */
-    private $context;
-
-    /** @var InitializeSubresources */
-    private $processor;
+    private MetadataProvider&MockObject $metadataProvider;
+    private CollectSubresourcesContext $context;
+    private InitializeSubresources $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -50,7 +46,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         $this->processor = new InitializeSubresources($this->configProvider, $this->metadataProvider);
     }
 
-    public function testProcessWhenSubresourcesAreAlreadyInitialized()
+    public function testProcessWhenSubresourcesAreAlreadyInitialized(): void
     {
         $this->context->getResult()->add(new ApiResourceSubresources('Test\Class'));
         $this->processor->process($this->context);
@@ -61,7 +57,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessForExcludedAssociation()
+    public function testProcessForExcludedAssociation(): void
     {
         $resource = new ApiResource('Test\Class');
 
@@ -112,7 +108,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessForToOneAssociationForNotAccessibleResource()
+    public function testProcessForToOneAssociationForNotAccessibleResource(): void
     {
         $resource = new ApiResource('Test\Class');
 
@@ -178,7 +174,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessForToManyAssociationForNotAccessibleResource()
+    public function testProcessForToManyAssociationForNotAccessibleResource(): void
     {
         $resource = new ApiResource('Test\Class');
 
@@ -244,7 +240,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessForToOneAssociationForResourceWithoutExcludedActions()
+    public function testProcessForToOneAssociationForResourceWithoutExcludedActions(): void
     {
         $resource = new ApiResource('Test\Class');
 
@@ -307,7 +303,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessForToManyAssociationForResourceWithoutExcludedActions()
+    public function testProcessForToManyAssociationForResourceWithoutExcludedActions(): void
     {
         $resource = new ApiResource('Test\Class');
 
@@ -368,7 +364,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessForToOneAssociationForResourceWithExcludedActions()
+    public function testProcessForToOneAssociationForResourceWithExcludedActions(): void
     {
         $resource = new ApiResource('Test\Class');
         $resource->setExcludedActions(['delete']);
@@ -432,7 +428,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessForToManyAssociationForResourceWithExcludedActions()
+    public function testProcessForToManyAssociationForResourceWithExcludedActions(): void
     {
         $resource = new ApiResource('Test\Class');
         $resource->setExcludedActions(['delete']);
@@ -494,7 +490,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessForToOneAssociationForResourceWithUpdateInExcludedActions()
+    public function testProcessForToOneAssociationForResourceWithUpdateInExcludedActions(): void
     {
         $resource = new ApiResource('Test\Class');
         $resource->setExcludedActions(['update']);
@@ -559,7 +555,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessForToManyAssociationForResourceWithUpdateInExcludedActions()
+    public function testProcessForToManyAssociationForResourceWithUpdateInExcludedActions(): void
     {
         $resource = new ApiResource('Test\Class');
         $resource->setExcludedActions(['update']);
@@ -624,7 +620,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWithoutEntityConfig()
+    public function testProcessWithoutEntityConfig(): void
     {
         $resource = new ApiResource('Test\Class');
         $resource->setExcludedActions(['update']);
@@ -653,7 +649,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWithoutEntityMetadata()
+    public function testProcessWithoutEntityMetadata(): void
     {
         $resource = new ApiResource('Test\Class');
         $resource->setExcludedActions(['update']);
@@ -697,7 +693,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getAssociationAsFieldDataTypeProvider
      */
-    public function testProcessForAssociationThatShouldBeRepresentedAsField(string $dataType)
+    public function testProcessForAssociationThatShouldBeRepresentedAsField(string $dataType): void
     {
         $resource = new ApiResource('Test\Class');
 
@@ -757,7 +753,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testProcessForToOneAssociationWithEmptyAcceptableTargetClassNames()
+    public function testProcessForToOneAssociationWithEmptyAcceptableTargetClassNames(): void
     {
         $resource = new ApiResource('Test\Class');
 
@@ -819,7 +815,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessForToManyAssociationWithEmptyAcceptableTargetClassNames()
+    public function testProcessForToManyAssociationWithEmptyAcceptableTargetClassNames(): void
     {
         $resource = new ApiResource('Test\Class');
 
@@ -879,7 +875,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWhenSubresourcesAreDisabled()
+    public function testProcessWhenSubresourcesAreDisabled(): void
     {
         $resource = new ApiResource('Test\Class');
         $resource->setExcludedActions([ApiAction::GET_SUBRESOURCE]);
@@ -929,7 +925,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessForAssociationWithEntityIdentifierAsTargetClass()
+    public function testProcessForAssociationWithEntityIdentifierAsTargetClass(): void
     {
         $resource = new ApiResource('Test\Class');
 
@@ -993,7 +989,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessForAssociationWithEntityIdentifierAsTargetClassAndEmptyAcceptableTargetClasses()
+    public function testProcessForAssociationWithEntityIdentifierAsTargetClassAndEmptyAcceptableTargetClasses(): void
     {
         $resource = new ApiResource('Test\Class');
 
@@ -1057,7 +1053,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessForAssociationWithInheritanceAsTargetClass()
+    public function testProcessForAssociationWithInheritanceAsTargetClass(): void
     {
         $resource = new ApiResource('Test\Class');
 
@@ -1121,7 +1117,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessForAssociationWhenAcceptableTargetClassEqualsToTargetClass()
+    public function testProcessForAssociationWhenAcceptableTargetClassEqualsToTargetClass(): void
     {
         $resource = new ApiResource('Test\Class');
 
@@ -1184,7 +1180,7 @@ class InitializeSubresourcesTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessForAssociationWithInheritanceAsTargetClassAndInvalidAcceptableTargetClass()
+    public function testProcessForAssociationWithInheritanceAsTargetClassAndInvalidAcceptableTargetClass(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(sprintf(

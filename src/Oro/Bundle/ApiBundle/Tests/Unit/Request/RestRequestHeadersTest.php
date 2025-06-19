@@ -3,18 +3,16 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
 use Oro\Bundle\ApiBundle\Request\RestRequestHeaders;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class RestRequestHeadersTest extends \PHPUnit\Framework\TestCase
+class RestRequestHeadersTest extends TestCase
 {
-    /** @var Request */
-    private $request;
-
-    /** @var RestRequestHeaders */
-    private $requestHeaders;
+    private Request $request;
+    private RestRequestHeaders $requestHeaders;
 
     #[\Override]
     protected function setUp(): void

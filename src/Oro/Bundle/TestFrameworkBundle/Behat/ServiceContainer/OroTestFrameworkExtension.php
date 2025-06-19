@@ -267,6 +267,11 @@ class OroTestFrameworkExtension implements TestworkExtension
         $definition = new Definition(SkipOnFailureStepTester::class, [
             new Reference(TesterExtension::STEP_TESTER_ID),
             new Reference('oro_test.storage.failed_features'),
+            new Reference(ExceptionExtension::PRESENTER_ID),
+            new Reference(
+                'oro_behat_statistic.silenced_feature_repository',
+                ContainerInterface::NULL_ON_INVALID_REFERENCE
+            ),
         ]);
         $definition->addTag(TesterExtension::STEP_TESTER_WRAPPER_TAG);
         $container->setDefinition(TesterExtension::STEP_TESTER_WRAPPER_TAG . '.skip_on_failure', $definition);

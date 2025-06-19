@@ -10,14 +10,13 @@ use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class MetadataProviderTest extends \PHPUnit\Framework\TestCase
+class MetadataProviderTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ActionProcessorInterface */
-    private $processor;
-
-    /** @var MetadataProvider */
-    private $metadataProvider;
+    private ActionProcessorInterface&MockObject $processor;
+    private MetadataProvider $metadataProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +26,7 @@ class MetadataProviderTest extends \PHPUnit\Framework\TestCase
         $this->metadataProvider = new MetadataProvider($this->processor);
     }
 
-    public function testShouldThrowExceptionIfClassNameIsEmpty()
+    public function testShouldThrowExceptionIfClassNameIsEmpty(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$className must not be empty.');
@@ -35,7 +34,7 @@ class MetadataProviderTest extends \PHPUnit\Framework\TestCase
         $this->metadataProvider->getMetadata('', '1.2', new RequestType([]), new EntityDefinitionConfig());
     }
 
-    public function testShouldBuildMetadata()
+    public function testShouldBuildMetadata(): void
     {
         $className = 'Test\Class';
         $version = '1.2';
@@ -110,7 +109,7 @@ class MetadataProviderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($result, $anotherResult);
     }
 
-    public function testShouldReturnNullIfMetadataDoesNotExist()
+    public function testShouldReturnNullIfMetadataDoesNotExist(): void
     {
         $className = 'Test\Class';
         $version = '1.2';
@@ -134,7 +133,7 @@ class MetadataProviderTest extends \PHPUnit\Framework\TestCase
         self::assertNull($anotherResult);
     }
 
-    public function testShouldNotCacheMetadataIfConfigDoesNotContainKey()
+    public function testShouldNotCacheMetadataIfConfigDoesNotContainKey(): void
     {
         $className = 'Test\Class';
         $version = '1.2';
@@ -153,7 +152,7 @@ class MetadataProviderTest extends \PHPUnit\Framework\TestCase
         $this->metadataProvider->getMetadata($className, $version, $requestType, $config);
     }
 
-    public function testShouldBePossibleToClearInternalCache()
+    public function testShouldBePossibleToClearInternalCache(): void
     {
         $className = 'Test\Class';
         $version = '1.2';

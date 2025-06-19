@@ -4,19 +4,16 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Model\EntityHolderInterface;
-use Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityObjectAccess;
 use Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityObjectsAccess;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\DeleteList\DeleteListProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 class ValidateEntityObjectsAccessTest extends DeleteListProcessorTestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var ValidateEntityObjectAccess */
-    private $processor;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private ValidateEntityObjectsAccess $processor;
 
     #[\Override]
     protected function setUp(): void

@@ -16,16 +16,18 @@ use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\EntityMapper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class FormContextTest extends \PHPUnit\Framework\TestCase
+class FormContextTest extends TestCase
 {
-    private ConfigProvider|\PHPUnit\Framework\MockObject\MockObject $configProvider;
-    private MetadataProvider|\PHPUnit\Framework\MockObject\MockObject $metadataProvider;
+    private ConfigProvider&MockObject $configProvider;
+    private MetadataProvider&MockObject $metadataProvider;
     private FormContext $context;
 
     #[\Override]
@@ -47,7 +49,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         return $result;
     }
 
-    public function testRequestId()
+    public function testRequestId(): void
     {
         self::assertNull($this->context->getRequestId());
 
@@ -56,7 +58,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($requestId, $this->context->getRequestId());
     }
 
-    public function testRequestData()
+    public function testRequestData(): void
     {
         self::assertSame([], $this->context->getRequestData());
 
@@ -65,7 +67,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($requestData, $this->context->getRequestData());
     }
 
-    public function testExisting()
+    public function testExisting(): void
     {
         self::assertFalse($this->context->isExisting());
 
@@ -73,14 +75,14 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->context->isExisting());
     }
 
-    public function testIncludedData()
+    public function testIncludedData(): void
     {
         $includedData = [];
         $this->context->setIncludedData($includedData);
         self::assertSame($includedData, $this->context->getIncludedData());
     }
 
-    public function testIncludedEntities()
+    public function testIncludedEntities(): void
     {
         self::assertNull($this->context->getIncludedEntities());
 
@@ -92,7 +94,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getIncludedEntities());
     }
 
-    public function testAdditionalEntities()
+    public function testAdditionalEntities(): void
     {
         self::assertSame([], $this->context->getAdditionalEntities());
 
@@ -125,7 +127,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $this->context->getAdditionalEntities());
     }
 
-    public function testEntityMapper()
+    public function testEntityMapper(): void
     {
         $entityMapper = $this->createMock(EntityMapper::class);
 
@@ -138,7 +140,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getEntityMapper());
     }
 
-    public function testFormBuilder()
+    public function testFormBuilder(): void
     {
         $formBuilder = $this->createMock(FormBuilderInterface::class);
 
@@ -154,7 +156,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getFormBuilder());
     }
 
-    public function testForm()
+    public function testForm(): void
     {
         $form = $this->createMock(FormInterface::class);
 
@@ -170,7 +172,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getForm());
     }
 
-    public function testSkipFormValidation()
+    public function testSkipFormValidation(): void
     {
         self::assertFalse($this->context->isFormValidationSkipped());
 
@@ -181,7 +183,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->context->isFormValidationSkipped());
     }
 
-    public function testFormOptions()
+    public function testFormOptions(): void
     {
         self::assertNull($this->context->getFormOptions());
 
@@ -195,7 +197,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getFormOptions());
     }
 
-    public function testSetConfigExtras()
+    public function testSetConfigExtras(): void
     {
         $normalizedExpandRelatedEntitiesConfigExtra = new ExpandRelatedEntitiesConfigExtra(['association1']);
         $normalizedFilterFieldsConfigExtra = new FilterFieldsConfigExtra(['entity1' => ['field1']]);
@@ -249,7 +251,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddAndRemoveConfigExtra()
+    public function testAddAndRemoveConfigExtra(): void
     {
         $normalizedExpandRelatedEntitiesConfigExtra = new ExpandRelatedEntitiesConfigExtra(['association1']);
         $normalizedFilterFieldsConfigExtra = new FilterFieldsConfigExtra(['entity1' => ['field1']]);
@@ -316,7 +318,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $this->context->getConfigExtras());
     }
 
-    public function testNormalizedEntityConfigExtras()
+    public function testNormalizedEntityConfigExtras(): void
     {
         self::assertSame([], $this->context->getNormalizedEntityConfigExtras());
 
@@ -325,7 +327,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame([$configExtra], $this->context->getNormalizedEntityConfigExtras());
     }
 
-    public function testGetNormalizedConfigWhenNoNormalizedConfigExtras()
+    public function testGetNormalizedConfigWhenNoNormalizedConfigExtras(): void
     {
         $version = '1.1';
         $requestType = 'rest';
@@ -353,7 +355,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($config, $this->context->getNormalizedConfig());
     }
 
-    public function testGetNormalizedConfigWhenNormalizedConfigExtrasExist()
+    public function testGetNormalizedConfigWhenNormalizedConfigExtrasExist(): void
     {
         $version = '1.1';
         $requestType = 'rest';
@@ -382,7 +384,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($config, $this->context->getNormalizedConfig());
     }
 
-    public function testGetNormalizedConfigWhenNormalizedConfigExtrasExistAndNoNormalizedConfig()
+    public function testGetNormalizedConfigWhenNormalizedConfigExtrasExistAndNoNormalizedConfig(): void
     {
         $version = '1.1';
         $requestType = 'rest';
@@ -408,7 +410,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getNormalizedConfig());
     }
 
-    public function testGetNormalizedConfigWhenNormalizedConfigExtrasExistAndNoEntityClass()
+    public function testGetNormalizedConfigWhenNormalizedConfigExtrasExistAndNoEntityClass(): void
     {
         $this->context->setVersion('1.1');
         $this->context->getRequestType()->add('rest');
@@ -426,7 +428,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getNormalizedConfig());
     }
 
-    public function testGetNormalizedConfigWhenItIsSetExplicitly()
+    public function testGetNormalizedConfigWhenItIsSetExplicitly(): void
     {
         $config = new EntityDefinitionConfig();
 
@@ -444,7 +446,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getNormalizedConfig());
     }
 
-    public function testGetNormalizedMetadataWhenNoNormalizedConfigExtras()
+    public function testGetNormalizedMetadataWhenNoNormalizedConfigExtras(): void
     {
         $version = '1.1';
         $requestType = 'rest';
@@ -484,7 +486,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($metadata, $this->context->getNormalizedMetadata());
     }
 
-    public function testGetNormalizedMetadataWhenNormalizedConfigExtrasExist()
+    public function testGetNormalizedMetadataWhenNormalizedConfigExtrasExist(): void
     {
         $version = '1.1';
         $requestType = 'rest';
@@ -525,7 +527,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($metadata, $this->context->getNormalizedMetadata());
     }
 
-    public function testGetNormalizedMetadataWhenNormalizedConfigExtrasExistAndNoNormalizedMetadata()
+    public function testGetNormalizedMetadataWhenNormalizedConfigExtrasExistAndNoNormalizedMetadata(): void
     {
         $version = '1.1';
         $requestType = 'rest';
@@ -565,7 +567,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getNormalizedMetadata());
     }
 
-    public function testGetNormalizedMetadataWhenNormalizedConfigExtrasExistAndNoEntityClass()
+    public function testGetNormalizedMetadataWhenNormalizedConfigExtrasExistAndNoEntityClass(): void
     {
         $this->context->setVersion('1.1');
         $this->context->getRequestType()->add('rest');
@@ -585,7 +587,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getNormalizedMetadata());
     }
 
-    public function testGetNormalizedMetadataWhenItIsSetExplicitly()
+    public function testGetNormalizedMetadataWhenItIsSetExplicitly(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
 
@@ -605,7 +607,7 @@ class FormContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getNormalizedMetadata());
     }
 
-    public function testGetAllEntities()
+    public function testGetAllEntities(): void
     {
         self::assertSame([], $this->context->getAllEntities());
         self::assertSame([], $this->context->getAllEntities(true));

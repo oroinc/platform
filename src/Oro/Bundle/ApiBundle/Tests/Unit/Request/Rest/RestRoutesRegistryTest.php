@@ -7,17 +7,14 @@ use Oro\Bundle\ApiBundle\Request\Rest\RestRoutes;
 use Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class RestRoutesRegistryTest extends \PHPUnit\Framework\TestCase
+class RestRoutesRegistryTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|RestRoutes */
-    private $defaultProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|RestRoutes */
-    private $firstProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|RestRoutes */
-    private $secondProvider;
+    private RestRoutes&MockObject $defaultProvider;
+    private RestRoutes&MockObject $firstProvider;
+    private RestRoutes&MockObject $secondProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +37,7 @@ class RestRoutesRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetRoutesForUnsupportedRequestType()
+    public function testGetRoutesForUnsupportedRequestType(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot find a routes provider for the request "rest,another".');
@@ -50,7 +47,7 @@ class RestRoutesRegistryTest extends \PHPUnit\Framework\TestCase
         $registry->getRoutes($requestType);
     }
 
-    public function testGetRoutesShouldReturnDefaultProviderForNotFirstAndSecondRequestType()
+    public function testGetRoutesShouldReturnDefaultProviderForNotFirstAndSecondRequestType(): void
     {
         $registry = $this->getRegistry(
             [
@@ -64,7 +61,7 @@ class RestRoutesRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->defaultProvider, $registry->getRoutes($requestType));
     }
 
-    public function testGetRoutesShouldReturnFirstProviderForFirstRequestType()
+    public function testGetRoutesShouldReturnFirstProviderForFirstRequestType(): void
     {
         $registry = $this->getRegistry(
             [
@@ -78,7 +75,7 @@ class RestRoutesRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->firstProvider, $registry->getRoutes($requestType));
     }
 
-    public function testGetRoutesShouldReturnSecondProviderForSecondRequestType()
+    public function testGetRoutesShouldReturnSecondProviderForSecondRequestType(): void
     {
         $registry = $this->getRegistry(
             [
@@ -92,7 +89,7 @@ class RestRoutesRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->secondProvider, $registry->getRoutes($requestType));
     }
 
-    public function testGetRoutesShouldReturnDefaultBagIfSpecificBagNotFound()
+    public function testGetRoutesShouldReturnDefaultBagIfSpecificBagNotFound(): void
     {
         $registry = $this->getRegistry(
             [

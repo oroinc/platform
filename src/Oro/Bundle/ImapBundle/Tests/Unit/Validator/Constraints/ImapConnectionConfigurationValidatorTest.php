@@ -6,14 +6,14 @@ use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Manager\ImapSettingsChecker;
 use Oro\Bundle\ImapBundle\Validator\Constraints\ImapConnectionConfiguration;
 use Oro\Bundle\ImapBundle\Validator\Constraints\ImapConnectionConfigurationValidator;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class ImapConnectionConfigurationValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var ImapSettingsChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $checker;
+    private ImapSettingsChecker&MockObject $checker;
 
     #[\Override]
     protected function setUp(): void

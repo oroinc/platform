@@ -63,7 +63,6 @@ class TargetConfigExtraBuilder
      * <code>
      *  $parentConfigExtras = TargetConfigExtraBuilder::buildParentConfigExtras(
      *      $configExtras,
-     *      $parentClassName,
      *      $associationName
      *  );
      *  $parentConfig = $this->configProvider
@@ -73,17 +72,13 @@ class TargetConfigExtraBuilder
      * </code>
      *
      * @param ConfigExtraInterface[] $configExtras
-     * @param string                 $parentClassName
      * @param string                 $associationName
      *
      * @return ConfigExtraInterface[]
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    public static function buildParentConfigExtras(
-        array $configExtras,
-        string $parentClassName,
-        string $associationName
-    ): array {
+    public static function buildParentConfigExtras(array $configExtras, string $associationName): array
+    {
         $result = [];
         $hasCustomizeExtra = false;
         $hasTransformExtra = false;

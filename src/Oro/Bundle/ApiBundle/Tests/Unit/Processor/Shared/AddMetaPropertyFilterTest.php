@@ -14,8 +14,7 @@ use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class AddMetaPropertyFilterTest extends GetProcessorTestCase
 {
-    /** @var AddMetaPropertyFilter */
-    private $processor;
+    private AddMetaPropertyFilter $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +35,7 @@ class AddMetaPropertyFilterTest extends GetProcessorTestCase
         );
     }
 
-    public function testProcessWhenMetaFilterAlreadyAdded()
+    public function testProcessWhenMetaFilterAlreadyAdded(): void
     {
         $filter = new MetaPropertyFilter(DataType::STRING);
 
@@ -46,7 +45,7 @@ class AddMetaPropertyFilterTest extends GetProcessorTestCase
         self::assertSame($filter, $this->context->getFilters()->get('meta'));
     }
 
-    public function testProcessWhenMetaFilterShouldBeAdded()
+    public function testProcessWhenMetaFilterShouldBeAdded(): void
     {
         $config = new EntityDefinitionConfig();
 

@@ -6,21 +6,16 @@ use Oro\Bundle\ApiBundle\ApiDoc\Sorter\FiltersSorterInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\Sorter\FiltersSorterRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
-class FiltersSorterRegistryTest extends \PHPUnit\Framework\TestCase
+class FiltersSorterRegistryTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FiltersSorterInterface */
-    private $defaultSorter;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FiltersSorterInterface */
-    private $firstSorter;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FiltersSorterInterface */
-    private $secondSorter;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
-    private $container;
+    private FiltersSorterInterface&MockObject $defaultSorter;
+    private FiltersSorterInterface&MockObject $firstSorter;
+    private FiltersSorterInterface&MockObject $secondSorter;
+    private ContainerInterface&MockObject $container;
 
     #[\Override]
     protected function setUp(): void
@@ -40,7 +35,7 @@ class FiltersSorterRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetSorterForUnsupportedRequestType()
+    public function testGetSorterForUnsupportedRequestType(): void
     {
         $registry = $this->getRegistry([
             ['first_sorter', 'first'],
@@ -53,7 +48,7 @@ class FiltersSorterRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertNull($registry->getSorter($requestType));
     }
 
-    public function testGetSorterShouldReturnDefaultSorterForNotFirstAndSecondRequestType()
+    public function testGetSorterShouldReturnDefaultSorterForNotFirstAndSecondRequestType(): void
     {
         $registry = $this->getRegistry([
             ['first_sorter', 'first'],
@@ -72,7 +67,7 @@ class FiltersSorterRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->defaultSorter, $registry->getSorter($requestType));
     }
 
-    public function testGetSorterShouldReturnFirstSorterForFirstRequestType()
+    public function testGetSorterShouldReturnFirstSorterForFirstRequestType(): void
     {
         $registry = $this->getRegistry([
             ['first_sorter', 'first'],
@@ -91,7 +86,7 @@ class FiltersSorterRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->firstSorter, $registry->getSorter($requestType));
     }
 
-    public function testGetSorterShouldReturnSecondSorterForSecondRequestType()
+    public function testGetSorterShouldReturnSecondSorterForSecondRequestType(): void
     {
         $registry = $this->getRegistry([
             ['first_sorter', 'first'],
@@ -110,7 +105,7 @@ class FiltersSorterRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->secondSorter, $registry->getSorter($requestType));
     }
 
-    public function testGetSorterShouldReturnDefaultSorterIfSpecificSorterNotFound()
+    public function testGetSorterShouldReturnDefaultSorterIfSpecificSorterNotFound(): void
     {
         $registry = $this->getRegistry([
             ['first_sorter', 'first'],
@@ -128,7 +123,7 @@ class FiltersSorterRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->defaultSorter, $registry->getSorter($requestType));
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $registry = $this->getRegistry([
             ['first_sorter', 'first'],

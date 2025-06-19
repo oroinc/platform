@@ -6,10 +6,11 @@ use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateRequest;
 use Oro\Bundle\ApiBundle\Batch\Model\ChunkFile;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\GaufretteBundle\FileManager;
+use PHPUnit\Framework\TestCase;
 
-class BatchUpdateRequestTest extends \PHPUnit\Framework\TestCase
+class BatchUpdateRequestTest extends TestCase
 {
-    public function testRequest()
+    public function testRequest(): void
     {
         $version = '1.2';
         $requestType = new RequestType([RequestType::REST]);

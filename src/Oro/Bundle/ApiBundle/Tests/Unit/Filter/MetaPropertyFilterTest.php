@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 
 use Oro\Bundle\ApiBundle\Filter\MetaPropertyFilter;
+use PHPUnit\Framework\TestCase;
 
-class MetaPropertyFilterTest extends \PHPUnit\Framework\TestCase
+class MetaPropertyFilterTest extends TestCase
 {
-    public function testAllowedMetaProperties()
+    public function testAllowedMetaProperties(): void
     {
         $filter = new MetaPropertyFilter('string');
 

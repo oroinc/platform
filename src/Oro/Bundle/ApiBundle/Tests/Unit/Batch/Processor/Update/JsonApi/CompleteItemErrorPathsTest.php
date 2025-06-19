@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\BatchUpdateItemContext;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Tests\Unit\Batch\Processor\Update\BatchUpdateProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -17,11 +18,8 @@ use Psr\Log\LoggerInterface;
  */
 class CompleteItemErrorPathsTest extends BatchUpdateProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
-    private $logger;
-
-    /** @var CompleteItemErrorPaths */
-    private $processor;
+    private LoggerInterface&MockObject $logger;
+    private CompleteItemErrorPaths $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -32,13 +30,13 @@ class CompleteItemErrorPathsTest extends BatchUpdateProcessorTestCase
         $this->processor = new CompleteItemErrorPaths($this->logger);
     }
 
-    public function testProcessWithoutBatchItems()
+    public function testProcessWithoutBatchItems(): void
     {
         $this->context->setFile(new ChunkFile('test', 10, 100));
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithBatchItemWithoutErrors()
+    public function testProcessWithBatchItemWithoutErrors(): void
     {
         $item = $this->createMock(BatchUpdateItem::class);
         $itemContext = $this->createMock(BatchUpdateItemContext::class);
@@ -54,7 +52,7 @@ class CompleteItemErrorPathsTest extends BatchUpdateProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithBatchItemWithErrorWithoutSource()
+    public function testProcessWithBatchItemWithErrorWithoutSource(): void
     {
         $error = new Error();
 
@@ -80,7 +78,7 @@ class CompleteItemErrorPathsTest extends BatchUpdateProcessorTestCase
         self::assertEquals('/data/100', $error->getSource()->getPointer());
     }
 
-    public function testProcessWithBatchItemWithErrorWithoutPointer()
+    public function testProcessWithBatchItemWithErrorWithoutPointer(): void
     {
         $error = new Error();
         $error->setSource(new ErrorSource());
@@ -106,7 +104,7 @@ class CompleteItemErrorPathsTest extends BatchUpdateProcessorTestCase
         self::assertEquals('/data/100', $error->getSource()->getPointer());
     }
 
-    public function testProcessWithBatchItemWithErrorWithPointer()
+    public function testProcessWithBatchItemWithErrorWithPointer(): void
     {
         $error = new Error();
         $error->setSource(new ErrorSource());
@@ -133,7 +131,7 @@ class CompleteItemErrorPathsTest extends BatchUpdateProcessorTestCase
         self::assertEquals('/data/100/attributes/name', $error->getSource()->getPointer());
     }
 
-    public function testProcessWithBatchItemWithErrorWithPointerFromUnknownSectionAndNoIncludedData()
+    public function testProcessWithBatchItemWithErrorWithPointerFromUnknownSectionAndNoIncludedData(): void
     {
         $error = new Error();
         $error->setSource(new ErrorSource());
@@ -161,7 +159,7 @@ class CompleteItemErrorPathsTest extends BatchUpdateProcessorTestCase
         self::assertEquals('/data/100/unknown/attributes/name', $error->getSource()->getPointer());
     }
 
-    public function testProcessWithBatchItemWithErrorWithPointerFromUnknownSectionAndHasIncludedData()
+    public function testProcessWithBatchItemWithErrorWithPointerFromUnknownSectionAndHasIncludedData(): void
     {
         $error = new Error();
         $error->setSource(new ErrorSource());
@@ -192,7 +190,7 @@ class CompleteItemErrorPathsTest extends BatchUpdateProcessorTestCase
         self::assertEquals('/data/100/unknown/attributes/name', $error->getSource()->getPointer());
     }
 
-    public function testProcessWithBatchItemWithSeveralErrors()
+    public function testProcessWithBatchItemWithSeveralErrors(): void
     {
         $error1 = new Error();
         $error1->setSource(new ErrorSource());
@@ -223,7 +221,7 @@ class CompleteItemErrorPathsTest extends BatchUpdateProcessorTestCase
         self::assertEquals('/data/100/attributes/another', $error2->getSource()->getPointer());
     }
 
-    public function testProcessWithSeveralBatchItemWithErrors()
+    public function testProcessWithSeveralBatchItemWithErrors(): void
     {
         $error1 = new Error();
         $error1->setSource(new ErrorSource());
@@ -267,7 +265,7 @@ class CompleteItemErrorPathsTest extends BatchUpdateProcessorTestCase
         self::assertEquals('/data/101/attributes/name', $error2->getSource()->getPointer());
     }
 
-    public function testProcessWithBatchItemUnexpectedErrorInIncludedRoot()
+    public function testProcessWithBatchItemUnexpectedErrorInIncludedRoot(): void
     {
         $error1 = new Error();
         $error1->setSource(new ErrorSource());
@@ -292,7 +290,7 @@ class CompleteItemErrorPathsTest extends BatchUpdateProcessorTestCase
         self::assertEquals('/included', $error1->getSource()->getPointer());
     }
 
-    public function testProcessWithBatchItemUnexpectedErrorInIncludedData()
+    public function testProcessWithBatchItemUnexpectedErrorInIncludedData(): void
     {
         $error1 = new Error();
         $error1->setSource(new ErrorSource());
@@ -342,7 +340,7 @@ class CompleteItemErrorPathsTest extends BatchUpdateProcessorTestCase
         self::assertEquals('/included/10', $error1->getSource()->getPointer());
     }
 
-    public function testProcessWithBatchItemValidationErrorInIncludedData()
+    public function testProcessWithBatchItemValidationErrorInIncludedData(): void
     {
         $error1 = new Error();
         $error1->setSource(new ErrorSource());
@@ -392,7 +390,7 @@ class CompleteItemErrorPathsTest extends BatchUpdateProcessorTestCase
         self::assertEquals('/included/10/attributes/name', $error1->getSource()->getPointer());
     }
 
-    public function testProcessWithBatchItemValidationErrorInIncludedDataButIncludedItemNotFound()
+    public function testProcessWithBatchItemValidationErrorInIncludedDataButIncludedItemNotFound(): void
     {
         $error1 = new Error();
         $error1->setSource(new ErrorSource());
@@ -458,7 +456,7 @@ class CompleteItemErrorPathsTest extends BatchUpdateProcessorTestCase
         self::assertEquals('/data/100', $error1->getSource()->getPointer());
     }
 
-    public function testProcessWithBatchItemValidationErrorInIncludedDataButIncludedItemIndexNotFound()
+    public function testProcessWithBatchItemValidationErrorInIncludedDataButIncludedItemIndexNotFound(): void
     {
         $error1 = new Error();
         $error1->setSource(new ErrorSource());

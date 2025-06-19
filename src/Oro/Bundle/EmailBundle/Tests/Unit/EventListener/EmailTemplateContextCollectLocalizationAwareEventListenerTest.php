@@ -16,8 +16,7 @@ use PHPUnit\Framework\TestCase;
 
 class EmailTemplateContextCollectLocalizationAwareEventListenerTest extends TestCase
 {
-    private PreferredLocalizationProviderInterface|MockObject $preferredLocalizationProvider;
-
+    private PreferredLocalizationProviderInterface&MockObject $preferredLocalizationProvider;
     private EmailTemplateContextCollectLocalizationAwareEventListener $listener;
 
     #[\Override]
@@ -41,8 +40,7 @@ class EmailTemplateContextCollectLocalizationAwareEventListenerTest extends Test
         $event = new EmailTemplateContextCollectEvent($from, $recipients, $emailTemplateCriteria, $templateParams);
         $event->setTemplateContextParameter('localization', $localization);
 
-        $this->preferredLocalizationProvider
-            ->expects(self::never())
+        $this->preferredLocalizationProvider->expects(self::never())
             ->method(self::anything());
 
         $this->listener->onContextCollect($event);
@@ -59,8 +57,7 @@ class EmailTemplateContextCollectLocalizationAwareEventListenerTest extends Test
 
         $event = new EmailTemplateContextCollectEvent($from, $recipients, $emailTemplateCriteria, $templateParams);
 
-        $this->preferredLocalizationProvider
-            ->expects(self::never())
+        $this->preferredLocalizationProvider->expects(self::never())
             ->method(self::anything());
 
         self::assertNull($event->getTemplateContextParameter('localization'));
@@ -79,8 +76,7 @@ class EmailTemplateContextCollectLocalizationAwareEventListenerTest extends Test
 
         $event = new EmailTemplateContextCollectEvent($from, $recipients, $emailTemplateCriteria, $templateParams);
 
-        $this->preferredLocalizationProvider
-            ->expects(self::once())
+        $this->preferredLocalizationProvider->expects(self::once())
             ->method('getPreferredLocalization')
             ->with(reset($recipients))
             ->willReturn(null);
@@ -102,8 +98,7 @@ class EmailTemplateContextCollectLocalizationAwareEventListenerTest extends Test
         $event = new EmailTemplateContextCollectEvent($from, $recipients, $emailTemplateCriteria, $templateParams);
 
         $localization = new Localization();
-        $this->preferredLocalizationProvider
-            ->expects(self::once())
+        $this->preferredLocalizationProvider->expects(self::once())
             ->method('getPreferredLocalization')
             ->with(reset($recipients))
             ->willReturn($localization);

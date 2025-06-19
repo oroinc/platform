@@ -5,18 +5,17 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Compiler;
 use Oro\Bundle\ApiBundle\ApiDoc\Parser\MarkdownApiDocParser;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserRegistry;
 use Oro\Bundle\ApiBundle\DependencyInjection\Compiler\ResourceDocParserCompilerPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class ResourceDocParserCompilerPassTest extends \PHPUnit\Framework\TestCase
+class ResourceDocParserCompilerPassTest extends TestCase
 {
     private ResourceDocParserCompilerPass $compiler;
-
     private ContainerBuilder $container;
-
     private Definition $registry;
 
     #[\Override]

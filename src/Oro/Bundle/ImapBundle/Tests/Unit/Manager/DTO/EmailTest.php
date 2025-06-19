@@ -12,14 +12,13 @@ use Oro\Bundle\ImapBundle\Manager\DTO\Email;
 use Oro\Bundle\ImapBundle\Manager\DTO\EmailAttachment;
 use Oro\Bundle\ImapBundle\Manager\DTO\EmailBody;
 use Oro\Bundle\ImapBundle\Manager\DTO\ItemId;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EmailTest extends \PHPUnit\Framework\TestCase
+class EmailTest extends TestCase
 {
-    /** @var Message|\PHPUnit\Framework\MockObject\MockObject */
-    private $message;
-
-    /** @var Email */
-    private $email;
+    private Message&MockObject $message;
+    private Email $email;
 
     #[\Override]
     protected function setUp(): void
@@ -32,7 +31,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getBodyDataProvider
      */
-    public function testGetBody(?ContentType $contentType, bool $bodyIsText, string $expectedContentType)
+    public function testGetBody(?ContentType $contentType, bool $bodyIsText, string $expectedContentType): void
     {
         $this->assertGetBodyCalled($contentType, $bodyIsText);
 
@@ -99,7 +98,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         ?ContentType $contentType = null,
         ?Attachment $msgAsAttachment = null,
         array $expected = []
-    ) {
+    ): void {
         $this->message->expects($this->once())
             ->method('getAttachments')
             ->willReturn($attachments);
@@ -128,7 +127,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
 
         return [
             'with attachments' => [
-                'attachments' => [$this->getAttachmentMock()],
+                'attachments' => [$this->getAttachment()],
                 'getBodyCalled' => false,
                 'contentType' => null,
                 'messageAsAttachment' => null,
@@ -138,7 +137,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
                 'attachments' => [],
                 'getBodyCalled' => true,
                 'contentType' => null,
-                'messageAsAttachment' => $this->getAttachmentMock(),
+                'messageAsAttachment' => $this->getAttachment(),
                 'expected' => [$attachment]
             ],
             'without any attachments' => [
@@ -151,10 +150,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    /**
-     * @return Attachment|\PHPUnit\Framework\MockObject\MockObject
-     */
-    protected function getAttachmentMock()
+    protected function getAttachment(): Attachment&MockObject
     {
         $srcAttachmentContent = $this->createMock(Content::class);
         $srcAttachmentContent->expects($this->once())
@@ -183,7 +179,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         return $srcAttachment;
     }
 
-    public function testGettersAndSetters()
+    public function testGettersAndSetters(): void
     {
         $id = new ItemId('testId', 'testChangeKey');
         $sentAt = new \DateTime('now');

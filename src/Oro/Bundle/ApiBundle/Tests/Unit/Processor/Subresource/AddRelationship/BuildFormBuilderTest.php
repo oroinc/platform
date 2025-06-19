@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Processor\Subresource\AddRelationship\BuildFormBuilder;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -18,17 +19,12 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
 {
-    private const TEST_PARENT_CLASS_NAME = 'Test\Entity';
-    private const TEST_ASSOCIATION_NAME = 'testAssociation';
+    private const string TEST_PARENT_CLASS_NAME = 'Test\Entity';
+    private const string TEST_ASSOCIATION_NAME = 'testAssociation';
 
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formFactory;
-
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
-
-    /** @var BuildFormBuilder */
-    private $processor;
+    private FormFactoryInterface&MockObject $formFactory;
+    private ContainerInterface&MockObject $container;
+    private BuildFormBuilder $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -53,7 +49,7 @@ class BuildFormBuilderTest extends ChangeRelationshipProcessorTestCase
         $this->context->setAssociationName(self::TEST_ASSOCIATION_NAME);
     }
 
-    public function testAppendRelationshipMapperShouldBeSetForFormBuilder()
+    public function testAppendRelationshipMapperShouldBeSetForFormBuilder(): void
     {
         $parentEntity = new \stdClass();
         $formBuilder = $this->createMock(FormBuilderInterface::class);

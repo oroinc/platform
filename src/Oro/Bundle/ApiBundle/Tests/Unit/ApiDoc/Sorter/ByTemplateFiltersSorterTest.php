@@ -3,15 +3,16 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc\Sorter;
 
 use Oro\Bundle\ApiBundle\ApiDoc\Sorter\ByTemplateFiltersSorter;
+use PHPUnit\Framework\TestCase;
 
-class ByTemplateFiltersSorterTest extends \PHPUnit\Framework\TestCase
+class ByTemplateFiltersSorterTest extends TestCase
 {
     private function getSorter(array $sortingTemplate, bool $addOtherFiltersToBegin): ByTemplateFiltersSorter
     {
         return new ByTemplateFiltersSorter($sortingTemplate, $addOtherFiltersToBegin);
     }
 
-    public function testSortFiltersWhenOtherFiltersAddedToEnd()
+    public function testSortFiltersWhenOtherFiltersAddedToEnd(): void
     {
         $filters = [
             'fields[field2]' => ['key' => 'fields.field2'],
@@ -36,7 +37,7 @@ class ByTemplateFiltersSorterTest extends \PHPUnit\Framework\TestCase
         self::assertSame($expectedFilters, $sorter->sortFilters($filters));
     }
 
-    public function testSortFiltersWhenOtherFiltersAddedToBegin()
+    public function testSortFiltersWhenOtherFiltersAddedToBegin(): void
     {
         $filters = [
             'fields[field2]' => ['key' => 'fields.field2'],

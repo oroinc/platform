@@ -9,17 +9,13 @@ use Oro\Bundle\SecurityBundle\AccessRule\AclAccessRule;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 use Oro\Component\EntitySerializer\EntityConfig;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class AclProtectedQueryResolverTest extends OrmRelatedTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|QueryHintResolverInterface */
-    private $queryHintResolver;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|AclHelper */
-    private $aclHelper;
-
-    /** @var AclProtectedQueryResolver */
-    private $queryResolver;
+    private QueryHintResolverInterface&MockObject $queryHintResolver;
+    private AclHelper&MockObject $aclHelper;
+    private AclProtectedQueryResolver $queryResolver;
 
     #[\Override]
     protected function setUp(): void
@@ -35,7 +31,7 @@ class AclProtectedQueryResolverTest extends OrmRelatedTestCase
         );
     }
 
-    public function testResolveQuery()
+    public function testResolveQuery(): void
     {
         $query = new Query($this->em);
         $config = new EntityConfig();
@@ -51,7 +47,7 @@ class AclProtectedQueryResolverTest extends OrmRelatedTestCase
         $this->queryResolver->resolveQuery($query, $config);
     }
 
-    public function testResolveQueryWhenAclForRootEntityShouldBeSkipped()
+    public function testResolveQueryWhenAclForRootEntityShouldBeSkipped(): void
     {
         $query = new Query($this->em);
 

@@ -5,24 +5,21 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Validator\Constraints;
 use Oro\Bundle\AttachmentBundle\Provider\FileConstraintsProvider;
 use Oro\Bundle\AttachmentBundle\Validator\Constraints\FileConstraintFromEntityFieldConfig;
 use Oro\Bundle\AttachmentBundle\Validator\Constraints\FileConstraintFromEntityFieldConfigValidator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\FileValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-class FileConstraintFromEntityFieldConfigValidatorTest extends \PHPUnit\Framework\TestCase
+class FileConstraintFromEntityFieldConfigValidatorTest extends TestCase
 {
-    private const MAX_SIZE = 1024;
-    private const MIME_TYPES = ['mime/type1'];
+    private const int MAX_SIZE = 1024;
+    private const array MIME_TYPES = ['mime/type1'];
 
-    /** @var FileConstraintsProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileConstraintsProvider;
-
-    /** @var FileValidator|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileValidator;
-
-    /** @var FileConstraintFromEntityFieldConfigValidator */
-    private $validator;
+    private FileConstraintsProvider&MockObject $fileConstraintsProvider;
+    private FileValidator&MockObject $fileValidator;
+    private FileConstraintFromEntityFieldConfigValidator $validator;
 
     #[\Override]
     protected function setUp(): void

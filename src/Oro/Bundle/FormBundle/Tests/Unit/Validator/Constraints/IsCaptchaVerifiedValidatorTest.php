@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class IsCaptchaVerifiedValidatorTest extends ConstraintValidatorTestCase
 {
-    private CaptchaServiceRegistry|MockObject $captchaServiceRegistry;
+    private CaptchaServiceRegistry&MockObject $captchaServiceRegistry;
 
     #[\Override]
     protected function createValidator()

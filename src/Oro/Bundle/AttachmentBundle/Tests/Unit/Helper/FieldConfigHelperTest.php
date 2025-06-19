@@ -5,13 +5,14 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Helper;
 use Oro\Bundle\AttachmentBundle\Helper\FieldConfigHelper;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Stub\Entity\TestEntity1;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use PHPUnit\Framework\TestCase;
 
-class FieldConfigHelperTest extends \PHPUnit\Framework\TestCase
+class FieldConfigHelperTest extends TestCase
 {
     /**
      * @dataProvider isImageFieldProvider
      */
-    public function testIsImageField(string $inputType, bool $expectedResult)
+    public function testIsImageField(string $inputType, bool $expectedResult): void
     {
         $fieldConfigId = new FieldConfigId('extend', TestEntity1::class, 'fieldName', $inputType);
 
@@ -39,7 +40,7 @@ class FieldConfigHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isFileFieldProvider
      */
-    public function testIsFileField(string $inputType, bool $expectedResult)
+    public function testIsFileField(string $inputType, bool $expectedResult): void
     {
         $fieldConfigId = new FieldConfigId('extend', TestEntity1::class, 'fieldName', $inputType);
 
@@ -67,7 +68,7 @@ class FieldConfigHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider isMultiFieldProvider
      */
-    public function testIsMultiField(string $inputType, bool $expectedResult)
+    public function testIsMultiField(string $inputType, bool $expectedResult): void
     {
         $fieldConfigId = new FieldConfigId('extend', TestEntity1::class, 'fieldName', $inputType);
 

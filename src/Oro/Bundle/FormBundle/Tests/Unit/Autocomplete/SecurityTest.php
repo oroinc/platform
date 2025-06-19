@@ -3,15 +3,14 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Autocomplete;
 
 use Oro\Bundle\FormBundle\Autocomplete\Security;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class SecurityTest extends \PHPUnit\Framework\TestCase
+class SecurityTest extends TestCase
 {
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var Security */
-    private $security;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private Security $security;
 
     #[\Override]
     protected function setUp(): void
@@ -24,13 +23,13 @@ class SecurityTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetAutocompleteAclResource()
+    public function testGetAutocompleteAclResource(): void
     {
         $this->assertNull($this->security->getAutocompleteAclResource('test'));
         $this->assertEquals('test_acl_resource', $this->security->getAutocompleteAclResource('test_search'));
     }
 
-    public function testIsAutocompleteGranted()
+    public function testIsAutocompleteGranted(): void
     {
         $this->authorizationChecker->expects($this->once())
             ->method('isGranted')

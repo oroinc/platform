@@ -11,21 +11,22 @@ use Oro\Bundle\EmailBundle\Entity\EmailRecipient;
 use Oro\Bundle\EmailBundle\Entity\EmailThread;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class EmailTest extends \PHPUnit\Framework\TestCase
+class EmailTest extends TestCase
 {
-    public function testIdGetter()
+    public function testIdGetter(): void
     {
         $entity = new Email();
         ReflectionUtil::setId($entity, 1);
         $this->assertEquals(1, $entity->getId());
     }
 
-    public function testFromEmailAddressGetterAndSetter()
+    public function testFromEmailAddressGetterAndSetter(): void
     {
         $emailAddress = $this->createMock(EmailAddress::class);
 
@@ -35,7 +36,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($emailAddress, $entity->getFromEmailAddress());
     }
 
-    public function testRecipientGetterAndSetter()
+    public function testRecipientGetterAndSetter(): void
     {
         $toRecipient = $this->createMock(EmailRecipient::class);
         $toRecipient->expects($this->any())
@@ -82,7 +83,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($bccRecipient, $recipients->first());
     }
 
-    public function testEmailBodyGetterAndSetter()
+    public function testEmailBodyGetterAndSetter(): void
     {
         $emailBody = $this->createMock(EmailBody::class);
 
@@ -92,7 +93,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($emailBody, $entity->getEmailBody());
     }
 
-    public function testBeforeSave()
+    public function testBeforeSave(): void
     {
         $createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
         $entity = new Email();
@@ -102,7 +103,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         $this->assertGreaterThanOrEqual($createdAt, $entity->getCreated());
     }
 
-    public function testIsHeadGetterAndSetter()
+    public function testIsHeadGetterAndSetter(): void
     {
         $entity = new Email();
         $this->assertTrue($entity->isHead());
@@ -114,7 +115,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider refsDataProvider
      */
-    public function testRefsGetterAndSetter(?string $set, array $get)
+    public function testRefsGetterAndSetter(?string $set, array $get): void
     {
         $entity = new Email();
         $entity->setRefs($set);
@@ -124,7 +125,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider propertiesDataProvider
      */
-    public function testSettersAndGetters(string $property, mixed $value)
+    public function testSettersAndGetters(string $property, mixed $value): void
     {
         $obj = new Email();
 
@@ -162,7 +163,7 @@ class EmailTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testSetSubjectOnLongString()
+    public function testSetSubjectOnLongString(): void
     {
         $activityList = new Email();
         $activityList->setSubject(

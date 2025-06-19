@@ -5,12 +5,13 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Provider;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Provider\ExternalUrlProvider;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ExternalUrlProviderTest extends \PHPUnit\Framework\TestCase
+class ExternalUrlProviderTest extends TestCase
 {
-    private FileUrlProviderInterface|\PHPUnit\Framework\MockObject\MockObject $innerFileUrlProvider;
-
+    private FileUrlProviderInterface&MockObject $innerFileUrlProvider;
     private ExternalUrlProvider $provider;
 
     #[\Override]
@@ -113,9 +114,8 @@ class ExternalUrlProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    private function getFile(
-        ?string $externalUrl = null
-    ): File|\PHPUnit\Framework\MockObject\MockObject {
+    private function getFile(?string $externalUrl = null): File&MockObject
+    {
         $file = $this->createMock(File::class);
         $file->expects(self::any())
             ->method('getId')

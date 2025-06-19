@@ -21,8 +21,7 @@ use Oro\Component\Testing\Unit\TestContainerBuilder;
  */
 class SetDefaultSortingTest extends GetListProcessorTestCase
 {
-    /** @var SetDefaultSorting */
-    private $processor;
+    private SetDefaultSorting $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -43,7 +42,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         );
     }
 
-    public function testProcessWhenQueryIsAlreadyExist()
+    public function testProcessWhenQueryIsAlreadyExist(): void
     {
         $query = new \stdClass();
 
@@ -53,7 +52,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         self::assertSame($query, $this->context->getQuery());
     }
 
-    public function testProcessForEntityWithIdentifierNamedId()
+    public function testProcessForEntityWithIdentifierNamedId(): void
     {
         $config = new EntityDefinitionConfig();
         $config->setIdentifierFieldNames(['id']);
@@ -76,7 +75,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
-    public function testProcessForEntityWithIdentifierNotNamedId()
+    public function testProcessForEntityWithIdentifierNotNamedId(): void
     {
         $config = new EntityDefinitionConfig();
         $config->setIdentifierFieldNames(['name']);
@@ -99,7 +98,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
-    public function testProcessForEntityWithSingleIdentifierAndSorterIsDisabled()
+    public function testProcessForEntityWithSingleIdentifierAndSorterIsDisabled(): void
     {
         $config = new EntityDefinitionConfig();
         $config->setIdentifierFieldNames(['id']);
@@ -122,7 +121,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
-    public function testProcessForEntityWithCompositeIdentifier()
+    public function testProcessForEntityWithCompositeIdentifier(): void
     {
         $config = new EntityDefinitionConfig();
         $config->setIdentifierFieldNames(['id', 'title']);
@@ -147,7 +146,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
-    public function testProcessForEntityWithCompositeIdentifierAndSorterForSomeIdentifierFieldsIsDisabled()
+    public function testProcessForEntityWithCompositeIdentifierAndSorterForSomeIdentifierFieldsIsDisabled(): void
     {
         $config = new EntityDefinitionConfig();
         $config->setIdentifierFieldNames(['id', 'title']);
@@ -172,7 +171,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
-    public function testProcessWhenNoIdentifierFieldInConfig()
+    public function testProcessWhenNoIdentifierFieldInConfig(): void
     {
         $config = new EntityDefinitionConfig();
         $config->setIdentifierFieldNames(['id']);
@@ -194,7 +193,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
-    public function testProcessWhenConfigHasOrderByOption()
+    public function testProcessWhenConfigHasOrderByOption(): void
     {
         $config = new EntityDefinitionConfig();
         $config->setIdentifierFieldNames(['id']);
@@ -217,7 +216,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
-    public function testProcessForEntityWithoutIdentifier()
+    public function testProcessForEntityWithoutIdentifier(): void
     {
         $config = new EntityDefinitionConfig();
         $configOfSorters = new SortersConfig();
@@ -236,7 +235,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
-    public function testProcessForEntityWithRenamedIdentifierFieldAndSorterForThisFieldIsDisabled()
+    public function testProcessForEntityWithRenamedIdentifierFieldAndSorterForThisFieldIsDisabled(): void
     {
         $config = new EntityDefinitionConfig();
         $config->setIdentifierFieldNames(['renamedId']);
@@ -261,7 +260,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         self::assertFalse($filters->isIncludeInDefaultGroup('sort'));
     }
 
-    public function testProcessWhenSortFilterIsAlreadyAdded()
+    public function testProcessWhenSortFilterIsAlreadyAdded(): void
     {
         $sortFilter = new SortFilter(DataType::ORDER_BY);
 
@@ -274,7 +273,7 @@ class SetDefaultSortingTest extends GetListProcessorTestCase
         self::assertFalse($this->context->getFilters()->isIncludeInDefaultGroup('sort'));
     }
 
-    public function testProcessWhenSortingIsDisabled()
+    public function testProcessWhenSortingIsDisabled(): void
     {
         $config = new EntityDefinitionConfig();
         $config->disableSorting();

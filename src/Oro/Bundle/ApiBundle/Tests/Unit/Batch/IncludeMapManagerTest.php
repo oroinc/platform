@@ -12,28 +12,21 @@ use Oro\Bundle\ApiBundle\Batch\Model\ChunkFile;
 use Oro\Bundle\ApiBundle\Batch\Model\IncludedData;
 use Oro\Bundle\ApiBundle\Exception\RuntimeException;
 use Oro\Bundle\GaufretteBundle\FileManager;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
+class IncludeMapManagerTest extends TestCase
 {
-    /** @var ItemKeyBuilder */
-    private $itemKeyBuilder;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FileManager */
-    private $fileManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FileLockManager */
-    private $fileLockManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|LoggerInterface */
-    private $logger;
-
-    /** @var IncludeMapManager */
-    private $includeMapManager;
+    private ItemKeyBuilder $itemKeyBuilder;
+    private FileManager&MockObject $fileManager;
+    private FileLockManager&MockObject $fileLockManager;
+    private LoggerInterface&MockObject $logger;
+    private IncludeMapManager $includeMapManager;
 
     #[\Override]
     protected function setUp(): void
@@ -51,7 +44,7 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testUpdateIncludedChunkIndexWhenIndexDoesNotExist()
+    public function testUpdateIncludedChunkIndexWhenIndexDoesNotExist(): void
     {
         $file1 = new ChunkFile('file1', 0, 0, 'included');
         $file2 = new ChunkFile('file2', 1, 2, 'included');
@@ -92,7 +85,7 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $errors);
     }
 
-    public function testUpdateIncludedChunkIndexWhenIndexExists()
+    public function testUpdateIncludedChunkIndexWhenIndexExists(): void
     {
         $file2 = new ChunkFile('file2', 1, 2, 'included');
 
@@ -134,7 +127,7 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $errors);
     }
 
-    public function testUpdateIncludedChunkIndexWhenSomeIncludedItemsHaveErrors()
+    public function testUpdateIncludedChunkIndexWhenSomeIncludedItemsHaveErrors(): void
     {
         $file1 = new ChunkFile('file1', 0, 0, 'included');
         $file2 = new ChunkFile('file2', 1, 2, 'included');
@@ -187,7 +180,7 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetIncludedItemsWhenDataDoesNotHaveRelationships()
+    public function testGetIncludedItemsWhenDataDoesNotHaveRelationships(): void
     {
         $data = [
             ['data' => ['type' => 'accounts']],
@@ -213,7 +206,7 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetIncludedItemsWhenIncludeIndexLockCannotBeAcquired()
+    public function testGetIncludedItemsWhenIncludeIndexLockCannotBeAcquired(): void
     {
         $includeIndexLockAttemptLimit = 3;
         $includeIndexLockLockWaitBetweenAttempts = 2;
@@ -260,7 +253,7 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($includedData);
     }
 
-    public function testGetIncludedItemsWhenLoadIndexDataFailed()
+    public function testGetIncludedItemsWhenLoadIndexDataFailed(): void
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('some error');
@@ -300,7 +293,7 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetIncludedItemsWhenIncludedItemsNotFound()
+    public function testGetIncludedItemsWhenIncludedItemsNotFound(): void
     {
         $data = [
             [
@@ -361,7 +354,7 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testGetIncludedItemsWhenDataHaveNotIntersectedRelationships()
+    public function testGetIncludedItemsWhenDataHaveNotIntersectedRelationships(): void
     {
         $data = [
             [
@@ -470,7 +463,7 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testGetIncludedItemsWhenDataHaveIntersectedRelationships()
+    public function testGetIncludedItemsWhenDataHaveIntersectedRelationships(): void
     {
         $data = [
             [
@@ -569,7 +562,7 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testGetIncludedItemsWhenIncludedDataHaveRelationships()
+    public function testGetIncludedItemsWhenIncludedDataHaveRelationships(): void
     {
         $data = [
             [
@@ -756,7 +749,7 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testGetIncludedItemsWhenThereAreAlreadyProcessedIncludedItems()
+    public function testGetIncludedItemsWhenThereAreAlreadyProcessedIncludedItems(): void
     {
         $data = [
             [
@@ -933,7 +926,7 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testGetIncludedItemsWhenThereAreAlreadyProcessedIncludedItemsAndNoIncludedItems()
+    public function testGetIncludedItemsWhenThereAreAlreadyProcessedIncludedItemsAndNoIncludedItems(): void
     {
         $data = [
             [
@@ -1028,7 +1021,7 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function testGetIncludedItemsWhenNotPossibleToAcquireLockForOneOfChunkFile()
+    public function testGetIncludedItemsWhenNotPossibleToAcquireLockForOneOfChunkFile(): void
     {
         $includeIndexLockAttemptLimit = 3;
         $includeIndexLockWaitBetweenAttempts = 2;
@@ -1146,7 +1139,7 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
         self::assertNull($includedData);
     }
 
-    public function testMoveToProcessed()
+    public function testMoveToProcessed(): void
     {
         $includeIndexLockFileName = 'api_123_include_index.lock';
         $indexDataFile = $this->createMock(File::class);
@@ -1214,7 +1207,7 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMoveToProcessedWhenAllItemsWereRemovedFromChunkFile()
+    public function testMoveToProcessedWhenAllItemsWereRemovedFromChunkFile(): void
     {
         $includeIndexLockFileName = 'api_123_include_index.lock';
         $indexDataFile = $this->createMock(File::class);
@@ -1284,7 +1277,7 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMoveToProcessedWhenNotPossibleToAcquireLockForIncludeIndex()
+    public function testMoveToProcessedWhenNotPossibleToAcquireLockForIncludeIndex(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage(
@@ -1322,7 +1315,7 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetNotLinkedIncludedItemIndexes()
+    public function testGetNotLinkedIncludedItemIndexes(): void
     {
         $indexDataFile = $this->createMock(File::class);
         $indexDataFile->expects(self::once())
@@ -1349,7 +1342,7 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetNotLinkedIncludedItemIndexesWhenIndexDataIsEmpty()
+    public function testGetNotLinkedIncludedItemIndexesWhenIndexDataIsEmpty(): void
     {
         $indexDataFile = $this->createMock(File::class);
         $indexDataFile->expects(self::once())
@@ -1367,7 +1360,7 @@ class IncludeMapManagerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetNotLinkedIncludedItemIndexesWhenLinkedIndexFileDoesNotExist()
+    public function testGetNotLinkedIncludedItemIndexesWhenLinkedIndexFileDoesNotExist(): void
     {
         $indexDataFile = $this->createMock(File::class);
         $indexDataFile->expects(self::once())

@@ -8,6 +8,8 @@ use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
 use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
 use Oro\Bundle\AttachmentBundle\Tests\Unit\Fixtures\TestSubscriber;
 use Oro\Bundle\AttachmentBundle\Tools\ExternalFileFactory;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Event\PreSetDataEvent;
 use Symfony\Component\Form\Extension\Core\Type\FileType as SymfonyFileType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -23,13 +25,10 @@ use Symfony\Component\Validator\Constraints\NotNull;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class FileTypeTest extends \PHPUnit\Framework\TestCase
+class FileTypeTest extends TestCase
 {
-    /** @var ExternalFileFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $externalFileFactory;
-
-    /** @var FileType */
-    private $type;
+    private ExternalFileFactory&MockObject $externalFileFactory;
+    private FileType $type;
 
     #[\Override]
     protected function setUp(): void

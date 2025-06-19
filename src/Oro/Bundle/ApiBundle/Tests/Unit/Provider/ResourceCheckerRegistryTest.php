@@ -7,15 +7,16 @@ use Oro\Bundle\ApiBundle\Provider\ResourceCheckerInterface;
 use Oro\Bundle\ApiBundle\Provider\ResourceCheckerRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ResourceCheckerRegistryTest extends \PHPUnit\Framework\TestCase
+class ResourceCheckerRegistryTest extends TestCase
 {
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
+    private ContainerInterface&MockObject $container;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +29,7 @@ class ResourceCheckerRegistryTest extends \PHPUnit\Framework\TestCase
         return new ResourceCheckerRegistry($config, $this->container, new RequestExpressionMatcher());
     }
 
-    public function testGetResourceTypeForUnsupportedRequestType()
+    public function testGetResourceTypeForUnsupportedRequestType(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot find a resource type for the request "rest,another".');
@@ -93,7 +94,7 @@ class ResourceCheckerRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame('default_type', $registry->getResourceType($requestType));
     }
 
-    public function testGetConfigProviderForUnsupportedRequestType()
+    public function testGetConfigProviderForUnsupportedRequestType(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot find a resource checker config provider for the request "rest,another".');
@@ -182,7 +183,7 @@ class ResourceCheckerRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($configProvider, $registry->getResourceCheckerConfigProvider($requestType));
     }
 
-    public function testGetResourceCheckerForUnsupportedRequestType()
+    public function testGetResourceCheckerForUnsupportedRequestType(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot find a resource checker for the request "rest,another".');

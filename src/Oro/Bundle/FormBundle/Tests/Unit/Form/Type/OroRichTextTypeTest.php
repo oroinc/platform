@@ -7,6 +7,7 @@ use Oro\Bundle\FormBundle\Form\Type\OroRichTextType;
 use Oro\Bundle\FormBundle\Provider\HtmlTagProvider;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\Asset\Packages;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -14,23 +15,12 @@ use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroRichTextTypeTest extends FormIntegrationTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigManager */
-    private $configManager;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|Packages */
-    private $assetsHelper;
-
-    /** @var ContextInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $context;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|HtmlTagProvider */
-    private $htmlTagProvider;
-
-    /** @var HtmlTagHelper */
-    private $htmlTagHelper;
-
-    /** @var OroRichTextType */
-    private $formType;
+    private ConfigManager&MockObject $configManager;
+    private Packages&MockObject $assetsHelper;
+    private ContextInterface&MockObject $context;
+    private HtmlTagProvider&MockObject $htmlTagProvider;
+    private HtmlTagHelper $htmlTagHelper;
+    private OroRichTextType $formType;
 
     #[\Override]
     protected function setUp(): void

@@ -3,16 +3,16 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension;
 
 use Oro\Bundle\FormBundle\Form\Extension\AdditionalAttrExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class AdditionalAttrExtensionTest extends \PHPUnit\Framework\TestCase
+class AdditionalAttrExtensionTest extends TestCase
 {
-    private const ID = 'test_id';
+    private const string ID = 'test_id';
 
-    /** @var AdditionalAttrExtension */
-    private $extension;
+    private AdditionalAttrExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +20,7 @@ class AdditionalAttrExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new AdditionalAttrExtension();
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects($this->once())
@@ -33,7 +33,7 @@ class AdditionalAttrExtensionTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider finishViewData
      */
-    public function testFinishView(FormView $view, array $options, array $expectedVars)
+    public function testFinishView(FormView $view, array $options, array $expectedVars): void
     {
         $formMock = $this->createMock(Form::class);
 

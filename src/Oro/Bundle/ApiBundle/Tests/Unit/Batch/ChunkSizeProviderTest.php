@@ -3,11 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch;
 
 use Oro\Bundle\ApiBundle\Batch\ChunkSizeProvider;
+use PHPUnit\Framework\TestCase;
 
-class ChunkSizeProviderTest extends \PHPUnit\Framework\TestCase
+class ChunkSizeProviderTest extends TestCase
 {
-    /** @var ChunkSizeProvider */
-    private $provider;
+    private ChunkSizeProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -20,22 +20,22 @@ class ChunkSizeProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetChunkSizeForEntityWithoutOwnChunkSize()
+    public function testGetChunkSizeForEntityWithoutOwnChunkSize(): void
     {
         self::assertSame(100, $this->provider->getChunkSize('Test\Entity2'));
     }
 
-    public function testGetChunkSizeForEntityWithOwnChunkSize()
+    public function testGetChunkSizeForEntityWithOwnChunkSize(): void
     {
         self::assertSame(10, $this->provider->getChunkSize('Test\Entity1'));
     }
 
-    public function testGetIncludedDataChunkSizeForEntityWithoutOwnChunkSize()
+    public function testGetIncludedDataChunkSizeForEntityWithoutOwnChunkSize(): void
     {
         self::assertSame(200, $this->provider->getIncludedDataChunkSize('Test\Entity2'));
     }
 
-    public function testGetIncludedDataChunkSizeForEntityWithOwnChunkSize()
+    public function testGetIncludedDataChunkSizeForEntityWithOwnChunkSize(): void
     {
         self::assertSame(20, $this->provider->getIncludedDataChunkSize('Test\Entity1'));
     }

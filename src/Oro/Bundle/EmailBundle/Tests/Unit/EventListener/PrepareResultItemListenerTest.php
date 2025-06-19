@@ -9,18 +9,15 @@ use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\EventListener\PrepareResultItemListener;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class PrepareResultItemListenerTest extends \PHPUnit\Framework\TestCase
+class PrepareResultItemListenerTest extends TestCase
 {
-    /** @var UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $urlGenerator;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var PrepareResultItemListener */
-    private $listener;
+    private UrlGeneratorInterface&MockObject $urlGenerator;
+    private ManagerRegistry&MockObject $doctrine;
+    private PrepareResultItemListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -31,14 +28,14 @@ class PrepareResultItemListenerTest extends \PHPUnit\Framework\TestCase
         $this->listener = new PrepareResultItemListener($this->urlGenerator, $this->doctrine);
     }
 
-    public function testPrepareResultItemForNotEmailUserEntity()
+    public function testPrepareResultItemForNotEmailUserEntity(): void
     {
         $event = new PrepareResultItemEvent(new Item('test'));
         $this->listener->prepareResultItem($event);
         $this->assertEquals('test', $event->getResultItem()->getEntityName());
     }
 
-    public function testPrepareResultItem()
+    public function testPrepareResultItem(): void
     {
         $emailId = 100;
         $emailUrl = 'test-email-url';

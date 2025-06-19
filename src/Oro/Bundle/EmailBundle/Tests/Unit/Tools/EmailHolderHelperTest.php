@@ -11,14 +11,13 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EmailHolderHelperTest extends \PHPUnit\Framework\TestCase
+class EmailHolderHelperTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject */
-    private $extendConfigProvider;
-
-    /** @var EmailHolderHelper */
-    private $helper;
+    private ConfigProvider&MockObject $extendConfigProvider;
+    private EmailHolderHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -31,12 +30,12 @@ class EmailHolderHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getEmailProvider
      */
-    public function testGetEmail(object|string|null $object, ?string $expected)
+    public function testGetEmail(object|string|null $object, ?string $expected): void
     {
         $this->assertEquals($expected, $this->helper->getEmail($object));
     }
 
-    public function testGetEmailFromRelatedObjectNotConfigurableEntity()
+    public function testGetEmailFromRelatedObjectNotConfigurableEntity(): void
     {
         $object = new TestCustomEntity();
         $object->setUser(new TestUser('user@example.com'));
@@ -52,7 +51,7 @@ class EmailHolderHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(null, $this->helper->getEmail($object));
     }
 
-    public function testGetEmailFromRelatedObjectNoTargetEntities()
+    public function testGetEmailFromRelatedObjectNoTargetEntities(): void
     {
         $object = new TestCustomEntity();
         $object->setUser(new TestUser('user@example.com'));
@@ -93,7 +92,7 @@ class EmailHolderHelperTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(null, $this->helper->getEmail($object));
     }
 
-    public function testGetEmailFromRelatedObject()
+    public function testGetEmailFromRelatedObject(): void
     {
         $object = new TestCustomEntity();
         $object->setUser(new TestUser('user@example.com'));

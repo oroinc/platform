@@ -25,7 +25,7 @@ class MailCatcherIsolator implements IsolatorInterface
     #[\Override]
     public function start(BeforeStartTestsEvent $event)
     {
-        $event->writeln('<info>Purge MailCatcher storage</info>');
+        $event->writeln('<info>Purging MailCatcher</info>');
         try {
             $this->emailClient->purge([
                 'timeout'         => 2,

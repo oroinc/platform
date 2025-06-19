@@ -5,10 +5,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection\QueryVisitorExpression;
 use Doctrine\ORM\Query\Expr\Andx;
 use Doctrine\ORM\Query\Expr\Comparison;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\AndCompositeExpression;
+use PHPUnit\Framework\TestCase;
 
-class AndCompositeExpressionTest extends \PHPUnit\Framework\TestCase
+class AndCompositeExpressionTest extends TestCase
 {
-    public function testWalkCompositeExpression()
+    public function testWalkCompositeExpression(): void
     {
         $expression = new AndCompositeExpression();
         $expressionList = [

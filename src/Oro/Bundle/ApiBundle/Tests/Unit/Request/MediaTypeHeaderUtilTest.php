@@ -3,8 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
 use Oro\Bundle\ApiBundle\Request\MediaTypeHeaderUtil;
+use PHPUnit\Framework\TestCase;
 
-class MediaTypeHeaderUtilTest extends \PHPUnit\Framework\TestCase
+class MediaTypeHeaderUtilTest extends TestCase
 {
     /**
      * @dataProvider parseMediaTypeDataProvider

@@ -7,17 +7,14 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\AttachmentBundle\Api\AttachmentAssociationProvider;
 use Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AttachmentAssociationProviderTest extends \PHPUnit\Framework\TestCase
+class AttachmentAssociationProviderTest extends TestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var AttachmentAssociationHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $attachmentAssociationHelper;
-
-    /** @var AttachmentAssociationProvider */
-    private $attachmentAssociationProvider;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private AttachmentAssociationHelper&MockObject $attachmentAssociationHelper;
+    private AttachmentAssociationProvider $attachmentAssociationProvider;
 
     #[\Override]
     protected function setUp(): void

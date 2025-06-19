@@ -7,8 +7,7 @@ use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\ComputePrimaryField;
 
 class ComputePrimaryFieldTest extends CustomizeLoadedDataProcessorTestCase
 {
-    /** @var ComputePrimaryField */
-    private $processor;
+    private ComputePrimaryField $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +22,7 @@ class ComputePrimaryFieldTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessWhenNoConfigForPrimaryField()
+    public function testProcessWhenNoConfigForPrimaryField(): void
     {
         $config = new EntityDefinitionConfig();
 
@@ -48,7 +47,7 @@ class ComputePrimaryFieldTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessForExcludedPrimaryField()
+    public function testProcessForExcludedPrimaryField(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('enabledRole')->setExcluded();
@@ -77,7 +76,7 @@ class ComputePrimaryFieldTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessWhenPrimaryFieldIsAlreadySet()
+    public function testProcessWhenPrimaryFieldIsAlreadySet(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('enabledRole');
@@ -108,7 +107,7 @@ class ComputePrimaryFieldTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessWhenPrimaryFieldIsNotSetYet()
+    public function testProcessWhenPrimaryFieldIsNotSetYet(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('enabledRole');
@@ -138,7 +137,7 @@ class ComputePrimaryFieldTest extends CustomizeLoadedDataProcessorTestCase
         );
     }
 
-    public function testProcessForRenamedFields()
+    public function testProcessForRenamedFields(): void
     {
         $this->processor = new ComputePrimaryField(
             'enabledRole',

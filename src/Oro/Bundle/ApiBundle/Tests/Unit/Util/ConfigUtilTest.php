@@ -5,11 +5,12 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Component\ChainProcessor\Tests\Unit\TestArrayObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ConfigUtilTest extends \PHPUnit\Framework\TestCase
+class ConfigUtilTest extends TestCase
 {
     public function testConvertObjectsToArrayDoNotTreatEmptyAsNull(): void
     {

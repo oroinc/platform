@@ -10,6 +10,7 @@ use Oro\Bundle\EmailBundle\Form\Configurator\EmailConfigurationConfigurator;
 use Oro\Bundle\FormBundle\Form\Extension\DataBlockExtension;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType as SymfonyFormType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -20,11 +21,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class EmailConfigurationConfiguratorTest extends FormIntegrationTestCase
 {
-    /** @var SymmetricCrypterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private static $encryptor;
-
-    /** @var ValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private static $validator;
+    private static SymmetricCrypterInterface&MockObject $encryptor;
+    private static ValidatorInterface&MockObject $validator;
 
     #[\Override]
     protected function setUp(): void

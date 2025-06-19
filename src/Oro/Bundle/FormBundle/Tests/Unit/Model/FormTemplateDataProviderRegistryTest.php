@@ -4,15 +4,14 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Model;
 
 use Oro\Bundle\FormBundle\Model\FormTemplateDataProviderRegistry;
 use Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class FormTemplateDataProviderRegistryTest extends \PHPUnit\Framework\TestCase
+class FormTemplateDataProviderRegistryTest extends TestCase
 {
-    /** @var FormTemplateDataProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $provider1;
-
-    /** @var FormTemplateDataProviderRegistry */
-    private $registry;
+    private FormTemplateDataProviderInterface&MockObject $provider1;
+    private FormTemplateDataProviderRegistry $registry;
 
     #[\Override]
     protected function setUp(): void
@@ -27,18 +26,18 @@ class FormTemplateDataProviderRegistryTest extends \PHPUnit\Framework\TestCase
         $this->registry = new FormTemplateDataProviderRegistry($providers);
     }
 
-    public function testHasAndGetForKnownProvider()
+    public function testHasAndGetForKnownProvider(): void
     {
         self::assertTrue($this->registry->has('provider1'));
         self::assertSame($this->provider1, $this->registry->get('provider1'));
     }
 
-    public function testHasForUnknownProvider()
+    public function testHasForUnknownProvider(): void
     {
         self::assertFalse($this->registry->has('unknown'));
     }
 
-    public function testGetForUnknownProvider()
+    public function testGetForUnknownProvider(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Unknown provider with alias "unknown".');

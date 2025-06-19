@@ -4,16 +4,17 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
 use Oro\Bundle\ApiBundle\Config\ActionConfig;
 use Oro\Bundle\ApiBundle\Config\ActionsConfig;
+use PHPUnit\Framework\TestCase;
 
-class ActionsConfigTest extends \PHPUnit\Framework\TestCase
+class ActionsConfigTest extends TestCase
 {
-    public function testIsEmpty()
+    public function testIsEmpty(): void
     {
         $config = new ActionsConfig();
         self::assertTrue($config->isEmpty());
     }
 
-    public function testGetAddRemove()
+    public function testGetAddRemove(): void
     {
         $actionConfig = new ActionConfig();
         $config = new ActionsConfig();
@@ -35,7 +36,7 @@ class ActionsConfigTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($config->isEmpty());
     }
 
-    public function testToArrayAndClone()
+    public function testToArrayAndClone(): void
     {
         $config = new ActionsConfig();
         $actionConfig = new ActionConfig();

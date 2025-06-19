@@ -6,14 +6,12 @@ use Oro\Bundle\ApiBundle\Provider\EntityTitleProvider;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class EntityTitleProviderTest extends OrmRelatedTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityNameResolver */
-    private $entityNameResolver;
-
-    /** @var EntityTitleProvider */
-    private $entityTitleProvider;
+    private EntityNameResolver&MockObject $entityNameResolver;
+    private EntityTitleProvider $entityTitleProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +34,7 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetTitlesForNotManageableEntity()
+    public function testGetTitlesForNotManageableEntity(): void
     {
         $this->notManageableClassNames = [Entity\Product::class];
 
@@ -50,7 +48,7 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetTitlesForEntityWithoutTitleDqlExpr()
+    public function testGetTitlesForEntityWithoutTitleDqlExpr(): void
     {
         $targets = [
             Entity\Product::class => ['id', [1]]
@@ -89,7 +87,7 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetTitlesForOneEntityType()
+    public function testGetTitlesForOneEntityType(): void
     {
         $targets = [
             Entity\Product::class => ['id', [1]]
@@ -128,7 +126,7 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetTitlesWhenTargetsContainBothNotManageableAndManageableEntities()
+    public function testGetTitlesWhenTargetsContainBothNotManageableAndManageableEntities(): void
     {
         $this->notManageableClassNames = [Entity\User::class];
 
@@ -170,7 +168,7 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetTitlesForSeveralEntityTypesWithSameIdentifierType()
+    public function testGetTitlesForSeveralEntityTypesWithSameIdentifierType(): void
     {
         $targets = [
             Entity\Product::class => ['id', [123]],
@@ -229,7 +227,7 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetTitlesForSeveralEntityTypesWithDifferentIdentifierType()
+    public function testGetTitlesForSeveralEntityTypesWithDifferentIdentifierType(): void
     {
         $targets = [
             Entity\Product::class  => ['id', [123]],
@@ -309,7 +307,7 @@ class EntityTitleProviderTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetTitlesForOneEntityTypeWithCompositeIdentifier()
+    public function testGetTitlesForOneEntityTypeWithCompositeIdentifier(): void
     {
         $targets = [
             Entity\CompositeKeyEntity::class => [['id', 'title'], [[1, 'item 1']]]

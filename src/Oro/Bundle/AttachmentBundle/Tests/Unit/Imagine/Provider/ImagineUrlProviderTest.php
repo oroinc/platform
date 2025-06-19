@@ -6,12 +6,13 @@ use Liip\ImagineBundle\Imagine\Filter\FilterConfiguration;
 use Oro\Bundle\AttachmentBundle\Imagine\Provider\ImagineUrlProvider;
 use Oro\Bundle\AttachmentBundle\Imagine\Provider\ImagineUrlProviderInterface;
 use Oro\Bundle\AttachmentBundle\Tools\FilenameExtensionHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class ImagineUrlProviderTest extends \PHPUnit\Framework\TestCase
+class ImagineUrlProviderTest extends TestCase
 {
-    private UrlGeneratorInterface|\PHPUnit\Framework\MockObject\MockObject $urlGenerator;
-
+    private UrlGeneratorInterface&MockObject $urlGenerator;
     private ImagineUrlProviderInterface $provider;
 
     #[\Override]
@@ -23,8 +24,7 @@ class ImagineUrlProviderTest extends \PHPUnit\Framework\TestCase
 
         $this->provider = new ImagineUrlProvider($this->urlGenerator, $filterConfiguration, $filenameExtensionHelper);
 
-        $filterConfiguration
-            ->expects(self::any())
+        $filterConfiguration->expects(self::any())
             ->method('get')
             ->willReturnMap([['jpeg_filter', ['format' => 'jpeg']], ['empty_filter', []]]);
     }
@@ -41,8 +41,7 @@ class ImagineUrlProviderTest extends \PHPUnit\Framework\TestCase
         $referenceType = UrlGeneratorInterface::ABSOLUTE_URL;
 
         $url = '/sample/image.img';
-        $this->urlGenerator
-            ->expects(self::once())
+        $this->urlGenerator->expects(self::once())
             ->method('generate')
             ->with('oro_imagine_filter', ['path' => $expectedPath, 'filter' => $filterName], $referenceType)
             ->willReturn($url);

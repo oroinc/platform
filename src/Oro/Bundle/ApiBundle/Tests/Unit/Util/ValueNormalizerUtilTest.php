@@ -7,11 +7,12 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ValueNormalizerUtilTest extends \PHPUnit\Framework\TestCase
+class ValueNormalizerUtilTest extends TestCase
 {
     /**
      * @dataProvider humanizeClassNameDataProvider

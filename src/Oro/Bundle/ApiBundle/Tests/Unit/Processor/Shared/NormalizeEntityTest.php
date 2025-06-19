@@ -7,14 +7,12 @@ use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class NormalizeEntityTest extends GetProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectNormalizer */
-    private $objectNormalizer;
-
-    /** @var NormalizeEntity */
-    private $processor;
+    private ObjectNormalizer&MockObject $objectNormalizer;
+    private NormalizeEntity $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +24,7 @@ class NormalizeEntityTest extends GetProcessorTestCase
         $this->processor = new NormalizeEntity($this->objectNormalizer);
     }
 
-    public function testProcessWhenNoData()
+    public function testProcessWhenNoData(): void
     {
         $this->objectNormalizer->expects(self::never())
             ->method('normalizeObjects');
@@ -35,7 +33,7 @@ class NormalizeEntityTest extends GetProcessorTestCase
         self::assertFalse($this->context->hasResult());
     }
 
-    public function testProcessWhenNullData()
+    public function testProcessWhenNullData(): void
     {
         $this->objectNormalizer->expects(self::never())
             ->method('normalizeObjects');
@@ -45,7 +43,7 @@ class NormalizeEntityTest extends GetProcessorTestCase
         self::assertNull($this->context->getResult());
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $data = new \stdClass();
         $normalizedData = ['key' => 'value'];
@@ -62,7 +60,7 @@ class NormalizeEntityTest extends GetProcessorTestCase
         self::assertSame($normalizedData, $this->context->getResult());
     }
 
-    public function testProcessWithNormalizedConfig()
+    public function testProcessWithNormalizedConfig(): void
     {
         $data = new \stdClass();
         $normalizedData = ['key' => 'value'];

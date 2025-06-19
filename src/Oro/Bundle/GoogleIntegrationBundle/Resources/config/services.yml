@@ -9,3 +9,14 @@ services:
 
     oro_google_integration.resource_owner.factory:
         class: Oro\Bundle\GoogleIntegrationBundle\OAuth\GoogleResourceOwnerFactory
+
+    oro_google_integration.event.google_sso_login_subscriber:
+        class: Oro\Bundle\SSOBundle\Event\CheckPassportEventSubscriber
+        arguments:
+            - '@oro_config.global'
+            - 'oro_google_integration.enable_sso'
+            - 'oro_google_integration.sso_domains'
+            - 'oro_google_integration.sso_only_login'
+            - 'main'
+        tags:
+            - { name: kernel.event_subscriber }

@@ -9,14 +9,14 @@ use Oro\Bundle\AttachmentBundle\Exception\FileNotFoundException;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlByUuidProvider;
 use Oro\Bundle\AttachmentBundle\Provider\FileUrlProviderInterface;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-class FileUrlByUuidProviderTest extends \PHPUnit\Framework\TestCase
+class FileUrlByUuidProviderTest extends TestCase
 {
-    private FileUrlProviderInterface|\PHPUnit\Framework\MockObject\MockObject $fileUrlProvider;
-
-    private ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject $registry;
-
+    private FileUrlProviderInterface&MockObject $fileUrlProvider;
+    private ManagerRegistry&MockObject $registry;
     private FileUrlByUuidProvider $provider;
 
     #[\Override]

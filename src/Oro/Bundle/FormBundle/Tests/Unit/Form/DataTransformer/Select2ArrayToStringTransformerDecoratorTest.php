@@ -3,15 +3,14 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\FormBundle\Form\DataTransformer\Select2ArrayToStringTransformerDecorator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\DataTransformerInterface;
 
-class Select2ArrayToStringTransformerDecoratorTest extends \PHPUnit\Framework\TestCase
+class Select2ArrayToStringTransformerDecoratorTest extends TestCase
 {
-    /** @var DataTransformerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $transformer;
-
-    /** @var Select2ArrayToStringTransformerDecorator */
-    private $transformerDecorator;
+    private DataTransformerInterface&MockObject $transformer;
+    private Select2ArrayToStringTransformerDecorator $transformerDecorator;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class Select2ArrayToStringTransformerDecoratorTest extends \PHPUnit\Framework\Te
         $this->transformerDecorator = new Select2ArrayToStringTransformerDecorator($this->transformer);
     }
 
-    public function testTransform()
+    public function testTransform(): void
     {
         $value = ['some array value'];
 
@@ -32,7 +31,7 @@ class Select2ArrayToStringTransformerDecoratorTest extends \PHPUnit\Framework\Te
         $this->transformerDecorator->transform($value);
     }
 
-    public function testReverseTransform()
+    public function testReverseTransform(): void
     {
         $value = 'some string value';
 

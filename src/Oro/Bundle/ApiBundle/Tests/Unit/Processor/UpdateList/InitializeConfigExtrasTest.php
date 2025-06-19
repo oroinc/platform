@@ -8,8 +8,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 
 class InitializeConfigExtrasTest extends UpdateListProcessorTestCase
 {
-    /** @var InitializeConfigExtras */
-    private $processor;
+    private InitializeConfigExtras $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +18,7 @@ class InitializeConfigExtrasTest extends UpdateListProcessorTestCase
         $this->processor = new InitializeConfigExtras();
     }
 
-    public function testProcessWhenConfigExtrasAreAlreadyInitialized()
+    public function testProcessWhenConfigExtrasAreAlreadyInitialized(): void
     {
         $this->context->setConfigExtras([]);
         $this->context->addConfigExtra(new EntityDefinitionConfigExtra());
@@ -33,7 +32,7 @@ class InitializeConfigExtrasTest extends UpdateListProcessorTestCase
         );
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $this->context->setConfigExtras([]);
 

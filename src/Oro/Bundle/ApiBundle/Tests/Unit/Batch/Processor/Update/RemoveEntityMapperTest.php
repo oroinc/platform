@@ -9,8 +9,7 @@ use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
 
 class RemoveEntityMapperTest extends BatchUpdateProcessorTestCase
 {
-    /** @var RemoveEntityMapper */
-    private $processor;
+    private RemoveEntityMapper $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -20,12 +19,12 @@ class RemoveEntityMapperTest extends BatchUpdateProcessorTestCase
         $this->processor = new RemoveEntityMapper();
     }
 
-    public function testProcessWhenNoBatchItems()
+    public function testProcessWhenNoBatchItems(): void
     {
         $this->processor->process($this->context);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $item1 = $this->createMock(BatchUpdateItem::class);
         $item1Context = $this->createMock(BatchUpdateItemContext::class);

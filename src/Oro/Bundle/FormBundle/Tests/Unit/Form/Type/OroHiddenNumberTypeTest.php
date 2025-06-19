@@ -5,6 +5,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\FormBundle\Form\Type\OroHiddenNumberType;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 use Symfony\Component\Intl\Util\IntlTestHelper;
@@ -12,11 +13,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class OroHiddenNumberTypeTest extends FormIntegrationTestCase
 {
-    /** @var NumberFormatter|\PHPUnit\Framework\MockObject\MockObject */
-    private $numberFormatter;
-
-    /** @var OroHiddenNumberType */
-    private $formType;
+    private NumberFormatter&MockObject $numberFormatter;
+    private OroHiddenNumberType $formType;
 
     #[\Override]
     protected function setUp(): void

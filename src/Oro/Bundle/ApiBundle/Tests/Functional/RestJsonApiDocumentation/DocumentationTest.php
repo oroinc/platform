@@ -261,7 +261,8 @@ class DocumentationTest extends RestJsonApiTestCase
                 [
                     'parameters' => [
                         'id' => [
-                            'description' => 'The unique identifier of a resource. It is a key.'
+                            'description' => '<p>The unique identifier of a resource. It is a key.</p>'
+                                . '<p><strong>The required field.</strong></p>'
                         ]
                     ],
                     'response'   => [

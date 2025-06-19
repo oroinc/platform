@@ -10,17 +10,14 @@ use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\NestedAssociationMetadataHelper;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectMetadataFactory;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\Loader\ObjectNestedAssociationMetadataFactory;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ObjectNestedAssociationMetadataFactoryTest extends \PHPUnit\Framework\TestCase
+class ObjectNestedAssociationMetadataFactoryTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|NestedAssociationMetadataHelper */
-    private $nestedAssociationMetadataHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ObjectMetadataFactory */
-    private $objectMetadataFactory;
-
-    /** @var ObjectNestedAssociationMetadataFactory */
-    private $objectNestedAssociationMetadataFactory;
+    private NestedAssociationMetadataHelper&MockObject $nestedAssociationMetadataHelper;
+    private ObjectMetadataFactory&MockObject $objectMetadataFactory;
+    private ObjectNestedAssociationMetadataFactory $objectNestedAssociationMetadataFactory;
 
     #[\Override]
     protected function setUp(): void
@@ -34,7 +31,7 @@ class ObjectNestedAssociationMetadataFactoryTest extends \PHPUnit\Framework\Test
         );
     }
 
-    public function testCreateAndAddNestedAssociationMetadataForExcludedTargetField()
+    public function testCreateAndAddNestedAssociationMetadataForExcludedTargetField(): void
     {
         $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
@@ -78,7 +75,7 @@ class ObjectNestedAssociationMetadataFactoryTest extends \PHPUnit\Framework\Test
         self::assertSame($associationMetadata, $result);
     }
 
-    public function testCreateAndAddNestedAssociationMetadataForExcludedTargetFieldWithExcludedProperties()
+    public function testCreateAndAddNestedAssociationMetadataForExcludedTargetFieldWithExcludedProperties(): void
     {
         $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
@@ -137,7 +134,7 @@ class ObjectNestedAssociationMetadataFactoryTest extends \PHPUnit\Framework\Test
         self::assertSame($associationMetadata, $result);
     }
 
-    public function testCreateAndAddNestedAssociationMetadataForField()
+    public function testCreateAndAddNestedAssociationMetadataForField(): void
     {
         $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';
@@ -195,7 +192,7 @@ class ObjectNestedAssociationMetadataFactoryTest extends \PHPUnit\Framework\Test
         self::assertSame($associationMetadata, $result);
     }
 
-    public function testCreateAndAddNestedAssociationMetadataForMetaProperty()
+    public function testCreateAndAddNestedAssociationMetadataForMetaProperty(): void
     {
         $entityMetadata = new EntityMetadata('Test\Entity');
         $entityClass = 'Test\Class';

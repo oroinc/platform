@@ -3,27 +3,28 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class RequestTypeTest extends \PHPUnit\Framework\TestCase
+class RequestTypeTest extends TestCase
 {
-    public function testIsEmptyForEmptyRequestType()
+    public function testIsEmptyForEmptyRequestType(): void
     {
         $requestType = new RequestType([]);
 
         self::assertTrue($requestType->isEmpty());
     }
 
-    public function testIsEmptyForNotEmptyRequestType()
+    public function testIsEmptyForNotEmptyRequestType(): void
     {
         $requestType = new RequestType([RequestType::REST]);
 
         self::assertFalse($requestType->isEmpty());
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $requestType = new RequestType([RequestType::REST]);
 
@@ -33,7 +34,7 @@ class RequestTypeTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('', (string)$requestType);
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
 
@@ -42,7 +43,7 @@ class RequestTypeTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([RequestType::REST, RequestType::JSON_API], $requestType->toArray());
     }
 
-    public function testToStringShouldSortAspectsBeforeBuildStringRepresentation()
+    public function testToStringShouldSortAspectsBeforeBuildStringRepresentation(): void
     {
         $requestType = new RequestType([RequestType::JSON_API, RequestType::REST]);
 
@@ -51,14 +52,14 @@ class RequestTypeTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([RequestType::JSON_API, RequestType::REST], $requestType->toArray());
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
 
         self::assertEquals([RequestType::REST, RequestType::JSON_API], $requestType->toArray());
     }
 
-    public function testContains()
+    public function testContains(): void
     {
         $requestType = new RequestType([RequestType::REST]);
 
@@ -66,7 +67,7 @@ class RequestTypeTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($requestType->contains('another'));
     }
 
-    public function testAdd()
+    public function testAdd(): void
     {
         $requestType = new RequestType([RequestType::REST]);
 
@@ -76,7 +77,7 @@ class RequestTypeTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([RequestType::REST, RequestType::JSON_API], $requestType->toArray());
     }
 
-    public function testAddDuplicate()
+    public function testAddDuplicate(): void
     {
         $requestType = new RequestType([RequestType::REST]);
 
@@ -86,7 +87,7 @@ class RequestTypeTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([RequestType::REST], $requestType->toArray());
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
 
@@ -96,7 +97,7 @@ class RequestTypeTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([RequestType::JSON_API], $requestType->toArray());
     }
 
-    public function testRemoveUnknown()
+    public function testRemoveUnknown(): void
     {
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
 
@@ -106,7 +107,7 @@ class RequestTypeTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([RequestType::REST, RequestType::JSON_API], $requestType->toArray());
     }
 
-    public function testSet()
+    public function testSet(): void
     {
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
 

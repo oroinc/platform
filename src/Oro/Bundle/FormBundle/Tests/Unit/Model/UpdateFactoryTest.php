@@ -9,18 +9,17 @@ use Oro\Bundle\FormBundle\Model\UpdateFactory;
 use Oro\Bundle\FormBundle\Model\UpdateInterface;
 use Oro\Bundle\FormBundle\Provider\CallbackFormTemplateDataProvider;
 use Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class UpdateFactoryTest extends \PHPUnit\Framework\TestCase
+class UpdateFactoryTest extends TestCase
 {
-    private FormFactory|\PHPUnit\Framework\MockObject\MockObject $formFactory;
-
-    private FormHandlerRegistry|\PHPUnit\Framework\MockObject\MockObject $handlerRegistry;
-
-    private FormTemplateDataProviderResolver|\PHPUnit\Framework\MockObject\MockObject $formTemplateDataProviderResolver;
-
+    private FormFactory&MockObject $formFactory;
+    private FormHandlerRegistry&MockObject $handlerRegistry;
+    private FormTemplateDataProviderResolver&MockObject $formTemplateDataProviderResolver;
     private UpdateFactory $updateFactory;
 
     #[\Override]
@@ -40,7 +39,6 @@ class UpdateFactoryTest extends \PHPUnit\Framework\TestCase
     public function testCreateAutoDefaults(): void
     {
         $argData = (object)[];
-        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $argForm */
         $argForm = $this->createMock(FormInterface::class);
         $argHandler = null;
         $argResultProvider = null;
@@ -93,7 +91,6 @@ class UpdateFactoryTest extends \PHPUnit\Framework\TestCase
     public function testCreateArgCallbacks(): void
     {
         $argData = (object)[];
-        /** @var FormInterface|\PHPUnit\Framework\MockObject\MockObject $argForm */
         $argForm = $this->createMock(FormInterface::class);
         $argHandler = function () {
             return true;
@@ -118,19 +115,17 @@ class UpdateFactoryTest extends \PHPUnit\Framework\TestCase
     protected function assertExpectedConstruction(
         UpdateInterface $update,
         object $formData,
-        FormInterface|\PHPUnit\Framework\MockObject\MockObject $form,
-        FormHandlerInterface|\PHPUnit\Framework\MockObject\MockObject $handler,
-        FormTemplateDataProviderInterface|\PHPUnit\Framework\MockObject\MockObject $provider
+        FormInterface&MockObject $form,
+        FormHandlerInterface&MockObject $handler,
+        FormTemplateDataProviderInterface&MockObject $provider
     ): void {
         self::assertSame($formData, $update->getFormData());
         self::assertSame($form, $update->getForm());
-        /** @var Request|\PHPUnit\Framework\MockObject\MockObject $request */
         $request = $this->createMock(Request::class);
         $handler->expects(self::once())
             ->method('process')
             ->with($formData, $form, $request);
-        $provider
-            ->expects(self::once())
+        $provider->expects(self::once())
             ->method('getData')
             ->with($formData, $form, $request);
 

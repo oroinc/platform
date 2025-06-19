@@ -19,28 +19,21 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
+class RestDocFiltersHandlerTest extends TestCase
 {
-    private const VIEW = 'test_view';
+    private const string VIEW = 'test_view';
 
-    /** @var RequestType */
-    private $requestType;
-
-    /** @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject */
-    private $valueNormalizer;
-
-    /** @var ApiDocDataTypeConverter|\PHPUnit\Framework\MockObject\MockObject */
-    private $dataTypeConverter;
-
-    /** @var FiltersSorterRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $sorterRegistry;
-
-    /** @var RestDocFiltersHandler */
-    private $filtersHandler;
+    private RequestType $requestType;
+    private ValueNormalizer&MockObject $valueNormalizer;
+    private ApiDocDataTypeConverter&MockObject $dataTypeConverter;
+    private FiltersSorterRegistry&MockObject $sorterRegistry;
+    private RestDocFiltersHandler $filtersHandler;
 
     #[\Override]
     protected function setUp(): void
@@ -67,7 +60,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHandleWithoutFilters()
+    public function testHandleWithoutFilters(): void
     {
         $annotation = new ApiDoc([]);
         $filterCollection = new FilterCollection();
@@ -78,7 +71,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $annotation->getFilters());
     }
 
-    public function testHandleWithFiltersInAnnotationButNoFiltersInFilterCollection()
+    public function testHandleWithFiltersInAnnotationButNoFiltersInFilterCollection(): void
     {
         $annotation = new ApiDoc([]);
         $filterCollection = new FilterCollection();
@@ -100,7 +93,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHandleForNonStandaloneFilter()
+    public function testHandleForNonStandaloneFilter(): void
     {
         $annotation = new ApiDoc([]);
         $filterCollection = new FilterCollection();
@@ -113,7 +106,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $annotation->getFilters());
     }
 
-    public function testHandleForStandaloneFilter()
+    public function testHandleForStandaloneFilter(): void
     {
         $annotation = new ApiDoc([]);
         $filterCollection = new FilterCollection();
@@ -140,7 +133,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHandleForStandaloneFilterWithDefaultValue()
+    public function testHandleForStandaloneFilterWithDefaultValue(): void
     {
         $annotation = new ApiDoc([]);
         $filterCollection = new FilterCollection();
@@ -168,7 +161,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHandleForComparisonFilter()
+    public function testHandleForComparisonFilter(): void
     {
         $annotation = new ApiDoc([]);
         $filterCollection = new FilterCollection();
@@ -203,7 +196,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHandleForComparisonFilterWithOnlyEqualsOperator()
+    public function testHandleForComparisonFilterWithOnlyEqualsOperator(): void
     {
         $annotation = new ApiDoc([]);
         $filterCollection = new FilterCollection();
@@ -237,7 +230,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHandleForComparisonFilterWithArrayAllowed()
+    public function testHandleForComparisonFilterWithArrayAllowed(): void
     {
         $annotation = new ApiDoc([]);
         $filterCollection = new FilterCollection();
@@ -271,7 +264,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHandleForComparisonFilterWithRangeAllowed()
+    public function testHandleForComparisonFilterWithRangeAllowed(): void
     {
         $annotation = new ApiDoc([]);
         $filterCollection = new FilterCollection();
@@ -305,7 +298,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHandleForComparisonFilterWithArrayAndRangeAllowed()
+    public function testHandleForComparisonFilterWithArrayAndRangeAllowed(): void
     {
         $annotation = new ApiDoc([]);
         $filterCollection = new FilterCollection();
@@ -340,7 +333,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHandleForStringComparisonFilterWithEmptyValueAllowed()
+    public function testHandleForStringComparisonFilterWithEmptyValueAllowed(): void
     {
         $annotation = new ApiDoc([]);
         $filterCollection = new FilterCollection();
@@ -374,7 +367,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHandleForComparisonFilterForAssociation()
+    public function testHandleForComparisonFilterForAssociation(): void
     {
         $annotation = new ApiDoc([]);
         $filterCollection = new FilterCollection();
@@ -416,7 +409,7 @@ class RestDocFiltersHandlerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testHandleForComparisonFilterForAssociationThatShouldBeRepresentedAsField()
+    public function testHandleForComparisonFilterForAssociationThatShouldBeRepresentedAsField(): void
     {
         $annotation = new ApiDoc([]);
         $filterCollection = new FilterCollection();

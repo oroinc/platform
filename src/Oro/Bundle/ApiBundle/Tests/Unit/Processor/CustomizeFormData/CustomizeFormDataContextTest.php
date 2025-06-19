@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 use Oro\Bundle\ApiBundle\Util\EntityMapper;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigInterface;
@@ -19,7 +20,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
+class CustomizeFormDataContextTest extends TestCase
 {
     private CustomizeFormDataContext $context;
 
@@ -54,7 +55,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         return $config;
     }
 
-    public function testIsInitialized()
+    public function testIsInitialized(): void
     {
         self::assertFalse($this->context->isInitialized());
 
@@ -62,7 +63,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->context->isInitialized());
     }
 
-    public function testRootClassName()
+    public function testRootClassName(): void
     {
         self::assertNull($this->context->getRootClassName());
 
@@ -71,14 +72,14 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($className, $this->context->getRootClassName());
     }
 
-    public function testClassName()
+    public function testClassName(): void
     {
         $className = 'Test\Class';
         $this->context->setClassName($className);
         self::assertEquals($className, $this->context->getClassName());
     }
 
-    public function testPropertyPath()
+    public function testPropertyPath(): void
     {
         self::assertNull($this->context->getPropertyPath());
 
@@ -87,7 +88,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($propertyPath, $this->context->getPropertyPath());
     }
 
-    public function testRootConfig()
+    public function testRootConfig(): void
     {
         self::assertNull($this->context->getRootConfig());
 
@@ -99,7 +100,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getRootConfig());
     }
 
-    public function testConfig()
+    public function testConfig(): void
     {
         self::assertNull($this->context->getConfig());
 
@@ -111,7 +112,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->getConfig());
     }
 
-    public function testSharedData()
+    public function testSharedData(): void
     {
         $sharedData = $this->createMock(ParameterBagInterface::class);
 
@@ -119,7 +120,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($sharedData, $this->context->getSharedData());
     }
 
-    public function testGetNormalizationContext()
+    public function testGetNormalizationContext(): void
     {
         $action = 'test_action';
         $version = '1.2';
@@ -148,7 +149,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($parentAction, $normalizationContext['parentAction']);
     }
 
-    public function testIncludedEntities()
+    public function testIncludedEntities(): void
     {
         self::assertNull($this->context->getIncludedEntities());
 
@@ -157,7 +158,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($includedEntities, $this->context->getIncludedEntities());
     }
 
-    public function testSetIncludedEntitiesWhenIncludedEntityCollectionWasAlreadyInitialized()
+    public function testSetIncludedEntitiesWhenIncludedEntityCollectionWasAlreadyInitialized(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The collection of included entities was already initialized.');
@@ -165,7 +166,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setIncludedEntities($this->createMock(IncludedEntityCollection::class));
     }
 
-    public function testIsPrimaryEntityRequestForPrimaryEntityRequest()
+    public function testIsPrimaryEntityRequestForPrimaryEntityRequest(): void
     {
         $primaryEntity = new \stdClass();
         $includedEntity = new \stdClass();
@@ -186,7 +187,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->context->isPrimaryEntityRequest());
     }
 
-    public function testIsPrimaryEntityRequestForIncludedEntityRequest()
+    public function testIsPrimaryEntityRequestForIncludedEntityRequest(): void
     {
         $primaryEntity = new \stdClass();
         $includedEntity = new \stdClass();
@@ -207,7 +208,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($this->context->isPrimaryEntityRequest());
     }
 
-    public function testGetAllEntitiesWhenNoIncludedEntities()
+    public function testGetAllEntitiesWhenNoIncludedEntities(): void
     {
         $mainEntity = new \stdClass();
         $form = $this->createMock(FormInterface::class);
@@ -220,7 +221,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame([$mainEntity], $this->context->getAllEntities(true));
     }
 
-    public function testGetAllEntitiesWhenNoIncludedEntitiesAndNoMainEntity()
+    public function testGetAllEntitiesWhenNoIncludedEntitiesAndNoMainEntity(): void
     {
         $form = $this->createMock(FormInterface::class);
         $form->expects(self::any())
@@ -232,7 +233,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $this->context->getAllEntities(true));
     }
 
-    public function testGetAllEntitiesWithIncludedEntitiesForPrimaryEntityRequest()
+    public function testGetAllEntitiesWithIncludedEntitiesForPrimaryEntityRequest(): void
     {
         $primaryEntity = new \stdClass();
         $includedEntity = new \stdClass();
@@ -253,7 +254,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame([$primaryEntity], $this->context->getAllEntities(true));
     }
 
-    public function testGetAllEntitiesWithIncludedEntitiesForIncludedEntityRequest()
+    public function testGetAllEntitiesWithIncludedEntitiesForIncludedEntityRequest(): void
     {
         $primaryEntity = new \stdClass();
         $includedEntity = new \stdClass();
@@ -274,7 +275,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame([$includedEntity], $this->context->getAllEntities(true));
     }
 
-    public function testGetAllEntitiesWithIncludedEntitiesAndNoPrimaryEntityForPrimaryEntityRequest()
+    public function testGetAllEntitiesWithIncludedEntitiesAndNoPrimaryEntityForPrimaryEntityRequest(): void
     {
         $includedEntity = new \stdClass();
         $form = $this->createMock(FormInterface::class);
@@ -290,7 +291,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame([], $this->context->getAllEntities(true));
     }
 
-    public function testGetAllEntitiesWithIncludedEntitiesAndNoPrimaryEntityForIncludedEntityRequest()
+    public function testGetAllEntitiesWithIncludedEntitiesAndNoPrimaryEntityForIncludedEntityRequest(): void
     {
         $includedEntity = new \stdClass();
         $form = $this->createMock(FormInterface::class);
@@ -306,7 +307,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame([$includedEntity], $this->context->getAllEntities(true));
     }
 
-    public function testAdditionalEntities()
+    public function testAdditionalEntities(): void
     {
         $additionalEntityCollection = new AdditionalEntityCollection();
         $this->context->setAdditionalEntityCollection($additionalEntityCollection);
@@ -325,14 +326,14 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($additionalEntityCollection->shouldEntityBeRemoved($entity2));
     }
 
-    public function testAdditionalEntitiesWhenAdditionalEntityCollectionWasNotInitialized()
+    public function testAdditionalEntitiesWhenAdditionalEntityCollectionWasNotInitialized(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The collection of additional entities was not initialized.');
         $this->context->getAdditionalEntities();
     }
 
-    public function testSetAdditionalEntityCollectionWhenItWasAlreadyInitialized()
+    public function testSetAdditionalEntityCollectionWhenItWasAlreadyInitialized(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The collection of additional entities was already initialized.');
@@ -340,7 +341,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         $this->context->setAdditionalEntityCollection($this->createMock(AdditionalEntityCollection::class));
     }
 
-    public function testEvent()
+    public function testEvent(): void
     {
         self::assertNull($this->context->getPropertyPath());
 
@@ -351,7 +352,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($eventName, $this->context->getLastGroup());
     }
 
-    public function testParentAction()
+    public function testParentAction(): void
     {
         self::assertNull($this->context->getParentAction());
         self::assertTrue($this->context->has('parentAction'));
@@ -369,14 +370,14 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame('', $this->context->get('parentAction'));
     }
 
-    public function testForm()
+    public function testForm(): void
     {
         $form = $this->createMock(FormInterface::class);
         $this->context->setForm($form);
         self::assertSame($form, $this->context->getForm());
     }
 
-    public function testFindForm()
+    public function testFindForm(): void
     {
         $entity = new \stdClass();
         $form = $this->createMock(FormInterface::class);
@@ -406,7 +407,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->findForm(new \stdClass()));
     }
 
-    public function testFindFormFieldWhenFieldDoesNotExist()
+    public function testFindFormFieldWhenFieldDoesNotExist(): void
     {
         $propertyPath = 'test';
         $form = new Form($this->getFormConfig('root', true));
@@ -417,7 +418,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->findFormFieldName($propertyPath));
     }
 
-    public function testFindFormFieldWhenFieldDoesNotExistAndExistFormFieldWithSameNameButMappedToAnotherProperty()
+    public function testFindFormFieldWhenFieldDoesNotExistAndExistFormFieldWithSameNameButMappedToAnotherProp(): void
     {
         $propertyPath = 'test';
         $form = new Form($this->getFormConfig('root', true));
@@ -429,7 +430,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertNull($this->context->findFormFieldName($propertyPath));
     }
 
-    public function testFindFormFieldForNotRenamedField()
+    public function testFindFormFieldForNotRenamedField(): void
     {
         $propertyPath = 'test';
         $form = new Form($this->getFormConfig('root', true));
@@ -442,7 +443,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($propertyPath, $this->context->findFormFieldName($propertyPath));
     }
 
-    public function testFindFormFieldForRenamedField()
+    public function testFindFormFieldForRenamedField(): void
     {
         $fieldName = 'renamedTest';
         $propertyPath = 'test';
@@ -457,7 +458,7 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertSame($fieldName, $this->context->findFormFieldName($propertyPath));
     }
 
-    public function testDataAndResult()
+    public function testDataAndResult(): void
     {
         self::assertNull($this->context->getData());
         self::assertNull($this->context->getResult());
@@ -476,13 +477,13 @@ class CustomizeFormDataContextTest extends \PHPUnit\Framework\TestCase
         self::assertTrue($this->context->hasResult());
     }
 
-    public function testRemoveResult()
+    public function testRemoveResult(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->context->removeResult();
     }
 
-    public function testEntityMapper()
+    public function testEntityMapper(): void
     {
         $entityMapper = $this->createMock(EntityMapper::class);
 

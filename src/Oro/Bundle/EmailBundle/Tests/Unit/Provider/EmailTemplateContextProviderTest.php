@@ -15,8 +15,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class EmailTemplateContextProviderTest extends TestCase
 {
-    private EventDispatcherInterface|MockObject $eventDispatcher;
-
+    private EventDispatcherInterface&MockObject $eventDispatcher;
     private EmailTemplateContextProvider $provider;
 
     #[\Override]
@@ -37,8 +36,7 @@ class EmailTemplateContextProviderTest extends TestCase
 
         $event = new EmailTemplateContextCollectEvent($from, [$recipient], $emailTemplateCriteria, $templateParams);
 
-        $this->eventDispatcher
-            ->expects(self::once())
+        $this->eventDispatcher->expects(self::once())
             ->method('dispatch')
             ->with($event)
             ->willReturnCallback(static function (EmailTemplateContextCollectEvent $event) {
@@ -63,8 +61,7 @@ class EmailTemplateContextProviderTest extends TestCase
 
         $event = new EmailTemplateContextCollectEvent($from, $recipients, $emailTemplateCriteria, $templateParams);
 
-        $this->eventDispatcher
-            ->expects(self::once())
+        $this->eventDispatcher->expects(self::once())
             ->method('dispatch')
             ->with($event)
             ->willReturnCallback(static function (EmailTemplateContextCollectEvent $event) {
@@ -90,8 +87,7 @@ class EmailTemplateContextProviderTest extends TestCase
 
         $event = new EmailTemplateContextCollectEvent($from, $recipients, $emailTemplateCriteria, $templateParams);
 
-        $this->eventDispatcher
-            ->expects(self::once())
+        $this->eventDispatcher->expects(self::once())
             ->method('dispatch')
             ->with($event)
             ->willReturnCallback(static function (EmailTemplateContextCollectEvent $event) {

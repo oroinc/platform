@@ -4,17 +4,18 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\ApiDoc;
 
 use Oro\Bundle\ApiBundle\ApiDoc\DocumentationProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
 use Symfony\Component\Config\FileLocator;
 
-class DocumentationProviderTest extends \PHPUnit\Framework\TestCase
+class DocumentationProviderTest extends TestCase
 {
     private function getFileLocator(): FileLocator
     {
         return new FileLocator(__DIR__ . '/../Fixtures/Resources/doc');
     }
 
-    public function testGetDocumentation()
+    public function testGetDocumentation(): void
     {
         $documentationProvider = new DocumentationProvider('test_doc.md', $this->getFileLocator());
 
@@ -24,7 +25,7 @@ class DocumentationProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetDocumentationForNotMarkdownFile()
+    public function testGetDocumentationForNotMarkdownFile(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The documentation resource "test_doc.txt" must be a Markdown document.');
@@ -34,7 +35,7 @@ class DocumentationProviderTest extends \PHPUnit\Framework\TestCase
         $documentationProvider->getDocumentation(new RequestType([RequestType::REST]));
     }
 
-    public function testGetDocumentationForNotExistingFile()
+    public function testGetDocumentationForNotExistingFile(): void
     {
         $this->expectException(FileLocatorFileNotFoundException::class);
         $documentationProvider = new DocumentationProvider('not_existing.md', $this->getFileLocator());

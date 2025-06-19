@@ -14,8 +14,7 @@ use Oro\Component\Testing\Unit\TestContainerBuilder;
 
 class AddPageNumberToInfoRecordTest extends GetListProcessorTestCase
 {
-    /** @var AddPageNumberToInfoRecord */
-    private $processor;
+    private AddPageNumberToInfoRecord $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -36,13 +35,13 @@ class AddPageNumberToInfoRecordTest extends GetListProcessorTestCase
         );
     }
 
-    public function testProcessWhenPaginationIsNotSupported()
+    public function testProcessWhenPaginationIsNotSupported(): void
     {
         $this->processor->process($this->context);
         self::assertNull($this->context->getInfoRecords());
     }
 
-    public function testProcessWhenPageNumberFilterValueDoesNotExist()
+    public function testProcessWhenPageNumberFilterValueDoesNotExist(): void
     {
         $this->context->getFilters()->add('page[number]', new PageNumberFilter(DataType::UNSIGNED_INTEGER));
         $this->processor->process($this->context);
@@ -52,7 +51,7 @@ class AddPageNumberToInfoRecordTest extends GetListProcessorTestCase
         );
     }
 
-    public function testProcessWhenPageNumberFilterValueExists()
+    public function testProcessWhenPageNumberFilterValueExists(): void
     {
         $this->context->getFilters()->add('page[number]', new PageNumberFilter(DataType::UNSIGNED_INTEGER));
         $this->context->getFilterValues()->set('page[number]', new FilterValue('number', 2));
@@ -63,7 +62,7 @@ class AddPageNumberToInfoRecordTest extends GetListProcessorTestCase
         );
     }
 
-    public function testProcessWhenInfoRecordForPrimaryCollectionAlreadyExists()
+    public function testProcessWhenInfoRecordForPrimaryCollectionAlreadyExists(): void
     {
         $this->context->getFilters()->add('page[number]', new PageNumberFilter(DataType::UNSIGNED_INTEGER));
         $this->context->getFilterValues()->set('page[number]', new FilterValue('number', 2));

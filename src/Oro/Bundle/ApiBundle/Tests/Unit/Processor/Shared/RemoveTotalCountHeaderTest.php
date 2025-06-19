@@ -8,10 +8,9 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
 class RemoveTotalCountHeaderTest extends GetListProcessorTestCase
 {
-    private const RESPONSE_TOTAL_COUNT_HEADER_NAME = 'X-Include-Total-Count';
+    private const string RESPONSE_TOTAL_COUNT_HEADER_NAME = 'X-Include-Total-Count';
 
-    /** @var RemoveTotalCountHeader */
-    private $processor;
+    private RemoveTotalCountHeader $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class RemoveTotalCountHeaderTest extends GetListProcessorTestCase
         $this->processor = new RemoveTotalCountHeader();
     }
 
-    public function testProcessWithoutErrors()
+    public function testProcessWithoutErrors(): void
     {
         $testCount = 123;
         $this->context->getResponseHeaders()->set(self::RESPONSE_TOTAL_COUNT_HEADER_NAME, $testCount);
@@ -34,7 +33,7 @@ class RemoveTotalCountHeaderTest extends GetListProcessorTestCase
         );
     }
 
-    public function testProcessWithErrors()
+    public function testProcessWithErrors(): void
     {
         $testCount = 123;
         $this->context->getResponseHeaders()->set(self::RESPONSE_TOTAL_COUNT_HEADER_NAME, $testCount);
@@ -47,7 +46,7 @@ class RemoveTotalCountHeaderTest extends GetListProcessorTestCase
         );
     }
 
-    public function testProcessWithErrorsButWithoutHeader()
+    public function testProcessWithErrorsButWithoutHeader(): void
     {
         $this->context->addError(new Error());
 

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TestFrameworkBundle\BehatJunitExtension\ServiceContainer;
 
 use Behat\Behat\Output\ServiceContainer\Formatter\JUnitFormatterFactory;
+use Behat\Testwork\Exception\ServiceContainer\ExceptionExtension;
 use Behat\Testwork\Output\Node\EventListener\ChainEventListener;
 use Behat\Testwork\Output\Printer\Factory\FilesystemOutputFactory;
 use Behat\Testwork\Output\ServiceContainer\OutputExtension;
@@ -13,6 +14,8 @@ use Oro\Bundle\TestFrameworkBundle\BehatJunitExtension\EventListener\JUnitFeatur
 use Oro\Bundle\TestFrameworkBundle\BehatJunitExtension\Output\Printer\JUnitFeaturePrinter;
 use Oro\Bundle\TestFrameworkBundle\BehatJunitExtension\Output\Printer\JUnitOutputPrinter;
 use Oro\Bundle\TestFrameworkBundle\BehatJunitExtension\Output\Printer\JUnitScenarioPrinter;
+use Oro\Bundle\TestFrameworkBundle\BehatJunitExtension\Output\Printer\JUnitSetupPrinter;
+use Oro\Bundle\TestFrameworkBundle\BehatJunitExtension\Output\Printer\JUnitSilencedStepPrinter;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -60,6 +63,13 @@ class BehatJunitExtension implements TestworkExtension
         $junitScenarioPrinter->addArgument(new Reference('output.node.listener.junit.duration'));
 
         $definition = new Definition(
+            JUnitSilencedStepPrinter::class,
+            [new Reference('.inner')]
+        );
+        $definition->setDecoratedService(new Reference('output.node.printer.junit.step'));
+        $container->setDefinition(JUnitSilencedStepPrinter::class, $definition);
+
+        $definition = new Definition(
             ChainEventListener::class,
             [[
                 new Reference('output.node.listener.junit.duration'),
@@ -87,6 +97,11 @@ class BehatJunitExtension implements TestworkExtension
 
             $container->setDefinition($formatterId, $definition);
         }
+        $definition = new Definition(
+            JUnitSetupPrinter::class,
+            [new Reference(ExceptionExtension::PRESENTER_ID),]
+        );
+        $container->setDefinition('output.node.printer.junit.setup', $definition);
     }
 
     #[\Override]

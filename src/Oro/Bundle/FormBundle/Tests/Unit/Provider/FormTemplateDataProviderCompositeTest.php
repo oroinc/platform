@@ -6,13 +6,14 @@ use Oro\Bundle\FormBundle\Model\FormTemplateDataProviderResolver;
 use Oro\Bundle\FormBundle\Provider\CallbackFormTemplateDataProvider;
 use Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderComposite;
 use Oro\Bundle\FormBundle\Provider\FormTemplateDataProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class FormTemplateDataProviderCompositeTest extends \PHPUnit\Framework\TestCase
+class FormTemplateDataProviderCompositeTest extends TestCase
 {
-    private FormTemplateDataProviderResolver|\PHPUnit\Framework\MockObject\MockObject $formTemplateDataProviderResolver;
-
+    private FormTemplateDataProviderResolver&MockObject $formTemplateDataProviderResolver;
     private FormTemplateDataProviderComposite $providerComposite;
 
     #[\Override]

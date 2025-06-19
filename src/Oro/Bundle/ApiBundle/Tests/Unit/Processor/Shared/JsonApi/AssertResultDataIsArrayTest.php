@@ -8,8 +8,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
 class AssertResultDataIsArrayTest extends GetListProcessorTestCase
 {
-    /** @var AssertResultDataIsArray */
-    private $processor;
+    private AssertResultDataIsArray $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -19,18 +18,18 @@ class AssertResultDataIsArrayTest extends GetListProcessorTestCase
         $this->processor = new AssertResultDataIsArray();
     }
 
-    public function testProcessWhenResultDoesNotExist()
+    public function testProcessWhenResultDoesNotExist(): void
     {
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenResultResultDataDoesNotExist()
+    public function testProcessWhenResultResultDataDoesNotExist(): void
     {
         $this->context->setResult([]);
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenResultResultDataIsNotArray()
+    public function testProcessWhenResultResultDataIsNotArray(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The "data" section must be an array.');
@@ -39,7 +38,7 @@ class AssertResultDataIsArrayTest extends GetListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenResultResultDataIsArray()
+    public function testProcessWhenResultResultDataIsArray(): void
     {
         $this->context->setResult(['data' => []]);
         $this->processor->process($this->context);

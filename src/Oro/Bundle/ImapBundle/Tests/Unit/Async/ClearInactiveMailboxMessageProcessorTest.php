@@ -9,11 +9,12 @@ use Oro\Component\MessageQueue\Consumption\MessageProcessorInterface;
 use Oro\Component\MessageQueue\Job\JobRunner;
 use Oro\Component\MessageQueue\Transport\Message;
 use Oro\Component\MessageQueue\Transport\SessionInterface;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class ClearInactiveMailboxMessageProcessorTest extends \PHPUnit\Framework\TestCase
+class ClearInactiveMailboxMessageProcessorTest extends TestCase
 {
-    public function testCouldBeConstructedWithRequiredAttributes()
+    public function testCouldBeConstructedWithRequiredAttributes(): void
     {
         $this->expectNotToPerformAssertions();
 
@@ -24,7 +25,7 @@ class ClearInactiveMailboxMessageProcessorTest extends \PHPUnit\Framework\TestCa
         );
     }
 
-    public function testShouldBeSubscribedForTopics()
+    public function testShouldBeSubscribedForTopics(): void
     {
         $expectedSubscribedTopics = [
             ClearInactiveMailboxTopic::getName()
@@ -33,7 +34,7 @@ class ClearInactiveMailboxMessageProcessorTest extends \PHPUnit\Framework\TestCa
         $this->assertEquals($expectedSubscribedTopics, ClearInactiveMailboxMessageProcessor::getSubscribedTopics());
     }
 
-    public function testShouldRunJob()
+    public function testShouldRunJob(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
 

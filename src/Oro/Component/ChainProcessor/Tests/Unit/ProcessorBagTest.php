@@ -6,18 +6,16 @@ use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ProcessorBagTest extends \PHPUnit\Framework\TestCase
+class ProcessorBagTest extends TestCase
 {
-    /** @var ProcessorBagConfigBuilder */
-    private $builder;
-
-    /** @var ProcessorBag */
-    private $processorBag;
+    private ProcessorBagConfigBuilder $builder;
+    private ProcessorBag $processorBag;
 
     #[\Override]
     protected function setUp(): void
@@ -25,17 +23,15 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         $processorRegistry = $this->createMock(ProcessorRegistryInterface::class);
         $processorRegistry->expects(self::any())
             ->method('getProcessor')
-            ->willReturnCallback(
-                function ($processorId) {
-                    return new ProcessorMock($processorId);
-                }
-            );
+            ->willReturnCallback(function ($processorId) {
+                return new ProcessorMock($processorId);
+            });
 
         $this->builder = new ProcessorBagConfigBuilder();
         $this->processorBag = new ProcessorBag($this->builder, $processorRegistry);
     }
 
-    public function testEmptyBag()
+    public function testEmptyBag(): void
     {
         $context = new Context();
         $context->setAction('action1');
@@ -46,7 +42,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testActions()
+    public function testActions(): void
     {
         $this->builder->addProcessor('processor1', [], 'action1');
         $this->builder->addProcessor('processor2', [], 'action2');
@@ -57,7 +53,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testActionGroupsForUnknownAction()
+    public function testActionGroupsForUnknownAction(): void
     {
         $this->builder->addGroup('group1', 'action1');
 
@@ -69,7 +65,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testActionGroupsForActionWithoutGroups()
+    public function testActionGroupsForActionWithoutGroups(): void
     {
         $this->builder->addProcessor('processor1', [], 'action1');
         $this->builder->addProcessor('processor2', [], 'action1');
@@ -80,7 +76,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testActionGroups()
+    public function testActionGroups(): void
     {
         $this->builder->addGroup('group3', 'action1', -10);
         $this->builder->addGroup('group2', 'action1', -20);
@@ -98,7 +94,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testActionGroupsSorting()
+    public function testActionGroupsSorting(): void
     {
         $this->builder->addGroup('group3', 'action1', -30);
         $this->builder->addGroup('group2', 'action1', -20);
@@ -116,7 +112,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testActionGroupsWithIdenticalPriority()
+    public function testActionGroupsWithIdenticalPriority(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -129,7 +125,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         $this->builder->addGroup('group3', 'action1', 1);
     }
 
-    public function testBagWithoutGroups()
+    public function testBagWithoutGroups(): void
     {
         $context = new Context();
 
@@ -168,7 +164,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testBagWithGroups()
+    public function testBagWithGroups(): void
     {
         $context = new Context();
 
@@ -225,7 +221,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testBagWhenBothGroupedAndUngroupedProcessorsExist()
+    public function testBagWhenBothGroupedAndUngroupedProcessorsExist(): void
     {
         $context = new Context();
 
@@ -264,7 +260,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testBagWhenThereAreGroupedAndUngroupedAndCommonProcessors()
+    public function testBagWhenThereAreGroupedAndUngroupedAndCommonProcessors(): void
     {
         $context = new Context();
 
@@ -339,7 +335,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testBagWhenThereAreStartingCommonProcessorsButNoEndingCommonProcessors()
+    public function testBagWhenThereAreStartingCommonProcessorsButNoEndingCommonProcessors(): void
     {
         $context = new Context();
 
@@ -359,7 +355,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testBagWhenThereAreEndingCommonProcessorsButNoStartingCommonProcessors()
+    public function testBagWhenThereAreEndingCommonProcessorsButNoStartingCommonProcessors(): void
     {
         $context = new Context();
 
@@ -379,7 +375,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testAddApplicableChecker()
+    public function testAddApplicableChecker(): void
     {
         $context = new Context();
 
@@ -399,7 +395,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testUndefinedGroup()
+    public function testUndefinedGroup(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(
@@ -418,7 +414,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         $this->processorBag->getProcessors($context);
     }
 
-    public function testAddProcessorToFrozenBag()
+    public function testAddProcessorToFrozenBag(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The ProcessorBag is frozen.');
@@ -430,7 +426,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         $this->builder->addProcessor('processor1', [], 'action1');
     }
 
-    public function testAddGroupToFrozenBag()
+    public function testAddGroupToFrozenBag(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The ProcessorBag is frozen.');
@@ -442,7 +438,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         $this->builder->addGroup('group1', 'action1');
     }
 
-    public function testAddApplicableCheckerToFrozenBag()
+    public function testAddApplicableCheckerToFrozenBag(): void
     {
         $context = new Context();
         $context->setAction('action1');
@@ -460,7 +456,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         self::assertCount(1, $this->processorBag->getProcessors($context));
     }
 
-    public function testMaxGroupPriority()
+    public function testMaxGroupPriority(): void
     {
         $this->expectException(\RangeException::class);
         $this->expectExceptionMessage(
@@ -475,7 +471,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         $this->processorBag->getProcessors($context);
     }
 
-    public function testMinGroupPriority()
+    public function testMinGroupPriority(): void
     {
         $this->expectException(\RangeException::class);
         $this->expectExceptionMessage(
@@ -490,7 +486,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         $this->processorBag->getProcessors($context);
     }
 
-    public function testMaxProcessorPriority()
+    public function testMaxProcessorPriority(): void
     {
         $this->expectException(\RangeException::class);
         $this->expectExceptionMessage(
@@ -505,7 +501,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         $this->processorBag->getProcessors($context);
     }
 
-    public function testMinProcessorPriority()
+    public function testMinProcessorPriority(): void
     {
         $this->expectException(\RangeException::class);
         $this->expectExceptionMessage(
@@ -520,7 +516,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         $this->processorBag->getProcessors($context);
     }
 
-    public function testInternalPriorityForLastGroupedProcessor()
+    public function testInternalPriorityForLastGroupedProcessor(): void
     {
         self::assertEquals(
             -130561,
@@ -528,7 +524,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testInternalPriorityForFirstUngroupedProcessorExecutedAtEnd()
+    public function testInternalPriorityForFirstUngroupedProcessorExecutedAtEnd(): void
     {
         self::assertEquals(
             -130562,
@@ -536,7 +532,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldNoLimitForPriorityOfUngroupedProcessorExecutedAtEnd()
+    public function testShouldNoLimitForPriorityOfUngroupedProcessorExecutedAtEnd(): void
     {
         self::assertEquals(
             -130561 - 1000,
@@ -544,7 +540,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testInternalPriorityForFirstGroupedProcessor()
+    public function testInternalPriorityForFirstGroupedProcessor(): void
     {
         self::assertEquals(
             130559,
@@ -552,7 +548,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testInternalPriorityForLastUngroupedProcessorExecutedAtBegin()
+    public function testInternalPriorityForLastUngroupedProcessorExecutedAtBegin(): void
     {
         self::assertEquals(
             130560,
@@ -560,7 +556,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldNoLimitForPriorityOfUngroupedProcessorExecutedAtBegin()
+    public function testShouldNoLimitForPriorityOfUngroupedProcessorExecutedAtBegin(): void
     {
         self::assertEquals(
             130560 + 1000,
@@ -568,7 +564,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testInternalPriorityForZeroProcessor()
+    public function testInternalPriorityForZeroProcessor(): void
     {
         self::assertEquals(
             -1,
@@ -576,7 +572,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testInternalPriorityForLastProcessorInZeroGroup()
+    public function testInternalPriorityForLastProcessorInZeroGroup(): void
     {
         self::assertEquals(
             -256,
@@ -584,7 +580,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testInternalPriorityForFirstProcessorInZeroGroup()
+    public function testInternalPriorityForFirstProcessorInZeroGroup(): void
     {
         self::assertEquals(
             254,
@@ -592,7 +588,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessorPrioritiesShouldNotBeIntersected()
+    public function testProcessorPrioritiesShouldNotBeIntersected(): void
     {
         $prevMaxPriority = $this->callCalculatePriority(255, -255);
         $groupPriority = -254;
@@ -616,13 +612,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * @param int      $processorPriority
-     * @param int|null $groupPriority
-     *
-     * @return int
-     */
-    private function callCalculatePriority($processorPriority, $groupPriority = null)
+    private function callCalculatePriority(int $processorPriority, ?int $groupPriority = null): int
     {
         $method = new \ReflectionMethod($this->builder, 'calculatePriority');
         $method->setAccessible(true);
@@ -630,11 +620,7 @@ class ProcessorBagTest extends \PHPUnit\Framework\TestCase
         return $method->invokeArgs(null, [$processorPriority, $groupPriority]);
     }
 
-    /**
-     * @param string[]  $expectedProcessorIds
-     * @param \Iterator $processors
-     */
-    private static function assertProcessors(array $expectedProcessorIds, \Iterator $processors)
+    private static function assertProcessors(array $expectedProcessorIds, \Iterator $processors): void
     {
         $processorIds = [];
         /** @var ProcessorMock $processor */

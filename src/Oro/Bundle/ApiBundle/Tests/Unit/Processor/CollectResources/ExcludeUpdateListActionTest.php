@@ -8,10 +8,11 @@ use Oro\Bundle\ApiBundle\Processor\CollectResources\CollectResourcesContext;
 use Oro\Bundle\ApiBundle\Processor\CollectResources\ExcludeUpdateListAction;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
+use PHPUnit\Framework\TestCase;
 
-class ExcludeUpdateListActionTest extends \PHPUnit\Framework\TestCase
+class ExcludeUpdateListActionTest extends TestCase
 {
-    public function testProcessOnEmptyExcludedActions()
+    public function testProcessOnEmptyExcludedActions(): void
     {
         $resource = new ApiResource('Test\Entity1');
         $context = new CollectResourcesContext();
@@ -26,7 +27,7 @@ class ExcludeUpdateListActionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWithManuallyEnabledUpdateListAction()
+    public function testProcessWithManuallyEnabledUpdateListAction(): void
     {
         $resource = new ApiResource('Test\Entity1');
         $context = new CollectResourcesContext();
@@ -42,7 +43,7 @@ class ExcludeUpdateListActionTest extends \PHPUnit\Framework\TestCase
         self::assertCount(0, $resource->getExcludedActions());
     }
 
-    public function testProcessWithExcludedGetAction()
+    public function testProcessWithExcludedGetAction(): void
     {
         $resource = new ApiResource('Test\Entity1');
         $resource->addExcludedAction(ApiAction::GET);
@@ -58,7 +59,7 @@ class ExcludeUpdateListActionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWithExcludedGetActionAndManuallyEnabledUpdateListAction()
+    public function testProcessWithExcludedGetActionAndManuallyEnabledUpdateListAction(): void
     {
         $resource = new ApiResource('Test\Entity1');
         $resource->addExcludedAction(ApiAction::GET);
@@ -78,7 +79,7 @@ class ExcludeUpdateListActionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWithExcludedGetAndCreateActions()
+    public function testProcessWithExcludedGetAndCreateActions(): void
     {
         $resource = new ApiResource('Test\Entity1');
         $resource->addExcludedAction(ApiAction::GET);
@@ -95,7 +96,7 @@ class ExcludeUpdateListActionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWithExcludedGetAndCreateActionsAndManuallyEnabledUpdateListAction()
+    public function testProcessWithExcludedGetAndCreateActionsAndManuallyEnabledUpdateListAction(): void
     {
         $resource = new ApiResource('Test\Entity1');
         $resource->addExcludedAction(ApiAction::GET);
@@ -116,7 +117,7 @@ class ExcludeUpdateListActionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWithExcludedGetAndCreateAndUpdateActions()
+    public function testProcessWithExcludedGetAndCreateAndUpdateActions(): void
     {
         $resource = new ApiResource('Test\Entity1');
         $resource->addExcludedAction(ApiAction::GET);
@@ -134,7 +135,7 @@ class ExcludeUpdateListActionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessWithExcludedGetAndCreateAndUpdateActionsAndManuallyEnabledUpdateListAction()
+    public function testProcessWithExcludedGetAndCreateAndUpdateActionsAndManuallyEnabledUpdateListAction(): void
     {
         $resource = new ApiResource('Test\Entity1');
         $resource->addExcludedAction(ApiAction::GET);

@@ -7,15 +7,15 @@ use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\SimpleFilterFactory;
 use Oro\Bundle\ApiBundle\Tests\Unit\Filter\FilterFactoryStub;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
-class SimpleFilterFactoryCompilerPassTest extends \PHPUnit\Framework\TestCase
+class SimpleFilterFactoryCompilerPassTest extends TestCase
 {
-    /** @var SimpleFilterFactoryCompilerPass */
-    private $compiler;
+    private SimpleFilterFactoryCompilerPass $compiler;
 
     #[\Override]
     protected function setUp(): void
@@ -23,7 +23,7 @@ class SimpleFilterFactoryCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new SimpleFilterFactoryCompilerPass();
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $simpleFilterFactoryDef = $container->register('oro_api.filter_factory.default', SimpleFilterFactory::class);
@@ -83,7 +83,7 @@ class SimpleFilterFactoryCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFilterFactoryWhenFactoryMethodDoesNotExist()
+    public function testFilterFactoryWhenFactoryMethodDoesNotExist(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(sprintf(
@@ -108,7 +108,7 @@ class SimpleFilterFactoryCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($container);
     }
 
-    public function testFilterFactoryWhenFactoryMethodIsNotPublic()
+    public function testFilterFactoryWhenFactoryMethodIsNotPublic(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(sprintf(
@@ -133,7 +133,7 @@ class SimpleFilterFactoryCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler->process($container);
     }
 
-    public function testFilterFactoryWhenFactoryMethodHasInvalidSignature()
+    public function testFilterFactoryWhenFactoryMethodHasInvalidSignature(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(sprintf(

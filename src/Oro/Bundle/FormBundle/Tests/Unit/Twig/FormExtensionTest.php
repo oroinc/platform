@@ -15,12 +15,13 @@ use Symfony\Component\Form\FormView;
 
 class FormExtensionTest extends TestCase
 {
-    private ContainerInterface|MockObject $container;
-    private CaptchaSettingsProviderInterface|MockObject $captchaSettingsProvider;
-    private FormFactoryInterface|MockObject $formFactory;
-    private FormRendererInterface|MockObject $formRenderer;
+    private ContainerInterface&MockObject $container;
+    private CaptchaSettingsProviderInterface&MockObject $captchaSettingsProvider;
+    private FormFactoryInterface&MockObject $formFactory;
+    private FormRendererInterface&MockObject $formRenderer;
     private FormExtension $extension;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->container = $this->createMock(ContainerInterface::class);

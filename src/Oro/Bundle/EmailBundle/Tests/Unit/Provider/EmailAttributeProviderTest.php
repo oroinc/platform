@@ -15,23 +15,16 @@ use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EmailAttributeProviderTest extends \PHPUnit\Framework\TestCase
+class EmailAttributeProviderTest extends TestCase
 {
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $registry;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var NameFormatter|\PHPUnit\Framework\MockObject\MockObject */
-    private $nameFormatter;
-
-    /** @var EmailAddressHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailAddressHelper;
-
-    /** @var EmailAttributeProvider */
-    private $provider;
+    private ManagerRegistry&MockObject $registry;
+    private ConfigManager&MockObject $configManager;
+    private NameFormatter&MockObject $nameFormatter;
+    private EmailAddressHelper&MockObject $emailAddressHelper;
+    private EmailAttributeProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -52,7 +45,7 @@ class EmailAttributeProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getAttributesDataProvider
      */
-    public function testGetAttributes(string $className, ClassMetadata $metadata, array $expected)
+    public function testGetAttributes(string $className, ClassMetadata $metadata, array $expected): void
     {
         $em = $this->createMock(ObjectManager::class);
 
@@ -178,7 +171,7 @@ class EmailAttributeProviderTest extends \PHPUnit\Framework\TestCase
             });
     }
 
-    public function testCreateEmailsFromAttributes()
+    public function testCreateEmailsFromAttributes(): void
     {
         $user = new UserStub(1, 'admin@example.com');
         $customer = new CustomerStub();

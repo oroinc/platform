@@ -7,8 +7,9 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
+use PHPUnit\Framework\TestCase;
 
-class OpenApiSpecificationTest extends \PHPUnit\Framework\TestCase
+class OpenApiSpecificationTest extends TestCase
 {
     use EntityTestCaseTrait;
 

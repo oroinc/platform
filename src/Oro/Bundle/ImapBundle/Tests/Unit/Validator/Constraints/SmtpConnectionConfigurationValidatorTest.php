@@ -8,17 +8,15 @@ use Oro\Bundle\EmailBundle\Mailer\Checker\SmtpSettingsChecker;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Validator\Constraints\SmtpConnectionConfiguration;
 use Oro\Bundle\ImapBundle\Validator\Constraints\SmtpConnectionConfigurationValidator;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class SmtpConnectionConfigurationValidatorTest extends ConstraintValidatorTestCase
 {
-    /** @var SmtpSettingsChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $checker;
-
-    /** @var SmtpSettingsFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $smtpSettingsFactory;
+    private SmtpSettingsChecker&MockObject $checker;
+    private SmtpSettingsFactory&MockObject $smtpSettingsFactory;
 
     #[\Override]
     protected function setUp(): void

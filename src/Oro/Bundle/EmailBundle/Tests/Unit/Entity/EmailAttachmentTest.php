@@ -7,31 +7,32 @@ use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class EmailAttachmentTest extends \PHPUnit\Framework\TestCase
+class EmailAttachmentTest extends TestCase
 {
-    public function testIdGetter()
+    public function testIdGetter(): void
     {
         $entity = new EmailAttachment();
         ReflectionUtil::setId($entity, 1);
         $this->assertEquals(1, $entity->getId());
     }
 
-    public function testFileNameGetterAndSetter()
+    public function testFileNameGetterAndSetter(): void
     {
         $entity = new EmailAttachment();
         $entity->setFileName('test');
         $this->assertEquals('test', $entity->getFileName());
     }
 
-    public function testContentTypeGetterAndSetter()
+    public function testContentTypeGetterAndSetter(): void
     {
         $entity = new EmailAttachment();
         $entity->setContentType('test');
         $this->assertEquals('test', $entity->getContentType());
     }
 
-    public function testContentGetterAndSetter()
+    public function testContentGetterAndSetter(): void
     {
         $content = $this->createMock(EmailAttachmentContent::class);
 
@@ -41,7 +42,7 @@ class EmailAttachmentTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($content, $entity->getContent());
     }
 
-    public function testEmailBodyGetterAndSetter()
+    public function testEmailBodyGetterAndSetter(): void
     {
         $emailBody = $this->createMock(EmailBody::class);
 
@@ -51,7 +52,7 @@ class EmailAttachmentTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($emailBody, $entity->getEmailBody());
     }
 
-    public function testGetSize()
+    public function testGetSize(): void
     {
         $file = $this->createMock(File::class);
         $file->expects($this->once())
@@ -73,7 +74,7 @@ class EmailAttachmentTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(4, $entity->getSize());
     }
 
-    public function testGetNotDownloadedFileSize()
+    public function testGetNotDownloadedFileSize(): void
     {
         $file = $this->createMock(File::class);
         $file->expects($this->once())

@@ -7,11 +7,12 @@ use Oro\Bundle\ApiBundle\Batch\Splitter\FileSplitterRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
-class FileSplitterRegistryTest extends \PHPUnit\Framework\TestCase
+class FileSplitterRegistryTest extends TestCase
 {
-    public function testEmptySplitters()
+    public function testEmptySplitters(): void
     {
         $registry = new FileSplitterRegistry(
             [],
@@ -22,7 +23,7 @@ class FileSplitterRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertNull($registry->getSplitter(new RequestType(['rest'])));
     }
 
-    public function testSplitterFound()
+    public function testSplitterFound(): void
     {
         $splitter1 = $this->createMock(FileSplitterInterface::class);
         $splitter2 = $this->createMock(FileSplitterInterface::class);
@@ -44,7 +45,7 @@ class FileSplitterRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($splitter2, $registry->getSplitter(new RequestType(['second'])));
     }
 
-    public function testSplitterNotFound()
+    public function testSplitterNotFound(): void
     {
         $splitter1 = $this->createMock(FileSplitterInterface::class);
         $splitter2 = $this->createMock(FileSplitterInterface::class);

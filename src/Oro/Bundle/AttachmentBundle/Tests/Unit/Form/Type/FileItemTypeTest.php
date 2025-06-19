@@ -5,11 +5,12 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Form\Type;
 use Oro\Bundle\AttachmentBundle\Entity\FileItem;
 use Oro\Bundle\AttachmentBundle\Form\Type\FileItemType;
 use Oro\Bundle\AttachmentBundle\Form\Type\FileType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class FileItemTypeTest extends \PHPUnit\Framework\TestCase
+class FileItemTypeTest extends TestCase
 {
     private FileItemType $type;
 

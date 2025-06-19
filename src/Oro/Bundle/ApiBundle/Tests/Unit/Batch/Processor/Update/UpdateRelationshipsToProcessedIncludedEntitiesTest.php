@@ -11,8 +11,7 @@ use Oro\Bundle\ApiBundle\Batch\Processor\Update\UpdateRelationshipsToProcessedIn
 
 class UpdateRelationshipsToProcessedIncludedEntitiesTest extends BatchUpdateProcessorTestCase
 {
-    /** @var UpdateRelationshipsToProcessedIncludedEntities */
-    private $processor;
+    private UpdateRelationshipsToProcessedIncludedEntities $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +35,7 @@ class UpdateRelationshipsToProcessedIncludedEntitiesTest extends BatchUpdateProc
         );
     }
 
-    public function testProcessWhenRelationshipsAlreadyUpdated()
+    public function testProcessWhenRelationshipsAlreadyUpdated(): void
     {
         $data = [
             [
@@ -84,7 +83,7 @@ class UpdateRelationshipsToProcessedIncludedEntitiesTest extends BatchUpdateProc
         self::assertSame($data, $this->context->getResult());
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $data = [
             [
@@ -136,7 +135,7 @@ class UpdateRelationshipsToProcessedIncludedEntitiesTest extends BatchUpdateProc
         self::assertSame($expectedData, $this->context->getResult());
     }
 
-    public function testProcessWhenNoProcessedItems()
+    public function testProcessWhenNoProcessedItems(): void
     {
         $data = [
             [
@@ -177,7 +176,7 @@ class UpdateRelationshipsToProcessedIncludedEntitiesTest extends BatchUpdateProc
         self::assertSame($data, $this->context->getResult());
     }
 
-    public function testProcessWhenBatchItemAlreadyProcessed()
+    public function testProcessWhenBatchItemAlreadyProcessed(): void
     {
         $data = [
             [
@@ -225,7 +224,7 @@ class UpdateRelationshipsToProcessedIncludedEntitiesTest extends BatchUpdateProc
         self::assertSame($data, $this->context->getResult());
     }
 
-    public function testProcessWithoutIncludedData()
+    public function testProcessWithoutIncludedData(): void
     {
         $data = [
             [
@@ -251,7 +250,7 @@ class UpdateRelationshipsToProcessedIncludedEntitiesTest extends BatchUpdateProc
         self::assertSame($data, $this->context->getResult());
     }
 
-    public function testProcessWhenDataNotLoaded()
+    public function testProcessWhenDataNotLoaded(): void
     {
         $this->context->setIncludedData($this->getIncludedData([], []));
         $this->processor->process($this->context);

@@ -7,21 +7,16 @@ use Oro\Bundle\ApiBundle\Provider\AssociationAccessExclusionProviderRegistry;
 use Oro\Bundle\ApiBundle\Provider\ChainAssociationAccessExclusionProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
-class AssociationAccessExclusionProviderRegistryTest extends \PHPUnit\Framework\TestCase
+class AssociationAccessExclusionProviderRegistryTest extends TestCase
 {
-    /** @var AssociationAccessExclusionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $defaultProvider;
-
-    /** @var AssociationAccessExclusionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $firstProvider;
-
-    /** @var AssociationAccessExclusionProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $secondProvider;
-
-    /** @var ContainerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $container;
+    private AssociationAccessExclusionProviderInterface&MockObject $defaultProvider;
+    private AssociationAccessExclusionProviderInterface&MockObject $firstProvider;
+    private AssociationAccessExclusionProviderInterface&MockObject $secondProvider;
+    private ContainerInterface&MockObject $container;
 
     #[\Override]
     protected function setUp(): void

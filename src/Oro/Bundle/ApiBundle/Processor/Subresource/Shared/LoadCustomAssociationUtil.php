@@ -28,7 +28,6 @@ final class LoadCustomAssociationUtil
 
         $configExtras = TargetConfigExtraBuilder::buildParentConfigExtras(
             $context->getConfigExtras(),
-            $parentClassName,
             $associationName
         );
         if ($context->getAction() === ApiAction::GET_SUBRESOURCE) {

@@ -9,14 +9,13 @@ use Laminas\Mail\Storage\Part;
 use Oro\Bundle\ImapBundle\Mail\Storage\Attachment;
 use Oro\Bundle\ImapBundle\Mail\Storage\Content;
 use Oro\Bundle\ImapBundle\Mail\Storage\Value;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AttachmentTest extends \PHPUnit\Framework\TestCase
+class AttachmentTest extends TestCase
 {
-    /** @var Part|\PHPUnit\Framework\MockObject\MockObject */
-    private $part;
-
-    /** @var Attachment */
-    private $attachment;
+    private Part&MockObject $part;
+    private Attachment $attachment;
 
     #[\Override]
     protected function setUp(): void
@@ -26,7 +25,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
         $this->attachment = new Attachment($this->part);
     }
 
-    public function testGetHeaders()
+    public function testGetHeaders(): void
     {
         $headers = new \stdClass();
 
@@ -39,7 +38,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($headers, $result);
     }
 
-    public function testGetHeader()
+    public function testGetHeader(): void
     {
         $header = new \stdClass();
 
@@ -53,7 +52,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($header, $result);
     }
 
-    public function testGetFileNameWithContentDispositionExists()
+    public function testGetFileNameWithContentDispositionExists(): void
     {
         $testFileName = 'SomeFile';
         $testEncoding = 'SomeEncoding';
@@ -89,7 +88,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testGetFileNameWithContentDispositionDoesNotExist()
+    public function testGetFileNameWithContentDispositionDoesNotExist(): void
     {
         $testFileName = 'SomeFile';
         $testEncoding = 'SomeEncoding';
@@ -138,7 +137,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
         $contentValue,
         $expected,
         $decodedValue
-    ) {
+    ): void {
         // Content-Type header
         $contentTypeHeader = $this->createMock(ContentType::class);
         if ($contentType !== null) {
@@ -183,7 +182,7 @@ class AttachmentTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getEmbeddedContentIdProvider
      */
-    public function testGetEmbeddedContentId($rawHeaders, $expected)
+    public function testGetEmbeddedContentId($rawHeaders, $expected): void
     {
         $headers = Headers::fromString(implode(PHP_EOL, $rawHeaders), PHP_EOL);
 

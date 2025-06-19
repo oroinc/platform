@@ -4,10 +4,11 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Mailer\Envelope;
 
 use Oro\Bundle\EmailBundle\Mailer\Envelope\EmailOriginAwareEnvelope;
 use Oro\Bundle\ImapBundle\Tests\Unit\Stub\TestUserEmailOrigin;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\Address as SymfonyAddress;
 use Symfony\Component\Mime\Message;
 
-class EmailOriginAwareEnvelopeTest extends \PHPUnit\Framework\TestCase
+class EmailOriginAwareEnvelopeTest extends TestCase
 {
     public function testCanBeConstructedWithoutEmailOrigin(): void
     {

@@ -22,6 +22,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormType\RestrictedNameContainerTyp
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormContextStub;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\Constraints\Form as FormConstraint;
@@ -40,23 +41,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  */
 class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
 {
-    /** @var ActionProcessorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $customizationProcessor;
-
-    /** @var CustomizeFormDataHandler */
-    private $customizationHandler;
-
-    /** @var FormContext */
-    private $formContext;
-
-    /** @var ValidatorInterface */
-    private $validator;
-
-    /** @var FormValidationHandler */
-    private $formValidationHandler;
-
-    /** @var MapPrimaryField */
-    private $processor;
+    private ActionProcessorInterface&MockObject $customizationProcessor;
+    private CustomizeFormDataHandler $customizationHandler;
+    private FormContext $formContext;
+    private ValidatorInterface $validator;
+    private FormValidationHandler $formValidationHandler;
+    private MapPrimaryField $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -185,7 +175,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
         return $role;
     }
 
-    public function testProcessWithoutConfigShouldWorkAsRegularForm()
+    public function testProcessWithoutConfigShouldWorkAsRegularForm(): void
     {
         $data = new Entity\Account();
         $role1 = $this->addRole($data, 'role1', false);
@@ -211,7 +201,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
         self::assertCount(3, $data->getRoles());
     }
 
-    public function testProcessWithoutAssociationConfigShouldWorkAsRegularForm()
+    public function testProcessWithoutAssociationConfigShouldWorkAsRegularForm(): void
     {
         $data = new Entity\Account();
         $role1 = $this->addRole($data, 'role1', false);
@@ -235,7 +225,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
         self::assertTrue($role2->isEnabled());
     }
 
-    public function testProcessWithoutPrimaryFieldFormFieldShouldWorkAsRegularForm()
+    public function testProcessWithoutPrimaryFieldFormFieldShouldWorkAsRegularForm(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('enabledRole');
@@ -280,7 +270,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
         self::assertCount(3, $data->getRoles());
     }
 
-    public function testProcessWithoutAssociationFormFieldShouldWorkAsRegularForm()
+    public function testProcessWithoutAssociationFormFieldShouldWorkAsRegularForm(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('enabledRole');
@@ -305,7 +295,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
         self::assertTrue($role2->isEnabled());
     }
 
-    public function testProcessWhenPrimaryFieldAndAssociationAreNotSubmitted()
+    public function testProcessWhenPrimaryFieldAndAssociationAreNotSubmitted(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('enabledRole');
@@ -324,7 +314,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
         self::assertTrue($role2->isEnabled());
     }
 
-    public function testProcessWhenPrimaryFieldIsNotSubmittedButAssociationIsSubmitted()
+    public function testProcessWhenPrimaryFieldIsNotSubmittedButAssociationIsSubmitted(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('enabledRole');
@@ -352,7 +342,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
         self::assertTrue($role2->isEnabled());
     }
 
-    public function testProcessWhenEmptyValueForPrimaryFieldIsSubmitted()
+    public function testProcessWhenEmptyValueForPrimaryFieldIsSubmitted(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('enabledRole');
@@ -371,7 +361,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
         self::assertFalse($role2->isEnabled());
     }
 
-    public function testProcessWhenEmptyValueForPrimaryFieldIsSubmittedAndAssociationIsSubmitted()
+    public function testProcessWhenEmptyValueForPrimaryFieldIsSubmittedAndAssociationIsSubmitted(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('enabledRole');
@@ -400,7 +390,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
         self::assertFalse($role2->isEnabled());
     }
 
-    public function testProcessWhenPrimaryFieldIsSubmitted()
+    public function testProcessWhenPrimaryFieldIsSubmitted(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('enabledRole');
@@ -419,7 +409,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
         self::assertFalse($role2->isEnabled());
     }
 
-    public function testProcessWhenBothPrimaryFieldAndAssociationAreSubmitted()
+    public function testProcessWhenBothPrimaryFieldAndAssociationAreSubmitted(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('enabledRole');
@@ -448,7 +438,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
         self::assertFalse($role2->isEnabled());
     }
 
-    public function testProcessWhenNewValueForPrimaryFieldIsSubmitted()
+    public function testProcessWhenNewValueForPrimaryFieldIsSubmitted(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('enabledRole');
@@ -470,7 +460,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
         self::assertEquals('role3', $role2->getName());
     }
 
-    public function testProcessWhenUnknownValueForPrimaryFieldIsSubmittedAndAssociationIsSubmitted()
+    public function testProcessWhenUnknownValueForPrimaryFieldIsSubmittedAndAssociationIsSubmitted(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('enabledRole');
@@ -502,7 +492,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
         );
     }
 
-    public function testProcessWhenInvalidValueForPrimaryFieldIsSubmitted()
+    public function testProcessWhenInvalidValueForPrimaryFieldIsSubmitted(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('enabledRole');
@@ -531,7 +521,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
         self::assertCount(0, $form->get('roles')->getErrors(true));
     }
 
-    public function testProcessWhenInvalidValueForPrimaryFieldIsSubmittedAndAssociationIsSubmitted()
+    public function testProcessWhenInvalidValueForPrimaryFieldIsSubmittedAndAssociationIsSubmitted(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('enabledRole');
@@ -564,7 +554,7 @@ class MapPrimaryFieldTest extends CustomizeFormDataProcessorTestCase
         );
     }
 
-    public function testProcessForRenamedFields()
+    public function testProcessForRenamedFields(): void
     {
         $this->processor = new MapPrimaryField(
             PropertyAccess::createPropertyAccessor(),

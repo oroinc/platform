@@ -13,21 +13,16 @@ use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerExtension;
 use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerExtensionRegistry;
 use Oro\Bundle\GaufretteBundle\FileManager;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class AsyncOperationDeleteHandlerTest extends \PHPUnit\Framework\TestCase
+class AsyncOperationDeleteHandlerTest extends TestCase
 {
-    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileManager;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var AsyncOperationDeleteHandler */
-    private $deleteHandler;
+    private FileManager&MockObject $fileManager;
+    private LoggerInterface&MockObject $logger;
+    private EntityManagerInterface&MockObject $em;
+    private AsyncOperationDeleteHandler $deleteHandler;
 
     #[\Override]
     protected function setUp(): void
@@ -66,13 +61,13 @@ class AsyncOperationDeleteHandlerTest extends \PHPUnit\Framework\TestCase
         return $operation;
     }
 
-    public function testIsDeleteGranted()
+    public function testIsDeleteGranted(): void
     {
         $operation = $this->getAsyncOperation(234);
         self::assertTrue($this->deleteHandler->isDeleteGranted($operation));
     }
 
-    public function testHandleDelete()
+    public function testHandleDelete(): void
     {
         $operation = $this->getAsyncOperation(234);
 
@@ -98,7 +93,7 @@ class AsyncOperationDeleteHandlerTest extends \PHPUnit\Framework\TestCase
         $this->deleteHandler->delete($operation);
     }
 
-    public function testHandleDeleteWhenExceptionOccurredOnFindFiles()
+    public function testHandleDeleteWhenExceptionOccurredOnFindFiles(): void
     {
         $this->expectException(DeleteAsyncOperationException::class);
         $this->expectExceptionMessage('Failed to delete all files related to the asynchronous operation.');
@@ -130,7 +125,7 @@ class AsyncOperationDeleteHandlerTest extends \PHPUnit\Framework\TestCase
         $this->deleteHandler->delete($operation);
     }
 
-    public function testHandleDeleteWhenExceptionOccurredOnDeleteFiles()
+    public function testHandleDeleteWhenExceptionOccurredOnDeleteFiles(): void
     {
         $this->expectException(DeleteAsyncOperationException::class);
         $this->expectExceptionMessage('Failed to delete all files related to the asynchronous operation.');

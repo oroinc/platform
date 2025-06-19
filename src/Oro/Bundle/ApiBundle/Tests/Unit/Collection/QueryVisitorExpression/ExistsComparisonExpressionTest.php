@@ -6,10 +6,11 @@ use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ExistsComparisonExpression;
 use Oro\Bundle\ApiBundle\Tests\Unit\Stub\FieldDqlExpressionProviderStub;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use PHPUnit\Framework\TestCase;
 
-class ExistsComparisonExpressionTest extends \PHPUnit\Framework\TestCase
+class ExistsComparisonExpressionTest extends TestCase
 {
-    public function testWalkComparisonExpressionForTrueValue()
+    public function testWalkComparisonExpressionForTrueValue(): void
     {
         $expression = new ExistsComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor(
@@ -35,7 +36,7 @@ class ExistsComparisonExpressionTest extends \PHPUnit\Framework\TestCase
         self::assertEmpty($expressionVisitor->getParameters());
     }
 
-    public function testWalkComparisonExpressionForFalseValue()
+    public function testWalkComparisonExpressionForFalseValue(): void
     {
         $expression = new ExistsComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor(

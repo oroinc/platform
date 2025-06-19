@@ -9,14 +9,13 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigConverter;
 use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Component\EntitySerializer\AssociationQuery;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ConfigConverterTest extends \PHPUnit\Framework\TestCase
+class ConfigConverterTest extends TestCase
 {
-    /** @var EntityOverrideProviderRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityOverrideProviderRegistry;
-
-    /** @var ConfigConverter */
-    private $configConverter;
+    private EntityOverrideProviderRegistry&MockObject $entityOverrideProviderRegistry;
+    private ConfigConverter $configConverter;
 
     #[\Override]
     protected function setUp(): void

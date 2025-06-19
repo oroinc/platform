@@ -4,11 +4,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig\CompleteDescriptio
 
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\RequestDependedTextProcessor;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use PHPUnit\Framework\TestCase;
 
-class RequestDependedTextProcessorTest extends \PHPUnit\Framework\TestCase
+class RequestDependedTextProcessorTest extends TestCase
 {
-    /** @var RequestDependedTextProcessor */
-    private $processor;
+    private RequestDependedTextProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -19,7 +19,7 @@ class RequestDependedTextProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider validTextExpressionProvider
      */
-    public function testProcess(string $text, string $expected)
+    public function testProcess(string $text, string $expected): void
     {
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
 
@@ -53,7 +53,7 @@ class RequestDependedTextProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider invalidTextExpressionProvider
      */
-    public function testProcessForInvalidExpression(string $text)
+    public function testProcessForInvalidExpression(string $text): void
     {
         $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
 

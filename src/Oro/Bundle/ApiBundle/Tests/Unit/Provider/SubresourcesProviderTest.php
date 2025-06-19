@@ -11,20 +11,15 @@ use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\ApiResourceSubresources;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class SubresourcesProviderTest extends \PHPUnit\Framework\TestCase
+class SubresourcesProviderTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|CollectSubresourcesProcessor */
-    private $processor;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesProvider */
-    private $resourcesProvider;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ResourcesCache */
-    private $resourcesCache;
-
-    /** @var SubresourcesProvider */
-    private $subresourcesProvider;
+    private CollectSubresourcesProcessor&MockObject $processor;
+    private ResourcesProvider&MockObject $resourcesProvider;
+    private ResourcesCache&MockObject $resourcesCache;
+    private SubresourcesProvider $subresourcesProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -43,7 +38,7 @@ class SubresourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetSubresourcesNoCache()
+    public function testGetSubresourcesNoCache(): void
     {
         $entityClass = 'Test\Entity';
         $version = '1.2.3';
@@ -103,7 +98,7 @@ class SubresourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetSubresourcesForUnknownEntity()
+    public function testGetSubresourcesForUnknownEntity(): void
     {
         $entityClass = 'Test\Entity1';
         $version = '1.2.3';
@@ -162,7 +157,7 @@ class SubresourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetSubresourcesFromCache()
+    public function testGetSubresourcesFromCache(): void
     {
         $entityClass = 'Test\Entity';
         $version = '1.2.3';
@@ -190,7 +185,7 @@ class SubresourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetSubresourceForKnownAssociation()
+    public function testGetSubresourceForKnownAssociation(): void
     {
         $entityClass = 'Test\Entity';
         $version = '1.2.3';
@@ -210,7 +205,7 @@ class SubresourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetSubresourceForUnknownAssociation()
+    public function testGetSubresourceForUnknownAssociation(): void
     {
         $entityClass = 'Test\Entity';
         $version = '1.2.3';
@@ -228,7 +223,7 @@ class SubresourcesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetSubresourceForForUnknownEntity()
+    public function testGetSubresourceForForUnknownEntity(): void
     {
         $entityClass = 'Test\Entity1';
         $version = '1.2.3';

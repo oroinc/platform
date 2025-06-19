@@ -3,8 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Exception;
 
 use Oro\Bundle\ApiBundle\Exception\InvalidHeaderValueException;
+use PHPUnit\Framework\TestCase;
 
-class InvalidHeaderValueExceptionTest extends \PHPUnit\Framework\TestCase
+class InvalidHeaderValueExceptionTest extends TestCase
 {
     public function testConstructor(): void
     {

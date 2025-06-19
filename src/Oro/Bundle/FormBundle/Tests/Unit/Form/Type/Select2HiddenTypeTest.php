@@ -32,7 +32,7 @@ class Select2HiddenTypeTest extends TypeTestCase
     {
         $form = $this->factory->create(Select2Type::class);
 
-        $this->assertEquals(HiddenType::class, get_class($form->getConfig()->getType()->getParent()->getInnerType()));
+        $this->assertEquals(HiddenType::class, $form->getConfig()->getType()->getParent()->getInnerType()::class);
     }
 
     public function testHiddenSingle()

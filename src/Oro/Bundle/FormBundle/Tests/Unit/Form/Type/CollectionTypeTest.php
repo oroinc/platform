@@ -4,6 +4,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Oro\Bundle\FormBundle\Form\EventListener\CollectionTypeSubscriber;
 use Oro\Bundle\FormBundle\Form\Type\CollectionType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType as BaseCollectionType;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormBuilderInterface;
@@ -11,10 +12,9 @@ use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class CollectionTypeTest extends \PHPUnit\Framework\TestCase
+class CollectionTypeTest extends TestCase
 {
-    /** @var CollectionType */
-    private $type;
+    private CollectionType $type;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +22,7 @@ class CollectionTypeTest extends \PHPUnit\Framework\TestCase
         $this->type = new CollectionType();
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $builder = $this->createMock(FormBuilderInterface::class);
 
@@ -37,7 +37,7 @@ class CollectionTypeTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider buildViewDataProvider
      */
-    public function testBuildView(array $options, array $expectedVars)
+    public function testBuildView(array $options, array $expectedVars): void
     {
         $form = $this->createMock(FormInterface::class);
         $view = new FormView();
@@ -92,7 +92,7 @@ class CollectionTypeTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testConfigureOptionsWithoutType()
+    public function testConfigureOptionsWithoutType(): void
     {
         $this->expectException(MissingOptionsException::class);
         $this->expectExceptionMessage('The required option "entry_type" is missing.');
@@ -102,7 +102,7 @@ class CollectionTypeTest extends \PHPUnit\Framework\TestCase
         $resolver->resolve([]);
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = $this->getOptionsResolver();
         $this->type->configureOptions($resolver);
@@ -130,7 +130,7 @@ class CollectionTypeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConfigureOptionsDisableAdd()
+    public function testConfigureOptionsDisableAdd(): void
     {
         $resolver = $this->getOptionsResolver();
         $this->type->configureOptions($resolver);
@@ -159,7 +159,7 @@ class CollectionTypeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConfigureOptionsDisableShowFormWhenEmpty()
+    public function testConfigureOptionsDisableShowFormWhenEmpty(): void
     {
         $resolver = $this->getOptionsResolver();
         $this->type->configureOptions($resolver);
@@ -188,7 +188,7 @@ class CollectionTypeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testConfigureOptionsCustomAddLabel()
+    public function testConfigureOptionsCustomAddLabel(): void
     {
         $resolver = $this->getOptionsResolver();
         $this->type->configureOptions($resolver);
@@ -217,12 +217,12 @@ class CollectionTypeTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $this->assertEquals(BaseCollectionType::class, $this->type->getParent());
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals('oro_collection', $this->type->getName());
     }

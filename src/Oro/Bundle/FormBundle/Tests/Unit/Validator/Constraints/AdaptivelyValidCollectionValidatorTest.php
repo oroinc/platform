@@ -20,12 +20,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AdaptivelyValidCollectionValidatorTest extends ConstraintValidatorTestCase
 {
-    private EntityStateChecker|MockObject $entityStateChecker;
-
-    private ValidatorInterface|MockObject $validatorComponent;
-
-    private ContextualValidatorInterface|MockObject $innerContextualValidator;
-
+    private EntityStateChecker&MockObject $entityStateChecker;
+    private ValidatorInterface&MockObject $validatorComponent;
+    private ContextualValidatorInterface&MockObject $innerContextualValidator;
     private AdaptivelyValidCollection $adaptivelyValidCollectionConstraint;
 
     #[\Override]
@@ -50,7 +47,7 @@ class AdaptivelyValidCollectionValidatorTest extends ConstraintValidatorTestCase
     protected function createContext()
     {
         $translator = $this->createMock(TranslatorInterface::class);
-        $translator
+        $translator->expects(self::any())
             ->method('trans')
             ->willReturnArgument(0);
 
@@ -60,7 +57,7 @@ class AdaptivelyValidCollectionValidatorTest extends ConstraintValidatorTestCase
         $context->setConstraint($this->constraint);
 
         $this->innerContextualValidator = $this->createMock(ContextualValidatorInterface::class);
-        $this->validatorComponent
+        $this->validatorComponent->expects(self::any())
             ->method('inContext')
             ->with($context)
             ->willReturn($this->innerContextualValidator);
@@ -103,24 +100,20 @@ class AdaptivelyValidCollectionValidatorTest extends ConstraintValidatorTestCase
     {
         $entity = new \stdClass();
 
-        $this->entityStateChecker
-            ->expects(self::once())
+        $this->entityStateChecker->expects(self::once())
             ->method('isNewEntity')
             ->with($entity)
             ->willReturn(true);
 
-        $this->entityStateChecker
-            ->expects(self::never())
+        $this->entityStateChecker->expects(self::never())
             ->method('isChangedEntity');
 
-        $this->innerContextualValidator
-            ->expects(self::once())
+        $this->innerContextualValidator->expects(self::once())
             ->method('atPath')
             ->with('[0]')
             ->willReturnSelf();
 
-        $this->innerContextualValidator
-            ->expects(self::once())
+        $this->innerContextualValidator->expects(self::once())
             ->method('validate')
             ->with($entity, null, $this->adaptivelyValidCollectionConstraint->validationGroupsForNew);
 
@@ -133,18 +126,15 @@ class AdaptivelyValidCollectionValidatorTest extends ConstraintValidatorTestCase
     {
         $entity = new \stdClass();
 
-        $this->entityStateChecker
-            ->expects(self::once())
+        $this->entityStateChecker->expects(self::once())
             ->method('isNewEntity')
             ->with($entity)
             ->willReturn(true);
 
-        $this->entityStateChecker
-            ->expects(self::never())
+        $this->entityStateChecker->expects(self::never())
             ->method('isChangedEntity');
 
-        $this->innerContextualValidator
-            ->expects(self::never())
+        $this->innerContextualValidator->expects(self::never())
             ->method(self::anything());
 
         $this->adaptivelyValidCollectionConstraint->validationGroupsForNew = [];
@@ -158,26 +148,22 @@ class AdaptivelyValidCollectionValidatorTest extends ConstraintValidatorTestCase
     {
         $entity = new \stdClass();
 
-        $this->entityStateChecker
-            ->expects(self::once())
+        $this->entityStateChecker->expects(self::once())
             ->method('isNewEntity')
             ->with($entity)
             ->willReturn(false);
 
-        $this->entityStateChecker
-            ->expects(self::once())
+        $this->entityStateChecker->expects(self::once())
             ->method('isChangedEntity')
             ->with($entity, $this->adaptivelyValidCollectionConstraint->trackFields)
             ->willReturn(true);
 
-        $this->innerContextualValidator
-            ->expects(self::once())
+        $this->innerContextualValidator->expects(self::once())
             ->method('atPath')
             ->with('[0]')
             ->willReturnSelf();
 
-        $this->innerContextualValidator
-            ->expects(self::once())
+        $this->innerContextualValidator->expects(self::once())
             ->method('validate')
             ->with($entity, null, $this->adaptivelyValidCollectionConstraint->validationGroupsForUpdated);
 
@@ -190,20 +176,17 @@ class AdaptivelyValidCollectionValidatorTest extends ConstraintValidatorTestCase
     {
         $entity = new \stdClass();
 
-        $this->entityStateChecker
-            ->expects(self::once())
+        $this->entityStateChecker->expects(self::once())
             ->method('isNewEntity')
             ->with($entity)
             ->willReturn(false);
 
-        $this->entityStateChecker
-            ->expects(self::once())
+        $this->entityStateChecker->expects(self::once())
             ->method('isChangedEntity')
             ->with($entity, $this->adaptivelyValidCollectionConstraint->trackFields)
             ->willReturn(true);
 
-        $this->innerContextualValidator
-            ->expects(self::never())
+        $this->innerContextualValidator->expects(self::never())
             ->method(self::anything());
 
         $this->adaptivelyValidCollectionConstraint->validationGroupsForUpdated = [];
@@ -217,26 +200,22 @@ class AdaptivelyValidCollectionValidatorTest extends ConstraintValidatorTestCase
     {
         $entity = new \stdClass();
 
-        $this->entityStateChecker
-            ->expects(self::once())
+        $this->entityStateChecker->expects(self::once())
             ->method('isNewEntity')
             ->with($entity)
             ->willReturn(false);
 
-        $this->entityStateChecker
-            ->expects(self::once())
+        $this->entityStateChecker->expects(self::once())
             ->method('isChangedEntity')
             ->with($entity, $this->adaptivelyValidCollectionConstraint->trackFields)
             ->willReturn(false);
 
-        $this->innerContextualValidator
-            ->expects(self::once())
+        $this->innerContextualValidator->expects(self::once())
             ->method('atPath')
             ->with('[0]')
             ->willReturnSelf();
 
-        $this->innerContextualValidator
-            ->expects(self::once())
+        $this->innerContextualValidator->expects(self::once())
             ->method('validate')
             ->with($entity, null, $this->adaptivelyValidCollectionConstraint->validationGroupsForUnchanged);
 
@@ -249,20 +228,17 @@ class AdaptivelyValidCollectionValidatorTest extends ConstraintValidatorTestCase
     {
         $entity = new \stdClass();
 
-        $this->entityStateChecker
-            ->expects(self::once())
+        $this->entityStateChecker->expects(self::once())
             ->method('isNewEntity')
             ->with($entity)
             ->willReturn(false);
 
-        $this->entityStateChecker
-            ->expects(self::once())
+        $this->entityStateChecker->expects(self::once())
             ->method('isChangedEntity')
             ->with($entity, $this->adaptivelyValidCollectionConstraint->trackFields)
             ->willReturn(false);
 
-        $this->innerContextualValidator
-            ->expects(self::never())
+        $this->innerContextualValidator->expects(self::never())
             ->method(self::anything());
 
         $this->adaptivelyValidCollectionConstraint->validationGroupsForUnchanged = [];
@@ -276,18 +252,15 @@ class AdaptivelyValidCollectionValidatorTest extends ConstraintValidatorTestCase
     {
         $entity = new \stdClass();
 
-        $this->entityStateChecker
-            ->expects(self::once())
+        $this->entityStateChecker->expects(self::once())
             ->method('isNewEntity')
             ->with($entity)
             ->willReturn(false);
 
-        $this->entityStateChecker
-            ->expects(self::never())
+        $this->entityStateChecker->expects(self::never())
             ->method('isChangedEntity');
 
-        $this->innerContextualValidator
-            ->expects(self::never())
+        $this->innerContextualValidator->expects(self::never())
             ->method(self::anything());
 
         $this->adaptivelyValidCollectionConstraint->trackFields = [];

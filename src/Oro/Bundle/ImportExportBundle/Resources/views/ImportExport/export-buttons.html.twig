@@ -12,6 +12,12 @@
 
     {% if exportAllowed %}
         {% set showExportButtons = true %}
+        {% if configuration.featureName is defined
+            and configuration.featureName is not empty
+            and not feature_enabled(configuration.featureName)
+        %}
+            {% set showExportButtons = false %}
+        {% endif %}
 
         {% set html %}
             <a href="#"

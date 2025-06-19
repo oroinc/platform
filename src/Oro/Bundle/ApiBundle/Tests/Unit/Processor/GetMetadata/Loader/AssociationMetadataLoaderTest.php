@@ -12,22 +12,19 @@ use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestMetadataExtra;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class AssociationMetadataLoaderTest extends \PHPUnit\Framework\TestCase
+class AssociationMetadataLoaderTest extends TestCase
 {
-    private const TEST_CLASS_NAME = 'Test\Class';
-    private const TEST_VERSION = '1.1';
+    private const string TEST_CLASS_NAME = 'Test\Class';
+    private const string TEST_VERSION = '1.1';
     private const TEST_REQUEST_TYPE = RequestType::REST;
-    private const TEST_TARGET_CLASS_NAME = 'Test\TargetClass';
+    private const string TEST_TARGET_CLASS_NAME = 'Test\TargetClass';
 
-    /** @var MetadataContext */
-    private $context;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|MetadataProvider */
-    private $metadataProvider;
-
-    /** @var AssociationMetadataLoader */
-    private $associationMetadataLoader;
+    private MetadataContext $context;
+    private MetadataProvider&MockObject $metadataProvider;
+    private AssociationMetadataLoader $associationMetadataLoader;
 
     #[\Override]
     protected function setUp(): void
@@ -44,7 +41,7 @@ class AssociationMetadataLoaderTest extends \PHPUnit\Framework\TestCase
         $this->context->setWithExcludedProperties(true);
     }
 
-    public function testWhenAssociationTargetMetadataAlreadyExists()
+    public function testWhenAssociationTargetMetadataAlreadyExists(): void
     {
         $config = new EntityDefinitionConfig();
         $fieldConfig = $config->addField('association');
@@ -69,7 +66,7 @@ class AssociationMetadataLoaderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(DataType::INTEGER, $association->getDataType());
     }
 
-    public function testAssociationWithoutFieldConfig()
+    public function testAssociationWithoutFieldConfig(): void
     {
         $config = new EntityDefinitionConfig();
 
@@ -90,7 +87,7 @@ class AssociationMetadataLoaderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(DataType::INTEGER, $association->getDataType());
     }
 
-    public function testAssociationWithoutFieldTargetConfig()
+    public function testAssociationWithoutFieldTargetConfig(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('association');
@@ -112,7 +109,7 @@ class AssociationMetadataLoaderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(DataType::INTEGER, $association->getDataType());
     }
 
-    public function testAssociationWithoutFieldTargetClass()
+    public function testAssociationWithoutFieldTargetClass(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('association')->createAndSetTargetEntity();
@@ -135,7 +132,7 @@ class AssociationMetadataLoaderTest extends \PHPUnit\Framework\TestCase
         self::assertNull($association->getTargetMetadata());
     }
 
-    public function testAssociationWhenTargetMetadataNotFound()
+    public function testAssociationWhenTargetMetadataNotFound(): void
     {
         $config = new EntityDefinitionConfig();
         $fieldConfig = $config->addField('association');
@@ -169,7 +166,7 @@ class AssociationMetadataLoaderTest extends \PHPUnit\Framework\TestCase
         self::assertNull($association->getTargetMetadata());
     }
 
-    public function testAssociationWhenTargetMetadataFound()
+    public function testAssociationWhenTargetMetadataFound(): void
     {
         $config = new EntityDefinitionConfig();
         $fieldConfig = $config->addField('association');
@@ -205,7 +202,7 @@ class AssociationMetadataLoaderTest extends \PHPUnit\Framework\TestCase
         self::assertSame($targetMetadata, $association->getTargetMetadata());
     }
 
-    public function testAssociationWhenItsTargetClassIsNotEqualToTargetClassInConfig()
+    public function testAssociationWhenItsTargetClassIsNotEqualToTargetClassInConfig(): void
     {
         $config = new EntityDefinitionConfig();
         $fieldConfig = $config->addField('association');
@@ -244,7 +241,7 @@ class AssociationMetadataLoaderTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['Test\TargetClassFromConfig'], $association->getAcceptableTargetClassNames());
     }
 
-    public function testAssociationWithoutDataTypeAndTargetMetadataHasSingleId()
+    public function testAssociationWithoutDataTypeAndTargetMetadataHasSingleId(): void
     {
         $config = new EntityDefinitionConfig();
         $fieldConfig = $config->addField('association');
@@ -281,7 +278,7 @@ class AssociationMetadataLoaderTest extends \PHPUnit\Framework\TestCase
         self::assertSame($targetMetadata, $association->getTargetMetadata());
     }
 
-    public function testAssociationWithoutDataTypeAndTargetMetadataHasCompositeId()
+    public function testAssociationWithoutDataTypeAndTargetMetadataHasCompositeId(): void
     {
         $config = new EntityDefinitionConfig();
         $fieldConfig = $config->addField('association');
@@ -319,7 +316,7 @@ class AssociationMetadataLoaderTest extends \PHPUnit\Framework\TestCase
         self::assertSame($targetMetadata, $association->getTargetMetadata());
     }
 
-    public function testAssociationWithoutDataTypeAndTargetMetadataHasSingleIdWithUnknownDataType()
+    public function testAssociationWithoutDataTypeAndTargetMetadataHasSingleIdWithUnknownDataType(): void
     {
         $config = new EntityDefinitionConfig();
         $fieldConfig = $config->addField('association');

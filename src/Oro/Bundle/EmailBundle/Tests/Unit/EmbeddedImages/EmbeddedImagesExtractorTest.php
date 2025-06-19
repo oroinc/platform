@@ -4,9 +4,10 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\EmbeddedImages;
 
 use Oro\Bundle\EmailBundle\EmbeddedImages\EmbeddedImage;
 use Oro\Bundle\EmailBundle\EmbeddedImages\EmbeddedImagesExtractor;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mime\MimeTypes;
 
-class EmbeddedImagesExtractorTest extends \PHPUnit\Framework\TestCase
+class EmbeddedImagesExtractorTest extends TestCase
 {
     private EmbeddedImagesExtractor $extractor;
 

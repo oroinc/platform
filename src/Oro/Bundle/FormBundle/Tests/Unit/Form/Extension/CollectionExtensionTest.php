@@ -3,14 +3,14 @@
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension;
 
 use Oro\Bundle\FormBundle\Form\Extension\CollectionExtension;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class CollectionExtensionTest extends \PHPUnit\Framework\TestCase
+class CollectionExtensionTest extends TestCase
 {
-    /** @var CollectionExtension */
-    private $extension;
+    private CollectionExtension $extension;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class CollectionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension = new CollectionExtension();
     }
 
-    public function testConfigureOptions()
+    public function testConfigureOptions(): void
     {
         $resolver = $this->createMock(OptionsResolver::class);
         $resolver->expects(self::once())
@@ -28,7 +28,7 @@ class CollectionExtensionTest extends \PHPUnit\Framework\TestCase
         $this->extension->configureOptions($resolver);
     }
 
-    public function testBuildView()
+    public function testBuildView(): void
     {
         $view = new FormView();
         $form = $this->createMock(FormInterface::class);

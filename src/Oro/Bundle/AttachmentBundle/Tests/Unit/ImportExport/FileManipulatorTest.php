@@ -11,6 +11,8 @@ use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
 use Oro\Bundle\SecurityBundle\Acl\BasicPermission;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -19,17 +21,17 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class FileManipulatorTest extends \PHPUnit\Framework\TestCase
+class FileManipulatorTest extends TestCase
 {
-    private const ENTITY_CLASS = 'SampleClass';
-    private const FIELD_NAME = 'sampleField';
-    private const FIELD_LABEL = 'Sample Label';
+    private const string ENTITY_CLASS = 'SampleClass';
+    private const string FIELD_NAME = 'sampleField';
+    private const string FIELD_LABEL = 'Sample Label';
 
-    private FileManager|\PHPUnit\Framework\MockObject\MockObject $fileManager;
-    private AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject $authorizationChecker;
-    private FileImportStrategyHelper|\PHPUnit\Framework\MockObject\MockObject $fileImportStrategyHelper;
-    private TranslatorInterface|\PHPUnit\Framework\MockObject\MockObject $translator;
-    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
+    private FileManager&MockObject $fileManager;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private FileImportStrategyHelper&MockObject $fileImportStrategyHelper;
+    private TranslatorInterface&MockObject $translator;
+    private LoggerInterface&MockObject $logger;
     private FileManipulator $manipulator;
 
     #[\Override]

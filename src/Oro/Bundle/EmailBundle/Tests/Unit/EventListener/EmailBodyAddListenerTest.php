@@ -17,35 +17,22 @@ use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\SomeEntity;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class EmailBodyAddListenerTest extends \PHPUnit\Framework\TestCase
+class EmailBodyAddListenerTest extends TestCase
 {
-    /** @var ConfigProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $configProvider;
-
-    /** @var EmailAttachmentManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailAttachmentManager;
-
-    /** @var EmailActivityListProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $activityListProvider;
-
-    /** @var AuthorizationCheckerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $authorizationChecker;
-
-    /** @var TokenStorageInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $tokenStorage;
-
-    /** @var ActivityListChainProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $chainProvider;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var EmailBodyAddListener */
-    private $listener;
+    private ConfigProvider&MockObject $configProvider;
+    private EmailAttachmentManager&MockObject $emailAttachmentManager;
+    private EmailActivityListProvider&MockObject $activityListProvider;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private TokenStorageInterface&MockObject $tokenStorage;
+    private ActivityListChainProvider&MockObject $chainProvider;
+    private ManagerRegistry&MockObject $doctrine;
+    private EmailBodyAddListener $listener;
 
     #[\Override]
     protected function setUp(): void

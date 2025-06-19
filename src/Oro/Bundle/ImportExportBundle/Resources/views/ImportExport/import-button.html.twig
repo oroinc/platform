@@ -3,6 +3,7 @@
 {% for configuration in get_import_export_configuration(alias) %}
     {% if configuration.importProcessorAlias is defined
         and configuration.importProcessorAlias is not empty
+        and (configuration.featureName is not defined or configuration.featureName is empty or feature_enabled(configuration.featureName))
         and is_granted('oro_importexport_import')
         and (is_granted('CREATE;entity:' ~ configuration.entityClass) or is_granted('EDIT;entity:' ~ configuration.entityClass))
     %}

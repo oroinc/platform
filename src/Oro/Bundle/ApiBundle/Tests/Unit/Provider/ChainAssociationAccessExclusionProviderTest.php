@@ -4,14 +4,14 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
 use Oro\Bundle\ApiBundle\Provider\AssociationAccessExclusionProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\ChainAssociationAccessExclusionProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ChainAssociationAccessExclusionProviderTest extends \PHPUnit\Framework\TestCase
+class ChainAssociationAccessExclusionProviderTest extends TestCase
 {
-    /** @var AssociationAccessExclusionProviderInterface[]|\PHPUnit\Framework\MockObject\MockObject[] */
+    /** @var AssociationAccessExclusionProviderInterface[]&MockObject[] */
     private array $providers = [];
-
-    /** @var ChainAssociationAccessExclusionProvider */
-    private $chainProvider;
+    private ChainAssociationAccessExclusionProvider $chainProvider;
 
     #[\Override]
     protected function setUp(): void

@@ -5,14 +5,14 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Form\Type;
 use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment;
 use Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentsType;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
 
-class EmailAttachmentsTypeTest extends \PHPUnit\Framework\TestCase
+class EmailAttachmentsTypeTest extends TestCase
 {
-    /** @var EmailAttachmentsType */
-    private $emailAttachmentsType;
+    private EmailAttachmentsType $emailAttachmentsType;
 
     #[\Override]
     protected function setUp(): void
@@ -20,12 +20,12 @@ class EmailAttachmentsTypeTest extends \PHPUnit\Framework\TestCase
         $this->emailAttachmentsType = new EmailAttachmentsType();
     }
 
-    public function testGetParent()
+    public function testGetParent(): void
     {
         $this->assertEquals(CollectionType::class, $this->emailAttachmentsType->getParent());
     }
 
-    public function testSanitizeAttachmentsWithCorrectExistAttachments()
+    public function testSanitizeAttachmentsWithCorrectExistAttachments(): void
     {
         $attachment = new EmailAttachment();
         $attachment->setId(1);
@@ -42,7 +42,7 @@ class EmailAttachmentsTypeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($attachment, $resultAttachment);
     }
 
-    public function testSanitizeAttachmentsWithCorrectNewAttachments()
+    public function testSanitizeAttachmentsWithCorrectNewAttachments(): void
     {
         $attachment = new EmailAttachment();
         $attachments = new ArrayCollection(['first' => $attachment]);
@@ -57,7 +57,7 @@ class EmailAttachmentsTypeTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($attachment, $resultAttachment);
     }
 
-    public function testSanitizeAttachmentsWithNonCorrectAttachment()
+    public function testSanitizeAttachmentsWithNonCorrectAttachment(): void
     {
         $attachment = null;
         $attachments = new ArrayCollection(['first' => $attachment]);

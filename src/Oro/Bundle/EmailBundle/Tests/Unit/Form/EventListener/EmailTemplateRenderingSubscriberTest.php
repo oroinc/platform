@@ -25,14 +25,10 @@ use Symfony\Component\Form\FormInterface;
 
 class EmailTemplateRenderingSubscriberTest extends TestCase
 {
-    private EmailModelBuilderHelper|MockObject $emailModelBuilderHelper;
-
-    private TranslatedEmailTemplateProvider|MockObject $translatedEmailTemplateProvider;
-
-    private EmailTemplateContextProvider|MockObject $emailTemplateContextProvider;
-
-    private EmailRenderer|MockObject $emailRenderer;
-
+    private EmailModelBuilderHelper&MockObject $emailModelBuilderHelper;
+    private TranslatedEmailTemplateProvider&MockObject $translatedEmailTemplateProvider;
+    private EmailTemplateContextProvider&MockObject $emailTemplateContextProvider;
+    private EmailRenderer&MockObject $emailRenderer;
     private EmailTemplateRenderingSubscriber $subscriber;
 
     #[\Override]
@@ -55,16 +51,13 @@ class EmailTemplateRenderingSubscriberTest extends TestCase
     {
         $event = new PreSetDataEvent($this->createMock(FormInterface::class), new \stdClass());
 
-        $this->emailTemplateContextProvider
-            ->expects(self::never())
+        $this->emailTemplateContextProvider->expects(self::never())
             ->method(self::anything());
 
-        $this->translatedEmailTemplateProvider
-            ->expects(self::never())
+        $this->translatedEmailTemplateProvider->expects(self::never())
             ->method(self::anything());
 
-        $this->emailRenderer
-            ->expects(self::never())
+        $this->emailRenderer->expects(self::never())
             ->method(self::anything());
 
         $this->subscriber->onPreSetData($event);
@@ -74,16 +67,13 @@ class EmailTemplateRenderingSubscriberTest extends TestCase
     {
         $event = new PreSetDataEvent($this->createMock(FormInterface::class), new EmailModel());
 
-        $this->emailTemplateContextProvider
-            ->expects(self::never())
+        $this->emailTemplateContextProvider->expects(self::never())
             ->method(self::anything());
 
-        $this->translatedEmailTemplateProvider
-            ->expects(self::never())
+        $this->translatedEmailTemplateProvider->expects(self::never())
             ->method(self::anything());
 
-        $this->emailRenderer
-            ->expects(self::never())
+        $this->emailRenderer->expects(self::never())
             ->method(self::anything());
 
         $this->subscriber->onPreSetData($event);
@@ -98,16 +88,13 @@ class EmailTemplateRenderingSubscriberTest extends TestCase
             ->setBody('sample body');
         $event = new PreSetDataEvent($this->createMock(FormInterface::class), $emailModel);
 
-        $this->emailTemplateContextProvider
-            ->expects(self::never())
+        $this->emailTemplateContextProvider->expects(self::never())
             ->method(self::anything());
 
-        $this->translatedEmailTemplateProvider
-            ->expects(self::never())
+        $this->translatedEmailTemplateProvider->expects(self::never())
             ->method(self::anything());
 
-        $this->emailRenderer
-            ->expects(self::never())
+        $this->emailRenderer->expects(self::never())
             ->method(self::anything());
 
         $this->subscriber->onPreSetData($event);
@@ -120,16 +107,13 @@ class EmailTemplateRenderingSubscriberTest extends TestCase
             ->setTemplate($emailTemplate);
         $event = new PreSetDataEvent($this->createMock(FormInterface::class), $emailModel);
 
-        $this->emailTemplateContextProvider
-            ->expects(self::never())
+        $this->emailTemplateContextProvider->expects(self::never())
             ->method(self::anything());
 
-        $this->translatedEmailTemplateProvider
-            ->expects(self::never())
+        $this->translatedEmailTemplateProvider->expects(self::never())
             ->method(self::anything());
 
-        $this->emailRenderer
-            ->expects(self::never())
+        $this->emailRenderer->expects(self::never())
             ->method(self::anything());
 
         $this->subscriber->onPreSetData($event);
@@ -143,16 +127,13 @@ class EmailTemplateRenderingSubscriberTest extends TestCase
             ->setEntityClass(User::class);
         $event = new PreSetDataEvent($this->createMock(FormInterface::class), $emailModel);
 
-        $this->emailTemplateContextProvider
-            ->expects(self::never())
+        $this->emailTemplateContextProvider->expects(self::never())
             ->method(self::anything());
 
-        $this->translatedEmailTemplateProvider
-            ->expects(self::never())
+        $this->translatedEmailTemplateProvider->expects(self::never())
             ->method(self::anything());
 
-        $this->emailRenderer
-            ->expects(self::never())
+        $this->emailRenderer->expects(self::never())
             ->method(self::anything());
 
         $this->subscriber->onPreSetData($event);
@@ -174,8 +155,7 @@ class EmailTemplateRenderingSubscriberTest extends TestCase
         $event = new PreSetDataEvent($this->createMock(FormInterface::class), $emailModel);
 
         $targetEntity = new UserStub($entityId);
-        $this->emailModelBuilderHelper
-            ->expects(self::once())
+        $this->emailModelBuilderHelper->expects(self::once())
             ->method('getTargetEntity')
             ->with($entityClass, $entityId)
             ->willReturn($targetEntity);
@@ -184,8 +164,7 @@ class EmailTemplateRenderingSubscriberTest extends TestCase
 
         $templateContext = ['localization' => new Localization()];
         $templateParams = ['entity' => $targetEntity];
-        $this->emailTemplateContextProvider
-            ->expects(self::once())
+        $this->emailTemplateContextProvider->expects(self::once())
             ->method('getTemplateContext')
             ->with(
                 From::emailAddress($emailModel->getFrom()),
@@ -198,8 +177,7 @@ class EmailTemplateRenderingSubscriberTest extends TestCase
         $translatedEmailTemplate = (new EmailTemplateModel($emailTemplate->getName()))
             ->setSubject('translated subject')
             ->setContent('translated content');
-        $this->translatedEmailTemplateProvider
-            ->expects(self::once())
+        $this->translatedEmailTemplateProvider->expects(self::once())
             ->method('getTranslatedEmailTemplate')
             ->with($emailTemplate, $templateContext['localization'])
             ->willReturn($translatedEmailTemplate);
@@ -208,8 +186,7 @@ class EmailTemplateRenderingSubscriberTest extends TestCase
             ->setSubject('rendered subject')
             ->setContent('rendered content');
 
-        $this->emailRenderer
-            ->expects(self::once())
+        $this->emailRenderer->expects(self::once())
             ->method('renderEmailTemplate')
             ->with($translatedEmailTemplate, $templateParams, $templateContext)
             ->willReturn($renderedEmailTemplate);
@@ -236,8 +213,7 @@ class EmailTemplateRenderingSubscriberTest extends TestCase
         $event = new PreSetDataEvent($this->createMock(FormInterface::class), $emailModel);
 
         $targetEntity = new UserStub($entityId);
-        $this->emailModelBuilderHelper
-            ->expects(self::once())
+        $this->emailModelBuilderHelper->expects(self::once())
             ->method('getTargetEntity')
             ->with($entityClass, $entityId)
             ->willReturn($targetEntity);
@@ -245,8 +221,7 @@ class EmailTemplateRenderingSubscriberTest extends TestCase
         $emailTemplateCriteria = new EmailTemplateCriteria($emailTemplate->getName(), $emailTemplate->getEntityName());
 
         $templateParams = ['entity' => $targetEntity];
-        $this->emailTemplateContextProvider
-            ->expects(self::once())
+        $this->emailTemplateContextProvider->expects(self::once())
             ->method('getTemplateContext')
             ->with(
                 From::emailAddress($emailModel->getFrom()),
@@ -259,8 +234,7 @@ class EmailTemplateRenderingSubscriberTest extends TestCase
         $translatedEmailTemplate = (new EmailTemplateModel($emailTemplate->getName()))
             ->setSubject('translated subject')
             ->setContent('translated content');
-        $this->translatedEmailTemplateProvider
-            ->expects(self::once())
+        $this->translatedEmailTemplateProvider->expects(self::once())
             ->method('getTranslatedEmailTemplate')
             ->with($emailTemplate, null)
             ->willReturn($translatedEmailTemplate);
@@ -269,8 +243,7 @@ class EmailTemplateRenderingSubscriberTest extends TestCase
             ->setSubject('rendered subject')
             ->setContent('rendered content');
 
-        $this->emailRenderer
-            ->expects(self::once())
+        $this->emailRenderer->expects(self::once())
             ->method('renderEmailTemplate')
             ->with($translatedEmailTemplate, $templateParams, [])
             ->willReturn($renderedEmailTemplate);
@@ -298,8 +271,7 @@ class EmailTemplateRenderingSubscriberTest extends TestCase
         $event = new PreSetDataEvent($this->createMock(FormInterface::class), $emailModel);
 
         $targetEntity = new UserStub($entityId);
-        $this->emailModelBuilderHelper
-            ->expects(self::once())
+        $this->emailModelBuilderHelper->expects(self::once())
             ->method('getTargetEntity')
             ->with($entityClass, $entityId)
             ->willReturn($targetEntity);
@@ -307,8 +279,7 @@ class EmailTemplateRenderingSubscriberTest extends TestCase
         $emailTemplateCriteria = new EmailTemplateCriteria($emailTemplate->getName(), $emailTemplate->getEntityName());
 
         $templateParams = ['entity' => $targetEntity];
-        $this->emailTemplateContextProvider
-            ->expects(self::once())
+        $this->emailTemplateContextProvider->expects(self::once())
             ->method('getTemplateContext')
             ->with(
                 From::emailAddress($emailModel->getFrom()),
@@ -321,8 +292,7 @@ class EmailTemplateRenderingSubscriberTest extends TestCase
         $translatedEmailTemplate = (new EmailTemplateModel($emailTemplate->getName()))
             ->setSubject('translated subject')
             ->setContent('translated content');
-        $this->translatedEmailTemplateProvider
-            ->expects(self::once())
+        $this->translatedEmailTemplateProvider->expects(self::once())
             ->method('getTranslatedEmailTemplate')
             ->with($emailTemplate, null)
             ->willReturn($translatedEmailTemplate);
@@ -331,8 +301,7 @@ class EmailTemplateRenderingSubscriberTest extends TestCase
             ->setSubject('rendered subject')
             ->setContent('rendered content');
 
-        $this->emailRenderer
-            ->expects(self::once())
+        $this->emailRenderer->expects(self::once())
             ->method('renderEmailTemplate')
             ->with($translatedEmailTemplate, $templateParams, [])
             ->willReturn($renderedEmailTemplate);
@@ -360,8 +329,7 @@ class EmailTemplateRenderingSubscriberTest extends TestCase
         $event = new PreSetDataEvent($this->createMock(FormInterface::class), $emailModel);
 
         $targetEntity = new UserStub($entityId);
-        $this->emailModelBuilderHelper
-            ->expects(self::once())
+        $this->emailModelBuilderHelper->expects(self::once())
             ->method('getTargetEntity')
             ->with($entityClass, $entityId)
             ->willReturn($targetEntity);
@@ -369,8 +337,7 @@ class EmailTemplateRenderingSubscriberTest extends TestCase
         $emailTemplateCriteria = new EmailTemplateCriteria($emailTemplate->getName(), $emailTemplate->getEntityName());
 
         $templateParams = ['entity' => $targetEntity];
-        $this->emailTemplateContextProvider
-            ->expects(self::once())
+        $this->emailTemplateContextProvider->expects(self::once())
             ->method('getTemplateContext')
             ->with(
                 From::emailAddress($emailModel->getFrom()),
@@ -383,8 +350,7 @@ class EmailTemplateRenderingSubscriberTest extends TestCase
         $translatedEmailTemplate = (new EmailTemplateModel($emailTemplate->getName()))
             ->setSubject('translated subject')
             ->setContent('translated content');
-        $this->translatedEmailTemplateProvider
-            ->expects(self::once())
+        $this->translatedEmailTemplateProvider->expects(self::once())
             ->method('getTranslatedEmailTemplate')
             ->with($emailTemplate, null)
             ->willReturn($translatedEmailTemplate);
@@ -393,8 +359,7 @@ class EmailTemplateRenderingSubscriberTest extends TestCase
             ->setSubject('rendered subject')
             ->setContent('rendered content');
 
-        $this->emailRenderer
-            ->expects(self::once())
+        $this->emailRenderer->expects(self::once())
             ->method('renderEmailTemplate')
             ->with($translatedEmailTemplate, $templateParams, [])
             ->willReturn($renderedEmailTemplate);

@@ -25,17 +25,17 @@ class ProcessorHelperTest extends TestCase
         );
     }
 
-    public function testGetPNGQuantLibrary()
+    public function testGetPNGQuantLibrary(): void
     {
         $this->assertNotEmpty($this->processorHelper->getPNGQuantLibrary());
     }
 
-    public function testGetJPEGOptimLibrary()
+    public function testGetJPEGOptimLibrary(): void
     {
         $this->assertNotEmpty($this->processorHelper->getJPEGOptimLibrary());
     }
 
-    public function testLibrariesExists()
+    public function testLibrariesExists(): void
     {
         $this->assertTrue($this->processorHelper->librariesExists());
     }

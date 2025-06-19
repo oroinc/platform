@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 use Oro\Bundle\ApiBundle\Filter\FilterOperator;
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -12,7 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
  * @SuppressWarnings(PHPMD.TooManyMethods)
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class RestFilterValueAccessorTest extends \PHPUnit\Framework\TestCase
+class RestFilterValueAccessorTest extends TestCase
 {
     private function getRestFilterValueAccessor(Request $request): RestFilterValueAccessor
     {

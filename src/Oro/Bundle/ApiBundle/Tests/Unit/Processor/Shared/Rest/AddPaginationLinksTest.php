@@ -15,16 +15,14 @@ use Oro\Bundle\ApiBundle\Request\Rest\RestRoutesRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class AddPaginationLinksTest extends GetListProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|UrlGeneratorInterface */
-    private $urlGenerator;
-
-    /** @var AddPaginationLinks */
-    private $processor;
+    private UrlGeneratorInterface&MockObject $urlGenerator;
+    private AddPaginationLinks $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -54,14 +52,14 @@ class AddPaginationLinksTest extends GetListProcessorTestCase
         );
     }
 
-    public function testProcessWhenNoDocumentBuilder()
+    public function testProcessWhenNoDocumentBuilder(): void
     {
         $this->context->setClassName('Test\Entity');
         $this->context->setResponseStatusCode(Response::HTTP_OK);
         $this->processor->process($this->context);
     }
 
-    public function testProcessForNotSuccessResponse()
+    public function testProcessForNotSuccessResponse(): void
     {
         $documentBuilder = $this->createMock(DocumentBuilderInterface::class);
 
@@ -76,7 +74,7 @@ class AddPaginationLinksTest extends GetListProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessForSuccessResponse()
+    public function testProcessForSuccessResponse(): void
     {
         $entityClass = 'Test\Entity';
         $entityAlias = 'test_entity';

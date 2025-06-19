@@ -13,6 +13,7 @@ class CaptchaTypeTest extends TestCase
 {
     private CaptchaType $captchaType;
 
+    #[\Override]
     protected function setUp(): void
     {
         $this->captchaType = new CaptchaType();

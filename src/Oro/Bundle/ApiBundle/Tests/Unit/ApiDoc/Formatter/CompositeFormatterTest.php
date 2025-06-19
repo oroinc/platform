@@ -6,17 +6,14 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Formatter\FormatterInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\Formatter\CompositeFormatter;
 use Oro\Bundle\ApiBundle\ApiDoc\RestDocViewDetector;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class CompositeFormatterTest extends \PHPUnit\Framework\TestCase
+class CompositeFormatterTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|RestDocViewDetector */
-    private $docViewDetector;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FormatterInterface */
-    private $formatter;
-
-    /** @var CompositeFormatter */
-    private $compositeFormatter;
+    private RestDocViewDetector&MockObject $docViewDetector;
+    private FormatterInterface&MockObject $formatter;
+    private CompositeFormatter $compositeFormatter;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +25,7 @@ class CompositeFormatterTest extends \PHPUnit\Framework\TestCase
         $this->compositeFormatter->addFormatter('test', $this->formatter);
     }
 
-    public function testFormatForViewWithUnknownFormatter()
+    public function testFormatForViewWithUnknownFormatter(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot find formatter for "unknown" API view.');
@@ -42,7 +39,7 @@ class CompositeFormatterTest extends \PHPUnit\Framework\TestCase
         $this->compositeFormatter->format($data);
     }
 
-    public function testFormatOneForViewWithUnknownFormatter()
+    public function testFormatOneForViewWithUnknownFormatter(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot find formatter for "unknown" API view.');
@@ -56,7 +53,7 @@ class CompositeFormatterTest extends \PHPUnit\Framework\TestCase
         $this->compositeFormatter->formatOne($data);
     }
 
-    public function testFormatForViewWithKnownFormatter()
+    public function testFormatForViewWithKnownFormatter(): void
     {
         $data = ['key' => 'value'];
         $formatterData = ['key' => 'formattedValue'];
@@ -76,7 +73,7 @@ class CompositeFormatterTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFormatOneForViewWithKnownFormatter()
+    public function testFormatOneForViewWithKnownFormatter(): void
     {
         $data = $this->createMock(ApiDoc::class);
         $formatterData = ['key' => 'formattedValue'];

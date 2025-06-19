@@ -22,7 +22,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EntityVariablesProviderTest extends TestCase
 {
-    private const TEST_ENTITY_NAME = TestEntityForVariableProvider::class;
+    private const string TEST_ENTITY_NAME = TestEntityForVariableProvider::class;
 
     private ConfigProvider&MockObject $emailConfigProvider;
     private ConfigProvider&MockObject $entityConfigProvider;

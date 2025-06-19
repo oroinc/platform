@@ -6,8 +6,7 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\ExcludeCustomFieldsByDefault;
 
 class ExcludeCustomFieldsByDefaultTest extends ConfigProcessorTestCase
 {
-    /** @var ExcludeCustomFieldsByDefault */
-    private $processor;
+    private ExcludeCustomFieldsByDefault $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -16,7 +15,7 @@ class ExcludeCustomFieldsByDefaultTest extends ConfigProcessorTestCase
         $this->processor = new ExcludeCustomFieldsByDefault();
     }
 
-    public function testShouldSetCustomFieldsToExclusionPolicyIfExclusionPolicyIsNotSetYet()
+    public function testShouldSetCustomFieldsToExclusionPolicyIfExclusionPolicyIsNotSetYet(): void
     {
         $this->context->setResult($this->createConfigObject([]));
         $this->processor->process($this->context);
@@ -25,7 +24,7 @@ class ExcludeCustomFieldsByDefaultTest extends ConfigProcessorTestCase
         self::assertEquals('custom_fields', $this->context->getRequestedExclusionPolicy());
     }
 
-    public function testProcessWhenExclusionPolicyIsAlreadySetToAll()
+    public function testProcessWhenExclusionPolicyIsAlreadySetToAll(): void
     {
         $this->context->setResult($this->createConfigObject(['exclusion_policy' => 'all']));
         $this->processor->process($this->context);
@@ -34,7 +33,7 @@ class ExcludeCustomFieldsByDefaultTest extends ConfigProcessorTestCase
         self::assertNull($this->context->getRequestedExclusionPolicy());
     }
 
-    public function testProcessWhenExclusionPolicyIsAlreadySetToNone()
+    public function testProcessWhenExclusionPolicyIsAlreadySetToNone(): void
     {
         $this->context->setResult($this->createConfigObject(['exclusion_policy' => 'none']));
         $this->processor->process($this->context);
@@ -43,7 +42,7 @@ class ExcludeCustomFieldsByDefaultTest extends ConfigProcessorTestCase
         self::assertNull($this->context->getRequestedExclusionPolicy());
     }
 
-    public function testProcessWhenExclusionPolicyIsAlreadySetToCustomFields()
+    public function testProcessWhenExclusionPolicyIsAlreadySetToCustomFields(): void
     {
         $this->context->setResult($this->createConfigObject(['exclusion_policy' => 'custom_fields']));
         $this->processor->process($this->context);

@@ -10,22 +10,17 @@ use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\ChainProcessor\ProcessorRegistryInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ByStepActionProcessorTest extends \PHPUnit\Framework\TestCase
+class ByStepActionProcessorTest extends TestCase
 {
-    private const TEST_ACTION = 'test';
+    private const string TEST_ACTION = 'test';
 
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ProcessorRegistryInterface */
-    private $processorRegistry;
-
-    /** @var ProcessorBagConfigBuilder */
-    private $processorBagConfigBuilder;
-
-    /** @var ProcessorBag */
-    private $processorBag;
-
-    /** @var ByStepActionProcessor */
-    private $processor;
+    private ProcessorRegistryInterface&MockObject $processorRegistry;
+    private ProcessorBagConfigBuilder $processorBagConfigBuilder;
+    private ProcessorBag $processorBag;
+    private ByStepActionProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -59,7 +54,7 @@ class ByStepActionProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @param array $processors [processorId => groupName, ...]
      *
-     * @return ProcessorInterface[]|\PHPUnit\Framework\MockObject\MockObject[]
+     * @return ProcessorInterface[]&MockObject[]
      */
     private function addProcessors(array $processors): array
     {
@@ -83,7 +78,7 @@ class ByStepActionProcessorTest extends \PHPUnit\Framework\TestCase
         return $createdProcessors;
     }
 
-    public function testBothFirstAndLastGroupsAreNotSet()
+    public function testBothFirstAndLastGroupsAreNotSet(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
@@ -96,7 +91,7 @@ class ByStepActionProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($context);
     }
 
-    public function testFirstGroupIsNotSet()
+    public function testFirstGroupIsNotSet(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
@@ -110,7 +105,7 @@ class ByStepActionProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($context);
     }
 
-    public function testLastGroupIsNotSet()
+    public function testLastGroupIsNotSet(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
@@ -124,7 +119,7 @@ class ByStepActionProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($context);
     }
 
-    public function testFirstGroupIsNotEqualLastGroup()
+    public function testFirstGroupIsNotEqualLastGroup(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(
@@ -139,13 +134,13 @@ class ByStepActionProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->process($context);
     }
 
-    public function testWhenNoProcessors()
+    public function testWhenNoProcessors(): void
     {
         $context = $this->getContext();
         $this->processor->process($context);
     }
 
-    public function testShouldRemoveSkippedGroupsBeforeCallParentProcess()
+    public function testShouldRemoveSkippedGroupsBeforeCallParentProcess(): void
     {
         $context = $this->getContext();
         $context->skipGroup('group2');
@@ -165,7 +160,7 @@ class ByStepActionProcessorTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($context->hasSkippedGroups());
     }
 
-    public function testWhenNoExceptionsAndErrors()
+    public function testWhenNoExceptionsAndErrors(): void
     {
         $context = $this->getContext();
         $context->setFirstGroup('group2');

@@ -9,8 +9,9 @@ use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\EqComparisonExpressio
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\ExpressionValue;
 use Oro\Bundle\ApiBundle\Tests\Unit\Stub\FieldDqlExpressionProviderStub;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use PHPUnit\Framework\TestCase;
 
-class EqComparisonExpressionTest extends \PHPUnit\Framework\TestCase
+class EqComparisonExpressionTest extends TestCase
 {
     public function testWalkComparisonExpression(): void
     {

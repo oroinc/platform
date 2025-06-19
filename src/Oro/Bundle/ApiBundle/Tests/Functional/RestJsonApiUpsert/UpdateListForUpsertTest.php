@@ -256,12 +256,12 @@ class UpdateListForUpsertTest extends RestJsonApiUpdateListTestCase
         self::assertSame('New Item', $createdEntity->name);
         $children = $createdEntity->getChildren()->toArray();
         self::assertCount(2, $children);
-        $childIds = array_map(fn (TestCustomIdentifier $child) => $child->id, $children);
+        $childIds = array_map(fn (TestCustomIdentifier $child) => $child->autoincrementKey, $children);
         sort($childIds);
         /** @var TestCustomIdentifier $updatedChildEntity */
         $updatedChildEntity = $this->getReference('test_custom_id1');
         $createdChildEntity = $this->getEntityWithCustomIdentifier('another new item');
-        self::assertSame([$updatedChildEntity->id, $createdChildEntity->id], $childIds);
+        self::assertSame([$updatedChildEntity->autoincrementKey, $createdChildEntity->autoincrementKey], $childIds);
         self::assertSame('Updated Item 1', $updatedChildEntity->name);
         self::assertSame('Another New Item', $createdChildEntity->name);
     }
@@ -433,12 +433,12 @@ class UpdateListForUpsertTest extends RestJsonApiUpdateListTestCase
         self::assertSame('New Item', $createdEntity->name);
         $children = $createdEntity->getChildren()->toArray();
         self::assertCount(2, $children);
-        $childIds = array_map(fn (TestCustomIdentifier $child) => $child->id, $children);
+        $childIds = array_map(fn (TestCustomIdentifier $child) => $child->autoincrementKey, $children);
         sort($childIds);
         /** @var TestCustomIdentifier $updatedChildEntity */
         $updatedChildEntity = $this->getReference('test_custom_id1');
         $createdChildEntity = $this->getEntityWithCustomIdentifier('another new item');
-        self::assertSame([$updatedChildEntity->id, $createdChildEntity->id], $childIds);
+        self::assertSame([$updatedChildEntity->autoincrementKey, $createdChildEntity->autoincrementKey], $childIds);
         self::assertSame('Updated Item 1', $updatedChildEntity->name);
         self::assertSame('Another New Item', $createdChildEntity->name);
     }

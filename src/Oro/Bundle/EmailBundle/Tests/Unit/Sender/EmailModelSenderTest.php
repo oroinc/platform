@@ -22,18 +22,12 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class EmailModelSenderTest extends TestCase
 {
-    private MailerInterface|MockObject $mailer;
-
-    private EmbeddedImagesInEmailModelHandler|MockObject $embeddedImagesHandler;
-
-    private EmailFactory|MockObject $symfonyEmailFactory;
-
-    private EmailUserFromEmailModelBuilder|MockObject $emailUserFromEmailModelBuilder;
-
-    private EventDispatcherInterface|MockObject $eventDispatcher;
-
-    private EntityListener|MockObject $emailEntityListener;
-
+    private MailerInterface&MockObject $mailer;
+    private EmbeddedImagesInEmailModelHandler&MockObject $embeddedImagesHandler;
+    private EmailFactory&MockObject $symfonyEmailFactory;
+    private EmailUserFromEmailModelBuilder&MockObject $emailUserFromEmailModelBuilder;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private EntityListener&MockObject $emailEntityListener;
     private EmailModelSender $emailModelSender;
 
     #[\Override]

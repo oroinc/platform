@@ -3,13 +3,14 @@
 namespace Oro\Component\ChainProcessor\Tests\Unit\DependencyInjection;
 
 use Oro\Component\ChainProcessor\DependencyInjection\LoadApplicableCheckersCompilerPass;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class LoadApplicableCheckersCompilerPassTest extends \PHPUnit\Framework\TestCase
+class LoadApplicableCheckersCompilerPassTest extends TestCase
 {
-    public function testProcessWithoutProcessorBag()
+    public function testProcessWithoutProcessorBag(): void
     {
         $container = new ContainerBuilder();
 
@@ -25,7 +26,7 @@ class LoadApplicableCheckersCompilerPassTest extends \PHPUnit\Framework\TestCase
         $compilerPass->process($container);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);

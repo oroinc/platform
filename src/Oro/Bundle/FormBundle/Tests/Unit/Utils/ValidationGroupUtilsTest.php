@@ -24,28 +24,34 @@ class ValidationGroupUtilsTest extends TestCase
         );
     }
 
-    public function resolveValidationGroupsDataProvider(): iterable
+    public function resolveValidationGroupsDataProvider(): array
     {
-        yield 'empty' => [[], [], []];
-
-        yield 'not empty groups' => [['group1', 'group2'], [], ['group1', 'group2']];
-
-        yield 'not empty groups, without placeholders' => [
-            ['group1%placeholder%', 'group2'],
-            [],
-            ['group1%placeholder%', 'group2'],
-        ];
-
-        yield 'not empty groups with placeholder, with placeholders' => [
-            ['group1%placeholder%', 'group2'],
-            ['%placeholder%' => '_user'],
-            ['group1_user', 'group2'],
-        ];
-
-        yield 'not empty groups with group sequence, with placeholders' => [
-            [['group1%placeholder%', 'group2']],
-            ['%placeholder%' => '_user'],
-            [new GroupSequence(['group1_user', 'group2'])],
+        return [
+            'empty' => [
+                [],
+                [],
+                []
+            ],
+            'not empty groups' => [
+                ['group1', 'group2'],
+                [],
+                ['group1', 'group2']
+            ],
+            'not empty groups, without placeholders' => [
+                ['group1%placeholder%', 'group2'],
+                [],
+                ['group1%placeholder%', 'group2']
+            ],
+            'not empty groups with placeholder, with placeholders' => [
+                ['group1%placeholder%', 'group2'],
+                ['%placeholder%' => '_user'],
+                ['group1_user', 'group2']
+            ],
+            'not empty groups with group sequence, with placeholders' => [
+                [['group1%placeholder%', 'group2']],
+                ['%placeholder%' => '_user'],
+                [new GroupSequence(['group1_user', 'group2'])]
+            ]
         ];
     }
 }

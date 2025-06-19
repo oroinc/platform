@@ -3,8 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 
 use Oro\Bundle\ApiBundle\Filter\FilterOperatorRegistry;
+use PHPUnit\Framework\TestCase;
 
-class FilterOperatorRegistryTest extends \PHPUnit\Framework\TestCase
+class FilterOperatorRegistryTest extends TestCase
 {
     private FilterOperatorRegistry $registry;
 

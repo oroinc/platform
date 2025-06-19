@@ -10,6 +10,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityNameProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Tests\Functional\Environment\TestEntityNameResolverClassesProviderInterface;
 use Oro\Bundle\EntityBundle\Tests\Functional\Environment\TestEntityNameResolverDataLoaderInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\LocaleBundle\Entity\Localization;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadBusinessUnit;
@@ -22,9 +23,6 @@ class EntityNameResolverTest extends WebTestCase
     #[\Override]
     protected function setUp(): void
     {
-        self::markTestSkipped(
-            'Skipped during to memory usage in this test exceeds 1GB, waiting fixes in ticket/BAP-22701'
-        );
         $this->initClient();
         $this->loadFixtures([LoadOrganization::class, LoadBusinessUnit::class, LoadUser::class]);
     }
@@ -108,6 +106,11 @@ class EntityNameResolverTest extends WebTestCase
         $entityNameResolver = $this->getEntityNameResolver();
         $entityDataLoader = $this->getEntityDataLoader();
         $doctrine = $this->getDoctrine();
+
+        /** @var ConfigManager $configManager */
+        $configManager = $this->getContainer()->get('oro_entity_config.config_manager');
+        $configManager->clear();
+
         $entityClasses = $this->getEntityClassesProvider()->getEntityClasses();
         ksort($entityClasses);
         foreach ($entityClasses as $entityClass => $reasons) {

@@ -3,8 +3,9 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Model;
 
 use Oro\Bundle\AttachmentBundle\Model\ExternalFile;
+use PHPUnit\Framework\TestCase;
 
-class ExternalFileTest extends \PHPUnit\Framework\TestCase
+class ExternalFileTest extends TestCase
 {
     /**
      * @dataProvider gettersDataProvider

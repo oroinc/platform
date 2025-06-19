@@ -12,19 +12,21 @@ use Oro\Bundle\AttachmentBundle\Provider\ResizedImageProvider;
 use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Factory\ImagineBinaryByFileContentFactoryInterface;
 use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Filter\ImagineBinaryFilterInterface;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ResizedImageProviderTest extends \PHPUnit\Framework\TestCase
+class ResizedImageProviderTest extends TestCase
 {
-    private FileManager|\PHPUnit\Framework\MockObject\MockObject $fileManager;
-    private ImagineBinaryByFileContentFactoryInterface|\PHPUnit\Framework\MockObject\MockObject $imagineBinaryFactory;
-    private ImagineBinaryFilterInterface|\PHPUnit\Framework\MockObject\MockObject $imagineBinaryFilter;
-    private FilterConfiguration|\PHPUnit\Framework\MockObject\MockObject $filterConfig;
-    private FilterRuntimeConfigProviderInterface|\PHPUnit\Framework\MockObject\MockObject $filterRuntimeConfigProvider;
-    private LoggerInterface|\PHPUnit\Framework\MockObject\MockObject $logger;
+    private FileManager&MockObject $fileManager;
+    private ImagineBinaryByFileContentFactoryInterface&MockObject $imagineBinaryFactory;
+    private ImagineBinaryFilterInterface&MockObject $imagineBinaryFilter;
+    private FilterConfiguration&MockObject $filterConfig;
+    private FilterRuntimeConfigProviderInterface&MockObject $filterRuntimeConfigProvider;
+    private LoggerInterface&MockObject $logger;
     private ResizedImageProvider $provider;
 
     #[\Override]

@@ -10,6 +10,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
@@ -17,14 +18,9 @@ use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
  */
 class CompleteSortersTest extends ConfigProcessorTestCase
 {
-    /** @var DoctrineHelper|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrineHelper;
-
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var CompleteSorters */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private ConfigManager&MockObject $configManager;
+    private CompleteSorters $processor;
 
     #[\Override]
     protected function setUp(): void

@@ -5,11 +5,12 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Tools\Imagine\Binary\Filter\Uns
 use Liip\ImagineBundle\Model\Binary;
 use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Filter\ImagineBinaryFilterInterface;
 use Oro\Bundle\AttachmentBundle\Tools\Imagine\Binary\Filter\UnsupportedBinaries;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class SkipUnsupportedBinariesByMimeTypeFilterDecoratorTest extends \PHPUnit\Framework\TestCase
+class SkipUnsupportedBinariesByMimeTypeFilterDecoratorTest extends TestCase
 {
-    private ImagineBinaryFilterInterface|\PHPUnit\Framework\MockObject\MockObject $decoratedFilter;
-
+    private ImagineBinaryFilterInterface&MockObject $decoratedFilter;
     private UnsupportedBinaries\SkipUnsupportedBinariesByMimeTypeFilterDecorator $filterDecorator;
 
     #[\Override]

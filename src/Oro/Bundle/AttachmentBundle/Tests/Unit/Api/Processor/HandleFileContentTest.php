@@ -7,17 +7,15 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeFormData\CustomizeFormDat
 use Oro\Bundle\AttachmentBundle\Api\Processor\HandleFileContent;
 use Oro\Bundle\AttachmentBundle\Entity\File;
 use Oro\Bundle\AttachmentBundle\Manager\FileManager;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class HandleFileContentTest extends CustomizeFormDataProcessorTestCase
 {
-    /** @var FileManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $fileManager;
-
-    /** @var HandleFileContent */
-    private $processor;
+    private FileManager&MockObject $fileManager;
+    private HandleFileContent $processor;
 
     #[\Override]
     protected function setUp(): void

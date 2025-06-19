@@ -10,8 +10,7 @@ use Oro\Bundle\ApiBundle\Util\EntityMapper;
 
 class ConvertModelToEntityTest extends FormProcessorTestCase
 {
-    /** @var ConvertModelToEntity */
-    private $processor;
+    private ConvertModelToEntity $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -21,7 +20,7 @@ class ConvertModelToEntityTest extends FormProcessorTestCase
         $this->processor = new ConvertModelToEntity();
     }
 
-    public function testProcessWhenNoModel()
+    public function testProcessWhenNoModel(): void
     {
         $entityClass = Entity\User::class;
         $config = new EntityDefinitionConfig();
@@ -38,7 +37,7 @@ class ConvertModelToEntityTest extends FormProcessorTestCase
         self::assertFalse($this->context->hasResult());
     }
 
-    public function testProcessWhenNoEntityMapper()
+    public function testProcessWhenNoEntityMapper(): void
     {
         $entityClass = Entity\User::class;
         $model = new \stdClass();
@@ -52,7 +51,7 @@ class ConvertModelToEntityTest extends FormProcessorTestCase
         self::assertSame($model, $this->context->getResult());
     }
 
-    public function testProcessWhenModelShouldBeConvertedToEntity()
+    public function testProcessWhenModelShouldBeConvertedToEntity(): void
     {
         $entityClass = Entity\User::class;
         $model = new \stdClass();
@@ -74,7 +73,7 @@ class ConvertModelToEntityTest extends FormProcessorTestCase
         self::assertSame($entity, $this->context->getResult());
     }
 
-    public function testProcessWhenModelShouldBeConvertedToEntityForApiResourceBasedOnManageableEntity()
+    public function testProcessWhenModelShouldBeConvertedToEntityForApiResourceBasedOnManageableEntity(): void
     {
         $entityClass = Entity\UserProfile::class;
         $parentResourceClass = Entity\User::class;

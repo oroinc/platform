@@ -11,19 +11,15 @@ use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface;
 use Oro\Bundle\ApiBundle\Request\ErrorCompleterRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 class BuildResultDocumentTest extends UpdateListProcessorTestCase
 {
-    /** @var ErrorCompleterRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $errorCompleterRegistry;
-
-    /** @var LoggerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $logger;
-
-    /** @var BuildResultDocument */
-    private $processor;
+    private ErrorCompleterRegistry&MockObject $errorCompleterRegistry;
+    private LoggerInterface&MockObject $logger;
+    private BuildResultDocument $processor;
 
     #[\Override]
     protected function setUp(): void

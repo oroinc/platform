@@ -165,6 +165,12 @@ api:
                             property_path: relatedId
                 linkedField:
                     property_path: linked.key
+            filters:
+                fields:
+                    relatedEntity:
+                        data_type: string
+                        type: nestedAssociation
+                        allow_array: true
         Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
             filters:
                 fields:
@@ -272,7 +278,7 @@ api:
             identifier_description: 'The unique identifier of a resource. It is a key.'
             fields:
                 databaseId:
-                    property_path: id
+                    property_path: autoincrementKey
             filters:
                 fields:
                     key:

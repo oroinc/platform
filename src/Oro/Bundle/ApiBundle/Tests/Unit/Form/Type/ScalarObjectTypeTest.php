@@ -40,7 +40,7 @@ class ScalarObjectTypeTest extends ApiFormTypeTestCase
         );
     }
 
-    public function testSubmitWhenNoApiContext()
+    public function testSubmitWhenNoApiContext(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
@@ -73,7 +73,7 @@ class ScalarObjectTypeTest extends ApiFormTypeTestCase
         self::assertSame('testPriceValue', $data->getPrice()->getValue());
     }
 
-    public function testCreateNestedObject()
+    public function testCreateNestedObject(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
@@ -112,7 +112,7 @@ class ScalarObjectTypeTest extends ApiFormTypeTestCase
         self::assertSame('testPriceValue', $data->getPrice()->getValue());
     }
 
-    public function testCreateNestedObjectWhenValueIsNotSubmitted()
+    public function testCreateNestedObjectWhenValueIsNotSubmitted(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
@@ -151,7 +151,7 @@ class ScalarObjectTypeTest extends ApiFormTypeTestCase
         self::assertNull($data->getPrice()->getValue());
     }
 
-    public function testCreateNestedObjectWhenSubmittedValueIsNull()
+    public function testCreateNestedObjectWhenSubmittedValueIsNull(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
@@ -190,7 +190,7 @@ class ScalarObjectTypeTest extends ApiFormTypeTestCase
         self::assertNull($data->getPrice()->getValue());
     }
 
-    public function testCreateNestedObjectWhenSubmittedValueIsNullAndRequiredOptionIsFalse()
+    public function testCreateNestedObjectWhenSubmittedValueIsNullAndRequiredOptionIsFalse(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
@@ -230,7 +230,7 @@ class ScalarObjectTypeTest extends ApiFormTypeTestCase
         self::assertNull($data->getNullablePrice());
     }
 
-    public function testUpdateNestedObject()
+    public function testUpdateNestedObject(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
@@ -271,7 +271,7 @@ class ScalarObjectTypeTest extends ApiFormTypeTestCase
         self::assertSame('oldPriceCurrency', $data->getPrice()->getCurrency());
     }
 
-    public function testUpdateNestedObjectWhenValueIsNotSubmitted()
+    public function testUpdateNestedObjectWhenValueIsNotSubmitted(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
@@ -311,7 +311,7 @@ class ScalarObjectTypeTest extends ApiFormTypeTestCase
         self::assertSame('oldPriceCurrency', $data->getPrice()->getCurrency());
     }
 
-    public function testUpdateNestedObjectWhenSubmittedValueIsNull()
+    public function testUpdateNestedObjectWhenSubmittedValueIsNull(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('value'));
@@ -352,7 +352,7 @@ class ScalarObjectTypeTest extends ApiFormTypeTestCase
         self::assertEquals('oldPriceCurrency', $data->getPrice()->getCurrency());
     }
 
-    public function testCreateNestedObjectWithRenamedField()
+    public function testCreateNestedObjectWithRenamedField(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('renamedValue'))->setPropertyPath('value');
@@ -391,7 +391,7 @@ class ScalarObjectTypeTest extends ApiFormTypeTestCase
         self::assertSame('testPriceValue', $data->getPrice()->getValue());
     }
 
-    public function testCreateNestedObjectWithFormOptions()
+    public function testCreateNestedObjectWithFormOptions(): void
     {
         $metadata = new EntityMetadata('Test\Entity');
         $metadata->addField(new FieldMetadata('renamedValue'));

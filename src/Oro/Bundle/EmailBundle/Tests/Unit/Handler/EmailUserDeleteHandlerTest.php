@@ -11,15 +11,14 @@ use Oro\Bundle\EmailBundle\Handler\EmailUserDeleteHandlerExtension;
 use Oro\Bundle\EntityBundle\Handler\EntityDeleteAccessDeniedExceptionFactory;
 use Oro\Bundle\EntityBundle\Handler\EntityDeleteHandlerExtensionRegistry;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class EmailUserDeleteHandlerTest extends \PHPUnit\Framework\TestCase
+class EmailUserDeleteHandlerTest extends TestCase
 {
-    /** @var EntityManagerInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $em;
-
-    /** @var EmailUserDeleteHandler */
-    private $deleteHandler;
+    private EntityManagerInterface&MockObject $em;
+    private EmailUserDeleteHandler $deleteHandler;
 
     #[\Override]
     protected function setUp(): void

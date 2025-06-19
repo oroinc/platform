@@ -21,6 +21,7 @@ use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
 use Oro\Component\Testing\ReflectionUtil;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 use Oro\Component\Testing\Unit\PreloadedExtension;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
@@ -30,14 +31,9 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EmailTemplateTypeTest extends FormIntegrationTestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var LocalizationManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $localizationManager;
-
-    /** @var EmailTemplateType */
-    private $type;
+    private ConfigManager&MockObject $configManager;
+    private LocalizationManager&MockObject $localizationManager;
+    private EmailTemplateType $type;
 
     #[\Override]
     protected function setUp(): void

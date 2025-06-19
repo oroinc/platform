@@ -8,16 +8,15 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailAddressManager;
 use Oro\Bundle\EmailBundle\EventListener\EmailAddressAssociationMetadataListener;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class EmailAddressAssociationMetadataListenerTest extends \PHPUnit\Framework\TestCase
+class EmailAddressAssociationMetadataListenerTest extends TestCase
 {
-    private const EMAIL_ADDRESS_PROXY_CLASS = 'Test\EmailAddressProxy';
+    private const string EMAIL_ADDRESS_PROXY_CLASS = 'Test\EmailAddressProxy';
 
-    /** @var EmailAddressManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailAddressManager;
-
-    /** @var EmailAddressAssociationMetadataListener */
-    private $listener;
+    private EmailAddressManager&MockObject $emailAddressManager;
+    private EmailAddressAssociationMetadataListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +29,7 @@ class EmailAddressAssociationMetadataListenerTest extends \PHPUnit\Framework\Tes
         $this->listener = new EmailAddressAssociationMetadataListener($this->emailAddressManager);
     }
 
-    public function testLoadClassMetadata()
+    public function testLoadClassMetadata(): void
     {
         $metadata = new ClassMetadata('Test\Entity');
         $metadata->associationMappings = [

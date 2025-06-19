@@ -4,6 +4,7 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Utils;
 
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Component\Testing\Unit\Form\Type\Stub\EntityTypeStub;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DataTransformerChain;
 use Symfony\Component\Form\FormConfigInterface;
@@ -15,7 +16,7 @@ use Symfony\Component\Form\Test\FormInterface;
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class FormUtilsTest extends \PHPUnit\Framework\TestCase
+class FormUtilsTest extends TestCase
 {
     /**
      * @dataProvider optionsProvider

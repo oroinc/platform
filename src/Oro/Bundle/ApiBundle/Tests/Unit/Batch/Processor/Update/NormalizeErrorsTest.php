@@ -6,15 +6,13 @@ use Oro\Bundle\ApiBundle\Batch\Handler\BatchUpdateItem;
 use Oro\Bundle\ApiBundle\Batch\Processor\Update\NormalizeErrors;
 use Oro\Bundle\ApiBundle\Batch\Processor\UpdateItem\BatchUpdateItemContext;
 use Oro\Bundle\ApiBundle\Model\Error;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 class NormalizeErrorsTest extends BatchUpdateProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|TranslatorInterface */
-    private $translator;
-
-    /** @var NormalizeErrors */
-    private $processor;
+    private TranslatorInterface&MockObject $translator;
+    private NormalizeErrors $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -26,12 +24,12 @@ class NormalizeErrorsTest extends BatchUpdateProcessorTestCase
         $this->processor = new NormalizeErrors($this->translator);
     }
 
-    public function testProcessWithoutErrors()
+    public function testProcessWithoutErrors(): void
     {
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithErrors()
+    public function testProcessWithErrors(): void
     {
         $error = $this->createMock(Error::class);
 
@@ -43,7 +41,7 @@ class NormalizeErrorsTest extends BatchUpdateProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithErrorsInBatchItem()
+    public function testProcessWithErrorsInBatchItem(): void
     {
         $error = $this->createMock(Error::class);
 

@@ -4,15 +4,14 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Datagrid;
 
 use Oro\Bundle\EmailBundle\Datagrid\EmailTemplateGridHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EmailTemplateGridHelperTest extends \PHPUnit\Framework\TestCase
+class EmailTemplateGridHelperTest extends TestCase
 {
-    /** @var EntityProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityProvider;
-
-    /** @var EmailTemplateGridHelper */
-    private $helper;
+    private EntityProvider&MockObject $entityProvider;
+    private EmailTemplateGridHelper $helper;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +29,7 @@ class EmailTemplateGridHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetEntityNames()
+    public function testGetEntityNames(): void
     {
         $this->entityProvider->expects($this->once())
             ->method('getEntities')

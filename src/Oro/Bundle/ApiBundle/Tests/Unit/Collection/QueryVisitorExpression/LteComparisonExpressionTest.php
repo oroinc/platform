@@ -8,10 +8,11 @@ use Oro\Bundle\ApiBundle\Collection\QueryExpressionVisitor;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\LteComparisonExpression;
 use Oro\Bundle\ApiBundle\Tests\Unit\Stub\FieldDqlExpressionProviderStub;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use PHPUnit\Framework\TestCase;
 
-class LteComparisonExpressionTest extends \PHPUnit\Framework\TestCase
+class LteComparisonExpressionTest extends TestCase
 {
-    public function testWalkComparisonExpression()
+    public function testWalkComparisonExpression(): void
     {
         $expression = new LteComparisonExpression();
         $expressionVisitor = new QueryExpressionVisitor(

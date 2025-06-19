@@ -4,17 +4,16 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Event;
 
 use Oro\Bundle\FormBundle\Event\EventDispatcher;
 use Oro\Bundle\FormBundle\Event\FormHandler\FormProcessEvent;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class EventDispatcherTest extends \PHPUnit\Framework\TestCase
+class EventDispatcherTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EventDispatcherInterface */
-    private $eventDispatcher;
-
-    /** @var EventDispatcher */
-    private $immutableDispatcher;
+    private EventDispatcherInterface&MockObject $eventDispatcher;
+    private EventDispatcher $immutableDispatcher;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +23,7 @@ class EventDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->immutableDispatcher = new EventDispatcher($this->eventDispatcher);
     }
 
-    public function testDispatchNonFormEvent()
+    public function testDispatchNonFormEvent(): void
     {
         $event = new Event();
         $eventName = 'test_event_name';
@@ -35,7 +34,7 @@ class EventDispatcherTest extends \PHPUnit\Framework\TestCase
         $this->immutableDispatcher->dispatch($event, $eventName);
     }
 
-    public function testDispatchFormEvent()
+    public function testDispatchFormEvent(): void
     {
         $form = $this->createMock(FormInterface::class);
         $form->expects($this->once())

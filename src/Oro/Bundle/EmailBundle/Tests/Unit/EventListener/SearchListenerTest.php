@@ -10,11 +10,11 @@ use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwner;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestOrganization;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
 use Oro\Bundle\SearchBundle\Event\PrepareEntityMapEvent;
+use PHPUnit\Framework\TestCase;
 
-class SearchListenerTest extends \PHPUnit\Framework\TestCase
+class SearchListenerTest extends TestCase
 {
-    /** @var SearchListener */
-    private $listener;
+    private SearchListener $listener;
 
     #[\Override]
     protected function setUp(): void
@@ -25,7 +25,7 @@ class SearchListenerTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider prepareEntityMapEventDataProvider
      */
-    public function testPrepareEntityMapEvent($entity, $expected)
+    public function testPrepareEntityMapEvent($entity, $expected): void
     {
         $data = [
             'integer' => [

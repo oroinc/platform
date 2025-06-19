@@ -8,17 +8,13 @@ use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\FlushDataHandlerInterface;
 use Oro\Bundle\ApiBundle\Processor\Subresource\Shared\SaveParentEntity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Subresource\ChangeRelationshipProcessorTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class SaveParentEntityTest extends ChangeRelationshipProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper */
-    private $doctrineHelper;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|FlushDataHandlerInterface */
-    private $flushDataHandler;
-
-    /** @var SaveParentEntity */
-    private $processor;
+    private DoctrineHelper&MockObject $doctrineHelper;
+    private FlushDataHandlerInterface&MockObject $flushDataHandler;
+    private SaveParentEntity $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -31,7 +27,7 @@ class SaveParentEntityTest extends ChangeRelationshipProcessorTestCase
         $this->processor = new SaveParentEntity($this->doctrineHelper, $this->flushDataHandler);
     }
 
-    public function testProcessWhenParentEntityAlreadySaved()
+    public function testProcessWhenParentEntityAlreadySaved(): void
     {
         $this->doctrineHelper->expects(self::never())
             ->method('getEntityManager');
@@ -44,7 +40,7 @@ class SaveParentEntityTest extends ChangeRelationshipProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWhenNoParentEntity()
+    public function testProcessWhenNoParentEntity(): void
     {
         $this->doctrineHelper->expects(self::never())
             ->method('getEntityManager');
@@ -56,7 +52,7 @@ class SaveParentEntityTest extends ChangeRelationshipProcessorTestCase
         self::assertFalse($this->context->isProcessed(SaveParentEntity::OPERATION_NAME));
     }
 
-    public function testProcessForNotSupportedParentEntity()
+    public function testProcessForNotSupportedParentEntity(): void
     {
         $this->doctrineHelper->expects(self::never())
             ->method('getEntityManager');
@@ -69,7 +65,7 @@ class SaveParentEntityTest extends ChangeRelationshipProcessorTestCase
         self::assertFalse($this->context->isProcessed(SaveParentEntity::OPERATION_NAME));
     }
 
-    public function testProcessForNotManageableParentEntity()
+    public function testProcessForNotManageableParentEntity(): void
     {
         $entity = new \stdClass();
 
@@ -86,7 +82,7 @@ class SaveParentEntityTest extends ChangeRelationshipProcessorTestCase
         self::assertFalse($this->context->isProcessed(SaveParentEntity::OPERATION_NAME));
     }
 
-    public function testProcessForManageableParentEntity()
+    public function testProcessForManageableParentEntity(): void
     {
         $entity = new \stdClass();
 

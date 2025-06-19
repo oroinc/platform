@@ -14,6 +14,7 @@ use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
@@ -21,11 +22,8 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  */
 class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigProvider */
-    private $configProvider;
-
-    /** @var CompleteAssociationHelper */
-    private $completeAssociationHelper;
+    private ConfigProvider&MockObject $configProvider;
+    private CompleteAssociationHelper $completeAssociationHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -48,7 +46,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
         array $extras,
         array $expectedConfig,
         array $expectedExtras
-    ) {
+    ): void {
         $config = $this->createConfigObject($config);
         $targetClass = 'Test\TargetEntity';
         $version = self::TEST_VERSION;
@@ -540,7 +538,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
         ];
     }
 
-    public function testCompleteAssociationWithTargetClass()
+    public function testCompleteAssociationWithTargetClass(): void
     {
         $targetClass = 'Test\TargetEntity';
         $baseTargetClass = 'Test\BaseTargetEntity';
@@ -608,7 +606,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    public function testCompleteAssociationWithTargetClassForModelThatExtendsEntity()
+    public function testCompleteAssociationWithTargetClassForModelThatExtendsEntity(): void
     {
         $targetClass = 'Test\TargetEntity';
         $baseTargetClass = 'Test\BaseTargetEntity';
@@ -678,7 +676,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    public function testCompleteNestedObject()
+    public function testCompleteNestedObject(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -732,7 +730,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    public function testCompleteNestedObjectWithInheritData()
+    public function testCompleteNestedObjectWithInheritData(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -785,7 +783,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    public function testCompleteNestedObjectWithInheritDataAndNotMapped()
+    public function testCompleteNestedObjectWithInheritDataAndNotMapped(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -840,7 +838,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    public function testCompleteNestedObjectForRenamedField()
+    public function testCompleteNestedObjectForRenamedField(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -895,7 +893,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    public function testCompleteNestedObjectWithoutFormOptions()
+    public function testCompleteNestedObjectWithoutFormOptions(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -945,7 +943,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    public function testCompleteNestedObjectWhenDependsOnIsPartiallySet()
+    public function testCompleteNestedObjectWhenDependsOnIsPartiallySet(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -996,7 +994,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    public function testCompleteNestedAssociation()
+    public function testCompleteNestedAssociation(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -1069,7 +1067,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    public function testCompleteNestedAssociationWhenDependsOnIsPartiallySet()
+    public function testCompleteNestedAssociationWhenDependsOnIsPartiallySet(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -1143,7 +1141,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    public function testCompleteNestedAssociationShouldExcludeSourceFieldsEvenIfTheyAreMarkedAsNotExcluded()
+    public function testCompleteNestedAssociationShouldExcludeSourceFieldsEvenIfTheyAreMarkedAsNotExcluded(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -1222,7 +1220,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    public function testCompleteNestedAssociationShouldExcludeSourceFieldsEvenIfTheyAreRenamedAndMarkedAsNotExcluded()
+    public function testCompleteNestedAssocShouldExcludeSourceFieldsEvenIfTheyAreRenamedAndMarkedAsNotExcluded(): void
     {
         $config = $this->createConfigObject([
             'fields' => [
@@ -1305,13 +1303,13 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    public function testGetAssociationTargetType()
+    public function testGetAssociationTargetType(): void
     {
         self::assertEquals('to-one', $this->completeAssociationHelper->getAssociationTargetType(false));
         self::assertEquals('to-many', $this->completeAssociationHelper->getAssociationTargetType(true));
     }
 
-    public function testLoadDefinition()
+    public function testLoadDefinition(): void
     {
         $entityClass = 'Test\Entity';
         $version = '1.2';
@@ -1338,7 +1336,7 @@ class CompleteAssociationHelperTest extends CompleteDefinitionHelperTestCase
         );
     }
 
-    public function testLoadDefinitionWhenItDoesNotExist()
+    public function testLoadDefinitionWhenItDoesNotExist(): void
     {
         $entityClass = 'Test\Entity';
         $version = '1.2';

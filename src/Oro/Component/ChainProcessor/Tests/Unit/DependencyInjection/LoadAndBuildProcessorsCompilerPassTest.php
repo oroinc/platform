@@ -4,12 +4,13 @@ namespace Oro\Component\ChainProcessor\Tests\Unit\DependencyInjection;
 
 use Oro\Component\ChainProcessor\DependencyInjection\LoadAndBuildProcessorsCompilerPass;
 use Oro\Component\ChainProcessor\ProcessorBagConfigProvider;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
-class LoadAndBuildProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
+class LoadAndBuildProcessorsCompilerPassTest extends TestCase
 {
-    public function testProcessWithoutProcessorBagConfigProvider()
+    public function testProcessWithoutProcessorBagConfigProvider(): void
     {
         $container = new ContainerBuilder();
 
@@ -25,7 +26,7 @@ class LoadAndBuildProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
         $compilerPass->process($container);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -70,7 +71,7 @@ class LoadAndBuildProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessForProcessorBagConfigProviderWithoutArguments()
+    public function testProcessForProcessorBagConfigProviderWithoutArguments(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -99,7 +100,7 @@ class LoadAndBuildProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessForProcessorBagConfigProviderWithoutProcessorsArgument()
+    public function testProcessForProcessorBagConfigProviderWithoutProcessorsArgument(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -129,7 +130,7 @@ class LoadAndBuildProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testProcessForProcessorBagConfigProviderWhenGroupsArgumentIsParameter()
+    public function testProcessForProcessorBagConfigProviderWhenGroupsArgumentIsParameter(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);

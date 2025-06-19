@@ -4,13 +4,13 @@ namespace Oro\Component\ChainProcessor\Tests\Unit\DependencyInjection;
 
 use Oro\Component\ChainProcessor\DependencyInjection\CleanUpProcessorsCompilerPass;
 use Oro\Component\ChainProcessor\SimpleProcessorRegistry;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class CleanUpProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
+class CleanUpProcessorsCompilerPassTest extends TestCase
 {
-    /** @var CleanUpProcessorsCompilerPass */
-    private $compiler;
+    private CleanUpProcessorsCompilerPass $compiler;
 
     #[\Override]
     protected function setUp(): void
@@ -18,7 +18,7 @@ class CleanUpProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
         $this->compiler = new CleanUpProcessorsCompilerPass('simple_factory', 'processor');
     }
 
-    public function testProcessForProcessorWithoutArguments()
+    public function testProcessForProcessorWithoutArguments(): void
     {
         $container = new ContainerBuilder();
         $simpleRegistryDef = $container->register('simple_factory', SimpleProcessorRegistry::class)
@@ -47,7 +47,7 @@ class CleanUpProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processorWithSimpleArgumentsDataProvider
      */
-    public function testProcessForProcessorWithSimpleArguments(array $arguments)
+    public function testProcessForProcessorWithSimpleArguments(array $arguments): void
     {
         $container = new ContainerBuilder();
         $simpleRegistryDef = $container->register('simple_factory', SimpleProcessorRegistry::class)
@@ -81,7 +81,7 @@ class CleanUpProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider processorWithNotSimpleArgumentsDataProvider
      */
-    public function testProcessForProcessorWithNotSimpleArguments(array $arguments)
+    public function testProcessForProcessorWithNotSimpleArguments(array $arguments): void
     {
         $container = new ContainerBuilder();
         $simpleRegistryDef = $container->register('simple_factory', SimpleProcessorRegistry::class)
@@ -106,7 +106,7 @@ class CleanUpProcessorsCompilerPassTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    public function testProcessForSimpleFactoryWithoutArguments()
+    public function testProcessForSimpleFactoryWithoutArguments(): void
     {
         $container = new ContainerBuilder();
         $simpleRegistryDef = $container->register('simple_factory', SimpleProcessorRegistry::class)

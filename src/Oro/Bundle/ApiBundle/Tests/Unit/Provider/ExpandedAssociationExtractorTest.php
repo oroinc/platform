@@ -5,14 +5,14 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\Extra\ExpandRelatedEntitiesConfigExtra;
 use Oro\Bundle\ApiBundle\Provider\ExpandedAssociationExtractor;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
+class ExpandedAssociationExtractorTest extends TestCase
 {
-    /** @var ExpandedAssociationExtractor */
-    private $extractor;
+    private ExpandedAssociationExtractor $extractor;
 
     #[\Override]
     protected function setUp(): void
@@ -20,7 +20,7 @@ class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
         $this->extractor = new ExpandedAssociationExtractor();
     }
 
-    public function testGetExpandedAssociations()
+    public function testGetExpandedAssociations(): void
     {
         $config = new EntityDefinitionConfig();
         $associationField = $config->addField('association');
@@ -40,7 +40,7 @@ class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetExpandedAssociationsWhenAssociationExistsInConfigButItWasNotRequested()
+    public function testGetExpandedAssociationsWhenAssociationExistsInConfigButItWasNotRequested(): void
     {
         $config = new EntityDefinitionConfig();
         $associationField = $config->addField('association');
@@ -60,7 +60,7 @@ class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetExpandedAssociationsForExcludedAssociation()
+    public function testGetExpandedAssociationsForExcludedAssociation(): void
     {
         $config = new EntityDefinitionConfig();
         $associationField = $config->addField('association');
@@ -81,7 +81,7 @@ class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetExpandedAssociationsForAssociationThatHasOnlyIdInConfig()
+    public function testGetExpandedAssociationsForAssociationThatHasOnlyIdInConfig(): void
     {
         $config = new EntityDefinitionConfig();
         $associationField = $config->addField('association');
@@ -100,7 +100,7 @@ class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetExpandedAssociationsForAssociationWithoutTargetClass()
+    public function testGetExpandedAssociationsForAssociationWithoutTargetClass(): void
     {
         $config = new EntityDefinitionConfig();
         $associationField = $config->addField('association');
@@ -120,7 +120,7 @@ class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetExpandedAssociationsForField()
+    public function testGetExpandedAssociationsForField(): void
     {
         $config = new EntityDefinitionConfig();
         $config->addField('field');
@@ -135,7 +135,7 @@ class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetExpandedAssociationsWhenAssociationShouldBeReturnedAsField()
+    public function testGetExpandedAssociationsWhenAssociationShouldBeReturnedAsField(): void
     {
         $config = new EntityDefinitionConfig();
         $associationField = $config->addField('association');
@@ -156,7 +156,7 @@ class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetExpandedAssociationsWhenAssociationHasMetaPropertyInAdditionalToId()
+    public function testGetExpandedAssociationsWhenAssociationHasMetaPropertyInAdditionalToId(): void
     {
         $config = new EntityDefinitionConfig();
         $associationField = $config->addField('association');
@@ -176,7 +176,7 @@ class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFirstLevelOfExpandedAssociationsByPath()
+    public function testGetFirstLevelOfExpandedAssociationsByPath(): void
     {
         $pathsToExpand = ['field1.field11'];
         $config = new EntityDefinitionConfig();
@@ -189,7 +189,7 @@ class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFirstLevelOfExpandedAssociationsForFieldWithoutPropertyPath()
+    public function testGetFirstLevelOfExpandedAssociationsForFieldWithoutPropertyPath(): void
     {
         $pathsToExpand = ['field1'];
         $config = new EntityDefinitionConfig();
@@ -201,7 +201,7 @@ class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFirstLevelOfExpandedAssociationsForNestedFieldOfFieldWithoutPropertyPath()
+    public function testGetFirstLevelOfExpandedAssociationsForNestedFieldOfFieldWithoutPropertyPath(): void
     {
         $pathsToExpand = ['field1.field3'];
         $config = new EntityDefinitionConfig();
@@ -215,7 +215,7 @@ class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFirstLevelOfExpandedAssociationsForRenamedFieldWithPropertyPath()
+    public function testGetFirstLevelOfExpandedAssociationsForRenamedFieldWithPropertyPath(): void
     {
         $pathsToExpand = ['field1'];
         $config = new EntityDefinitionConfig();
@@ -227,7 +227,7 @@ class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFirstLevelOfExpandedAssociationsForNestedFieldOfRenamedFieldWithPropertyPath()
+    public function testGetFirstLevelOfExpandedAssociationsForNestedFieldOfRenamedFieldWithPropertyPath(): void
     {
         $pathsToExpand = ['field1.field3'];
         $config = new EntityDefinitionConfig();
@@ -241,7 +241,7 @@ class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFirstLevelOfExpandedAssociationsForFieldWithPropertyPath()
+    public function testGetFirstLevelOfExpandedAssociationsForFieldWithPropertyPath(): void
     {
         $pathsToExpand = ['field1'];
         $config = new EntityDefinitionConfig();
@@ -255,7 +255,7 @@ class ExpandedAssociationExtractorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetFirstLevelOfExpandedAssociationsForNestedFieldOfFieldWithPropertyPath()
+    public function testGetFirstLevelOfExpandedAssociationsForNestedFieldOfFieldWithPropertyPath(): void
     {
         $pathsToExpand = ['field1.field3'];
         $config = new EntityDefinitionConfig();

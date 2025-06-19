@@ -4,11 +4,12 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetConfig\MergeConfig;
 
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\MergeConfig\MergeActionConfigHelper;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
+class MergeActionConfigHelperTest extends TestCase
 {
     private MergeActionConfigHelper $mergeActionConfigHelper;
 
@@ -18,7 +19,7 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
         $this->mergeActionConfigHelper = new MergeActionConfigHelper();
     }
 
-    public function testMergeEmptyActionConfig()
+    public function testMergeEmptyActionConfig(): void
     {
         $config = [];
         $actionConfig = [];
@@ -29,7 +30,7 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMergeActionConfigWhenNoActionsInConfig()
+    public function testMergeActionConfigWhenNoActionsInConfig(): void
     {
         $config = [];
         $actionConfig = [
@@ -49,7 +50,7 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMergeActionConfig()
+    public function testMergeActionConfig(): void
     {
         $config = [
             'key1' => 'value 1',
@@ -70,7 +71,7 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMergeActionDisabledMetaPropertiesConfig()
+    public function testMergeActionDisabledMetaPropertiesConfig(): void
     {
         $config = [
             'disabled_meta_properties' => ['prop1', 'prop3']
@@ -87,7 +88,7 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMergeActionDisabledMetaPropertiesConfigWhenActionDoesNotHaveDisabledMetaProperties()
+    public function testMergeActionDisabledMetaPropertiesConfigWhenActionDoesNotHaveDisabledMetaProperties(): void
     {
         $config = [
             'disabled_meta_properties' => ['prop1', 'prop2']
@@ -100,7 +101,7 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMergeActionFieldsConfig()
+    public function testMergeActionFieldsConfig(): void
     {
         $config = [
             'fields' => [
@@ -147,7 +148,7 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMergeActionFieldsConfigWhenActionDoesNotHaveFields()
+    public function testMergeActionFieldsConfigWhenActionDoesNotHaveFields(): void
     {
         $config = [
             'fields' => [
@@ -169,7 +170,7 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMergeActionConfigWhenNoActionsInConfigWithoutStatusCodes()
+    public function testMergeActionConfigWhenNoActionsInConfigWithoutStatusCodes(): void
     {
         $config = [];
         $actionConfig = [
@@ -192,7 +193,7 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMergeActionConfigWhenNoActionsInConfigWithStatusCodes()
+    public function testMergeActionConfigWhenNoActionsInConfigWithStatusCodes(): void
     {
         $config = [];
         $actionConfig = [
@@ -219,7 +220,7 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMergeActionStatusCodes()
+    public function testMergeActionStatusCodes(): void
     {
         $existingStatusCodes = new StatusCodesConfig();
         $config = [
@@ -258,7 +259,7 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMergeActionFormOptions()
+    public function testMergeActionFormOptions(): void
     {
         $config = [
             'form_options' => [
@@ -285,7 +286,7 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMergeActionFormOptionsWhenActionDoesNotHaveFormOptions()
+    public function testMergeActionFormOptionsWhenActionDoesNotHaveFormOptions(): void
     {
         $config = [
             'form_options' => ['entity_option' => 'entity_value']
@@ -300,7 +301,7 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMergeActionFormOptionsWhenEntityDoesNotHaveFormOptions()
+    public function testMergeActionFormOptionsWhenEntityDoesNotHaveFormOptions(): void
     {
         $config = [];
         $actionConfig = [
@@ -315,7 +316,7 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMergeActionFormOptionsWhenFormTypeIsChanged()
+    public function testMergeActionFormOptionsWhenFormTypeIsChanged(): void
     {
         $config = [
             'form_options' => ['entity_option' => 'entity_value']
@@ -334,7 +335,7 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMergeActionFormEventSubscribers()
+    public function testMergeActionFormEventSubscribers(): void
     {
         $config = [
             'form_event_subscriber' => ['entity_subscriber']
@@ -351,7 +352,7 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMergeActionFormEventSubscribersWhenActionDoesNotHaveFormEventSubscribers()
+    public function testMergeActionFormEventSubscribersWhenActionDoesNotHaveFormEventSubscribers(): void
     {
         $config = [
             'form_event_subscriber' => ['entity_subscriber']
@@ -366,7 +367,7 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMergeActionFormEventSubscribersWhenEntityDoesNotHaveFormEventSubscribers()
+    public function testMergeActionFormEventSubscribersWhenEntityDoesNotHaveFormEventSubscribers(): void
     {
         $config = [];
         $actionConfig = [
@@ -381,7 +382,7 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMergeActionFormEventSubscribersWhenFormTypeIsChanged()
+    public function testMergeActionFormEventSubscribersWhenFormTypeIsChanged(): void
     {
         $config = [
             'form_event_subscriber' => ['entity_subscriber']
@@ -403,7 +404,7 @@ class MergeActionConfigHelperTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider mergeActionUpsertConfigDataProvider
      */
-    public function testMergeActionUpsertConfig(array $config, array $actionConfig, array $expectedConfig)
+    public function testMergeActionUpsertConfig(array $config, array $actionConfig, array $expectedConfig): void
     {
         self::assertEquals(
             $expectedConfig,

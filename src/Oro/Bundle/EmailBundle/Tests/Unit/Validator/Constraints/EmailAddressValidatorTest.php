@@ -5,6 +5,8 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Validator\Constraints;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Validator\Constraints\EmailAddress;
 use Oro\Bundle\EmailBundle\Validator\Constraints\EmailAddressValidator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -12,16 +14,11 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface;
 
-class EmailAddressValidatorTest extends \PHPUnit\Framework\TestCase
+class EmailAddressValidatorTest extends TestCase
 {
-    /** @var EmailAddress */
-    private $constraint;
-
-    /** @var ExecutionContextInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $context;
-
-    /** @var EmailAddressHelper */
-    private $emailAddressHelper;
+    private EmailAddress $constraint;
+    private ExecutionContextInterface&MockObject $context;
+    private EmailAddressHelper $emailAddressHelper;
 
     #[\Override]
     protected function setUp(): void
@@ -31,14 +28,14 @@ class EmailAddressValidatorTest extends \PHPUnit\Framework\TestCase
         $this->emailAddressHelper = new EmailAddressHelper();
     }
 
-    public function testUnexpectedConstraint()
+    public function testUnexpectedConstraint(): void
     {
         $this->expectException(UnexpectedTypeException::class);
 
         $this->getValidator()->validate('test@example.com', $this->createMock(Constraint::class));
     }
 
-    public function testValidateNoErrors()
+    public function testValidateNoErrors(): void
     {
         $violationList = new ConstraintViolationList();
         $this->context->expects($this->once())
@@ -49,21 +46,21 @@ class EmailAddressValidatorTest extends \PHPUnit\Framework\TestCase
         $this->getValidator()->validate('testname <test@mail.com>', $this->constraint);
     }
 
-    public function testValidateNullValue()
+    public function testValidateNullValue(): void
     {
         $this->context->expects($this->never())
             ->method('addViolation');
         $this->getValidator()->validate(null, $this->constraint);
     }
 
-    public function testValidateEmptyValue()
+    public function testValidateEmptyValue(): void
     {
         $this->context->expects($this->never())
             ->method('addViolation');
         $this->getValidator()->validate('', $this->constraint);
     }
 
-    public function testValidateWithErrors()
+    public function testValidateWithErrors(): void
     {
         $violationList = new ConstraintViolationList();
         $violation1 = $this->createMock(ConstraintViolation::class);

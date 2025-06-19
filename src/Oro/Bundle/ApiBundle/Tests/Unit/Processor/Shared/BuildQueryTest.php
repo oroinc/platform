@@ -17,17 +17,15 @@ use Oro\Bundle\ApiBundle\Processor\Shared\LoadEntitiesByEntitySerializer;
 use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class BuildQueryTest extends GetListProcessorOrmRelatedTestCase
 {
-    /** @var FilterNamesRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $filterNamesRegistry;
-
-    /** @var BuildQuery */
-    private $processor;
+    private FilterNamesRegistry&MockObject $filterNamesRegistry;
+    private BuildQuery $processor;
 
     #[\Override]
     protected function setUp(): void

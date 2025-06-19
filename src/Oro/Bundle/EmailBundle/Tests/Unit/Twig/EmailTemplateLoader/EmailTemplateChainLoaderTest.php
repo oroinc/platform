@@ -45,14 +45,12 @@ class EmailTemplateChainLoaderTest extends TestCase
 
         $name = 'sample_name';
         $sourceContext = new Source('sample_code', $name);
-        $emailTemplateLoader1
-            ->expects(self::once())
+        $emailTemplateLoader1->expects(self::once())
             ->method('exists')
             ->with($name)
             ->willReturn(true);
 
-        $emailTemplateLoader1
-            ->expects(self::once())
+        $emailTemplateLoader1->expects(self::once())
             ->method('getSourceContext')
             ->with($name)
             ->willReturn($sourceContext);
@@ -67,14 +65,12 @@ class EmailTemplateChainLoaderTest extends TestCase
         $emailTemplateLoader1 = $this->createMock(EmailTemplateLoaderInterface::class);
 
         $name = 'sample_name';
-        $emailTemplateLoader1
-            ->expects(self::once())
+        $emailTemplateLoader1->expects(self::once())
             ->method('exists')
             ->with($name)
             ->willReturn(true);
 
-        $emailTemplateLoader1
-            ->expects(self::once())
+        $emailTemplateLoader1->expects(self::once())
             ->method('getCacheKey')
             ->with($name)
             ->willReturn($name);
@@ -89,15 +85,13 @@ class EmailTemplateChainLoaderTest extends TestCase
         $emailTemplateLoader1 = $this->createMock(EmailTemplateLoaderInterface::class);
 
         $name = 'sample_name';
-        $emailTemplateLoader1
-            ->expects(self::once())
+        $emailTemplateLoader1->expects(self::once())
             ->method('exists')
             ->with($name)
             ->willReturn(true);
 
         $time = time();
-        $emailTemplateLoader1
-            ->expects(self::once())
+        $emailTemplateLoader1->expects(self::once())
             ->method('isFresh')
             ->with($name, $time)
             ->willReturn(true);
@@ -112,8 +106,7 @@ class EmailTemplateChainLoaderTest extends TestCase
         $emailTemplateLoader1 = $this->createMock(EmailTemplateLoaderInterface::class);
 
         $name = 'sample_name';
-        $emailTemplateLoader1
-            ->expects(self::once())
+        $emailTemplateLoader1->expects(self::once())
             ->method('exists')
             ->with($name)
             ->willReturn(true);
@@ -129,14 +122,12 @@ class EmailTemplateChainLoaderTest extends TestCase
 
         $name = 'sample_name';
         $emailTemplate = new EmailTemplateModel();
-        $emailTemplateLoader1
-            ->expects(self::once())
+        $emailTemplateLoader1->expects(self::once())
             ->method('exists')
             ->with($name)
             ->willReturn(true);
 
-        $emailTemplateLoader1
-            ->expects(self::once())
+        $emailTemplateLoader1->expects(self::once())
             ->method('getEmailTemplate')
             ->with($name)
             ->willReturn($emailTemplate);

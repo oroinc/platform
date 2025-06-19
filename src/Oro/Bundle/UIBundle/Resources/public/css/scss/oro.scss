@@ -489,7 +489,7 @@ textarea {
         content: '\f06a';
         color: $danger;
         text-indent: 0;
-        speak: none;
+        speak: never;
     }
 }
 
@@ -686,8 +686,8 @@ iframe.email-body {
     min-height: 5em;
     font-family: $font-family-monospace;
     color: $primary;
-    padding: ($line-height-base - 1) * .5;
-    margin: 0 0 $line-height-base * .5;
+    padding: 4px;
+    margin: 0 0 8px;
     display: block;
     // 14px to 13px
     font-size: $base-font-size - 1;

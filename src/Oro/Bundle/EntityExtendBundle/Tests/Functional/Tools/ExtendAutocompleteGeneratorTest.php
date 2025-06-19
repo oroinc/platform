@@ -34,6 +34,16 @@ class ExtendAutocompleteGeneratorTest extends WebTestCase
         self::assertFileExists($autocompleteFile);
 
         $fileContents = \file_get_contents($autocompleteFile);
+
+        self::assertStringNotContainsString('): void', $fileContents);
+        self::assertStringNotContainsString('): int', $fileContents);
+        self::assertStringNotContainsString('): string', $fileContents);
+        self::assertStringNotContainsString('):', $fileContents);
+        self::assertStringContainsString('@method void', $fileContents);
+        self::assertStringContainsString('@method string|null', $fileContents);
+        self::assertStringContainsString('@method integer|null', $fileContents);
+        self::assertStringContainsString('@method string', $fileContents);
+
         preg_match_all('/^trait (.+)/m', $fileContents, $matches);
         $traitNames = $matches[1];
 

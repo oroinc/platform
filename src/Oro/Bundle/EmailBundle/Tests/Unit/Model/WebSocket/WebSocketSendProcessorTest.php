@@ -8,20 +8,15 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
+class WebSocketSendProcessorTest extends TestCase
 {
-    /** @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $websocketClient;
-
-    /** @var ConnectionChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $connectionChecker;
-
-    /** @var EmailUser|\PHPUnit\Framework\MockObject\MockObject */
-    private $emailUser;
-
-    /** @var WebSocketSendProcessor */
-    private $processor;
+    private WebsocketClientInterface&MockObject $websocketClient;
+    private ConnectionChecker&MockObject $connectionChecker;
+    private EmailUser&MockObject $emailUser;
+    private WebSocketSendProcessor $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -33,7 +28,7 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor = new WebSocketSendProcessor($this->websocketClient, $this->connectionChecker);
     }
 
-    public function testSendSuccess()
+    public function testSendSuccess(): void
     {
         $organization = new Organization();
         $organization->setId(1);
@@ -62,7 +57,7 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->send([1 => ['entity' => $this->emailUser, 'new' => 1]]);
     }
 
-    public function testSendNotNewEntity()
+    public function testSendNotNewEntity(): void
     {
         $organization = new Organization();
         $organization->setId(1);
@@ -91,7 +86,7 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->send([1 => ['entity' => $this->emailUser, 'new' => 0]]);
     }
 
-    public function testSendNoConnection()
+    public function testSendNoConnection(): void
     {
         $this->emailUser->expects($this->never())
             ->method($this->anything());
@@ -106,7 +101,7 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
         $this->processor->send([1 => ['entity' => $this->emailUser, 'new' => 0]]);
     }
 
-    public function testSendFailure()
+    public function testSendFailure(): void
     {
         $this->websocketClient->expects($this->never())
             ->method('publish');
@@ -117,7 +112,7 @@ class WebSocketSendProcessorTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider getUserTopicDataProvider
      */
-    public function testGetUserTopic(User|string $user, ?Organization $organization, string $expected)
+    public function testGetUserTopic(User|string $user, ?Organization $organization, string $expected): void
     {
         $this->assertEquals($expected, WebSocketSendProcessor::getUserTopic($user, $organization));
     }

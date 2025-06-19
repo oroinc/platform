@@ -8,8 +8,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ValidateEntityExistsTest extends GetProcessorTestCase
 {
-    /** @var ValidateEntityExists */
-    private $processor;
+    private ValidateEntityExists $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -19,13 +18,13 @@ class ValidateEntityExistsTest extends GetProcessorTestCase
         $this->processor = new ValidateEntityExists();
     }
 
-    public function testProcessWhenEntityIsLoaded()
+    public function testProcessWhenEntityIsLoaded(): void
     {
         $this->context->setResult(new \stdClass());
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithoutObject()
+    public function testProcessWithoutObject(): void
     {
         $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('An entity with the requested identifier does not exist.');
@@ -33,7 +32,7 @@ class ValidateEntityExistsTest extends GetProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithNullObject()
+    public function testProcessWithNullObject(): void
     {
         $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('An entity with the requested identifier does not exist.');

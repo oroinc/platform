@@ -7,17 +7,18 @@ use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EntityExtendBundle\PropertyAccess;
 use Oro\Component\Testing\ReflectionUtil;
+use PHPUnit\Framework\TestCase;
 
-class EmailFolderTest extends \PHPUnit\Framework\TestCase
+class EmailFolderTest extends TestCase
 {
-    public function testIdGetter()
+    public function testIdGetter(): void
     {
         $entity = new EmailFolder();
         ReflectionUtil::setId($entity, 1);
         $this->assertEquals(1, $entity->getId());
     }
 
-    public function testOutdatedAt()
+    public function testOutdatedAt(): void
     {
         $entity = new EmailFolder();
         $this->assertFalse($entity->isOutdated());
@@ -31,7 +32,7 @@ class EmailFolderTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse($entity->isOutdated());
     }
 
-    public function testFolderGetterAndSetter()
+    public function testFolderGetterAndSetter(): void
     {
         $subFolder = $this->createMock(EmailFolder::class);
         $subFolder2 = $this->createMock(EmailFolder::class);
@@ -51,7 +52,7 @@ class EmailFolderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider propertiesDataProvider
      */
-    public function testSettersAndGetters(string $property, mixed $value)
+    public function testSettersAndGetters(string $property, mixed $value): void
     {
         $obj = new EmailFolder();
 

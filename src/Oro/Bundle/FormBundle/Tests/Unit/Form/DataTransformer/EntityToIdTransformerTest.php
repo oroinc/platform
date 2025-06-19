@@ -192,7 +192,7 @@ class EntityToIdTransformerTest extends TestCase
             ->with('TestClass')
             ->willReturn($repository);
 
-        $transformer = $this->getTransformer('id', $callback, true);
+        $transformer = $this->getTransformer('id', $callback);
         $transformer->reverseTransform(1);
     }
 

@@ -31,12 +31,6 @@ services:
         arguments:
             - '%paths.base%'
 
-    oro_behat_statistic.database.connection:
-        class: Doctrine\DBAL\Connection
-        public: true
-        factory:   ['Doctrine\DBAL\DriverManager', getConnection]
-        arguments: ['%oro_behat_statistic.connection%']
-
     oro_behat_statistic.feature_repository:
         class: Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\Repository\StatisticRepository
         arguments:

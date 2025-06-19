@@ -3,10 +3,11 @@
 namespace Oro\Bundle\ImapBundle\Tests\Unit\Connector\Search;
 
 use Oro\Bundle\ImapBundle\Connector\Search\SearchQueryExprItem;
+use PHPUnit\Framework\TestCase;
 
-class SearchQueryExprItemTest extends \PHPUnit\Framework\TestCase
+class SearchQueryExprItemTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $name = 'testName';
         $value = 'testValue';
@@ -18,7 +19,7 @@ class SearchQueryExprItemTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($match, $obj->getMatch());
     }
 
-    public function testSettersAndGetters()
+    public function testSettersAndGetters(): void
     {
         $obj = new SearchQueryExprItem('1', '1', '=', 0, false);
 

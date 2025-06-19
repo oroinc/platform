@@ -6,17 +6,13 @@ use Oro\Bundle\DataGridBundle\Extension\Action\ActionConfiguration;
 use Oro\Bundle\EmailBundle\Datagrid\Extension\MassAction\Actions\MarkReadMassAction;
 use Oro\Bundle\EmailBundle\Datagrid\Extension\MassAction\Actions\MarkUnreadMassAction;
 use Oro\Bundle\EmailBundle\Datagrid\Extension\MassAction\MarkMassActionHandler;
+use PHPUnit\Framework\TestCase;
 
-class MarkMassActionTest extends \PHPUnit\Framework\TestCase
+class MarkMassActionTest extends TestCase
 {
-    /** @var MarkReadMassAction */
-    private $readAction;
-
-    /** @var MarkUnreadMassAction */
-    private $unreadAction;
-
-    /** @var ActionConfiguration */
-    private $configuration;
+    private MarkReadMassAction $readAction;
+    private MarkUnreadMassAction $unreadAction;
+    private ActionConfiguration $configuration;
 
     #[\Override]
     protected function setUp(): void
@@ -30,7 +26,7 @@ class MarkMassActionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testMarkRead()
+    public function testMarkRead(): void
     {
         $this->readAction = new MarkReadMassAction();
         $this->readAction->setOptions($this->configuration);
@@ -39,7 +35,7 @@ class MarkMassActionTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(MarkMassActionHandler::MARK_READ, $options->offsetGet('mark_type'));
     }
 
-    public function testMarkUnread()
+    public function testMarkUnread(): void
     {
         $this->configuration->offsetUnset('mark_type');
 

@@ -70,7 +70,7 @@ class DoctrineHelperTest extends OrmRelatedTestCase
         self::assertNull($this->doctrineHelper->getEntityManagerForClass(\stdClass::class, false));
     }
 
-    public function testFindEntityMetadataByPathForAssociation()
+    public function testFindEntityMetadataByPathForAssociation(): void
     {
         self::assertEquals(
             $this->getClassMetadata(Entity\Category::class),
@@ -81,7 +81,7 @@ class DoctrineHelperTest extends OrmRelatedTestCase
         );
     }
 
-    public function testFindEntityMetadataByPathForField()
+    public function testFindEntityMetadataByPathForField(): void
     {
         self::assertNull(
             $this->doctrineHelper->findEntityMetadataByPath(
@@ -91,7 +91,7 @@ class DoctrineHelperTest extends OrmRelatedTestCase
         );
     }
 
-    public function testFindEntityMetadataByPathForStringPath()
+    public function testFindEntityMetadataByPathForStringPath(): void
     {
         self::assertEquals(
             $this->getClassMetadata(Entity\Category::class),
@@ -102,7 +102,7 @@ class DoctrineHelperTest extends OrmRelatedTestCase
         );
     }
 
-    public function testFindEntityMetadataByPathForArrayPath()
+    public function testFindEntityMetadataByPathForArrayPath(): void
     {
         self::assertEquals(
             $this->getClassMetadata(Entity\Category::class),
@@ -113,7 +113,7 @@ class DoctrineHelperTest extends OrmRelatedTestCase
         );
     }
 
-    public function testFindEntityMetadataByPathForDeepPath()
+    public function testFindEntityMetadataByPathForDeepPath(): void
     {
         self::assertNull(
             $this->doctrineHelper->findEntityMetadataByPath(
@@ -123,7 +123,7 @@ class DoctrineHelperTest extends OrmRelatedTestCase
         );
     }
 
-    public function testFindEntityMetadataByPathForNotManageableEntity()
+    public function testFindEntityMetadataByPathForNotManageableEntity(): void
     {
         $className = 'Test\Class';
 
@@ -134,7 +134,7 @@ class DoctrineHelperTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetIndexedFields()
+    public function testGetIndexedFields(): void
     {
         self::assertEquals(
             [
@@ -146,7 +146,7 @@ class DoctrineHelperTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetIndexedAssociations()
+    public function testGetIndexedAssociations(): void
     {
         self::assertEquals(
             [
@@ -159,7 +159,7 @@ class DoctrineHelperTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDataTypeForScalarField()
+    public function testGetFieldDataTypeForScalarField(): void
     {
         $metadata = $this->getClassMetadata(Entity\Role::class);
 
@@ -169,7 +169,7 @@ class DoctrineHelperTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDataTypeForUnknownField()
+    public function testGetFieldDataTypeForUnknownField(): void
     {
         $metadata = $this->getClassMetadata(Entity\Role::class);
 
@@ -178,7 +178,7 @@ class DoctrineHelperTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDataTypeForAssociation()
+    public function testGetFieldDataTypeForAssociation(): void
     {
         $metadata = $this->getClassMetadata(Entity\Role::class);
 
@@ -188,7 +188,7 @@ class DoctrineHelperTest extends OrmRelatedTestCase
         );
     }
 
-    public function testGetFieldDataTypeForAssociationWithCompositeIdentifier()
+    public function testGetFieldDataTypeForAssociationWithCompositeIdentifier(): void
     {
         $metadata = $this->getClassMetadata(Entity\CompositeKeyEntity::class);
 

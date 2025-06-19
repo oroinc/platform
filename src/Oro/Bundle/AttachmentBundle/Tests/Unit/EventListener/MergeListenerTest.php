@@ -10,11 +10,11 @@ use Oro\Bundle\EntityMergeBundle\Metadata\DoctrineMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
+use PHPUnit\Framework\TestCase;
 
-class MergeListenerTest extends \PHPUnit\Framework\TestCase
+class MergeListenerTest extends TestCase
 {
-    /** @var string */
-    private $fieldPrefix;
+    private string $fieldPrefix;
 
     #[\Override]
     protected function setUp(): void
@@ -22,7 +22,7 @@ class MergeListenerTest extends \PHPUnit\Framework\TestCase
         $this->fieldPrefix = str_replace('\\', '_', Attachment::class) . '_';
     }
 
-    public function testShouldSetMetadataToAttachmentAssociations()
+    public function testShouldSetMetadataToAttachmentAssociations(): void
     {
         $fieldName = $this->fieldPrefix . 'field1';
         $listener = $this->getListener(['Foo\\Bar' => 'field1']);
@@ -43,7 +43,7 @@ class MergeListenerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldNotSetMetadataToUnknownAssociations()
+    public function testShouldNotSetMetadataToUnknownAssociations(): void
     {
         $listener = $this->getListener(['Foo\\Bar' => 'field1']);
         $event = $this->getEvent('Foo\\Foo');
@@ -55,7 +55,7 @@ class MergeListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(0, $fieldsMetadata);
     }
 
-    public function testShouldNotOverwriteFieldMetadataReference()
+    public function testShouldNotOverwriteFieldMetadataReference(): void
     {
         $fieldName = $this->fieldPrefix . 'field1';
         $listener = $this->getListener(['Foo\\Bar' => 'field1']);
@@ -71,7 +71,7 @@ class MergeListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertSame($fieldMetadata, $fieldsMetadata[$fieldName]);
     }
 
-    public function testShouldNotOverwriteTemplate()
+    public function testShouldNotOverwriteTemplate(): void
     {
         $fieldName = $this->fieldPrefix . 'field1';
         $listener = $this->getListener(['Foo\\Bar' => 'field1']);
@@ -86,7 +86,7 @@ class MergeListenerTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('abc.html.twig', $fieldsMetadata[$fieldName]->get('template'));
     }
 
-    public function testShouldCombineMergeModes()
+    public function testShouldCombineMergeModes(): void
     {
         $fieldName = $this->fieldPrefix . 'field1';
         $listener = $this->getListener(['Foo\\Bar' => 'field1']);

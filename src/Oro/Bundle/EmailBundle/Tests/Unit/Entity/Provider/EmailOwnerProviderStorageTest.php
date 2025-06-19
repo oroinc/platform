@@ -4,10 +4,11 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\Provider;
 
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderInterface;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
+use PHPUnit\Framework\TestCase;
 
-class EmailOwnerProviderStorageTest extends \PHPUnit\Framework\TestCase
+class EmailOwnerProviderStorageTest extends TestCase
 {
-    public function testStorage()
+    public function testStorage(): void
     {
         $provider1 = $this->createMock(EmailOwnerProviderInterface::class);
         $provider2 = $this->createMock(EmailOwnerProviderInterface::class);

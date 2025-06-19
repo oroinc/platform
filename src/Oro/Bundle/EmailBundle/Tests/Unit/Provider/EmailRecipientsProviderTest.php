@@ -6,12 +6,12 @@ use Oro\Bundle\EmailBundle\Model\Recipient;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProvider;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProviderInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class EmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
+class EmailRecipientsProviderTest extends TestCase
 {
-    /** @var EmailRecipientsProvider */
-    private $emailRecipientsProvider;
+    private EmailRecipientsProvider $emailRecipientsProvider;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +36,7 @@ class EmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
         $this->emailRecipientsProvider = new EmailRecipientsProvider($translator, $emailRecipientsHelper);
     }
 
-    public function testGetEmailRecipientsShouldReturnEmptyArrayIfThereAreNoProviders()
+    public function testGetEmailRecipientsShouldReturnEmptyArrayIfThereAreNoProviders(): void
     {
         $this->assertEmpty($this->emailRecipientsProvider->getEmailRecipients());
     }
@@ -44,7 +44,7 @@ class EmailRecipientsProviderTest extends \PHPUnit\Framework\TestCase
     /**
      * @dataProvider dataProvider
      */
-    public function testGetEmailRecipients(array $providers, array $expectedRecipients, int $limit = 100)
+    public function testGetEmailRecipients(array $providers, array $expectedRecipients, int $limit = 100): void
     {
         $this->emailRecipientsProvider->setProviders($providers);
 

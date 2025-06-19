@@ -7,17 +7,14 @@ use Oro\Bundle\ImapBundle\OriginSyncCredentials\NotificationSender\SocketNotific
 use Oro\Bundle\SyncBundle\Client\ConnectionChecker;
 use Oro\Bundle\SyncBundle\Client\WebsocketClientInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class SocketNotificationSenderTest extends \PHPUnit\Framework\TestCase
+class SocketNotificationSenderTest extends TestCase
 {
-    /** @var WebsocketClientInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $websocketClient;
-
-    /** @var ConnectionChecker|\PHPUnit\Framework\MockObject\MockObject */
-    private $connectionChecker;
-
-    /** @var SocketNotificationSender */
-    private $sender;
+    private WebsocketClientInterface&MockObject $websocketClient;
+    private ConnectionChecker&MockObject $connectionChecker;
+    private SocketNotificationSender $sender;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +25,7 @@ class SocketNotificationSenderTest extends \PHPUnit\Framework\TestCase
         $this->sender = new SocketNotificationSender($this->websocketClient, $this->connectionChecker);
     }
 
-    public function testSendNotificationForSystemOrigin()
+    public function testSendNotificationForSystemOrigin(): void
     {
         $origin = new UserEmailOrigin();
         $origin->setUser('test@example.com');
@@ -48,7 +45,7 @@ class SocketNotificationSenderTest extends \PHPUnit\Framework\TestCase
         $this->sender->sendNotification($origin);
     }
 
-    public function testSendNotification()
+    public function testSendNotification(): void
     {
         $origin = new UserEmailOrigin();
         $origin->setUser('test@example.com');
@@ -72,7 +69,7 @@ class SocketNotificationSenderTest extends \PHPUnit\Framework\TestCase
         $this->sender->sendNotification($origin);
     }
 
-    public function testSendNotificationNoConnection()
+    public function testSendNotificationNoConnection(): void
     {
         $user = new User();
         $user->setId(456);

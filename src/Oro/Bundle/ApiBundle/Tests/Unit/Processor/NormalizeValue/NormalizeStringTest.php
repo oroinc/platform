@@ -4,11 +4,12 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\NormalizeValue;
 
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeString;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeValueContext;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
-class NormalizeStringTest extends \PHPUnit\Framework\TestCase
+class NormalizeStringTest extends TestCase
 {
     private NormalizeString $processor;
 

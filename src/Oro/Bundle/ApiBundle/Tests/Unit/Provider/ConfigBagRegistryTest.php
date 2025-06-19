@@ -7,21 +7,16 @@ use Oro\Bundle\ApiBundle\Provider\ConfigBagInterface;
 use Oro\Bundle\ApiBundle\Provider\ConfigBagRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
-class ConfigBagRegistryTest extends \PHPUnit\Framework\TestCase
+class ConfigBagRegistryTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigBagInterface */
-    private $defaultConfigBag;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigBagInterface */
-    private $firstConfigBag;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigBagInterface */
-    private $secondConfigBag;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
-    private $container;
+    private ConfigBagInterface&MockObject $defaultConfigBag;
+    private ConfigBagInterface&MockObject $firstConfigBag;
+    private ConfigBagInterface&MockObject $secondConfigBag;
+    private ContainerInterface&MockObject $container;
 
     #[\Override]
     protected function setUp(): void
@@ -41,7 +36,7 @@ class ConfigBagRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetConfigBagForUnsupportedRequestType()
+    public function testGetConfigBagForUnsupportedRequestType(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot find a config bag for the request "rest,another".');
@@ -51,7 +46,7 @@ class ConfigBagRegistryTest extends \PHPUnit\Framework\TestCase
         $registry->getConfigBag($requestType);
     }
 
-    public function testGetConfigBagShouldReturnDefaultBagForNotFirstAndSecondRequestType()
+    public function testGetConfigBagShouldReturnDefaultBagForNotFirstAndSecondRequestType(): void
     {
         $registry = $this->getRegistry([
             ['default_config_bag', '!first&!second'],
@@ -70,7 +65,7 @@ class ConfigBagRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->defaultConfigBag, $registry->getConfigBag($requestType));
     }
 
-    public function testGetConfigBagShouldReturnFirstBagForFirstRequestType()
+    public function testGetConfigBagShouldReturnFirstBagForFirstRequestType(): void
     {
         $registry = $this->getRegistry([
             ['default_config_bag', '!first&!second'],
@@ -89,7 +84,7 @@ class ConfigBagRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->firstConfigBag, $registry->getConfigBag($requestType));
     }
 
-    public function testGetConfigBagShouldReturnSecondBagForSecondRequestType()
+    public function testGetConfigBagShouldReturnSecondBagForSecondRequestType(): void
     {
         $registry = $this->getRegistry([
             ['default_config_bag', '!first&!second'],
@@ -108,7 +103,7 @@ class ConfigBagRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->secondConfigBag, $registry->getConfigBag($requestType));
     }
 
-    public function testGetConfigBagShouldReturnDefaultBagIfSpecificBagNotFound()
+    public function testGetConfigBagShouldReturnDefaultBagIfSpecificBagNotFound(): void
     {
         $registry = $this->getRegistry([
             ['first_config_bag', 'first'],
@@ -126,7 +121,7 @@ class ConfigBagRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($this->defaultConfigBag, $registry->getConfigBag($requestType));
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $registry = $this->getRegistry([
             ['default_config_bag', '!first&!second'],

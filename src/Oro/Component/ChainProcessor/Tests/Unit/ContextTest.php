@@ -3,162 +3,163 @@
 namespace Oro\Component\ChainProcessor\Tests\Unit;
 
 use Oro\Component\ChainProcessor\Context;
+use PHPUnit\Framework\TestCase;
 
-class ContextTest extends \PHPUnit\Framework\TestCase
+class ContextTest extends TestCase
 {
-    public function testGenericMethods()
+    public function testGenericMethods(): void
     {
         $context = new Context();
 
-        $this->assertFalse($context->has('test'));
-        $this->assertFalse(isset($context['test']));
-        $this->assertNull($context->get('test'));
-        $this->assertNull($context['test']);
+        self::assertFalse($context->has('test'));
+        self::assertFalse(isset($context['test']));
+        self::assertNull($context->get('test'));
+        self::assertNull($context['test']);
 
         $context->set('test', 'value');
-        $this->assertTrue($context->has('test'));
-        $this->assertTrue(isset($context['test']));
-        $this->assertEquals('value', $context->get('test'));
-        $this->assertEquals('value', $context['test']);
+        self::assertTrue($context->has('test'));
+        self::assertTrue(isset($context['test']));
+        self::assertEquals('value', $context->get('test'));
+        self::assertEquals('value', $context['test']);
 
         $context->remove('test');
-        $this->assertFalse($context->has('test'));
-        $this->assertFalse(isset($context['test']));
-        $this->assertNull($context->get('test'));
-        $this->assertNull($context['test']);
+        self::assertFalse($context->has('test'));
+        self::assertFalse(isset($context['test']));
+        self::assertNull($context->get('test'));
+        self::assertNull($context['test']);
 
         $context['test1'] = 'value1';
-        $this->assertTrue($context->has('test1'));
-        $this->assertTrue(isset($context['test1']));
-        $this->assertEquals('value1', $context->get('test1'));
-        $this->assertEquals('value1', $context['test1']);
+        self::assertTrue($context->has('test1'));
+        self::assertTrue(isset($context['test1']));
+        self::assertEquals('value1', $context->get('test1'));
+        self::assertEquals('value1', $context['test1']);
 
         unset($context['test1']);
-        $this->assertFalse($context->has('test1'));
-        $this->assertFalse(isset($context['test1']));
-        $this->assertNull($context->get('test1'));
-        $this->assertNull($context['test1']);
+        self::assertFalse($context->has('test1'));
+        self::assertFalse(isset($context['test1']));
+        self::assertNull($context->get('test1'));
+        self::assertNull($context['test1']);
 
         $context->set('test', null);
-        $this->assertTrue($context->has('test'));
-        $this->assertTrue(isset($context['test']));
-        $this->assertNull($context->get('test'));
-        $this->assertNull($context['test']);
+        self::assertTrue($context->has('test'));
+        self::assertTrue(isset($context['test']));
+        self::assertNull($context->get('test'));
+        self::assertNull($context['test']);
 
-        $this->assertCount(1, $context);
-        $this->assertEquals(['test' => null], $context->toArray());
+        self::assertCount(1, $context);
+        self::assertEquals(['test' => null], $context->toArray());
 
         $context->clear();
-        $this->assertCount(0, $context);
+        self::assertCount(0, $context);
     }
 
-    public function testAction()
+    public function testAction(): void
     {
         $context = new Context();
 
         $context->setAction('test');
-        $this->assertEquals('test', $context->getAction());
-        $this->assertEquals('test', $context->get(Context::ACTION));
+        self::assertEquals('test', $context->getAction());
+        self::assertEquals('test', $context->get(Context::ACTION));
     }
 
-    public function testFirstGroup()
+    public function testFirstGroup(): void
     {
         $context = new Context();
 
-        $this->assertNull($context->getFirstGroup());
+        self::assertNull($context->getFirstGroup());
 
         $context->setFirstGroup('test');
-        $this->assertEquals('test', $context->getFirstGroup());
+        self::assertEquals('test', $context->getFirstGroup());
 
         $context->setFirstGroup(null);
-        $this->assertNull($context->getFirstGroup());
+        self::assertNull($context->getFirstGroup());
     }
 
-    public function testLastGroup()
+    public function testLastGroup(): void
     {
         $context = new Context();
 
-        $this->assertNull($context->getLastGroup());
+        self::assertNull($context->getLastGroup());
 
         $context->setLastGroup('test');
-        $this->assertEquals('test', $context->getLastGroup());
+        self::assertEquals('test', $context->getLastGroup());
 
         $context->setLastGroup(null);
-        $this->assertNull($context->getLastGroup());
+        self::assertNull($context->getLastGroup());
     }
 
-    public function testSkippedGroups()
+    public function testSkippedGroups(): void
     {
         $context = new Context();
 
-        $this->assertFalse($context->hasSkippedGroups());
-        $this->assertSame([], $context->getSkippedGroups());
+        self::assertFalse($context->hasSkippedGroups());
+        self::assertSame([], $context->getSkippedGroups());
 
         $context->skipGroup('test');
-        $this->assertTrue($context->hasSkippedGroups());
-        $this->assertSame(['test'], $context->getSkippedGroups());
+        self::assertTrue($context->hasSkippedGroups());
+        self::assertSame(['test'], $context->getSkippedGroups());
 
         $context->skipGroup('test1');
-        $this->assertTrue($context->hasSkippedGroups());
-        $this->assertSame(['test', 'test1'], $context->getSkippedGroups());
+        self::assertTrue($context->hasSkippedGroups());
+        self::assertSame(['test', 'test1'], $context->getSkippedGroups());
 
         $context->skipGroup('test');
-        $this->assertTrue($context->hasSkippedGroups());
-        $this->assertSame(['test', 'test1'], $context->getSkippedGroups());
+        self::assertTrue($context->hasSkippedGroups());
+        self::assertSame(['test', 'test1'], $context->getSkippedGroups());
 
         $context->undoGroupSkipping('test');
-        $this->assertTrue($context->hasSkippedGroups());
-        $this->assertSame(['test1'], $context->getSkippedGroups());
+        self::assertTrue($context->hasSkippedGroups());
+        self::assertSame(['test1'], $context->getSkippedGroups());
 
         $context->undoGroupSkipping('test1');
-        $this->assertFalse($context->hasSkippedGroups());
-        $this->assertSame([], $context->getSkippedGroups());
+        self::assertFalse($context->hasSkippedGroups());
+        self::assertSame([], $context->getSkippedGroups());
 
         $context->skipGroup('test');
-        $this->assertTrue($context->hasSkippedGroups());
+        self::assertTrue($context->hasSkippedGroups());
         $context->resetSkippedGroups();
-        $this->assertFalse($context->hasSkippedGroups());
-        $this->assertSame([], $context->getSkippedGroups());
+        self::assertFalse($context->hasSkippedGroups());
+        self::assertSame([], $context->getSkippedGroups());
     }
 
-    public function testResult()
+    public function testResult(): void
     {
         $context = new Context();
 
-        $this->assertFalse($context->hasResult());
-        $this->assertNull($context->getResult());
+        self::assertFalse($context->hasResult());
+        self::assertNull($context->getResult());
 
         $context->setResult('test');
-        $this->assertTrue($context->hasResult());
-        $this->assertEquals('test', $context->getResult());
+        self::assertTrue($context->hasResult());
+        self::assertEquals('test', $context->getResult());
 
         $context->setResult(null);
-        $this->assertTrue($context->hasResult());
-        $this->assertNull($context->getResult());
+        self::assertTrue($context->hasResult());
+        self::assertNull($context->getResult());
 
         $context->removeResult();
-        $this->assertFalse($context->hasResult());
-        $this->assertNull($context->getResult());
+        self::assertFalse($context->hasResult());
+        self::assertNull($context->getResult());
     }
 
-    public function testGetChecksum()
+    public function testGetChecksum(): void
     {
         $context = new Context();
-        $this->assertEquals('', $context->getChecksum());
+        self::assertEquals('', $context->getChecksum());
 
         $context->setAction('test');
-        $this->assertEquals('5f806996b5064aae1b0c0a2cc0f90d1550f05af7', $context->getChecksum());
+        self::assertEquals('5f806996b5064aae1b0c0a2cc0f90d1550f05af7', $context->getChecksum());
 
         $context->set('key1', 'val1');
-        $this->assertEquals('64072bb9a8a46f46ea83b5c3d4bf6aa5ee2cdb8a', $context->getChecksum());
+        self::assertEquals('64072bb9a8a46f46ea83b5c3d4bf6aa5ee2cdb8a', $context->getChecksum());
 
         $context->set('key2', null);
-        $this->assertEquals('64072bb9a8a46f46ea83b5c3d4bf6aa5ee2cdb8a', $context->getChecksum());
+        self::assertEquals('64072bb9a8a46f46ea83b5c3d4bf6aa5ee2cdb8a', $context->getChecksum());
 
         $context->set('key3', ['key' => 'val']);
-        $this->assertEquals('b382be496f9cc9ba10e545c41ddd1ca9d9f9fb5a', $context->getChecksum());
+        self::assertEquals('b382be496f9cc9ba10e545c41ddd1ca9d9f9fb5a', $context->getChecksum());
 
         $context->remove('key3');
-        $this->assertEquals('64072bb9a8a46f46ea83b5c3d4bf6aa5ee2cdb8a', $context->getChecksum());
+        self::assertEquals('64072bb9a8a46f46ea83b5c3d4bf6aa5ee2cdb8a', $context->getChecksum());
     }
 }

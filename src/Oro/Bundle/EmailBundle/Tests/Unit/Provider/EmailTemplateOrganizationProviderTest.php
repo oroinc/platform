@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 class EmailTemplateOrganizationProviderTest extends TestCase
 {
-    private tokenAccessorInterface|MockObject $tokenAccessor;
+    private tokenAccessorInterface&MockObject $tokenAccessor;
     private EmailTemplateOrganizationProvider $provider;
 
     #[\Override]
@@ -27,8 +27,7 @@ class EmailTemplateOrganizationProviderTest extends TestCase
         $organization = new Organization();
         ReflectionUtil::setId($organization, 1);
 
-        $this->tokenAccessor
-            ->expects(self::once())
+        $this->tokenAccessor->expects(self::once())
             ->method('getOrganization')
             ->willReturn($organization);
 

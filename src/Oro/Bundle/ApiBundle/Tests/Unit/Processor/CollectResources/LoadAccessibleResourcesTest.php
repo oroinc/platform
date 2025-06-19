@@ -7,14 +7,13 @@ use Oro\Bundle\ApiBundle\Processor\CollectResources\LoadAccessibleResources;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderInterface;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class LoadAccessibleResourcesTest extends \PHPUnit\Framework\TestCase
+class LoadAccessibleResourcesTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|EntityOverrideProviderRegistry */
-    private $entityOverrideProviderRegistry;
-
-    /** @var LoadAccessibleResources */
-    private $processor;
+    private EntityOverrideProviderRegistry&MockObject $entityOverrideProviderRegistry;
+    private LoadAccessibleResources $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -24,7 +23,7 @@ class LoadAccessibleResourcesTest extends \PHPUnit\Framework\TestCase
         $this->processor = new LoadAccessibleResources($this->entityOverrideProviderRegistry);
     }
 
-    public function testProcessWhenAccessibleResourcesAreAlreadyBuilt()
+    public function testProcessWhenAccessibleResourcesAreAlreadyBuilt(): void
     {
         $context = new CollectResourcesContext();
         $context->setAccessibleResources(['Test\Entity1', 'Test\Entity2']);
@@ -39,7 +38,7 @@ class LoadAccessibleResourcesTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['Test\Entity1'], $context->getAccessibleAsAssociationResources());
     }
 
-    public function testProcessAccessibleResource()
+    public function testProcessAccessibleResource(): void
     {
         $context = new CollectResourcesContext();
 
@@ -61,7 +60,7 @@ class LoadAccessibleResourcesTest extends \PHPUnit\Framework\TestCase
         self::assertEquals(['Test\Entity'], $context->getAccessibleAsAssociationResources());
     }
 
-    public function testProcessForNotAccessibleAsAssociationResourceBecauseGetActionIsExcluded()
+    public function testProcessForNotAccessibleAsAssociationResourceBecauseGetActionIsExcluded(): void
     {
         $context = new CollectResourcesContext();
 
@@ -84,7 +83,7 @@ class LoadAccessibleResourcesTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $context->getAccessibleAsAssociationResources());
     }
 
-    public function testProcessForNotAccessibleResourceBecauseGetAndGetListActionsAreExcluded()
+    public function testProcessForNotAccessibleResourceBecauseGetAndGetListActionsAreExcluded(): void
     {
         $context = new CollectResourcesContext();
 
@@ -105,7 +104,7 @@ class LoadAccessibleResourcesTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $context->getAccessibleAsAssociationResources());
     }
 
-    public function testProcessForNotAccessibleAsAssociationResourceResourceBecauseItIsOverridden()
+    public function testProcessForNotAccessibleAsAssociationResourceResourceBecauseItIsOverridden(): void
     {
         $context = new CollectResourcesContext();
 
@@ -127,7 +126,7 @@ class LoadAccessibleResourcesTest extends \PHPUnit\Framework\TestCase
         self::assertEquals([], $context->getAccessibleAsAssociationResources());
     }
 
-    public function testProcessForNotAccessibleBecauseItIsOverridden()
+    public function testProcessForNotAccessibleBecauseItIsOverridden(): void
     {
         $context = new CollectResourcesContext();
 

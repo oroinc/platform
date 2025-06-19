@@ -7,11 +7,12 @@ use Oro\Bundle\ApiBundle\Batch\Encoder\DataEncoderRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
 use Oro\Component\Testing\Unit\TestContainerBuilder;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
-class DataEncoderRegistryTest extends \PHPUnit\Framework\TestCase
+class DataEncoderRegistryTest extends TestCase
 {
-    public function testEmptyEncoders()
+    public function testEmptyEncoders(): void
     {
         $registry = new DataEncoderRegistry(
             [],
@@ -22,7 +23,7 @@ class DataEncoderRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertNull($registry->getEncoder(new RequestType(['rest'])));
     }
 
-    public function testEncoderFound()
+    public function testEncoderFound(): void
     {
         $encoder1 = $this->createMock(DataEncoderInterface::class);
         $encoder2 = $this->createMock(DataEncoderInterface::class);
@@ -44,7 +45,7 @@ class DataEncoderRegistryTest extends \PHPUnit\Framework\TestCase
         self::assertSame($encoder2, $registry->getEncoder(new RequestType(['second'])));
     }
 
-    public function testEncoderNotFound()
+    public function testEncoderNotFound(): void
     {
         $encoder1 = $this->createMock(DataEncoderInterface::class);
         $encoder2 = $this->createMock(DataEncoderInterface::class);

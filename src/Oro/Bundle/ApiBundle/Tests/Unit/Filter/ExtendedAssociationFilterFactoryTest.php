@@ -7,20 +7,15 @@ use Oro\Bundle\ApiBundle\Filter\ExtendedAssociationFilterFactory;
 use Oro\Bundle\ApiBundle\Provider\EntityOverrideProviderRegistry;
 use Oro\Bundle\ApiBundle\Provider\ExtendedAssociationProvider;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 
-class ExtendedAssociationFilterFactoryTest extends \PHPUnit\Framework\TestCase
+class ExtendedAssociationFilterFactoryTest extends TestCase
 {
-    /** @var ValueNormalizer|\PHPUnit\Framework\MockObject\MockObject */
-    private $valueNormalizer;
-
-    /** @var ExtendedAssociationProvider|\PHPUnit\Framework\MockObject\MockObject */
-    private $extendedAssociationProvider;
-
-    /** @var EntityOverrideProviderRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityOverrideProviderRegistry;
-
-    /** @var ExtendedAssociationFilterFactory */
-    private $factory;
+    private ValueNormalizer&MockObject $valueNormalizer;
+    private ExtendedAssociationProvider&MockObject $extendedAssociationProvider;
+    private EntityOverrideProviderRegistry&MockObject $entityOverrideProviderRegistry;
+    private ExtendedAssociationFilterFactory $factory;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +31,7 @@ class ExtendedAssociationFilterFactoryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testCreateFilter()
+    public function testCreateFilter(): void
     {
         $dataType = 'integer';
 

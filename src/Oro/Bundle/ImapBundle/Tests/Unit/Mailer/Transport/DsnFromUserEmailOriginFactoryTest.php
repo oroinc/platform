@@ -7,15 +7,14 @@ use Oro\Bundle\ImapBundle\Mailer\Transport\DsnFromUserEmailOriginFactory;
 use Oro\Bundle\ImapBundle\Manager\OAuthManagerInterface;
 use Oro\Bundle\ImapBundle\Manager\OAuthManagerRegistry;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Transport\Dsn;
 
-class DsnFromUserEmailOriginFactoryTest extends \PHPUnit\Framework\TestCase
+class DsnFromUserEmailOriginFactoryTest extends TestCase
 {
-    /** @var OAuthManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $oauthManagerRegistry;
-
-    /** @var DsnFromUserEmailOriginFactory */
-    private $factory;
+    private OAuthManagerRegistry&MockObject $oauthManagerRegistry;
+    private DsnFromUserEmailOriginFactory $factory;
 
     #[\Override]
     protected function setUp(): void

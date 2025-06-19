@@ -16,6 +16,8 @@ use Oro\Bundle\AttachmentBundle\Tools\ExternalFileFactory;
 use Oro\Bundle\AttachmentBundle\Validator\ProtocolValidatorInterface;
 use Oro\Bundle\GaufretteBundle\FilesystemMap;
 use Oro\Bundle\SecurityBundle\Tools\UUIDGenerator;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -24,22 +26,15 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class FileManagerTest extends \PHPUnit\Framework\TestCase
+class FileManagerTest extends TestCase
 {
-    private const TEST_FILE_SYSTEM_NAME = 'testAttachments';
-    private const TEST_PROTOCOL = 'testProtocol';
+    private const string TEST_FILE_SYSTEM_NAME = 'testAttachments';
+    private const string TEST_PROTOCOL = 'testProtocol';
 
-    /** @var Filesystem|\PHPUnit\Framework\MockObject\MockObject */
-    private $filesystem;
-
-    /** @var ProtocolValidatorInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $protocolValidator;
-
-    /** @var ExternalFileFactory */
-    private $externalFileFactory;
-
-    /** @var FileManager */
-    private $fileManager;
+    private Filesystem&MockObject $filesystem;
+    private ProtocolValidatorInterface&MockObject $protocolValidator;
+    private ExternalFileFactory $externalFileFactory;
+    private FileManager $fileManager;
 
     #[\Override]
     protected function setUp(): void
@@ -498,7 +493,7 @@ class FileManagerTest extends \PHPUnit\Framework\TestCase
         self::assertNotEquals('testFile.txt', $fileEntity->getFilename());
     }
 
-    public function testPreUploadForWinZipFile()
+    public function testPreUploadForWinZipFile(): void
     {
         $fileEntity = $this->createFileEntity();
         $file = new UploadedFile(

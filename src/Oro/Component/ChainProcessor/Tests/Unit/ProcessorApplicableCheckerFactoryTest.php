@@ -7,10 +7,11 @@ use Oro\Component\ChainProcessor\GroupRangeApplicableChecker;
 use Oro\Component\ChainProcessor\MatchApplicableChecker;
 use Oro\Component\ChainProcessor\ProcessorApplicableCheckerFactory;
 use Oro\Component\ChainProcessor\SkipGroupApplicableChecker;
+use PHPUnit\Framework\TestCase;
 
-class ProcessorApplicableCheckerFactoryTest extends \PHPUnit\Framework\TestCase
+class ProcessorApplicableCheckerFactoryTest extends TestCase
 {
-    public function testCreateApplicableChecker()
+    public function testCreateApplicableChecker(): void
     {
         $factory = new ProcessorApplicableCheckerFactory();
         $chainApplicableChecker = $factory->createApplicableChecker();

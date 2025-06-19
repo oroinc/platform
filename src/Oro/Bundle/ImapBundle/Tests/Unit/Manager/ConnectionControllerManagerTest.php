@@ -18,28 +18,19 @@ use Oro\Bundle\ImapBundle\Provider\OAuthProviderInterface;
 use Oro\Bundle\SecurityBundle\Encoder\DefaultCrypter;
 use Oro\Bundle\SecurityBundle\Encoder\SymmetricCrypterInterface;
 use Oro\Bundle\UserBundle\Entity\User;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 
-class ConnectionControllerManagerTest extends \PHPUnit\Framework\TestCase
+class ConnectionControllerManagerTest extends TestCase
 {
-    /** @var FormFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $formFactory;
-
-    /** @var SymmetricCrypterInterface */
-    private $crypter;
-
-    /** @var ManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $doctrine;
-
-    /** @var ImapConnectorFactory|\PHPUnit\Framework\MockObject\MockObject */
-    private $imapConnectorFactory;
-
-    /** @var OAuthManagerRegistry|\PHPUnit\Framework\MockObject\MockObject */
-    private $oauthManagerRegistry;
-
-    /** @var ConnectionControllerManager */
-    private $controllerManager;
+    private FormFactoryInterface&MockObject $formFactory;
+    private SymmetricCrypterInterface $crypter;
+    private ManagerRegistry&MockObject $doctrine;
+    private ImapConnectorFactory&MockObject $imapConnectorFactory;
+    private OAuthManagerRegistry&MockObject $oauthManagerRegistry;
+    private ConnectionControllerManager $controllerManager;
 
     #[\Override]
     protected function setUp(): void

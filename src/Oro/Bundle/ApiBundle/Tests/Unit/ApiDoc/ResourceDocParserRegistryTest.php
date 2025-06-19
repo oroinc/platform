@@ -6,12 +6,13 @@ use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserInterface;
 use Oro\Bundle\ApiBundle\ApiDoc\ResourceDocParserRegistry;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\RequestExpressionMatcher;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
-class ResourceDocParserRegistryTest extends \PHPUnit\Framework\TestCase
+class ResourceDocParserRegistryTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ContainerInterface */
-    private $container;
+    private ContainerInterface&MockObject $container;
 
     #[\Override]
     protected function setUp(): void
@@ -28,7 +29,7 @@ class ResourceDocParserRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldReturnResourceDocParserIfItExistsForSpecificRequestType()
+    public function testShouldReturnResourceDocParserIfItExistsForSpecificRequestType(): void
     {
         $registry = $this->getResourceDocParserRegistry([
             ['resourceDocParser1', 'rest&json_api'],
@@ -48,7 +49,7 @@ class ResourceDocParserRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldReturnDefaultResourceDocParserIfNoParserForSpecificRequestType()
+    public function testShouldReturnDefaultResourceDocParserIfNoParserForSpecificRequestType(): void
     {
         $registry = $this->getResourceDocParserRegistry([
             ['resourceDocParser1', 'rest&json_api'],
@@ -68,7 +69,7 @@ class ResourceDocParserRegistryTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testShouldThrowExceptionIfNoResourceDocParserForSpecificRequestTypeAndNoDefaultParser()
+    public function testShouldThrowExceptionIfNoResourceDocParserForSpecificRequestTypeAndNoDefaultParser(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot find a resource documentation parser for the request "another".');

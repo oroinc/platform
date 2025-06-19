@@ -6,21 +6,20 @@ use Oro\Bundle\ApiBundle\Form\FormUtil;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataContext;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataEventDispatcher;
 use Oro\Bundle\ApiBundle\Processor\CustomizeFormData\CustomizeFormDataHandler;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\DataMapperInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormInterface;
 
-class CustomizeFormDataEventDispatcherTest extends \PHPUnit\Framework\TestCase
+class CustomizeFormDataEventDispatcherTest extends TestCase
 {
-    private const TEST_EVENT_NAME = 'test_customize_form_data_event';
+    private const string TEST_EVENT_NAME = 'test_customize_form_data_event';
 
-    /** @var CustomizeFormDataHandler|\PHPUnit\Framework\MockObject\MockObject */
-    private $customizationHandler;
-
-    /** @var CustomizeFormDataEventDispatcher */
-    private $eventDispatcher;
+    private CustomizeFormDataHandler&MockObject $customizationHandler;
+    private CustomizeFormDataEventDispatcher $eventDispatcher;
 
     #[\Override]
     protected function setUp(): void

@@ -5,18 +5,15 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Provider;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EmailBundle\Provider\SystemVariablesProvider;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatterInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class SystemVariablesProviderTest extends \PHPUnit\Framework\TestCase
+class SystemVariablesProviderTest extends TestCase
 {
-    /** @var ConfigManager|\PHPUnit\Framework\MockObject\MockObject */
-    private $configManager;
-
-    /** @var DateTimeFormatterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $dateTimeFormatter;
-
-    /** @var SystemVariablesProvider */
-    private $provider;
+    private ConfigManager&MockObject $configManager;
+    private DateTimeFormatterInterface&MockObject $dateTimeFormatter;
+    private SystemVariablesProvider $provider;
 
     #[\Override]
     protected function setUp(): void
@@ -36,7 +33,7 @@ class SystemVariablesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetVariableDefinitions()
+    public function testGetVariableDefinitions(): void
     {
         $result = $this->provider->getVariableDefinitions();
         $this->assertEquals(
@@ -50,7 +47,7 @@ class SystemVariablesProviderTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetVariableValues()
+    public function testGetVariableValues(): void
     {
         $this->configManager->expects($this->any())
             ->method('get')

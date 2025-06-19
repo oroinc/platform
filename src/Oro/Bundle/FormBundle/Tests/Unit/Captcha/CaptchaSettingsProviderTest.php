@@ -15,11 +15,10 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 
 class CaptchaSettingsProviderTest extends TestCase
 {
-    private ConfigManager|MockObject $configManager;
-    private CaptchaServiceRegistry|MockObject $captchaServiceRegistry;
-    private CaptchaServiceInterface|MockObject $captchaService;
-    private TokenStorageInterface|MockObject $tokenStorage;
-
+    private ConfigManager&MockObject $configManager;
+    private CaptchaServiceRegistry&MockObject $captchaServiceRegistry;
+    private CaptchaServiceInterface&MockObject $captchaService;
+    private TokenStorageInterface&MockObject $tokenStorage;
     private CaptchaSettingsProvider $captchaSettingsProvider;
 
     #[\Override]
@@ -37,10 +36,9 @@ class CaptchaSettingsProviderTest extends TestCase
         );
     }
 
-    public function testIsProtectionAvailableWhenCaptchaDisabled()
+    public function testIsProtectionAvailableWhenCaptchaDisabled(): void
     {
-        $this->configManager
-            ->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('get')
             ->with(Configuration::getConfigKey(Configuration::ENABLED_CAPTCHA))
             ->willReturn(false);
@@ -48,10 +46,9 @@ class CaptchaSettingsProviderTest extends TestCase
         $this->assertFalse($this->captchaSettingsProvider->isProtectionAvailable());
     }
 
-    public function testIsProtectionAvailableWhenCaptchaEnabledAndServiceConfigured()
+    public function testIsProtectionAvailableWhenCaptchaEnabledAndServiceConfigured(): void
     {
-        $this->configManager
-            ->expects($this->exactly(2))
+        $this->configManager->expects($this->exactly(2))
             ->method('get')
             ->withConsecutive(
                 [Configuration::getConfigKey(Configuration::ENABLED_CAPTCHA)],
@@ -59,23 +56,20 @@ class CaptchaSettingsProviderTest extends TestCase
             )
             ->willReturnOnConsecutiveCalls(true, true);
 
-        $this->captchaServiceRegistry
-            ->expects($this->once())
+        $this->captchaServiceRegistry->expects($this->once())
             ->method('getCaptchaService')
             ->willReturn($this->captchaService);
 
-        $this->captchaService
-            ->expects($this->once())
+        $this->captchaService->expects($this->once())
             ->method('isConfigured')
             ->willReturn(true);
 
         $this->assertTrue($this->captchaSettingsProvider->isProtectionAvailable());
     }
 
-    public function testIsProtectionWhenUserChecksEnabledAndUserNotLoggedInNoToken()
+    public function testIsProtectionWhenUserChecksEnabledAndUserNotLoggedInNoToken(): void
     {
-        $this->configManager
-            ->expects($this->exactly(2))
+        $this->configManager->expects($this->exactly(2))
             ->method('get')
             ->withConsecutive(
                 [Configuration::getConfigKey(Configuration::ENABLED_CAPTCHA)],
@@ -87,23 +81,20 @@ class CaptchaSettingsProviderTest extends TestCase
             ->method('getToken')
             ->willReturn(null);
 
-        $this->captchaServiceRegistry
-            ->expects($this->once())
+        $this->captchaServiceRegistry->expects($this->once())
             ->method('getCaptchaService')
             ->willReturn($this->captchaService);
 
-        $this->captchaService
-            ->expects($this->once())
+        $this->captchaService->expects($this->once())
             ->method('isConfigured')
             ->willReturn(true);
 
         $this->assertTrue($this->captchaSettingsProvider->isProtectionAvailable());
     }
 
-    public function testIsProtectionWhenUserChecksEnabledAndUserNotLoggedInAnonymousToken()
+    public function testIsProtectionWhenUserChecksEnabledAndUserNotLoggedInAnonymousToken(): void
     {
-        $this->configManager
-            ->expects($this->exactly(2))
+        $this->configManager->expects($this->exactly(2))
             ->method('get')
             ->withConsecutive(
                 [Configuration::getConfigKey(Configuration::ENABLED_CAPTCHA)],
@@ -115,23 +106,20 @@ class CaptchaSettingsProviderTest extends TestCase
             ->method('getToken')
             ->willReturn($this->createMock(AnonymousToken::class));
 
-        $this->captchaServiceRegistry
-            ->expects($this->once())
+        $this->captchaServiceRegistry->expects($this->once())
             ->method('getCaptchaService')
             ->willReturn($this->captchaService);
 
-        $this->captchaService
-            ->expects($this->once())
+        $this->captchaService->expects($this->once())
             ->method('isConfigured')
             ->willReturn(true);
 
         $this->assertTrue($this->captchaSettingsProvider->isProtectionAvailable());
     }
 
-    public function testIsProtectionWhenUserChecksEnabledAndUserLoggedIn()
+    public function testIsProtectionWhenUserChecksEnabledAndUserLoggedIn(): void
     {
-        $this->configManager
-            ->expects($this->exactly(2))
+        $this->configManager->expects($this->exactly(2))
             ->method('get')
             ->withConsecutive(
                 [Configuration::getConfigKey(Configuration::ENABLED_CAPTCHA)],
@@ -143,21 +131,18 @@ class CaptchaSettingsProviderTest extends TestCase
             ->method('getToken')
             ->willReturn($this->createMock(UsernamePasswordOrganizationToken::class));
 
-        $this->captchaServiceRegistry
-            ->expects($this->never())
+        $this->captchaServiceRegistry->expects($this->never())
             ->method('getCaptchaService');
 
-        $this->captchaService
-            ->expects($this->never())
+        $this->captchaService->expects($this->never())
             ->method('isConfigured');
 
         $this->assertFalse($this->captchaSettingsProvider->isProtectionAvailable());
     }
 
-    public function testIsProtectionAvailableWhenCaptchaEnabledAndServiceNotConfigured()
+    public function testIsProtectionAvailableWhenCaptchaEnabledAndServiceNotConfigured(): void
     {
-        $this->configManager
-            ->expects($this->exactly(2))
+        $this->configManager->expects($this->exactly(2))
             ->method('get')
             ->withConsecutive(
                 [Configuration::getConfigKey(Configuration::ENABLED_CAPTCHA)],
@@ -165,26 +150,23 @@ class CaptchaSettingsProviderTest extends TestCase
             )
             ->willReturnOnConsecutiveCalls(true, true);
 
-        $this->captchaServiceRegistry
-            ->expects($this->once())
+        $this->captchaServiceRegistry->expects($this->once())
             ->method('getCaptchaService')
             ->willReturn($this->captchaService);
 
-        $this->captchaService
-            ->expects($this->once())
+        $this->captchaService->expects($this->once())
             ->method('isConfigured')
             ->willReturn(false);
 
         $this->assertFalse($this->captchaSettingsProvider->isProtectionAvailable());
     }
 
-    public function testIsFormProtected()
+    public function testIsFormProtected(): void
     {
         $formName = 'test_form';
         $protectedForms = ['test_form'];
 
-        $this->configManager
-            ->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('get')
             ->with(Configuration::getConfigKey(Configuration::CAPTCHA_PROTECTED_FORMS))
             ->willReturn($protectedForms);
@@ -192,13 +174,12 @@ class CaptchaSettingsProviderTest extends TestCase
         $this->assertTrue($this->captchaSettingsProvider->isFormProtected($formName));
     }
 
-    public function testIsFormProtectedWhenNotProtected()
+    public function testIsFormProtectedWhenNotProtected(): void
     {
         $formName = 'test_form';
         $protectedForms = ['another_form'];
 
-        $this->configManager
-            ->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('get')
             ->with(Configuration::getConfigKey(Configuration::CAPTCHA_PROTECTED_FORMS))
             ->willReturn($protectedForms);
@@ -206,17 +187,15 @@ class CaptchaSettingsProviderTest extends TestCase
         $this->assertFalse($this->captchaSettingsProvider->isFormProtected($formName));
     }
 
-    public function testGetFormType()
+    public function testGetFormType(): void
     {
         $formType = 'captcha_form_type';
 
-        $this->captchaServiceRegistry
-            ->expects($this->once())
+        $this->captchaServiceRegistry->expects($this->once())
             ->method('getCaptchaService')
             ->willReturn($this->captchaService);
 
-        $this->captchaService
-            ->expects($this->once())
+        $this->captchaService->expects($this->once())
             ->method('getFormType')
             ->willReturn($formType);
 

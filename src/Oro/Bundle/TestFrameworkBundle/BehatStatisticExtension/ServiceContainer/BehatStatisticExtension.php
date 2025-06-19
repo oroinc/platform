@@ -9,6 +9,7 @@ use Behat\Testwork\ServiceContainer\ExtensionManager;
 use Behat\Testwork\Suite\ServiceContainer\SuiteExtension;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\PDOException;
+use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception\ConnectionException;
 use Doctrine\DBAL\Exception\DriverException;
 use Oro\Bundle\TestFrameworkBundle\BehatStatisticExtension\ServiceContainer\Formatter\StatisticFormatterFactory;
@@ -16,10 +17,14 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Allows to collect and analyze test execution statistics, such as average execution time.
+ */
 final class BehatStatisticExtension implements TestworkExtension
 {
     const SUITE_SET_ENV_VAR = 'BEHAT_SUITE_SETS';
@@ -78,6 +83,14 @@ final class BehatStatisticExtension implements TestworkExtension
         $loader->load('cli_controllers.yml');
         $loader->load('avg_time.yml');
         $loader->load('avg_time_feature.yml');
+
+        if (!$container->hasDefinition('oro_behat_statistic.database.connection')) {
+            $connectionDefinition = new Definition(Connection::class);
+            $connectionDefinition->setPublic(true);
+            $connectionDefinition->setFactory([DriverManager::class, 'getConnection']);
+            $connectionDefinition->setArguments(['%oro_behat_statistic.connection%']);
+            $container->setDefinition('oro_behat_statistic.database.connection', $connectionDefinition);
+        }
     }
 
     /**

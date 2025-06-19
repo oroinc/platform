@@ -17,10 +17,8 @@ class EmailTemplateSenderTest extends TestCase
 {
     use LoggerAwareTraitTestTrait;
 
-    private EmailModelFromEmailTemplateFactory|MockObject $emailModelFromEmailTemplateFactory;
-
-    private EmailModelSender|MockObject $emailModelSender;
-
+    private EmailModelFromEmailTemplateFactory&MockObject $emailModelFromEmailTemplateFactory;
+    private EmailModelSender&MockObject $emailModelSender;
     private EmailTemplateSender $sender;
 
     #[\Override]
@@ -43,21 +41,18 @@ class EmailTemplateSenderTest extends TestCase
         $templateParams = ['sample_key' => 'sample_value'];
 
         $emailModel = new EmailModel();
-        $this->emailModelFromEmailTemplateFactory
-            ->expects(self::once())
+        $this->emailModelFromEmailTemplateFactory->expects(self::once())
             ->method('createEmailModel')
             ->with($from, $recipient, $templateName, $templateParams)
             ->willReturn($emailModel);
 
         $exception = new \Exception('sample error');
-        $this->emailModelSender
-            ->expects(self::once())
+        $this->emailModelSender->expects(self::once())
             ->method('send')
             ->with($emailModel, $emailModel->getOrigin())
             ->willThrowException($exception);
 
-        $this->loggerMock
-            ->expects(self::once())
+        $this->loggerMock->expects(self::once())
             ->method('error')
             ->with(
                 'Failed to send an email to {recipients_emails} using "{template_name}" email template: {message}',
@@ -83,15 +78,13 @@ class EmailTemplateSenderTest extends TestCase
         $templateParams = ['sample_key' => 'sample_value'];
 
         $emailModel = new EmailModel();
-        $this->emailModelFromEmailTemplateFactory
-            ->expects(self::once())
+        $this->emailModelFromEmailTemplateFactory->expects(self::once())
             ->method('createEmailModel')
             ->with($from, $recipient, $templateName, $templateParams)
             ->willReturn($emailModel);
 
         $emailUser = $this->createMock(EmailUser::class);
-        $this->emailModelSender
-            ->expects(self::once())
+        $this->emailModelSender->expects(self::once())
             ->method('send')
             ->with($emailModel, $emailModel->getOrigin())
             ->willReturn($emailUser);

@@ -7,8 +7,7 @@ use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Options\OptionsProcessorTestCase;
 
 class SetCorsAllowMethodsTest extends OptionsProcessorTestCase
 {
-    /** @var SetCorsAllowMethods */
-    private $processor;
+    private SetCorsAllowMethods $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -17,7 +16,7 @@ class SetCorsAllowMethodsTest extends OptionsProcessorTestCase
         $this->processor = new SetCorsAllowMethods();
     }
 
-    public function testAllowMethodsAreAlreadySet()
+    public function testAllowMethodsAreAlreadySet(): void
     {
         $this->context->getRequestHeaders()->set('Access-Control-Request-Method', 'POST');
         $this->context->getResponseHeaders()->set('Allow', 'GET, POST, PATCH');
@@ -31,7 +30,7 @@ class SetCorsAllowMethodsTest extends OptionsProcessorTestCase
         self::assertTrue($this->context->getResponseHeaders()->has('Allow'));
     }
 
-    public function testAllowMethodsWhenRequestedMethodIsAllowed()
+    public function testAllowMethodsWhenRequestedMethodIsAllowed(): void
     {
         $this->context->getRequestHeaders()->set('Access-Control-Request-Method', 'POST');
         $this->context->getResponseHeaders()->set('Allow', 'GET, POST, PATCH');
@@ -44,7 +43,7 @@ class SetCorsAllowMethodsTest extends OptionsProcessorTestCase
         self::assertFalse($this->context->getResponseHeaders()->has('Allow'));
     }
 
-    public function testAllowMethodsWhenRequestedMethodIsNotAllowed()
+    public function testAllowMethodsWhenRequestedMethodIsNotAllowed(): void
     {
         $this->context->getRequestHeaders()->set('Access-Control-Request-Method', 'DELETE');
         $this->context->getResponseHeaders()->set('Allow', 'GET, POST, PATCH');
@@ -57,7 +56,7 @@ class SetCorsAllowMethodsTest extends OptionsProcessorTestCase
         self::assertFalse($this->context->getResponseHeaders()->has('Allow'));
     }
 
-    public function testAllowMethodsWhenAllowHeaderIsNotSet()
+    public function testAllowMethodsWhenAllowHeaderIsNotSet(): void
     {
         $this->context->getRequestHeaders()->set('Access-Control-Request-Method', 'DELETE');
         $this->processor->process($this->context);

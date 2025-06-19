@@ -4,9 +4,10 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Mailer\Transport;
 
 use Oro\Bundle\EmailBundle\Form\Model\SmtpSettings;
 use Oro\Bundle\EmailBundle\Mailer\Transport\DsnFromSmtpSettingsFactory;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Transport\Dsn;
 
-class DsnFromSmtpSettingsFactoryTest extends \PHPUnit\Framework\TestCase
+class DsnFromSmtpSettingsFactoryTest extends TestCase
 {
     private DsnFromSmtpSettingsFactory $factory;
 

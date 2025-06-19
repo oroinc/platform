@@ -7,10 +7,11 @@ use Oro\Bundle\ApiBundle\Metadata\DataAccessorInterface;
 use Oro\Bundle\ApiBundle\Metadata\ExternalLinkMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FirstPageLinkMetadata;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use PHPUnit\Framework\TestCase;
 
-class FirstPageLinkMetadataTest extends \PHPUnit\Framework\TestCase
+class FirstPageLinkMetadataTest extends TestCase
 {
-    public function testGetHrefWhenPaginationIsNotSupported()
+    public function testGetHrefWhenPaginationIsNotSupported(): void
     {
         $queryStringAccessor = $this->createMock(QueryStringAccessorInterface::class);
         $linkMetadata = new FirstPageLinkMetadata(
@@ -29,7 +30,7 @@ class FirstPageLinkMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertNull($linkMetadata->getHref($dataAccessor));
     }
 
-    public function testGetHrefForFirstPage()
+    public function testGetHrefForFirstPage(): void
     {
         $queryStringAccessor = $this->createMock(QueryStringAccessorInterface::class);
         $linkMetadata = new FirstPageLinkMetadata(
@@ -41,7 +42,7 @@ class FirstPageLinkMetadataTest extends \PHPUnit\Framework\TestCase
         $dataAccessor = $this->createMock(DataAccessorInterface::class);
         $dataAccessor->expects(self::once())
             ->method('tryGetValue')
-            ->willReturnCallback(function ($propertyPath, &$value) {
+            ->willReturnCallback(function ($propertyPath, &$value): bool {
                 $hasValue = false;
                 if (ConfigUtil::PAGE_NUMBER === $propertyPath) {
                     $value = 1;
@@ -56,7 +57,7 @@ class FirstPageLinkMetadataTest extends \PHPUnit\Framework\TestCase
         self::assertNull($linkMetadata->getHref($dataAccessor));
     }
 
-    public function testGetHrefForAnotherPage()
+    public function testGetHrefForAnotherPage(): void
     {
         $queryStringAccessor = $this->createMock(QueryStringAccessorInterface::class);
         $linkMetadata = new FirstPageLinkMetadata(
@@ -68,7 +69,7 @@ class FirstPageLinkMetadataTest extends \PHPUnit\Framework\TestCase
         $dataAccessor = $this->createMock(DataAccessorInterface::class);
         $dataAccessor->expects(self::once())
             ->method('tryGetValue')
-            ->willReturnCallback(function ($propertyPath, &$value) {
+            ->willReturnCallback(function ($propertyPath, &$value): bool {
                 $hasValue = false;
                 if (ConfigUtil::PAGE_NUMBER === $propertyPath) {
                     $value = 2;
@@ -87,7 +88,7 @@ class FirstPageLinkMetadataTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testGetHrefWhenNoQueryStringAccessor()
+    public function testGetHrefWhenNoQueryStringAccessor(): void
     {
         $linkMetadata = new FirstPageLinkMetadata(
             new ExternalLinkMetadata('http://test.com'),
@@ -97,7 +98,7 @@ class FirstPageLinkMetadataTest extends \PHPUnit\Framework\TestCase
         $dataAccessor = $this->createMock(DataAccessorInterface::class);
         $dataAccessor->expects(self::once())
             ->method('tryGetValue')
-            ->willReturnCallback(function ($propertyPath, &$value) {
+            ->willReturnCallback(function ($propertyPath, &$value): bool {
                 $hasValue = false;
                 if (ConfigUtil::PAGE_NUMBER === $propertyPath) {
                     $value = 2;

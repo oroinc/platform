@@ -15,12 +15,13 @@ use Oro\Bundle\ApiBundle\Model\NormalizedDateTime;
 use Oro\Bundle\ApiBundle\Model\Range;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  */
-class ComparisonFilterTest extends \PHPUnit\Framework\TestCase
+class ComparisonFilterTest extends TestCase
 {
     private function getDateTime(string $datetime): \DateTime
     {

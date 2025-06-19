@@ -7,13 +7,14 @@ use Oro\Bundle\ApiBundle\Validator\Constraints\AccessGrantedValidator;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ObjectIdentityHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class AccessGrantedValidatorTest extends ConstraintValidatorTestCase
 {
-    private \PHPUnit\Framework\MockObject\MockObject|AuthorizationCheckerInterface $authorizationChecker;
-    private \PHPUnit\Framework\MockObject\MockObject|DoctrineHelper $doctrineHelper;
+    private AuthorizationCheckerInterface&MockObject $authorizationChecker;
+    private DoctrineHelper&MockObject $doctrineHelper;
 
     #[\Override]
     protected function setUp(): void

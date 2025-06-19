@@ -4,10 +4,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Batch\Async;
 
 use Oro\Bundle\ApiBundle\Batch\Async\ChunkFileClassifier;
 use Oro\Bundle\ApiBundle\Batch\Model\ChunkFile;
+use PHPUnit\Framework\TestCase;
 
-class ChunkFileClassifierTest extends \PHPUnit\Framework\TestCase
+class ChunkFileClassifierTest extends TestCase
 {
-    public function testIsPrimaryData()
+    public function testIsPrimaryData(): void
     {
         $primaryDataChunkFile = new ChunkFile('file1', 0, 0, 'data');
         $anotherChunkFile = new ChunkFile('file1', 0, 0, 'another');
@@ -17,7 +18,7 @@ class ChunkFileClassifierTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($classifier->isPrimaryData($anotherChunkFile));
     }
 
-    public function testIsIncludedData()
+    public function testIsIncludedData(): void
     {
         $includedDataChunkFile = new ChunkFile('file1', 0, 0, 'included');
         $anotherChunkFile = new ChunkFile('file1', 0, 0, 'another');
@@ -27,7 +28,7 @@ class ChunkFileClassifierTest extends \PHPUnit\Framework\TestCase
         self::assertFalse($classifier->isIncludedData($anotherChunkFile));
     }
 
-    public function testIsIncludedDataWhenClassifierIsNotConfiguredToDetermineIncludedData()
+    public function testIsIncludedDataWhenClassifierIsNotConfiguredToDetermineIncludedData(): void
     {
         $chunkFile = new ChunkFile('file1', 0, 0, 'included');
 

@@ -5,8 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Util;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Oro\Bundle\ApiBundle\Util\FieldVisitor;
+use PHPUnit\Framework\TestCase;
 
-class FieldVisitorTest extends \PHPUnit\Framework\TestCase
+class FieldVisitorTest extends TestCase
 {
     private FieldVisitor $visitor;
 

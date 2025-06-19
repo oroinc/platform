@@ -5,8 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\CustomizeLoadedData;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedData\CustomizeLoadedDataContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ParameterBag;
+use PHPUnit\Framework\TestCase;
 
-class CustomizeLoadedDataProcessorTestCase extends \PHPUnit\Framework\TestCase
+class CustomizeLoadedDataProcessorTestCase extends TestCase
 {
     protected const TEST_VERSION = '1.1';
     protected const TEST_REQUEST_TYPE = RequestType::REST;

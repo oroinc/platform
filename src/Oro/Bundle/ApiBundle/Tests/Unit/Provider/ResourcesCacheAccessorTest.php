@@ -6,19 +6,16 @@ use Oro\Bundle\ApiBundle\Provider\ConfigCacheStateRegistry;
 use Oro\Bundle\ApiBundle\Provider\ResourcesCacheAccessor;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\Config\Cache\ConfigCacheStateInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
-class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
+class ResourcesCacheAccessorTest extends TestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|CacheItemPoolInterface */
-    private $cache;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|CacheItemInterface */
-    private $cacheItem;
-
-    /** @var \PHPUnit\Framework\MockObject\MockObject|ConfigCacheStateRegistry */
-    private $configCacheStateRegistry;
+    private CacheItemPoolInterface&MockObject $cache;
+    private CacheItemInterface&MockObject $cacheItem;
+    private ConfigCacheStateRegistry&MockObject $configCacheStateRegistry;
 
     #[\Override]
     protected function setUp(): void
@@ -38,7 +35,7 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
         return $cacheAccessor;
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $this->cache->expects(self::once())
             ->method('clear');
@@ -48,7 +45,7 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
         $cacheAccessor->clear();
     }
 
-    public function testFetchWhenNoCachedData()
+    public function testFetchWhenNoCachedData(): void
     {
         $version = '1.2';
         $requestType = new RequestType([RequestType::REST]);
@@ -72,7 +69,7 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFetchWithoutConfigCacheStateRegistry()
+    public function testFetchWithoutConfigCacheStateRegistry(): void
     {
         $version = '1.2';
         $requestType = new RequestType([RequestType::REST]);
@@ -98,7 +95,7 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFetchWhenConfigCacheTimestampIsNull()
+    public function testFetchWhenConfigCacheTimestampIsNull(): void
     {
         $version = '1.2';
         $requestType = new RequestType([RequestType::REST]);
@@ -134,7 +131,7 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFetchWhenConfigCacheIsFresh()
+    public function testFetchWhenConfigCacheIsFresh(): void
     {
         $version = '1.2';
         $requestType = new RequestType([RequestType::REST]);
@@ -171,7 +168,7 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testFetchWhenConfigCacheIsDirty()
+    public function testFetchWhenConfigCacheIsDirty(): void
     {
         $version = '1.2';
         $requestType = new RequestType([RequestType::REST]);
@@ -207,7 +204,7 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testSaveWithoutConfigCacheStateRegistry()
+    public function testSaveWithoutConfigCacheStateRegistry(): void
     {
         $version = '1.2';
         $requestType = new RequestType([RequestType::REST]);
@@ -230,7 +227,7 @@ class ResourcesCacheAccessorTest extends \PHPUnit\Framework\TestCase
         $cacheAccessor->save($version, $requestType, $id, $data);
     }
 
-    public function testSave()
+    public function testSave(): void
     {
         $version = '1.2';
         $requestType = new RequestType([RequestType::REST]);

@@ -4,6 +4,8 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Extension\JsValidation;
 
 use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintConverterInterface;
 use Oro\Bundle\FormBundle\Form\Extension\JsValidation\ConstraintsProvider;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormConfigBuilder;
@@ -14,16 +16,11 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\PropertyMetadata;
 
-class ConstraintsProviderTest extends \PHPUnit\Framework\TestCase
+class ConstraintsProviderTest extends TestCase
 {
-    /** @var MetadataFactoryInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $metadataFactory;
-
-    /** @var ConstraintConverterInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $constraintConverter;
-
-    /** @var ConstraintsProvider */
-    private $constraintsProvider;
+    private MetadataFactoryInterface&MockObject $metadataFactory;
+    private ConstraintConverterInterface&MockObject $constraintConverter;
+    private ConstraintsProvider $constraintsProvider;
 
     #[\Override]
     protected function setUp(): void

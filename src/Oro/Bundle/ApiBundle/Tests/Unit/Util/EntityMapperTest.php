@@ -11,17 +11,15 @@ use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
 use Oro\Bundle\ApiBundle\Util\EntityMapper;
 use Oro\Bundle\EntityExtendBundle\Entity\EnumOption;
+use PHPUnit\Framework\MockObject\MockObject;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class EntityMapperTest extends OrmRelatedTestCase
 {
-    /** @var EntityOverrideProviderInterface|\PHPUnit\Framework\MockObject\MockObject */
-    private $entityOverrideProvider;
-
-    /** @var EntityMapper */
-    private $entityMapper;
+    private EntityOverrideProviderInterface&MockObject $entityOverrideProvider;
+    private EntityMapper $entityMapper;
 
     #[\Override]
     protected function setUp(): void

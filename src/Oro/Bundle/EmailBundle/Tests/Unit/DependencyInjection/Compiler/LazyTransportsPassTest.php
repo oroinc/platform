@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\DependencyInjection\Compiler;
 
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\LazyTransportsPass;
 use Oro\Bundle\EmailBundle\Mailer\Transport\LazyTransports;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Compiler\ResolveNamedArgumentsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -11,7 +12,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Mailer\Transport\Transports;
 
-class LazyTransportsPassTest extends \PHPUnit\Framework\TestCase
+class LazyTransportsPassTest extends TestCase
 {
     public function testProcessDoesNothingWhenNoMailerTransports(): void
     {

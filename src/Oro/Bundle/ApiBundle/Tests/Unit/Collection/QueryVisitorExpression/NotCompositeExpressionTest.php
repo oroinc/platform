@@ -5,10 +5,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection\QueryVisitorExpression;
 use Doctrine\ORM\Query\Expr\Comparison;
 use Doctrine\ORM\Query\Expr\Func;
 use Oro\Bundle\ApiBundle\Collection\QueryVisitorExpression\NotCompositeExpression;
+use PHPUnit\Framework\TestCase;
 
-class NotCompositeExpressionTest extends \PHPUnit\Framework\TestCase
+class NotCompositeExpressionTest extends TestCase
 {
-    public function testWalkCompositeExpression()
+    public function testWalkCompositeExpression(): void
     {
         $expression = new NotCompositeExpression();
         $expressionList = [

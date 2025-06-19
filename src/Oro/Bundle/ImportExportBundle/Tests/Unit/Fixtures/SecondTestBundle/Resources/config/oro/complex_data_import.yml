@@ -1,0 +1,4 @@
+test_entity:
+    fields:
+        externalIdentifier:
+            target_path: attributes.externalIdentifier

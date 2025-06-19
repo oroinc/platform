@@ -3,11 +3,11 @@
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Guesser;
 
 use Oro\Bundle\AttachmentBundle\Guesser\MimeTypeExtensionGuesser;
+use PHPUnit\Framework\TestCase;
 
-class MimeTypeExtensionGuesserTest extends \PHPUnit\Framework\TestCase
+class MimeTypeExtensionGuesserTest extends TestCase
 {
-    /** @var MimeTypeExtensionGuesser */
-    private $guesser;
+    private MimeTypeExtensionGuesser $guesser;
 
     #[\Override]
     protected function setUp(): void

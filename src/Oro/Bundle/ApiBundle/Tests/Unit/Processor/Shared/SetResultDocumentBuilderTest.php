@@ -7,15 +7,13 @@ use Oro\Bundle\ApiBundle\Processor\Shared\SetResultDocumentBuilder;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderFactory;
 use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\HttpFoundation\Response;
 
 class SetResultDocumentBuilderTest extends GetProcessorTestCase
 {
-    /** @var \PHPUnit\Framework\MockObject\MockObject|DocumentBuilderFactory */
-    private $documentBuilderFactory;
-
-    /** @var SetResultDocumentBuilder */
-    private $processor;
+    private DocumentBuilderFactory&MockObject $documentBuilderFactory;
+    private SetResultDocumentBuilder $processor;
 
     #[\Override]
     protected function setUp(): void
@@ -27,7 +25,7 @@ class SetResultDocumentBuilderTest extends GetProcessorTestCase
         $this->processor = new SetResultDocumentBuilder($this->documentBuilderFactory);
     }
 
-    public function testProcessContextWithoutErrorsOnEmptyResult()
+    public function testProcessContextWithoutErrorsOnEmptyResult(): void
     {
         $result = null;
 
@@ -42,7 +40,7 @@ class SetResultDocumentBuilderTest extends GetProcessorTestCase
         self::assertSame($documentBuilder, $this->context->getResponseDocumentBuilder());
     }
 
-    public function testProcessContextWithoutErrorsOnNonEmptyResult()
+    public function testProcessContextWithoutErrorsOnNonEmptyResult(): void
     {
         $result = [new \stdClass()];
 
@@ -57,7 +55,7 @@ class SetResultDocumentBuilderTest extends GetProcessorTestCase
         self::assertSame($documentBuilder, $this->context->getResponseDocumentBuilder());
     }
 
-    public function testProcessContextWithoutErrorsOnNonEmptyResultAndErroredStatusCode()
+    public function testProcessContextWithoutErrorsOnNonEmptyResultAndErroredStatusCode(): void
     {
         $this->documentBuilderFactory->expects(self::never())
             ->method('createDocumentBuilder');
@@ -68,7 +66,7 @@ class SetResultDocumentBuilderTest extends GetProcessorTestCase
         self::assertNull($this->context->getResponseDocumentBuilder());
     }
 
-    public function testProcessWithErrors()
+    public function testProcessWithErrors(): void
     {
         $error = new Error();
 
