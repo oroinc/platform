@@ -8,7 +8,6 @@ define(function(require, exports, module) {
     const mediator = require('oroui/js/mediator');
     const tools = require('oroui/js/tools');
     const BaseView = require('oroui/js/app/views/base/view');
-    const MultiselectDecorator = require('orofilter/js/multiselect-decorator');
     const filterWrapper = require('orofilter/js/datafilter-wrapper');
     const FiltersStateView = require('orofilter/js/app/views/filters-state-view');
     const persistentStorage = require('oroui/js/persistent-storage');
@@ -50,13 +49,6 @@ define(function(require, exports, module) {
         viewMode: NaN,
 
         /**
-         * Filter list input selector
-         *
-         * @property
-         */
-        filterSelector: '[data-action=add-filter-select]',
-
-        /**
          *  Is used in template for render additional html
          * @property {String} 'collapse-mode' | 'toggle-mode'
          */
@@ -70,39 +62,11 @@ define(function(require, exports, module) {
         addButtonHint: __('oro_datagrid.label_add_filter'),
 
         /**
-         * Set label for reset button
-         *
-         * @property
-         */
-        multiselectResetButtonLabel: __('oro_datagrid.label_reset_button'),
-
-        /**
          * Set title for dialog widget with filters
          *
          * @property
          */
         filterDialogTitle: __('oro.filter.dialog.filter_results'),
-
-        /**
-         * Select widget object
-         *
-         * @property {oro.MultiselectDecorator}
-         */
-        selectWidget: null,
-
-        /**
-         * Select widget constructor
-         *
-         * @property
-         */
-        MultiselectDecorator: MultiselectDecorator,
-
-        /**
-         *  Parameters Select widget constructor
-         *
-         * @property
-         */
-        multiselectParameters: {},
 
         /**
          * ImportExport button selector
@@ -139,18 +103,9 @@ define(function(require, exports, module) {
          */
         storageKey: null,
 
-        /**
-         * Show or hide Manage filters button
-         * @property {Boolean}
-         */
-        enableMultiselectWidget: false,
-
         /** @property */
         events: {
-            'change [data-action=add-filter-select]': '_onChangeFilterSelect',
-            'click .reset-filter-button, [data-role="reset-all-filters"]': '_onReset',
-            'click a[data-name="filters-dropdown"]': '_onDropdownToggle',
-            'click [data-role="reset-filters"]': '_onResetFiltersSelection'
+            'click a[data-name="filters-dropdown"]': '_onDropdownToggle'
         },
 
         /**
@@ -179,7 +134,7 @@ define(function(require, exports, module) {
          */
         initialize: function(options) {
             _.extend(this, _.pick(options,
-                'addButtonHint', 'multiselectResetButtonLabel', 'stateViewElement', 'template', 'renderMode',
+                'addButtonHint', 'stateViewElement', 'template', 'renderMode',
                 'autoClose', 'outerHintContainer', 'enableMultiselectWidget', 'multiselectParameters',
                 'filterContainer'
             ));
@@ -289,28 +244,6 @@ define(function(require, exports, module) {
                     filter.hide();
                 }
             });
-
-            this.checkFiltersSelectVisibility();
-        },
-
-        checkFiltersSelectVisibility: function() {
-            const filterSelector = this.$(this.filterSelector);
-
-            if (!filterSelector.length) {
-                return;
-            }
-
-            _.each(this.filters, filter => {
-                const option = filterSelector.find(`option[value="${filter.name}"]`);
-
-                if (filter.visible && option.hasClass('hidden')) {
-                    option.removeClass('hidden').prop('disabled', false);
-                } else if (!filter.visible && !option.hasClass('hidden')) {
-                    option.addClass('hidden').attr('disabled', true);
-                }
-            });
-
-            this._refreshSelectWidget();
         },
 
         /**
@@ -333,7 +266,6 @@ define(function(require, exports, module) {
                 filter.dispose();
             });
             delete this.filters;
-            this._disposeSelectWidget();
             FiltersManager.__super__.dispose.call(this);
         },
 
@@ -447,35 +379,20 @@ define(function(require, exports, module) {
         /**
          * Enable filters
          *
-         * @param filters []
+         * @param {Array} filters []
          * @return {*}
          */
-        enableFilters: function(filters) {
-            if (_.isEmpty(filters)) {
+        enableFilters: function(filters = []) {
+            if (!filters.length && !Array.isArray(filters)) {
                 return this;
             }
-            const optionsSelectors = [];
 
-            _.each(filters, function(filter) {
+            filters.forEach(filter => {
                 this._renderFilter(filter);
                 if (filter.visible) {
                     filter.enable();
                 }
-                optionsSelectors.push('option[value="' + filter.name + '"]:not(:selected)');
-            }, this);
-
-            if (!this.enableMultiselectWidget) {
-                return;
-            }
-
-            const options = this.$(this.filterSelector).find(optionsSelectors.join(','));
-            if (options.length) {
-                options.prop('selected', true);
-            }
-
-            if (optionsSelectors.length) {
-                this._refreshSelectWidget();
-            }
+            });
 
             return this;
         },
@@ -483,31 +400,15 @@ define(function(require, exports, module) {
         /**
          * Disable filters
          *
-         * @param filters []
+         * @param {Array} filters []
          * @return {*}
          */
-        disableFilters: function(filters) {
-            if (_.isEmpty(filters)) {
+        disableFilters: function(filters = []) {
+            if (!filters.length || !Array.isArray(filters)) {
                 return this;
             }
-            const optionsSelectors = [];
 
-            _.each(filters, function(filter) {
-                filter.disable();
-                optionsSelectors.push('option[value="' + filter.name + '"]:selected');
-            }, this);
-
-            if (!this.enableMultiselectWidget) {
-                return;
-            }
-            const options = this.$(this.filterSelector).find(optionsSelectors.join(','));
-            if (options.length) {
-                options.prop('selected', false);
-            }
-
-            if (optionsSelectors.length) {
-                this.selectWidget.multiselect('refresh');
-            }
+            filters.forEach(filter => filter.disable());
 
             return this;
         },
@@ -539,8 +440,7 @@ define(function(require, exports, module) {
             return {
                 filters: this.filters,
                 renderMode: this.renderMode,
-                outerHintContainer: this.outerHintContainer,
-                enableMultiselectWidget: this.enableMultiselectWidget
+                outerHintContainer: this.outerHintContainer
             };
         },
 
@@ -578,9 +478,8 @@ define(function(require, exports, module) {
 
             if (_.isEmpty(this.filters)) {
                 this.hide();
-            } else if (this.enableMultiselectWidget) {
-                this._initializeSelectWidget();
             }
+
             const filtersStateView = this.subview('filters-state');
             if (filtersStateView) {
                 filtersStateView.render();
@@ -696,87 +595,6 @@ define(function(require, exports, module) {
             this._publishCountSelectedFilters();
         },
 
-        _disposeSelectWidget() {
-            if (this.selectWidget) {
-                this.$(this.filterSelector).off(`remove${this.eventNamespace()}`);
-                this.selectWidget.dispose();
-                delete this.selectWidget;
-            }
-        },
-
-        /**
-         * Initialize multiselect widget
-         *
-         * @protected
-         */
-        _initializeSelectWidget: function() {
-            this._disposeSelectWidget();
-
-            const multiselectDefaults = {
-                multiple: true,
-                selectedList: 0,
-                classes: 'select-filter-widget',
-                position: {
-                    my: 'left top+2',
-                    at: 'left bottom'
-                }
-            };
-
-            if (this.multiselectParameters.appendTo) {
-                this.multiselectParameters.appendTo = this.$el.find(this.multiselectParameters.appendTo);
-            }
-
-            const options = _.extend(
-                multiselectDefaults,
-                {
-                    minWidth: 'none',
-                    selectedText: this.addButtonHint,
-                    beforeopen: () => {
-                        this.selectWidget.onBeforeOpenDropdown();
-                    },
-                    open: () => {
-                        this.selectWidget.onOpenDropdown();
-                        this._setDropdownWidth();
-                    },
-                    refresh: () => {
-                        this.selectWidget.onRefresh();
-                    },
-                    beforeclose: () => {
-                        return this.ignoreFiltersUpdateEvents === false;
-                    },
-                    close: () => {
-                        this.selectWidget.onClose();
-                    },
-                    appendTo: this.dropdownContainer,
-                    initialValue: this._defaultFiltersNames()
-                },
-                this.multiselectParameters
-            );
-
-            this.$(this.filterSelector).on(`remove${this.eventNamespace()}`, this._disposeSelectWidget.bind(this));
-            this.selectWidget = new this.MultiselectDecorator({
-                element: this.$(this.filterSelector),
-                parameters: options
-            });
-
-            this.selectWidget.setViewDesign(this);
-            const $button = this.selectWidget.multiselect('instance').button;
-            this._setButtonDesign($button);
-            this._setButtonReset();
-        },
-
-        /**
-         * Refresh multiselect widget
-         *
-         * @protected
-         */
-        _refreshSelectWidget: function() {
-            if (!this.selectWidget && !this.enableMultiselectWidget) {
-                return;
-            }
-            this.selectWidget.multiselect('refresh');
-        },
-
         /**
          * Set design for filter manager button
          *
@@ -784,44 +602,6 @@ define(function(require, exports, module) {
          */
         _setButtonDesign: function($button) {
             $button.addClass('dropdown-toggle');
-        },
-
-        /**
-         *  Create html node
-         *
-         * @returns {*|jQuery|HTMLElement}
-         * @private
-         */
-        _createButtonReset: function() {
-            return $(
-                '<div class="ui-multiselect-footer">' +
-                    '<a href="#" class="ui-multiselect-reset" role="button" data-role="reset-filters">' +
-                        '<i class="fa-refresh"></i>' + this.multiselectResetButtonLabel + '' +
-                    '</a>' +
-                '</div>'
-            );
-        },
-
-        /**
-         * Set button for reset filters
-         *
-         * @protected
-         */
-        _setButtonReset: function() {
-            const $footerContainer = this._createButtonReset();
-            const instance = this.selectWidget.multiselect('instance');
-            instance.menu.append($footerContainer);
-        },
-
-        /**
-         * Set design for select dropdown
-         *
-         * @protected
-         */
-        _setDropdownWidth: function() {
-            const widget = this.selectWidget.getWidget();
-            const requiredWidth = this.selectWidget.getMinimumDropdownWidth() + 24;
-            widget.width(requiredWidth).css('min-width', requiredWidth + 'px');
         },
 
         /**
@@ -853,28 +633,6 @@ define(function(require, exports, module) {
             this.collection.state.filters = {};
             this.collection.trigger('updateState', this.collection);
             mediator.trigger('datagrid:doRefresh:' + this.collection.inputName, true);
-        },
-
-        /**
-         * Reset active filters selection button click handler
-         * @param {jQuery.Event} e
-         */
-        _onResetFiltersSelection: function(e) {
-            e.stopPropagation();
-            const defaultFilters = this._defaultFiltersNames();
-            this.selectWidget.element.val(defaultFilters).trigger('change');
-        },
-
-        /**
-         * Fetches filters names, that are rendered by default
-         *
-         * @returns {Array.<string>}
-         * @protected
-         */
-        _defaultFiltersNames() {
-            return Object.values(this.filters)
-                .filter(filter => filter.renderableByDefault === true)
-                .map(filter => filter.name);
         },
 
         /**

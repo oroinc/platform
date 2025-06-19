@@ -23,6 +23,10 @@ const MultiselectDropdownView = MultiselectView.extend({
 
     template,
 
+    listen: {
+        'change:enabledTooltip model': 'initTooltip'
+    },
+
     constructor: function MultiselectDropdownView(...args) {
         MultiselectDropdownView.__super__.constructor.apply(this, args);
     },
@@ -33,6 +37,39 @@ const MultiselectDropdownView = MultiselectView.extend({
      */
     getRootElement() {
         return this.$('[data-role="content"]');
+    },
+
+    render() {
+        MultiselectDropdownView.__super__.render.call(this);
+
+        this.initTooltip();
+
+        return this;
+    },
+
+    initTooltip() {
+        if (!this.getToogleButton().data('bs.tooltip')) {
+            this.getToogleButton().tooltip({
+                placement: this.model.get('tooltipPlacement')
+            });
+        }
+
+        this.getToogleButton().tooltip(this.model.get('enabledTooltip') ? 'enable' : 'disable');
+    },
+
+    /**
+     * Enable showing tooltip on toggle button
+     *
+     * @param {boolean} enabled
+     */
+    buttonTooltipEnabled(enabled = true) {
+        this.model.set('enabledTooltip', enabled);
+
+        return this;
+    },
+
+    getToogleButton() {
+        return this.$('[data-toggle="dropdown"]');
     }
 });
 

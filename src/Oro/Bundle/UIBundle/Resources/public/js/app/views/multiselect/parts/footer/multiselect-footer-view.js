@@ -15,6 +15,8 @@ export const cssConfig = {
  * @class MultiselectFooterView
  */
 const MultiSelectFooterView = BaseMultiSelectView.extend({
+    Model: MultiselectFooterModel,
+
     optionNames: BaseMultiSelectView.prototype.optionNames.concat(['cssConfig']),
 
     cssConfig,
@@ -37,16 +39,6 @@ const MultiSelectFooterView = BaseMultiSelectView.extend({
 
     constructor: function MultiSelectFooterView(...args) {
         MultiSelectFooterView.__super__.constructor.apply(this, args);
-    },
-
-    initialize(options) {
-        this.model = new MultiselectFooterModel({
-            collection: options.collection,
-            cssConfig: this.cssConfig,
-            ...options
-        });
-
-        MultiSelectFooterView.__super__.initialize.call(this, options);
     },
 
     resetState(event) {

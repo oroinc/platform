@@ -11,6 +11,8 @@ export const cssConfig = {
 };
 
 const MultiselectSearchView = BaseMultiSelectView.extend({
+    Model: MultiselectSearchModel,
+
     cssConfig,
 
     template,
@@ -32,16 +34,6 @@ const MultiselectSearchView = BaseMultiSelectView.extend({
 
     constructor: function MultiselectSearchView(...args) {
         MultiselectSearchView.__super__.constructor.apply(this, args);
-    },
-
-    initialize(options) {
-        this.model = new MultiselectSearchModel({
-            collection: options.collection,
-            cssConfig: this.cssConfig,
-            maxItemsForShowSearchBar: options.maxItemsForShowSearchBar
-        });
-
-        MultiselectSearchView.__super__.initialize.call(this, options);
     },
 
     render() {

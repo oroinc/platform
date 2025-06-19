@@ -47,7 +47,6 @@ app-modules:
     - oroui/js/app/modules/input-widgets
     - oroui/js/app/modules/layout-module
     - oroui/js/app/modules/messenger-module
-#    - oroui/js/app/modules/styled-scroll-bar-module -- currently not in use
     - oroui/js/app/modules/swipeable-module
     - oroui/js/app/modules/template-macros-module
     - oroui/js/app/modules/svg-sprite-module
@@ -118,8 +117,6 @@ dynamic-imports:
         - oroui/js/standart-confirmation
         - oroui/js/tools
         - oroui/js/tools/api-accessor
-        - oroui/js/app/views/multiselect/multiselect-view
-        - oroui/js/app/views/multiselect/variants/dropdown/multiselect-dropdown-view
 map:
     '*':
         alert.js: bootstrap-alert

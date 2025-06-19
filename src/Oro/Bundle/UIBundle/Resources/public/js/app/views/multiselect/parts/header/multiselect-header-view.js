@@ -5,7 +5,9 @@ import MultiselectHeaderModel from 'oroui/js/app/views/multiselect/parts/header/
 export const cssConfig = {
     header: `multiselect__header`,
     headerCheckboxLabel: 'checkbox-label multiselect__item-checkbox',
-    headerHidden: 'hidden'
+    headerHidden: 'hidden',
+    selectAll: 'multiselect__select-none',
+    selectNone: 'multiselect__select-all'
 };
 
 /**
@@ -15,6 +17,8 @@ export const cssConfig = {
  * @class MultiselectHeaderView
  */
 const MultiselectHeaderView = BaseMultiSelectView.extend({
+    Model: MultiselectHeaderModel,
+
     optionNames: BaseMultiSelectView.prototype.optionNames.concat(['cssConfig']),
 
     cssConfig,
@@ -39,27 +43,19 @@ const MultiselectHeaderView = BaseMultiSelectView.extend({
         MultiselectHeaderView.__super__.constructor.apply(this, args);
     },
 
-    initialize(options) {
-        this.model = new MultiselectHeaderModel({
-            collection: options.collection,
-            cssConfig: this.cssConfig,
-            ...options
-        });
-
-        MultiselectHeaderView.__super__.initialize.call(this, options);
-    },
-
     /**
      * Handle checkbox change event
      *
      * @param {InputEvent} event
      */
     onChanged(event) {
-        if (event.currentTarget.checked) {
-            this.model.selectAll();
-        } else if (!this.model.getCollection().isFullSelected() && event.currentTarget.indeterminate) {
+        console.log(event);
+
+        if (!this.model.isFullSelected()) {
             this.model.selectAll();
         } else {
+            console.log('dwadwa');
+
             this.model.unSelectAll();
         }
     },
@@ -68,6 +64,9 @@ const MultiselectHeaderView = BaseMultiSelectView.extend({
         MultiselectHeaderView.__super__.render.call(this);
 
         this.$('[name="select-condition"]').prop('indeterminate', this.model.isIndeterminate());
+        this.$('[data-role="mass-select"]')
+            .toggleClass(this.cssConfig.selectNone, this.model.isFullSelected())
+            .toggleClass(this.cssConfig.selectAll, !this.model.isFullSelected());
 
         return this;
     },

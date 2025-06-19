@@ -39,6 +39,16 @@ const MultiSelectCollectionView = BaseCollectionView.extend({
         return uniq(classes).join(' ');
     },
 
+    attributes() {
+        const attrs = {};
+
+        if (this.model.get('listAriaLabel')) {
+            attrs['aria-label'] = this.model.get('listAriaLabel');
+        }
+
+        return attrs;
+    },
+
     events: {
         keydown: 'onKeyDown'
     },
@@ -46,6 +56,7 @@ const MultiSelectCollectionView = BaseCollectionView.extend({
     listen: {
         'all collection': 'onCollectionEvent',
         'visibilityModelsChange collection': 'filter',
+        'update collection': 'filter',
         'visibilityChange': 'toggleNotToShowBlock'
     },
 

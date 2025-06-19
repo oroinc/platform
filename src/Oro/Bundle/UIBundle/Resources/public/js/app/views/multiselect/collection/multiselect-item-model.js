@@ -15,13 +15,22 @@ const MultiSelectItemModel = BaseModel.extend({
         hidden: false
     },
 
+    idAttribute: 'value',
+
     constructor: function MultiSelectItemModel(...args) {
         MultiSelectItemModel.__super__.constructor.apply(this, args);
     },
 
-    preinitialize(attrs) {
-        /** default state of the item */
-        this.defaultState = {...attrs};
+    preinitialize(attrs, options) {
+        if (options.defaultState && Array.isArray(options.defaultState)) {
+            this.defaultState = options.defaultState
+                .find(dState => dState[this.idAttribute] === attrs[this.idAttribute]);
+        } else if (options.defaultState) {
+            this.defaultState = this.defaultState;
+        } else {
+            /** default state of the item */
+            this.defaultState = {...attrs};
+        }
     },
 
     /**
@@ -102,10 +111,15 @@ const MultiSelectItemModel = BaseModel.extend({
         }
 
         return Object.entries(this.defaultState).some(([name, value]) => this.get(name) !== value);
-    }
-}, {
-    getAlias(value, prefix = 'selectable-item') {
-        return `${prefix}-${value}`;
+    },
+
+    /**
+     * Check if item is active for user actions
+     *
+     * @returns {boolean}
+     */
+    isActive() {
+        return !this.get('disabled') && !this.get('hidden');
     }
 });
 

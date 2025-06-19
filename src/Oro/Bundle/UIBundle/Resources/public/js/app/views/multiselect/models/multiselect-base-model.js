@@ -44,6 +44,15 @@ const MultiSelectBaseModel = BaseModel.extend({
     },
 
     /**
+     * Is full selected items
+     *
+     * @returns {boolean}
+     */
+    isFullSelected() {
+        return this.getCollection().isFullSelected();
+    },
+
+    /**
      * Setup collection
      *
      * @param {MultiSelectCollection} collection

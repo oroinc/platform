@@ -4,7 +4,9 @@ import MultiselectBaseModel from 'oroui/js/app/views/multiselect/models/multisel
 const MultiselectHeaderModel = MultiselectBaseModel.extend({
     defaults: {
         ...MultiselectBaseModel.prototype.defaults,
-        label: __('oro.ui.multiselect.select_all')
+        label: __('oro.ui.multiselect.select_all'),
+        checkAllText: __('oro.ui.multiselect.select_all'),
+        uncheckAllText: __('oro.ui.multiselect.deselect_all')
     },
 
     constructor: function MultiselectHeaderModel(...args) {
@@ -25,8 +27,8 @@ const MultiselectHeaderModel = MultiselectBaseModel.extend({
 
     updateLabel() {
         this.set('label', this.getCollection().isFullSelected()
-            ? __('oro.ui.multiselect.deselect_all')
-            : __('oro.ui.multiselect.select_all'));
+            ? this.get('uncheckAllText')
+            : this.get('checkAllText'));
     }
 });
 

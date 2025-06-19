@@ -7,6 +7,9 @@
         data-toggle="dropdown"
         data-prevent-close-on-menu-click="true"
         aria-expanded="false"
+        data-placement="<%- dropdownPlacement %>"
+        <% if (tooltipTitle) { %>title="<%- tooltipTitle %>"<% } else if (dropdownMenuLabel) { %>title="<%- dropdownMenuLabel %>"<% } %>
+        <% if (dropdownAriaLabel) { %>aria-label="<%- dropdownAriaLabel %>" <% } %>
     >
         <% if (dropdownToggleIcon) { %>
             <%= oroui.renderIcon({

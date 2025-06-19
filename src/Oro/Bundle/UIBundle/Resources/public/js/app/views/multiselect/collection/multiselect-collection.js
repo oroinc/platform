@@ -18,26 +18,13 @@ const MultiSelectCollection = BaseCollection.extend({
         /**
          * Default state of the collection
          */
-        this.defaultState = [...data];
-
-        MultiSelectCollection.__super__.initialize.call(this, data, options);
-    },
-
-    /**
-     * Prepares model for collection
-     * Generates id for model if it is not set
-     *
-     * @param {Object} attrs
-     * @param {Object} options
-     *
-     * @returns {MultiSelectItemModel}
-     */
-    _prepareModel(attrs, options = {}) {
-        if (!attrs.id) {
-            attrs.id = this.model.getAlias(attrs.value);
+        if (!options.defaultState) {
+            this.defaultState = [...data];
+        } else {
+            this.defaultState = options.defaultState;
         }
 
-        return MultiSelectCollection.__super__._prepareModel.call(this, attrs, options);
+        MultiSelectCollection.__super__.initialize.call(this, data, options);
     },
 
     /**
@@ -50,7 +37,11 @@ const MultiSelectCollection = BaseCollection.extend({
      * @returns {MultiSelectCollection}
      */
     reset(models, options) {
-        this.defaultState = [...models];
+        if (!options.defaultState) {
+            this.defaultState = [...models];
+        } else {
+            this.defaultState = options.defaultState;
+        }
 
         return MultiSelectCollection.__super__.reset.call(this, models, {
             ...options,
@@ -72,13 +63,17 @@ const MultiSelectCollection = BaseCollection.extend({
         this.invoke('setUnSelected');
     },
 
+    getActiveItems() {
+        return this.filter(model => model.isActive());
+    },
+
     /**
      * Get selected items from the collection
      *
      * @returns {Array<MultiSelectItemModel>}
      */
     getSelected() {
-        return this.filter(model => model.get('selected'));
+        return this.getActiveItems().filter(model => model.get('selected'));
     },
 
     /**
@@ -87,7 +82,7 @@ const MultiSelectCollection = BaseCollection.extend({
      * @returns {boolean}
      */
     isFullSelected() {
-        return this.every(model => model.get('selected'));
+        return this.getActiveItems().every(model => model.get('selected'));
     },
 
     /**
@@ -96,7 +91,7 @@ const MultiSelectCollection = BaseCollection.extend({
      * @returns {boolean}
      */
     isFullUnSelected() {
-        return this.every(model => !model.get('selected'));
+        return this.getActiveItems().every(model => !model.get('selected'));
     },
 
     /**

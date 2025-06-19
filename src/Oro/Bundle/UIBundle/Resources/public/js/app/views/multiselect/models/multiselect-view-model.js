@@ -5,7 +5,8 @@ const MultiselectViewModel = MultiselectBaseModel.extend({
         ...MultiselectBaseModel.prototype.defaults,
         enabledHeader: true,
         enabledFooter: false,
-        enabledSearch: true
+        enabledSearch: true,
+        listAriaLabel: ''
     },
 
     constructor: function MultiselectViewModel(...args) {

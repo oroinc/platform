@@ -1,3 +1,4 @@
+import {omit} from 'underscore';
 import BaseMultiSelectView from 'oroui/js/app/views/multiselect/base-multiselect-view';
 import MultiSelectCollectionView, {cssConfig as collectionCssConfig}
     from 'oroui/js/app/views/multiselect/collection/multiselect-collection-view';
@@ -7,15 +8,16 @@ import MultiselectHeaderView, {cssConfig as headerCssConfig}
     from 'oroui/js/app/views/multiselect/parts/header/multiselect-header-view';
 import MultiselectFooterView, {cssConfig as footerCssConfig}
     from 'oroui/js/app/views/multiselect/parts/footer/multiselect-footer-view';
-import MultiSelectItemModel from 'oroui/js/app/views/multiselect/collection/multiselect-item-model';
-import MultiselectSearchView from 'oroui/js/app/views/multiselect/parts/search/multiselect-search-view';
+import MultiselectSearchView, {cssConfig as searchCssConfig}
+    from 'oroui/js/app/views/multiselect/parts/search/multiselect-search-view';
 
 export const cssConfig = {
     main: 'multiselect-view',
     sourceSelectHide: 'hidden',
     ...collectionCssConfig,
     ...headerCssConfig,
-    ...footerCssConfig
+    ...footerCssConfig,
+    ...searchCssConfig
 };
 
 /**
@@ -25,7 +27,7 @@ export const cssConfig = {
  * @class MultiSelectView
  */
 const MultiSelectView = BaseMultiSelectView.extend({
-    optionNames: BaseMultiSelectView.prototype.optionNames.concat(['options']),
+    optionNames: BaseMultiSelectView.prototype.optionNames.concat(['options', 'defaultOptions']),
 
     cssConfig,
 
@@ -77,36 +79,15 @@ const MultiSelectView = BaseMultiSelectView.extend({
         MultiSelectView.__super__.constructor.apply(this, args);
     },
 
-    preinitialize({el, name, autoRender, ...options}) {
+    preinitialize(options) {
         if (!options.selectElement && !options.options) {
             throw new Error('Select element is required or put options collection insted');
         }
 
         this.$sourceSelect = options.selectElement;
+        this.subViewOptions = omit(options, this.optionNames);
 
-        const collection = this.initializeCollection(options);
-
-        /**
-         * Create model instance
-         * @type {MultiSelectViewModel}
-         */
-        this.model = new this.Model({
-            ...options,
-            cssConfig: this.cssConfig,
-            collection
-        });
-    },
-
-    /**
-     * Initialize collection
-     *
-     * @param {options} param
-     * @returns {MultiSelectCollection}
-     */
-    initializeCollection({options} = {}) {
-        this.collection = new this.Collection(this.collectionItems(options));
-
-        return this.collection;
+        return MultiSelectView.__super__.preinitialize.call(this, options);
     },
 
     delegateEvents(events) {
@@ -116,7 +97,10 @@ const MultiSelectView = BaseMultiSelectView.extend({
             /**
              * Bind change event to source select element if it is passed
              */
-            this.$sourceSelect.on(`input${this.eventNamespace()}`, this.onSourceSelectChanged.bind(this));
+            this.$sourceSelect.on(
+                `input${this.eventNamespace()} change${this.eventNamespace()}`,
+                this.onSourceSelectChanged.bind(this)
+            );
         }
 
         return this;
@@ -152,6 +136,12 @@ const MultiSelectView = BaseMultiSelectView.extend({
         this.$sourceSelect && this.$sourceSelect.addClass(this.cssConfig.sourceSelectHide);
 
         return this;
+    },
+
+    getCollectionOptions() {
+        return {
+            defaultState: this.defaultOptions
+        };
     },
 
     /**
@@ -195,17 +185,29 @@ const MultiSelectView = BaseMultiSelectView.extend({
     },
 
     /**
+     * Return common options for subview
+     *
+     * @returns {object}
+     */
+    getCommonSubViewOptions() {
+        return {
+            ...this.subViewOptions,
+            container: this.getRootElement(),
+            collection: this.collection,
+            autoRender: true,
+            cssConfig: this.cssConfig
+        };
+    },
+
+    /**
      * Return options for options collection view
      *
      * @returns {object}
      */
     collectionViewRenderOptions() {
         return {
-            container: this.getRootElement(),
-            collection: this.collection,
-            autoRender: true,
-            model: this.model,
-            cssConfig: this.cssConfig
+            ...this.getCommonSubViewOptions(),
+            model: this.model
         };
     },
 
@@ -215,12 +217,7 @@ const MultiSelectView = BaseMultiSelectView.extend({
      * @returns {object}
      */
     headerRenderOptions() {
-        return {
-            container: this.getRootElement(),
-            autoRender: true,
-            collection: this.collection,
-            cssConfig: this.cssConfig
-        };
+        return this.getCommonSubViewOptions();
     },
 
     /**
@@ -229,12 +226,7 @@ const MultiSelectView = BaseMultiSelectView.extend({
      * @returns {object}
      */
     footerRenderOptions() {
-        return {
-            container: this.getRootElement(),
-            autoRender: true,
-            collection: this.collection,
-            cssConfig: this.cssConfig
-        };
+        return this.getCommonSubViewOptions();
     },
 
     /**
@@ -243,22 +235,7 @@ const MultiSelectView = BaseMultiSelectView.extend({
      * @returns {object}
      */
     searchBlockRenderOptions() {
-        return {
-            container: this.getRootElement(),
-            autoRender: true,
-            collection: this.collection,
-            cssConfig: this.cssConfig,
-            maxItemsForShowSearchBar: this.model.get('maxItemsForShowSearchBar')
-        };
-    },
-
-    /**
-     * Return root element of the view
-     *
-     * @returns {jQuery}
-     */
-    getRootElement() {
-        return this.$el;
+        return this.getCommonSubViewOptions();
     },
 
     /**
@@ -271,7 +248,7 @@ const MultiSelectView = BaseMultiSelectView.extend({
      */
     collectionItems(options) {
         if (options) {
-            return options;
+            return MultiSelectView.__super__.collectionItems.call(this, options);
         } else if (this.$sourceSelect) {
             return this.getSelectOptions(this.$sourceSelect.get(0));
         } else {
@@ -295,8 +272,7 @@ const MultiSelectView = BaseMultiSelectView.extend({
             label: option.innerHTML,
             selected: option.selected,
             disabled: option.disabled,
-            value: option.value,
-            id: option.id || MultiSelectItemModel.getAlias(option.value)
+            value: option.value
         }));
     },
 
@@ -317,6 +293,7 @@ const MultiSelectView = BaseMultiSelectView.extend({
      */
     onCollectionChange(collection) {
         this.$sourceSelect && this.$sourceSelect.val(collection.getSelectedValues()).trigger('change');
+        this.trigger('change:selected', collection.getSelectedValues());
     },
 
     /**
@@ -354,7 +331,7 @@ const MultiSelectView = BaseMultiSelectView.extend({
      *   - {string} id - The ID of the option or generated ID in format 'selectable-item-{value}'
      */
     setState(state = []) {
-        this.subview('multiselect-collection').setState(state);
+        this.subview('multiselect-collection').setState(this.collectionItems(state));
     },
 
     dispose() {
