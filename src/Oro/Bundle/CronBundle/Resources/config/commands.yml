@@ -11,6 +11,8 @@ services:
             - '@oro_cron.command_feature_checker'
             - '@logger'
             - '%kernel.environment%'
+        calls:
+            - [ setCache, [ '@oro_cron.state_cache' ] ]
         tags:
             - { name: console.command }
 
