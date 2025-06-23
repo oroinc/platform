@@ -20,7 +20,7 @@ class HtmlTagProviderTest extends WebTestCase
         'tbody[align|valign]',
         'tr[align|valign]',
         'td[align|valign|rowspan|colspan|bgcolor|nowrap|width|height]',
-        'th[align|valign|rowspan|colspan|bgcolor|nowrap|width|height]',
+        'th[align|valign|rowspan|colspan|bgcolor|nowrap|width|height|scope]',
         'a[!href|target|title|data-action]',
         'dl',
         'dt',

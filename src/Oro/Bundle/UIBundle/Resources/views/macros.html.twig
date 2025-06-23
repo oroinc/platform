@@ -1263,7 +1263,7 @@
 
     {% if not isMobileVersion() %}
         <div id="{{ dataTarget }}" class="navbar navbar-static scrollspy-nav">
-            <nav class="nav">
+            <nav class="nav" aria-label="{{ 'Page navigation'|trans }}">
                 {% for navElement in dataBlocks %}
                     <a class="nav-link{% if loop.first %} active {% endif %}{{ navElement.class|default('') }}"
                        href="#scroll-{{ loop.index }}"

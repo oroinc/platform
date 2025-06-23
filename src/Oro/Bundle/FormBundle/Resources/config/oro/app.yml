@@ -69,6 +69,7 @@ oro_form:
                         - nowrap
                         - width
                         - height
+                        - scope
                 a:
                     attributes:
                         - "!href"
