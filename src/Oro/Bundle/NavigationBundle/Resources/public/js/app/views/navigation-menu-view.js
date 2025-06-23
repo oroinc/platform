@@ -75,7 +75,7 @@ const NavigationMenuView = BaseView.extend({
         linkSelector: 'a:first',
         // Some menus might be filled in real-time or on resize, so we need to skip empty ones
         subMenus: 'ul:not(:empty), ol:not(:empty), nav:not(:empty), [data-role="sub-menu"]:not(:empty)',
-        popupMenuCriteria: '[aria-hidden]',
+        popupMenuCriteria: '[data-role="sub-menu"]',
         closeMenu: '[data-role="close"]',
         listenToMouseEvents: true
     },

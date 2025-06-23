@@ -27,7 +27,9 @@
            {% if 'page-component-module' not in options.data|default({})|keys %}
                data-page-component-module="oroaction/js/app/components/button-component"
            {% endif %}
-           role="{{ linkRole|default("button") }}"
+           {% if 'link' == linkType|default(null) %}
+               role="{{ linkRole|default("button") }}"
+           {% endif %}
            {% if not button.buttonContext.enabled %}
                disabled="disabled"
            {% endif %}
