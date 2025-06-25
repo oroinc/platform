@@ -54,3 +54,42 @@ services:
     Oro\Bundle\AssetBundle\VersionStrategy\BuildVersionStrategy:
         arguments:
             - '%kernel.project_dir%/public/build/build_version.txt'
+
+    oro_asset.twig.webpack_subresource_integrity_extension:
+        class: Oro\Bundle\AssetBundle\Twig\SubresourceIntegrityExtension
+        arguments:
+            - '@oro_asset.subresource_integrity_provider'
+        tags:
+            - { name: twig.extension }
+
+    oro_asset.twig.external_resource_extension:
+        class: Oro\Bundle\AssetBundle\Twig\ExternalResourceExtension
+        arguments:
+            - '%oro_asset.external_resources%'
+        tags:
+            - { name: twig.extension }
+
+    oro_asset.cache.integrity_pool:
+        parent: cache.system
+        tags:
+            - cache.pool
+
+    oro_asset.cache.subresource_integrity_cache:
+        class: Psr\Cache\CacheItemPoolInterface
+        factory: [ Symfony\Component\Cache\Adapter\PhpArrayAdapter, create ]
+        arguments:
+            - '%kernel.cache_dir%/subresource_integrity_cache.php'
+            - '@oro_asset.cache.integrity_pool'
+
+    oro_asset.cache.subresource_integrity_cache_warmer:
+        class: Oro\Bundle\AssetBundle\Cache\SubresourceIntegrityCacheWarmer
+        arguments:
+            - '@oro_asset.subresource_integrity_provider'
+        tags:
+            - kernel.cache_warmer
+
+    oro_asset.subresource_integrity_provider:
+        class: Oro\Bundle\AssetBundle\Provider\SubresourceIntegrityProvider
+        arguments:
+            - '@oro_asset.cache.subresource_integrity_cache'
+            - '%kernel.project_dir%'
