@@ -8,6 +8,9 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     #[\Override]
     public function getConfigTreeBuilder(): TreeBuilder
     {
@@ -32,6 +35,18 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('npm_install_timeout')
                     ->defaultValue(null)
                     ->info('Npm installation timeout in seconds, null to disable timeout')
+                ->end()
+                ->arrayNode('external_resources')
+                    ->useAttributeAsKey('name')
+                    ->arrayPrototype()
+                        ->children()
+                            ->scalarNode('link')
+                                ->isRequired()
+                                ->cannotBeEmpty()
+                                ->info('The link to the external resource')
+                            ->end()
+                        ->end()
+                    ->end()
                 ->end()
                 ->arrayNode('webpack_dev_server')
                     ->info('Webpack Dev Server configuration')

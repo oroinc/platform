@@ -9,3 +9,9 @@ services:
         class: Oro\Bundle\TestFrameworkBundle\Security\CsrfSuccessLoginListener
         tags:
             - { name: kernel.event_listener, event: Symfony\Component\Security\Http\Event\LoginSuccessEvent, method: onSuccess, priority: 100 }
+
+    oro_asset.twig.webpack_subresource_integrity_extension_decorator_mock:
+        class: Oro\Bundle\TestFrameworkBundle\Twig\SubresourceIntegrityExtensionMock
+        decorates: oro_asset.twig.webpack_subresource_integrity_extension
+        arguments:
+            - '@oro_asset.subresource_integrity_provider'
