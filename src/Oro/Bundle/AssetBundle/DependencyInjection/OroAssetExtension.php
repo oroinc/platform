@@ -23,5 +23,6 @@ class OroAssetExtension extends Extension
         $container->setParameter('oro_asset.build_timeout', $config['build_timeout']);
         $container->setParameter('oro_asset.npm_install_timeout', $config['npm_install_timeout']);
         $container->setParameter('oro_asset.webpack_dev_server_options', $config['webpack_dev_server']);
+        $container->setParameter('oro_asset.external_resources', $config['external_resources']);
     }
 }
