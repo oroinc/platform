@@ -279,6 +279,16 @@ JS;
                 return false;
             }
             
+            // Check for loading bar components
+            if (document.querySelector('.loading-bar.show') !== null) {
+                return false;
+            }
+            
+            // Check for any loading mask views that are shown
+            if (document.querySelector('.loader-mask.shown') !== null) {
+                return false;
+            }
+            
             // loadModules should be available at this point.
             // loadModules is absent on lightweight pages like login, forgot password, embedded forms, etc.
             // Next checks are valid only for pages where loadModules is loaded.
