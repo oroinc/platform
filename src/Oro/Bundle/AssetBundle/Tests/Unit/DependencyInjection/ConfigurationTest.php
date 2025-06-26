@@ -60,7 +60,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'port' => 8081,
                         'https' => false,
                     ],
-                    'external_resources' => []
                 ],
             ],
             [
@@ -76,11 +75,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'port' => 65000,
                         'https' => true,
                     ],
-                    'external_resources' => [
-                        'test1' => [
-                            'link' => 'http://example.local/test1.js',
-                        ]
-                    ]
                 ],
                 'expects' => [
                     'with_babel' => false,
@@ -94,11 +88,6 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'port' => 65000,
                         'https' => true,
                     ],
-                    'external_resources' => [
-                        'test1' => [
-                            'link' => 'http://example.local/test1.js',
-                        ]
-                    ]
                 ],
             ],
         ];

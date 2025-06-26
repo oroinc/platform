@@ -1,13 +1,13 @@
 {% macro css(src, extra_attributes) %}
     {% if webpack_hmr_enabled() %}
-        <script src="{{ asset(src|webpack_asset) }}" integrity="{{ oro_integrity(asset(src|webpack_asset)) }}" crossorigin="anonymous"></script>
+        <script src="{{ asset(src|webpack_asset) }}"></script>
     {% else %}
-        <link rel="stylesheet" {{ extra_attributes|raw }} href="{{ asset(src) }}" integrity="{{ oro_integrity(asset(src)) }}" crossorigin="anonymous">
+        <link rel="stylesheet" {{ extra_attributes|raw }} href="{{ asset(src) }}">
     {% endif %}
 {% endmacro %}
 
 {% macro js(src) %}
-    <script src="{{ asset(src) }}" integrity="{{ oro_integrity(asset(src)) }}" crossorigin="anonymous"></script>
+    <script src="{{ asset(src) }}"></script>
 {% endmacro %}
 
 {% macro js_modules_config(config) %}
