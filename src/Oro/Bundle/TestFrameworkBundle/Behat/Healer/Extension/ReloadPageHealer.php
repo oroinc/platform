@@ -35,6 +35,7 @@ class ReloadPageHealer implements HealerInterface
     public function process(Call &$call, CallResult $failedCall): bool
     {
         try {
+            sleep(5);
             $page = $this->elementFactory->getPage();
             $page->getSession()->reload();
         } catch (\Throwable $exception) {
