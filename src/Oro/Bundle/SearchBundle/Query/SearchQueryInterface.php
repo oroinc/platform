@@ -118,6 +118,13 @@ interface SearchQueryInterface
      */
     public function setOrderBy($fieldName, $direction = Query::ORDER_ASC, $type = Query::TYPE_TEXT);
 
+    public function addOrderBy(
+        string $fieldName,
+        string $direction = Query::ORDER_ASC,
+        string $type = Query::TYPE_TEXT,
+        bool $prepend = false
+    ): SearchQueryInterface;
+
     /**
      * Get order by field
      *

@@ -16,6 +16,9 @@ The current file describes significant changes in the code that may affect the u
 * Added a new `preload_web_link` layout block type that uses Symfony WebLink component and pushes resources to clients before they even know that they need them.
 * Added a new `oro_layout.inherited_theme_options` configs to application settings.
 
+#### SearchBundle
+* Added a new `addOrderBy` method to the `Oro\Bundle\SearchBundle\Query\SearchQueryInterface` interface.
+
 ### Removed
 
 #### ApiBundle
