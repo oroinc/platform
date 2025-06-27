@@ -213,6 +213,48 @@ class IndexerQueryTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
+    /**
+     * @dataProvider addOrderByDataProvider
+     */
+    public function testAddOrderBy(array $arguments, array $ordering): void
+    {
+        $this->criteria->expects(self::once())
+            ->method('getOrderings')
+            ->willReturn(['integer.field' => 3]);
+
+        $this->criteria->expects(self::once())
+            ->method('orderBy')
+            ->with($ordering);
+
+        $this->query->addOrderBy(...$arguments);
+    }
+
+    public function addOrderByDataProvider(): array
+    {
+        return [
+            'only field name' => [
+                'arguments' => ['field'],
+                'ordering' => ['integer.field' => 3, 'text.field' => 'asc']
+            ],
+            'field and direction' => [
+                'arguments' => ['field', 'desc'],
+                'ordering'  => ['integer.field' => 3, 'text.field' => 'desc'],
+            ],
+            'field, direction and type' => [
+                'arguments' => ['field', 'desc', 'decimal'],
+                'ordering'  => ['integer.field' => 3, 'decimal.field' => 'desc'],
+            ],
+            'field with predefined type' => [
+                'arguments' => ['decimal.field', 'desc'],
+                'ordering'  => ['integer.field' => 3, 'decimal.field' => 'desc'],
+            ],
+            'field with prepend' => [
+                'arguments' => ['field', 'desc', 'decimal', true],
+                'ordering'  => ['decimal.field' => 'desc', 'integer.field' => 3],
+            ],
+        ];
+    }
+
     public function testAddSelect()
     {
         $this->innerQuery->expects($this->once())

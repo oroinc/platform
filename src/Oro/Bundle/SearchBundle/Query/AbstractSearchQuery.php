@@ -132,7 +132,7 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
     #[\Override]
     public function setOrderBy($fieldName, $direction = Query::ORDER_ASC, $type = Query::TYPE_TEXT)
     {
-        if (str_contains($fieldName, '.')) {
+        if (\str_contains($fieldName, '.')) {
             $field = $fieldName;
         } else {
             $field = $type . '.' . $fieldName;
@@ -141,6 +141,32 @@ abstract class AbstractSearchQuery implements SearchQueryInterface
         $this->query
             ->getCriteria()
             ->orderBy([$field => $direction]);
+
+        return $this;
+    }
+
+    public function addOrderBy(
+        string $fieldName,
+        string $direction = Query::ORDER_ASC,
+        string $type = Query::TYPE_TEXT,
+        bool $prepend = false
+    ): SearchQueryInterface {
+        if (\str_contains($fieldName, '.')) {
+            $field = $fieldName;
+        } else {
+            $field = $type . '.' . $fieldName;
+        }
+
+        $orders = $this->query->getCriteria()->getOrderings();
+        if ($prepend) {
+            $orders = [$field => $direction, ...$orders];
+        } else {
+            $orders[$field] = $direction;
+        }
+
+        $this->query
+            ->getCriteria()
+            ->orderBy($orders);
 
         return $this;
     }
