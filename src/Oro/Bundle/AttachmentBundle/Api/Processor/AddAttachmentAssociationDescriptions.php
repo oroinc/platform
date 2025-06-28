@@ -50,40 +50,33 @@ class AddAttachmentAssociationDescriptions implements ProcessorInterface
             return;
         }
 
-        $associationName = $context->getAssociationName();
-        $entityClass = $associationName ? $context->getParentClassName() : $context->getClassName();
+        $version = $context->getVersion();
         $requestType = $context->getRequestType();
-
-        $attachmentAssociationName = $this->attachmentAssociationProvider->getAttachmentAssociationName(
-            $entityClass,
-            $context->getVersion(),
-            $requestType
-        );
-        if ($attachmentAssociationName) {
-            $this->addAttachmentAssociationDescriptions(
-                $context->getResult(),
-                $requestType,
-                $targetAction,
-                $entityClass,
-                $associationName
-            );
-        }
-    }
-
-    private function addAttachmentAssociationDescriptions(
-        EntityDefinitionConfig $definition,
-        RequestType $requestType,
-        string $targetAction,
-        string $entityClass,
-        ?string $associationName
-    ): void {
-        if (!$associationName) {
-            $this->setDescriptionsForAttachmentsField($definition, $requestType, $entityClass, $targetAction);
-        } elseif (self::ATTACHMENTS_ASSOCIATION_NAME === $associationName && !$definition->hasDocumentation()) {
-            $this->setDescriptionsForSubresource(
+        $definition = $context->getResult();
+        $associationName = $context->getAssociationName();
+        if ($associationName) {
+            $this->setDescriptionsForAttachmentsField(
                 $definition,
+                $version,
                 $requestType,
-                $entityClass,
+                $definition->getResourceClass(),
+                $targetAction
+            );
+            if (self::ATTACHMENTS_ASSOCIATION_NAME === $associationName && !$definition->hasDocumentation()) {
+                $this->setDescriptionsForSubresource(
+                    $definition,
+                    $version,
+                    $requestType,
+                    $context->getParentClassName(),
+                    $targetAction
+                );
+            }
+        } else {
+            $this->setDescriptionsForAttachmentsField(
+                $definition,
+                $version,
+                $requestType,
+                $context->getClassName(),
                 $targetAction
             );
         }
@@ -91,10 +84,15 @@ class AddAttachmentAssociationDescriptions implements ProcessorInterface
 
     private function setDescriptionsForAttachmentsField(
         EntityDefinitionConfig $definition,
+        string $version,
         RequestType $requestType,
         string $entityClass,
         string $targetAction
     ): void {
+        if (!$this->attachmentAssociationProvider->getAttachmentAssociationName($entityClass, $version, $requestType)) {
+            return;
+        }
+
         $attachmentsAssociationDefinition = $definition->getField(self::ATTACHMENTS_ASSOCIATION_NAME);
         if (null === $attachmentsAssociationDefinition || $attachmentsAssociationDefinition->hasDescription()) {
             return;
@@ -113,10 +111,15 @@ class AddAttachmentAssociationDescriptions implements ProcessorInterface
 
     private function setDescriptionsForSubresource(
         EntityDefinitionConfig $definition,
+        string $version,
         RequestType $requestType,
         string $entityClass,
         string $targetAction
     ): void {
+        if (!$this->attachmentAssociationProvider->getAttachmentAssociationName($entityClass, $version, $requestType)) {
+            return;
+        }
+
         $docParser = $this->getDocumentationParser($requestType, self::ATTACHMENT_ASSOCIATION_DOC_RESOURCE);
         $subresourceDocumentationTemplate = $docParser->getSubresourceDocumentation(
             self::ATTACHMENT_TARGET_ENTITY,
