@@ -53,18 +53,21 @@ class AddTagsAssociationDescriptions implements ProcessorInterface
             return;
         }
 
-        $associationName = $context->getAssociationName();
-        $entityClass = $associationName ? $context->getParentClassName() : $context->getClassName();
-
-        if (!$this->taggableHelper->isTaggable($entityClass)) {
-            return;
-        }
-
+        $requestType = $context->getRequestType();
         $definition = $context->getResult();
-        if (!$associationName) {
-            $this->setDescriptionsForFields($definition, $context->getRequestType(), $entityClass);
-        } elseif (self::TAGS_ASSOCIATION_NAME === $associationName && !$definition->hasDocumentation()) {
-            $this->setDescriptionsForSubresource($definition, $context->getRequestType(), $entityClass, $targetAction);
+        $associationName = $context->getAssociationName();
+        if ($associationName) {
+            $this->setDescriptionsForFields($definition, $requestType, $definition->getResourceClass());
+            if (self::TAGS_ASSOCIATION_NAME === $associationName && !$definition->hasDocumentation()) {
+                $this->setDescriptionsForSubresource(
+                    $definition,
+                    $requestType,
+                    $context->getParentClassName(),
+                    $targetAction
+                );
+            }
+        } else {
+            $this->setDescriptionsForFields($definition, $requestType, $context->getClassName());
         }
     }
 
@@ -73,6 +76,10 @@ class AddTagsAssociationDescriptions implements ProcessorInterface
         RequestType $requestType,
         string $entityClass
     ): void {
+        if (!$this->taggableHelper->isTaggable($entityClass)) {
+            return;
+        }
+
         $docParser = $this->getDocumentationParser($requestType, self::TAGS_ASSOCIATION_DOC_RESOURCE);
         $associationDocumentationTemplate = $docParser->getFieldDocumentation(
             self::TAGGABLE_ENTITY,
@@ -94,6 +101,10 @@ class AddTagsAssociationDescriptions implements ProcessorInterface
         string $entityClass,
         string $targetAction
     ): void {
+        if (!$this->taggableHelper->isTaggable($entityClass)) {
+            return;
+        }
+
         $docParser = $this->getDocumentationParser($requestType, self::TAGS_ASSOCIATION_DOC_RESOURCE);
         $subresourceDocumentationTemplate = $docParser->getSubresourceDocumentation(
             self::TAGGABLE_ENTITY,

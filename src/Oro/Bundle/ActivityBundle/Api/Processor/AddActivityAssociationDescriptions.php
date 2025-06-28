@@ -59,84 +59,88 @@ class AddActivityAssociationDescriptions implements ProcessorInterface
             return;
         }
 
-        $associationName = $context->getAssociationName();
-        $entityClass = $associationName ? $context->getParentClassName() : $context->getClassName();
         $version = $context->getVersion();
         $requestType = $context->getRequestType();
-
-        if ($this->activityAssociationProvider->isActivityEntity($entityClass)) {
-            $this->addActivityTargetsAssociationDescription(
-                $context->getResult(),
+        $definition = $context->getResult();
+        $associationName = $context->getAssociationName();
+        if ($associationName) {
+            $parentEntityClass = $context->getParentClassName();
+            $this->addActivityTargetsAssociationDescriptionForSubresource(
+                $definition,
                 $version,
                 $requestType,
                 $targetAction,
-                $entityClass,
-                $associationName,
+                $parentEntityClass,
+                $associationName
             );
-        }
-
-        $activityAssociations = $this->activityAssociationProvider->getActivityAssociations(
-            $entityClass,
-            $version,
-            $requestType
-        );
-        if ($activityAssociations) {
-            $this->addActivityAssociationDescriptions(
-                $context->getResult(),
+            $this->addActivityAssociationDescriptionsForSubresource(
+                $definition,
+                $version,
                 $requestType,
                 $targetAction,
+                $parentEntityClass,
+                $associationName
+            );
+        } else {
+            $entityClass = $context->getClassName();
+            $this->setDescriptionForActivityTargetsField($definition, $requestType, $entityClass);
+            $this->setDescriptionsForFields(
+                $definition,
+                $requestType,
                 $entityClass,
-                $associationName,
-                $activityAssociations
+                $this->activityAssociationProvider->getActivityAssociations($entityClass, $version, $requestType)
             );
         }
     }
 
-    private function addActivityTargetsAssociationDescription(
+    private function addActivityTargetsAssociationDescriptionForSubresource(
         EntityDefinitionConfig $definition,
         string $version,
         RequestType $requestType,
         string $targetAction,
-        string $activityEntityClass,
+        string $parentEntityClass,
         ?string $associationName
     ): void {
-        if (!$associationName) {
-            $this->setDescriptionForActivityTargetsField(
-                $definition,
-                $requestType,
-                $activityEntityClass
-            );
-        } elseif (self::ACTIVITY_TARGETS_ASSOCIATION_NAME === $associationName && !$definition->hasDocumentation()) {
+        $this->setDescriptionForActivityTargetsField($definition, $requestType, $definition->getResourceClass());
+        if (self::ACTIVITY_TARGETS_ASSOCIATION_NAME === $associationName
+            && !$definition->hasDocumentation()
+            && $this->activityAssociationProvider->isActivityEntity($parentEntityClass)
+        ) {
             $this->setDescriptionsForActivityTargetsSubresource(
                 $definition,
                 $version,
                 $requestType,
-                $activityEntityClass,
+                $parentEntityClass,
                 $targetAction
             );
         }
     }
 
-    private function addActivityAssociationDescriptions(
+    private function addActivityAssociationDescriptionsForSubresource(
         EntityDefinitionConfig $definition,
+        string $version,
         RequestType $requestType,
         string $targetAction,
-        string $entityClass,
-        ?string $associationName,
-        array $activityAssociations
+        string $parentEntityClass,
+        string $associationName
     ): void {
-        if (!$associationName) {
-            $this->setDescriptionsForFields(
-                $definition,
-                $requestType,
-                $entityClass,
-                $activityAssociations
-            );
-        } elseif (isset($activityAssociations[$associationName]) && !$definition->hasDocumentation()) {
+        $resourceClass = $definition->getResourceClass();
+        $this->setDescriptionsForFields(
+            $definition,
+            $requestType,
+            $resourceClass,
+            $this->activityAssociationProvider->getActivityAssociations($resourceClass, $version, $requestType)
+        );
+        $activityAssociations = $this->activityAssociationProvider->getActivityAssociations(
+            $parentEntityClass,
+            $version,
+            $requestType
+        );
+        if (isset($activityAssociations[$associationName]) && !$definition->hasDocumentation()) {
             $this->setDescriptionsForSubresource(
                 $definition,
                 $requestType,
-                $entityClass,
+                $parentEntityClass,
                 $activityAssociations[$associationName]['className'],
                 $targetAction
             );
@@ -148,6 +152,10 @@ class AddActivityAssociationDescriptions implements ProcessorInterface
         RequestType $requestType,
         string $activityEntityClass
     ): void {
+        if (!$this->activityAssociationProvider->isActivityEntity($activityEntityClass)) {
+            return;
+        }
+
         $activityTargetsAssociationDefinition = $definition->getField(self::ACTIVITY_TARGETS_ASSOCIATION_NAME);
         if (null === $activityTargetsAssociationDefinition
             || $activityTargetsAssociationDefinition->hasDescription()
