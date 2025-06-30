@@ -49,41 +49,33 @@ class AddCommentAssociationDescriptions implements ProcessorInterface
             return;
         }
 
-        $associationName = $context->getAssociationName();
-        $entityClass = $associationName ? $context->getParentClassName() : $context->getClassName();
         $version = $context->getVersion();
         $requestType = $context->getRequestType();
-
-        $commentAssociationName = $this->commentAssociationProvider->getCommentAssociationName(
-            $entityClass,
-            $version,
-            $requestType
-        );
-        if ($commentAssociationName) {
-            $this->addCommentAssociationDescriptions(
-                $context->getResult(),
-                $requestType,
-                $targetAction,
-                $entityClass,
-                $associationName
-            );
-        }
-    }
-
-    private function addCommentAssociationDescriptions(
-        EntityDefinitionConfig $definition,
-        RequestType $requestType,
-        string $targetAction,
-        string $entityClass,
-        ?string $associationName
-    ): void {
-        if (!$associationName) {
-            $this->setDescriptionsForCommentsField($definition, $requestType, $entityClass, $targetAction);
-        } elseif (self::COMMENTS_ASSOCIATION_NAME === $associationName && !$definition->hasDocumentation()) {
-            $this->setDescriptionsForSubresource(
+        $definition = $context->getResult();
+        $associationName = $context->getAssociationName();
+        if ($associationName) {
+            $this->setDescriptionsForCommentsField(
                 $definition,
+                $version,
                 $requestType,
-                $entityClass,
+                $definition->getResourceClass(),
+                $targetAction
+            );
+            if (self::COMMENTS_ASSOCIATION_NAME === $associationName && !$definition->hasDocumentation()) {
+                $this->setDescriptionsForSubresource(
+                    $definition,
+                    $version,
+                    $requestType,
+                    $context->getParentClassName(),
+                    $targetAction
+                );
+            }
+        } else {
+            $this->setDescriptionsForCommentsField(
+                $definition,
+                $version,
+                $requestType,
+                $context->getClassName(),
                 $targetAction
             );
         }
@@ -91,10 +83,15 @@ class AddCommentAssociationDescriptions implements ProcessorInterface
 
     private function setDescriptionsForCommentsField(
         EntityDefinitionConfig $definition,
+        string $version,
         RequestType $requestType,
         string $entityClass,
         string $targetAction
     ): void {
+        if (!$this->commentAssociationProvider->getCommentAssociationName($entityClass, $version, $requestType)) {
+            return;
+        }
+
         $commentsAssociationDefinition = $definition->getField(self::COMMENTS_ASSOCIATION_NAME);
         if (null === $commentsAssociationDefinition || $commentsAssociationDefinition->hasDescription()) {
             return;
@@ -113,10 +110,15 @@ class AddCommentAssociationDescriptions implements ProcessorInterface
 
     private function setDescriptionsForSubresource(
         EntityDefinitionConfig $definition,
+        string $version,
         RequestType $requestType,
         string $entityClass,
         string $targetAction
     ): void {
+        if (!$this->commentAssociationProvider->getCommentAssociationName($entityClass, $version, $requestType)) {
+            return;
+        }
+
         $docParser = $this->getDocumentationParser($requestType, self::COMMENT_ASSOCIATION_DOC_RESOURCE);
         $subresourceDocumentationTemplate = $docParser->getSubresourceDocumentation(
             self::COMMENT_TARGET_ENTITY,

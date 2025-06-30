@@ -207,6 +207,15 @@ trait DocumentationTestTrait
         } elseif ($this->hasDuplicates($definition['documentation'])) {
             $missingDocs[] = 'Duplicates in documentation. Full documentation:' . "\n" . $definition['documentation'];
         }
+
+        if ($association) {
+            $targetEntityClass = $this->getApiConfig($entityClass)?->getField($association)?->getTargetClass();
+            if (!$targetEntityClass) {
+                return $missingDocs;
+            }
+            $entityClass = $targetEntityClass;
+        }
+
         if (!empty($definition['parameters'])) {
             $idFieldName = null;
             if (!empty($definition['requirements']) && count($definition['requirements']) === 1) {
@@ -247,7 +256,7 @@ trait DocumentationTestTrait
                 }
             }
         }
-        if (!$association && !empty($definition['response'])) {
+        if (!empty($definition['response'])) {
             foreach ($definition['response'] as $name => $item) {
                 if ($this->isEmptyDescription($item, 'description')
                     && !$this->isSkippedField($entityClass, $name)
