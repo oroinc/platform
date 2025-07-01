@@ -252,23 +252,6 @@ Retrieve the avatar configured for a specific user record.
 
 Retrieve the ID of the avatar configured for a specific user.
 
-#### update_relationship
-
-Replace the avatar for a specific user.
-
-{@request:json_api}
-Example:
-
-```JSON
-{
-  "data": {
-    "type": "files",
-    "id": "1"
-  }
-}
-```
-{@/request}
-
 ### businessUnits
 
 #### get_subresource

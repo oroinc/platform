@@ -17,7 +17,6 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\EntityMapper;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
-use Symfony\Component\Form\FormTypeGuesserInterface;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
 
@@ -25,7 +24,7 @@ use Symfony\Component\Form\Guess\ValueGuess;
  * Guesses form types based on "form_type_guesses" configuration and API metadata.
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class MetadataTypeGuesser implements FormTypeGuesserInterface
+class MetadataTypeGuesser implements MetadataTypeGuesserInterface
 {
     private DataTypeGuesser $dataTypeGuesser;
     private DoctrineHelper $doctrineHelper;
@@ -40,41 +39,49 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
         $this->doctrineHelper = $doctrineHelper;
     }
 
+    #[\Override]
     public function getMetadataAccessor(): ?MetadataAccessorInterface
     {
         return $this->metadataAccessor;
     }
 
+    #[\Override]
     public function setMetadataAccessor(?MetadataAccessorInterface $metadataAccessor): void
     {
         $this->metadataAccessor = $metadataAccessor;
     }
 
+    #[\Override]
     public function getConfigAccessor(): ?ConfigAccessorInterface
     {
         return $this->configAccessor;
     }
 
+    #[\Override]
     public function setConfigAccessor(?ConfigAccessorInterface $configAccessor): void
     {
         $this->configAccessor = $configAccessor;
     }
 
+    #[\Override]
     public function getEntityMapper(): ?EntityMapper
     {
         return $this->entityMapper;
     }
 
+    #[\Override]
     public function setEntityMapper(?EntityMapper $entityMapper): void
     {
         $this->entityMapper = $entityMapper;
     }
 
+    #[\Override]
     public function getIncludedEntities(): ?IncludedEntityCollection
     {
         return $this->includedEntities;
     }
 
+    #[\Override]
     public function setIncludedEntities(?IncludedEntityCollection $includedEntities): void
     {
         $this->includedEntities = $includedEntities;

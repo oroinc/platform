@@ -193,4 +193,15 @@ class MetaPropertyMetadataTest extends \PHPUnit\Framework\TestCase
         $propertyMetadata->setResultName(null);
         self::assertEquals('name', $propertyMetadata->getResultName());
     }
+
+    public function testAssociationLevel()
+    {
+        $propertyMetadata = new MetaPropertyMetadata();
+
+        self::assertFalse($propertyMetadata->isAssociationLevel());
+        $propertyMetadata->setAssociationLevel(true);
+        self::assertTrue($propertyMetadata->isAssociationLevel());
+        $propertyMetadata->setAssociationLevel(false);
+        self::assertFalse($propertyMetadata->isAssociationLevel());
+    }
 }

@@ -45,12 +45,6 @@ Example:
                "id": "1"
             }
          },
-         "attachment": {
-            "data": {
-               "type": "files",
-               "id": "1"
-            }
-         },
          "target": {
             "data": {
                "type": "emails",
@@ -92,12 +86,6 @@ Example:
          "organization": {
             "data": {
                "type": "organizations",
-               "id": "1"
-            }
-         },
-         "attachment": {
-            "data": {
-               "type": "files",
                "id": "1"
             }
          },
@@ -168,23 +156,6 @@ Retrieve the record of the attachment uploaded with a specific comment.
 #### get_relationship
 
 Retrieve the ID of the file attached to a specific comment.
-
-#### update_relationship
-
-Replace the file attached to a specific comment.
-
-{@request:json_api}
-Example:
-
-```JSON
-{
-  "data": {
-    "type": "files",
-    "id": "1"
-  }
-}
-```
-{@/request}
 
 ### organization
 

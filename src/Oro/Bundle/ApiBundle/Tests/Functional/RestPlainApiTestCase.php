@@ -145,8 +145,10 @@ abstract class RestPlainApiTestCase extends RestApiTestCase
         static::assertResponseStatusCodeEquals($response, $statusCode);
 
         $content = self::jsonToArray($response->getContent());
+        $constraint = new RestPlainDocContainsConstraint($expectedErrors, false);
+        $constraint->useStartsWithComparison('detail');
         try {
-            $this->assertResponseContains($expectedErrors, $response);
+            self::assertThat($content, $constraint);
             if ($strict) {
                 self::assertCount(
                     count($expectedErrors),

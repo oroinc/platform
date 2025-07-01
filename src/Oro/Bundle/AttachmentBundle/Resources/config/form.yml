@@ -19,7 +19,6 @@ services:
             - [setEventSubscriber,  ['@oro_attachment.form.file_subscriber']]
         tags:
             - { name: form.type, alias: oro_file }
-            - { name: c, alias: file }
 
     oro_attachment.form.type.image:
         class: Oro\Bundle\AttachmentBundle\Form\Type\ImageType

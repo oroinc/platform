@@ -19,4 +19,5 @@ final class Constraint
     public const FORM = 'form constraint';
     public const EXTRA_FIELDS = 'extra fields constraint';
     public const RELATIONSHIP = 'relationship constraint';
+    public const TYPE = 'type constraint';
 }

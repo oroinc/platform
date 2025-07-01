@@ -522,7 +522,90 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
         );
     }
 
-    public function testProcessForAssociationDoesNotExistInEntityAndConfiguredByTargetClassAndTargetType()
+    public function testProcessForManageableEntityWithAssociationMetaProperties()
+    {
+        $entityDefinition = $this->createConfigObject([
+            'fields' => [
+                'accounts' => [
+                    'fields' => [
+                        'metaProperty' => [
+                            'meta_property' => true
+                        ]
+                    ]
+                ]
+            ]
+        ]);
+        $this->context->setResult($entityDefinition);
+        $this->context->setExtras([
+            new ExpandRelatedEntitiesConfigExtra(['accounts']),
+            new TestConfigSection('test_section')
+        ]);
+
+        $this->configProvider->expects(self::any())
+            ->method('getConfig')
+            ->with(
+                'Test\Account',
+                $this->context->getVersion(),
+                $this->context->getRequestType(),
+                [new TestConfigSection('test_section')]
+            )
+            ->willReturn($this->createRelationConfigObject([
+                'fields' => [
+                    'name' => [
+                        'data_type' => 'string'
+                    ]
+                ]
+            ]));
+
+        $metadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+        $metadata->expects(self::once())
+            ->method('hasAssociation')
+            ->with('accounts')
+            ->willReturn(true);
+        $metadata->expects(self::once())
+            ->method('getAssociationTargetClass')
+            ->with('accounts')
+            ->willReturn('Test\Account');
+        $metadata->expects(self::once())
+            ->method('isCollectionValuedAssociation')
+            ->with('accounts')
+            ->willReturn(true);
+        $accountMetadata = new ClassMetadata('Test\Account');
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::exactly(2))
+            ->method('getEntityMetadataForClass')
+            ->willReturnMap([
+                [self::TEST_CLASS_NAME, true, $metadata],
+                ['Test\Account', true, $accountMetadata]
+            ]);
+
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'fields' => [
+                    'accounts' => [
+                        'target_class' => 'Test\Account',
+                        'target_type'  => 'to-many',
+                        'fields' => [
+                            'name' => [
+                                'data_type' => 'string'
+                            ],
+                            'metaProperty' => [
+                                'meta_property' => true
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $this->context->getResult()
+        );
+    }
+
+    public function testProcessForAssociationDoesNotExistInEntityAndConfiguredByTargetClassAndTargetType(): void
     {
         $config = [
             'fields' => [

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Form\FormExtensionSwitcherInterface;
-use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser;
+use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesserInterface;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 
 /**
@@ -19,11 +19,11 @@ abstract class SwitchFormExtension
     private const PREVIOUS_INCLUDED_ENTITIES = 'previousIncludedEntities';
 
     protected FormExtensionSwitcherInterface $formExtensionSwitcher;
-    protected MetadataTypeGuesser $metadataTypeGuesser;
+    protected MetadataTypeGuesserInterface $metadataTypeGuesser;
 
     public function __construct(
         FormExtensionSwitcherInterface $formExtensionSwitcher,
-        MetadataTypeGuesser $metadataTypeGuesser
+        MetadataTypeGuesserInterface $metadataTypeGuesser
     ) {
         $this->formExtensionSwitcher = $formExtensionSwitcher;
         $this->metadataTypeGuesser = $metadataTypeGuesser;

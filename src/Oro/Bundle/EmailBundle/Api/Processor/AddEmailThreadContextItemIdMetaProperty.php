@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Api\Processor;
 
 use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -28,8 +29,12 @@ class AddEmailThreadContextItemIdMetaProperty implements ProcessorInterface
             return;
         }
 
-        $activityTargetsAssociationMetadata->addMetaProperty(
+        $emailThreadContextItemIdMetadata = $activityTargetsAssociationMetadata->addMetaProperty(
             new MetaPropertyMetadata('emailThreadContextItemId', DataType::STRING)
         );
+        $parentAction = $context->getParentAction();
+        if (ApiAction::CREATE === $parentAction || ApiAction::UPDATE === $parentAction) {
+            $emailThreadContextItemIdMetadata->setAssociationLevel(true);
+        }
     }
 }

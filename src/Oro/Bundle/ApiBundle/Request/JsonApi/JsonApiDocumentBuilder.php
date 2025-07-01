@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Metadata\DataAccessorInterface;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\LinkCollectionMetadataInterface;
 use Oro\Bundle\ApiBundle\Metadata\LinkMetadataInterface;
+use Oro\Bundle\ApiBundle\Metadata\MetaPropertyMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Request\AbstractDocumentBuilder;
 use Oro\Bundle\ApiBundle\Request\DataType;
@@ -197,21 +198,43 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
     {
         $properties = $metadata->getMetaProperties();
         foreach ($properties as $name => $property) {
-            if (!$property->isOutput()) {
-                continue;
+            if (!$property->isAssociationLevel()) {
+                $this->addMetaProperty($result, $data, $metadata, $name, $property);
             }
-            $propertyPath = $property->getPropertyPath();
-            if (!$propertyPath || $this->isIgnoredMeta($propertyPath, $metadata)) {
-                continue;
+        }
+    }
+
+    protected function addMetaForAssociation(array &$result, array $data, EntityMetadata $metadata): void
+    {
+        $properties = $metadata->getMetaProperties();
+        foreach ($properties as $name => $property) {
+            if ($property->isAssociationLevel()) {
+                $this->addMetaProperty($result, $data, $metadata, $name, $property);
             }
-            $resultName = $property->getResultName();
-            if (\array_key_exists($name, $data)) {
-                $result[self::META][$resultName] = $data[$name];
-            } else {
-                $value = null;
-                if ($this->resultDataAccessor->tryGetValue($propertyPath, $value)) {
-                    $result[self::META][$resultName] = $value;
-                }
+        }
+    }
+
+    protected function addMetaProperty(
+        array &$result,
+        array $data,
+        EntityMetadata $metadata,
+        string $name,
+        MetaPropertyMetadata $property
+    ): void {
+        if (!$property->isOutput()) {
+            return;
+        }
+        $propertyPath = $property->getPropertyPath();
+        if (!$propertyPath || $this->isIgnoredMeta($propertyPath, $metadata)) {
+            return;
+        }
+        $resultName = $property->getResultName();
+        if (\array_key_exists($name, $data)) {
+            $result[self::META][$resultName] = $data[$name];
+        } else {
+            $value = null;
+            if ($this->resultDataAccessor->tryGetValue($propertyPath, $value)) {
+                $result[self::META][$resultName] = $value;
             }
         }
     }
@@ -306,7 +329,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
                         );
                         $this->addAssociationMeta($value[$i], $this->getAssociationMeta($association));
                         if (\is_array($item)) {
-                            $this->addMeta($value[$i], $item, $association->getTargetMetadata());
+                            $this->addMetaForAssociation($value[$i], $item, $association->getTargetMetadata());
                         }
                         $this->addLinks($value[$i], $association->getLinks());
                         $i++;
@@ -320,7 +343,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
                 );
                 $this->addAssociationMeta($value, $this->getAssociationMeta($association));
                 if (\is_array($item)) {
-                    $this->addMeta($value, $item, $association->getTargetMetadata());
+                    $this->addMetaForAssociation($value, $item, $association->getTargetMetadata());
                 }
                 $this->addLinks($value, $association->getLinks());
             }

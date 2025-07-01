@@ -42,12 +42,6 @@ Example:
             "id": "5"
           }
         ]
-      },    
-      "image": {
-        "data": {
-          "type": "files",
-          "id": "1"
-        }
       }
     }
   }
@@ -196,21 +190,4 @@ Retrieve a record of image assigned to a specific attribute family record.
 
 #### get_relationship
 
-Retrieve ID of image records assigned to a specific attribute family record.
-
-#### update_relationship
-
-Replace image assigned to a specific attribute family record.
-
-{@request:json_api}
-Example:
-
-```JSON
-{
-  "data": {
-    "type": "files",
-    "id": "1"
-  }
-}
-```
-{@/request}
+Retrieve the ID of image records assigned to a specific attribute family record.

@@ -715,6 +715,62 @@ class JsonApiDocumentBuilderTest extends DocumentBuilderTestCase
                         'category'   => [
                             'data' => [
                                 'type' => 'test_category',
+                                'id'   => 'Test\Category::456'
+                            ]
+                        ],
+                        'categories' => [
+                            'data' => [
+                                [
+                                    'type' => 'test_category',
+                                    'id'   => 'Test\Category::456'
+                                ],
+                                [
+                                    'type' => 'test_category',
+                                    'id'   => 'Test\Category::457'
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $this->documentBuilder->getDocument()
+        );
+    }
+
+    public function testAssociationWithAssociationLevelMetaPropertiesInTargetMetadata()
+    {
+        $object = [
+            'code'       => 123,
+            'category'   => ['code' => 456, '_meta1' => 'category_meta1'],
+            'categories' => [
+                ['code' => 456, '_meta1' => 'category_meta1_item1', 'meta2' => 'category_meta2_item1'],
+                ['code' => 457, '_meta1' => 'category_meta1_item2']
+            ]
+        ];
+
+        $metadata = $this->getEntityMetadata('Test\Entity', ['code']);
+        $metadata->addField($this->createFieldMetadata('code'));
+        $metadata->addAssociation($this->createAssociationMetadata('category', 'Test\Category', false, ['code']));
+        $metadata->addAssociation($this->createAssociationMetadata('categories', 'Test\Category', true, ['code']));
+
+        foreach ($metadata->getAssociations() as $association) {
+            $associationTargetMetadata = $association->getTargetMetadata();
+            $associationTargetMetadata->addMetaProperty(new MetaPropertyMetadata('meta1', 'string', '_meta1'))
+                ->setAssociationLevel(true);
+            $associationTargetMetadata->addMetaProperty(new MetaPropertyMetadata('meta2', 'string'))
+                ->setAssociationLevel(true);
+        }
+
+        $this->documentBuilder->setDataObject($object, $this->requestType, $metadata);
+        self::assertEquals(
+            [
+                'data' => [
+                    'type'          => 'test_entity',
+                    'id'            => 'Test\Entity::123',
+                    'relationships' => [
+                        'category'   => [
+                            'data' => [
+                                'type' => 'test_category',
                                 'id'   => 'Test\Category::456',
                                 'meta' => [
                                     'meta1' => 'category_meta1'

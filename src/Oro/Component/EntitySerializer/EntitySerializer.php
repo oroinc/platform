@@ -310,9 +310,17 @@ class EntitySerializer
 
     /**
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function serializeItem(mixed $entity, string $entityClass, EntityConfig $config, array $context): array
     {
+        $additionalData = [];
+        if (\is_array($entity) && \array_key_exists(0, $entity)) {
+            $additionalData = $entity;
+            unset($additionalData[0]);
+            $entity = $entity[0];
+        }
+
         if (!$entity) {
             return [];
         }
@@ -360,6 +368,10 @@ class EntitySerializer
                 $context,
                 $referenceFields
             );
+        }
+
+        foreach ($additionalData as $key => $value) {
+            $result[$key] = $value;
         }
 
         return $result;
@@ -969,6 +981,9 @@ class EntitySerializer
     {
         $ids = [];
         foreach ($entities as $entity) {
+            if (\is_array($entity) && \array_key_exists(0, $entity)) {
+                $entity = $entity[0];
+            }
             $id = $this->dataAccessor->getValue($entity, $idFieldName);
             if (!isset($ids[$id])) {
                 $ids[$id] = $id;

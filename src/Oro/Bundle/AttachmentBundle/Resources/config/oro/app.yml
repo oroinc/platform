@@ -31,15 +31,10 @@ oro_api:
     api_doc_cache:
         resettable_services:
             - oro_attachment.api.attachment_association_provider
+            - oro_attachment.api.multi_file_association_provider
+
     error_title_overrides:
         'file constraint from system config constraint': 'file constraint'
-
-    form_types:
-        - Oro\Bundle\AttachmentBundle\Form\Type\FileType
-
-    form_type_guesses:
-        file:
-            form_type: Oro\Bundle\AttachmentBundle\Form\Type\FileType
 
 oro_security:
     login_target_path_excludes:
