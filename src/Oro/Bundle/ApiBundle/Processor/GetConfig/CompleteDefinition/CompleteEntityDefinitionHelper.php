@@ -601,9 +601,8 @@ class CompleteEntityDefinitionHelper
             $targetField = $targetDefinition->findField($targetPropertyName, true);
             if (null === $targetField) {
                 $targetFullDefinition = $this->loadFullDefinition($targetClass, $version, $requestType);
-                $targetFieldName = $targetDefinition->findField($targetPropertyName)
-                    ? $targetFullDefinition->findFieldNameByPropertyPath($targetPropertyName)
-                    : $targetPropertyName;
+                $targetFieldName = $targetFullDefinition->findFieldNameByPropertyPath($targetPropertyName)
+                    ?? $targetPropertyName;
 
                 $targetField = $targetDefinition->addField(
                     $targetFieldName,

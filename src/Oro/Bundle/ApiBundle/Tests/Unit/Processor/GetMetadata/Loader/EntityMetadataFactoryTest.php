@@ -116,6 +116,34 @@ class EntityMetadataFactoryTest extends LoaderTestCase
         self::assertEquals($expected, $result);
     }
 
+    public function testCreateAndAddMetaPropertyMetadataForAssociationLevelMetaProperty()
+    {
+        $entityMetadata = new EntityMetadata('Test\Entity');
+        $field = new EntityDefinitionFieldConfig();
+        $field->setDataType('string');
+        $field->setAssociationLevelMetaProperty(true);
+
+        $classMetadata = $this->getClassMetadataMock('Test\Class');
+
+        $this->metadataFactory->expects(self::once())
+            ->method('createMetaPropertyMetadata')
+            ->with(self::identicalTo($classMetadata), 'testField', 'string')
+            ->willReturn(new MetaPropertyMetadata('testField', 'string'));
+
+        $expected = $this->createMetaPropertyMetadata('testField', 'string');
+        $expected->setAssociationLevel(true);
+
+        $result = $this->entityMetadataFactory->createAndAddMetaPropertyMetadata(
+            $entityMetadata,
+            $classMetadata,
+            'testField',
+            $field,
+            'test'
+        );
+        self::assertSame($result, $entityMetadata->getMetaProperty('testField'));
+        self::assertEquals($expected, $result);
+    }
+
     public function testCreateAndAddAssociationMetadata(): void
     {
         $entityMetadata = new EntityMetadata('Test\Entity');

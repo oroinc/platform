@@ -149,6 +149,16 @@
         .dashboard-widget-content {
             margin-top: 0;
 
+            &.recent-calls-widget-content {
+                .in-call {
+                    color: $secondary-secondary-1;
+                }
+
+                .out-call {
+                    color: $secondary-secondary-2;
+                }
+            }
+
             .other-scroll-container {
                 margin-bottom: $dashboard-container-other-scroll-container-offset;
             }

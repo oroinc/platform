@@ -62,14 +62,23 @@ class ComputeEmailFields implements ProcessorInterface
             return;
         }
 
+        $recipientsFieldName = $context->getResultFieldName('recipients');
+        $recipientsConfig = $context->getConfig()->getField($recipientsFieldName)->getTargetEntity();
+        $typeFieldName = $context->getResultFieldName('type', $recipientsConfig);
+        $nameFieldName = $context->getResultFieldName('name', $recipientsConfig);
+        $emailAddressFieldName = $context->getResultFieldName('emailAddress', $recipientsConfig);
+        $emailFieldName = $context->getResultFieldName(
+            'email',
+            $recipientsConfig->getField($emailAddressFieldName)->getTargetEntity()
+        );
         $recipients = [];
-        foreach ($data['recipients'] as $item) {
-            if ($item['type'] !== $recipientType) {
+        foreach ($data[$recipientsFieldName] as $item) {
+            if ($item[$typeFieldName] !== $recipientType) {
                 continue;
             }
             $recipient = $this->buildEmailAddress(
-                $this->emailAddressHelper->extractEmailAddressName($item['name']),
-                $item['emailAddress']['email'] ?? null
+                $this->emailAddressHelper->extractEmailAddressName($item[$nameFieldName]),
+                $item[$emailAddressFieldName][$emailFieldName] ?? null
             );
             if (null !== $recipient) {
                 $recipients[] = $recipient;
@@ -117,8 +126,10 @@ class ComputeEmailFields implements ProcessorInterface
         }
 
         if (isset($data[$bodyFieldName])) {
-            $typeFieldName = $context->getConfig()->getField($bodyFieldName)->getTargetEntity()
-                ->findFieldNameByPropertyPath('bodyIsText');
+            $typeFieldName = $context->getResultFieldName(
+                'bodyIsText',
+                $context->getConfig()->getField($bodyFieldName)->getTargetEntity()
+            );
             $data[$bodyFieldName][$typeFieldName] = $data[$bodyFieldName][$typeFieldName] ? 'text' : 'html';
         } else {
             $data[$bodyFieldName] = null;

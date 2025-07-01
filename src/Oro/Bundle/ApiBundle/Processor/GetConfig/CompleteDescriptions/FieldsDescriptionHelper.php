@@ -249,6 +249,10 @@ class FieldsDescriptionHelper
         ?string $fieldPrefix
     ): ?string {
         $propertyPath = $field->getPropertyPath($fieldName);
+        if (ConfigUtil::IGNORE_PROPERTY_PATH === $propertyPath) {
+            return null;
+        }
+
         if ($fieldPrefix) {
             $propertyPath = $fieldPrefix . $propertyPath;
         } elseif (null !== $entityConfig) {

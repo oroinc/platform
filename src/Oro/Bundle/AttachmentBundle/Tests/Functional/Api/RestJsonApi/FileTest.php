@@ -4,17 +4,20 @@ namespace Oro\Bundle\AttachmentBundle\Tests\Functional\Api\RestJsonApi;
 
 use Oro\Bundle\ApiBundle\Tests\Functional\RestJsonApiTestCase;
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Tests\Functional\Api\DataFixtures\LoadFileData;
 use Oro\Bundle\AttachmentBundle\Tests\Functional\Stub\ExternalFileFactoryStub;
 use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadUser;
 use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
+ * @dbIsolationPerTest
+ * @nestTransactionsWithSavepoints
  * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class FileTest extends RestJsonApiTestCase
 {
-    private static $blankFileContent = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA'
+    private const string BLANK_FILE_CONTENT = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA'
         . '1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAApJREFUCNdjYAAAAAIAAeIhvDMAAAAASUVORK5CYII=';
 
     private string $externalFileAllowedUrlsRegExp;
@@ -23,24 +26,17 @@ class FileTest extends RestJsonApiTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->loadFixtures([LoadUser::class]);
-        $this->externalFileAllowedUrlsRegExp = $this->getExternalFileAllowedUrlsRegExp();
+        $this->loadFixtures([LoadUser::class, LoadFileData::class]);
+        $this->externalFileAllowedUrlsRegExp = self::getConfigManager()
+            ->get('oro_attachment.external_file_allowed_urls_regexp');
     }
 
     #[\Override]
     protected function tearDown(): void
     {
-        parent::tearDown();
-        if ($this->getExternalFileAllowedUrlsRegExp() !== $this->externalFileAllowedUrlsRegExp) {
-            $this->setExternalFileAllowedUrlsRegExp($this->externalFileAllowedUrlsRegExp);
-        }
-        $this->externalFileAllowedUrlsRegExp = '';
+        $this->setExternalFileAllowedUrlsRegExp($this->externalFileAllowedUrlsRegExp);
         $this->setIsStoredExternally(false);
-    }
-
-    private function getExternalFileAllowedUrlsRegExp(): string
-    {
-        return (string)self::getConfigManager()->get('oro_attachment.external_file_allowed_urls_regexp');
+        parent::tearDown();
     }
 
     private function setExternalFileAllowedUrlsRegExp(string $value): void
@@ -61,17 +57,51 @@ class FileTest extends RestJsonApiTestCase
         }
     }
 
-    public function testCreate(): int
+    public function testGet(): void
+    {
+        $fileId = $this->getReference('file_1')->getId();
+
+        $response = $this->get(
+            ['entity' => 'files', 'id' => (string)$fileId]
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    'type' => 'files',
+                    'id' => (string)$fileId,
+                    'attributes' => [
+                        'mimeType' => 'text/plain',
+                        'originalFilename' => 'file_1.txt',
+                        'fileSize' => 7,
+                        'content' => 'ZmlsZV9hCg==',
+                        'parentFieldName' => 'avatar'
+                    ],
+                    'relationships' => [
+                        'owner' => [
+                            'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
+                        ],
+                        'parent' => [
+                            'data' => ['type' => 'users', 'id' => '<toString(@user_1->id)>']
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+    }
+
+    public function testCreate(): void
     {
         $data = [
             'data' => [
-                'type'          => 'files',
-                'attributes'    => [
-                    'mimeType'         => 'image/png',
+                'type' => 'files',
+                'attributes' => [
+                    'mimeType' => 'image/png',
                     'originalFilename' => 'blank.png',
-                    'fileSize'         => 95,
-                    'content'          => self::$blankFileContent,
-                    'parentFieldName'  => 'avatar'
+                    'fileSize' => 95,
+                    'content' => self::BLANK_FILE_CONTENT,
+                    'parentFieldName' => 'avatar'
                 ],
                 'relationships' => [
                     'parent' => [
@@ -85,7 +115,7 @@ class FileTest extends RestJsonApiTestCase
         $expectedData = $data;
         $expectedData['data']['relationships']['owner']['data'] = [
             'type' => 'users',
-            'id'   => '<toString(@user->id)>'
+            'id' => '<toString(@user->id)>'
         ];
         $this->assertResponseContains($expectedData, $response);
 
@@ -94,58 +124,18 @@ class FileTest extends RestJsonApiTestCase
         // test that the entity was created
         $entity = $this->getEntityManager()->find(File::class, $fileId);
         self::assertNotNull($entity);
-
-        // clear entity manager to not affect dependent tests
-        $this->getEntityManager()->clear();
-
-        return $fileId;
-    }
-
-    /**
-     * @depends testCreate
-     */
-    public function testGet(int $fileId): void
-    {
-        $response = $this->get(
-            ['entity' => 'files', 'id' => (string)$fileId]
-        );
-
-        $this->assertResponseContains(
-            [
-                'data' => [
-                    'type'          => 'files',
-                    'id'            => (string)$fileId,
-                    'attributes'    => [
-                        'mimeType'         => 'image/png',
-                        'originalFilename' => 'blank.png',
-                        'fileSize'         => 95,
-                        'content'          => self::$blankFileContent,
-                        'parentFieldName'  => 'avatar'
-                    ],
-                    'relationships' => [
-                        'owner'  => [
-                            'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
-                        ],
-                        'parent' => [
-                            'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
-                        ]
-                    ]
-                ]
-            ],
-            $response
-        );
     }
 
     public function testTryToCreateWithoutOriginalFilename(): void
     {
         $data = [
             'data' => [
-                'type'          => 'files',
-                'attributes'    => [
-                    'mimeType'         => 'image/png',
-                    'fileSize'         => 95,
-                    'content'          => self::$blankFileContent,
-                    'parentFieldName'  => 'avatar'
+                'type' => 'files',
+                'attributes' => [
+                    'mimeType' => 'image/png',
+                    'fileSize' => 95,
+                    'content' => self::BLANK_FILE_CONTENT,
+                    'parentFieldName' => 'avatar'
                 ],
                 'relationships' => [
                     'parent' => [
@@ -158,7 +148,7 @@ class FileTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
-                'title'  => 'form constraint',
+                'title' => 'form constraint',
                 'detail' => 'The "content" field should be specified together with "originalFilename" field.'
             ],
             $response
@@ -169,13 +159,13 @@ class FileTest extends RestJsonApiTestCase
     {
         $data = [
             'data' => [
-                'type'          => 'files',
-                'attributes'    => [
-                    'mimeType'         => 'image/png',
+                'type' => 'files',
+                'attributes' => [
+                    'mimeType' => 'image/png',
                     'originalFilename' => '/path/blank.png',
-                    'fileSize'         => 95,
-                    'content'          => self::$blankFileContent,
-                    'parentFieldName'  => 'avatar'
+                    'fileSize' => 95,
+                    'content' => self::BLANK_FILE_CONTENT,
+                    'parentFieldName' => 'avatar'
                 ],
                 'relationships' => [
                     'parent' => [
@@ -188,7 +178,7 @@ class FileTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
-                'title'  => 'filename without path constraint',
+                'title' => 'filename without path constraint',
                 'detail' => 'The file name should not have a path.',
                 'source' => ['pointer' => '/data/attributes/originalFilename']
             ],
@@ -200,16 +190,16 @@ class FileTest extends RestJsonApiTestCase
     {
         $data = [
             'data' => [
-                'type'          => 'files',
-                'attributes'    => [
-                    'mimeType'         => 'image/png',
+                'type' => 'files',
+                'attributes' => [
+                    'mimeType' => 'image/png',
                     'originalFilename' => 'Fuscebibendumleointemporhendreritmaurisestsemperodiovestibulumconguearcuera'
                         . 'tegeterateraesentacorcjustojrcivariusnatoquepenatibusetmagnisdisparturientmontesFuscebibend'
                         . 'umleointemporhendreritmaurisestsemperodiovestibulumconguearcuerategeterateraesentacorcjusto'
                         . 'jrcivariusnatoquepenatibusetmagnisdisparturientmontes.png',
-                    'fileSize'         => 95,
-                    'content'          => self::$blankFileContent,
-                    'parentFieldName'  => 'avatar'
+                    'fileSize' => 95,
+                    'content' => self::BLANK_FILE_CONTENT,
+                    'parentFieldName' => 'avatar'
                 ],
                 'relationships' => [
                     'parent' => [
@@ -222,9 +212,65 @@ class FileTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
-                'title'  => 'length constraint',
+                'title' => 'length constraint',
                 'detail' => 'This value is too long. It should have 255 characters or less.',
                 'source' => ['pointer' => '/data/attributes/originalFilename']
+            ],
+            $response
+        );
+    }
+
+    public function testTryToCreateWithoutParent(): void
+    {
+        $data = [
+            'data' => [
+                'type' => 'files',
+                'attributes' => [
+                    'mimeType' => 'image/png',
+                    'originalFilename' => 'blank.png',
+                    'fileSize' => 95,
+                    'content' => self::BLANK_FILE_CONTENT,
+                    'parentFieldName' => 'avatar'
+                ]
+            ]
+        ];
+        $response = $this->post(['entity' => 'files'], $data, [], false);
+
+        $this->assertResponseValidationError(
+            [
+                'title' => 'not blank constraint',
+                'detail' => 'This value should not be blank.',
+                'source' => ['pointer' => '/data/relationships/parent/data']
+            ],
+            $response
+        );
+    }
+
+    public function testTryToCreateWithoutParentFieldName(): void
+    {
+        $data = [
+            'data' => [
+                'type' => 'files',
+                'attributes' => [
+                    'mimeType' => 'image/png',
+                    'originalFilename' => 'blank.png',
+                    'fileSize' => 95,
+                    'content' => self::BLANK_FILE_CONTENT
+                ],
+                'relationships' => [
+                    'parent' => [
+                        'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
+                    ]
+                ]
+            ]
+        ];
+        $response = $this->post(['entity' => 'files'], $data, [], false);
+
+        $this->assertResponseValidationError(
+            [
+                'title' => 'not blank constraint',
+                'detail' => 'This value should not be blank.',
+                'source' => ['pointer' => '/data/attributes/parentFieldName']
             ],
             $response
         );
@@ -234,13 +280,13 @@ class FileTest extends RestJsonApiTestCase
     {
         $data = [
             'data' => [
-                'type'          => 'files',
-                'attributes'    => [
-                    'mimeType'         => 'image/png',
+                'type' => 'files',
+                'attributes' => [
+                    'mimeType' => 'image/png',
                     'originalFilename' => 'blank.png',
-                    'fileSize'         => 95,
-                    'content'          => '0',
-                    'parentFieldName'  => 'avatar'
+                    'fileSize' => 95,
+                    'content' => '0',
+                    'parentFieldName' => 'avatar'
                 ],
                 'relationships' => [
                     'parent' => [
@@ -253,7 +299,7 @@ class FileTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
-                'title'  => 'form constraint',
+                'title' => 'form constraint',
                 'detail' => 'Cannot decode content encoded with MIME base64.'
             ],
             $response
@@ -266,10 +312,10 @@ class FileTest extends RestJsonApiTestCase
 
         $data = [
             'data' => [
-                'type'          => 'files',
-                'attributes'    => [
-                    'externalUrl'     => ExternalFileFactoryStub::IMAGE_A_TEST_URL,
-                    'parentFieldName' => 'avatar',
+                'type' => 'files',
+                'attributes' => [
+                    'externalUrl' => ExternalFileFactoryStub::IMAGE_A_TEST_URL,
+                    'parentFieldName' => 'avatar'
                 ],
                 'relationships' => [
                     'parent' => [
@@ -282,7 +328,7 @@ class FileTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
-                'title'  => 'external file url constraint',
+                'title' => 'external file url constraint',
                 'detail' => 'No external files and images are allowed.'
                     . ' Allowed URLs RegExp can be configured on the following page:'
                     . ' System -> Configuration -> General Setup -> Upload Settings.',
@@ -298,8 +344,8 @@ class FileTest extends RestJsonApiTestCase
 
         $data = [
             'data' => [
-                'type'          => 'files',
-                'attributes'    => [
+                'type' => 'files',
+                'attributes' => [
                     'externalUrl' => ExternalFileFactoryStub::MISSING_URL
                 ],
                 'relationships' => [
@@ -313,7 +359,7 @@ class FileTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
-                'title'  => 'external file url constraint',
+                'title' => 'external file url constraint',
                 'detail' => 'The specified URL is not accessible. Reason: "Not Found"',
                 'source' => ['pointer' => '/data/attributes/externalUrl']
             ],
@@ -327,10 +373,10 @@ class FileTest extends RestJsonApiTestCase
 
         $data = [
             'data' => [
-                'type'          => 'files',
-                'attributes'    => [
-                    'externalUrl'     => ExternalFileFactoryStub::IMAGE_A_TEST_URL,
-                    'parentFieldName' => 'avatar',
+                'type' => 'files',
+                'attributes' => [
+                    'externalUrl' => ExternalFileFactoryStub::IMAGE_A_TEST_URL,
+                    'parentFieldName' => 'avatar'
                 ],
                 'relationships' => [
                     'parent' => [
@@ -343,7 +389,7 @@ class FileTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
-                'title'  => 'external file url constraint',
+                'title' => 'external file url constraint',
                 'detail' => 'The provided URL does not match the URLs allowed in the system configuration.',
                 'source' => ['pointer' => '/data/attributes/externalUrl']
             ],
@@ -358,10 +404,10 @@ class FileTest extends RestJsonApiTestCase
 
         $data = [
             'data' => [
-                'type'          => 'files',
-                'attributes'    => [
-                    'externalUrl'     => ExternalFileFactoryStub::FILE_A_TEST_URL,
-                    'parentFieldName' => 'avatar',
+                'type' => 'files',
+                'attributes' => [
+                    'externalUrl' => ExternalFileFactoryStub::FILE_A_TEST_URL,
+                    'parentFieldName' => 'avatar'
                 ],
                 'relationships' => [
                     'parent' => [
@@ -374,9 +420,8 @@ class FileTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
-                'title'  => 'external file mime type constraint',
-                'detail' => 'The MIME type of the file is invalid ("text/plain").'
-                    . ' Allowed MIME types are "image/gif", "image/jpeg", "image/png", "image/webp".',
+                'title' => 'external file mime type constraint',
+                'detail' => 'The MIME type of the file is invalid ("text/plain").',
                 'source' => ['pointer' => '/data/attributes/externalUrl']
             ],
             $response
@@ -390,12 +435,12 @@ class FileTest extends RestJsonApiTestCase
 
         $data = [
             'data' => [
-                'type'          => 'files',
-                'attributes'    => [
-                    'externalUrl'      => ExternalFileFactoryStub::IMAGE_A_TEST_URL,
-                    'content'          => 'sample data',
+                'type' => 'files',
+                'attributes' => [
+                    'externalUrl' => ExternalFileFactoryStub::IMAGE_A_TEST_URL,
+                    'content' => 'sample data',
                     'originalFilename' => 'image-a.png',
-                    'parentFieldName'  => 'avatar',
+                    'parentFieldName' => 'avatar'
                 ],
                 'relationships' => [
                     'parent' => [
@@ -408,24 +453,24 @@ class FileTest extends RestJsonApiTestCase
 
         $this->assertResponseValidationError(
             [
-                'title'  => 'form constraint',
+                'title' => 'form constraint',
                 'detail' => 'Either "externalUrl" or "content" must be specified, but not both'
             ],
             $response
         );
     }
 
-    public function testCreateWithExternalUrl(): int
+    public function testCreateWithExternalUrl(): void
     {
         $this->setIsStoredExternally(true);
         $this->setExternalFileAllowedUrlsRegExp('^http:\/\/example\.org');
 
         $data = [
             'data' => [
-                'type'          => 'files',
-                'attributes'    => [
-                    'externalUrl'     => ExternalFileFactoryStub::IMAGE_A_TEST_URL,
-                    'parentFieldName' => 'avatar',
+                'type' => 'files',
+                'attributes' => [
+                    'externalUrl' => ExternalFileFactoryStub::IMAGE_A_TEST_URL,
+                    'parentFieldName' => 'avatar'
                 ],
                 'relationships' => [
                     'parent' => [
@@ -439,7 +484,7 @@ class FileTest extends RestJsonApiTestCase
         $expectedData = $data;
         $expectedData['data']['relationships']['owner']['data'] = [
             'type' => 'users',
-            'id'   => '<toString(@user->id)>'
+            'id' => '<toString(@user->id)>'
         ];
         $this->assertResponseContains($expectedData, $response);
 
@@ -448,18 +493,12 @@ class FileTest extends RestJsonApiTestCase
         // test that the entity was created
         $entity = $this->getEntityManager()->find(File::class, $fileId);
         self::assertNotNull($entity);
-
-        // clear entity manager to not affect dependent tests
-        $this->getEntityManager()->clear();
-
-        return $fileId;
     }
 
-    /**
-     * @depends testCreateWithExternalUrl
-     */
-    public function testGetExternalUrl(int $fileId): void
+    public function testGetExternalUrl(): void
     {
+        $fileId = $this->getReference('external_file_1')->getId();
+
         $response = $this->get(
             ['entity' => 'files', 'id' => (string)$fileId]
         );
@@ -467,21 +506,21 @@ class FileTest extends RestJsonApiTestCase
         $this->assertResponseContains(
             [
                 'data' => [
-                    'type'          => 'files',
-                    'id'            => (string)$fileId,
-                    'attributes'    => [
-                        'mimeType'         => 'image/png',
-                        'originalFilename' => 'image-a.png',
-                        'fileSize'         => 95,
-                        'externalUrl'      => ExternalFileFactoryStub::IMAGE_A_TEST_URL,
-                        'parentFieldName'  => 'avatar',
+                    'type' => 'files',
+                    'id' => (string)$fileId,
+                    'attributes' => [
+                        'mimeType' => 'text/plain',
+                        'originalFilename' => 'file_1.txt',
+                        'fileSize' => 7,
+                        'externalUrl' => ExternalFileFactoryStub::IMAGE_A_TEST_URL,
+                        'parentFieldName' => 'avatar'
                     ],
                     'relationships' => [
-                        'owner'  => [
+                        'owner' => [
                             'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
                         ],
                         'parent' => [
-                            'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
+                            'data' => ['type' => 'users', 'id' => '<toString(@user_2->id)>']
                         ]
                     ]
                 ]
@@ -490,94 +529,58 @@ class FileTest extends RestJsonApiTestCase
         );
     }
 
-    /**
-     * @depends testCreateWithExternalUrl
-     */
-    public function testUpdateExternalUrl(int $fileId): int
+    public function testUpdateExternalUrl(): void
     {
         $this->setIsStoredExternally(true);
         $this->setExternalFileAllowedUrlsRegExp('^http:\/\/example\.org');
 
+        $fileId = $this->getReference('external_file_1')->getId();
+
         $data = [
             'data' => [
-                'type'       => 'files',
-                'id'         => (string)$fileId,
+                'type' => 'files',
+                'id' => (string)$fileId,
                 'attributes' => [
-                    'externalUrl'     => ExternalFileFactoryStub::IMAGE_B_TEST_URL,
-                    'parentFieldName' => 'avatar',
+                    'externalUrl' => ExternalFileFactoryStub::IMAGE_B_TEST_URL,
+                    'parentFieldName' => 'avatar'
                 ]
             ]
         ];
         $response = $this->patch(['entity' => 'files', 'id' => (string)$fileId], $data);
 
-        $this->assertResponseContains(
-            [
-                'data' => [
-                    'type'          => 'files',
-                    'id'            => (string)$fileId,
-                    'attributes'    => [
-                        'mimeType'         => 'image/png',
-                        'originalFilename' => 'image-b.png',
-                        'fileSize'         => 96,
-                        'externalUrl'      => ExternalFileFactoryStub::IMAGE_B_TEST_URL,
-                        'parentFieldName'  => 'avatar',
+        $expectedData = [
+            'data' => [
+                'type' => 'files',
+                'id' => (string)$fileId,
+                'attributes' => [
+                    'mimeType' => 'image/png',
+                    'originalFilename' => 'image-b.png',
+                    'fileSize' => 96,
+                    'externalUrl' => ExternalFileFactoryStub::IMAGE_B_TEST_URL,
+                    'parentFieldName' => 'avatar'
+                ],
+                'relationships' => [
+                    'owner' => [
+                        'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
                     ],
-                    'relationships' => [
-                        'owner'  => [
-                            'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
-                        ],
-                        'parent' => [
-                            'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
-                        ]
+                    'parent' => [
+                        'data' => ['type' => 'users', 'id' => '<toString(@user_2->id)>']
                     ]
                 ]
-            ],
-            $response
-        );
+            ]
+        ];
+        $this->assertResponseContains($expectedData, $response);
 
-        return $fileId;
-    }
-
-    /**
-     * @depends testUpdateExternalUrl
-     */
-    public function testGetExternalUrlAfterPatch(int $fileId): void
-    {
         $response = $this->get(
             ['entity' => 'files', 'id' => (string)$fileId]
         );
-
-        $this->assertResponseContains(
-            [
-                'data' => [
-                    'type'          => 'files',
-                    'id'            => (string)$fileId,
-                    'attributes'    => [
-                        'mimeType'         => 'image/png',
-                        'originalFilename' => 'image-b.png',
-                        'fileSize'         => 96,
-                        'externalUrl'      => ExternalFileFactoryStub::IMAGE_B_TEST_URL,
-                        'parentFieldName'  => 'avatar',
-                    ],
-                    'relationships' => [
-                        'owner'  => [
-                            'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
-                        ],
-                        'parent' => [
-                            'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
-                        ]
-                    ]
-                ]
-            ],
-            $response
-        );
+        $this->assertResponseContains($expectedData, $response);
     }
 
-    /**
-     * @depends testCreateWithExternalUrl
-     */
-    public function testDeleteExternalUrl(int $fileId): void
+    public function testDeleteExternalUrl(): void
     {
+        $fileId = $this->getReference('external_file_1')->getId();
+
         $response = $this->delete(
             ['entity' => 'files', 'id' => (string)$fileId]
         );

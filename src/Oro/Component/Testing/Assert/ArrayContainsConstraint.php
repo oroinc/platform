@@ -9,6 +9,7 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
 {
     protected array $expected;
     protected bool $strict;
+    private array $useStartsWithComparison = [];
     /** @var array [[path, message], ...] */
     protected array $errors = [];
 
@@ -20,6 +21,15 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
     {
         $this->expected = $expected;
         $this->strict = $strict;
+    }
+
+    public function useStartsWithComparison(string $propertyPath, bool $useStartsWithComparison = true): void
+    {
+        if ($useStartsWithComparison) {
+            $this->useStartsWithComparison[$propertyPath] = true;
+        } else {
+            unset($this->useStartsWithComparison[$propertyPath]);
+        }
     }
 
     #[\Override]
@@ -213,19 +223,20 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
     {
         try {
             if (\is_string($actual) && \is_string($expected)) {
-                if ($actual !== $expected) {
+                $propertyPath = $this->getPropertyPath($path);
+                if (isset($this->useStartsWithComparison[$propertyPath])) {
+                    \PHPUnit\Framework\Assert::assertStringStartsWith($expected, $actual);
+                } elseif ($actual !== $expected) {
                     throw new \PHPUnit\Framework\ExpectationFailedException(sprintf(
                         'Failed asserting that \'%s\' is identical to \'%s\'.',
                         $actual,
                         $expected
                     ));
                 }
+            } elseif (\is_float($expected)) {
+                \PHPUnit\Framework\Assert::assertEqualsWithDelta($expected, $actual, 0.0000001);
             } else {
-                if (\is_float($expected)) {
-                    \PHPUnit\Framework\Assert::assertEqualsWithDelta($expected, $actual, 0.0000001);
-                } else {
-                    \PHPUnit\Framework\Assert::assertSame($expected, $actual);
-                }
+                \PHPUnit\Framework\Assert::assertSame($expected, $actual);
             }
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $this->errors[] = [$path, $e->getMessage()];
@@ -238,6 +249,13 @@ class ArrayContainsConstraint extends \PHPUnit\Framework\Constraint\Constraint
 
     protected function isAssocArray(array $array): bool
     {
-        return array_values($array) !== $array;
+        return !array_is_list($array);
+    }
+
+    private function getPropertyPath(array $path): string
+    {
+        return implode('.', array_filter($path, static function ($item) {
+            return !is_numeric($item);
+        }));
     }
 }

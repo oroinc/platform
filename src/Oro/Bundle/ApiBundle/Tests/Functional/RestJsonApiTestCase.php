@@ -260,8 +260,11 @@ abstract class RestJsonApiTestCase extends RestApiTestCase
         static::assertResponseStatusCodeEquals($response, $statusCode);
 
         $content = self::jsonToArray($response->getContent());
+        $expectedContent = $this->getResponseData([JsonApiDoc::ERRORS => $expectedErrors]);
+        $constraint = new JsonApiDocContainsConstraint($expectedContent, false);
+        $constraint->useStartsWithComparison(JsonApiDoc::ERRORS . '.detail');
         try {
-            $this->assertResponseContains([JsonApiDoc::ERRORS => $expectedErrors], $response);
+            self::assertThat($content, $constraint);
             if ($strict) {
                 self::assertCount(
                     count($expectedErrors),

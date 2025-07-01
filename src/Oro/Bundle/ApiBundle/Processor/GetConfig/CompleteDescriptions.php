@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\EntityDescript
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\FieldsDescriptionHelper;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\CompleteDescriptions\FiltersDescriptionHelper;
 use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
+use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
@@ -72,22 +73,24 @@ class CompleteDescriptions implements ProcessorInterface
             $context->getAssociationName(),
             $context->getParentClassName()
         );
-        $this->fieldsDescriptionHelper->setDescriptionsForFields(
-            $definition,
-            $requestType,
-            $entityClass,
-            $isInherit,
-            $this->getTargetActionForFields($context)
-        );
-        $filters = $context->getFilters();
-        if (null !== $filters) {
-            $this->filtersDescriptionHelper->setDescriptionsForFilters(
-                $filters,
+        if (ApiAction::OPTIONS !== $targetAction) {
+            $this->fieldsDescriptionHelper->setDescriptionsForFields(
                 $definition,
                 $requestType,
                 $entityClass,
-                $isInherit
+                $isInherit,
+                $this->getTargetActionForFields($context)
             );
+            $filters = $context->getFilters();
+            if (null !== $filters) {
+                $this->filtersDescriptionHelper->setDescriptionsForFilters(
+                    $filters,
+                    $definition,
+                    $requestType,
+                    $entityClass,
+                    $isInherit
+                );
+            }
         }
     }
 

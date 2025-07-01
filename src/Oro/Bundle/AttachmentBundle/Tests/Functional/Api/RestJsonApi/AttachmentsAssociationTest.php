@@ -9,9 +9,13 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 /**
  * @dbIsolationPerTest
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class AttachmentsAssociationTest extends RestJsonApiTestCase
 {
+    private const string BLANK_FILE_CONTENT = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAQMAAAAl21bKAAAAA'
+        . '1BMVEUAAACnej3aAAAAAXRSTlMAQObYZgAAAApJREFUCNdjYAAAAAIAAeIhvDMAAAAASUVORK5CYII=';
+
     #[\Override]
     protected function setUp(): void
     {
@@ -190,7 +194,128 @@ class AttachmentsAssociationTest extends RestJsonApiTestCase
         self::assertMethodNotAllowedResponse($response, 'OPTIONS, GET');
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testCreateWithNewAttachments(): void
+    {
+        $response = $this->post(
+            ['entity' => 'testapidepartments'],
+            [
+                'data'     => [
+                    'type'          => 'testapidepartments',
+                    'attributes'    => [
+                        'title' => 'New department 1'
+                    ],
+                    'relationships' => [
+                        'attachments' => [
+                            'data' => [
+                                ['type' => 'attachments', 'id' => 'attachment1']
+                            ]
+                        ]
+                    ]
+                ],
+                'included' => [
+                    [
+                        'type'          => 'attachments',
+                        'id'            => 'attachment1',
+                        'attributes'    => [
+                            'comment' => 'Attachment for new department 1'
+                        ],
+                        'relationships' => [
+                            'file' => [
+                                'data' => ['type' => 'files', 'id' => 'file1']
+                            ]
+                        ]
+                    ],
+                    [
+                        'type'          => 'files',
+                        'id'            => 'file1',
+                        'attributes' => [
+                            'mimeType'         => 'image/png',
+                            'originalFilename' => 'blank.png',
+                            'content'          => self::BLANK_FILE_CONTENT
+                        ]
+                    ]
+                ]
+            ]
+        );
+
+        $expectedData = [
+            'data'     => [
+                'type'          => 'testapidepartments',
+                'id'            => 'new',
+                'attributes'    => [
+                    'title' => 'New department 1'
+                ],
+                'relationships' => [
+                    'attachments' => [
+                        'data' => [
+                            ['type' => 'attachments', 'id' => 'new']
+                        ]
+                    ]
+                ]
+            ],
+            'included' => [
+                [
+                    'type'          => 'attachments',
+                    'id'            => 'new',
+                    'meta'          => ['includeId' => 'attachment1'],
+                    'attributes'    => [
+                        'comment' => 'Attachment for new department 1'
+                    ],
+                    'relationships' => [
+                        'file' => [
+                            'data' => ['type' => 'files', 'id' => 'new']
+                        ],
+                        'target' => [
+                            'data' => ['type' => 'testapidepartments', 'id' => 'new']
+                        ],
+                        'organization' => [
+                            'data' => ['type' => 'organizations', 'id' => '<toString(@organization->id)>']
+                        ],
+                        'owner' => [
+                            'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
+                        ]
+                    ]
+                ],
+                [
+                    'type'          => 'files',
+                    'id'            => 'new',
+                    'meta'          => ['includeId' => 'file1'],
+                    'attributes' => [
+                        'mimeType'         => 'image/png',
+                        'originalFilename' => 'blank.png',
+                        'content'          => self::BLANK_FILE_CONTENT,
+                        'fileSize'         => 95,
+                        'parentFieldName'  => 'file'
+                    ],
+                    'relationships' => [
+                        'parent' => [
+                            'data' => ['type' => 'attachments', 'id' => 'new']
+                        ],
+                        'owner' => [
+                            'data' => ['type' => 'users', 'id' => '<toString(@user->id)>']
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        $expectedData = $this->updateResponseContent($expectedData, $response);
+        $this->assertResponseContains($expectedData, $response);
+
+        $departmentId = (int)$this->getResourceId($response);
+        /** @var TestDepartment $department */
+        $department = $this->getEntityManager()->find(TestDepartment::class, $departmentId);
+        self::assertEquals('New department 1', $department->getName());
+        $attachmentIds = $this->getAttachmentIds($departmentId);
+        self::assertCount(1, $attachmentIds);
+        /** @var Attachment $attachment */
+        $attachment = $this->getEntityManager()->find(Attachment::class, $attachmentIds[0]);
+        self::assertEquals('Attachment for new department 1', $attachment->getComment());
+    }
+
+    public function testTryToCreateWithNewAttachmentsWhenFileAlreadyExistsAndBelongsToAnotherEntity(): void
     {
         $response = $this->post(
             ['entity' => 'testapidepartments'],
@@ -222,18 +347,19 @@ class AttachmentsAssociationTest extends RestJsonApiTestCase
                         ]
                     ]
                 ]
-            ]
+            ],
+            [],
+            false
         );
 
-        $departmentId = (int)$this->getResourceId($response);
-        /** @var TestDepartment $department */
-        $department = $this->getEntityManager()->find(TestDepartment::class, $departmentId);
-        self::assertEquals('New department 1', $department->getName());
-        $attachmentIds = $this->getAttachmentIds($departmentId);
-        self::assertCount(1, $attachmentIds);
-        /** @var Attachment $attachment */
-        $attachment = $this->getEntityManager()->find(Attachment::class, $attachmentIds[0]);
-        self::assertEquals('Attachment for new department 1', $attachment->getComment());
+        $this->assertResponseValidationError(
+            [
+                'title' => 'form constraint',
+                'detail' => 'This file is already used in another entity.',
+                'source' => ['pointer' => '/included/0/relationships/file/data']
+            ],
+            $response
+        );
     }
 
     public function testCreateWithExistingAttachments(): void

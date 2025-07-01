@@ -64,7 +64,6 @@
 .nav-tabs {
     padding-left: $nav-tabs-inner-offset-left;
     margin-bottom: $nav-tabs-offset-bottom;
-    border-bottom: $nav-tabs-border-bottom;
     display: $nav-tabs-display;
     flex-wrap: $nav-tabs-flex-wrap;
 
@@ -139,13 +138,22 @@
         &.show .nav-link,
         .nav-link.active {
             background: $nav-link-active-background;
+            font-weight: $nav-link-active-font-weight;
             color: $nav-link-active-color;
-            box-shadow: $nav-link-active-box-shadow;
+            position: $nav-link-active-position;
 
             &:hover,
             &:active,
             &:focus {
                 background: $nav-link-active-background;
+            }
+
+            &::before {
+                content: $nav-link-active-before-content;
+                background: $nav-link-active-before-background;
+                height: $nav-link-active-before-height;
+                position: $nav-link-active-before-position;
+                inset: $nav-link-active-before-inset;
             }
         }
 
@@ -174,18 +182,6 @@
 
                     @include gradient-bg($dropdown-link-active-bg);
                 }
-            }
-        }
-
-        &:first-child {
-            .nav-link {
-                border-radius: $nav-link-border-radius 0 0 $nav-link-border-radius;
-            }
-        }
-
-        &:last-child {
-            .nav-link {
-                border-radius: 0 $nav-link-border-radius $nav-link-border-radius 0;
             }
         }
     }

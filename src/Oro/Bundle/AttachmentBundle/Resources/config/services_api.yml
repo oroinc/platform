@@ -5,6 +5,43 @@ services:
             - '@oro_api.doctrine_helper'
             - '@oro_attachment.association_helper'
 
+    oro_attachment.api.multi_file_association_provider:
+        class: Oro\Bundle\AttachmentBundle\Api\MultiFileAssociationProvider
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_entity_config.config_manager'
+
+    oro_attachment.api.form.type.file_entity:
+        class: Oro\Bundle\AttachmentBundle\Api\Form\Type\FileEntityType
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_loader'
+            - '@translator'
+        tags:
+            - { name: oro.api.form.type, alias: Oro\Bundle\AttachmentBundle\Api\Form\Type\FileEntityType }
+
+    oro_attachment.api.form.type.multi_file_entity:
+        class: Oro\Bundle\AttachmentBundle\Api\Form\Type\MultiFileEntityType
+        arguments:
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_loader'
+            - '@translator'
+            - '@oro_attachment.api.form.type.multi_file_entity.options_processor'
+        tags:
+            - { name: oro.api.form.type, alias: Oro\Bundle\AttachmentBundle\Api\Form\Type\MultiFileEntityType }
+
+    oro_attachment.api.form.type.multi_file_entity.options_processor:
+        class: Oro\Bundle\AttachmentBundle\Api\Form\Type\MultiFileEntitySortOrderProcessor
+        arguments:
+            - '@translator'
+
+    oro_attachment.api.form.guesser.metadata:
+        class: Oro\Bundle\AttachmentBundle\Api\Form\Guesser\MetadataTypeGuesser
+        decorates: oro_api.form.guesser.metadata
+        arguments:
+            - '@.inner'
+            - '@oro_api.doctrine_helper'
+
     oro_attachment.api.get_config.add_attachment_associations:
         class: Oro\Bundle\AttachmentBundle\Api\Processor\AddAttachmentAssociations
         arguments:
@@ -27,6 +64,46 @@ services:
             - '@oro_attachment.api.attachment_association_provider'
         tags:
             - { name: oro.api.processor, action: collect_subresources, priority: -20 }
+
+    oro_attachment.api.collect_subresources.exclude_change_file_subresources:
+        class: Oro\Bundle\AttachmentBundle\Api\Processor\ExcludeChangeFileSubresources
+        tags:
+            - { name: oro.api.processor, action: collect_subresources, priority: -20 }
+
+    oro_attachment.api.get_config.add_multi_file_associations:
+        class: Oro\Bundle\AttachmentBundle\Api\Processor\AddMultiFileAssociations
+        arguments:
+            - '@oro_attachment.api.multi_file_association_provider'
+            - '@oro_api.config_provider'
+        tags:
+            - { name: oro.api.processor, action: get_config, priority: -10 }
+
+    oro_attachment.api.get_config.add_multi_file_association_descriptions:
+        class: Oro\Bundle\AttachmentBundle\Api\Processor\AddMultiFileAssociationDescriptions
+        arguments:
+            - '@oro_attachment.api.multi_file_association_provider'
+            - '@oro_api.complete_descriptions.resource_doc_parser_provider'
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: descriptions, priority: -220 }
+
+    oro_attachment.api.compute_multi_file_associations:
+        class: Oro\Bundle\AttachmentBundle\Api\Processor\ComputeMultiFileAssociations
+        arguments:
+            - '@oro_attachment.api.multi_file_association_provider'
+            - '@oro_api.entity_serializer'
+            - '@oro_api.doctrine_helper'
+        tags:
+            - { name: oro.api.processor, action: customize_loaded_data, collection: true }
+
+    oro_attachment.api.build_multi_file_subresource_query:
+        class: Oro\Bundle\AttachmentBundle\Api\Processor\BuildMultiFileSubresourceQuery
+        arguments:
+            - '@oro_attachment.api.multi_file_association_provider'
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_id_helper'
+        tags:
+            - { name: oro.api.processor, action: get_subresource, group: build_query, priority: -90 }
+            - { name: oro.api.processor, action: get_relationship, group: build_query, priority: -90 }
 
     oro_attachment.api.compute_file_content:
         class: Oro\Bundle\AttachmentBundle\Api\Processor\ComputeFileContent
@@ -52,6 +129,11 @@ services:
             - '@translator'
         tags:
             - { name: oro.api.processor, action: customize_form_data, event: pre_submit|post_validate, class: Oro\Bundle\AttachmentBundle\Entity\File }
+
+    oro_attachment.api.validate_file_parent:
+        class: Oro\Bundle\AttachmentBundle\Api\Processor\ValidateFileParent
+        tags:
+            - { name: oro.api.processor, action: customize_form_data, event: post_flush_data, parentAction: create|update, class: Oro\Bundle\AttachmentBundle\Entity\File, priority: 250 }
 
     oro_attachment.api.validate_file_view_access:
         class: Oro\Bundle\AttachmentBundle\Api\Processor\ValidateFileViewAccess

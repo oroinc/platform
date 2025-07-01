@@ -4,6 +4,7 @@ namespace Oro\Component\EntitySerializer;
 
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Component\DoctrineUtils\ORM\QueryBuilderUtil;
 use Oro\Component\PhpUtils\ReflectionUtil;
 
 /**
@@ -61,9 +62,36 @@ class QueryModifier
     ): void {
         if ($config->isPartialLoadEnabled()) {
             $fields = $this->fieldAccessor->getFieldsToSelect($entityClass, $config, $withAssociations);
-            $qb->addSelect(sprintf('partial %s.{%s}', $alias, implode(',', $fields)));
+            $qb->addSelect(\sprintf('partial %s.{%s}', $alias, implode(',', $fields)));
         } else {
             $qb->addSelect($alias);
+        }
+
+        $fields = $config->getFields();
+        foreach ($fields as $fieldName => $field) {
+            $propertyPath = $field->getPropertyPath();
+            if (!$propertyPath) {
+                continue;
+            }
+            $pathDelimiterPos = strpos($propertyPath, ConfigUtil::PATH_DELIMITER);
+            if (false === $pathDelimiterPos) {
+                continue;
+            }
+            $parentFieldName = substr($propertyPath, 0, $pathDelimiterPos);
+            $parentFieldConfig = $config->getField($parentFieldName)?->getTargetEntity();
+            if (null === $parentFieldConfig) {
+                continue;
+            }
+            $parentFieldExcludedFields = $parentFieldConfig->get(ConfigUtil::EXCLUDED_FIELDS);
+            if (null !== $parentFieldExcludedFields
+                && \in_array(substr($propertyPath, $pathDelimiterPos + 1), $parentFieldExcludedFields, true)
+            ) {
+                continue;
+            }
+            if (null === QueryBuilderUtil::findJoinByAlias($qb, $parentFieldName)) {
+                continue;
+            }
+            $qb->addSelect(\sprintf('%s AS %s', $propertyPath, $fieldName));
         }
     }
 
