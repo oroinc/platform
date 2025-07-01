@@ -14,6 +14,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Routing\RequestContextAwareInterface;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
@@ -49,21 +50,21 @@ class LocaleListener implements EventSubscriberInterface
     public function onKernelRequest(RequestEvent $event): void
     {
         $request = $event->getRequest();
-        if (!$request || !$this->isInstalled()) {
+        if (!$this->isInstalled()) {
             return;
         }
 
         $language = $this->getCurrentLanguage();
         if (!$request->attributes->get('_locale')) {
             $request->setLocale($language);
-
             $this->router->getContext()->setParameter('_locale', $language);
         }
 
         $this->setPhpDefaultLocale($this->localeSettings->getLocale());
-
         $this->translatableListener->setTranslatableLocale($language);
-        $this->translator->setLocale($language);
+        if ($this->translator instanceof LocaleAwareInterface) {
+            $this->translator->setLocale($language);
+        }
     }
 
     public function setPhpDefaultLocale(string $locale): void
@@ -114,6 +115,9 @@ class LocaleListener implements EventSubscriberInterface
 
         $this->setPhpDefaultLocale($locale);
         $this->translatableListener->setTranslatableLocale($language);
+        if ($this->translator instanceof LocaleAwareInterface) {
+            $this->translator->setLocale($language);
+        }
     }
 
     #[\Override]

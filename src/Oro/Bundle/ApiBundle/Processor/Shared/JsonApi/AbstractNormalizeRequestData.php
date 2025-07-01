@@ -141,10 +141,10 @@ abstract class AbstractNormalizeRequestData implements ProcessorInterface
             }
         }
 
-        return [
+        return array_merge($data[JsonApiDoc::META] ?? [], [
             self::CLASS_FIELD_NAME => $entityClass,
             self::ID_FIELD_NAME => $entityId
-        ];
+        ]);
     }
 
     protected function isAcceptableTargetClass(string $entityClass, ?AssociationMetadata $associationMetadata): bool

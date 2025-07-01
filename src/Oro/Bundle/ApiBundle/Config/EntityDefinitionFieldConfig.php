@@ -32,6 +32,9 @@ class EntityDefinitionFieldConfig extends FieldConfig
         if (isset($result[ConfigUtil::COLLAPSE]) && false === $result[ConfigUtil::COLLAPSE]) {
             unset($result[ConfigUtil::COLLAPSE]);
         }
+        if (isset($result[ConfigUtil::ASSOCIATION_LEVEL_META_PROPERTY])) {
+            unset($result[ConfigUtil::ASSOCIATION_LEVEL_META_PROPERTY]);
+        }
 
         return $result;
     }
@@ -198,7 +201,7 @@ class EntityDefinitionFieldConfig extends FieldConfig
     public function setMetaProperty(bool $isMetaProperty): void
     {
         if ($isMetaProperty) {
-            $this->items[ConfigUtil::META_PROPERTY] = $isMetaProperty;
+            $this->items[ConfigUtil::META_PROPERTY] = true;
         } else {
             unset($this->items[ConfigUtil::META_PROPERTY]);
         }
@@ -221,6 +224,26 @@ class EntityDefinitionFieldConfig extends FieldConfig
             $this->items[ConfigUtil::META_PROPERTY_RESULT_NAME] = $name;
         } else {
             unset($this->items[ConfigUtil::META_PROPERTY_RESULT_NAME]);
+        }
+    }
+
+    /**
+     * Indicates whether the meta property is available on an association level only
+     */
+    public function isAssociationLevelMetaProperty(): bool
+    {
+        return $this->get(ConfigUtil::ASSOCIATION_LEVEL_META_PROPERTY, false);
+    }
+
+    /**
+     * Sets a flag indicates whether the meta property is available on an association level only.
+     */
+    public function setAssociationLevelMetaProperty(bool $associationLevelMetaProperty): void
+    {
+        if ($associationLevelMetaProperty) {
+            $this->items[ConfigUtil::ASSOCIATION_LEVEL_META_PROPERTY] = true;
+        } else {
+            unset($this->items[ConfigUtil::ASSOCIATION_LEVEL_META_PROPERTY]);
         }
     }
 

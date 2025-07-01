@@ -1,18 +1,5 @@
 api:
-    entity_aliases:
-        Oro\Bundle\AttachmentBundle\Tests\Functional\Environment\Entity\TestAttachmentOwner:
-            alias: testapiattachmentowner
-            plural_alias: testapiattachmentowner
-
     entities:
         Oro\Bundle\AttachmentBundle\Tests\Functional\Environment\Entity\TestAttachmentOwner:
-            exclude: false # see Oro\Bundle\ApiBundle\Tests\Functional\Environment\EntityExclusionProvider
-            filters:
-                fields:
-                    name: ~
-            sorters:
-                fields:
-                    name: ~
-                    position: ~
             actions:
                 update_list: true

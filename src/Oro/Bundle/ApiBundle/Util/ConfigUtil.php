@@ -119,6 +119,9 @@ class ConfigUtil extends BaseConfigUtil
     /** the name by which the meta property should be returned in the response */
     public const META_PROPERTY_RESULT_NAME = 'meta_property_result_name';
 
+    /** a flag indicates whether the meta property is available on an association level only */
+    public const ASSOCIATION_LEVEL_META_PROPERTY = 'association_level_meta_property';
+
     /** the class name of a target entity */
     public const TARGET_CLASS = 'target_class';
 

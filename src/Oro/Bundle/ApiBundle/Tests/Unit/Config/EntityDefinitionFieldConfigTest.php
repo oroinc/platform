@@ -200,6 +200,34 @@ class EntityDefinitionFieldConfigTest extends TestCase
         self::assertSame($targetEntity1, $config->getTargetEntity());
     }
 
+    public function testMetaPropertyResultName()
+    {
+        $config = new EntityDefinitionFieldConfig();
+        self::assertNull($config->getMetaPropertyResultName());
+
+        $config->setMetaPropertyResultName('test');
+        self::assertEquals('test', $config->getMetaPropertyResultName());
+        self::assertEquals(['meta_property_result_name' => 'test'], $config->toArray());
+
+        $config->setMetaPropertyResultName(null);
+        self::assertNull($config->getMetaPropertyResultName());
+        self::assertEquals([], $config->toArray());
+    }
+
+    public function testAssociationLevelMetaProperty()
+    {
+        $config = new EntityDefinitionFieldConfig();
+        self::assertFalse($config->isAssociationLevelMetaProperty());
+
+        $config->setAssociationLevelMetaProperty(true);
+        self::assertTrue($config->isAssociationLevelMetaProperty());
+        self::assertEquals([], $config->toArray());
+
+        $config->setAssociationLevelMetaProperty(false);
+        self::assertFalse($config->isAssociationLevelMetaProperty());
+        self::assertEquals([], $config->toArray());
+    }
+
     public function testCreateAndSetTargetEntity(): void
     {
         $config = new EntityDefinitionFieldConfig();

@@ -93,6 +93,8 @@ Delete a set of file records.
 
 ### uuid
 
+#### create, update
+
 {@inheritdoc}
 
 **The read-only field. A passed value will be ignored.**
@@ -159,6 +161,38 @@ URL of the file that is stored externally on a third party service. Either `exte
 
 The entity to which this file belongs.
 
+#### create
+
+{@inheritdoc}
+
+**The required field.**
+
+**Note:**
+This field is set automatically in case a file is linked to another entity in a request.
+
+#### update
+
+{@inheritdoc}
+
+**The read-only field. A passed value will be ignored.**
+
+### parentFieldName
+
+#### create
+
+{@inheritdoc}
+
+**The required field.**
+
+**Note:**
+This field is set automatically in case a file is linked to another entity in a request.
+
+#### update
+
+{@inheritdoc}
+
+**The read-only field. A passed value will be ignored.**
+
 ## SUBRESOURCES
 
 ### owner
@@ -197,20 +231,3 @@ Retrieve the entity to which a specific file belongs.
 #### get_relationship
 
 Retrieve the ID of the entity to which a specific file belongs.
-
-#### update_relationship
-
-Retrieve the entity to which a specific file belongs.
-
-{@request:json_api}
-Example:
-
-```JSON
-{
-  "data": {
-    "type": "users",
-    "id": "1"
-  }
-}
-```
-{@/request}
