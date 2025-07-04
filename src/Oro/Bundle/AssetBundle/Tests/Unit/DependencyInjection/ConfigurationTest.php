@@ -60,7 +60,14 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'port' => 8081,
                         'https' => false,
                     ],
-                    'external_resources' => []
+                    'external_resources' => [],
+                    'settings' => [
+                        'resolved' => true,
+                        'subresource_integrity_enabled' => [
+                            'value' => true,
+                            'scope' => 'app'
+                        ],
+                    ]
                 ],
             ],
             [
@@ -80,6 +87,13 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'test1' => [
                             'link' => 'http://example.local/test1.js',
                         ]
+                    ],
+                    'settings' => [
+                        'resolved' => true,
+                        'subresource_integrity_enabled' => [
+                            'value' => true,
+                            'scope' => 'app'
+                        ],
                     ]
                 ],
                 'expects' => [
@@ -98,6 +112,13 @@ class ConfigurationTest extends \PHPUnit\Framework\TestCase
                         'test1' => [
                             'link' => 'http://example.local/test1.js',
                         ]
+                    ],
+                    'settings' => [
+                        'resolved' => true,
+                        'subresource_integrity_enabled' => [
+                            'value' => true,
+                            'scope' => 'app'
+                        ],
                     ]
                 ],
             ],

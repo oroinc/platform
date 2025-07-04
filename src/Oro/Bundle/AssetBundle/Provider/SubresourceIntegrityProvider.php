@@ -11,11 +11,16 @@ use Symfony\Component\Finder\Finder;
  */
 class SubresourceIntegrityProvider
 {
+    protected const string INTEGRITY_LAST_MODIFIED = 'integrity_last_modified';
     protected const string BUILD_ASSET_PATH = '/public/build';
     protected const string INTEGRITY_FILE_MASK = '/public/build/%s/integrity.json';
 
-    public function __construct(private CacheItemPoolInterface $integrityCache, private string $projectDir)
-    {
+    protected ?bool $integrityModified = null;
+
+    public function __construct(
+        private readonly CacheItemPoolInterface $integrityCache,
+        private readonly string $projectDir,
+    ) {
     }
 
     public function warmUpCache(): void
@@ -26,22 +31,39 @@ class SubresourceIntegrityProvider
 
             foreach ($integrityData as $key => $value) {
                 $hashKey = $this->getHashKey($key);
-
-                if (!$this->integrityCache->getItem($hashKey)->isHit()) {
-                    $item = $this->integrityCache->getItem($hashKey)->set($value);
-                    $this->integrityCache->save($item);
-                }
+                $item = $this->integrityCache->getItem($hashKey)->set($value);
+                $this->integrityCache->save($item);
             }
+
+            // update last modified time for the related integrity file
+            $this->updateLastModify($themeDirName);
         }
+    }
+
+    public function clearCache(): void
+    {
+        $this->integrityCache->clear();
     }
 
     public function getHash(string $assetName): ?string
     {
         $hashKey = $this->getHashKey($assetName);
-        if ($this->integrityCache->getItem($hashKey)->isHit()) {
-            return $this->integrityCache->getItem($hashKey)->get();
-        }
         $themeDirName = $this->extractThemeName($assetName);
+
+        if ($this->integrityCache->getItem($hashKey)->isHit()) {
+            if (null === $this->integrityModified) {
+                $lastModify = $this->integrityCache->getItem(self::INTEGRITY_LAST_MODIFIED . $themeDirName)->get();
+                $actualLastModify = $this->getIntegrityLastModified($themeDirName);
+                $this->integrityModified = $lastModify !== $actualLastModify;
+            }
+            if (!$this->integrityModified) {
+                return $this->integrityCache->getItem($hashKey)->get();
+            }
+            // If the integrity has changed, we need to invalidate the cache
+            $this->clearCache();
+            $this->updateLastModify($themeDirName, $actualLastModify);
+            $this->integrityModified = false;
+        }
         $integrityData = $this->getIntegrityForTheme($themeDirName);
 
         foreach ($integrityData as $key => $value) {
@@ -74,6 +96,22 @@ class SubresourceIntegrityProvider
     protected function getHashKey(string $assetName): string
     {
         return md5($assetName);
+    }
+
+    protected function updateLastModify(string $themeDirName, int $lastModify = null): void
+    {
+        $lastModify = $lastModify ?? $this->getIntegrityLastModified($themeDirName);
+        $item = $this->integrityCache->getItem(self::INTEGRITY_LAST_MODIFIED . $themeDirName)
+            ->set($lastModify);
+        $this->integrityCache->save($item);
+    }
+
+    protected function getIntegrityLastModified(string $themeDirName): ?int
+    {
+        $integrityThemeFilePath = $this->projectDir . sprintf(self::INTEGRITY_FILE_MASK, $themeDirName);
+        $lastModified = @filemtime($integrityThemeFilePath);
+
+        return $lastModified !== false ? $lastModified : null;
     }
 
     protected function getThemeDirNames(): array

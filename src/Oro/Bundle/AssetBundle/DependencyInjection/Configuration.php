@@ -3,6 +3,7 @@
 namespace Oro\Bundle\AssetBundle\DependencyInjection;
 
 use Oro\Bundle\AssetBundle\NodeJsExecutableFinder;
+use Oro\Bundle\ConfigBundle\DependencyInjection\SettingsBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -16,7 +17,9 @@ class Configuration implements ConfigurationInterface
     {
         $finder = new NodeJsExecutableFinder();
         $treeBuilder = new TreeBuilder('oro_asset');
-        $treeBuilder->getRootNode()
+        $rootNode = $treeBuilder->getRootNode();
+
+        $rootNode
             ->children()
                 ->booleanNode('with_babel')
                     ->info('Permanently enable Babel')
@@ -112,6 +115,11 @@ class Configuration implements ConfigurationInterface
                     }
                 )
             ->end();
+
+        SettingsBuilder::append(
+            $rootNode,
+            ['subresource_integrity_enabled' => ['value' => true, 'type' => 'boolean']]
+        );
 
         return $treeBuilder;
     }
