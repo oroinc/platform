@@ -59,6 +59,7 @@ services:
         class: Oro\Bundle\AssetBundle\Twig\SubresourceIntegrityExtension
         arguments:
             - '@oro_asset.subresource_integrity_provider'
+            - '@oro_featuretoggle.checker.feature_checker'
         tags:
             - { name: twig.extension }
 
