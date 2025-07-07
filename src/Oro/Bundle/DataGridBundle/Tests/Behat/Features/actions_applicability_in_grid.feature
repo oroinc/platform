@@ -1,5 +1,6 @@
 @regression
 @fixture-OroUserBundle:user.yml
+@ticket-BB-25327
 Feature: Actions applicability in grid
 
   Scenario: Administrator should see all actions except delete for system email templates

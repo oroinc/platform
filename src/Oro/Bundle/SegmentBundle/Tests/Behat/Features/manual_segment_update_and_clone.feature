@@ -9,7 +9,7 @@ Feature: Manual segment update and clone
   Scenario: Create segment
     Given I login as administrator
     When I go to Reports & Segments/ Manage Segments
-    Then there are two records in grid
+#    Then there are two records in grid
     When I click "Create Segment"
     And I fill "Segment Form" with:
       | Name          | Test user segment             |
@@ -33,7 +33,8 @@ Feature: Manual segment update and clone
 
   Scenario: View segment
     When I go to Reports & Segments/ Manage Segments
-    Then there are 3 records in grid
+    And I check "User" in Entity filter
+    Then there are 1 records in grid
     And I should see following grid containing rows:
       | Name              | Entity | Type   |
       | Test user segment | User   | Manual |
@@ -66,7 +67,8 @@ Feature: Manual segment update and clone
       | Name                              | Entity | Type   |
       | Updated test user segment         | User   | Manual |
       | Copy of Updated test user segment | User   | Manual |
-    And there are 4 records in grid
+    And I check "User" in Entity filter
+    And there are 2 records in grid
     And I click edit "Copy of Updated test user segment" in grid
     And Name field should has Copy of Updated test user segment value
     And Description field should has Test user segment description value

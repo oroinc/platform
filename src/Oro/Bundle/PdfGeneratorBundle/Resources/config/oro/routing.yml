@@ -1,0 +1,7 @@
+oro_pdf_generator_pdf_document_file:
+    path: '/pdf-document/{fileAction}/{uuid}'
+    controller: 'oro_pdf_generator.controller.pdf_document_file'
+    requirements:
+        uuid: '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
+        fileAction: '(get|download)'
+    methods: ['GET']

@@ -1,7 +1,7 @@
 @regression
 @ticket-BAP-21510
 @fixture-OroEmailBundle:other_users_emails_displayed_in_grid_in_my_emails_page.yml
-
+@ticket-BB-25327
 Feature: Create mailbox, check autocomplete users in Access Management
   As an Administrator
 

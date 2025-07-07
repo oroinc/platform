@@ -1,5 +1,6 @@
 @regression
 @ticket-BAP-16267
+@ticket-BB-25327
 Feature: Navigation bar position
   In order to provide better navigation for users
   As a configurator

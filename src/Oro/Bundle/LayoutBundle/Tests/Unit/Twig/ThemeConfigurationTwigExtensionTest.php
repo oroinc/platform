@@ -39,6 +39,24 @@ final class ThemeConfigurationTwigExtensionTest extends TestCase
         self::assertEquals($expectedOptionValue, $actualOptionValue);
     }
 
+    /**
+     * @dataProvider getThemeConfigurationOptionDataProvider
+     */
+    public function testGetThemeDefinitionValue(mixed $expectedValue): void
+    {
+        $key = 'some_value';
+
+        $this->generalProvider
+            ->expects(self::once())
+            ->method('getThemeProperty')
+            ->with($key)
+            ->willReturn($expectedValue);
+
+        $actualValue = $this->extension->getThemeDefinitionValue($key);
+
+        self::assertEquals($expectedValue, $actualValue);
+    }
+
     public function getThemeConfigurationOptionDataProvider(): array
     {
         return [

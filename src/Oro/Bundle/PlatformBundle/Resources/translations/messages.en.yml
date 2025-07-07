@@ -29,3 +29,22 @@ oro:
             system_info:
                 label: System Information
                 description: Enables access to view system information such as the current application version, licenses, installed packages.
+
+    number_sequence:
+        entity_label: Number Sequence
+        entity_plural_label: Number Sequences
+        id:
+            label: ID
+            description: Internal number sequence ID
+        sequence_type:
+            label: Sequence Type
+            description: The type of the sequence. It can be a string representing the type of sequence (e.g., 'order').
+        discriminator_type:
+            label: Discriminator Type
+            description: The type of the discriminator. It can be a string representing the type of sequence (e.g., 'organization_periodic').
+        discriminator_value:
+            label: Discriminator Value
+            description: The value of the discriminator. It can be a string representing the specific value for the sequence type. For example, '42:2023-01', where 42 is organization id and 2023-01 is date.
+        number:
+            label: Number
+            description: The sequential number itself

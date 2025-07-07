@@ -1,0 +1,103 @@
+services:
+    oro_pdf_generator.pdf_template_renderer.twig:
+        class: Twig\Environment
+        arguments:
+            - !abstract '$loader defined in Oro\Bundle\PdfGeneratorBundle\DependencyInjection\Compiler\PdfTemplateTwigEnvironment'
+            - !abstract '$options defined in Oro\Bundle\PdfGeneratorBundle\DependencyInjection\Compiler\PdfTemplateTwigEnvironment'
+
+    oro_pdf_generator.pdf_template_renderer:
+        class: Oro\Bundle\PdfGeneratorBundle\PdfTemplateRenderer\PdfTemplateRenderer
+        arguments:
+            - '@oro_pdf_generator.pdf_template_renderer.twig'
+        calls:
+            - [ 'setLogger', [ '@logger' ] ]
+        tags:
+            - { name: monolog.logger, channel: oro_pdf_generator }
+
+    oro_pdf_generator.pdf_template.factory:
+        class: Oro\Bundle\PdfGeneratorBundle\PdfTemplate\Factory\PdfTemplateFactoryComposite
+        arguments:
+            - !tagged_iterator { tag: oro_pdf_generator.pdf_template.factory }
+
+    oro_pdf_generator.pdf_template.factory.default:
+        class: Oro\Bundle\PdfGeneratorBundle\PdfTemplate\Factory\DefaultPdfTemplateFactory
+        tags:
+            -   name: oro_pdf_generator.pdf_template.factory
+                # Default factory should be the last one in the chain.
+                priority: -100
+
+    oro_pdf_generator.pdf_template.factory.layout_theme_aware:
+        class: Oro\Bundle\PdfGeneratorBundle\PdfTemplate\Factory\LayoutThemeAwarePdfTemplateFactory
+        arguments:
+            - '@oro_pdf_generator.pdf_template_renderer.twig'
+            - '@oro_theme.provider.theme_configuration'
+            - '@oro_layout.theme_manager'
+        tags:
+            - { name: oro_pdf_generator.pdf_template.factory }
+
+    oro_pdf_generator.pdf_template_asset.factory:
+        class: Oro\Bundle\PdfGeneratorBundle\PdfTemplateAsset\PdfTemplateAssetFactory
+        arguments:
+            - !tagged_iterator { tag: oro_pdf_generator.pdf_template_asset.factory }
+
+    oro_pdf_generator.pdf_template_asset.factory.basic:
+        class: Oro\Bundle\PdfGeneratorBundle\PdfTemplateAsset\PdfTemplateAssetBasicFactory
+        arguments:
+            - '@oro_distribution.provider.public_directory_provider'
+        tags:
+            -   name: oro_pdf_generator.pdf_template_asset.factory
+                # Basic factory should be in the end of list as a last resort.
+                priority: -100
+
+    oro_pdf_generator.pdf_template_asset.factory.css:
+        class: Oro\Bundle\PdfGeneratorBundle\PdfTemplateAsset\PdfTemplateAssetCssFactory
+        arguments:
+            - '@oro_pdf_generator.pdf_template_asset.factory.basic'
+            - '@oro_pdf_generator.pdf_template_asset.factory'
+        tags:
+            - { name: oro_pdf_generator.pdf_template_asset.factory }
+
+    oro_pdf_generator.pdf_template_renderer.assets.collector:
+        class: Oro\Bundle\PdfGeneratorBundle\PdfTemplateRenderer\AssetsCollector\PdfTemplateAssetsCollector
+        arguments:
+            - '@oro_pdf_generator.pdf_template_asset.factory'
+
+    oro_pdf_generator.pdf_template_renderer.twig.pdf_template_assets_collector:
+        class: Oro\Bundle\PdfGeneratorBundle\PdfTemplateRenderer\Twig\PdfTemplateAssetsCollectorExtension
+        arguments:
+            - '@assets.packages'
+            - '@oro_attachment.manager.image_resize'
+            - '@oro_pdf_generator.pdf_template_renderer.assets.collector'
+        tags:
+            - { name: oro_pdf_generator.pdf_template_renderer.twig.extension }
+
+    oro_pdf_generator.pdf_options.factory:
+        class: Oro\Bundle\PdfGeneratorBundle\PdfOptions\PdfOptionsFactory
+        arguments:
+            - !tagged_iterator { tag: oro_pdf_generator.pdf_options_preset_configurator }
+
+    oro_pdf_generator.pdf_options_preset.default_configurator:
+        class: Oro\Bundle\PdfGeneratorBundle\PdfOptionsPreset\DefaultPdfOptionsPresetConfigurator
+        arguments:
+            - '@oro_pdf_generator.pdf_template_asset.factory'
+        tags:
+            - { name: oro_pdf_generator.pdf_options_preset_configurator }
+
+    oro_pdf_generator.pdf_engine.registry:
+        class: Oro\Bundle\PdfGeneratorBundle\PdfEngine\PdfEngineRegistry
+        arguments:
+            - !tagged_locator { tag: 'oro_pdf_generator.pdf_engine', default_index_method: 'getName' }
+
+    oro_pdf_generator.pdf_builder.factory:
+        class: Oro\Bundle\PdfGeneratorBundle\PdfBuilder\PdfBuilderFactory
+        arguments:
+            - '@oro_pdf_generator.pdf_engine.registry'
+            - '@oro_pdf_generator.pdf_options.factory'
+            - '%oro_pdf_generator.pdf_engine_name%'
+        calls:
+            - [ setEventDispatcher, [ '@event_dispatcher' ] ]
+
+    oro_pdf_generator.pdf_file.factory.file_entity_from_pdf_file:
+        class: Oro\Bundle\PdfGeneratorBundle\PdfFile\Factory\FileEntityFromPdfFileFactory
+        arguments:
+            - '@oro_attachment.file_manager'

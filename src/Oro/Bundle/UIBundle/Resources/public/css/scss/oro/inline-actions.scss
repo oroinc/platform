@@ -12,8 +12,13 @@
 
     transition: $hover-transition;
 
-    .inline-actions-element_actions {
+    .inline-actions-element_actions:not(.always-show) {
         visibility: hidden;
+    }
+
+    &.inline-grid {
+        display: inline-grid;
+        grid-template-columns: 1fr auto;
     }
 
     &:hover {

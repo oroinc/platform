@@ -1,6 +1,7 @@
 @regression
 @ticket-BAP-15726
 @ticket-BAP-21510
+@ticket-BB-25327
 Feature: Extended table fields
   In order to manage data of extended fields
   As an Administrator

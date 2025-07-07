@@ -43,6 +43,33 @@ class HtmlTagExtensionTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testHtmlSanitizeBasicReturnsEmptyStringWhenNullInput(): void
+    {
+        $this->htmlTagHelper->expects(self::never())
+            ->method('sanitize');
+
+        self::assertEquals(
+            '',
+            self::callTwigFilter($this->extension, 'oro_html_sanitize_basic', [null])
+        );
+    }
+
+    public function testHtmlSanitizeBasic(): void
+    {
+        $html = '<div><b>sample text</b></div>';
+        $htmlSanitized = '<b>sample text</b>';
+
+        $this->htmlTagHelper->expects(self::once())
+            ->method('sanitize')
+            ->with($html, 'basic', false)
+            ->willReturn($htmlSanitized);
+
+        self::assertEquals(
+            $htmlSanitized,
+            self::callTwigFilter($this->extension, 'oro_html_sanitize_basic', [$html])
+        );
+    }
+
     public function testHtmlStripTags()
     {
         $html = '<html>HTML</html>';

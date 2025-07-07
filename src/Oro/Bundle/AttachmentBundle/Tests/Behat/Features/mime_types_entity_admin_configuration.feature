@@ -9,7 +9,7 @@ Feature: Mime types entity admin configuration
   Scenario: Update mime types configuration for entity
     Given I login as administrator
     Given I go to System/ Entities/ Entity Management
-    And filter "Name" as is equal to "Product"
+    And filter "Name" as is equal to "User"
     And I click "Edit"
     And I should see "Allowed MIME Types" with options:
       | Value                                                                     |

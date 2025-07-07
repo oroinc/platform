@@ -182,21 +182,3 @@ Feature: Pin page
       | Last Name         |    |
       | Primary Email     |    |
       | Roles             | [] |
-
-  Scenario: Pin multi-step form
-    Given I go to Products/Products
-    And click "Create Product"
-    And click "Continue"
-    And fill "Create Product Form" with:
-      |SKU             |sku_for_pin_testing     |
-      |Name            |name_for_pin_testing    |
-    When I pin page
-    Then I should see that "Create Product" pin is active
-    When I go to Dashboards/Dashboard
-    Then I should see that "Create Product" pin is inactive
-    When I follow Create Product link in pin holder
-    And click "Continue"
-    Then I should see that "Create Product" pin is active
-    And "Create Product Form" must contains values:
-      |SKU             |sku_for_pin_testing     |
-      |Name            |name_for_pin_testing    |

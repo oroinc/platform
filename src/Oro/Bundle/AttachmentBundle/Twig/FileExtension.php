@@ -31,7 +31,7 @@ use Twig\TwigFunction;
  */
 class FileExtension extends AbstractExtension implements ServiceSubscriberInterface
 {
-    private const DEFAULT_THUMB_SIZE = 16;
+    public const DEFAULT_THUMB_SIZE = 16;
 
     private ContainerInterface $container;
     private ?AttachmentManager $attachmentManager = null;

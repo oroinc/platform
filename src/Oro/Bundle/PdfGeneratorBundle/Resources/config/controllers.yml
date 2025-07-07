@@ -1,0 +1,10 @@
+services:
+    _defaults:
+        public: true
+
+    oro_pdf_generator.controller.pdf_document_file:
+        class: 'Oro\Bundle\PdfGeneratorBundle\Controller\PdfDocumentFileController'
+        calls:
+            - [ 'setContainer', [ '@Psr\Container\ContainerInterface' ] ]
+        tags:
+            - { name: 'container.service_subscriber' }

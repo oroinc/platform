@@ -19,7 +19,7 @@ class OroPlatformBundleInstaller implements Installation, DatabasePlatformAwareI
     #[\Override]
     public function getMigrationVersion(): string
     {
-        return 'v1_2';
+        return 'v6_1_3_0';
     }
 
     #[\Override]
@@ -28,6 +28,7 @@ class OroPlatformBundleInstaller implements Installation, DatabasePlatformAwareI
         /** Tables generation **/
         $this->oroSessionTable($schema, $queries);
         $this->createMaterializedViewTable($schema);
+        $this->createNumberSequenceTable($schema);
     }
 
     /**
@@ -38,16 +39,16 @@ class OroPlatformBundleInstaller implements Installation, DatabasePlatformAwareI
         if (!$schema->hasTable('oro_session')) {
             $this->createOroSessionTable($schema);
         } else {
-            $currentSchema  = new Schema([clone $schema->getTable('oro_session')]);
+            $currentSchema = new Schema([clone $schema->getTable('oro_session')]);
             $requiredSchema = new Schema();
             $this->createOroSessionTable($requiredSchema);
 
             $comparator = new Comparator();
-            $changes    = $comparator->compare($currentSchema, $requiredSchema)->toSql($this->platform);
+            $changes = $comparator->compare($currentSchema, $requiredSchema)->toSql($this->platform);
             if ($changes) {
                 // force to recreate oro_session table as a result of dropTable/createTable pair
                 // might be "ALTER TABLE" query rather than "DROP/CREATE" queries
-                $dropTableSql   = $comparator->compare($currentSchema, new Schema())->toSql($this->platform);
+                $dropTableSql = $comparator->compare($currentSchema, new Schema())->toSql($this->platform);
                 $createTableSql = $comparator->compare(new Schema(), $requiredSchema)->toSql($this->platform);
                 $queries->addQuery(new SqlMigrationQuery($dropTableSql));
                 $queries->addQuery(new SqlMigrationQuery($createTableSql));
@@ -81,5 +82,23 @@ class OroPlatformBundleInstaller implements Installation, DatabasePlatformAwareI
         $table->addColumn('created_at', Types::DATETIME_MUTABLE);
         $table->addColumn('updated_at', Types::DATETIME_MUTABLE);
         $table->setPrimaryKey(['name']);
+    }
+
+    private function createNumberSequenceTable(Schema $schema): void
+    {
+        if (!$schema->hasTable('oro_number_sequence')) {
+            $table = $schema->createTable('oro_number_sequence');
+            $table->addColumn('id', Types::INTEGER, ['autoincrement' => true]);
+            $table->setPrimaryKey(['id']);
+
+            $table->addColumn('sequence_type', Types::STRING, ['length' => 255]);
+            $table->addColumn('discriminator_type', Types::STRING, ['length' => 255]);
+            $table->addColumn('discriminator_value', Types::STRING, ['length' => 255]);
+            $table->addColumn('number', Types::INTEGER, []);
+            $table->addColumn('created_at', Types::DATETIME_MUTABLE, ['comment' => '(DC2Type:datetime)']);
+            $table->addColumn('updated_at', Types::DATETIME_MUTABLE, ['comment' => '(DC2Type:datetime)']);
+
+            $table->addUniqueIndex(['sequence_type', 'discriminator_type', 'discriminator_value'], 'oro_sequence_uidx');
+        }
     }
 }

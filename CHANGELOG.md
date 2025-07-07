@@ -37,6 +37,20 @@ The current file describes significant changes in the code that may affect the u
 - [2.2.0](#220-2017-05-31)
 - [2.1.0](#210-2017-03-30)
 
+## UNRELEASED
+
+### Added
+
+#### DataGridBundle
+* Added `\Oro\Bundle\DataGridBundle\Event\BuildBeforeListenerInterface` that can be used to make lazy services for final listener classes that cannot be proxied due to missing interface.
+* Added `\Oro\Bundle\DataGridBundle\Event\OrmResultAfterListenerInterface` that can be used to make lazy services for final listener classes that cannot be proxied due to missing interface.
+* Added `\Oro\Bundle\DataGridBundle\Extension\Action\DataGridActionConfiguratorInterface` as general interface for action configurators.
+* Added OroPdfGeneratorBundle that provides a functionality to generate PDF documents from TWIG templates using Gotenberg.
+
+### Changed
+
+### Removed
+
 ## 6.1.0 (2025-03-31)
 [Show detailed list of changes](incompatibilities-6-1.md)
 
@@ -95,6 +109,18 @@ The current file describes significant changes in the code that may affect the u
 #### DataGridBundle
 * Added a new `transTemplate` datagrid option for the `itemsCounter` section that allows to set translation template for the datagrid items counter.
 * Added a new `orodatagrid/js/datagrid/builder/items-count-external` datagrid builder that allows the showing of datagrid item count in an element with the specific data attribute.
+
+#### PlatformBundle
+* Added `\Oro\Bundle\PlatformBundle\Entity\NumberSequence` entity for managing sequential number generation, supporting custom sequence types and discriminators.
+* Added `\Oro\Bundle\PlatformBundle\Entity\Repository\NumberSequenceRepository` with a `getLockedSequence()` method for transactional retrieval using row-level locking.
+* Added `\Oro\Bundle\PlatformBundle\NumberSequence\Manager\NumberSequenceManagerInterface` to define a common interface for sequential number management operations.
+* Implemented `\Oro\Bundle\PlatformBundle\NumberSequence\Manager\GenericNumberSequenceManager` with support for:
+  - Atomic number generation (`nextNumber()`)
+  - Sequence reset (`resetSequence()`)
+  - Batch reservation of numbers (`reserveSequence()`)
+* Added `\Oro\Bundle\PlatformBundle\Command\Cron\DeleteOldNumberSequenceCronCommand` to schedule removal of old sequence records.
+* Added `\Oro\Bundle\PlatformBundle\Async\DeleteOldNumberSequenceProcessor` and `\Oro\Bundle\PlatformBundle\Async\Topic\DeleteOldNumberSequenceTopic` to handle asynchronous cleanup of number sequences via message queue.
+* Added `\Oro\Bundle\PlatformBundle\EventListener\DeleteOldNumberSequenceEventListener` to remove outdated number sequences while preserving the most recent one.
 
 ### Changed
 
@@ -278,6 +304,7 @@ For all events except start 3 events are triggered. oro_workflow.<event_name>, o
 
 #### EntityBundle
 * Changed `\Oro\Bundle\EntityBundle\Provider\EntityNameProvider` to make it work with enum fields.
+* Added `\Oro\Bundle\EntityBundle\Layout\DataProvider\EntityNameLayoutDataProvider` that provides entity name on frontend layouts.
 
 #### EmailBundle
 * Fixed `\Oro\Bundle\EmailBundle\Sync\NotificationAlertManager` fails to update an existing alert if user is null.

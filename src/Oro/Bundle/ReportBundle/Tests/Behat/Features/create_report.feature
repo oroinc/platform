@@ -12,12 +12,12 @@ Feature: Create report
     And I click "Create Report"
     And I fill "Report Form" with:
       | Name        | Contacts Report |
-      | Entity      | Contact Email   |
+      | Entity      | User Emails     |
       | Report Type | Table           |
     And I add the following columns:
-      | Email |
+      | Subject |
     And I add the following filters:
-      | Field Condition | Primary | Yes      |
+      | Field Condition | Private | Yes      |
       | Field Condition | Id      | is empty |
     When I save form
     Then I should see "Report saved" flash message

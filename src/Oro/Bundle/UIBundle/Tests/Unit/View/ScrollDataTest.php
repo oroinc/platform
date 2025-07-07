@@ -730,4 +730,175 @@ class ScrollDataTest extends \PHPUnit\Framework\TestCase
         $this->scrollData->removeField(ScrollData::TITLE);
         $this->assertFalse($this->scrollData->hasNamedField(ScrollData::TITLE));
     }
+
+    public function testMoveFieldWhenAppendTrue(): void
+    {
+        $data = [
+            ScrollData::DATA_BLOCKS => [
+                'general' => [
+                    ScrollData::SUB_BLOCKS => [
+                        'main' => [
+                            ScrollData::DATA => [
+                                'first_field' => 'First field content',
+                                'middle_field' => 'Middle field content',
+                                'last_field' => 'Last field content',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->scrollData->setData($data);
+
+        // Test moving the field after the sibling (append = true)
+        $result = $this->scrollData->moveField('general', 'main', 'middle_field', 'last_field', true);
+
+        $this->assertTrue($result);
+
+        $expectedOrder = [
+            'first_field' => 'First field content',
+            'last_field' => 'Last field content',
+            'middle_field' => 'Middle field content',
+        ];
+
+        $actualData = $this->scrollData->getData()[ScrollData::DATA_BLOCKS]['general']
+        [ScrollData::SUB_BLOCKS]['main'][ScrollData::DATA];
+
+        $this->assertEquals(array_keys($expectedOrder), array_keys($actualData));
+    }
+
+    public function testMoveFieldWhenAppendFalse(): void
+    {
+        $data = [
+            ScrollData::DATA_BLOCKS => [
+                'general' => [
+                    ScrollData::SUB_BLOCKS => [
+                        'main' => [
+                            ScrollData::DATA => [
+                                'first_field' => 'First field content',
+                                'middle_field' => 'Middle field content',
+                                'last_field' => 'Last field content',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->scrollData->setData($data);
+
+        // Test moving the field before the sibling (append = false)
+        $result = $this->scrollData->moveField('general', 'main', 'last_field', 'middle_field', false);
+
+        $this->assertTrue($result);
+
+        $expectedOrder = [
+            'first_field' => 'First field content',
+            'last_field' => 'Last field content',
+            'middle_field' => 'Middle field content',
+        ];
+
+        $actualData = $this->scrollData->getData()[ScrollData::DATA_BLOCKS]['general']
+        [ScrollData::SUB_BLOCKS]['main'][ScrollData::DATA];
+
+        $this->assertEquals(array_keys($expectedOrder), array_keys($actualData));
+    }
+
+    public function testMoveFieldDoesNothingWhenNoSibling(): void
+    {
+        $data = [
+            ScrollData::DATA_BLOCKS => [
+                'general' => [
+                    ScrollData::SUB_BLOCKS => [
+                        'main' => [
+                            ScrollData::DATA => [
+                                'first_field' => 'First field content',
+                                'middle_field' => 'Middle field content',
+                                'last_field' => 'Last field content',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->scrollData->setData($data);
+
+        // Test moving the field when sibling doesn't exist
+        $result = $this->scrollData->moveField('general', 'main', 'middle_field', 'non_existent_field', true);
+
+        $this->assertFalse($result);
+
+        $expectedData = $data;
+
+        $this->assertEquals($expectedData, $this->scrollData->getData());
+    }
+
+    public function testMoveFieldWhenNoFieldDoesNothing(): void
+    {
+        $data = [
+            ScrollData::DATA_BLOCKS => [
+                'general' => [
+                    ScrollData::SUB_BLOCKS => [
+                        'main' => [
+                            ScrollData::DATA => [
+                                'first_field' => 'First field content',
+                                'middle_field' => 'Middle field content',
+                                'sibling_field' => 'Sibling field content',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->scrollData->setData($data);
+
+        // Test moving a non-existing field
+        $result = $this->scrollData->moveField('general', 'main', 'non_existent_field', 'sibling_field', true);
+
+        $this->assertFalse($result);
+
+        $expectedData = $data;
+
+        $this->assertEquals($expectedData, $this->scrollData->getData());
+    }
+
+    public function testMoveFieldWhenPrependBeforeFirstField(): void
+    {
+        $data = [
+            ScrollData::DATA_BLOCKS => [
+                'general' => [
+                    ScrollData::SUB_BLOCKS => [
+                        'main' => [
+                            ScrollData::DATA => [
+                                'first_field' => 'First field content',
+                                'middle_field' => 'Middle field content',
+                                'last_field' => 'Last field content',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        $this->scrollData->setData($data);
+
+        // Test moving the last field before the first field (append = false)
+        $result = $this->scrollData->moveField('general', 'main', 'last_field', 'first_field', false);
+
+        $this->assertTrue($result);
+
+        $expectedOrder = [
+            'last_field' => 'Last field content',
+            'first_field' => 'First field content',
+            'middle_field' => 'Middle field content',
+        ];
+
+        $actualData = $this->scrollData
+            ->getData()[ScrollData::DATA_BLOCKS]['general'][ScrollData::SUB_BLOCKS]['main'][ScrollData::DATA];
+
+        $this->assertEquals(array_keys($expectedOrder), array_keys($actualData));
+    }
 }

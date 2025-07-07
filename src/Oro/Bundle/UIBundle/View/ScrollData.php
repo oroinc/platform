@@ -380,4 +380,46 @@ class ScrollData
 
         return true;
     }
+
+    /**
+     * Moves a field within a sub-block to a new position relative to a sibling field.
+     */
+    public function moveField(
+        string $blockId,
+        string $subBlockId,
+        string $fieldName,
+        string $siblingFieldName,
+        bool $append = true
+    ): bool {
+        $subBlock = &$this->data[self::DATA_BLOCKS][$blockId][self::SUB_BLOCKS][$subBlockId];
+
+        // Moves $fieldToMove field after/before the sibling field.
+        $fieldIndex = array_search($siblingFieldName, array_keys($subBlock[self::DATA]), true);
+        if ($fieldIndex === false) {
+            return false;
+        }
+
+        if (!array_key_exists($fieldName, $subBlock[self::DATA])) {
+            return false;
+        }
+
+        $fieldData = $subBlock[self::DATA][$fieldName];
+        unset($subBlock[self::DATA][$fieldName]);
+
+        if ($append) {
+            $subBlock[self::DATA] = array_merge(
+                array_slice($subBlock[self::DATA], 0, $fieldIndex + 1, true),
+                [$fieldName => $fieldData],
+                array_slice($subBlock[self::DATA], $fieldIndex + 1, null, true)
+            );
+        } else {
+            $subBlock[self::DATA] = array_merge(
+                array_slice($subBlock[self::DATA], 0, $fieldIndex, true),
+                [$fieldName => $fieldData],
+                array_slice($subBlock[self::DATA], $fieldIndex, null, true)
+            );
+        }
+
+        return true;
+    }
 }

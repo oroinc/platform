@@ -129,7 +129,8 @@
         "predis/predis": "~1.1.6",
         "psr/log": "1.1.*",
         "oro/platform-serialised-fields": "6.1.*",
-        "google/recaptcha": "^1.3"
+        "google/recaptcha": "^1.3",
+        "gotenberg/gotenberg-php": "~2.12.0"
     },
     "require-dev": {
         "behat/behat": "~3.12.0",
@@ -304,6 +305,8 @@
             "Oro\\Bundle\\ViewSwitcherBundle\\": "src/Oro/Bundle/ViewSwitcherBundle",
             "Oro\\Bundle\\WindowsBundle\\": "src/Oro/Bundle/WindowsBundle",
             "Oro\\Bundle\\WorkflowBundle\\": "src/Oro/Bundle/WorkflowBundle",
+            "Oro\\Bundle\\WsseAuthenticationBundle\\": "src/Oro/Bundle/WsseAuthenticationBundle",
+            "Oro\\Bundle\\PdfGeneratorBundle\\": "src/Oro/Bundle/PdfGeneratorBundle",
             "Oro\\Component\\Action\\": "src/Oro/Component/Action",
             "Oro\\Component\\ChainProcessor\\": "src/Oro/Component/ChainProcessor",
             "Oro\\Component\\Config\\": "src/Oro/Component/Config",

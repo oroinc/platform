@@ -336,6 +336,13 @@ services:
         tags:
             - { name: twig.extension }
 
+    oro_ui.twig.asset_source_extension:
+        class: Oro\Bundle\UIBundle\Twig\AssetSourceExtension
+        arguments:
+            - '@oro_platform.twig.service_locator'
+        tags:
+            - { name: twig.extension }
+
     oro_ui.validator.move_to_child:
         class: Oro\Bundle\UIBundle\Validator\Constraints\MoveToChildValidator
         arguments:
