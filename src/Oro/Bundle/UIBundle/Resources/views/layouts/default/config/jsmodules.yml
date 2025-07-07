@@ -23,7 +23,7 @@ aliases:
     jquery$: jquery/dist/jquery
     jquery-ui: jquery-ui/ui
     jquery.cookie$: jquery.cookie/jquery.cookie
-    jquery.form$: jquery-form/src/jquery.form
+    jquery.form$: oroui/lib/jquery.form
     jquery.mousewheel$: jquery-mousewheel/jquery.mousewheel
     jquery.multiselect$: jquery-ui-multiselect-widget/src/jquery.multiselect.min
     jquery.multiselect.filter$: jquery-ui-multiselect-widget/src/jquery.multiselect.filter.min
