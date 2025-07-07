@@ -48,7 +48,8 @@ class MoveBaseEnumOptionsMigration implements Migration, ConnectionAwareInterfac
             if (!isset($entityConfigData['extend']['is_extend'])
                 || !$entityConfigData['extend']['is_extend']
                 || $entityConfig['class_name'] === EnumOption::class
-                || str_starts_with($entityConfig['class_name'], ExtendHelper::ENTITY_NAMESPACE)) {
+                || ExtendHelper::isOutdatedEnumOptionEntity($entityConfig['class_name'])
+            ) {
                 continue;
             }
             $fieldConfigs = $this->connection->fetchAllAssociative(
