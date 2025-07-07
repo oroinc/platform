@@ -513,7 +513,7 @@ class FormContext extends OroFeatureContext implements OroPageObjectAware
      * Go to System/Configuration and see the fields with default checkboxes
      * Example: And check "Use default" for "Position" field
      *
-     * @Given check :checkbox for :label field
+     * @Given /^(?:|I )check "(?P<checkbox>[^"]*)" for "(?P<label>[^"]*)" field$/
      */
     public function checkUseDefaultForField($label, $checkbox)
     {

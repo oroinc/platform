@@ -38,11 +38,33 @@ class ReindexTopicTest extends AbstractTopicTestCase
         ];
     }
 
-    public function testCreateJobName(): void
+    /**
+     * @dataProvider createJobNameDataProvider
+     */
+    public function testCreateJobName(array $messageBody, string $expectedJobName): void
     {
-        self::assertSame(
-            'oro.search.reindex',
-            $this->getTopic()->createJobName([])
+        self::assertEquals(
+            $expectedJobName,
+            $this->getTopic()->createJobName($messageBody)
         );
+    }
+
+    public static function createJobNameDataProvider(): array
+    {
+        return [
+            'full' => [[], 'oro.search.reindex'],
+            'one entity' => [
+                ['Test\Entity'],
+                'oro.search.reindex:Test\Entity'
+            ],
+            'several entities' => [
+                ['Test\Entity1', 'Test\Entity2'],
+                'oro.search.reindex:' . hash('sha256', 'Test\Entity1,Test\Entity2')
+            ],
+            'several entities, not ordered' => [
+                ['Test\Entity2', 'Test\Entity1'],
+                'oro.search.reindex:' . hash('sha256', 'Test\Entity1,Test\Entity2')
+            ],
+        ];
     }
 }
