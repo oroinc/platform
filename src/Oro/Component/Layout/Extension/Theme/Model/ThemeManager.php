@@ -228,7 +228,7 @@ class ThemeManager implements ResetInterface
     {
         $hierarchy = $this->getThemesHierarchy($theme);
         foreach ($hierarchy as $currentTheme) {
-            if (in_array($currentTheme->getName(), $parentThemes)) {
+            if (\in_array($currentTheme->getName(), $parentThemes)) {
                 return true;
             }
         }

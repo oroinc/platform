@@ -37,6 +37,12 @@ services:
         arguments:
             - '@request_stack'
 
+    oro_layout.old_theme_provider:
+        class: Oro\Component\Layout\Extension\Theme\Model\OldThemeProvider
+        arguments:
+            - '@oro_layout.current_theme_provider'
+            - '@oro_layout.theme_manager'
+
     oro_layout.loader:
         class:  Oro\Component\Layout\Loader\LayoutUpdateLoader
         calls:

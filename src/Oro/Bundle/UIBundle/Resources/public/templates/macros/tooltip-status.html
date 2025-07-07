@@ -1,0 +1,10 @@
+<% const current = obj.currentStatus ? currentStatus : label; %>
+<% const status = (obj.map && map[current]) ? `status-tooltip--${map[current]}` : '';%>
+<% const offset = obj.offset ?? '-8, 0'; %>
+<button class="status-tooltip <%- status %>"
+        title="<%- label %>"
+        type="button"
+        data-toggle="tooltip"
+        data-placement="bottom"
+        data-offset="<%- offset %>"
+></button>
