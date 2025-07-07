@@ -29,7 +29,7 @@ aliases:
     jquery$: jquery/dist/jquery
     jquery-ui: jquery-ui/ui
     jquery.cookie$: jquery.cookie/jquery.cookie
-    jquery.form$: jquery-form/src/jquery.form
+    jquery.form$: oroui/lib/jquery.form
     jquery.jstree$: jstree/dist/jstree
     jquery.minicolors$: oroui/lib/minicolors/jquery.minicolors
     jquery.mousewheel$: jquery-mousewheel/jquery.mousewheel
