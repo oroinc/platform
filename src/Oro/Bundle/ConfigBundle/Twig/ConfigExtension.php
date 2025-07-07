@@ -44,14 +44,14 @@ class ConfigExtension extends AbstractExtension implements ServiceSubscriberInte
     public static function getSubscribedServices(): array
     {
         return [
-            'oro_config.user' => ConfigManager::class
+            'oro_config.manager' => ConfigManager::class
         ];
     }
 
     private function getConfigManager(): ConfigManager
     {
         if (!$this->configManager) {
-            $this->configManager = $this->container->get('oro_config.user');
+            $this->configManager = $this->container->get('oro_config.manager');
         }
 
         return $this->configManager;
