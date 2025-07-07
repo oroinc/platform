@@ -31,6 +31,18 @@ class ReindexTopic extends AbstractTopic implements JobAwareTopicInterface
     #[\Override]
     public function createJobName($messageBody): string
     {
-        return self::getName();
+        $jobName = self::getName();
+        if ($messageBody) {
+            $jobName .= ':';
+            if (\count($messageBody) === 1) {
+                $jobName .= reset($messageBody);
+            } else {
+                $entityClasses = $messageBody;
+                sort($entityClasses, SORT_STRING);
+                $jobName .= hash('sha256', implode(',', $entityClasses));
+            }
+        }
+
+        return $jobName;
     }
 }
