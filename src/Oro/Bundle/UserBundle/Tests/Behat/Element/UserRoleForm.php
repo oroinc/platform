@@ -74,7 +74,7 @@ class UserRoleForm extends Form
                 '[contains(' .
                     'translate(text(),"ABCDEFGHIJKLMNOPQRSTUVWXYZ","abcdefghijklmnopqrstuvwxyz"),' .
                      '"'.strtolower($action).'"' .
-                ')]'
+                ')]//following-sibling::a[@class="action-permissions__dropdown-toggle"]'
             );
             if ($label) {
                 $label->click();
