@@ -227,9 +227,9 @@ class EntityStructureTest extends RestJsonApiTestCase
             ['entity' => 'entitystructures', 'id' => 'Oro_Bundle_UserBundle_Entity_User']
         );
 
-        $this->assertResponseContains(
+        self::assertArrayContains(
             ['data' => $this->getUserEntityData()],
-            $response
+            self::jsonToArray($response->getContent())
         );
     }
 
@@ -239,9 +239,9 @@ class EntityStructureTest extends RestJsonApiTestCase
             ['entity' => 'entitystructures', 'id' => 'Extend_Entity_TestEntity1']
         );
 
-        $this->assertResponseContains(
+        self::assertArrayContains(
             ['data' => $this->getTestEntityData()],
-            $response
+            self::jsonToArray($response->getContent())
         );
     }
 
