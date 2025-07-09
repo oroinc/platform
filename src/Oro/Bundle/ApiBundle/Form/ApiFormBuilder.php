@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Form;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\NullTransformer;
 use Oro\Bundle\ApiBundle\Form\DataTransformer\NullValueTransformer;
 use Symfony\Component\Form\DataTransformerInterface;
+use Symfony\Component\Form\Extension\Core\DataTransformer\NumberToLocalizedStringTransformer;
 use Symfony\Component\Form\FormBuilder;
 
 /**
@@ -25,6 +26,9 @@ class ApiFormBuilder extends FormBuilder
 
         if (!$viewTransformer instanceof NullValueTransformer) {
             $viewTransformer = new NullValueTransformer($viewTransformer);
+        }
+        if ($this->isEmptyStringProcessingNeeded($viewTransformer->getInnerTransformer())) {
+            $viewTransformer->setAllowEmptyString(false);
         }
 
         return parent::addViewTransformer($viewTransformer, $forcePrepend);
@@ -52,5 +56,10 @@ class ApiFormBuilder extends FormBuilder
         }
 
         return $viewTransformers;
+    }
+
+    private function isEmptyStringProcessingNeeded(DataTransformerInterface $viewTransformer): bool
+    {
+        return $viewTransformer instanceof NumberToLocalizedStringTransformer;
     }
 }
