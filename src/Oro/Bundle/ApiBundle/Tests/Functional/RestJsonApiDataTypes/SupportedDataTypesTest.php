@@ -474,6 +474,8 @@ class SupportedDataTypesTest extends RestJsonApiTestCase
             'Time (empty string)'                 => ['fieldTime', ''],
             'Time (invalid string)'               => ['fieldTime', 'a', 'The "a" is not valid time.'],
             'Time (not string)'                   => ['fieldTime', false, 'The "false" is not valid time.'],
+            'Guid (empty string)'                 => ['fieldGuid', ''],
+            'Guid (not GUID string)'              => ['fieldGuid', 'a'],
             'Percent (empty string)'              => ['fieldPercent', '', 'Please enter a number.'],
             'Percent (not number string)'         => ['fieldPercent', 'a', 'Please enter a number.'],
             'Percent_100 (empty string)'          => ['fieldPercent100', ''],
