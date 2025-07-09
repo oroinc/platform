@@ -24,6 +24,7 @@ A label to render status
 Parameters - array:
     [
         'label' - text to show for a satus
+        'ariaLabel' - text for a descriptive label
         'code' - current status
         'map' - an array of statuses,
         'placement' - how to position the tooltip - auto | top | bottom | left | right,
@@ -33,6 +34,7 @@ Parameters - array:
 {% macro statusAsTooltip(parameters) %}
     {% apply spaceless %}
         {% set label = parameters.label|default('') %}
+        {% set arialabel = parameters.arialabel|default('oro.ui.status_button.aria_label'|trans) %}
         {% set placement = parameters.placement|default('bottom') %}
         {% set offset = parameters.offset|default('-8, 0') %}
         {% set code = parameters.code|default('') %}
@@ -44,6 +46,7 @@ Parameters - array:
                 type="button"
                 data-toggle="tooltip"
                 data-placement="{{ placement }}"
-                data-offset="{{ offset }}"></button>
+                data-offset="{{ offset }}"
+                aria-label="{{ arialabel }}"></button>
     {% endapply %}
 {% endmacro %}

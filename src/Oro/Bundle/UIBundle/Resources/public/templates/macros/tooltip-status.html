@@ -1,4 +1,5 @@
 <% const current = obj.currentStatus ? currentStatus : label; %>
+<% const currentAriaLabel = obj.statusAriaLabel ? currentStatus : _.__('oro.ui.status_button.aria_label'); %>
 <% const status = (obj.map && map[current]) ? `status-tooltip--${map[current]}` : '';%>
 <% const offset = obj.offset ?? '-8, 0'; %>
 <button class="status-tooltip <%- status %>"
@@ -7,4 +8,5 @@
         data-toggle="tooltip"
         data-placement="bottom"
         data-offset="<%- offset %>"
+        aria-label="<%- currentAriaLabel %>"
 ></button>

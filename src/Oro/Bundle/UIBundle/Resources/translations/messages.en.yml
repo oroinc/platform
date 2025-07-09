@@ -161,6 +161,8 @@ oro:
         dropdown_option_aria_label: "More Actions"
         simplified_preview:
             message: Current content view is simplified, please check the edit page to see the actual result.
+        status_button:
+            aria_label: 'View status'
 
     htmlpurifier:
         formatted_error: '- {{ message }} (near {{ place }}...)'
