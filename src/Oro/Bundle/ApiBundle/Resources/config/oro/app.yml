@@ -426,6 +426,7 @@ oro_api:
         - Oro\Bundle\ApiBundle\Form\Type\ArrayType
         - Oro\Bundle\ApiBundle\Form\Type\CollectionType
         - Oro\Bundle\ApiBundle\Form\Type\EntityCollectionType
+        - Oro\Bundle\ApiBundle\Form\Type\GuidType
         - Oro\Bundle\ApiBundle\Form\Type\Percent100Type
         - Oro\Bundle\FormBundle\Form\Type\OroDurationType
 
@@ -466,6 +467,8 @@ oro_api:
             form_type: Oro\Bundle\ApiBundle\Form\Type\DateTimeType
         text:
             form_type: Symfony\Component\Form\Extension\Core\Type\TextareaType
+        guid:
+            form_type: Oro\Bundle\ApiBundle\Form\Type\GuidType
         percent:
             form_type: Symfony\Component\Form\Extension\Core\Type\NumberType
         percent_100:

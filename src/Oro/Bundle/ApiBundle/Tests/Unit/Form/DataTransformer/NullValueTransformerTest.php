@@ -4,7 +4,11 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\DataTransformer;
 
 use Oro\Bundle\ApiBundle\Form\DataTransformer\NullValueTransformer;
 use Symfony\Component\Form\DataTransformerInterface;
+use Symfony\Component\Form\Exception\TransformationFailedException;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class NullValueTransformerTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit\Framework\MockObject\MockObject|DataTransformerInterface */
@@ -63,7 +67,29 @@ class NullValueTransformerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($transformedValue, $this->nullValueTransformer->reverseTransform(null));
     }
 
-    public function testReverseTransformForEmptyString()
+    public function testReverseTransformForNullWhenInnerTransformerReturnsNull(): void
+    {
+        $this->innerTransformer->expects(self::once())
+            ->method('reverseTransform')
+            ->with(self::identicalTo(''))
+            ->willReturn(null);
+
+        self::assertNull($this->nullValueTransformer->reverseTransform(null));
+    }
+
+    public function testReverseTransformForNullWhenInnerTransformerReturnsNullAndEmptyStringNotAllowed(): void
+    {
+        $this->innerTransformer->expects(self::once())
+            ->method('reverseTransform')
+            ->with(self::identicalTo(''))
+            ->willReturn(null);
+
+        $this->nullValueTransformer->setAllowEmptyString(false);
+
+        self::assertNull($this->nullValueTransformer->reverseTransform(null));
+    }
+
+    public function testReverseTransformForEmptyString(): void
     {
         $transformedValue = 'transformed';
 
@@ -75,7 +101,21 @@ class NullValueTransformerTest extends \PHPUnit\Framework\TestCase
         self::assertEquals($transformedValue, $this->nullValueTransformer->reverseTransform(''));
     }
 
-    public function testReverseTransformWhenInnerTransformerReturnsNullAndInputValueIsEmptyString()
+    public function testReverseTransformForEmptyStringAndEmptyStringNotAllowed(): void
+    {
+        $transformedValue = 'transformed';
+
+        $this->innerTransformer->expects(self::once())
+            ->method('reverseTransform')
+            ->with(self::identicalTo(''))
+            ->willReturn($transformedValue);
+
+        $this->nullValueTransformer->setAllowEmptyString(false);
+
+        self::assertEquals($transformedValue, $this->nullValueTransformer->reverseTransform(''));
+    }
+
+    public function testReverseTransformForEmptyStringWhenInnerTransformerReturnsNull(): void
     {
         $this->innerTransformer->expects(self::once())
             ->method('reverseTransform')
@@ -85,7 +125,22 @@ class NullValueTransformerTest extends \PHPUnit\Framework\TestCase
         self::assertSame('', $this->nullValueTransformer->reverseTransform(''));
     }
 
-    public function testReverseTransformWhenInnerTransformerReturnsNullButInputValueIsNotEmptyString()
+    public function testReverseTransformForEmptyStringWhenInnerTransformerReturnsNullAndEmptyStringNotAllowed(): void
+    {
+        $this->innerTransformer->expects(self::once())
+            ->method('reverseTransform')
+            ->with(self::identicalTo(''))
+            ->willReturn(null);
+
+        $this->nullValueTransformer->setAllowEmptyString(false);
+
+        $this->expectException(TransformationFailedException::class);
+        $this->expectExceptionMessage('The value is not valid.');
+
+        $this->nullValueTransformer->reverseTransform('');
+    }
+
+    public function testReverseTransformWhenInnerTransformerReturnsNullButInputValueIsNotEmptyString(): void
     {
         $value = 'test';
 
