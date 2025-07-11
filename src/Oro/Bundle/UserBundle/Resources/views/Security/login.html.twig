@@ -22,77 +22,13 @@
 <div class="container">
     <div class="form-wrapper">
         <div class="form-wrapper__inner">
-            {% set usernameLabel = 'Username'|trans %}
-            {% set passwordLabel = 'Password'|trans %}
-            {% set showLabels = (usernameLabel|length <= 9) and (passwordLabel|length <= 9) %}
-            {% set layoutName = showLabels ? 'form-row-layout' : 'form-column-layout' %}
-            <form id="login-form" action="{{ loginFormActionPath|default(path('oro_user_security_check')) }}" method="post" class="form-signin form-signin--login {{ layoutName }}">
-                <div class="form-description">
-                    {% if oro_theme_logo() %}
-                        <div class="form-description__logo">
-                            <img src="{{ asset(oro_theme_logo()) }}"
-                                 alt="{{ 'oro.auth.description.logo'|trans }}"
-                                 class="form-description__logo-img">
-                        </div>
-                    {% endif %}
-                    <div class="form-description__main">{{ 'oro.auth.description.main'|trans }}</div>
-                    <div class="form-description__text">{{ 'oro.auth.description.text'|trans }}</div>
-                </div>
-                <div class="title-box">
-                    <h2 class="title">{{ 'Login'|trans }}</h2>
-                </div>
-                <fieldset class="field-set">
-                    {% if error %}
-                        <div class="alert alert-error" role="alert">
-                            <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-                        </div>
-                    {% endif %}
-                    {{ messagesContent }}
-                    <div class="input-field-group">
-                        <div class="input-prepend">
-                            <label for="prependedInput" class="add-on">{{ usernameLabel }}</label>
-                            <input type="text" id="prependedInput" class="input" autocomplete="username" name="_username" value="{{ last_username }}" required="required" placeholder="{{ 'Username or Email'|trans }}" autofocus>
-                        </div>
-                        <div class="input-prepend input-prepend--last">
-                            <label for="prependedInput2" class="add-on">{{ passwordLabel }}</label>
-                            <input type="password" id="prependedInput2" class="input" autocomplete="off" name="_password" required="required" placeholder="{{ 'Password'|trans }}">
-                        </div>
-                    </div>
-                    <div class="oro-remember-me">
-                        <label class="checkbox-label" for="remember_me">
-                            <input type="checkbox"
-                                    id="remember_me"
-                                    name="_remember_me"
-                                    value="on">
-                            {{- 'Remember me on this computer'|trans -}}
-                        </label>
-                    </div>
-                    {% if is_form_protected_with_captcha("oro_user_form_login") %}
-                        <div class="form-signin__footer">
-                            {{ form_row(get_captcha_form_element()) }}
-                        </div>
-                    {% endif %}
-                    <div class="form-signin__footer">
-                        <button type="submit" class="btn extra-submit btn-uppercase btn-primary" id="_submit" name="_submit">{{ 'Log in'|trans }}</button>
-                        <a href="{{ loginFormResetPath|default(path('oro_user_reset_request')) }}">{{ 'Forgot your password?'|trans }}</a>
-                    </div>
-                    <div class="form-signin__oauth">
-                        {% placeholder oro_user_login_form %}
-                    </div>
-                </fieldset>
-                <input type="hidden" name="_target_path" value="{{ loginFormTargetPath|default('') }}">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
-            </form>
+            {% set description_main = 'oro.auth.description.main'|trans %}
+            {% set description_text = 'oro.auth.description.text'|trans %}
+            {% include '@OroUser/Security/login_form.html.twig' %}
         </div>
         <div class="login-copyright">{{ 'oro.copyright'|trans({ '{{year}}': 'now'|date('Y') }) }}</div>
     </div>
     <script>
-        document.getElementById('login-form').addEventListener('submit', function (event) {
-            var buttons = event.target.getElementsByTagName('button');
-            for (var i = 0; i < buttons.length; i++) {
-                buttons[i].setAttribute('disabled', 'disabled');
-            }
-        });
         window.addEventListener('load', function() {
             var loader = document.getElementById('login-page-loader');
             if (loader) {
