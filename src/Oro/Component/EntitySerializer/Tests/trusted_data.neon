@@ -13,6 +13,8 @@ trusted_data:
                 alias: true
             updateSelectQueryPart:
                 alias: true
+                fieldName: true
+                propertyPath: true
     safe_methods:
         Oro\Component\EntitySerializer\DoctrineHelper:
             getRootAlias: true

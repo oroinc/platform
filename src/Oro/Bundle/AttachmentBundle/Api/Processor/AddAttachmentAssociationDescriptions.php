@@ -53,30 +53,23 @@ class AddAttachmentAssociationDescriptions implements ProcessorInterface
         $version = $context->getVersion();
         $requestType = $context->getRequestType();
         $definition = $context->getResult();
+        $this->setDescriptionsForAttachmentsField(
+            $definition,
+            $version,
+            $requestType,
+            $context->getClassName(),
+            $targetAction
+        );
         $associationName = $context->getAssociationName();
-        if ($associationName) {
-            $this->setDescriptionsForAttachmentsField(
+        if ($associationName
+            && self::ATTACHMENTS_ASSOCIATION_NAME === $associationName
+            && !$definition->hasDocumentation()
+        ) {
+            $this->setDescriptionsForSubresource(
                 $definition,
                 $version,
                 $requestType,
-                $definition->getResourceClass(),
-                $targetAction
-            );
-            if (self::ATTACHMENTS_ASSOCIATION_NAME === $associationName && !$definition->hasDocumentation()) {
-                $this->setDescriptionsForSubresource(
-                    $definition,
-                    $version,
-                    $requestType,
-                    $context->getParentClassName(),
-                    $targetAction
-                );
-            }
-        } else {
-            $this->setDescriptionsForAttachmentsField(
-                $definition,
-                $version,
-                $requestType,
-                $context->getClassName(),
+                $context->getParentClassName(),
                 $targetAction
             );
         }

@@ -1,5 +1,7 @@
 <span class="filename">
+    {% if additional['showIcon'] is not defined or additional['showIcon'] %}
     <i class="fa {{ iconClass }}"></i>
+    {% endif %}
     {% if url %}
         <a href="{{ url }}" data-filename="{{ fileName }}"
            {% if additional['galleryId'] is defined %}data-gallery="{{ additional['galleryId'] }}"{% endif %}

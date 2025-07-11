@@ -69,6 +69,67 @@ class AttachmentCustomFieldTypeTest extends RestJsonApiTestCase
         );
     }
 
+    public function testGetWithFileOnly(): void
+    {
+        $entityType = $this->getEntityType(TestAttachmentOwner::class);
+
+        $response = $this->get(
+            ['entity' => $entityType, 'id' => '<toString(@entity1->id)>'],
+            ['fields[' . $entityType . ']' => 'test_file']
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    'type' => $entityType,
+                    'id' => '<toString(@entity1->id)>',
+                    'relationships' => [
+                        'test_file' => [
+                            'data' => ['type' => 'files', 'id' => '<toString(@file_1->id)>']
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+
+        $responseData = self::jsonToArray($response->getContent());
+        self::assertArrayNotHasKey('attributes', $responseData['data']);
+        self::assertCount(1, $responseData['data']['relationships']);
+    }
+
+    public function testGetWithMultiFileOnly(): void
+    {
+        $entityType = $this->getEntityType(TestAttachmentOwner::class);
+
+        $response = $this->get(
+            ['entity' => $entityType, 'id' => '<toString(@entity1->id)>'],
+            ['fields[' . $entityType . ']' => 'test_multi_files']
+        );
+
+        $this->assertResponseContains(
+            [
+                'data' => [
+                    'type' => $entityType,
+                    'id' => '<toString(@entity1->id)>',
+                    'relationships' => [
+                        'test_multi_files' => [
+                            'data' => [
+                                ['type' => 'files', 'id' => '<toString(@file_3->id)>', 'meta' => ['sortOrder' => 1]],
+                                ['type' => 'files', 'id' => '<toString(@file_2->id)>', 'meta' => ['sortOrder' => 2]]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            $response
+        );
+
+        $responseData = self::jsonToArray($response->getContent());
+        self::assertArrayNotHasKey('attributes', $responseData['data']);
+        self::assertCount(1, $responseData['data']['relationships']);
+    }
+
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */

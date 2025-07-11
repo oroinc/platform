@@ -10,6 +10,7 @@ use Oro\Bundle\ApiBundle\Config\Extra\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\Extra\FilterIdentifierFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\GetConfig\ConfigContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Provider\ResourcesProvider;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -29,7 +30,8 @@ class AddMultiFileAssociations implements ProcessorInterface
 
     public function __construct(
         private readonly MultiFileAssociationProvider $multiFileAssociationProvider,
-        private readonly ConfigProvider $configProvider
+        private readonly ConfigProvider $configProvider,
+        private readonly ResourcesProvider $resourcesProvider
     ) {
     }
 
@@ -53,41 +55,35 @@ class AddMultiFileAssociations implements ProcessorInterface
 
         $version = $context->getVersion();
         $requestType = $context->getRequestType();
-        $entityClass = $associationName ? $context->getParentClassName() : $context->getClassName();
-
+        $definition = $context->getResult();
         $multiFileAssociationNames = $this->multiFileAssociationProvider->getMultiFileAssociationNames(
-            $entityClass,
+            $context->getClassName(),
             $version,
             $requestType
         );
-        if (!$multiFileAssociationNames) {
-            return;
-        }
-
-        $definition = $context->getResult();
-        if (!$associationName) {
+        if ($multiFileAssociationNames) {
+            $isReadonly = $this->resourcesProvider->isReadOnlyResource(File::class, $version, $requestType);
             $fileDefinition = $this->getFileDefinition($version, $requestType);
             foreach ($multiFileAssociationNames as $multiFileAssociationName) {
                 $this->addMultiFileAssociation(
                     $targetAction,
                     $definition,
-                    $entityClass,
                     $multiFileAssociationName,
-                    true,
-                    $fileDefinition
+                    !$isReadonly,
+                    $fileDefinition,
+                    $isReadonly
                 );
             }
-        } elseif (\in_array($associationName, $multiFileAssociationNames, true)) {
-            if ($definition->getResourceClass() === $entityClass) {
-                $this->addMultiFileAssociation(
-                    $targetAction,
-                    $definition,
-                    $entityClass,
-                    $associationName,
-                    false,
-                    $this->getFileDefinition($version, $requestType)
-                );
-            } else {
+        }
+        if ($associationName && !$this->resourcesProvider->isReadOnlyResource(File::class, $version, $requestType)) {
+            $parentEntityMultiFileAssociationNames = $this->multiFileAssociationProvider->getMultiFileAssociationNames(
+                $context->getParentClassName(),
+                $version,
+                $requestType
+            );
+            if ($parentEntityMultiFileAssociationNames
+                && \in_array($associationName, $parentEntityMultiFileAssociationNames, true)
+            ) {
                 /** @see BuildMultiFileSubresourceQuery */
                 $sortOrderMetaProperty = $this->addSortOrderMetaProperty($definition, 'r.' . self::SORT_ORDER);
                 if ($context->hasExtra(DescriptionsConfigExtra::NAME)) {
@@ -102,21 +98,12 @@ class AddMultiFileAssociations implements ProcessorInterface
     private function addMultiFileAssociation(
         ?string $targetAction,
         EntityDefinitionConfig $definition,
-        string $entityClass,
         string $multiFileAssociationName,
         bool $addSortOrderMetaProperty,
-        EntityDefinitionConfig $fileDefinition
+        EntityDefinitionConfig $fileDefinition,
+        bool $isReadonly
     ): void {
-        if ($definition->hasField($multiFileAssociationName)) {
-            throw new \RuntimeException(\sprintf(
-                'The association "%s" cannot be added to "%s"'
-                . ' because an association with this name already exists.',
-                $multiFileAssociationName,
-                $entityClass
-            ));
-        }
-
-        $association = $definition->addField($multiFileAssociationName);
+        $association = $definition->getOrAddField($multiFileAssociationName);
         $association->setTargetClass(File::class);
         $association->setTargetType(ConfigUtil::TO_MANY);
         if (ApiAction::CREATE !== $targetAction && ApiAction::UPDATE !== $targetAction) {
@@ -126,6 +113,9 @@ class AddMultiFileAssociations implements ProcessorInterface
             $multiFileAssociationName . '.file',
             $multiFileAssociationName . '.' . self::SORT_ORDER
         ]);
+        if ($isReadonly) {
+            $association->setFormOption('mapped', false);
+        }
         $associationTargetEntity = $association->createAndSetTargetEntity();
         $this->addIdentifierDefinition($associationTargetEntity, $fileDefinition);
         if ($addSortOrderMetaProperty) {
@@ -136,7 +126,9 @@ class AddMultiFileAssociations implements ProcessorInterface
         $sourceAssociation = $definition->addField(ConfigUtil::IGNORE_PROPERTY_PATH . $multiFileAssociationName);
         $sourceAssociation->setPropertyPath($multiFileAssociationName);
         $sourceAssociation->setExcluded();
-        $sourceAssociation->createAndSetTargetEntity()->setOrderBy([self::SORT_ORDER => Criteria::ASC]);
+        $sourceAssociationTargetEntity = $sourceAssociation->createAndSetTargetEntity();
+        $sourceAssociationTargetEntity->setMaxResults(-1);
+        $sourceAssociationTargetEntity->setOrderBy([self::SORT_ORDER => Criteria::ASC]);
 
         $definition->addField(ExtendConfigDumper::DEFAULT_PREFIX . $multiFileAssociationName)
             ->setExcluded();

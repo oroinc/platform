@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
+use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetOperationFlags;
 use Oro\Bundle\ApiBundle\Processor\Update\UpdateContext;
 use Oro\Bundle\ApiBundle\Request\ApiAction;
 use Oro\Bundle\ApiBundle\Request\ApiActionGroup;
@@ -75,7 +76,13 @@ class LoadNormalizedEntity implements ProcessorInterface
         $getContext->setClassName($context->getClassName());
         $getContext->setId($context->getId());
         if ($context->hasResult()
-            && ($this->reuseExistingEntity || $context->getConfig()?->isValidationEnabled())
+            && (
+                $this->reuseExistingEntity
+                || (
+                    ($context->get(SetOperationFlags::VALIDATE_FLAG) ?? false)
+                    && $context->getConfig()?->isValidationEnabled()
+                )
+            )
         ) {
             $getContext->setResult($context->getResult());
         }
