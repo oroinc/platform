@@ -124,18 +124,22 @@ class FileController extends AbstractController
             Response::HTTP_OK,
             [
                 'Content-Type' => $binary->getMimeType(),
-                AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER => true
+                AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER => true,
+                'Cache-Control' => 'no-cache, no-store, must-revalidate, max-age=0',
             ]
         );
-        $response->setPublic();
-        $sessionConfig = $this->getParameter('session.storage.options');
-        $imageMaxAge = \array_key_exists('cookie_lifetime', $sessionConfig)
-            ? $sessionConfig['cookie_lifetime']
-            : $sessionConfig['gc_maxlifetime'];
-        if ($imageMaxAge > 3600) {
-            $imageMaxAge = 3600;
+
+        if (str_contains($filter, 'avatar')) {
+            $sessionConfig = $this->getParameter('session.storage.options');
+            $imageMaxAge = \array_key_exists('cookie_lifetime', $sessionConfig)
+                ? $sessionConfig['cookie_lifetime']
+                : $sessionConfig['gc_maxlifetime'];
+            if ($imageMaxAge > 3600) {
+                $imageMaxAge = 3600;
+            }
+
+            $response->headers->set('Cache-Control', sprintf('public, max-age=%d', $imageMaxAge));
         }
-        $response->setMaxAge($imageMaxAge);
 
         return $response;
     }
