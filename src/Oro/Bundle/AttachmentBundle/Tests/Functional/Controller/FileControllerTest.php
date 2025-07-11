@@ -244,8 +244,7 @@ class FileControllerTest extends WebTestCase
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
 
-        self::assertTrue($result->headers->getCacheControlDirective('public'));
-        self::assertTrue($result->headers->hasCacheControlDirective('max-age'));
+        self::assertEquals(0, $result->headers->getCacheControlDirective('max-age'));
         self::assertResponseContentTypeEquals($result, $file->getMimeType());
         self::assertResponseStatusCodeEquals($result, 200);
     }
@@ -259,8 +258,7 @@ class FileControllerTest extends WebTestCase
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
 
-        self::assertTrue($result->headers->getCacheControlDirective('public'));
-        self::assertTrue($result->headers->hasCacheControlDirective('max-age'));
+        self::assertEquals(0, $result->headers->getCacheControlDirective('max-age'));
         self::assertResponseContentTypeEquals($result, 'image/webp');
         self::assertResponseStatusCodeEquals($result, 200);
     }
@@ -281,8 +279,7 @@ class FileControllerTest extends WebTestCase
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
 
-        self::assertTrue($result->headers->getCacheControlDirective('public'));
-        self::assertTrue($result->headers->hasCacheControlDirective('max-age'));
+        self::assertEquals(0, $result->headers->getCacheControlDirective('max-age'));
         self::assertResponseContentTypeEquals($result, 'image/png');
         self::assertResponseStatusCodeEquals($result, 200);
     }
@@ -303,9 +300,23 @@ class FileControllerTest extends WebTestCase
         $this->client->request('GET', $url);
         $result = $this->client->getResponse();
 
-        self::assertTrue($result->headers->getCacheControlDirective('public'));
-        self::assertTrue($result->headers->hasCacheControlDirective('max-age'));
+        self::assertEquals(0, $result->headers->getCacheControlDirective('max-age'));
         self::assertResponseContentTypeEquals($result, 'image/webp');
+        self::assertResponseStatusCodeEquals($result, 200);
+    }
+
+    public function testGetFilteredAvatarImage(): void
+    {
+        /** @var File $file */
+        $file = $this->getReference(LoadImageData::IMAGE_JPG);
+        $url = self::getContainer()->get(FileUrlProviderInterface::class)
+            ->getFilteredImageUrl($file, 'avatar_med', '');
+        $this->client->request('GET', $url);
+        $result = $this->client->getResponse();
+
+        self::assertTrue($result->headers->getCacheControlDirective('public'));
+        self::assertNotEquals(0, $result->headers->getCacheControlDirective('max-age'));
+        self::assertResponseContentTypeEquals($result, $file->getMimeType());
         self::assertResponseStatusCodeEquals($result, 200);
     }
 }
