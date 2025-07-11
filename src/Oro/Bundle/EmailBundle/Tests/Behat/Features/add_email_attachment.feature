@@ -1,4 +1,4 @@
-@regression
+@random-failed
 @ticket-BAP-19096
 Feature: Add email attachment
   In order to send files with email
