@@ -63,12 +63,12 @@ class MoveBaseEnumOptionsMigration implements Migration, ConnectionAwareInterfac
                     || !isset($fieldConfigData['extend']['target_entity'])) {
                     continue;
                 }
-                $this->createEnumOptions($fieldConfigData);
+                $this->createEnumOptions($schema, $fieldConfigData);
             }
         }
     }
 
-    private function createEnumOptions(array $fieldConfigData): void
+    private function createEnumOptions(Schema $schema, array $fieldConfigData): void
     {
         $enumCode = $fieldConfigData['enum']['enum_code'];
         $enumClassName = $fieldConfigData['extend']['target_entity'];
@@ -104,7 +104,7 @@ class MoveBaseEnumOptionsMigration implements Migration, ConnectionAwareInterfac
             );
             $this->moveEnumTranslations($newEnumOptionId, $enumValue['name']);
         }
-        $this->moveOtherEnumTranslations($enumCode, $enumClassName);
+        $this->moveOtherEnumTranslations($schema, $enumCode, $enumClassName);
     }
 
     private function moveEnumTranslations(
@@ -156,8 +156,11 @@ class MoveBaseEnumOptionsMigration implements Migration, ConnectionAwareInterfac
         );
     }
 
-    private function moveOtherEnumTranslations(string $enumCode, string $enumClassName): void
+    private function moveOtherEnumTranslations(Schema $schema, string $enumCode, string $enumClassName): void
     {
+        if (!$schema->hasTable('oro_enum_value_trans')) {
+            return;
+        }
         $enumTranslations = $this->connection->fetchAllAssociative(
             'SELECT * FROM oro_enum_value_trans WHERE object_class = :object_class',
             ['object_class' => $enumClassName]
