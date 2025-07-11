@@ -44,7 +44,7 @@ class ComputeMultiFileAssociations implements ProcessorInterface
         $data = $context->getData();
         foreach ($associationNames as $associationName) {
             if (!$context->isFieldRequestedForCollection($associationName, $data)) {
-                return;
+                continue;
             }
             $this->updateAssociationData($data, $associationName);
             $associationConfig = $config?->getField($associationName);

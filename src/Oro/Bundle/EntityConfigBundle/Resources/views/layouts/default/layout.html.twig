@@ -82,10 +82,7 @@
 
 {% block attribute_multiselect_widget %}
     {%- for item in value -%}
-        {{- item -}}
-        {%- if not loop.last -%}
-            ,&nbsp;
-        {%- endif -%}
+        {{- item -}}{% if not loop.last %}, {% endif %}
     {%- else -%}
         {{ 'N/A'|trans }}
     {%- endfor -%}
@@ -148,4 +145,17 @@
 
 {% block attribute_group_rest_attribute_widget %}
     <div class="tab-content__wrapper">{{ block('attribute_label_widget') }} {{ block_widget(block) }}</div>
+{% endblock %}
+
+{% block file_widget %}
+    {{ oro_file_view(value, {showIcon: showIcon}) }}
+{% endblock %}
+
+{% block multi_file_widget %}
+    {%- for item in value.toArray()|sort((a, b) => a.sortOrder <=> b.sortOrder) -%}
+        {{ oro_file_view(item.file, {showIcon: showIcon}) }}
+        {%- if not loop.last %}, {% endif -%}
+    {%- else -%}
+        {{ 'N/A'|trans }}
+    {%- endfor -%}
 {% endblock %}

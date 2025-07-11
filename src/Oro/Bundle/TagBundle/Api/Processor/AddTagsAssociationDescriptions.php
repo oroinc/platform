@@ -55,19 +55,18 @@ class AddTagsAssociationDescriptions implements ProcessorInterface
 
         $requestType = $context->getRequestType();
         $definition = $context->getResult();
+        $this->setDescriptionsForFields($definition, $requestType, $context->getClassName());
         $associationName = $context->getAssociationName();
-        if ($associationName) {
-            $this->setDescriptionsForFields($definition, $requestType, $definition->getResourceClass());
-            if (self::TAGS_ASSOCIATION_NAME === $associationName && !$definition->hasDocumentation()) {
-                $this->setDescriptionsForSubresource(
-                    $definition,
-                    $requestType,
-                    $context->getParentClassName(),
-                    $targetAction
-                );
-            }
-        } else {
-            $this->setDescriptionsForFields($definition, $requestType, $context->getClassName());
+        if ($associationName
+            && self::TAGS_ASSOCIATION_NAME === $associationName
+            && !$definition->hasDocumentation()
+        ) {
+            $this->setDescriptionsForSubresource(
+                $definition,
+                $requestType,
+                $context->getParentClassName(),
+                $targetAction
+            );
         }
     }
 

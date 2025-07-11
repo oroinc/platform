@@ -75,6 +75,8 @@ services:
         arguments:
             - '@oro_attachment.api.multi_file_association_provider'
             - '@oro_api.config_provider'
+        calls:
+            - [setResourcesProvider, ['@oro_api.resources_provider']]
         tags:
             - { name: oro.api.processor, action: get_config, priority: -10 }
 
@@ -83,6 +85,9 @@ services:
         arguments:
             - '@oro_attachment.api.multi_file_association_provider'
             - '@oro_api.complete_descriptions.resource_doc_parser_provider'
+        calls:
+            - [setEntityDescriptionProvider, ['@oro_api.entity_description_provider']]
+            - [setEntityNameProvider, ['@oro_api.entity_name_provider']]
         tags:
             - { name: oro.api.processor, action: get_config, extra: descriptions, priority: -220 }
 

@@ -397,6 +397,11 @@ class DataAuditTest extends WebTestCase
         $this->markTestSkipped('File audit not supported');
     }
 
+    public function testMultiFile(): void
+    {
+        $this->markTestSkipped('File audit not supported');
+    }
+
     public function testFloat()
     {
         $owner = new TestAuditDataOwner();

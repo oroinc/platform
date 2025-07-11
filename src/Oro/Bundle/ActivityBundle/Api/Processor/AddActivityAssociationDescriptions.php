@@ -78,6 +78,7 @@ class AddActivityAssociationDescriptions implements ProcessorInterface
                 $version,
                 $requestType,
                 $targetAction,
+                $context->getClassName(),
                 $parentEntityClass,
                 $associationName
             );
@@ -121,15 +122,15 @@ class AddActivityAssociationDescriptions implements ProcessorInterface
         string $version,
         RequestType $requestType,
         string $targetAction,
+        string $entityClass,
         string $parentEntityClass,
         string $associationName
     ): void {
-        $resourceClass = $definition->getResourceClass();
         $this->setDescriptionsForFields(
             $definition,
             $requestType,
-            $resourceClass,
-            $this->activityAssociationProvider->getActivityAssociations($resourceClass, $version, $requestType)
+            $entityClass,
+            $this->activityAssociationProvider->getActivityAssociations($entityClass, $version, $requestType)
         );
         $activityAssociations = $this->activityAssociationProvider->getActivityAssociations(
             $parentEntityClass,

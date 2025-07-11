@@ -51,30 +51,23 @@ class AddCommentAssociationDescriptions implements ProcessorInterface
         $version = $context->getVersion();
         $requestType = $context->getRequestType();
         $definition = $context->getResult();
+        $this->setDescriptionsForCommentsField(
+            $definition,
+            $version,
+            $requestType,
+            $context->getClassName(),
+            $targetAction
+        );
         $associationName = $context->getAssociationName();
-        if ($associationName) {
-            $this->setDescriptionsForCommentsField(
+        if ($associationName
+            && self::COMMENTS_ASSOCIATION_NAME === $associationName
+            && !$definition->hasDocumentation()
+        ) {
+            $this->setDescriptionsForSubresource(
                 $definition,
                 $version,
                 $requestType,
-                $definition->getResourceClass(),
-                $targetAction
-            );
-            if (self::COMMENTS_ASSOCIATION_NAME === $associationName && !$definition->hasDocumentation()) {
-                $this->setDescriptionsForSubresource(
-                    $definition,
-                    $version,
-                    $requestType,
-                    $context->getParentClassName(),
-                    $targetAction
-                );
-            }
-        } else {
-            $this->setDescriptionsForCommentsField(
-                $definition,
-                $version,
-                $requestType,
-                $context->getClassName(),
+                $context->getParentClassName(),
                 $targetAction
             );
         }

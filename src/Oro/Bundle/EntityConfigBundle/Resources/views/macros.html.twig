@@ -45,12 +45,10 @@
     {% if fieldValue is iterable %}
         {% if fieldValue.values is defined %}
             {%- for value in fieldValue.values -%}
-                {{- entityConfigMacros.renderField(value) -}}
-                {%- if not loop.last -%}
-                    ,&nbsp;
-                {%- endif -%}
+                {{ entityConfigMacros.renderField(value) }}
+                {%- if not loop.last %}, {% endif -%}
             {%- else -%}
-                {{- 'N/A'|trans -}}
+                {{ 'N/A'|trans }}
             {%- endfor -%}
         {% else %}
             {{ entityConfigMacros.renderField(fieldValue) }}
