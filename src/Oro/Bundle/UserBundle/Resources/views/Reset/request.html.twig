@@ -9,46 +9,17 @@
 <div class="container">
     <div class="form-wrapper">
         <div class="form-wrapper__inner">
-            {% set requestLabel = 'Request'|trans %}
-            {% set returnToLoginLabel = 'Return to Login'|trans %}
-            {% set showLabels = (requestLabel|length <= 9) and (returnToLoginLabel|length <= 15) %}
-            {% set layoutName = showLabels ? 'form-row-layout' : 'form-column-layout' %}
-            {{ form_start(form, {
-                'attr': {
-                    'class': 'form-signin form-signin--forgot ' ~ layoutName,
-                    'data-nohash': true
-                }
-            }) }}
-                <div class="title-box">
-                    <h2 class="title">{{ 'Forgot Password'|trans }}</h2>
-                </div>
-                <fieldset class="form-signin__fieldset">
-                    {%- if form.vars.errors|length > 0 -%}
-                        <div class="alert alert-error" role="alert">
-                        {%- for error in form.vars.errors -%}
-                            <div>{{ error.message|trans }}</div>
-                        {%- endfor -%}
-                        </div>
-                    {%- endif -%}
-
-                    {{ messagesContent }}
-
-                    {{ form_widget(form.username, {
-                        'attr': {
-                            'autofocus': true
-                        }
-                    }) }}
-                    {{ form_row(form.frontend) }}
-                    {{ form_rest(form) }}
-
-                    <div class="form-row form-signin__footer form-signin__footer">
-                        <button type="submit" class="btn extra-submit btn-uppercase btn-primary">{{ requestLabel }}</button>
-                        <a href="{{ resetFormReturnPath|default(path('oro_user_security_login')) }}">&laquo; {{ returnToLoginLabel }}</a>
-                    </div>
-                </fieldset>
-            {{ form_end(form) }}
+            {% include '@OroUser/Reset/request_form.html.twig' %}
         </div>
         <div class="login-copyright">{{ 'oro.copyright'|trans({ '{{year}}': 'now'|date('Y') }) }}</div>
     </div>
 </div>
+<script type="text/javascript">
+    window.addEventListener('load', function() {
+        var loader = document.getElementById('login-page-loader');
+        if (loader) {
+            loader.parentNode.removeChild(loader);
+        }
+    });
+</script>
 {% endblock %}
