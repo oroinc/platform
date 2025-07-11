@@ -50,22 +50,22 @@ oro:
             delete_file.label:       Delete
             file_size:
                 label:               File size
-                description:         The size of a file in bytes.
+                description:         The size of the file in bytes.
             mime_type:
                 label:               Mime type
-                description:         A media type and subtype of the file.
+                description:         The media type of the file.
             content:
                 label:               Content
                 description:         The content of the file as a string.
             parent_entity_class:
                 label:               Parent entity class
-                description:         The class of the entity to which this file belongs.
+                description:         The class of the entity to which the file belongs.
             parent_entity_id:
                 label:               Parent entity id
-                description:         The ID of the entity to which this file belongs.
+                description:         The ID of the entity to which the file belongs.
             parent_entity_field_name:
                 label:               Parent entity field name
-                description:         The field name where this file is stored of the entity to which this file belongs.
+                description:         The field name where the file is stored of the entity to which the file belongs.
             external_url:
                 label:               External URL
                 description:         URL of the file that is stored externally on a third party service.

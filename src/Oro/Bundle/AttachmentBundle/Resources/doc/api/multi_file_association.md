@@ -6,4 +6,14 @@
 
 {@inheritdoc}
 
-The ``sortOrder`` meta option denotes which order a file is to appear when displayed.
+## SUBRESOURCES
+
+### %multi_file_association%
+
+#### get_subresource
+
+Retrieve records of the %association% associated with a specific %entity_name% record.
+
+#### get_relationship
+
+Retrieve the IDs of the %association% associated with a specific %entity_name% record.
