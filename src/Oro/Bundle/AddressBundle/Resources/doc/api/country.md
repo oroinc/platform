@@ -24,4 +24,4 @@ Retrieve a collection of region records.
 
 #### get_relationship
 
-Retrieve IDs of region records assigned to a specific country record.
+Retrieve the IDs of region records assigned to a specific country record.

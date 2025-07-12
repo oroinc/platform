@@ -119,7 +119,7 @@ Retrieve a record of an organization that a specific tag record belongs to.
 
 #### get_relationship
 
-Retrieve an ID of the organization that a specific tag record belongs to.
+Retrieve the ID of the organization that a specific tag record belongs to.
 
 #### update_relationship
 
@@ -146,7 +146,7 @@ Retrieve a record of the user who is the owner of a specific tag record.
 
 #### get_relationship
 
-Retrieve an ID of the user who is the owner of a specific tag record.
+Retrieve the ID of the user who is the owner of a specific tag record.
 
 #### update_relationship
 
@@ -173,7 +173,7 @@ Retrieve a record of the taxonomic unit associated with a specific tag record.
 
 #### get_relationship
 
-Retrieve an ID of the taxonomic unit associated with a specific tag record.
+Retrieve the ID of the taxonomic unit associated with a specific tag record.
 
 #### update_relationship
 
