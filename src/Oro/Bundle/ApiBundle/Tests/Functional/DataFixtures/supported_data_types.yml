@@ -25,6 +25,8 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
         fieldDuration: 11
         fieldMoneyValue: 1.2345
         fieldCurrency: 'USD'
+        fieldBackedEnumInt: <(Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestBackedEnumInt::Item1)>
+        fieldBackedEnumStr: <(Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestBackedEnumString::Item1)>
     TestItem2:
         fieldString: 'Test String 2 Value'
         fieldText: 'Test Text 2 Value'
@@ -51,6 +53,8 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
         fieldDuration: 22
         fieldMoneyValue: 2.3456
         fieldCurrency: 'UAH'
+        fieldBackedEnumInt: <(Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestBackedEnumInt::Item2)>
+        fieldBackedEnumStr: <(Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestBackedEnumString::Item2)>
     TestItem3:
         fieldString: 'Test String 3 Value'
         fieldText: 'Test Text 3 Value'
@@ -77,6 +81,8 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
         fieldDuration: 33
         fieldMoneyValue: 3.4567
         fieldCurrency: 'EUR'
+        fieldBackedEnumInt: <(Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestBackedEnumInt::Item3)>
+        fieldBackedEnumStr: <(Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestBackedEnumString::Item3)>
     AnotherItem:
         fieldString: 'Another'
         fieldText: 'Another'
@@ -103,6 +109,8 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
         fieldDuration: 10
         fieldMoneyValue: 10.1234
         fieldCurrency: 'CNY'
+        fieldBackedEnumInt: <(Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestBackedEnumInt::Item4)>
+        fieldBackedEnumStr: <(Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestBackedEnumString::Item4)>
     EmptyItem:
         fieldString: ''
         fieldText: ''
@@ -129,6 +137,8 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
         fieldDuration: 0
         fieldMoneyValue: 0.0
         fieldCurrency: ''
+        fieldBackedEnumInt: ~
+        fieldBackedEnumStr: ~
     NullItem:
         fieldString: ~
         fieldText: ~
@@ -155,3 +165,5 @@ Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity\TestAllDataTypes:
         fieldDuration: ~
         fieldMoneyValue: ~
         fieldCurrency: ~
+        fieldBackedEnumInt: ~
+        fieldBackedEnumStr: ~

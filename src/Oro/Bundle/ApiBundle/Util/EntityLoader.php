@@ -80,14 +80,13 @@ class EntityLoader
 
     private function isValidIdentifier(mixed $entityId, ClassMetadata $classMetadata): bool
     {
-        if (!is_scalar($entityId)) {
+        if (!\is_scalar($entityId)) {
             return true;
         }
 
-        $primaryKeyFieldName = $classMetadata->getSingleIdentifierFieldName();
-        $primaryKeyType = $classMetadata->getFieldMapping($primaryKeyFieldName)['type'];
-
-        return $primaryKeyType !== 'integer' || (int)$entityId == $entityId;
+        return
+            'integer' !== $classMetadata->getTypeOfField($classMetadata->getSingleIdentifierFieldName())
+            || (int)$entityId == $entityId;
     }
 
     private function buildFindCriteria(mixed $entityId, EntityIdMetadataInterface $metadata): array

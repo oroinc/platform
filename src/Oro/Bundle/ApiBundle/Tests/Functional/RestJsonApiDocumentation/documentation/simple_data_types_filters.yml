@@ -1,4 +1,12 @@
 filters:
+    'filter[fieldBackedEnumInt]':
+        requirement: '\w+(,\w+)*'
+        type: 'string or array'
+        operators: 'eq,neq,exists,neq_or_null'
+    'filter[fieldBackedEnumStr]':
+        requirement: '\w+(,\w+)*'
+        type: 'string or array'
+        operators: 'eq,neq,exists,neq_or_null'
     'filter[fieldBigInt]':
         requirement: '-?\d+(,-?\d+)*|-?\d+\.\.-?\d+'
         type: 'bigint or array or range'

@@ -17,6 +17,26 @@ paths:
         -
           $ref: '#/components/parameters/xInclude'
         -
+          $ref: '#/components/parameters/filterFieldBackedEnumInt'
+        -
+          $ref: '#/components/parameters/filterFieldBackedEnumIntEq'
+        -
+          $ref: '#/components/parameters/filterFieldBackedEnumIntNeq'
+        -
+          $ref: '#/components/parameters/filterFieldBackedEnumIntExists'
+        -
+          $ref: '#/components/parameters/filterFieldBackedEnumIntNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldBackedEnumStr'
+        -
+          $ref: '#/components/parameters/filterFieldBackedEnumStrEq'
+        -
+          $ref: '#/components/parameters/filterFieldBackedEnumStrNeq'
+        -
+          $ref: '#/components/parameters/filterFieldBackedEnumStrExists'
+        -
+          $ref: '#/components/parameters/filterFieldBackedEnumStrNeqOrNull'
+        -
           $ref: '#/components/parameters/filterFieldBigInt'
         -
           $ref: '#/components/parameters/filterFieldBigIntEq'
@@ -354,6 +374,10 @@ paths:
           $ref: '#/components/parameters/contentType'
         -
           $ref: '#/components/parameters/xInclude1'
+        -
+          $ref: '#/components/parameters/fieldsTestapialldatatypes'
+        -
+          $ref: '#/components/parameters/meta'
       requestBody:
         $ref: '#/components/requestBodies/testapialldatatypes1Model'
       responses:
@@ -382,6 +406,26 @@ paths:
           $ref: '#/components/parameters/contentType'
         -
           $ref: '#/components/parameters/xInclude2'
+        -
+          $ref: '#/components/parameters/filterFieldBackedEnumInt'
+        -
+          $ref: '#/components/parameters/filterFieldBackedEnumIntEq'
+        -
+          $ref: '#/components/parameters/filterFieldBackedEnumIntNeq'
+        -
+          $ref: '#/components/parameters/filterFieldBackedEnumIntExists'
+        -
+          $ref: '#/components/parameters/filterFieldBackedEnumIntNeqOrNull'
+        -
+          $ref: '#/components/parameters/filterFieldBackedEnumStr'
+        -
+          $ref: '#/components/parameters/filterFieldBackedEnumStrEq'
+        -
+          $ref: '#/components/parameters/filterFieldBackedEnumStrNeq'
+        -
+          $ref: '#/components/parameters/filterFieldBackedEnumStrExists'
+        -
+          $ref: '#/components/parameters/filterFieldBackedEnumStrNeqOrNull'
         -
           $ref: '#/components/parameters/filterFieldBigInt'
         -
@@ -799,6 +843,10 @@ paths:
           $ref: '#/components/parameters/xInclude1'
         -
           $ref: '#/components/parameters/id'
+        -
+          $ref: '#/components/parameters/fieldsTestapialldatatypes'
+        -
+          $ref: '#/components/parameters/meta'
       requestBody:
         $ref: '#/components/requestBodies/testapialldatatypesModel'
       responses:
@@ -993,6 +1041,10 @@ components:
           properties:
             fieldArray:
               $ref: '#/components/schemas/array'
+            fieldBackedEnumInt:
+              $ref: '#/components/schemas/enum'
+            fieldBackedEnumStr:
+              $ref: '#/components/schemas/enum'
             fieldBigInt:
               $ref: '#/components/schemas/bigint'
             fieldBoolean:
@@ -1071,6 +1123,10 @@ components:
     object:
       type: object
       additionalProperties: true
+    enum:
+      type: string
+      format: word
+      pattern: \w+
     bigint:
       type: string
       format: bigint
@@ -1188,6 +1244,10 @@ components:
           properties:
             fieldArray:
               $ref: '#/components/schemas/array'
+            fieldBackedEnumInt:
+              $ref: '#/components/schemas/enum'
+            fieldBackedEnumStr:
+              $ref: '#/components/schemas/enum'
             fieldBigInt:
               $ref: '#/components/schemas/bigint'
             fieldBoolean:
@@ -1275,6 +1335,10 @@ components:
           $ref: '#/components/schemas/datetimeArray'
         -
           $ref: '#/components/schemas/datetimeRange'
+    datetimeArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/datetime'
     datetimeRange:
       type: string
       pattern: '\d{4}(-\d{2}(-\d{2}(T\d{2}(:\d{2})?(:\d{2})?(\.\d{2})?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?\.\.\d{4}(-\d{2}(-\d{2}(T\d{2}(:\d{2})?(:\d{2})?(\.\d{2})?(Z|([-+]\d{2}(:?\d{2})?))?)?)?)?'
@@ -1286,6 +1350,10 @@ components:
           $ref: '#/components/schemas/dateArray'
         -
           $ref: '#/components/schemas/dateRange'
+    dateArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/date'
     dateRange:
       type: string
       pattern: '\d{4}(-\d{2}(-\d{2}?)?)?\.\.\d{4}(-\d{2}(-\d{2}?)?)?'
@@ -1372,6 +1440,10 @@ components:
           $ref: '#/components/schemas/timeArray'
         -
           $ref: '#/components/schemas/timeRange'
+    timeArray:
+      type: array
+      items:
+        $ref: '#/components/schemas/time'
     timeRange:
       type: string
       pattern: '\d{2}(:\d{2}(:\d{2}(\.\d+)?)?)?\.\.\d{2}(:\d{2}(:\d{2}(\.\d+)?)?)?'
@@ -1520,6 +1592,66 @@ components:
       schema:
         type: string
       example: totalCount
+    filterFieldBackedEnumInt:
+      name: 'filter[fieldBackedEnumInt]'
+      in: query
+      description: "Filter records by 'fieldBackedEnumInt' field."
+      schema:
+        $ref: '#/components/schemas/stringUnionArray'
+    filterFieldBackedEnumIntEq:
+      name: 'filter[fieldBackedEnumInt][eq]'
+      in: query
+      description: "Filter records by 'fieldBackedEnumInt' field."
+      schema:
+        $ref: '#/components/schemas/stringUnionArray'
+    filterFieldBackedEnumIntNeq:
+      name: 'filter[fieldBackedEnumInt][neq]'
+      in: query
+      description: "Filter records by 'fieldBackedEnumInt' field."
+      schema:
+        $ref: '#/components/schemas/stringUnionArray'
+    filterFieldBackedEnumIntExists:
+      name: 'filter[fieldBackedEnumInt][exists]'
+      in: query
+      description: "Filter records by 'fieldBackedEnumInt' field."
+      schema:
+        type: boolean
+    filterFieldBackedEnumIntNeqOrNull:
+      name: 'filter[fieldBackedEnumInt][neq_or_null]'
+      in: query
+      description: "Filter records by 'fieldBackedEnumInt' field."
+      schema:
+        $ref: '#/components/schemas/stringUnionArray'
+    filterFieldBackedEnumStr:
+      name: 'filter[fieldBackedEnumStr]'
+      in: query
+      description: "Filter records by 'fieldBackedEnumStr' field."
+      schema:
+        $ref: '#/components/schemas/stringUnionArray'
+    filterFieldBackedEnumStrEq:
+      name: 'filter[fieldBackedEnumStr][eq]'
+      in: query
+      description: "Filter records by 'fieldBackedEnumStr' field."
+      schema:
+        $ref: '#/components/schemas/stringUnionArray'
+    filterFieldBackedEnumStrNeq:
+      name: 'filter[fieldBackedEnumStr][neq]'
+      in: query
+      description: "Filter records by 'fieldBackedEnumStr' field."
+      schema:
+        $ref: '#/components/schemas/stringUnionArray'
+    filterFieldBackedEnumStrExists:
+      name: 'filter[fieldBackedEnumStr][exists]'
+      in: query
+      description: "Filter records by 'fieldBackedEnumStr' field."
+      schema:
+        type: boolean
+    filterFieldBackedEnumStrNeqOrNull:
+      name: 'filter[fieldBackedEnumStr][neq_or_null]'
+      in: query
+      description: "Filter records by 'fieldBackedEnumStr' field."
+      schema:
+        $ref: '#/components/schemas/stringUnionArray'
     filterFieldBigInt:
       name: 'filter[fieldBigInt]'
       in: query
