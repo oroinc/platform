@@ -59,6 +59,11 @@ class ValueNormalizer implements ResetInterface
         bool $isRangeAllowed = false,
         array $options = []
     ): mixed {
+        [$dataType, $dataTypeDetail] = $this->normalizeDataType($dataType);
+        if ($dataTypeDetail) {
+            $options['data_type_detail'] = $dataTypeDetail;
+        }
+
         if (!isset($this->cachedData[$dataType])) {
             return $this->getNormalizedValue(
                 $dataType,
@@ -107,6 +112,11 @@ class ValueNormalizer implements ResetInterface
         bool $isRangeAllowed = false,
         array $options = []
     ): string {
+        [$dataType, $dataTypeDetail] = $this->normalizeDataType($dataType);
+        if ($dataTypeDetail) {
+            $options['data_type_detail'] = $dataTypeDetail;
+        }
+
         $cacheKey = $dataType . '|' . $this->buildCacheKey($requestType, $isArrayAllowed, $isRangeAllowed, $options);
         if (!\array_key_exists($cacheKey, $this->requirements)) {
             $context = $this->doNormalization(
@@ -178,6 +188,18 @@ class ValueNormalizer implements ResetInterface
     ): mixed {
         return $this->doNormalization($dataType, $requestType, $value, $isArrayAllowed, $isRangeAllowed, $options)
             ->getResult();
+    }
+
+    private function normalizeDataType(string $dataType): array
+    {
+        $dataTypeDetail = null;
+        $dataTypeDetailDelimiterPos = strpos($dataType, DataType::DETAIL_DELIMITER);
+        if (false !== $dataTypeDetailDelimiterPos) {
+            $dataTypeDetail = substr($dataType, $dataTypeDetailDelimiterPos + 1);
+            $dataType = substr($dataType, 0, $dataTypeDetailDelimiterPos);
+        }
+
+        return [$dataType, $dataTypeDetail];
     }
 
     private function buildCacheKey(

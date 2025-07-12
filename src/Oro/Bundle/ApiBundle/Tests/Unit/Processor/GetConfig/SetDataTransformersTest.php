@@ -178,15 +178,20 @@ class SetDataTransformersTest extends ConfigProcessorTestCase
                 'field9' => [
                     'data_transformer' => [$this->createMock(DataTransformerInterface::class)],
                     'post_processor'   => 'test'
+                ],
+                'field10' => [
+                    'data_type' => 'type:detail'
                 ]
             ]
         ];
 
         $timeDataTransformer = $this->createMock(FormDataTransformerInterface::class);
+        $typeWithDetailDataTransformer = $this->createMock(DataTransformerInterface::class);
         $this->dataTransformerRegistry->expects(self::any())
             ->method('getDataTransformer')
             ->willReturnMap([
-                ['time', $this->context->getRequestType(), $timeDataTransformer]
+                ['time', $this->context->getRequestType(), $timeDataTransformer],
+                ['type', $this->context->getRequestType(), $typeWithDetailDataTransformer]
             ]);
 
         $testPostProcessor = $this->createMock(PostProcessorInterface::class);
@@ -198,19 +203,13 @@ class SetDataTransformersTest extends ConfigProcessorTestCase
         $metadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
 
         $metadata->expects(self::exactly(5))
-            ->method('hasField')
-            ->willReturnMap([
-                ['field3', true],
-                ['field4', true],
-                ['realField5', true],
-                ['someAssociation.field6', false]
-            ]);
-        $metadata->expects(self::exactly(3))
             ->method('getTypeOfField')
             ->willReturnMap([
                 ['field3', 'time'],
                 ['field4', 'integer'],
-                ['realField5', 'time']
+                ['realField5', 'time'],
+                ['someAssociation.field6', null],
+                ['field8', null]
             ]);
 
         $this->doctrineHelper->expects(self::once())
@@ -232,6 +231,7 @@ class SetDataTransformersTest extends ConfigProcessorTestCase
         ];
         $expectedConfig['fields']['field9']['data_transformer'][] =
             new PostProcessingDataTransformer($testPostProcessor, []);
+        $expectedConfig['fields']['field10']['data_transformer'] = [$typeWithDetailDataTransformer];
         $this->assertConfig($expectedConfig, $configObject);
     }
 
@@ -346,14 +346,6 @@ class SetDataTransformersTest extends ConfigProcessorTestCase
                 ['association1', 'Test\Association1Target']
             ]);
 
-        $association1Metadata->expects(self::exactly(4))
-            ->method('hasField')
-            ->willReturnMap([
-                ['field11', true],
-                ['field12', true],
-                ['realField13', true],
-                ['field14', true]
-            ]);
         $association1Metadata->expects(self::exactly(4))
             ->method('getTypeOfField')
             ->willReturnMap([

@@ -34,4 +34,9 @@ class ApiDocDataTypeConverterTest extends \PHPUnit\Framework\TestCase
         self::assertEquals('doc_type1', $this->converter->convertDataType('type1', 'view1'));
         self::assertEquals('doc_type2', $this->converter->convertDataType('type2', 'view2'));
     }
+
+    public function testForDataTypeWithDetail(): void
+    {
+        self::assertEquals('type', $this->converter->convertDataType('type:detail', 'view1'));
+    }
 }

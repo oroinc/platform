@@ -343,6 +343,8 @@ api:
                     fieldDuration: ~
                     fieldMoneyValue: ~
                     fieldCurrency: ~
+                    fieldBackedEnumInt: ~
+                    fieldBackedEnumStr: ~
             sorters:
                 fields:
                     fieldString: ~
@@ -363,6 +365,8 @@ api:
                     fieldDuration: ~
                     fieldMoneyValue: ~
                     fieldCurrency: ~
+                    fieldBackedEnumInt: ~
+                    fieldBackedEnumStr: ~
         Extend\Entity\EV_Api_Enum2:
             actions:
                 get_list:

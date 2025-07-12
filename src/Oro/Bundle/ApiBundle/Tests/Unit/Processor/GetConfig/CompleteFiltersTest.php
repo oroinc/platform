@@ -40,7 +40,7 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
             $this->doctrineHelper,
             $this->configManager,
             ['string', 'text'],
-            ['string']
+            ['string', 'typeWithDetail']
         );
     }
 
@@ -282,6 +282,65 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                         'data_type'   => 'integer',
                         'allow_array' => true,
                         'allow_range' => true
+                    ]
+                ]
+            ],
+            $this->context->getFilters()
+        );
+    }
+
+    public function testIndexedFieldWithDataTypeHasDetail(): void
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'field1' => [
+                    'data_type' => 'typeWithDetail:detail'
+                ]
+            ]
+        ];
+        $filters = [
+            'fields' => [
+                'field1' => [
+                    'data_type' => 'typeWithDetail:detail'
+                ]
+            ]
+        ];
+
+        $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
+
+        $this->doctrineHelper->expects(self::once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getEntityMetadataForClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($rootEntityMetadata);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getIndexedFields')
+            ->with(self::identicalTo($rootEntityMetadata))
+            ->willReturn(['field1' => 'integer']);
+        $this->doctrineHelper->expects(self::once())
+            ->method('getIndexedAssociations')
+            ->with(self::identicalTo($rootEntityMetadata))
+            ->willReturn([]);
+        $this->configManager->expects(self::once())
+            ->method('hasConfig')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(false);
+
+        $this->context->setResult($this->createConfigObject($config));
+        $this->context->setFilters($this->createConfigObject($filters, ConfigUtil::FILTERS));
+        $this->processor->process($this->context);
+
+        $this->assertConfig(
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'field1' => [
+                        'data_type' => 'typeWithDetail:detail',
+                        'allow_array' => true
                     ]
                 ]
             ],

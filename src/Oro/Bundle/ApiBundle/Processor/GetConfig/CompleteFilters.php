@@ -254,7 +254,7 @@ class CompleteFilters extends CompleteSection
     private function setFilterArrayAllowed(FilterFieldConfig $filter): void
     {
         if (!$filter->hasArrayAllowed()) {
-            $dataType = $filter->getDataType();
+            $dataType = $this->getFilterDataType($filter);
             if ($dataType && !isset($this->disallowArrayDataTypes[$dataType])) {
                 $filter->setArrayAllowed();
             }
@@ -264,11 +264,24 @@ class CompleteFilters extends CompleteSection
     private function setFilterRangeAllowed(FilterFieldConfig $filter): void
     {
         if (!$filter->hasRangeAllowed()) {
-            $dataType = $filter->getDataType();
+            $dataType = $this->getFilterDataType($filter);
             if ($dataType && !isset($this->disallowRangeDataTypes[$dataType])) {
                 $filter->setRangeAllowed();
             }
         }
+    }
+
+    private function getFilterDataType(FilterFieldConfig $filter): ?string
+    {
+        $dataType = $filter->getDataType();
+        if ($dataType) {
+            $dataTypeDetailDelimiterPos = strpos($dataType, DataType::DETAIL_DELIMITER);
+            if (false !== $dataTypeDetailDelimiterPos) {
+                $dataType = substr($dataType, 0, $dataTypeDetailDelimiterPos);
+            }
+        }
+
+        return $dataType;
     }
 
     private function getFieldDataType(ClassMetadata $metadata, string $propertyPath): ?string

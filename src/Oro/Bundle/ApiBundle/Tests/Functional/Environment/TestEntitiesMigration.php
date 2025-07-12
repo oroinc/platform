@@ -407,6 +407,8 @@ class TestEntitiesMigration implements
         $table->addColumn('field_duration', 'duration', ['notnull' => false]);
         $table->addColumn('field_money_value', 'money_value', ['notnull' => false]);
         $table->addColumn('field_currency', 'currency', ['notnull' => false]);
+        $table->addColumn('field_backed_enum_int', 'integer', ['notnull' => false]);
+        $table->addColumn('field_backed_enum_str', 'string', ['notnull' => false, 'length' => 6]);
         $table->setPrimaryKey(['id']);
     }
 

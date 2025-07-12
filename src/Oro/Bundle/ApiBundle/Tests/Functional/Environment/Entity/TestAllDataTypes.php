@@ -4,6 +4,8 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional\Environment\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestBackedEnumInt;
+use Oro\Bundle\ApiBundle\Tests\Functional\Environment\Model\TestBackedEnumString;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestFrameworkEntityInterface;
 
 /**
@@ -92,4 +94,21 @@ class TestAllDataTypes implements TestFrameworkEntityInterface
 
     #[ORM\Column(name: 'field_currency', type: 'currency', nullable: true)]
     public ?string $fieldCurrency = null;
+
+    #[ORM\Column(
+        name: 'field_backed_enum_int',
+        type: Types::INTEGER,
+        nullable: true,
+        enumType: TestBackedEnumInt::class
+    )]
+    public ?TestBackedEnumInt $fieldBackedEnumInt = null;
+
+    #[ORM\Column(
+        name: 'field_backed_enum_str',
+        type: Types::STRING,
+        length: 6,
+        nullable: true,
+        enumType: TestBackedEnumString::class
+    )]
+    public ?TestBackedEnumString $fieldBackedEnumStr = null;
 }

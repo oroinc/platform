@@ -124,4 +124,19 @@ class SimpleFilterFactoryTest extends \PHPUnit\Framework\TestCase
             $filterFactory->createFilter($filterType)
         );
     }
+
+    public function testWhenDataTypeHasDetail(): void
+    {
+        $filterFactory = $this->getFilterFactory(
+            ['type' => [ComparisonFilter::class, []]]
+        );
+
+        $expectedFilter = new ComparisonFilter('type');
+        $expectedFilter->setDataType('type:detail');
+
+        self::assertEquals(
+            $expectedFilter,
+            $filterFactory->createFilter('type:detail')
+        );
+    }
 }

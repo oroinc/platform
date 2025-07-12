@@ -13,6 +13,7 @@ use Oro\Bundle\ApiBundle\Provider\EntityAliasResolverRegistry;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Model\BackedEnumInt;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Component\ChainProcessor\ProcessorBagConfigBuilder;
@@ -35,6 +36,7 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
     private const DECIMAL_REQUIREMENT = Processor\NormalizeDecimal::REQUIREMENT;
     private const NUMBER_REQUIREMENT = Processor\NormalizeNumber::REQUIREMENT;
     private const PERCENT100_REQUIREMENT = Processor\NormalizePercent100::REQUIREMENT;
+    private const ENUM_REQUIREMENT = Processor\NormalizeEnum::REQUIREMENT;
     private const GUID_REQUIREMENT = Processor\NormalizeGuid::REQUIREMENT;
     private const DATETIME_REQUIREMENT = Processor\Rest\NormalizeDateTime::REQUIREMENT;
     private const DATE_REQUIREMENT = Processor\Rest\NormalizeDate::REQUIREMENT;
@@ -122,6 +124,10 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 new Processor\NormalizePercent100()
             ],
             [
+                $this->addProcessor($builder, 'enum', DataType::ENUM),
+                new Processor\NormalizeEnum()
+            ],
+            [
                 $this->addProcessor($builder, 'guid', DataType::GUID),
                 new Processor\NormalizeGuid()
             ],
@@ -204,6 +210,11 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
             [self::DATETIME_REQUIREMENT, DataType::DATETIME, [RequestType::REST]],
             [self::DATE_REQUIREMENT, DataType::DATE, [RequestType::REST]],
             [self::TIME_REQUIREMENT, DataType::TIME, [RequestType::REST]],
+            [
+                self::ENUM_REQUIREMENT,
+                DataType::ENUM . DataType::DETAIL_DELIMITER . BackedEnumInt::class,
+                [RequestType::REST]
+            ],
             [self::GUID_REQUIREMENT, DataType::GUID, [RequestType::REST]],
             [self::ORDER_BY_REQUIREMENT, DataType::ORDER_BY, [RequestType::REST]]
         ];
@@ -302,6 +313,11 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
             [
                 $this->getArrayRequirement(self::TIME_REQUIREMENT),
                 DataType::TIME,
+                [RequestType::REST]
+            ],
+            [
+                $this->getArrayRequirement(self::ENUM_REQUIREMENT),
+                DataType::ENUM . DataType::DETAIL_DELIMITER . BackedEnumInt::class,
                 [RequestType::REST]
             ],
             [
@@ -418,6 +434,11 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
+                $this->getRangeRequirement(self::ENUM_REQUIREMENT),
+                DataType::ENUM . DataType::DETAIL_DELIMITER . BackedEnumInt::class,
+                [RequestType::REST]
+            ],
+            [
                 self::GUID_REQUIREMENT,
                 DataType::GUID,
                 [RequestType::REST]
@@ -531,6 +552,11 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 [RequestType::REST]
             ],
             [
+                $this->getArrayRangeRequirement(self::ENUM_REQUIREMENT),
+                DataType::ENUM . DataType::DETAIL_DELIMITER . BackedEnumInt::class,
+                [RequestType::REST]
+            ],
+            [
                 $this->getArrayRequirement(self::GUID_REQUIREMENT),
                 DataType::GUID,
                 [RequestType::REST]
@@ -605,6 +631,19 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
             [null, null, DataType::DATE, [RequestType::REST], false],
             [null, null, DataType::TIME, [RequestType::REST], true],
             [null, null, DataType::TIME, [RequestType::REST], false],
+            [
+                null,
+                null,
+                DataType::ENUM . DataType::DETAIL_DELIMITER . BackedEnumInt::class,
+                [RequestType::REST],
+                true],
+            [
+                null,
+                null,
+                DataType::ENUM . DataType::DETAIL_DELIMITER . BackedEnumInt::class,
+                [RequestType::REST],
+                false
+            ],
             [null, null, DataType::GUID, [RequestType::REST], true],
             [null, null, DataType::GUID, [RequestType::REST], false],
             [null, null, DataType::ORDER_BY, [RequestType::REST], true],
@@ -1241,6 +1280,41 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 true
             ],
             [
+                BackedEnumInt::Item1,
+                'Item1',
+                DataType::ENUM . DataType::DETAIL_DELIMITER . BackedEnumInt::class,
+                [RequestType::REST],
+                true
+            ],
+            [
+                BackedEnumInt::Item1,
+                'Item1',
+                DataType::ENUM . DataType::DETAIL_DELIMITER . BackedEnumInt::class,
+                [RequestType::REST],
+                false
+            ],
+            [
+                [BackedEnumInt::Item1, BackedEnumInt::Item2],
+                [BackedEnumInt::Item1, BackedEnumInt::Item2],
+                DataType::ENUM . DataType::DETAIL_DELIMITER . BackedEnumInt::class,
+                [RequestType::REST],
+                true
+            ],
+            [
+                [BackedEnumInt::Item1, BackedEnumInt::Item2],
+                [BackedEnumInt::Item1, BackedEnumInt::Item2],
+                DataType::ENUM . DataType::DETAIL_DELIMITER . BackedEnumInt::class,
+                [RequestType::REST],
+                false
+            ],
+            [
+                [BackedEnumInt::Item1, BackedEnumInt::Item2],
+                'Item1,Item2',
+                DataType::ENUM . DataType::DETAIL_DELIMITER . BackedEnumInt::class,
+                [RequestType::REST],
+                true
+            ],
+            [
                 'EAC12975-D94D-4E96-88B1-101B99914DEF',
                 'EAC12975-D94D-4E96-88B1-101B99914DEF',
                 DataType::GUID,
@@ -1863,6 +1937,60 @@ class ValueNormalizerTest extends \PHPUnit\Framework\TestCase
                 'Expected an array of times. Given "10:30:59,test".',
                 '10:30:59,test',
                 DataType::TIME,
+                [RequestType::REST]
+            ],
+            [
+                'Expected enum item value. Given "".',
+                '',
+                DataType::ENUM . DataType::DETAIL_DELIMITER . BackedEnumInt::class,
+                [RequestType::REST]
+            ],
+            [
+                'Expected enum item value. Given "Item!@#".',
+                'Item!@#',
+                DataType::ENUM . DataType::DETAIL_DELIMITER . BackedEnumInt::class,
+                [RequestType::REST]
+            ],
+            [
+                'The "UnknownItem" enum item is unknown.',
+                'UnknownItem',
+                DataType::ENUM . DataType::DETAIL_DELIMITER . BackedEnumInt::class,
+                [RequestType::REST]
+            ],
+            [
+                'Expected an array of enum items. Given "Item1,Item!@#".',
+                'Item1,Item!@#',
+                DataType::ENUM . DataType::DETAIL_DELIMITER . BackedEnumInt::class,
+                [RequestType::REST]
+            ],
+            [
+                'Expected an array of enum items. Given "Item1,UnknownItem".',
+                'Item1,UnknownItem',
+                DataType::ENUM . DataType::DETAIL_DELIMITER . BackedEnumInt::class,
+                [RequestType::REST]
+            ],
+            [
+                'Expected an array of enum items. Given ",Item2".',
+                ',Item2',
+                DataType::ENUM . DataType::DETAIL_DELIMITER . BackedEnumInt::class,
+                [RequestType::REST]
+            ],
+            [
+                'Expected an array of enum items. Given "Item1,".',
+                'Item1,',
+                DataType::ENUM . DataType::DETAIL_DELIMITER . BackedEnumInt::class,
+                [RequestType::REST]
+            ],
+            [
+                'Expected an array of enum items. Given " ,Item2".',
+                ' ,Item2',
+                DataType::ENUM . DataType::DETAIL_DELIMITER . BackedEnumInt::class,
+                [RequestType::REST]
+            ],
+            [
+                'Expected an array of enum items. Given "Item1, ".',
+                'Item1, ',
+                DataType::ENUM . DataType::DETAIL_DELIMITER . BackedEnumInt::class,
                 [RequestType::REST]
             ],
             [
